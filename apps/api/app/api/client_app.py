@@ -77,6 +77,15 @@ class ClientBusiness(BaseModel):
     resource_payment: Literal["app", "venue"] = Field(
         default="app", description="Reservations: paid in the app when booking, or at the venue"
     )
+    waitlist_class: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for classes (off: none)"
+    )
+    waitlist_appointment: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for personal appointments"
+    )
+    waitlist_resource: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for courts and rooms"
+    )
     dependents: Literal["pet", "child"] | None = Field(
         default=None, description="The industry keeps the client's pets / children (#43)"
     )
@@ -224,6 +233,11 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
            t.cancellation_window_minutes, t.online_sales, t.resource_payment, t.website_url,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_class_mode ELSE 'off' END AS waitlist_class,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_appointment_mode ELSE 'off' END
+               AS waitlist_appointment,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_resource_mode ELSE 'off' END
+               AS waitlist_resource,
            {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id

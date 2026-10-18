@@ -354,6 +354,423 @@
         }
       }
     },
+    "/mcp-oauth/clients/{client_id}": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Client Info",
+        "description": "What the approval screen shows the signed-in person about the app asking (its self-chosen\nname: untrusted text, shown with the address it returns to).",
+        "operationId": "mcp_client_info",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Redirect Uri"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-oauth/approve": {
+      "post": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Approve",
+        "description": "The signed-in person lets the app read the business they are working in.",
+        "operationId": "mcp_approve",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Approval"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-connections": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "List Connections",
+        "description": "The AI apps the signed-in person connected to this business.",
+        "operationId": "list_mcp_connections",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/McpConnection"
+                  },
+                  "title": "Response List Mcp Connections"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-connections/{connection_id}": {
+      "delete": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Revoke Connection",
+        "description": "Cuts an app off at once: its tokens stop working.",
+        "operationId": "revoke_mcp_connection",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Connection Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-info": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Info",
+        "operationId": "mcp_info",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-requests": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "List Requests",
+        "description": "The changes AI apps proposed to the signed-in person: the ones waiting first, then what\nhappened to the recent ones. Only the person the app acted for sees and decides them.",
+        "operationId": "list_mcp_requests",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/McpRequest"
+                  },
+                  "title": "Response List Mcp Requests"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ai/tasks": {
       "get": {
         "tags": [
@@ -8110,6 +8527,78 @@
         }
       }
     },
+    "/quotes/summary": {
+      "get": {
+        "tags": [
+          "quotes"
+        ],
+        "summary": "Quotes Summary",
+        "description": "How many quotes and how much money per status and currency, over every visible quote.",
+        "operationId": "quotes_summary",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteStatusTotal"
+                  },
+                  "title": "Response Quotes Summary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/quotes/{quote_id}": {
       "get": {
         "tags": [
@@ -15625,6 +16114,336 @@
         }
       }
     },
+    "/website/order": {
+      "get": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Get Order",
+        "description": "The business's website order (none yet), the price list and what the brief still lacks.",
+        "operationId": "get_order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Save Brief",
+        "description": "Saves the brief as a draft; the first save opens the order. Locked once MyBiz builds.",
+        "operationId": "save_brief",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BriefSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/website/order/submit": {
+      "post": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Submit Order",
+        "description": "Sends the brief to MyBiz (the order moves to \"received\").",
+        "operationId": "submit_order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/website/order/respond": {
+      "post": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Respond",
+        "description": "The business answers a site that waits for its review: approve it, or ask for changes\n(the order goes back to \"building\" with the request).",
+        "operationId": "respond",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Response"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/website-visits": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Count Visit",
+        "description": "The finished site reports a visit: a count per day and source, nothing personal.",
+        "operationId": "count_visit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Visit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/services": {
       "get": {
         "tags": [
@@ -19376,6 +20195,115 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/me/tours": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "List Seen Tours",
+        "description": "The tours this person has finished or skipped.",
+        "operationId": "list_seen_tours",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeenTours"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/me/tours/{key}": {
+      "put": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Mark Tour Seen",
+        "description": "Remember that the tour was seen; safe to call again.",
+        "operationId": "mark_tour_seen",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "const": "ai_team",
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Reset Tour",
+        "description": "Forget that the tour was seen, so it shows again on the next visit.",
+        "operationId": "reset_tour",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "const": "ai_team",
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/platform/broadcasts": {
@@ -28463,6 +29391,747 @@
         }
       }
     },
+    "/waitlist": {
+      "get": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "List Waitlist",
+        "description": "Everyone waiting for a spot, by day: requests and places on classes' own lists.",
+        "operationId": "list_waitlist",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Day"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "service_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "auto",
+                    "first_come",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mode"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WaitlistEntry"
+                  },
+                  "title": "Response List Waitlist"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/summary": {
+      "get": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Waitlist Summary",
+        "description": "How many people wait, and for what (the dashboard's hint to open another class).",
+        "operationId": "waitlist_summary",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaitlistSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/requests/{request_id}/admit": {
+      "post": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Admit Request",
+        "description": "The team lets a waiting client in (the manual mode's \"let in\"): books them into the spot\nthat opened and tells them.",
+        "operationId": "admit_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdmitRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admitted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/bookings/{booking_id}/admit": {
+      "post": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Admit Booking",
+        "description": "The team moves someone from a class's own list into a spot that is free.",
+        "operationId": "admit_booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admitted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/requests/{request_id}": {
+      "delete": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Remove Request",
+        "description": "The team takes a request off the list.",
+        "operationId": "remove_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/requests/{request_id}/notify": {
+      "post": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Notify Request",
+        "description": "The team tells a waiting client about the spot that is free for them now.",
+        "operationId": "notify_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/waitlist": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Waitlist",
+        "description": "What the signed-in client waits for: their requests and their places on classes' lists.",
+        "operationId": "my_waitlist",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyWaitlistEntry"
+                  },
+                  "title": "Response My Waitlist"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Join Waitlist",
+        "description": "\"Tell me if something opens\": a given time, a range of hours or a whole day.",
+        "operationId": "join_waitlist",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaitlistRequestCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyWaitlistEntry"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/waitlist/{request_id}": {
+      "delete": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Leave Waitlist",
+        "description": "The client stops waiting (a place on a class's own list is cancelled as a booking).",
+        "operationId": "leave_waitlist",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/waitlist/claim": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Claim Spot",
+        "description": "\"First to take it gets it\": the client takes the spot they were told about. 409\n`spot_taken` when someone was faster (they stay on the list).",
+        "operationId": "claim_spot",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Claimed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/rooms/{room_id}/hours": {
       "get": {
         "tags": [
@@ -30227,6 +31896,991 @@
               "title": "X-Location-Id"
             },
             "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entitlement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freeze-rules": {
+      "get": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Get Freeze Rules",
+        "operationId": "get_freeze_rules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Set Freeze Rules",
+        "operationId": "set_freeze_rules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FreezeRules"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entitlements/{entitlement_id}/freeze-preview": {
+      "get": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Preview Freeze",
+        "description": "What freezing these days would do. A manager may freeze for any reason, so `problems`\nlists what a client's request would run into.",
+        "operationId": "preview_freeze",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entitlement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entitlement Id"
+            }
+          },
+          {
+            "name": "starts_on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Starts On"
+            }
+          },
+          {
+            "name": "ends_on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Ends On"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezePreview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freeze-requests": {
+      "get": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "List Freeze Requests",
+        "description": "Waiting requests first, then the latest decided ones.",
+        "operationId": "list_freeze_requests",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected",
+                    "cancelled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FreezeRequest"
+                  },
+                  "title": "Response List Freeze Requests"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freeze-requests/{request_id}/approve": {
+      "post": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Approve Freeze Request",
+        "description": "Approves the whole request, or only part of it (`approved_ends_on`).",
+        "operationId": "approve_freeze_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__api__freeze_requests__Decision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freeze-requests/{request_id}/reject": {
+      "post": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Reject Freeze Request",
+        "operationId": "reject_freeze_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__api__freeze_requests__Decision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freezes/{freeze_id}/end-early": {
+      "post": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "End Freeze Early",
+        "description": "The client is back: the freeze ends yesterday (or disappears if it has not begun).",
+        "operationId": "end_freeze_early",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "freeze_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Freeze Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entitlement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/freeze-rules": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Freeze Rules",
+        "operationId": "my_freeze_rules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientFreezeRules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/entitlements/{entitlement_id}/freeze-preview": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Freeze Preview",
+        "description": "Exactly what will happen, shown before the client sends the request.",
+        "operationId": "my_freeze_preview",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entitlement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entitlement Id"
+            }
+          },
+          {
+            "name": "starts_on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Starts On"
+            }
+          },
+          {
+            "name": "ends_on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Ends On"
+            }
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "travel",
+                    "reserve_duty",
+                    "illness",
+                    "pregnancy",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Reason"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezePreview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/freeze-requests": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Freeze Requests",
+        "operationId": "my_freeze_requests",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FreezeRequest"
+                  },
+                  "title": "Response My Freeze Requests"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/entitlements/{entitlement_id}/freeze-requests": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Ask For Freeze",
+        "description": "Sends the request to the client's branch managers; a reason the business approves\nautomatically takes effect at once.",
+        "operationId": "ask_for_freeze",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entitlement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entitlement Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FreezeRequestCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/freeze-requests/{request_id}": {
+      "delete": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Withdraw Freeze Request",
+        "operationId": "withdraw_freeze_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/freezes/{freeze_id}/end-early": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My End Freeze Early",
+        "description": "\"I'm back early\": the freeze ends yesterday, and the dates and the charge come back.",
+        "operationId": "my_end_freeze_early",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "freeze_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Freeze Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
           }
         ],
         "responses": {
@@ -33037,6 +35691,383 @@
         }
       }
     },
+    "/ai/meter": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Ai Meter",
+        "description": "The month's AI meter: where the business is against its pool and against the calendar\n(managers), and the person's own allowance for today and the month.",
+        "operationId": "ai_meter",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Meter"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/usage/breakdown": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Ai Usage Breakdown",
+        "description": "What the usage window adds to /ai/usage: questions people asked against tasks that ran by\nthemselves, and how many people have AI access against what the module includes.",
+        "operationId": "ai_usage_breakdown",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageBreakdown"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/extra-users": {
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Set Extra Ai Users",
+        "description": "The paid \"extra AI user\" add-ons: each lets one more person use the AI team and adds 150\ncredits to the month's pool. Cannot go below the people who already have access.",
+        "operationId": "set_extra_ai_users",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtraUsers"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageBreakdown"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/members/{user_id}": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Get Member Ai",
+        "description": "One team member's AI settings and use, for the AI tab of the staff card.",
+        "operationId": "get_member_ai",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Member Ai",
+        "operationId": "update_member_ai",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberAiUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/catalog": {
       "get": {
         "tags": [
@@ -35551,6 +38582,147 @@
         ]
       }
     },
+    "/platform/website-orders": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Website Orders",
+        "description": "The board: every website order that was started, with its brief and the build prompt.",
+        "operationId": "website_orders",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WebsiteOrder"
+                  },
+                  "type": "array",
+                  "title": "Response Website Orders"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/website-orders/{order_id}": {
+      "patch": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Update Website Order",
+        "description": "Moves an order along the board, sets the site address (it becomes the business's website\nwhen the site goes live), internal notes and the message the business sees.",
+        "operationId": "update_website_order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebsiteOrderUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WebsiteOrder"
+                  },
+                  "title": "Response Update Website Order"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/website-orders/{order_id}/files.zip": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Website Order Files",
+        "description": "The images and logo the business uploaded, as one ZIP.",
+        "operationId": "website_order_files",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/ai/costs": {
       "get": {
         "tags": [
@@ -35585,6 +38757,57 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AICostBoard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/connectors": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Ai Connectors",
+        "description": "Who uses the AI connectors (Claude, ChatGPT): per business, the apps, the calls and what\nbecame of the changes they proposed.",
+        "operationId": "ai_connectors",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorBoard"
                 }
               }
             }
@@ -41695,6 +44918,45 @@
         ],
         "title": "Adjustment"
       },
+      "AdmitRequest": {
+        "properties": {
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "The free spot to use; default: the first one that matches"
+          }
+        },
+        "type": "object",
+        "title": "AdmitRequest"
+      },
+      "Admitted": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "booking_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Booking Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "booking_id"
+        ],
+        "title": "Admitted"
+      },
       "AgentCard": {
         "properties": {
           "key": {
@@ -42744,6 +46006,57 @@
         ],
         "title": "AppointmentStaff"
       },
+      "Approval": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "title": "Client Id"
+          },
+          "redirect_uri": {
+            "type": "string",
+            "title": "Redirect Uri"
+          },
+          "code_challenge": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 43,
+            "title": "Code Challenge"
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "State",
+            "default": ""
+          },
+          "propose": {
+            "type": "boolean",
+            "title": "Propose",
+            "description": "Also let the app propose changes; each one waits for this person's approval",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "redirect_uri",
+          "code_challenge"
+        ],
+        "title": "Approval"
+      },
+      "ApprovalResult": {
+        "properties": {
+          "redirect_to": {
+            "type": "string",
+            "title": "Redirect To",
+            "description": "Send the browser here: back to the app, with the code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "redirect_to"
+        ],
+        "title": "ApprovalResult"
+      },
       "AttentionItem": {
         "properties": {
           "id": {
@@ -42785,6 +46098,7 @@
               "plan_ending",
               "leads_due",
               "health_review",
+              "freeze_requests",
               "license_expiring"
             ],
             "title": "Kind"
@@ -44538,6 +47852,272 @@
         ],
         "title": "BreakdownItem"
       },
+      "Brief": {
+        "properties": {
+          "goals": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "leads",
+                "bookings",
+                "showcase",
+                "sell"
+              ]
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Goals"
+          },
+          "main_action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Main Action"
+          },
+          "unique": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unique"
+          },
+          "audience": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audience"
+          },
+          "area": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          },
+          "sections": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "hero",
+                "services",
+                "gallery",
+                "team",
+                "testimonials",
+                "faq",
+                "location",
+                "contact",
+                "booking",
+                "whatsapp"
+              ]
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Sections"
+          },
+          "no_logo": {
+            "type": "boolean",
+            "title": "No Logo",
+            "default": false
+          },
+          "logo_file_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo File Id"
+          },
+          "colors_from_brand": {
+            "type": "boolean",
+            "title": "Colors From Brand",
+            "default": true
+          },
+          "colors": {
+            "items": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Colors"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "clean",
+                  "luxury",
+                  "warm",
+                  "vibrant"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Style"
+          },
+          "font": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Font"
+          },
+          "motion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "subtle",
+                  "rich"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motion"
+          },
+          "images": {
+            "items": {
+              "$ref": "#/components/schemas/ImageNote"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Images"
+          },
+          "no_good_photos": {
+            "type": "boolean",
+            "title": "No Good Photos",
+            "default": false
+          },
+          "inspiration": {
+            "items": {
+              "$ref": "#/components/schemas/Inspiration"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Inspiration"
+          },
+          "copy_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "me",
+                  "you"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Copy By"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "have",
+                  "buy",
+                  "temporary"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "domain_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain Name"
+          },
+          "languages": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "array",
+            "maxItems": 2,
+            "title": "Languages"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Brief",
+        "description": "Eight steps, in the wizard's order."
+      },
+      "BriefSave": {
+        "properties": {
+          "brief": {
+            "$ref": "#/components/schemas/Brief"
+          }
+        },
+        "type": "object",
+        "required": [
+          "brief"
+        ],
+        "title": "BriefSave"
+      },
       "BusinessAICost": {
         "properties": {
           "tenant_id": {
@@ -44655,6 +48235,80 @@
           "issued_at"
         ],
         "title": "BusinessInvoice"
+      },
+      "BusinessMeter": {
+        "properties": {
+          "used": {
+            "type": "number",
+            "title": "Used"
+          },
+          "included": {
+            "type": "integer",
+            "title": "Included"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit",
+            "description": "Where questions stop; null: no limit"
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent",
+            "description": "Used / included, in percent"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warn",
+              "over"
+            ],
+            "title": "Level"
+          },
+          "reach_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reach Date",
+            "description": "When the month's pool runs out at this pace; null if it will not"
+          },
+          "questions_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Questions Left",
+            "description": "About, at one credit per question"
+          }
+        },
+        "type": "object",
+        "required": [
+          "used",
+          "included",
+          "limit",
+          "percent",
+          "level",
+          "reach_date",
+          "questions_left"
+        ],
+        "title": "BusinessMeter"
       },
       "BusinessProfile": {
         "properties": {
@@ -45611,6 +49265,60 @@
         ],
         "title": "City"
       },
+      "ClaimBody": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id",
+            "description": "The spot the client was told about"
+          },
+          "pay": {
+            "type": "boolean",
+            "title": "Pay",
+            "description": "Courts paid in the app: the client agreed to pay",
+            "default": false
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id"
+        ],
+        "title": "ClaimBody"
+      },
+      "Claimed": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "booking_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Booking Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "booking_id"
+        ],
+        "title": "Claimed"
+      },
       "Client": {
         "properties": {
           "id": {
@@ -46102,6 +49810,42 @@
             "description": "Reservations: paid in the app when booking, or at the venue",
             "default": "app"
           },
+          "waitlist_class": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Class",
+            "description": "The business's waitlist for classes (off: none)",
+            "default": "off"
+          },
+          "waitlist_appointment": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Appointment",
+            "description": "The business's waitlist for personal appointments",
+            "default": "off"
+          },
+          "waitlist_resource": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Resource",
+            "description": "The business's waitlist for courts and rooms",
+            "default": "off"
+          },
           "dependents": {
             "anyOf": [
               {
@@ -46395,6 +50139,22 @@
         ],
         "title": "ClientFieldDefinition"
       },
+      "ClientFreezeRules": {
+        "properties": {
+          "rules": {
+            "$ref": "#/components/schemas/FreezeRules"
+          },
+          "bank": {
+            "$ref": "#/components/schemas/FreezeBank"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rules",
+          "bank"
+        ],
+        "title": "ClientFreezeRules"
+      },
       "ClientHealth": {
         "properties": {
           "state": {
@@ -46486,6 +50246,25 @@
           "mode"
         ],
         "title": "ClientIdentity"
+      },
+      "ClientInfo": {
+        "properties": {
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "redirect_host": {
+            "type": "string",
+            "title": "Redirect Host",
+            "description": "Where the person is sent back to after approving"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_name",
+          "redirect_host"
+        ],
+        "title": "ClientInfo"
       },
       "ClientListItem": {
         "properties": {
@@ -48073,6 +51852,127 @@
           "accounts"
         ],
         "title": "ConnectResult"
+      },
+      "ConnectorBoard": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "daily_limit": {
+            "type": "integer",
+            "title": "Daily Limit",
+            "description": "Calls per business per rolling 24 hours"
+          },
+          "businesses": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorUse"
+            },
+            "type": "array",
+            "title": "Businesses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "daily_limit",
+          "businesses"
+        ],
+        "title": "ConnectorBoard"
+      },
+      "ConnectorInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "What to call the connector in the AI app"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url",
+            "description": "The address to paste into the AI app"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "title": "ConnectorInfo"
+      },
+      "ConnectorUse": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "connections": {
+            "type": "integer",
+            "title": "Connections",
+            "description": "AI apps connected now"
+          },
+          "apps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Apps"
+          },
+          "calls": {
+            "type": "integer",
+            "title": "Calls",
+            "description": "Calls in the window"
+          },
+          "last_call": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Call"
+          },
+          "proposed": {
+            "type": "integer",
+            "title": "Proposed",
+            "description": "Changes the apps proposed in the window"
+          },
+          "executed": {
+            "type": "integer",
+            "title": "Executed"
+          },
+          "rejected": {
+            "type": "integer",
+            "title": "Rejected"
+          },
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting",
+            "description": "Proposals waiting for approval now"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "connections",
+          "apps",
+          "calls",
+          "last_call",
+          "proposed",
+          "executed",
+          "rejected",
+          "waiting"
+        ],
+        "title": "ConnectorUse"
       },
       "ConsentBody": {
         "properties": {
@@ -50649,6 +54549,68 @@
               }
             ],
             "title": "Receipt Number"
+          },
+          "billing_cycle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "yearly",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle"
+          },
+          "billing_cycle_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle Days"
+          },
+          "auto_renew": {
+            "type": "boolean",
+            "title": "Auto Renew"
+          },
+          "next_billing_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing On",
+            "description": "Renewing memberships: the next charge"
+          },
+          "next_billing_amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing Amount",
+            "description": "What the next charge will be after freeze credits and fees (minor units)"
+          },
+          "freezable": {
+            "type": "boolean",
+            "title": "Freezable",
+            "description": "A membership that is not over, cancelled or used up"
           }
         },
         "type": "object",
@@ -50669,7 +54631,13 @@
           "freezes",
           "created_at",
           "receipt_id",
-          "receipt_number"
+          "receipt_number",
+          "billing_cycle",
+          "billing_cycle_days",
+          "auto_renew",
+          "next_billing_on",
+          "next_billing_amount",
+          "freezable"
         ],
         "title": "Entitlement"
       },
@@ -50897,6 +54865,21 @@
           "url"
         ],
         "title": "ExportLink"
+      },
+      "ExtraUsers": {
+        "properties": {
+          "extra_ai_users": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 0.0,
+            "title": "Extra Ai Users"
+          }
+        },
+        "type": "object",
+        "required": [
+          "extra_ai_users"
+        ],
+        "title": "ExtraUsers"
       },
       "FileLink": {
         "properties": {
@@ -51751,6 +55734,44 @@
               }
             ],
             "title": "Reason"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id",
+            "description": "The client's request, if it came from one"
+          },
+          "billing_mode": {
+            "type": "string",
+            "enum": [
+              "none",
+              "defer",
+              "credit"
+            ],
+            "title": "Billing Mode",
+            "description": "What it did to the billing: deferred the next charge, credited it, or neither"
+          },
+          "billing_shift_days": {
+            "type": "integer",
+            "title": "Billing Shift Days",
+            "description": "Days the next charge moved"
+          },
+          "credit_amount": {
+            "type": "integer",
+            "title": "Credit Amount",
+            "description": "Credit for the next charge, in minor units"
+          },
+          "fee_amount": {
+            "type": "integer",
+            "title": "Fee Amount",
+            "description": "Freeze fee for the next charge, in minor units"
           }
         },
         "type": "object",
@@ -51758,9 +55779,57 @@
           "id",
           "starts_on",
           "ends_on",
-          "reason"
+          "reason",
+          "request_id",
+          "billing_mode",
+          "billing_shift_days",
+          "credit_amount",
+          "fee_amount"
         ],
         "title": "Freeze"
+      },
+      "FreezeBank": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "yearly_bank_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yearly Bank Days"
+          },
+          "used_days": {
+            "type": "integer",
+            "title": "Used Days",
+            "description": "Freeze days this year, including requests waiting"
+          },
+          "remaining_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remaining Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "yearly_bank_days",
+          "used_days",
+          "remaining_days"
+        ],
+        "title": "FreezeBank"
       },
       "FreezeCreate": {
         "properties": {
@@ -51793,6 +55862,385 @@
           "ends_on"
         ],
         "title": "FreezeCreate"
+      },
+      "FreezePreview": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "new_ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "New Ends On",
+            "description": "The membership's end date once frozen"
+          },
+          "billing_mode": {
+            "type": "string",
+            "enum": [
+              "none",
+              "defer",
+              "credit"
+            ],
+            "title": "Billing Mode"
+          },
+          "next_billing_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing From"
+          },
+          "next_billing_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing To"
+          },
+          "credit_amount": {
+            "type": "integer",
+            "title": "Credit Amount"
+          },
+          "fee_amount": {
+            "type": "integer",
+            "title": "Fee Amount"
+          },
+          "next_billing_amount_after": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing Amount After",
+            "description": "The next charge after this freeze (renewing memberships)"
+          },
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Problems",
+            "description": "Why a request would be refused now: freeze_requests_off, not_freezable, too_short, too_long, notice_required, outside_validity, overlapping_freeze, overlapping_request, bank_exceeded"
+          },
+          "auto_approved": {
+            "type": "boolean",
+            "title": "Auto Approved",
+            "description": "Whether it would be approved without a manager"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "new_ends_on",
+          "billing_mode",
+          "next_billing_from",
+          "next_billing_to",
+          "credit_amount",
+          "fee_amount",
+          "next_billing_amount_after",
+          "problems",
+          "auto_approved"
+        ],
+        "title": "FreezePreview"
+      },
+      "FreezeRequest": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "entitlement_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Entitlement Id"
+          },
+          "entitlement_name": {
+            "type": "string",
+            "title": "Entitlement Name"
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Starts On"
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Ends On"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "travel",
+              "reserve_duty",
+              "illness",
+              "pregnancy",
+              "other"
+            ],
+            "title": "Reason"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "approved_starts_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved Starts On"
+          },
+          "approved_ends_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved Ends On"
+          },
+          "auto_approved": {
+            "type": "boolean",
+            "title": "Auto Approved"
+          },
+          "decided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Name"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Note"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "client_id",
+          "client_name",
+          "entitlement_id",
+          "entitlement_name",
+          "starts_on",
+          "ends_on",
+          "reason",
+          "note",
+          "status",
+          "approved_starts_on",
+          "approved_ends_on",
+          "auto_approved",
+          "decided_by_name",
+          "decided_at",
+          "decision_note",
+          "created_at",
+          "days"
+        ],
+        "title": "FreezeRequest"
+      },
+      "FreezeRequestCreate": {
+        "properties": {
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Starts On"
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Ends On"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "travel",
+              "reserve_duty",
+              "illness",
+              "pregnancy",
+              "other"
+            ],
+            "title": "Reason"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_on",
+          "ends_on",
+          "reason"
+        ],
+        "title": "FreezeRequestCreate"
+      },
+      "FreezeRules": {
+        "properties": {
+          "allow_requests": {
+            "type": "boolean",
+            "title": "Allow Requests",
+            "description": "Clients may ask from the app",
+            "default": false
+          },
+          "min_days": {
+            "type": "integer",
+            "maximum": 90.0,
+            "minimum": 1.0,
+            "title": "Min Days",
+            "default": 1
+          },
+          "max_days": {
+            "type": "integer",
+            "maximum": 90.0,
+            "minimum": 1.0,
+            "title": "Max Days",
+            "default": 30
+          },
+          "yearly_bank_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 366.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yearly Bank Days",
+            "description": "Most freeze days per client in a year; empty: no limit"
+          },
+          "notice_days": {
+            "type": "integer",
+            "maximum": 60.0,
+            "minimum": 0.0,
+            "title": "Notice Days",
+            "description": "Days ahead a request must be sent",
+            "default": 0
+          },
+          "fee_amount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Fee Amount",
+            "description": "Freeze fee in minor units",
+            "default": 0
+          },
+          "billing_mode": {
+            "type": "string",
+            "enum": [
+              "defer",
+              "credit"
+            ],
+            "title": "Billing Mode",
+            "description": "Renewing memberships: defer the next charge, or credit it",
+            "default": "defer"
+          },
+          "auto_approve_reasons": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "travel",
+                "reserve_duty",
+                "illness",
+                "pregnancy",
+                "other"
+              ]
+            },
+            "type": "array",
+            "title": "Auto Approve Reasons"
+          }
+        },
+        "type": "object",
+        "title": "FreezeRules"
       },
       "FriendRequestCreate": {
         "properties": {
@@ -52305,6 +56753,33 @@
         "title": "IdentitySummary",
         "description": "What a screen may show: never the full number."
       },
+      "ImageNote": {
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "File Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "title": "ImageNote"
+      },
       "ImportIssue": {
         "properties": {
           "line": {
@@ -52779,6 +57254,34 @@
           "first_name"
         ],
         "title": "InquiryCreate"
+      },
+      "Inspiration": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 300,
+            "pattern": "^https?://[^\\s]+$",
+            "title": "Url"
+          },
+          "likes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "Inspiration"
       },
       "Instructor": {
         "properties": {
@@ -54139,6 +58642,28 @@
           "engagements"
         ],
         "title": "KindEngagement"
+      },
+      "KindRow": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "asked",
+              "scheduled"
+            ],
+            "title": "Key"
+          },
+          "credits": {
+            "type": "number",
+            "title": "Credits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "credits"
+        ],
+        "title": "KindRow"
       },
       "Kpi": {
         "properties": {
@@ -55597,6 +60122,130 @@
         "type": "object",
         "title": "MarkRead"
       },
+      "McpConnection": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "calls": {
+            "type": "integer",
+            "title": "Calls"
+          },
+          "can_propose": {
+            "type": "boolean",
+            "title": "Can Propose",
+            "description": "May also propose changes, which wait for approval"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "client_name",
+          "created_at",
+          "last_used_at",
+          "calls",
+          "can_propose"
+        ],
+        "title": "McpConnection"
+      },
+      "McpRequest": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "tool_name": {
+            "type": "string",
+            "title": "Tool Name"
+          },
+          "preview": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Preview"
+          },
+          "client_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Name",
+            "description": "The AI app that asked"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "rejected",
+              "expired",
+              "executed",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tool_name",
+          "preview",
+          "client_name",
+          "status",
+          "created_at",
+          "expires_at",
+          "result"
+        ],
+        "title": "McpRequest"
+      },
       "Me": {
         "properties": {
           "id": {
@@ -56028,6 +60677,156 @@
         ],
         "title": "Member"
       },
+      "MemberAi": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "role_default": {
+            "type": "boolean",
+            "title": "Role Default",
+            "description": "Whether their role gives AI access without a switch"
+          },
+          "ai_access": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Access",
+            "description": "Their own switch; null: follow the role"
+          },
+          "has_access": {
+            "type": "boolean",
+            "title": "Has Access"
+          },
+          "monthly_credits": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Credits",
+            "description": "Their own monthly limit; null: the business's"
+          },
+          "daily_percent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Percent",
+            "description": "Their own daily pace; null: the default"
+          },
+          "default_daily_percent": {
+            "type": "integer",
+            "title": "Default Daily Percent",
+            "default": 15
+          },
+          "day_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day Limit"
+          },
+          "used_month": {
+            "type": "number",
+            "title": "Used Month"
+          },
+          "used_today": {
+            "type": "number",
+            "title": "Used Today"
+          },
+          "ai_users_allowed": {
+            "type": "integer",
+            "title": "Ai Users Allowed"
+          },
+          "ai_users_count": {
+            "type": "integer",
+            "title": "Ai Users Count"
+          },
+          "is_owner": {
+            "type": "boolean",
+            "title": "Is Owner"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "role_default",
+          "ai_access",
+          "has_access",
+          "monthly_credits",
+          "daily_percent",
+          "day_limit",
+          "used_month",
+          "used_today",
+          "ai_users_allowed",
+          "ai_users_count",
+          "is_owner"
+        ],
+        "title": "MemberAi"
+      },
+      "MemberAiUpdate": {
+        "properties": {
+          "ai_access": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Access"
+          },
+          "monthly_credits": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Credits"
+          },
+          "daily_percent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Percent"
+          }
+        },
+        "type": "object",
+        "title": "MemberAiUpdate",
+        "description": "Fields left out stay as they are; `null` clears a personal setting back to the default."
+      },
       "MemberAtRisk": {
         "properties": {
           "client_id": {
@@ -56345,6 +61144,63 @@
           "created_at"
         ],
         "title": "Message"
+      },
+      "Meter": {
+        "properties": {
+          "month_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Month Start"
+          },
+          "day_of_month": {
+            "type": "integer",
+            "title": "Day Of Month"
+          },
+          "days_in_month": {
+            "type": "integer",
+            "title": "Days In Month"
+          },
+          "pace_percent": {
+            "type": "number",
+            "title": "Pace Percent",
+            "description": "How far into the month we are, in percent"
+          },
+          "business": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BusinessMeter"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only for those who manage the AI team"
+          },
+          "person": {
+            "$ref": "#/components/schemas/PersonMeter"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warn",
+              "over"
+            ],
+            "title": "Level",
+            "description": "The worse of the two: what the small dot shows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month_start",
+          "day_of_month",
+          "days_in_month",
+          "pace_percent",
+          "business",
+          "person",
+          "level"
+        ],
+        "title": "Meter"
       },
       "MethodTotal": {
         "properties": {
@@ -57245,6 +62101,158 @@
         ],
         "title": "MyReview"
       },
+      "MyWaitlistEntry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "request",
+              "booking"
+            ],
+            "title": "Source"
+          },
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "service_name": {
+            "type": "string",
+            "title": "Service Name"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "session",
+              "slot",
+              "range",
+              "day"
+            ],
+            "title": "Kind"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "from_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Time"
+          },
+          "to_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Time"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At"
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "offer_session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offer Session Id",
+            "description": "A spot is free and the client can take it now"
+          },
+          "offer_starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offer Starts At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "service_id",
+          "service_name",
+          "kind",
+          "day",
+          "created_at"
+        ],
+        "title": "MyWaitlistEntry"
+      },
       "NetLine": {
         "properties": {
           "code": {
@@ -57533,7 +62541,11 @@
               "session_reminder",
               "plan_ending",
               "friend_request",
-              "class_invite"
+              "class_invite",
+              "freeze_approved",
+              "freeze_rejected",
+              "waitlist_spot_open",
+              "waitlist_spot_taken"
             ],
             "title": "Kind"
           },
@@ -57541,7 +62553,7 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Payload",
-            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at"
+            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at; freeze_approved, freeze_rejected: plan_name, starts_on, ends_on, note; waitlist_spot_open: session_id, service_name, starts_at, ends_at"
           },
           "created_at": {
             "type": "string",
@@ -57765,6 +62777,157 @@
         ],
         "title": "Order"
       },
+      "OrderOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "briefing",
+              "received",
+              "building",
+              "review",
+              "live"
+            ],
+            "title": "Stage"
+          },
+          "product": {
+            "type": "string",
+            "enum": [
+              "landing_only",
+              "landing_with_system"
+            ],
+            "title": "Product"
+          },
+          "brief": {
+            "$ref": "#/components/schemas/Brief"
+          },
+          "site_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Url"
+          },
+          "customer_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Message",
+            "description": "The platform team's note to the business"
+          },
+          "change_request": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Request",
+            "description": "What the business asked to change"
+          },
+          "setup_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Price"
+          },
+          "monthly_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Price"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "live_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "stage",
+          "product",
+          "brief",
+          "site_url",
+          "customer_message",
+          "change_request",
+          "setup_price",
+          "monthly_price",
+          "currency",
+          "submitted_at",
+          "approved_at",
+          "live_at",
+          "updated_at"
+        ],
+        "title": "OrderOut"
+      },
       "OrderPage": {
         "properties": {
           "items": {
@@ -57797,6 +62960,51 @@
           "total"
         ],
         "title": "OrderPage"
+      },
+      "OrderState": {
+        "properties": {
+          "order": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrderOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "with_system": {
+            "type": "boolean",
+            "title": "With System",
+            "description": "The business also uses the system"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing",
+            "description": "Answers the brief still needs before it can be sent"
+          },
+          "files_folder_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Files Folder Id",
+            "description": "Where the wizard's images are uploaded"
+          }
+        },
+        "type": "object",
+        "required": [
+          "order",
+          "price",
+          "with_system",
+          "missing",
+          "files_folder_id"
+        ],
+        "title": "OrderState"
       },
       "OtherIncome": {
         "properties": {
@@ -58551,6 +63759,73 @@
         ],
         "title": "PersonDetail"
       },
+      "PersonMeter": {
+        "properties": {
+          "used_month": {
+            "type": "number",
+            "title": "Used Month"
+          },
+          "month_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Month Limit",
+            "description": "Their own monthly limit, if one is set"
+          },
+          "used_today": {
+            "type": "number",
+            "title": "Used Today"
+          },
+          "day_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day Limit",
+            "description": "Their daily pace; null: none (the owner)"
+          },
+          "questions_left_today": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Questions Left Today",
+            "description": "About, at one credit per question"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warn",
+              "over"
+            ],
+            "title": "Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "used_month",
+          "month_limit",
+          "used_today",
+          "day_limit",
+          "questions_left_today",
+          "level"
+        ],
+        "title": "PersonMeter"
+      },
       "PersonMonth": {
         "properties": {
           "user_id": {
@@ -59026,6 +64301,38 @@
             "type": "boolean",
             "title": "Active"
           },
+          "billing_cycle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "yearly",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle"
+          },
+          "billing_cycle_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle Days"
+          },
+          "auto_renew": {
+            "type": "boolean",
+            "title": "Auto Renew"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -59048,6 +64355,9 @@
           "validity_days",
           "credits",
           "active",
+          "billing_cycle",
+          "billing_cycle_days",
+          "auto_renew",
           "created_at",
           "updated_at"
         ],
@@ -59124,6 +64434,44 @@
             "type": "boolean",
             "title": "Active",
             "default": true
+          },
+          "billing_cycle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "yearly",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle",
+            "description": "Memberships only: how often it is billed. With a cycle, validity_days follows it (30, 91, 365 or billing_cycle_days)"
+          },
+          "billing_cycle_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1095.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle Days",
+            "description": "Only for the custom cycle"
+          },
+          "auto_renew": {
+            "type": "boolean",
+            "title": "Auto Renew",
+            "description": "Needs a billing cycle",
+            "default": false
           }
         },
         "type": "object",
@@ -59192,6 +64540,38 @@
             "type": "boolean",
             "title": "Active"
           },
+          "billing_cycle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "yearly",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle"
+          },
+          "billing_cycle_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle Days"
+          },
+          "auto_renew": {
+            "type": "boolean",
+            "title": "Auto Renew"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -59223,6 +64603,9 @@
           "validity_days",
           "credits",
           "active",
+          "billing_cycle",
+          "billing_cycle_days",
+          "auto_renew",
           "created_at",
           "updated_at",
           "holders",
@@ -59293,6 +64676,18 @@
               }
             ],
             "title": "Active"
+          },
+          "auto_renew": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auto Renew",
+            "description": "Needs a billing cycle"
           }
         },
         "type": "object",
@@ -59608,6 +65003,40 @@
           "audience"
         ],
         "title": "PreviewBody"
+      },
+      "Price": {
+        "properties": {
+          "product": {
+            "type": "string",
+            "enum": [
+              "landing_only",
+              "landing_with_system"
+            ],
+            "title": "Product"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "setup": {
+            "type": "integer",
+            "title": "Setup",
+            "description": "One-time, minor units"
+          },
+          "monthly": {
+            "type": "integer",
+            "title": "Monthly",
+            "description": "Minor units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product",
+          "currency",
+          "setup",
+          "monthly"
+        ],
+        "title": "Price"
       },
       "Proactive": {
         "properties": {
@@ -61119,6 +66548,43 @@
         ],
         "title": "QuoteOut"
       },
+      "QuoteStatusTotal": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "sent",
+              "accepted",
+              "declined",
+              "expired"
+            ],
+            "title": "Status",
+            "description": "expired: sent and past its date"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Minor units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "currency",
+          "count",
+          "total"
+        ],
+        "title": "QuoteStatusTotal"
+      },
       "QuoteSummary": {
         "properties": {
           "id": {
@@ -62117,6 +67583,35 @@
           "occupancy_percent"
         ],
         "title": "ResourceUsageRow"
+      },
+      "Response": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "changes"
+            ],
+            "title": "Action"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "Response"
       },
       "Retainer": {
         "properties": {
@@ -63992,6 +69487,23 @@
         ],
         "title": "SecurityPolicy"
       },
+      "SeenTours": {
+        "properties": {
+          "seen": {
+            "items": {
+              "type": "string",
+              "const": "ai_team"
+            },
+            "type": "array",
+            "title": "Seen"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seen"
+        ],
+        "title": "SeenTours"
+      },
       "SelectAccounts": {
         "properties": {
           "external_ids": {
@@ -64331,6 +69843,24 @@
             "type": "integer",
             "title": "Travel Minutes",
             "default": 0
+          },
+          "waitlist_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Mode",
+            "description": "Overrides the business's waitlist mode for this service"
           }
         },
         "type": "object",
@@ -64745,6 +70275,24 @@
               }
             ],
             "title": "Travel Minutes"
+          },
+          "waitlist_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Mode",
+            "description": "This service's own waitlist mode; null follows the business"
           }
         },
         "type": "object",
@@ -67436,6 +72984,54 @@
             "description": "Whether the business asks its clients for an ID number",
             "default": "off"
           },
+          "waitlist_enabled": {
+            "type": "boolean",
+            "title": "Waitlist Enabled",
+            "description": "The business keeps waitlists",
+            "default": true
+          },
+          "waitlist_class_mode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Class Mode",
+            "description": "What happens when a spot in a class opens",
+            "default": "auto"
+          },
+          "waitlist_appointment_mode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Appointment Mode",
+            "description": "What happens when a personal appointment time opens",
+            "default": "off"
+          },
+          "waitlist_resource_mode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Resource Mode",
+            "description": "What happens when a court or room time opens",
+            "default": "off"
+          },
+          "waitlist_auto_hours": {
+            "type": "integer",
+            "title": "Waitlist Auto Hours",
+            "description": "Automatic sign-up stops this many hours before a class starts",
+            "default": 3
+          },
           "resource_payment": {
             "type": "string",
             "enum": [
@@ -68021,6 +73617,81 @@
               }
             ],
             "title": "Client Id Number"
+          },
+          "waitlist_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Enabled"
+          },
+          "waitlist_class_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Class Mode"
+          },
+          "waitlist_appointment_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Appointment Mode"
+          },
+          "waitlist_resource_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Resource Mode"
+          },
+          "waitlist_auto_hours": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 72.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Auto Hours"
           },
           "shifts_publish_auto": {
             "anyOf": [
@@ -68873,6 +74544,47 @@
         ],
         "title": "TypedAmount"
       },
+      "UsageBreakdown": {
+        "properties": {
+          "by_kind": {
+            "items": {
+              "$ref": "#/components/schemas/KindRow"
+            },
+            "type": "array",
+            "title": "By Kind"
+          },
+          "ai_users_allowed": {
+            "type": "integer",
+            "title": "Ai Users Allowed"
+          },
+          "ai_users_count": {
+            "type": "integer",
+            "title": "Ai Users Count"
+          },
+          "extra_ai_users": {
+            "type": "integer",
+            "title": "Extra Ai Users"
+          },
+          "extra_user_price_minor": {
+            "type": "integer",
+            "title": "Extra User Price Minor"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "by_kind",
+          "ai_users_allowed",
+          "ai_users_count",
+          "extra_ai_users",
+          "extra_user_price_minor",
+          "currency"
+        ],
+        "title": "UsageBreakdown"
+      },
       "UsagePoint": {
         "properties": {
           "day": {
@@ -68972,6 +74684,33 @@
         "type": "object",
         "title": "VenuePayment"
       },
+      "Visit": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 8,
+            "pattern": "^[0-9a-f]+$",
+            "title": "Key"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "direct",
+              "search",
+              "social",
+              "other"
+            ],
+            "title": "Source",
+            "default": "other"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "title": "Visit"
+      },
       "VoidInvoice": {
         "properties": {
           "reason": {
@@ -68986,6 +74725,639 @@
           "reason"
         ],
         "title": "VoidInvoice"
+      },
+      "WaitlistEntry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "request",
+              "booking"
+            ],
+            "title": "Source",
+            "description": "request: a time range, day or exact time; booking: a place on a class's list"
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "service_name": {
+            "type": "string",
+            "title": "Service Name"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "session",
+              "slot",
+              "range",
+              "day"
+            ],
+            "title": "Kind"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "The class, for a booking entry"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "from_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Time"
+          },
+          "to_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Time"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "location_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Name"
+          },
+          "staff_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff User Id"
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position",
+            "description": "Place in the queue for this service and day"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Mode"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "offered"
+            ],
+            "title": "Status",
+            "description": "offered: the client was told about a free spot"
+          },
+          "open_session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Session Id",
+            "description": "A spot that is free right now for this client"
+          },
+          "open_starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Starts At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "client_id",
+          "client_name",
+          "service_id",
+          "service_name",
+          "kind",
+          "day",
+          "position",
+          "created_at",
+          "mode",
+          "status"
+        ],
+        "title": "WaitlistEntry"
+      },
+      "WaitlistRequestCreate": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "slot",
+              "range",
+              "day"
+            ],
+            "title": "Kind"
+          },
+          "day": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day",
+            "description": "The local day (a slot's own day)"
+          },
+          "from_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Time",
+            "description": "Range: from (local time)"
+          },
+          "to_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Time",
+            "description": "Range: to (local time)"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At",
+            "description": "Slot: the exact start"
+          },
+          "staff_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff User Id",
+            "description": "Only with this person"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id",
+            "description": "Only at this branch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "kind"
+        ],
+        "title": "WaitlistRequestCreate"
+      },
+      "WaitlistServiceCount": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "name",
+          "waiting"
+        ],
+        "title": "WaitlistServiceCount"
+      },
+      "WaitlistSummary": {
+        "properties": {
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/WaitlistServiceCount"
+            },
+            "type": "array",
+            "title": "Services",
+            "description": "The most wanted services"
+          }
+        },
+        "type": "object",
+        "required": [
+          "waiting",
+          "services"
+        ],
+        "title": "WaitlistSummary"
+      },
+      "WebsiteOrder": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "tenant_name": {
+            "type": "string",
+            "title": "Tenant Name"
+          },
+          "product": {
+            "type": "string",
+            "enum": [
+              "landing_only",
+              "landing_with_system"
+            ],
+            "title": "Product"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "briefing",
+              "received",
+              "building",
+              "review",
+              "live"
+            ],
+            "title": "Stage"
+          },
+          "brief": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Brief"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "setup_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Price",
+            "description": "Minor units"
+          },
+          "monthly_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Price",
+            "description": "Minor units"
+          },
+          "site_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Url"
+          },
+          "internal_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Internal Notes"
+          },
+          "customer_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Message"
+          },
+          "change_request": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Request",
+            "description": "What the business asked to change"
+          },
+          "contact_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "contact_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Name"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "live_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "prompt": {
+            "type": "string",
+            "title": "Prompt",
+            "description": "Ready-made prompt for Claude Code, built from the brief"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tenant_id",
+          "tenant_name",
+          "product",
+          "stage",
+          "brief",
+          "currency",
+          "setup_price",
+          "monthly_price",
+          "site_url",
+          "internal_notes",
+          "customer_message",
+          "change_request",
+          "contact_email",
+          "contact_name",
+          "submitted_at",
+          "approved_at",
+          "live_at",
+          "updated_at",
+          "prompt"
+        ],
+        "title": "WebsiteOrder"
+      },
+      "WebsiteOrderUpdate": {
+        "properties": {
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "briefing",
+                  "received",
+                  "building",
+                  "review",
+                  "live"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "site_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Url",
+            "description": "'' clears it"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message",
+            "description": "To the business"
+          }
+        },
+        "type": "object",
+        "title": "WebsiteOrderUpdate"
       },
       "WeekCopied": {
         "properties": {
@@ -69594,6 +75966,38 @@
           "first_name"
         ],
         "title": "ProfileUpdate"
+      },
+      "app__api__freeze_requests__Decision": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note",
+            "description": "Shown to the client"
+          },
+          "approved_ends_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved Ends On",
+            "description": "Approve only part of it: the last day to freeze"
+          }
+        },
+        "type": "object",
+        "title": "Decision"
       },
       "app__api__pay_components__Decision": {
         "properties": {

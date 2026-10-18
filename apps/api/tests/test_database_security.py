@@ -12,6 +12,7 @@ GLOBAL_TABLES = {
     "platform_ai_settings",
     "platform_ai_conversations",
     "push_tokens",
+    "user_tours",
     "login_devices",
     "legal_acceptances",
     "job_runs",
@@ -24,6 +25,7 @@ GLOBAL_TABLES = {
     "platform_incidents",
     "geo_cities",  # the official city list, the same for every business; read-only for the API
     "geo_streets",  # the official street list; read-only for the API
+    "mcp_clients",  # AI apps that registered to ask for access; the API reads and adds rows
     "payroll_rates",  # law-driven rates, the same for every business; read-only for the API
 }
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
@@ -162,6 +164,7 @@ UNINDEXED_USER_KEYS = {
     ("payments", "created_by"),
     ("pending_actions", "decided_by"),
     ("pending_actions", "requested_by"),
+    ("freeze_requests", "decided_by"),
     ("quotes", "created_by"),
     ("reviews", "staff_user_id"),
     ("shifts", "created_by"),

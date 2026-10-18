@@ -7,9 +7,11 @@ import { notFound } from "next/navigation";
 import { BRAND } from "@business-os/i18n/brand";
 
 import { Section } from "@/components/layout/section";
+import { AgentLine } from "@/components/marketing/ai-team-sections";
 import { CtaBand, FeatureGrid } from "@/components/marketing/sections";
 import { SubpageHero } from "@/components/marketing/subpage";
 import { VerticalIcon } from "@/components/vertical-icon";
+import { agentForIndustry } from "@/lib/ai-team-keys";
 import { formatMoney } from "@/lib/money";
 import { industryTexts } from "@/lib/verticals";
 
@@ -112,6 +114,8 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
       )}
 
       {!planned && <ReadySection match={match} />}
+
+      {!planned && <AgentLine agent={agentForIndustry(match.category)} />}
 
       {/* Named by its own heading, so it never collides with the footer's industries nav. */}
       <Section spacing="compact" tone="surface" innerClassName="flex flex-col gap-4">

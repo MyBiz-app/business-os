@@ -14,7 +14,7 @@ import helpers as h
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 PAGES = ["/", "/features", "/industries", "/industries/fitness", "/industries/beauty",
          "/industries/clinic", "/industries/classes", "/industries/automotive", "/industries/barbershop",
-         "/industries/pets", "/pricing", "/about", "/contact", "/legal/terms", "/legal/privacy",
+         "/industries/pets", "/ai-team", "/pricing", "/about", "/contact", "/legal/terms", "/legal/privacy",
          "/legal/accessibility"]  # fmt: skip
 
 

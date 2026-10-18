@@ -15,7 +15,9 @@ import {
   DemoSection,
   FactsStrip,
   PricingTeaser,
+  WebsitesTeaser,
 } from "@/components/marketing/home";
+import { AiTeamSection } from "@/components/marketing/ai-team-sections";
 import { HomePhone } from "@/components/marketing/home-phone";
 import { HeroIntro } from "@/components/marketing/hero-intro";
 import { Reveal } from "@/components/marketing/reveal";
@@ -142,6 +144,8 @@ export default async function Home() {
 
       <DemoSection />
 
+      <AiTeamSection />
+
       {/* AI assistant */}
       <Section
         tone="inverse"
@@ -215,6 +219,7 @@ export default async function Home() {
       <IndustryCards />
 
       <PricingTeaser />
+      <WebsitesTeaser />
 
       {/* How it works */}
       <Section

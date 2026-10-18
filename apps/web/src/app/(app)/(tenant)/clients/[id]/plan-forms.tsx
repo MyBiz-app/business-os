@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import type { components } from "@business-os/api-client";
 import { useActionState } from "react";
 
 import { Field, SelectField } from "@/components/form/field";
@@ -71,6 +72,58 @@ export function FreezeForm({ action, today }: { action: Action; today: string })
       <div>
         <SubmitButton>{t("freeze")}</SubmitButton>
       </div>
+    </form>
+  );
+}
+
+type Request = components["schemas"]["FreezeRequest"];
+
+/** One waiting request: approve it (all of it, or until a day), or decline it, with a message. */
+export function RequestDecision({
+  request,
+  approve,
+  reject,
+}: {
+  request: Request;
+  approve: Action;
+  reject: Action;
+}) {
+  const t = useTranslations("plans");
+  const [approveState, approveAction] = useActionState(approve, {});
+  const [rejectState, rejectAction] = useActionState(reject, {});
+  return (
+    <div className="flex flex-col gap-3 pt-2">
+      <Feedback state={approveState} savedMessage={t("decided")} />
+      <Feedback state={rejectState} savedMessage={t("decided")} />
+      <form action={approveAction} className="flex flex-col gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label={t("approvePartial")} name="approved_ends_on" type="date" min={request.starts_on} max={request.ends_on} />
+          <Field label={t("decisionNote")} name="note" maxLength={500} />
+        </div>
+        <div>
+          <SubmitButton>{t("approve")}</SubmitButton>
+        </div>
+      </form>
+      <form action={rejectAction} className="flex flex-wrap items-end gap-3">
+        <div className="min-w-48 flex-1">
+          <Field label={t("decisionNote")} name="note" maxLength={500} />
+        </div>
+        <SubmitButton variant="secondary">{t("reject")}</SubmitButton>
+      </form>
+    </div>
+  );
+}
+
+/** "The client is back": ends a running freeze (or removes one that has not begun). */
+export function EndFreezeButton({ action }: { action: (state: PlanFormState) => Promise<PlanFormState> }) {
+  const t = useTranslations("plans");
+  const [state, formAction] = useActionState(action, {});
+  return (
+    <form action={formAction} className="inline-flex flex-col gap-1">
+      <Feedback state={state} savedMessage={t("endEarlyDone")} />
+      <button type="submit" className="btn-link text-start text-sm text-primary-ink underline-offset-4 hover:underline">
+        {t("endEarly")}
+      </button>
     </form>
   );
 }

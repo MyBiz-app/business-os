@@ -381,6 +381,40 @@ TOOL_DOMAINS: dict[str, str] = {
 BRANCH_BLIND: frozenset[str] = frozenset({"lead_pipeline"})
 
 
+# What an AI connector (MCP, round 7 R37a) may use: the tools that only read. A test runs every
+# one of these in a read-only transaction.
+MCP_READ_TOOLS: frozenset[str] = frozenset(
+    {
+        "find_clients",
+        "get_client",
+        "inactive_members",
+        "list_sessions",
+        "free_courts",
+        "get_session_roster",
+        "get_metrics",
+        "client_sources",
+        "lead_pipeline",
+        "list_plans",
+        "open_balances",
+        "logged_time",
+        "billing_preview",
+        "social_overview",
+        "top_posts",
+        "audience_summary",
+        "list_drafts",
+    }
+)
+
+
+# What a connector may also propose (R37b), when the person allowed it: the tools that only create
+# a pending action. The connector never changes anything; the person approves each request in
+# MyBiz, where it is checked again (app/ai/actions.py). Publishing and scheduled tasks stay with
+# the built-in assistant.
+MCP_ACTION_TOOLS: frozenset[str] = frozenset(
+    {"book_client", "cancel_booking", "log_time", "bill_month"}
+)
+
+
 def _allowed(tool: Tool, permissions: frozenset[str], modules: set[str]) -> bool:
     return (
         tool.permission in permissions
@@ -404,6 +438,20 @@ def tools_for(
         if _allowed(tool, permissions, modules)
         and (domains is None or TOOL_DOMAINS[tool.name] in domains)
         and not (narrowed and tool.name in BRANCH_BLIND)
+    ]
+
+
+def mcp_tools_for(
+    permissions: frozenset[str],
+    modules: set[str],
+    narrowed: bool = False,
+    propose: bool = False,
+) -> list[Tool]:
+    """The tools a connection's person may use in their business: the read tools, and the ones
+    that propose a change when the connection was allowed to."""
+    names = MCP_READ_TOOLS | MCP_ACTION_TOOLS if propose else MCP_READ_TOOLS
+    return [
+        tool for tool in tools_for(permissions, modules, narrowed=narrowed) if tool.name in names
     ]
 
 

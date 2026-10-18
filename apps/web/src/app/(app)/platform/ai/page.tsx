@@ -4,6 +4,7 @@ import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
+import { isolate } from "@/lib/bidi";
 import { formatMoney } from "@/lib/money";
 import { getPlatformFor } from "@/lib/platform";
 
@@ -19,6 +20,8 @@ export default async function PlatformAiPage() {
   const { api, can } = await getPlatformFor("usage.read");
   const costs = unwrap(await api.GET("/platform/ai/costs", { params: { query: { days: 30 } } }));
   const settings = unwrap(await api.GET("/platform/ai/settings"));
+  const connectors = unwrap(await api.GET("/platform/ai/connectors", { params: { query: { days: 30 } } }));
+  const stamp = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const canChange = can("billing.manage");
   const trend = (now: number, before: number) => (before === 0 ? (now === 0 ? "" : "↑") : now > before * 1.2 ? "↑" : now < before * 0.8 ? "↓" : "→");
@@ -85,6 +88,45 @@ export default async function PlatformAiPage() {
             </tbody>
           </table>
         </ScrollRegion>
+      </section>
+
+      <section aria-labelledby="ai-connectors" className="flex flex-col gap-4">
+        <h2 id="ai-connectors" className="text-lg font-semibold">{t("connectors.title")}</h2>
+        <p className="text-sm text-muted">{t("connectors.hint")} {t("connectors.limit", { count: connectors.daily_limit })}</p>
+        {connectors.businesses.length === 0 ? (
+          <p className="card p-5 text-sm text-muted">{t("connectors.empty")}</p>
+        ) : (
+          <ScrollRegion labelledBy="ai-connectors" className="card">
+            <table className="w-full text-sm">
+              <thead className="text-muted">
+                <tr className="border-b border-border">
+                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("connectors.columns.business")}</th>
+                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("connectors.columns.apps")}</th>
+                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.calls")}</th>
+                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.proposed")}</th>
+                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.executed")}</th>
+                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.rejected")}</th>
+                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.waiting")}</th>
+                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("connectors.columns.last")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {connectors.businesses.map((b) => (
+                  <tr key={b.tenant_id} className="border-b border-border last:border-0">
+                    <td className="px-4 py-3" dir="auto">{b.name}</td>
+                    <td className="px-4 py-3" dir="auto">{b.apps.map((app) => isolate(app)).join(", ") || "-"}</td>
+                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.calls)}</td>
+                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.proposed)}</td>
+                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.executed)}</td>
+                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.rejected)}</td>
+                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.waiting)}</td>
+                    <td className="px-4 py-3">{b.last_call ? stamp.format(new Date(b.last_call)) : "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </ScrollRegion>
+        )}
       </section>
 
       <section aria-labelledby="ai-models" className="flex flex-col gap-4">

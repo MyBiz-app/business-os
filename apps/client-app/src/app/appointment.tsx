@@ -40,6 +40,7 @@ const ME = "me";
 /** Book a personal appointment: service → staff → day → time. */
 export default function Appointment() {
   const t = useTranslations("client.appointment");
+  const tWaitlist = useTranslations("client.waitlist");
   const tDependents = useTranslations("dependents");
   const tJobs = useTranslations("jobs");
   const tHome = useTranslations("client.homeCards");
@@ -261,7 +262,12 @@ export default function Appointment() {
             {slots === null ? (
               <ActivityIndicator color={palette.primary} />
             ) : slots.length === 0 ? (
-              <Text style={[styles.muted, { color: palette.muted }]}>{t("noSlots")}</Text>
+              <>
+                <Text style={[styles.muted, { color: palette.muted }]}>{t("noSlots")}</Text>
+                {business.waitlist_appointment !== "off" && (
+                  <Button label={tWaitlist("notifyMe")} variant="secondary" palette={palette} onPress={() => router.push({ pathname: "/waitlist-new", params: { service_id: service.id, day } })} />
+                )}
+              </>
             ) : (
               <View role="radiogroup" aria-label={t("time")} style={local.grid}>
                 {slots.map((item) => (

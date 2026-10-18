@@ -78,6 +78,13 @@ class QuoteCreate(QuoteFields):
     client_id: UUID
 
 
+class QuoteStatusTotal(BaseModel):
+    status: QuoteStatus = Field(description="expired: sent and past its date")
+    currency: str
+    count: int
+    total: int = Field(description="Minor units")
+
+
 class QuoteSummary(BaseModel):
     id: UUID
     number: int
@@ -276,6 +283,23 @@ def list_quotes(
         },
     ).mappings()
     return [QuoteSummary.model_validate(dict(row)) for row in rows]
+
+
+@router.get("/quotes/summary")
+def quotes_summary(context: ReadDep) -> list[QuoteStatusTotal]:
+    """How many quotes and how much money per status and currency, over every visible quote."""
+    visible, visible_params = client_branch_filter(context, "c.home_location_id")
+    rows = context.session.execute(
+        text(f"""
+            SELECT q.status, q.currency, count(*)::integer AS count,
+                   coalesce(sum(q.total), 0)::bigint AS total
+            FROM ({SUMMARY} {FROM} WHERE {visible}) q
+            GROUP BY q.status, q.currency
+            ORDER BY q.status, q.currency
+        """),
+        visible_params,
+    ).mappings()
+    return [QuoteStatusTotal.model_validate(dict(row)) for row in rows]
 
 
 @router.post("/quotes", status_code=status.HTTP_201_CREATED)

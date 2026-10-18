@@ -6,6 +6,7 @@ import { Suspense } from "react";
 
 import { AttentionPanel } from "./attention-panel";
 import { BranchMapCard } from "./branch-map-card";
+import { WaitlistHint } from "./waitlist-hint";
 import { usageWarnings } from "@business-os/i18n/usage";
 import { termsOf } from "@business-os/verticals";
 
@@ -241,6 +242,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       )}
 
       <AttentionPanel context={{ api, scope }} />
+      <WaitlistHint context={{ api, scope, tenant }} />
 
       {reports && (
         <PeriodProvider>

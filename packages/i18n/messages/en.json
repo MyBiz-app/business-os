@@ -245,13 +245,19 @@
         "integrations": "Integrations",
         "audit": "Activity log",
         "data": "Export and close",
-        "help": "Support"
+        "help": "Support",
+        "aiConnections": "AI connections",
+        "bookings": "Bookings and waitlists",
+        "memberships": "Memberships and freezes"
       },
       "hints": {
         "business": "Details, legal identity, legal readiness and your business emails.",
         "branding": "Name, color, logo and cover, with a live preview.",
         "data": "Download your business data, or close the business.",
-        "help": "Let our team look at your account, or write to us."
+        "help": "Let our team look at your account, or write to us.",
+        "aiConnections": "Connect Claude or ChatGPT to your business, and approve what they ask to change.",
+        "bookings": "What happens when a class, an appointment or a court is full.",
+        "memberships": "Whether clients can ask to freeze from the app, and the rules."
       }
     },
     "branding": {
@@ -297,6 +303,56 @@
         "joinButton": "Join"
       },
       "presetsLabel": "Ready-made colors"
+    },
+    "waitlist": {
+      "title": "Waitlists",
+      "subtitle": "What happens when a spot opens in a class, an appointment or a court that was full.",
+      "enabled": "Keep waitlists",
+      "enabledHint": "Off: a full class cannot be joined and nobody can ask to be told about a free spot.",
+      "classes": "Classes",
+      "appointments": "Personal appointments",
+      "resources": "Courts and rooms",
+      "modes": {
+        "off": "Off",
+        "auto": "Sign in automatically",
+        "first_come": "First to take it",
+        "manual": "Team decides"
+      },
+      "modeHints": {
+        "off": "No waitlist for this kind.",
+        "auto": "The first in line is signed in and told. For requests for a range of hours or a whole day, it works as first to take it.",
+        "first_come": "Everyone waiting is told right away, and whoever takes the spot first gets it.",
+        "manual": "Nobody is told. The team sees the free spot and the waiting list and lets someone in."
+      },
+      "autoHours": "Stop signing in automatically before the class",
+      "hoursBefore": "{hours, plural, =0 {Never stop} one {# hour before} other {# hours before}}",
+      "autoHoursHint": "Closer to the class than this, a free spot is offered to everyone waiting instead, so nobody is signed in without knowing.",
+      "save": "Save",
+      "perService": "A service that works differently",
+      "perServiceHint": "Choose a mode for one service. The business setting applies to the others.",
+      "followBusiness": "Same as the business"
+    },
+    "freezeRules": {
+      "title": "Freezing a membership",
+      "intro": "Clients can ask to freeze a membership from the app. You approve each request, or let some reasons be approved automatically.",
+      "allow": "Let clients ask to freeze in the app",
+      "minDays": "Shortest freeze (days)",
+      "maxDays": "Longest freeze (days)",
+      "bank": "Freeze days per client per year",
+      "bankHint": "Leave empty for no limit. Clients see how many days are left.",
+      "notice": "Notice before the freeze (days)",
+      "fee": "Freeze fee",
+      "feeHint": "Added to the next charge. Leave 0 for no fee.",
+      "billingMode": "Renewing memberships",
+      "billingModes": {
+        "defer": "Move the next charge by the frozen days",
+        "credit": "Credit the frozen days on the next charge"
+      },
+      "billingHint": "Prepaid memberships always get their end date extended by the frozen days.",
+      "autoApprove": "Approve these reasons automatically",
+      "autoApproveHint": "A request for one of these takes effect at once, without a manager.",
+      "save": "Save",
+      "saved": "Saved."
     }
   },
   "locales": {
@@ -485,17 +541,23 @@
         "inactive": "Haven't come in lately",
         "leads_due": "Leads to call back",
         "health_review": "Health declarations to review",
-        "license_expiring": "Business licence about to expire"
+        "license_expiring": "Business licence about to expire",
+        "freeze_requests": "Freeze requests to decide"
       },
       "dates": {
         "plan_ending": "until {date}",
         "inactive": "last visit {date}",
         "leads_due": "since {date}",
         "health_review": "signed {date}",
-        "license_expiring": "expires {date}"
+        "license_expiring": "expires {date}",
+        "freeze_requests": "from {date}"
       },
       "never": "no visit yet",
       "all": "See all {count}"
+    },
+    "waitlist": {
+      "waiting": "{count, plural, one {# person is waiting for a spot} other {# people are waiting for a spot}}",
+      "top": "Most wanted: {service} ({count})"
     }
   },
   "roles": {
@@ -544,7 +606,8 @@
     "sidebarLight": "Use a light sidebar",
     "sidebarDark": "Use a dark sidebar",
     "quotesEvents": "Quotes and events",
-    "catalog": "Catalog"
+    "catalog": "Catalog",
+    "website": "My website"
   },
   "terms": {
     "fitness": {
@@ -1265,7 +1328,8 @@
     "publishWeekHint": "Opens the next week of classes for clients now, ahead of the scheduled release.",
     "publishWeekDone": "The schedule is open for clients until {date}.",
     "publishWeekAlready": "The next week is already published.",
-    "publishWeekError": "Couldn't publish the week. Try again."
+    "publishWeekError": "Couldn't publish the week. Try again.",
+    "waitlists": "Waitlists"
   },
   "bookings": {
     "title": "Bookings",
@@ -1561,7 +1625,11 @@
         "health_approved": "The business approved your health declaration. You can book now.",
         "health_rejected": "The business couldn't approve your health declaration. Please contact them.",
         "session_reminder": "Reminder: you're booked into {service} today, {when}.",
-        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking."
+        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking.",
+        "waitlist_spot_open": "A spot opened for {service}, {when}. Open the app to take it.",
+        "waitlist_spot_taken": "The spot for {service}, {when} was taken. You stay on the list.",
+        "freeze_approved": "Your freeze of {plan} was approved: {from} - {date}.",
+        "freeze_rejected": "Your freeze request for {plan} wasn't approved."
       }
     },
     "pay": {
@@ -1717,6 +1785,73 @@
         "week": "This week",
         "earlier": "Earlier"
       }
+    },
+    "waitlist": {
+      "title": "My waitlists",
+      "empty": "You are not waiting for anything. Ask to be told when a time opens up.",
+      "add": "Tell me when something opens",
+      "leave": "Leave the list",
+      "take": "Take it now",
+      "position": "Place {position} in the queue",
+      "spotOpen": "A spot opened: {day}, {time}",
+      "rangeAt": "{day}, {from}-{to}",
+      "slotAt": "{day}, {time}",
+      "dayAt": "{day}, any time",
+      "newTitle": "Tell me when a time opens",
+      "newBody": "We will send you an update as soon as a time matches. The first to take it gets it.",
+      "service": "Service",
+      "day": "Day",
+      "when": "When",
+      "allDay": "Any time that day",
+      "range": "A time range",
+      "from": "From",
+      "to": "Until",
+      "earlier": "{what}: 30 minutes earlier",
+      "later": "{what}: 30 minutes later",
+      "submit": "Add me to the list",
+      "notifyMe": "Tell me if a time opens",
+      "errors": {
+        "generic": "Something went wrong. Try again.",
+        "waitlist_off": "This business does not use a waitlist for this.",
+        "already_waiting": "You are already waiting for this.",
+        "in_the_past": "Pick a day that has not passed.",
+        "too_many": "You can wait for up to 5 things at once.",
+        "on_site": "Visits at your address cannot have a waitlist.",
+        "spot_taken": "Someone was faster. You stay on the list.",
+        "payment_required": "This spot needs payment in the app."
+      }
+    },
+    "freeze": {
+      "title": "Freeze my plan",
+      "request": "Freeze",
+      "backTo": "My bookings",
+      "off": "This business doesn't take freeze requests in the app. Ask the front desk.",
+      "pickStart": "Tap the first day of the freeze",
+      "pickEnd": "Now tap the last day",
+      "range": "{from} - {to} · {days, plural, one {# day} other {# days}}",
+      "reason": "Reason",
+      "note": "Note (optional)",
+      "bank": "{remaining, plural, one {# freeze day left this year} other {# freeze days left this year}} of {total}",
+      "whatHappens": "What will happen",
+      "newEnd": "Your plan will be valid until {date}.",
+      "shift": "Your next charge moves from {from} to {to}.",
+      "credit": "You'll get a credit of {amount} on your next charge.",
+      "fee": "A freeze fee of {amount} is added to your next charge.",
+      "nextAmount": "Your next charge will be {amount}.",
+      "auto": "This reason is approved right away.",
+      "manual": "The business will review your request and let you know.",
+      "send": "Send request",
+      "sendNow": "Freeze now",
+      "sent": "Your request was sent. You'll get an update when the business decides.",
+      "done": "Done. Your plan is frozen.",
+      "myRequests": "My requests",
+      "withdraw": "Withdraw",
+      "backEarly": "I'm back early",
+      "backEarlyTitle": "End the freeze now?",
+      "backEarlyMessage": "Your plan opens again today, and the dates and next charge go back by the unused days.",
+      "backEarlyDone": "Welcome back! Your plan is active again.",
+      "frozenRange": "Frozen {from} - {to}",
+      "keep": "Keep frozen"
     }
   },
   "join": {
@@ -1792,7 +1927,11 @@
       "generic": "Something went wrong. Try again.",
       "not_active": "This plan is no longer active.",
       "outside_validity": "The freeze must start while the plan is valid.",
-      "overlapping_freeze": "That overlaps an existing freeze."
+      "overlapping_freeze": "That overlaps an existing freeze.",
+      "not_a_membership": "Only memberships can be frozen.",
+      "request_not_pending": "This request was already decided.",
+      "not_freezable": "This plan can't be frozen now.",
+      "freeze_over": "That freeze is already over."
     },
     "validityRange": "Valid {from} - {to}",
     "paymentMethod": "Payment method",
@@ -1800,7 +1939,36 @@
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
       "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
     },
-    "created": "Plan created."
+    "created": "Plan created.",
+    "cycle": "Billing cycle",
+    "cycles": {
+      "none": "Paid in advance, no renewal",
+      "monthly": "Monthly",
+      "quarterly": "Every 3 months",
+      "yearly": "Yearly",
+      "custom": "Every N days"
+    },
+    "cycleDays": "Days in a cycle",
+    "cycleHint": "The membership is valid for one cycle at a time.",
+    "autoRenew": "Renews automatically",
+    "autoRenewHint": "Charged at the start of each cycle. Payments are simulated until a payment provider is connected.",
+    "renews": "Renews {date} · {amount}",
+    "renewsOff": "Next billing {date}",
+    "freezeShifted": "Next charge moved by {days, plural, one {# day} other {# days}}",
+    "freezeCredit": "Credit {amount}",
+    "freezeFee": "Fee {amount}",
+    "punchNoFreeze": "Punch cards can't be frozen.",
+    "endEarly": "Client is back",
+    "endEarlyDone": "The freeze ended. Dates and the next charge were updated.",
+    "requestsTitle": "Freeze requests",
+    "requestLine": "{from} - {to} · {days, plural, one {# day} other {# days}} · {reason}",
+    "approve": "Approve",
+    "approvePartial": "Approve until",
+    "reject": "Decline",
+    "decisionNote": "Message to the client (optional)",
+    "decided": "Done.",
+    "requestsRequestedBy": "Requested by the client in the app",
+    "autoApproved": "Approved automatically"
   },
   "metrics": {
     "revenue": "Revenue",
@@ -1852,6 +2020,8 @@
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
+      "ai_user_limit_reached": "You've reached your personal AI limit for this month.",
+      "ai_daily_pace_reached": "You've used your share of the AI for today. It opens again tomorrow.",
       "ai_rate_limited": "You're sending questions too fast. Wait a minute and try again.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
@@ -1864,7 +2034,61 @@
     "firstRun": "First run: {when}",
     "upTo": "Up to {credits} credits per run, read-only; anything it proposes waits for your approval."
   },
+  "tour": {
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip the guide",
+    "done": "Done",
+    "progress": "Step {current} of {total}"
+  },
   "aiTeam": {
+    "tour": {
+      "help": "Guide",
+      "team": {
+        "title": "Meet your team",
+        "body": "Every agent has a job of its own. The chief knows who to send you to, so you can always start with it."
+      },
+      "talk": {
+        "title": "How to talk to them",
+        "body": "Click an agent on the map to open a chat. On every other screen a round button sits in the corner: click it to talk to the agent that fits the screen, or press and hold to see the whole team. Ask in plain words, for example \"Who didn't show up this week?\".",
+        "appBody": "In the app, open the AI team from the menu and tap an agent to talk. Ask in plain words, for example \"Who didn't show up this week?\"."
+      },
+      "approvals": {
+        "title": "What they do alone, and what waits for you",
+        "body": "Reading, searching and summing up they do on their own. Anything sensitive, like messaging your clients or changing something in the system, waits for your approval on a card, and the system checks it again before it happens. Try it on this example:"
+      },
+      "usage": {
+        "title": "How much AI was used",
+        "body": "Every chat uses credits from your monthly plan. The bar above the map shows how much of what is included has been used so far."
+      },
+      "hire": {
+        "title": "Hire an agent of your own",
+        "body": "Use \"Hire an agent\" to set up a new one: a name, a job, a way of speaking, the branches it knows and who may use it.",
+        "bodyMember": "Owners and managers can hire an agent of their own: a name, a job, a way of speaking, the branches it knows and who may use it."
+      },
+      "spots": {
+        "map": {
+          "title": "The map",
+          "body": "Click an agent to talk to it. On a wide screen you can also switch to a list."
+        },
+        "toolbar": {
+          "title": "The toolbar",
+          "body": "Switch between the map and the list here. Whoever may edit the team also changes its structure from here."
+        },
+        "meter": {
+          "title": "The usage meter",
+          "body": "This is how many of this month's credits have been used."
+        }
+      },
+      "simulation": {
+        "label": "Example chat, nothing is sent",
+        "question": "Who didn't show up this week?",
+        "answer": "{name}: three clients booked and didn't come this week: Dana Cohen, Yossi Levi and Michal Barak. Want me to send them a reminder with a link to book a new class?",
+        "card": "Send a reminder to 3 clients",
+        "confirmed": "In this example nothing was sent. In a real chat the message goes out only after you confirm.",
+        "rejected": "In this example nothing was sent. In a real chat the request would simply be dropped."
+      }
+    },
     "title": "AI team",
     "subtitle": "Your agents, each with a job. Pick one to talk, or ask the chief and it will point you to the right one.",
     "mapLabel": "The AI team",
@@ -1875,7 +2099,34 @@
       "map": "Map",
       "list": "List"
     },
-    "usage": "{used} of {included} AI credits used this month",
+    "meter": {
+      "business": "{percent}% of this month's AI used",
+      "person": "{percent}% of your daily AI allowance used",
+      "reach": "At this pace the month's AI runs out on {date}",
+      "left": "About {count, plural, one {# question} other {# questions}} left this month",
+      "leftToday": "About {count, plural, one {# question} other {# questions}} left for you today",
+      "noPace": "No daily limit for you",
+      "paceMark": "Where an even pace would be today",
+      "openWindow": "Open the AI usage window",
+      "windowTitle": "AI usage",
+      "windowSubtitle": "{used} of {included} credits used this month",
+      "byDay": "Credits per day",
+      "byPerson": "By person",
+      "byAgent": "By agent",
+      "byKind": "Questions and tasks",
+      "kind": {
+        "asked": "Questions people asked",
+        "scheduled": "Tasks that ran by themselves"
+      },
+      "none": "Nothing used yet this month.",
+      "unknownPerson": "Someone who left or is unknown",
+      "aiUsers": "{count} of {allowed} people have access to the AI team",
+      "alertWarn": "The month's AI is almost used up. You can turn on pay-as-you-go or move to AI Pro.",
+      "alertOver": "The month's AI is used up. New questions wait until next month unless you turn on pay-as-you-go or move to AI Pro.",
+      "enablePayg": "Turn on pay-as-you-go",
+      "upgrade": "Upgrade to AI Pro",
+      "limitPerson": "Limit a person"
+    },
     "state": {
       "active": "Available",
       "locked": "Locked: not in your plan",
@@ -2043,7 +2294,8 @@
         "agent_unavailable": "The agent is not available",
         "business_closed": "The business is closed",
         "generic": "Something went wrong",
-        "ai_user_limit_reached": "The AI limit set for this person was reached"
+        "ai_user_limit_reached": "The AI limit set for this person was reached",
+        "ai_daily_pace_reached": "The person reached their daily AI pace"
       },
       "credits": "{credits} credits",
       "frequency": {
@@ -2299,6 +2551,8 @@
     }
   },
   "aiBubble": {
+    "levelWarn": "The month's AI is almost used up",
+    "levelOver": "The month's AI is used up",
     "open": "Ask {name} or the AI team",
     "close": "Close the chat",
     "openFull": "Open in the full team",
@@ -2425,7 +2679,8 @@
       "ai": "AI",
       "health": "System health",
       "incidents": "Incident banners",
-      "growth": "Growth"
+      "growth": "Growth",
+      "websiteOrders": "Website orders"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -2841,6 +3096,22 @@
         "ai_busy": "The AI is busy. Try again in a moment.",
         "ai_unavailable": "The AI is not answering right now.",
         "ai_not_configured": "AI is not set up on this server."
+      },
+      "connectors": {
+        "title": "AI connectors",
+        "hint": "Which businesses connected Claude or ChatGPT, how much they use it, and what became of the changes the apps proposed.",
+        "limit": "Daily limit: {count} calls per business.",
+        "empty": "No business has connected an AI app yet.",
+        "columns": {
+          "business": "Business",
+          "apps": "Apps",
+          "calls": "Calls",
+          "proposed": "Proposed",
+          "executed": "Approved",
+          "rejected": "Rejected",
+          "waiting": "Waiting",
+          "last": "Last call"
+        }
       }
     },
     "health": {
@@ -2969,6 +3240,29 @@
       "save": "Save",
       "saved": "Saved",
       "invalid": "Check the numbers: suspension must come after read-only."
+    },
+    "websites": {
+      "title": "Website orders",
+      "hint": "Landing page orders by stage, from the brief to live. Every order has a ready-made prompt for Claude Code.",
+      "empty": "There are no website orders yet.",
+      "changesAsked": "Changes asked",
+      "prompt": "Claude Code prompt and files",
+      "copy": "Copy the prompt",
+      "copied": "Copied",
+      "files": "Download the files (ZIP)",
+      "stage": "Stage",
+      "siteUrl": "Site address",
+      "message": "Message to the customer",
+      "notes": "Internal notes",
+      "save": "Save",
+      "writing": "The business is still writing the brief.",
+      "stages": {
+        "briefing": "Brief in progress",
+        "received": "Received",
+        "building": "Building",
+        "review": "With the customer for approval",
+        "live": "Live"
+      }
     }
   },
   "permissions": {
@@ -3192,7 +3486,11 @@
       "session_reminder": "Today: {service} at {when}",
       "plan_ending": "Your plan ends on {date}",
       "friend_request": "{friend} wants to be your friend",
-      "class_invite": "{friend} invited you: {service} on {when}"
+      "class_invite": "{friend} invited you: {service} on {when}",
+      "waitlist_spot_open": "A spot opened: {service} on {when}",
+      "waitlist_spot_taken": "Someone was quicker: {service} on {when}",
+      "freeze_approved": "Your freeze was approved: {from} to {date}",
+      "freeze_rejected": "About your freeze request"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -3206,7 +3504,11 @@
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
       "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking.",
       "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
-      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time."
+      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time.",
+      "waitlist_spot_open": "A spot opened up for {service} on {when}, and whoever takes it first gets it. Open the app to take it.",
+      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens.",
+      "freeze_approved": "{business} approved freezing your {plan} from {from} to {date}. Your end date moves by the same number of days.",
+      "freeze_rejected": "{business} couldn't approve freezing your {plan} from {from} to {date}."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -3354,7 +3656,9 @@
       "menu": "Menu",
       "close": "Close",
       "dashboard": "Go to dashboard",
-      "guide": "Getting started guide"
+      "guide": "Getting started guide",
+      "websites": "Websites",
+      "aiTeam": "AI team"
     },
     "intro": {
       "eyebrow": "Everything in one place",
@@ -3658,7 +3962,8 @@
         "clients": "Your clients' experience",
         "ai": "AI assistant and agents",
         "growth": "Growth and sales"
-      }
+      },
+      "websiteAddon": "Add a website to your plan: from setup price shown on the websites page."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -4212,7 +4517,9 @@
       "pricing": "Pricing",
       "about": "About",
       "contact": "Contact",
-      "industries": "Industries"
+      "industries": "Industries",
+      "websites": "Websites",
+      "aiTeam": "AI team · MyBiz"
     },
     "branches": {
       "eyebrow": "Chains and branches",
@@ -4308,6 +4615,334 @@
           "schedule": "Clients book on their own and the calendar updates at once.",
           "ai": "Ask in plain language and the assistant prepares an action for your approval.",
           "reports": "Revenue and occupancy without opening a spreadsheet."
+        }
+      },
+      "websitesTeaser": {
+        "title": "Need a website too?",
+        "text": "We build it for you and wire it into MyBiz.",
+        "link": "See websites"
+      }
+    },
+    "websites": {
+      "title": "Your business's website. Built for you.",
+      "subtitle": "Tell us about your business once. We build the site, and it plugs straight into your MyBiz.",
+      "start": "Get started",
+      "seePrices": "See prices",
+      "showcase": "One site for every kind of business",
+      "showcaseCaption": "Sample sites",
+      "sites": {
+        "barber": {
+          "label": "Barbershop",
+          "name": "Bar & Blade",
+          "line": "A sharp cut, booked in ten seconds",
+          "button": "Book a chair",
+          "items": [
+            "Haircut",
+            "Beard",
+            "Kids"
+          ]
+        },
+        "gym": {
+          "label": "Fitness studio",
+          "name": "Core Studio",
+          "line": "Your first class is on us",
+          "button": "Join a class",
+          "items": [
+            "Pilates",
+            "Strength",
+            "Yoga"
+          ]
+        },
+        "pizza": {
+          "label": "Pizzeria",
+          "name": "Forno",
+          "line": "Hot from the oven, to your door",
+          "button": "Order now",
+          "items": [
+            "Margherita",
+            "Seasonal",
+            "Dessert"
+          ]
+        }
+      },
+      "steps": {
+        "title": "Three steps to a live site.",
+        "items": [
+          {
+            "title": "You tell us",
+            "text": "A short guided form: your goal, your style, your photos. Saved as you go."
+          },
+          {
+            "title": "We build it",
+            "text": "Your site is built to your brief, fast, accessible and ready for search."
+          },
+          {
+            "title": "You are live",
+            "text": "Online and connected to MyBiz: enquiries, bookings and visits in one place."
+          }
+        ]
+      },
+      "combo": {
+        "eyebrow": "Site + system",
+        "title": "A site that talks to your business.",
+        "text": "A visitor fills in the form and the enquiry is already a lead in your CRM, with its source. No copying, nothing lost.",
+        "site": "Your website",
+        "crm": "Your CRM",
+        "name": "Name",
+        "phone": "Phone",
+        "send": "Send",
+        "sent": "Sent",
+        "lead": "New lead",
+        "source": "Source",
+        "fromSite": "Website",
+        "person": "Dana Levi"
+      },
+      "prices": {
+        "title": "Simple prices. Cheaper together.",
+        "subtitle": "Choose a website, a system, or both.",
+        "currency": "Currency",
+        "recommended": "Best value",
+        "once": "one time",
+        "perMonth": "/month",
+        "from": "From",
+        "note": "Monthly price covers hosting, upkeep and small changes. Prices exclude VAT.",
+        "saving": "You save {amount} on the setup",
+        "siteOnly": {
+          "name": "Website only",
+          "text": "A professional site, without the system.",
+          "points": [
+            "Built to your brief",
+            "Mobile, accessible, ready for search",
+            "Contact form to your email"
+          ],
+          "cta": "Order a website"
+        },
+        "systemOnly": {
+          "name": "System only",
+          "text": "Calendar, clients, payments and the AI team.",
+          "points": [
+            "Everything to run the business",
+            "Client app included",
+            "Add a website any time"
+          ],
+          "cta": "See system plans"
+        },
+        "both": {
+          "name": "Site and system",
+          "text": "The site is wired into the system.",
+          "points": [
+            "Enquiries become leads automatically",
+            "Book appointments straight from the site",
+            "Visits and sources in your dashboard"
+          ],
+          "cta": "Start with both"
+        }
+      },
+      "gallery": {
+        "title": "Made for your field",
+        "subtitle": "Three styles, any industry.",
+        "note": "Sample designs. Your site is built to your own brand."
+      },
+      "faq": {
+        "title": "Questions about websites",
+        "items": [
+          {
+            "q": "How long does it take?",
+            "a": "It depends on the content you send. We confirm a date once you submit the brief."
+          },
+          {
+            "q": "Can I use my own domain?",
+            "a": "Yes. Bring a domain you own, buy one, or start on a temporary address."
+          },
+          {
+            "q": "Do I need MyBiz to get a website?",
+            "a": "No. A website alone works, and you can add the system later."
+          },
+          {
+            "q": "Can I ask for changes later?",
+            "a": "Yes. Request a change from your account and the monthly price covers small updates."
+          }
+        ]
+      }
+    },
+    "aiTeam": {
+      "home": {
+        "eyebrow": "A team working for you 24/7",
+        "title": "Nine agents. Each one an expert in their field.",
+        "subtitle": "Chief of staff, secretary, marketing, sales, finance, team, care, data and creative. They prepare the work, and you approve.",
+        "more": "Meet the whole team"
+      },
+      "page": {
+        "eyebrow": "AI team",
+        "title": "A whole team working for you, even at night",
+        "subtitle": "Every agent knows your business, sees only what it needs and proposes actions. Nothing happens without your approval.",
+        "ctaPrimary": "Start free",
+        "ctaSecondary": "See them at work",
+        "teamTitle": "Meet the team",
+        "teamSubtitle": "What each agent does, and what you can ask it.",
+        "exampleLabel": "You can ask",
+        "hireTitle": "Hire your own agent",
+        "hireText": "Need an agent for a field the team does not cover? Give it a name, a role, a face and working rules, and choose what it may see and do. It joins the team like any other agent.",
+        "hirePoints": [
+          "A name, role and face of your choice",
+          "Limited to the branches and topics you pick",
+          "It also waits for your approval before every action"
+        ],
+        "costTitle": "And what does it cost?",
+        "costText": "The team is part of the system. Usage is measured in AI credits: plans of 400 or 1,200 credits a month per business, enough for the conversations, drafts and summaries of a small business.",
+        "costPoints": [
+          "No set-up fee and no commitment",
+          "An alert at 80% of the allowance",
+          "Pause any agent at any moment"
+        ]
+      },
+      "org": {
+        "label": "Team structure",
+        "modeLabel": "Team view",
+        "single": "One business",
+        "network": "Branch network",
+        "chiefNote": "The agents work with the chief of staff, who routes every question to whoever knows it best.",
+        "branchesTitle": "A manager agent for every branch",
+        "branchesNote": "In a network, each branch gets an agent that runs its day and reports to the chief of staff.",
+        "branchManager": "Branch manager",
+        "branches": [
+          {
+            "city": "Tel Aviv",
+            "name": "Dorit"
+          },
+          {
+            "city": "Haifa",
+            "name": "Asaf"
+          },
+          {
+            "city": "Beer Sheva",
+            "name": "Noa"
+          }
+        ]
+      },
+      "sim": {
+        "eyebrow": "At work",
+        "title": "What a morning with the team looks like",
+        "subtitle": "Four short scenes. In each one the agent prepares, and you approve.",
+        "scenesLabel": "Choose a scene",
+        "pause": "Pause the demo",
+        "play": "Play the demo",
+        "waiting": "Waiting for your approval",
+        "approve": "Approve",
+        "decline": "Not now",
+        "note": "A recorded demo. In the product every sensitive action waits for your approval.",
+        "scenes": {
+          "secretary": {
+            "tab": "Shiri",
+            "caption": "Shiri arranges an appointment and reminds the client.",
+            "message": "Dana asked to move her Wednesday appointment. I found Thursday at 10:30 and will prepare a reminder for her.",
+            "card": "Move Dana's appointment to Thursday 10:30 and send a reminder"
+          },
+          "marketing": {
+            "tab": "Lia",
+            "caption": "Lia proposes a campaign for clients who went quiet.",
+            "message": "12 clients have not visited in over 45 days. I drafted a warm message with a free trial class.",
+            "card": "Send the message to 12 clients who went quiet"
+          },
+          "finance": {
+            "tab": "Adam",
+            "caption": "Adam flags an open balance.",
+            "message": "There is an open balance of $480 for 21 days. I prepared a friendly reminder with a payment link.",
+            "card": "Send a payment reminder for $480"
+          },
+          "chief": {
+            "tab": "Adir",
+            "caption": "Adir, the chief of staff, sums up the morning.",
+            "message": "Good morning. 14 appointments today, two clients at risk of leaving, and two actions waiting for you.",
+            "card": "2 actions waiting for your approval"
+          }
+        }
+      },
+      "line": {
+        "label": "Your agent for this field",
+        "more": "Meet the whole team"
+      },
+      "agents": {
+        "chief": {
+          "name": "Adir",
+          "role": "Chief of staff",
+          "does": "Sums up what is urgent today, answers cross-cutting questions and hands you to the right agent.",
+          "examples": [
+            "What is urgent today across all branches?",
+            "Give me a morning summary."
+          ]
+        },
+        "secretary": {
+          "name": "Shiri",
+          "role": "Personal secretary",
+          "does": "Arranges appointments, waiting lists and reminders, and finds free slots.",
+          "examples": [
+            "Move Dana's appointment to Thursday.",
+            "Who is on the waiting list for the 6 PM class?"
+          ]
+        },
+        "marketing": {
+          "name": "Lia",
+          "role": "Marketing and leads",
+          "does": "Tracks leads, wins back clients who went quiet and drafts campaigns.",
+          "examples": [
+            "Who has not visited in over 45 days?",
+            "Draft a win-back message with an offer."
+          ]
+        },
+        "sales": {
+          "name": "Daniel",
+          "role": "Sales",
+          "does": "Watches revenue, renewals and open quotes, and suggests upgrades.",
+          "examples": [
+            "Which plans end this month?",
+            "How many quotes are still open?"
+          ]
+        },
+        "finance": {
+          "name": "Adam",
+          "role": "Finance",
+          "does": "Flags open balances, prepares payment reminders and follows monthly billing.",
+          "examples": [
+            "Who owes us money?",
+            "Prepare a friendly payment reminder."
+          ]
+        },
+        "team": {
+          "name": "Emma",
+          "role": "Team and shifts",
+          "does": "Spots roster gaps, handles swaps and time off, and prepares hours for payroll.",
+          "examples": [
+            "Who is free to cover Saturday?",
+            "How many hours did everyone work this month?"
+          ]
+        },
+        "care": {
+          "name": "Leo",
+          "role": "Customer care",
+          "does": "Answers the inbox and WhatsApp, and follows reviews and clients at risk.",
+          "examples": [
+            "Draft a reply to an unhappy client.",
+            "Who is at risk of leaving?"
+          ]
+        },
+        "analyst": {
+          "name": "Ethan",
+          "role": "Data analyst",
+          "does": "Compares branches and periods, spots anomalies and prepares the weekly report.",
+          "examples": [
+            "Which branch grew the most?",
+            "What changed this week?"
+          ]
+        },
+        "creative": {
+          "name": "Sophie",
+          "role": "Content and creative",
+          "does": "Writes posts, newsletters and story scripts, and advises on social media.",
+          "examples": [
+            "Write a post for the new term.",
+            "What worked for us on Instagram?"
+          ]
         }
       }
     }
@@ -6731,6 +7366,7 @@
     "new": "New quote",
     "back": "All quotes",
     "none": "No quotes here yet.",
+    "loadMore": "Load more",
     "noneForClient": "No quotes for this client yet.",
     "filter": "Filter by status",
     "filters": {
@@ -7725,7 +8361,8 @@
       "employees": "Employees",
       "business_docs": "Business documents",
       "imports": "Imports",
-      "general": "General"
+      "general": "General",
+      "website": "Website"
     },
     "count": "{count, plural, =0 {No files} one {# file} other {# files}}",
     "sealed": "Sealed",
@@ -8184,6 +8821,7 @@
       "ai_not_configured": "The AI is not available right now.",
       "ai_limit_reached": "The monthly AI allowance is used up. You can still map the columns by hand.",
       "ai_user_limit_reached": "Your personal AI limit for this month is used up.",
+      "ai_daily_pace_reached": "You used your share of the AI for today. Map the rest by hand or try tomorrow.",
       "ai_busy": "The AI is busy. Try again in a moment.",
       "ai_unavailable": "The AI could not be reached. Try again later.",
       "ai_map_limit": "You used the AI mapping many times in this move. Map the rest by hand.",
@@ -8680,10 +9318,27 @@
     "noClasses": "Nothing to teach in the next {days} days.",
     "openPayRun": "Open the pay run",
     "aiTitle": "AI team",
-    "aiAllowed": "Can use the AI team",
-    "aiNotAllowed": "No access to the AI team",
-    "aiUsedThisMonth": "credits this month (the whole business: {used} of {included})",
-    "aiHint": "Access follows the role. Change it under Permissions.",
+    "aiNotAllowed": "The AI settings could not be loaded.",
+    "aiHint": "Without a personal switch, access follows the role. The owner is not limited.",
+    "ai": {
+      "usedMonth": "Credits this month",
+      "usedToday": "Credits today (pace: {limit})",
+      "access": "Can use the AI team",
+      "accessHint": "{count} of {allowed} people have access under the plan. An extra AI user costs a little more each month.",
+      "monthly": "Personal monthly limit (credits)",
+      "monthlyPlaceholder": "As the business",
+      "daily": "Daily pace (% of the month's AI, usually {default})",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "owner": "The owner always has access to the AI team and no daily pace.",
+      "errors": {
+        "ai_users_full": "The plan's AI users are all taken. Add an extra AI user first.",
+        "owner_always_has_ai": "The owner always has access.",
+        "invalid": "Check the numbers and try again.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
     "openAi": "Open the AI team",
     "permissionsTitle": "Role and permissions",
     "roleIs": "Role: {role}",
@@ -8744,6 +9399,415 @@
       "title": "No discount codes yet",
       "body": "A code gives a percent or a fixed amount off a plan. Share it in a message or a post and clients enter it when they buy.",
       "cta": "Create your first code"
+    }
+  },
+  "mcpConnect": {
+    "title": "Connect an AI app",
+    "body": "{app} asks to read the data of the business you choose, as you and with your permissions.",
+    "reads": [
+      "Clients and their profiles",
+      "The schedule and bookings",
+      "Plans, punch cards and open balances",
+      "Metrics and reports"
+    ],
+    "returns": "The app reads as you. Any change it suggests waits for your approval in MyBiz, under Settings, AI connections. You can disconnect it at any time. After you approve you return to {host}.",
+    "business": "Business",
+    "approve": "Approve the connection",
+    "deny": "Cancel",
+    "invalid": "This connection link is not valid. Start again from the app.",
+    "noBusiness": "You have no business in MyBiz yet. Create one and try again.",
+    "propose": "Also let it suggest changes",
+    "proposeHint": "It can propose bookings and cancellations. Nothing changes until you approve each one in MyBiz."
+  },
+  "website": {
+    "title": "My website",
+    "subtitle": "A branded landing page for your business, built by the MyBiz team and connected to your system.",
+    "wizardTitle": "Tell us about your website",
+    "wizardHint": "Eight short steps. Every step is saved, so you can leave and come back any time.",
+    "stepOf": "Step {current} of {total}",
+    "summaryStep": "Summary and send",
+    "back": "Back",
+    "next": "Next",
+    "toSummary": "To the summary",
+    "send": "Send to MyBiz",
+    "autosave": "Saved automatically",
+    "sent": "Your brief was sent. We will start building your website.",
+    "errors": {
+      "locked": "Building has started, so the brief can no longer change. Tell us what to change.",
+      "invalid": "One of the answers is not valid. Check it and try again.",
+      "generic": "Something went wrong. Try again in a moment.",
+      "storage_full": "There is not enough file space in the business."
+    },
+    "steps": {
+      "goal": {
+        "title": "What is the website for?",
+        "hint": "Pick everything that applies, then the single most important action.",
+        "goals": "The website is meant to",
+        "mainAction": "The most important action on the page",
+        "mainActionHint": "For example: book a free trial class"
+      },
+      "business": {
+        "title": "About the business",
+        "hint": "In your own words. A few short sentences are enough.",
+        "unique": "What makes you special? (three sentences)",
+        "audience": "Who is your audience?",
+        "area": "Which area do you serve?"
+      },
+      "sections": {
+        "title": "What goes on the page?",
+        "hint": "Pick the sections. We will arrange them well.",
+        "legend": "Sections"
+      },
+      "branding": {
+        "title": "Branding",
+        "hint": "Logo, colors and style. What is already set in the system is taken from there.",
+        "logo": "Logo",
+        "uploadLogo": "Upload a logo",
+        "replaceLogo": "Replace the logo",
+        "noLogo": "I do not have a logo",
+        "fromBrand": "Use the business color from the system",
+        "color": "Color {number}",
+        "addColor": "Add a color",
+        "style": "Style",
+        "font": "Font (optional)",
+        "fontHint": "If you have none, we pick one that fits the style"
+      },
+      "motion": {
+        "title": "Motion",
+        "hint": "How much life the page should have.",
+        "legend": "Level of motion"
+      },
+      "images": {
+        "title": "Images",
+        "hint": "Your own photos are the best thing for a website. They are kept in the \"Website\" folder of your files.",
+        "upload": "Upload images",
+        "uploading": "Uploading...",
+        "note": "Note for the image (optional)",
+        "remove": "Remove the image",
+        "noGood": "I do not have good photos",
+        "noGoodHint": "We will add fitting stock photos"
+      },
+      "inspiration": {
+        "title": "Inspiration and texts",
+        "hint": "Sites you like, and who writes the texts.",
+        "sites": "Up to three sites you like",
+        "url": "Site address {number}",
+        "likes": "What do you like about it?",
+        "copy": "The texts"
+      },
+      "domain": {
+        "title": "Domain and languages",
+        "hint": "Where the site lives, in which languages, and when it should be ready.",
+        "legend": "Domain",
+        "name": "Your domain name",
+        "languages": "Website languages",
+        "dueDate": "Target date (optional)"
+      }
+    },
+    "goals": {
+      "leads": "Bring in inquiries",
+      "bookings": "Bring in bookings",
+      "showcase": "Present the business",
+      "sell": "Sell"
+    },
+    "sections": {
+      "hero": {
+        "title": "Hero",
+        "hint": "The main line and the main button"
+      },
+      "services": {
+        "title": "Services and prices",
+        "hint": "Pulled from your catalog"
+      },
+      "gallery": {
+        "title": "Gallery",
+        "hint": "Photos of the business"
+      },
+      "team": {
+        "title": "Team",
+        "hint": "Who we are"
+      },
+      "testimonials": {
+        "title": "Testimonials",
+        "hint": "Pulled from your reviews"
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "hint": "Answers to the questions that come back"
+      },
+      "location": {
+        "title": "Location and hours",
+        "hint": "Address, map and opening hours"
+      },
+      "contact": {
+        "title": "Contact",
+        "hint": "An inquiry form that lands in the system"
+      },
+      "booking": {
+        "title": "Book an appointment or class",
+        "hint": "Directly through MyBiz",
+        "needsSystem": "Only for a business that uses the system"
+      },
+      "whatsapp": {
+        "title": "WhatsApp button",
+        "hint": "A chat in one tap"
+      }
+    },
+    "styles": {
+      "clean": {
+        "title": "Modern and clean",
+        "hint": "Lots of air, sharp lines"
+      },
+      "luxury": {
+        "title": "Luxurious",
+        "hint": "Restrained, elegant, careful"
+      },
+      "warm": {
+        "title": "Warm and family-friendly",
+        "hint": "Soft colors and rounded corners"
+      },
+      "vibrant": {
+        "title": "Young and vibrant",
+        "hint": "Strong colors and energy"
+      }
+    },
+    "motions": {
+      "none": {
+        "title": "No motion",
+        "hint": "A quiet, fast page"
+      },
+      "subtle": {
+        "title": "Subtle",
+        "hint": "Soft fades and hover accents"
+      },
+      "rich": {
+        "title": "Rich",
+        "hint": "Scroll animations and transitions between sections"
+      }
+    },
+    "domains": {
+      "have": {
+        "title": "I have a domain",
+        "hint": "We will connect it to the site"
+      },
+      "buy": {
+        "title": "I want to buy one",
+        "hint": "We buy it for you at cost plus 20 shekels a year"
+      },
+      "temporary": {
+        "title": "A temporary address",
+        "hint": "A subdomain until you decide"
+      }
+    },
+    "languages": {
+      "he": "Hebrew",
+      "en": "English"
+    },
+    "copyBy": {
+      "me": "I write them",
+      "you": "Write them for me"
+    },
+    "summary": {
+      "title": "All set?",
+      "hint": "Check your answers and send. You can change them until we start building.",
+      "missing": "To send, you still need:"
+    },
+    "missing": {
+      "goals": "The website's goal",
+      "sections": "Sections on the page",
+      "booking_needs_system": "Booking is only available with the system",
+      "style": "Style",
+      "motion": "Level of motion",
+      "copy_by": "Who writes the texts",
+      "domain": "Domain",
+      "domain_name": "The domain name",
+      "languages": "Languages"
+    },
+    "offer": {
+      "title": "A website for your business, without the headache",
+      "body": "You answer a few questions and we build a designed, branded landing page, with an inquiry form that lands in your system and a visit counter. You approve the site before it goes live.",
+      "price": "One-time setup {setup} and {monthly} a month (hosting, security, upkeep and one small change a month).",
+      "nothingCharged": "Nothing is charged until payments are switched on in the system.",
+      "start": "Start the brief"
+    },
+    "status": {
+      "title": "Order status",
+      "submitted": "Sent on {date}",
+      "prices": "Price offered: setup {setup} and {monthly} a month",
+      "message": "A message from the MyBiz team",
+      "yourRequest": "What you asked to change",
+      "open": "Open the website",
+      "continue": "Continue the brief",
+      "edit": "Edit the brief"
+    },
+    "stages": {
+      "briefing": "Brief",
+      "received": "Received",
+      "building": "Building",
+      "review": "Your approval",
+      "live": "Live"
+    },
+    "stageHint": {
+      "briefing": "The brief was not sent yet. Continue where you stopped.",
+      "received": "We received your brief. You can edit it until we start building.",
+      "building": "The website is being built. We will update you here when it is ready to view.",
+      "review": "The website is ready to view. Approve it or ask for changes.",
+      "live": "The website is live."
+    },
+    "review": {
+      "title": "The website is ready to view",
+      "body": "Open the link in the message, then approve or ask for changes.",
+      "approve": "Approve the website",
+      "askChanges": "Ask for changes",
+      "changesLabel": "What should change?",
+      "sendChanges": "Send the request",
+      "cancel": "Cancel",
+      "approved": "You approved the website. We are putting it live."
+    }
+  },
+  "aiConnections": {
+    "title": "AI connections",
+    "subtitle": "Use your own Claude or ChatGPT with your business. They read as you, with your permissions, and any change they suggest waits here for your approval.",
+    "waitingTitle": "Waiting for your approval",
+    "waitingEmpty": "Nothing is waiting. When an AI app suggests a change, it appears here.",
+    "waitingHint": "Nothing happens until you approve. Everything is checked again at the moment you approve.",
+    "from": "Suggested by {app}",
+    "expires": "Open until {when}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveFor": "Approve: {what}",
+    "rejectFor": "Reject: {what}",
+    "kinds": {
+      "book_client": "Book a client",
+      "cancel_booking": "Cancel a booking",
+      "log_time": "Log time",
+      "bill_month": "Bill a month"
+    },
+    "fields": {
+      "client": "Client",
+      "service": "Class",
+      "starts": "Starts",
+      "dependent": "For",
+      "date": "Date",
+      "hours": "Hours",
+      "description": "Work",
+      "month": "Month",
+      "clients": "Clients",
+      "total": "Total"
+    },
+    "full": "The class is full: the client joins the waitlist.",
+    "historyTitle": "Recent requests",
+    "status": {
+      "pending": "Waiting",
+      "executed": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "failed": "Could not be done"
+    },
+    "appsTitle": "Connected apps",
+    "appsEmpty": "No AI app is connected yet.",
+    "canPropose": "Reads and suggests changes",
+    "readOnly": "Reads only",
+    "lastUsed": "Last used {when}",
+    "neverUsed": "Not used yet",
+    "calls": "{count} calls",
+    "disconnect": "Disconnect",
+    "disconnectApp": "Disconnect {app}",
+    "howTitle": "How to connect",
+    "howIntro": "The same address works for every AI app. You need a paid Claude or ChatGPT plan that supports custom connectors.",
+    "address": "Connector address",
+    "addressHint": "Paste this address into the AI app.",
+    "claudeTitle": "Claude",
+    "claudeSteps": [
+      "Open Claude and go to Settings, then Connectors.",
+      "Choose Add custom connector.",
+      "Paste the address above, name it MyBiz and add it.",
+      "Sign in to MyBiz when asked, pick your business and approve.",
+      "Ask something like: how many new clients did I get this week?"
+    ],
+    "chatgptTitle": "ChatGPT",
+    "chatgptSteps": [
+      "Open ChatGPT and go to Settings, then Connectors, and turn on Developer mode.",
+      "Choose Create and paste the address above as the connector's address.",
+      "Choose OAuth for sign-in and save.",
+      "Sign in to MyBiz when asked, pick your business and approve.",
+      "Start a chat, add the connector from the tools menu and ask your question."
+    ],
+    "safetyTitle": "What the apps can and cannot do",
+    "safety": [
+      "They see only what you could see in MyBiz, in the business you picked.",
+      "They never change anything themselves: a suggested change waits here until you approve it.",
+      "You can disconnect an app at any moment, and it stops at once.",
+      "Every use is counted, and there is a daily limit per business."
+    ]
+  },
+  "waitlist": {
+    "title": "Waitlists",
+    "subtitle": "Everyone waiting for a class, an appointment or a court. Let someone in when a spot is free, or tell them about it.",
+    "empty": "Nobody is waiting right now.",
+    "filters": {
+      "label": "Filter the waitlists",
+      "day": "Day",
+      "branch": "Branch",
+      "allBranches": "All branches",
+      "service": "Service",
+      "allServices": "All services",
+      "mode": "Mode",
+      "allModes": "All modes",
+      "apply": "Show",
+      "clear": "Clear filters"
+    },
+    "modes": {
+      "off": "Off",
+      "auto": "Sign in automatically",
+      "first_come": "First to take it",
+      "manual": "Team decides"
+    },
+    "kinds": {
+      "session": "Class at {time}",
+      "slot": "Exactly {time}",
+      "range": "Between {from} and {to}",
+      "day": "Any time that day"
+    },
+    "told": "Told about a spot",
+    "openSpot": "Free spot: {when}",
+    "admit": "Let in",
+    "notify": "Tell them",
+    "remove": "Remove",
+    "admitted": "{name} was let in and has been told.",
+    "notified": "{name} was told about the free spot.",
+    "removed": "{name} was taken off the list.",
+    "errors": {
+      "spot_taken": "Someone was faster, the spot is taken.",
+      "no_free_spot": "There is no free spot for this person right now.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "freeze": {
+    "reasons": {
+      "travel": "Travel abroad",
+      "reserve_duty": "Reserve duty",
+      "illness": "Illness or injury",
+      "pregnancy": "Pregnancy",
+      "other": "Other"
+    },
+    "problems": {
+      "freeze_requests_off": "This business doesn't take freeze requests in the app. Ask the front desk.",
+      "not_freezable": "This plan can't be frozen.",
+      "too_short": "The freeze is shorter than the business allows.",
+      "too_long": "The freeze is longer than the business allows.",
+      "notice_required": "Freezes must be requested earlier than that.",
+      "outside_validity": "The freeze must start while the plan is valid.",
+      "overlapping_freeze": "That overlaps an existing freeze.",
+      "overlapping_request": "You already have a request for those days.",
+      "bank_exceeded": "That is more freeze days than you have left this year.",
+      "generic": "Something went wrong. Try again."
+    },
+    "status": {
+      "pending": "Waiting for approval",
+      "approved": "Approved",
+      "rejected": "Declined",
+      "cancelled": "Withdrawn"
     }
   }
 }
