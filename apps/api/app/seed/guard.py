@@ -22,6 +22,6 @@ def refuse_blocked_owner(email: str) -> None:
     """Stops the program (SystemExit) when the account must not get demo businesses."""
     if email.strip().lower() in blocked_owners():
         sys.exit(
-            f"Refusing to seed demo businesses for {email}: this account is the MyBiz primary "
+            f"Refusing to seed demo businesses for {email}: this account is the platform primary "
             "owner and must own no businesses. Use the demo account instead."
         )
