@@ -20,6 +20,7 @@ from app.ai.tools.base import (
 )
 from app.ai.tools.reading import _billable_clients, _month_arg, get_client
 from app.api import schedule as schedule_api
+from app.core.brand import NAME
 
 
 def payload_hash(tool_name: str, payload: dict[str, Any]) -> str:
@@ -30,6 +31,8 @@ def payload_hash(tool_name: str, payload: dict[str, Any]) -> str:
 def _propose(
     ctx: ToolContext, tool_name: str, payload: dict[str, Any], preview: dict[str, Any]
 ) -> dict[str, Any]:
+    if ctx.source is not None:
+        preview = {**preview, "source": ctx.source}
     action_id = ctx.tenant.session.execute(
         text("""
             INSERT INTO app.pending_actions
@@ -51,12 +54,21 @@ def _propose(
             "ttl": ctx.pending_ttl,
         },
     ).scalar_one()
+    instruction = (
+        "Nothing has happened yet. Tell the user to review and confirm the card shown under "
+        "your message. Do not claim the action is done."
+    )
+    if ctx.source is not None:
+        instruction = (
+            f"Nothing has happened yet. The request now waits in {NAME}, under Settings, AI "
+            "connections, where the business owner approves or rejects it. Tell the user to "
+            "approve it there. Do not claim the action is done."
+        )
     return {
         "pending_action_id": str(action_id),
         "status": "waiting_for_user_confirmation",
         "preview": preview,
-        "instruction": "Nothing has happened yet. Tell the user to review and confirm the card "
-        "shown under your message. Do not claim the action is done.",
+        "instruction": instruction,
     }
 
 

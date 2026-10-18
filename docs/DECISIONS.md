@@ -331,6 +331,14 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Reads run in a READ ONLY transaction and results are wrapped as untrusted data. Usage is the meter `mcp_calls` (one per call); the ceiling is 600 per business per rolling 24 hours, a setting.
 - Tokens: access 60 minutes, refresh 90 days and rotated on use, code 5 minutes; only SHA-256 hashes are stored. Connection lookups by hash are SECURITY DEFINER functions because the token endpoint knows no business yet.
 
+### AI connectors: actions that wait for approval (2026-10-18, round 7 R37b, migration 0136)
+
+- A connector may only propose, never change. The four proposing tools (`MCP_ACTION_TOOLS`: book, cancel, log time, bill a month) are the assistant's own, so they only create a pending action; publishing and scheduled tasks stay with the built-in assistant. The request is filed with agent key `mcp` and the app's name in its preview, so no table changed.
+- Proposing is a second scope the person ticks on the approval screen (`propose`, on by default); the first scope (`read`) is always granted. Connections made before this release stay read-only until reconnected, so nobody gains a power they did not approve.
+- Only the person the app acts for sees and decides its requests (the existing confirm and reject endpoints already require the requester). Approval re-checks permission, module, payload hash and capacity, and the audit entry carries the app's name.
+- Requests last 24 hours (nobody watches when an app proposes), at most 20 wait per business, and the read-only database transaction stays the default; only a proposing call writes, and only the request row.
+- The console view is a read-only function (`platform_mcp_usage`, usage permission) with per-business apps, calls and proposal outcomes. The settings guide is text only; screenshots wait for a real Claude and ChatGPT session.
+
 ## Open
 
 | # | Question |

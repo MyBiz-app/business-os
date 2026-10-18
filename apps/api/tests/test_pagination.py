@@ -70,6 +70,8 @@ BOUNDED = {
     "/client/waitlist": "limit in SQL",
     # one person's AI connections in one business: at most 20 (the cap when approving)
     "/mcp-connections": "capped",
+    # the changes AI apps proposed to one person in the last 30 days: the query returns at most 50
+    "/mcp-requests": "capped",
     # the console's unpaid-invoice list: the function returns at most 500 businesses
     "/platform/billing/overdue": "capped",
     # the SQL function returns at most 5 open banners, or the latest 50
