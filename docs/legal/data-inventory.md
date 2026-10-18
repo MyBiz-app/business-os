@@ -3,7 +3,7 @@
 Draft for a lawyer. One row per kind of personal data MyBiz holds, grouped by whose it is. Table
 names are the database tables (`app.*`), so an engineer can verify each row. "Basis" is our reading
 of the legal ground and is **to confirm**. "Retention" is what the code does today (the
-`purge-expired` job in `apps/api/app/jobs.py` and `app/core/retention.py`); where the law sets a
+`purge-expired` job in `apps/api/app/jobs/` and `app/core/retention.py`); where the law sets a
 minimum, that is written as "legal minimum, to confirm".
 
 Every business-owned table carries `tenant_id` and Postgres row level security, so a business only

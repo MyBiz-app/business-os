@@ -1,4 +1,4 @@
-"""Emailing staff their newly published shifts (the notify-shifts job; see app/jobs.py).
+"""Emailing staff their newly published shifts (the notify-shifts job; see app/jobs/).
 
 A published shift is emailed once, to the person it belongs to, in one message per person and
 business; manual and scheduled publishing look the same here. People can turn the emails off

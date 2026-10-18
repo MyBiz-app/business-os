@@ -1,4 +1,4 @@
-"""The broadcast center's sender (round 5, M1; the send-announcements job in app/jobs.py).
+"""The broadcast center's sender (round 5, M1; the send-announcements job in app/jobs/).
 
 A due announcement is resolved to one delivery per person and channel, then sent:
 - email through the platform's email provider (a marketing one carries "Ad" in the subject and
