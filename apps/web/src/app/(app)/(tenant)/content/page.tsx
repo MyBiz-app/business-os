@@ -21,6 +21,7 @@ import { Heatmap } from "./heatmap";
 import { LineChart } from "./line-chart";
 import { NetworkIcon } from "./network-icon";
 import { getStudio } from "./studio";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Kpi = components["schemas"]["Kpi"];
 
@@ -365,12 +366,11 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             </li>
           ))}
         </ul>
-        <details>
-          <summary className="cursor-pointer text-sm font-semibold text-primary-ink">{t("accounts.addMore")}</summary>
-          <div className="mt-4">
+        <CollapsibleSection variant="inline" triggerClassName="font-semibold text-primary-ink" title={t("accounts.addMore")}>
+          <div>
             <ConnectCards networks={providers.networks} canManage={canManage} withDemo={false} />
           </div>
-        </details>
+        </CollapsibleSection>
       </section>
     </Container>
   );

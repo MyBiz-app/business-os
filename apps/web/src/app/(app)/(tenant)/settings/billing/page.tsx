@@ -258,15 +258,11 @@ export default async function BillingPage() {
         ) : (
           <>
             <p className="text-sm text-muted">{t("subscription.hint")}</p>
-            {/* No script needed: the confirmation is a native disclosure. */}
-            <details className="text-sm">
-              <summary className="btn-link cursor-pointer font-medium text-danger underline-offset-4 hover:underline">
-                {t("subscription.cancel")}
-              </summary>
-              <form action={cancelSubscription} className="mt-3">
+            <CollapsibleSection variant="inline" className="text-sm" triggerClassName="font-medium text-danger underline-offset-4 hover:underline" title={t("subscription.cancel")}>
+              <form action={cancelSubscription}>
                 <SubmitButton>{t("subscription.cancelConfirm")}</SubmitButton>
               </form>
-            </details>
+            </CollapsibleSection>
           </>
         )}
         </div>

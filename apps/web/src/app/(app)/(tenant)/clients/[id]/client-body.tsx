@@ -29,6 +29,7 @@ import { QuotesSection } from "./quotes-section";
 import { DocumentsSection, TimeSection } from "./work-section";
 import { MessagesSection } from "../../messages/messages-section";
 import { NotesSection, ProfileSection } from "./profile-section";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
 const RECENT = 8; // past visits shown before "show the whole history"
@@ -234,9 +235,8 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
             </h2>
             {bookings.length === 0 && <p className="text-sm text-muted">{tBookings("noneYet")}</p>}
             {waivers && waivers.items.length > 0 && (
-              <details className="rounded-xl bg-primary/5 p-3 text-sm">
-                <summary className="cursor-pointer font-medium">{tBookings("waive.thisYear", { count: waivers.this_year })}</summary>
-                <ul className="mt-2 flex flex-col gap-1 text-muted">
+              <CollapsibleSection variant="inline" className="rounded-xl bg-primary/5 p-3 text-sm" triggerClassName="font-medium text-primary-ink" title={tBookings("waive.thisYear", { count: waivers.this_year })}>
+                <ul className="flex flex-col gap-1 text-muted">
                   {waivers.items.map((item) => (
                     <li key={item.booking_id}>
                       {item.service_name} · {dateFormat.format(new Date(item.starts_at))}
@@ -245,7 +245,7 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
                     </li>
                   ))}
                 </ul>
-              </details>
+              </CollapsibleSection>
             )}
             {upcoming.length > 0 && (
               <div className="flex flex-col gap-1">
@@ -258,10 +258,9 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
                 <h3 className="font-semibold">{tBookings("history")}</h3>
                 {bookingList(past.slice(0, RECENT))}
                 {past.length > RECENT && (
-                  <details>
-                    <summary className="cursor-pointer py-2 text-sm text-primary-ink">{tBookings("showAll", { count: past.length })}</summary>
+                  <CollapsibleSection variant="inline" title={tBookings("showAll", { count: past.length })}>
                     {bookingList(past.slice(RECENT))}
-                  </details>
+                  </CollapsibleSection>
                 )}
               </div>
             )}

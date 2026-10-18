@@ -4,6 +4,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { toMajor } from "@/lib/money";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 /** `href`: where the column leads (the list this bar counts), when it is clickable. */
 export type Column = { key: string; label: string; value: number; display: string; href?: string };
@@ -130,9 +131,8 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
           </div>
         )}
       </div>
-      <details className="text-sm">
-        <summary className="cursor-pointer text-muted">{tableLabel}</summary>
-        <table className="mt-2 w-full text-start">
+      <CollapsibleSection variant="inline" className="text-sm" triggerClassName="text-muted" title={tableLabel}>
+        <table className="w-full text-start">
           <thead>
             <tr className="text-muted">
               <th className="py-1 text-start font-medium">{headers[0]}</th>
@@ -148,7 +148,7 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
             ))}
           </tbody>
         </table>
-      </details>
+      </CollapsibleSection>
     </figure>
   );
 }

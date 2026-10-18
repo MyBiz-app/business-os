@@ -17,6 +17,7 @@ import { ScrollRegion } from "@/components/scroll-region";
 import { BranchComparison } from "./branch-comparison";
 import { BranchLink } from "./branch-link";
 import { BusyHours } from "./busy-hours";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Row = components["schemas"]["BreakdownItem"];
 
@@ -219,10 +220,9 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           </ul>
         )}
         {atRisk.length > SHOWN && (
-          <details>
-            <summary className="cursor-pointer text-sm text-primary-ink">{t("showAll", { count: atRisk.length })}</summary>
-            <ul className="mt-2 flex flex-col divide-y divide-border">{atRisk.slice(SHOWN).map(memberRow)}</ul>
-          </details>
+          <CollapsibleSection variant="inline" title={t("showAll", { count: atRisk.length })}>
+            <ul className="flex flex-col divide-y divide-border">{atRisk.slice(SHOWN).map(memberRow)}</ul>
+          </CollapsibleSection>
         )}
       </section>
       </PendingArea>
