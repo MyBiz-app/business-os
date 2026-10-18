@@ -69400,6 +69400,11 @@
             "type": "integer",
             "title": "Deductions Minor"
           },
+          "employer_cost_minor": {
+            "type": "integer",
+            "title": "Employer Cost Minor",
+            "description": "Gross pay plus what the employer pays on top (pension, severance, insurance)"
+          },
           "previous_gross_minor": {
             "anyOf": [
               {
@@ -69425,6 +69430,7 @@
           "people",
           "gross_minor",
           "deductions_minor",
+          "employer_cost_minor",
           "previous_gross_minor",
           "open_errors",
           "open_warnings"
