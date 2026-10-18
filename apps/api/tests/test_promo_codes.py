@@ -118,3 +118,37 @@ def test_paused_codes_and_strangers(client: TestClient, studio: dict, auth: Auth
         ).status_code
         == 403
     )
+
+
+def test_edit_a_code_before_and_after_use(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    _joined, headers, card = setup(client, auth, studio)
+    h = studio["headers"]
+    code = client.post("/promo-codes", json={"code": "EDITME", "percent_off": 10}, headers=h).json()
+    edited = client.patch(
+        f"/promo-codes/{code['id']}",
+        json={"amount_off": 500, "max_uses": 3, "ends_on": "2099-01-01"},
+        headers=h,
+    ).json()
+    assert edited["amount_off"] == 500 and edited["percent_off"] is None
+    assert edited["max_uses"] == 3 and edited["ends_on"] == "2099-01-01"
+    cleared = client.patch(f"/promo-codes/{code['id']}", json={"max_uses": None}, headers=h).json()
+    assert cleared["max_uses"] is None and cleared["amount_off"] == 500
+    backwards = client.patch(
+        f"/promo-codes/{code['id']}", json={"starts_on": "2100-01-01"}, headers=h
+    )
+    assert backwards.status_code == 422
+    checkout = start(client, headers, card["id"])
+    client.post(
+        f"/client/checkouts/{checkout['id']}/promo", json={"code": "EDITME"}, headers=headers
+    )
+    client.post(f"/client/checkouts/{checkout['id']}/pay", json={}, headers=headers)
+    used = client.get("/promo-codes", headers=h).json()[0]
+    if used["uses"]:
+        locked = client.patch(f"/promo-codes/{code['id']}", json={"percent_off": 20}, headers=h)
+        assert locked.status_code == 409
+    assert (
+        client.patch(f"/promo-codes/{code['id']}", json={"max_uses": 9}, headers=h).status_code
+        == 200
+    )

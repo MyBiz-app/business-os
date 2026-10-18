@@ -953,6 +953,7 @@
     "staffBadge": "Team",
     "addMe": "Add me",
     "absentDays": "Not in {days} days",
+    "newClients": "New",
     "homeBranch": "Home branch",
     "allBranches": "All branches",
     "profile": {
@@ -1116,8 +1117,8 @@
       "clients": "Active clients",
       "bookings": "Sessions held",
       "occupancy": "Average occupancy",
-      "staffCost": "Team cost, {month}",
-      "staffCostHint": "Gross pay of the latest payroll month, split by where people clocked in",
+      "staffCost": "Team cost (gross pay), {month}",
+      "staffCostHint": "Gross pay only, from the latest payroll month, split by where people clocked in. Employer contributions and other expenses are not included, because there is no expense ledger yet",
       "origins": "Where clients come from",
       "originsEmpty": "No client addresses yet for the people who came in the last 30 days.",
       "originRow": "{city}: {count}",
@@ -7699,6 +7700,7 @@
       "draft": "Drafts",
       "sent": "Waiting for an answer",
       "accepted": "Accepted",
+      "acceptedMonth": "Accepted this month",
       "declined": "Declined or expired",
       "closeRate": "Close rate",
       "closeRateHint": "{won} of {decided} decided"

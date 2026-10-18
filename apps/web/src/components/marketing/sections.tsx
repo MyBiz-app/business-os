@@ -29,6 +29,7 @@ import { Reveal } from "@/components/marketing/reveal";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { VerticalIcon } from "@/components/vertical-icon";
 import { industryTexts } from "@/lib/verticals";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 export const FEATURES = [
   { key: "schedule", Icon: CalendarDays },
@@ -166,15 +167,9 @@ export async function Faq() {
       <Reveal delay={80}>
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
           {items.map((item) => (
-            <details key={item.q} className="card group p-5 open:shadow-md">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
-                {item.q}
-                <span aria-hidden="true" className="text-xl text-primary-ink transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 text-muted">{item.a}</p>
-            </details>
+            <CollapsibleSection key={item.q} title={item.q}>
+              <p className="text-muted">{item.a}</p>
+            </CollapsibleSection>
           ))}
         </div>
       </Reveal>

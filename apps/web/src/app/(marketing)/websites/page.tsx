@@ -12,6 +12,7 @@ import { WebsiteLeadDemo } from "@/components/marketing/website-lead-demo";
 import { WebsitesShowcase, type ShowcaseSite } from "@/components/marketing/websites-showcase";
 import { loadCatalog, loadSitePrices } from "@/lib/pricing";
 import { formatMoney } from "@/lib/money";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 const SITES = [
   { key: "barber", tone: "bg-gradient-to-br from-navy to-primary" },
@@ -176,10 +177,9 @@ export default async function WebsitesPage({ searchParams }: PageProps<"/website
         <SectionHeading id="faq-heading" title={t("faq.title")} />
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
           {(t.raw("faq.items") as { q: string; a: string }[]).map((item) => (
-            <details key={item.q} className="card group p-5 open:shadow-md">
-              <summary className="cursor-pointer list-none font-semibold">{item.q}</summary>
-              <p className="mt-3 text-muted">{item.a}</p>
-            </details>
+            <CollapsibleSection key={item.q} title={item.q}>
+              <p className="text-muted">{item.a}</p>
+            </CollapsibleSection>
           ))}
         </div>
       </Section>

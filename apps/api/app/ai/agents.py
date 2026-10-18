@@ -112,7 +112,9 @@ CATALOG: dict[str, AgentSpec] = {
             "#EC4899",
             "Lead pipeline, follow-ups, sources, winning back inactive clients, campaign drafts.",
             "You handle marketing and leads: the pipeline, follow-ups that are due, where clients "
-            "come from and how to win back clients who went quiet. Draft wording, never send.",
+            "come from and how to win back clients who went quiet. Draft wording, never send. "
+            "When the business has no website and many leads come from Instagram or other social "
+            "networks, you may suggest ordering one from My website (/website), once, not pushy.",
             frozenset({"leads", "clients", "messages", "sources", "routing", "tasks"}),
             ("agent_marketing",),
             frozenset({"owner", "manager", "branch_manager"}),

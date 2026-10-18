@@ -18051,10 +18051,31 @@ export interface components {
             /** Max Uses */
             max_uses?: number | null;
         };
-        /** PromoCodeUpdate */
+        /**
+         * PromoCodeUpdate
+         * @description Only the fields that are sent change; null clears plan, dates and limit.
+         *
+         *     The code itself never changes. The discount amount changes only before the first use,
+         *     so paid checkouts keep the meaning they were paid with.
+         */
         PromoCodeUpdate: {
             /** Active */
-            active: boolean;
+            active?: boolean | null;
+            /** Percent Off */
+            percent_off?: number | null;
+            /**
+             * Amount Off
+             * @description Minor units
+             */
+            amount_off?: number | null;
+            /** Plan Id */
+            plan_id?: string | null;
+            /** Starts On */
+            starts_on?: string | null;
+            /** Ends On */
+            ends_on?: string | null;
+            /** Max Uses */
+            max_uses?: number | null;
         };
         /** ProviderField */
         ProviderField: {
@@ -18470,6 +18491,18 @@ export interface components {
              * @description Minor units
              */
             total: number;
+            /**
+             * Month Count
+             * @description Of these, accepted in the current month (business time zone)
+             * @default 0
+             */
+            month_count: number;
+            /**
+             * Month Total
+             * @description Minor units, accepted this month
+             * @default 0
+             */
+            month_total: number;
         };
         /** QuoteSummary */
         QuoteSummary: {
