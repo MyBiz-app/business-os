@@ -29252,6 +29252,747 @@
         }
       }
     },
+    "/waitlist": {
+      "get": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "List Waitlist",
+        "description": "Everyone waiting for a spot, by day: requests and places on classes' own lists.",
+        "operationId": "list_waitlist",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Day"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "service_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "auto",
+                    "first_come",
+                    "manual"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mode"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WaitlistEntry"
+                  },
+                  "title": "Response List Waitlist"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/summary": {
+      "get": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Waitlist Summary",
+        "description": "How many people wait, and for what (the dashboard's hint to open another class).",
+        "operationId": "waitlist_summary",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaitlistSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/requests/{request_id}/admit": {
+      "post": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Admit Request",
+        "description": "The team lets a waiting client in (the manual mode's \"let in\"): books them into the spot\nthat opened and tells them.",
+        "operationId": "admit_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdmitRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admitted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/bookings/{booking_id}/admit": {
+      "post": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Admit Booking",
+        "description": "The team moves someone from a class's own list into a spot that is free.",
+        "operationId": "admit_booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admitted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/requests/{request_id}": {
+      "delete": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Remove Request",
+        "description": "The team takes a request off the list.",
+        "operationId": "remove_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist/requests/{request_id}/notify": {
+      "post": {
+        "tags": [
+          "waitlist"
+        ],
+        "summary": "Notify Request",
+        "description": "The team tells a waiting client about the spot that is free for them now.",
+        "operationId": "notify_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/waitlist": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Waitlist",
+        "description": "What the signed-in client waits for: their requests and their places on classes' lists.",
+        "operationId": "my_waitlist",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyWaitlistEntry"
+                  },
+                  "title": "Response My Waitlist"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Join Waitlist",
+        "description": "\"Tell me if something opens\": a given time, a range of hours or a whole day.",
+        "operationId": "join_waitlist",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaitlistRequestCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyWaitlistEntry"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/waitlist/{request_id}": {
+      "delete": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Leave Waitlist",
+        "description": "The client stops waiting (a place on a class's own list is cancelled as a booking).",
+        "operationId": "leave_waitlist",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/waitlist/claim": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Claim Spot",
+        "description": "\"First to take it gets it\": the client takes the spot they were told about. 409\n`spot_taken` when someone was faster (they stay on the list).",
+        "operationId": "claim_spot",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Claimed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/rooms/{room_id}/hours": {
       "get": {
         "tags": [
@@ -43002,6 +43743,45 @@
         ],
         "title": "Adjustment"
       },
+      "AdmitRequest": {
+        "properties": {
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "The free spot to use; default: the first one that matches"
+          }
+        },
+        "type": "object",
+        "title": "AdmitRequest"
+      },
+      "Admitted": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "booking_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Booking Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "booking_id"
+        ],
+        "title": "Admitted"
+      },
       "AgentCard": {
         "properties": {
           "key": {
@@ -47303,6 +48083,60 @@
         ],
         "title": "City"
       },
+      "ClaimBody": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id",
+            "description": "The spot the client was told about"
+          },
+          "pay": {
+            "type": "boolean",
+            "title": "Pay",
+            "description": "Courts paid in the app: the client agreed to pay",
+            "default": false
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id"
+        ],
+        "title": "ClaimBody"
+      },
+      "Claimed": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "booking_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Booking Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "booking_id"
+        ],
+        "title": "Claimed"
+      },
       "Client": {
         "properties": {
           "id": {
@@ -47793,6 +48627,42 @@
             "title": "Resource Payment",
             "description": "Reservations: paid in the app when booking, or at the venue",
             "default": "app"
+          },
+          "waitlist_class": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Class",
+            "description": "The business's waitlist for classes (off: none)",
+            "default": "off"
+          },
+          "waitlist_appointment": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Appointment",
+            "description": "The business's waitlist for personal appointments",
+            "default": "off"
+          },
+          "waitlist_resource": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Resource",
+            "description": "The business's waitlist for courts and rooms",
+            "default": "off"
           },
           "dependents": {
             "anyOf": [
@@ -59275,6 +60145,158 @@
         ],
         "title": "MyReview"
       },
+      "MyWaitlistEntry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "request",
+              "booking"
+            ],
+            "title": "Source"
+          },
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "service_name": {
+            "type": "string",
+            "title": "Service Name"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "session",
+              "slot",
+              "range",
+              "day"
+            ],
+            "title": "Kind"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "from_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Time"
+          },
+          "to_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Time"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At"
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "offer_session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offer Session Id",
+            "description": "A spot is free and the client can take it now"
+          },
+          "offer_starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offer Starts At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "service_id",
+          "service_name",
+          "kind",
+          "day",
+          "created_at"
+        ],
+        "title": "MyWaitlistEntry"
+      },
       "NetLine": {
         "properties": {
           "code": {
@@ -59563,7 +60585,9 @@
               "session_reminder",
               "plan_ending",
               "friend_request",
-              "class_invite"
+              "class_invite",
+              "waitlist_spot_open",
+              "waitlist_spot_taken"
             ],
             "title": "Kind"
           },
@@ -59571,7 +60595,7 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Payload",
-            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at"
+            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at; waitlist_spot_open: session_id, service_name, starts_at, ends_at"
           },
           "created_at": {
             "type": "string",
@@ -66741,6 +67765,24 @@
             "type": "integer",
             "title": "Travel Minutes",
             "default": 0
+          },
+          "waitlist_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Mode",
+            "description": "Overrides the business's waitlist mode for this service"
           }
         },
         "type": "object",
@@ -67155,6 +68197,24 @@
               }
             ],
             "title": "Travel Minutes"
+          },
+          "waitlist_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Mode",
+            "description": "This service's own waitlist mode; null follows the business"
           }
         },
         "type": "object",
@@ -69846,6 +70906,54 @@
             "description": "Whether the business asks its clients for an ID number",
             "default": "off"
           },
+          "waitlist_enabled": {
+            "type": "boolean",
+            "title": "Waitlist Enabled",
+            "description": "The business keeps waitlists",
+            "default": true
+          },
+          "waitlist_class_mode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Class Mode",
+            "description": "What happens when a spot in a class opens",
+            "default": "auto"
+          },
+          "waitlist_appointment_mode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Appointment Mode",
+            "description": "What happens when a personal appointment time opens",
+            "default": "off"
+          },
+          "waitlist_resource_mode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Waitlist Resource Mode",
+            "description": "What happens when a court or room time opens",
+            "default": "off"
+          },
+          "waitlist_auto_hours": {
+            "type": "integer",
+            "title": "Waitlist Auto Hours",
+            "description": "Automatic sign-up stops this many hours before a class starts",
+            "default": 3
+          },
           "resource_payment": {
             "type": "string",
             "enum": [
@@ -70431,6 +71539,81 @@
               }
             ],
             "title": "Client Id Number"
+          },
+          "waitlist_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Enabled"
+          },
+          "waitlist_class_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Class Mode"
+          },
+          "waitlist_appointment_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Appointment Mode"
+          },
+          "waitlist_resource_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "off",
+                  "auto",
+                  "first_come",
+                  "manual"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Resource Mode"
+          },
+          "waitlist_auto_hours": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 72.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Auto Hours"
           },
           "shifts_publish_auto": {
             "anyOf": [
@@ -71464,6 +72647,370 @@
           "reason"
         ],
         "title": "VoidInvoice"
+      },
+      "WaitlistEntry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "request",
+              "booking"
+            ],
+            "title": "Source",
+            "description": "request: a time range, day or exact time; booking: a place on a class's list"
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "service_name": {
+            "type": "string",
+            "title": "Service Name"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "session",
+              "slot",
+              "range",
+              "day"
+            ],
+            "title": "Kind"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "The class, for a booking entry"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "from_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Time"
+          },
+          "to_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Time"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "location_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Name"
+          },
+          "staff_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff User Id"
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position",
+            "description": "Place in the queue for this service and day"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "off",
+              "auto",
+              "first_come",
+              "manual"
+            ],
+            "title": "Mode"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "offered"
+            ],
+            "title": "Status",
+            "description": "offered: the client was told about a free spot"
+          },
+          "open_session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Session Id",
+            "description": "A spot that is free right now for this client"
+          },
+          "open_starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Starts At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "client_id",
+          "client_name",
+          "service_id",
+          "service_name",
+          "kind",
+          "day",
+          "position",
+          "created_at",
+          "mode",
+          "status"
+        ],
+        "title": "WaitlistEntry"
+      },
+      "WaitlistRequestCreate": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "slot",
+              "range",
+              "day"
+            ],
+            "title": "Kind"
+          },
+          "day": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day",
+            "description": "The local day (a slot's own day)"
+          },
+          "from_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Time",
+            "description": "Range: from (local time)"
+          },
+          "to_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Time",
+            "description": "Range: to (local time)"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At",
+            "description": "Slot: the exact start"
+          },
+          "staff_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff User Id",
+            "description": "Only with this person"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id",
+            "description": "Only at this branch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "kind"
+        ],
+        "title": "WaitlistRequestCreate"
+      },
+      "WaitlistServiceCount": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "name",
+          "waiting"
+        ],
+        "title": "WaitlistServiceCount"
+      },
+      "WaitlistSummary": {
+        "properties": {
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/WaitlistServiceCount"
+            },
+            "type": "array",
+            "title": "Services",
+            "description": "The most wanted services"
+          }
+        },
+        "type": "object",
+        "required": [
+          "waiting",
+          "services"
+        ],
+        "title": "WaitlistSummary"
       },
       "WebsiteOrder": {
         "properties": {

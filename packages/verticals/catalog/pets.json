@@ -6,6 +6,7 @@
   "color": "from-orange-400 to-amber-600",
   "terms": "pets",
   "schedule_view": "appointments",
+  "waitlist": { "enabled": false, "classes": "first_come", "appointments": "first_come", "resources": "first_come" },
   "social": "off",
   "client_term": "owner",
   "booking_modes": ["appointment", "class"],

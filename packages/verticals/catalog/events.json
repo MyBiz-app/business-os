@@ -6,6 +6,7 @@
   "color": "from-fuchsia-500 to-purple-600",
   "terms": "events",
   "schedule_view": "appointments",
+  "waitlist": { "enabled": false, "classes": "first_come", "appointments": "first_come", "resources": "first_come" },
   "social": "off",
   "client_term": "client",
   "booking_modes": [

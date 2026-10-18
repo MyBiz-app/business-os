@@ -27,6 +27,7 @@ from its parent (sub-categories can have sub-categories of their own):
   `booking_requires_plan`, `client_home` (the cards of the client app's home, in order: see
   `CLIENT_HOME_CARDS` in `packages/verticals/src/index.ts`), `health_form`, `default_preset`, `recommended_modules`, `icon`,
   `color`): the entry's own value, else the parent's.
+- `waitlist` (R30): `enabled` and the mode (`off`, `auto`, `first_come`, `manual`) for `classes`, `appointments` and `resources`; copied to the business when it picks its category and changed in Settings, Booking and waitlist.
 - `default_services`, `default_plans`, `default_rooms`: the entry's own list replaces the parent's.
 - `client_fields` replaces the parent's fields; `extra_client_fields` adds to them.
 - Dependents (#43): `dependents` (`pet` / `child`: the industry keeps profiles of who comes under

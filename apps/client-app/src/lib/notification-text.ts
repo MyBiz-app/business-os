@@ -38,6 +38,7 @@ export function useNotificationText(): (n: Notification) => string {
 
 /** An icon (Ionicons name) for the kind of update, so the list can be scanned. */
 export function notificationIcon(kind: string): "calendar-outline" | "checkmark-circle-outline" | "close-circle-outline" | "heart-outline" | "card-outline" | "notifications-outline" {
+  if (kind === "waitlist_spot_open") return "notifications-outline";
   if (kind.includes("cancel") || kind.includes("rejected")) return "close-circle-outline";
   if (kind.includes("health")) return "heart-outline";
   if (kind.includes("plan") || kind.includes("entitlement")) return "card-outline";
