@@ -20,6 +20,7 @@ from app.ai.tools.base import (
 )
 from app.ai.tools.reading import _billable_clients, _month_arg, get_client
 from app.api import schedule as schedule_api
+from app.core.brand import NAME
 
 
 def payload_hash(tool_name: str, payload: dict[str, Any]) -> str:
@@ -59,7 +60,7 @@ def _propose(
     )
     if ctx.source is not None:
         instruction = (
-            "Nothing has happened yet. The request now waits in MyBiz, under Settings, AI "
+            f"Nothing has happened yet. The request now waits in {NAME}, under Settings, AI "
             "connections, where the business owner approves or rejects it. Tell the user to "
             "approve it there. Do not claim the action is done."
         )
