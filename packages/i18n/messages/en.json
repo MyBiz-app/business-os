@@ -2129,6 +2129,8 @@
     "bookPreview": "Book {client} into {service}",
     "publishPreview": "Publish on {network} ({account}): {text}",
     "cancelPreview": "Cancel {client}'s booking for {service}",
+    "sendMessagePreview": "Send {client} a message: {body}",
+    "giveBackPreview": "Give {client} back the visit for {service} ({reason})",
     "fullWaitlist": "It's full, so this will add them to the waitlist.",
     "confirm": "Confirm",
     "reject": "Don't do it",
@@ -3260,6 +3262,7 @@
       "messagesFailed": "Messages failed (24h)",
       "emailsWaiting": "Emails waiting",
       "database": "Database size",
+      "files": "Kept files",
       "aiToday": "AI credits today",
       "aiLimit": "of {limit}",
       "release": "Version",
@@ -4020,6 +4023,8 @@
       "upTo": "Up to {count} active clients",
       "custom": "Over 1,000 active clients",
       "customPrice": "Custom price",
+      "aiAllowance": "Up to {users} AI users, {credits} AI credits a month",
+      "aiExtraUser": "One more AI user: {price} a month",
       "modulesTitle": "Add-ons",
       "presetsTitle": "Recommended plans",
       "presets": {
@@ -4539,7 +4544,8 @@
             ]
           }
         ],
-        "coordinatorLine": "Accessibility coordinator: {name}, {email}."
+        "coordinatorLine": "Accessibility coordinator: {name}, {email}.",
+        "coordinatorPhone": "Phone: {phone}."
       },
       "dpa": {
         "title": "Data processing agreement",
@@ -9977,7 +9983,9 @@
       "book_client": "Book a client",
       "cancel_booking": "Cancel a booking",
       "log_time": "Log time",
-      "bill_month": "Bill a month"
+      "bill_month": "Bill a month",
+      "send_message": "Send a message",
+      "give_back_visit": "Give a visit back"
     },
     "fields": {
       "client": "Client",
@@ -9989,7 +9997,9 @@
       "description": "Work",
       "month": "Month",
       "clients": "Clients",
-      "total": "Total"
+      "total": "Total",
+      "body": "Message",
+      "reason": "Reason"
     },
     "full": "The class is full: the client joins the waitlist.",
     "historyTitle": "Recent requests",

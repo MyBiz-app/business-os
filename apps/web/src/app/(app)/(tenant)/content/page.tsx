@@ -137,7 +137,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
         actions={
           <>
             <CsvButton label={t("export.csv")} filename={`content-${from}-${to}.csv`} rows={csv} />
-            <PrintButton label={t("export.print")} />
+            <PrintButton label={t("export.print")} logAs="report_print" />
           </>
         }
       />

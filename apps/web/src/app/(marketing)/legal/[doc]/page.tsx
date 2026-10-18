@@ -112,6 +112,7 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
                     name: BRAND.legal.accessibilityCoordinator.name[locale === "en" ? "en" : "he"],
                     email: BRAND.legal.accessibilityCoordinator.email,
                   })}
+                  {BRAND.legal.accessibilityCoordinator.phone ? ` ${t("accessibility.coordinatorPhone", { phone: BRAND.legal.accessibilityCoordinator.phone })}` : null}
                 </p>
               )}
               {section.items ? (

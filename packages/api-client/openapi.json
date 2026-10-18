@@ -29460,6 +29460,78 @@
         }
       }
     },
+    "/audit-log/exports": {
+      "post": {
+        "tags": [
+          "settings",
+          "reports"
+        ],
+        "summary": "Log Export",
+        "description": "Records that someone took business data out as a CSV or a printed report. Some exports are\nbuilt in the browser from what the page already shows, so the page reports them here.",
+        "operationId": "log_export",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportNotice"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/appointments/staff": {
       "get": {
         "tags": [
@@ -50371,6 +50443,11 @@
             },
             "type": "object",
             "title": "Presets"
+          },
+          "ai_extra_user_price": {
+            "type": "integer",
+            "title": "Ai Extra User Price",
+            "description": "One more AI user a month, minor units"
           }
         },
         "type": "object",
@@ -50378,7 +50455,8 @@
           "currency",
           "core",
           "modules",
-          "presets"
+          "presets",
+          "ai_extra_user_price"
         ],
         "title": "Catalog"
       },
@@ -50501,6 +50579,18 @@
             ],
             "title": "Billing",
             "description": "\"once\": charged with the first invoice only"
+          },
+          "ai_users_included": {
+            "type": "integer",
+            "title": "Ai Users Included",
+            "description": "People with AI access it includes",
+            "default": 0
+          },
+          "ai_credits_included": {
+            "type": "integer",
+            "title": "Ai Credits Included",
+            "description": "Monthly AI credits it includes",
+            "default": 0
           }
         },
         "type": "object",
@@ -56606,6 +56696,31 @@
           "url"
         ],
         "title": "ExportLink"
+      },
+      "ExportNotice": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "sales_csv",
+              "content_csv",
+              "report_print"
+            ],
+            "title": "Kind"
+          },
+          "rows": {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Rows",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "ExportNotice"
       },
       "ExtraUsers": {
         "properties": {
@@ -74477,6 +74592,11 @@
             "type": "integer",
             "title": "Database Bytes"
           },
+          "files_bytes": {
+            "type": "integer",
+            "title": "Files Bytes",
+            "description": "All kept files of all businesses (documents, logos, payslips)"
+          },
           "ai_credits_today": {
             "type": "number",
             "title": "Ai Credits Today"
@@ -74521,6 +74641,7 @@
           "messages_failed_24h",
           "emails_waiting",
           "database_bytes",
+          "files_bytes",
           "ai_credits_today",
           "ai_alert_at",
           "routes",

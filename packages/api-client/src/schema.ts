@@ -5649,6 +5649,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/audit-log/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Log Export
+         * @description Records that someone took business data out as a CSV or a printed report. Some exports are
+         *     built in the browser from what the page already shows, so the page reports them here.
+         */
+        post: operations["log_export"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/appointments/staff": {
         parameters: {
             query?: never;
@@ -11373,6 +11394,11 @@ export interface components {
             presets: {
                 [key: string]: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "payroll" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             };
+            /**
+             * Ai Extra User Price
+             * @description One more AI user a month, minor units
+             */
+            ai_extra_user_price: number;
         };
         /** CatalogModule */
         CatalogModule: {
@@ -11405,6 +11431,18 @@ export interface components {
              * @enum {string}
              */
             billing: "monthly" | "once";
+            /**
+             * Ai Users Included
+             * @description People with AI access it includes
+             * @default 0
+             */
+            ai_users_included: number;
+            /**
+             * Ai Credits Included
+             * @description Monthly AI credits it includes
+             * @default 0
+             */
+            ai_credits_included: number;
         };
         /** Chat */
         Chat: {
@@ -13817,6 +13855,19 @@ export interface components {
              * @description Downloads the ZIP without signing in, for 24 hours
              */
             url: string;
+        };
+        /** ExportNotice */
+        ExportNotice: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "sales_csv" | "content_csv" | "report_print";
+            /**
+             * Rows
+             * @default 0
+             */
+            rows: number;
         };
         /** ExtraUsers */
         ExtraUsers: {
@@ -20698,6 +20749,11 @@ export interface components {
             emails_waiting: number;
             /** Database Bytes */
             database_bytes: number;
+            /**
+             * Files Bytes
+             * @description All kept files of all businesses (documents, logos, payslips)
+             */
+            files_bytes: number;
             /** Ai Credits Today */
             ai_credits_today: number;
             /** Ai Alert At */
@@ -36065,6 +36121,41 @@ export interface operations {
                 content: {
                     "application/json": unknown;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    log_export: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportNotice"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

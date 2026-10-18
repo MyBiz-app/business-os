@@ -217,6 +217,13 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                       ? tModules("descriptions.extra_location", { price: money(module.price) })
                       : tModules(`descriptions.${module.key}` as "descriptions.client_app")}
                   </p>
+                  {module.ai_users_included > 0 && (
+                    <p className="text-sm font-medium">
+                      {t("aiAllowance", { users: module.ai_users_included, credits: module.ai_credits_included })}
+                      <br />
+                      {t("aiExtraUser", { price: money(catalog.ai_extra_user_price) })}
+                    </p>
+                  )}
                   <p className="flex items-baseline gap-1 sm:border-t sm:border-border sm:pt-3">
                     <span className="flex items-center gap-1.5 text-lg font-extrabold sm:text-2xl">
                       +<CurrencyBadge currency={currency} />

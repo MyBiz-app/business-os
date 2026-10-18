@@ -31,6 +31,8 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 
 `client_import.py` imports a Hebrew Windows-1255 CSV: recognized columns, a column mapped by hand, preview with a duplicate and an invalid row, then the import.
 
+`mfa.py` turns on an authenticator app on the account page with a generated code, then signs in from a new browser with password and code (a wrong code is refused).
+
 `privacy.py` downloads a client's data export, then erases their personal details.
 
 `notifications.py`: the studio books a member and cancels the class; the member sees both under Updates, with an unread badge that clears once read.

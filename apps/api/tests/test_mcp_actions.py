@@ -13,7 +13,14 @@ from tests.test_assistant import enable_ai_pro
 from tests.test_bookings import new_client, new_session
 from tests.test_mcp import REDIRECT, call, exchange, pkce, register, rpc, tool_names
 
-PROPOSALS = {"book_client", "cancel_booking", "log_time", "bill_month"}
+PROPOSALS = {
+    "book_client",
+    "cancel_booking",
+    "log_time",
+    "bill_month",
+    "send_message",
+    "give_back_visit",
+}
 
 
 def connect(client: TestClient, headers: dict, propose: bool, name: str = "Claude") -> dict:
@@ -264,3 +271,76 @@ def test_the_console_sees_who_uses_the_connectors(
     assert mine["apps"] == ["Claude"] and mine["connections"] == 1
     assert mine["calls"] == 1 and mine["proposed"] == 1 and mine["waiting"] == 1
     assert board["daily_limit"] > 0
+
+
+def test_a_message_to_a_client_waits_for_approval_then_is_queued(
+    client: TestClient, studio: dict
+) -> None:
+    headers = studio["headers"]
+    modules = {"client_app": 1, "ai_pro": 1, "whatsapp": 1}
+    assert (
+        client.put(
+            "/tenants/current/modules", json={"modules": modules}, headers=headers
+        ).status_code
+        == 200
+    )
+    dana = client.post(
+        "/clients", json={"first_name": "Dana", "phone": "050-1234567"}, headers=headers
+    ).json()["id"]
+    tokens = connect(client, headers, propose=True)
+
+    proposed = call(
+        client,
+        tokens["access_token"],
+        "send_message",
+        {"client_id": dana, "body": "See you at 18:00"},
+    )
+
+    assert proposed["isError"] is False
+    assert client.get("/messages", headers=headers).json() == []
+    [request] = waiting(client, headers)
+    assert request["preview"]["body"] == "See you at 18:00"
+    approved = client.post(f"/ai/pending-actions/{request['id']}/confirm", headers=headers)
+    assert approved.status_code == 200, approved.text
+    [sent] = client.get("/messages", headers=headers).json()
+    assert sent["body"] == "See you at 18:00" and sent["client_id"] == dana
+
+
+def test_a_message_needs_a_phone_number(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    modules = {"client_app": 1, "ai_pro": 1, "whatsapp": 1}
+    client.put("/tenants/current/modules", json={"modules": modules}, headers=headers)
+    nobody = new_client(client, headers, "NoPhone")
+    tokens = connect(client, headers, propose=True)
+
+    refused = call(
+        client, tokens["access_token"], "send_message", {"client_id": nobody, "body": "Hi"}
+    )
+
+    assert refused["isError"] is True
+    assert waiting(client, headers) == []
+
+
+def test_giving_a_visit_back_waits_for_approval(client: TestClient, studio: dict) -> None:
+    from tests.test_cancellation_policy import booked_with_card, credits_left, week
+
+    enable_ai_pro(client, studio)
+    headers = studio["headers"]
+    week(client, headers)
+    client_id, booking = booked_with_card(client, studio)
+    tokens = connect(client, headers, propose=True)
+    args = {"booking_id": booking["id"], "reason": "family emergency"}
+
+    too_early = call(client, tokens["access_token"], "give_back_visit", args)
+    assert too_early["isError"] is True  # not cancelled late yet: nothing to give back
+
+    client.patch(f"/bookings/{booking['id']}", json={"status": "cancelled"}, headers=headers)
+    assert credits_left(client, headers, client_id) == 2
+    proposed = call(client, tokens["access_token"], "give_back_visit", args)
+
+    assert proposed["isError"] is False
+    assert credits_left(client, headers, client_id) == 2  # nothing happens until approval
+    [request] = waiting(client, headers)
+    approved = client.post(f"/ai/pending-actions/{request['id']}/confirm", headers=headers)
+    assert approved.status_code == 200, approved.text
+    assert credits_left(client, headers, client_id) == 3

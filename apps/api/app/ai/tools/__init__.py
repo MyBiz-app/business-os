@@ -40,9 +40,11 @@ from app.ai.tools.writing import (
     book_client,
     cancel_booking,
     cancel_scheduled_task,
+    give_back_visit,
     list_scheduled_tasks,
     log_time,
     schedule_task,
+    send_message,
     suggest_agent,
 )
 from app.ai.tools.writing import (
@@ -174,6 +176,28 @@ TOOLS: dict[str, Tool] = {
             {"booking_id": ID},
             Permission.BOOKINGS_MANAGE,
             cancel_booking,
+            module="ai_pro",
+        ),
+        Tool(
+            "send_message",
+            "Propose a WhatsApp message to one client (an id from find_clients). Creates a card "
+            "the user must confirm; nothing is sent until they do.",
+            {"client_id": ID, "body": {"type": "string", "description": "The message text"}},
+            Permission.CLIENTS_WRITE,
+            send_message,
+            module="ai_pro",
+        ),
+        Tool(
+            "give_back_visit",
+            "Propose giving a client back the visit that a late cancellation or a no-show used "
+            "up (a booking id from get_session_roster or get_client), with a short reason. "
+            "Creates a card the user must confirm; the client is told.",
+            {
+                "booking_id": ID,
+                "reason": {"type": "string", "description": "Why, 3 to 300 characters"},
+            },
+            Permission.SALES_MANAGE,
+            give_back_visit,
             module="ai_pro",
         ),
         Tool(
@@ -366,6 +390,8 @@ TOOL_DOMAINS: dict[str, str] = {
     "get_session_roster": "bookings",
     "book_client": "bookings",
     "cancel_booking": "bookings",
+    "give_back_visit": "bookings",
+    "send_message": "messages",
     "get_metrics": "metrics",
     "client_sources": "sources",
     "lead_pipeline": "leads",
@@ -424,7 +450,7 @@ MCP_READ_TOOLS: frozenset[str] = frozenset(
 # MyBiz, where it is checked again (app/ai/actions.py). Publishing and scheduled tasks stay with
 # the built-in assistant.
 MCP_ACTION_TOOLS: frozenset[str] = frozenset(
-    {"book_client", "cancel_booking", "log_time", "bill_month"}
+    {"book_client", "cancel_booking", "log_time", "bill_month", "send_message", "give_back_visit"}
 )
 
 
