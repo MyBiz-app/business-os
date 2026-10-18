@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Avatar } from "@/components/avatar";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { CardTransition } from "@/components/ui/page-transition";
 import { SummaryTiles } from "@/components/ui/summary-tiles";
 import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
@@ -188,6 +189,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
                       const due = lead.follow_up_on && !["won", "lost"].includes(stage) && lead.follow_up_on <= today;
                       return (
                         <li key={lead.id}>
+<CardTransition name={`lead-${lead.id}`}>
                           <Link
                             href={`/leads/${lead.id}`}
                             className="card card-hover relative flex flex-col gap-2 overflow-hidden p-3 ps-4"
@@ -211,6 +213,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
                               {lead.owner_name && <span className="ms-auto truncate text-muted">{lead.owner_name}</span>}
                             </span>
                           </Link>
+</CardTransition>
                         </li>
                       );
                     })}

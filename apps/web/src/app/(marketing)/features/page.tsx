@@ -4,6 +4,7 @@ import { BRAND } from "@business-os/i18n/brand";
 
 import { Section } from "@/components/layout/section";
 import { ChatMock, DashboardMock, PhoneMock } from "@/components/marketing/mocks";
+import { AgentLine } from "@/components/marketing/ai-team-sections";
 import { Reveal } from "@/components/marketing/reveal";
 import { BandText, SubpageHero } from "@/components/marketing/subpage";
 import { BranchesSection, CtaBand, FeatureGrid, SafetySection } from "@/components/marketing/sections";
@@ -29,6 +30,7 @@ export default async function FeaturesPage() {
           <BandText eyebrow={t("app.eyebrow")} title={t("app.title")} text={t("app.text")} />
         </Reveal>
       </Section>
+      <AgentLine agent="secretary" />
       <BranchesSection />
       <SafetySection />
       <CtaBand />

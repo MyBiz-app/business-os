@@ -19,11 +19,14 @@ export function RouteModal({
   title,
   description,
   size,
+  transitionName,
   children,
 }: {
   title: string;
   description?: string;
   size?: "sm" | "md" | "lg";
+  /** The card in the list behind that this window grows out of; pair it with `CardTransition`. */
+  transitionName?: string;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -41,7 +44,7 @@ export function RouteModal({
 
   return (
     <RouteModalContext.Provider value={value}>
-      <Modal title={title} description={description} size={size} dirty={dirty} onClose={close}>
+      <Modal title={title} description={description} size={size} transitionName={transitionName} dirty={dirty} onClose={close}>
         <div onInput={() => setDirty(true)} onChange={() => setDirty(true)}>
           {children}
         </div>
