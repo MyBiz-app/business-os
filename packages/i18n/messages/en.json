@@ -1044,6 +1044,44 @@
       "action": "Fill in the address"
     }
   },
+  "branchMap": {
+    "title": "Branches map",
+    "subtitle": "Where your branches are, sized by the numbers of the last 30 days. Pick one to fly to its street.",
+    "mapLabel": "Map of the branches",
+    "failed": "The map could not be loaded. Try again in a moment.",
+    "colorByLabel": "Color and size by",
+    "colorBy": {
+      "revenue": "Revenue",
+      "clients": "Clients",
+      "occupancy": "Occupancy"
+    },
+    "hover": {
+      "clients": "Active clients: {value}",
+      "revenue": "Revenue: {value}",
+      "occupancy": "Occupancy: {value}"
+    },
+    "panel": {
+      "revenue": "Revenue",
+      "clients": "Active clients",
+      "bookings": "Sessions held",
+      "occupancy": "Average occupancy",
+      "trend": "Revenue per day, last 30 days",
+      "report": "Branch report",
+      "schedule": "Branch schedule"
+    },
+    "close": "Close",
+    "openFull": "Open the full map",
+    "empty": "No branch has a point on the map yet. Add the address of a branch and it appears here.",
+    "emptyLink": "To the branches",
+    "pin": {
+      "label": "The branch's point on the map",
+      "none": "The point on the map appears after you save an address.",
+      "hint": "Drag the pin if the point is not exactly right, then save.",
+      "moved": "The new point is saved with the branch.",
+      "readOnly": "The branch's point on the map.",
+      "failed": "The map could not be loaded."
+    }
+  },
   "locations": {
     "manager": {
       "title": "Branch manager",
@@ -1735,6 +1773,8 @@
       "nothingBooked": "Nothing booked yet.",
       "bookNow": "Book now",
       "navigate": "Navigate",
+      "navigateWaze": "Navigate with Waze",
+      "navigateGoogle": "Navigate with Google Maps",
       "website": "Website",
       "addToCalendar": "Add to calendar",
       "cancelFailed": "The cancellation didn't go through. Try again.",
@@ -2105,7 +2145,8 @@
       "alertOver": "The month's AI is used up. New questions wait until next month unless you turn on pay-as-you-go or move to AI Pro.",
       "enablePayg": "Turn on pay-as-you-go",
       "upgrade": "Upgrade to AI Pro",
-      "limitPerson": "Limit a person"
+      "limitPerson": "Limit a person",
+      "buyUser": "Add an AI user"
     },
     "state": {
       "active": "Available",
@@ -2572,7 +2613,8 @@
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
       "noPack": "Included amount",
-      "social_studio": "Content studio"
+      "social_studio": "Content studio",
+      "payroll": "Payroll"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -2596,7 +2638,8 @@
       "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
       "noSupport": "Email and help center, an answer by the next business day.",
       "noPack": "2 GB for files and 200 messages a month.",
-      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post."
+      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post.",
+      "payroll": "Monthly payroll runs, payslips, Form 101 and the bank transfer file, for up to 10 staff."
     },
     "followsBranches": "Follows your active branches",
     "supportTier": "Support",
@@ -3520,6 +3563,14 @@
       "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
       "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
     },
+    "payrollReminder": {
+      "title": "Payroll for {month} is waiting",
+      "body": "{business}: the payroll run for {month} is not approved yet. Open payroll to finish it."
+    },
+    "payslipReady": {
+      "title": "Your payslip is ready",
+      "body": "{business}: your payslip for {month} is in your documents."
+    },
     "roster": {
       "subject": "Your new shifts at {business}",
       "intro": "Your roster at {business} was published. Your shifts:",
@@ -3943,7 +3994,8 @@
         "ai": "AI assistant and agents",
         "growth": "Growth and sales"
       },
-      "websiteAddon": "Add a website to your plan: from setup price shown on the websites page."
+      "websiteAddon": "Add a website to your plan",
+      "websiteAddonPrice": "With MyBiz: {setup} once and {monthly} a month. Website only: from {alone} once."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -5239,6 +5291,20 @@
       "nextPayment": "Next payment",
       "method": "Payment method",
       "noMethod": "No card yet"
+    },
+    "aiUsers": {
+      "title": "AI users",
+      "intro": "Your plan lets {allowed} people use the AI team. Each extra AI user lets one more person in and adds 150 AI credits to the month, for {price} a month.",
+      "using": "{count} of {allowed} AI users in use",
+      "extra": "Extra AI users",
+      "less": "One fewer",
+      "more": "One more",
+      "cost": "Extra AI users: {amount} a month",
+      "save": "Save",
+      "saved": "Saved",
+      "inUse": "Some of these AI users are in use. Take away someone's AI access first, then lower the number.",
+      "needModule": "Choose an AI plan to add AI users.",
+      "generic": "Could not save. Try again."
     }
   },
   "visitNotes": {
@@ -5889,11 +5955,10 @@
     "finish": {
       "title": "Last step: payment details",
       "subtitle": "Add a card for after the trial. Nothing is charged today, and we'll remind you before the first charge.",
-      "branchAddress": "Your first branch address",
-      "branchAddressHint": "Customers see it, and it puts your branch on the map. You can change it later in the branch settings.",
       "card": "Card number",
       "expiry": "Expiry (MM/YY)",
       "cvc": "CVC",
+      "branchAddress": "Main branch address",
       "holder": "Name on card",
       "simulated": "Test mode: the card is filled in for you and nothing is charged.",
       "secure": "Secure, encrypted payment",
@@ -9325,7 +9390,8 @@
         "owner_always_has_ai": "The owner always has access.",
         "invalid": "Check the numbers and try again.",
         "generic": "Something went wrong. Try again."
-      }
+      },
+      "buyExtra": "Add an extra AI user"
     },
     "openAi": "Open the AI team",
     "permissionsTitle": "Role and permissions",

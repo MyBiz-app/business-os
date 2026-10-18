@@ -4,8 +4,8 @@ import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { legalVersion } from "@business-os/i18n/brand";
 
-import { ApiError, getApi, type Tenant, unwrap } from "@/lib/api";
 import { addressFromForm } from "@/lib/address";
+import { ApiError, getApi, type Tenant, unwrap } from "@/lib/api";
 import { clearResumePath } from "@/lib/resume";
 import { decodePlan } from "@/lib/signup-plan";
 import { setActiveTenant } from "@/lib/tenant";
@@ -58,15 +58,12 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
       })
       .catch(() => null);
   }
-  // The first branch gets the address typed in the journey (the API also pins it on the map).
+  // The main branch starts without an address: the sign-up collects it here (a hiccup is not fatal;
+  // the owner can add it in the branch settings, and the setup checklist shows it is missing).
   const address = addressFromForm(formData);
   if (address.city_code) {
-    const [branch] = await api.GET("/locations", { params: scope }).then(unwrap).catch(() => []);
-    if (branch) {
-      await api
-        .PATCH("/locations/{location_id}", { params: { ...scope, path: { location_id: branch.id } }, body: address })
-        .catch(() => null);
-    }
+    const main = (await api.GET("/locations", { params: scope }).catch(() => null))?.data?.[0];
+    if (main) await api.PATCH("/locations/{location_id}", { params: { ...scope, path: { location_id: main.id } }, body: address }).catch(() => null);
   }
   await api.POST("/billing/payment-method", { params: scope, body: { brand } }).catch(() => null);
   await api

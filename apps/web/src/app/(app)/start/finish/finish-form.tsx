@@ -1,7 +1,7 @@
 "use client";
 
 import { CreditCard } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useSyncExternalStore } from "react";
 
 import { AddressPicker } from "@/components/address-picker";
@@ -19,6 +19,8 @@ const serverZone = () => "";
  * test card is filled in and nothing is charged. */
 export function FinishForm({ plan }: { plan: string }) {
   const t = useTranslations("start.finish");
+  // The official city and street lists are Israel's; elsewhere the address is added in the branch settings.
+  const official = useLocale() === "he";
   const [state, action] = useActionState<FinishState, FormData>(startTrial, {});
   const timeZone = useSyncExternalStore(noSubscribe, browserZone, serverZone);
 
@@ -32,11 +34,12 @@ export function FinishForm({ plan }: { plan: string }) {
         <CreditCard aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
         {t("simulated")}
       </p>
-      <fieldset className="flex flex-col gap-3">
-        <legend className="mb-1 text-sm font-medium">{t("branchAddress")}</legend>
-        <p className="text-xs text-muted">{t("branchAddressHint")}</p>
-        <AddressPicker />
-      </fieldset>
+      {official && (
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-1 text-sm font-medium">{t("branchAddress")}</legend>
+          <AddressPicker required />
+        </fieldset>
+      )}
       <Field label={t("card")} name="card" defaultValue="4242 4242 4242 4242" dir="ltr" inputMode="numeric" autoComplete="cc-number" readOnly />
       <div className="grid grid-cols-2 gap-4">
         <Field label={t("expiry")} name="expiry" defaultValue="12/30" dir="ltr" autoComplete="cc-exp" readOnly />

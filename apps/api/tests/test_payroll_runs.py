@@ -103,8 +103,31 @@ def test_typed_amounts_fill_the_components_that_need_them() -> None:
     assert typed.components_minor == 7000 and typed.problems == []
 
 
+def open_payroll(client: TestClient, headers: dict) -> None:
+    """Gives the business the payroll module and the legal details a payroll needs."""
+    assert (
+        client.put(
+            "/tenants/current/modules", json={"modules": {"payroll": 1}}, headers=headers
+        ).status_code
+        == 200
+    )
+    details = client.patch(
+        "/tenants/current",
+        json={
+            "legal_entity_type": "licensed_dealer",
+            "business_number": "000000018",
+            "address_line": "12 Herzl St",
+            "address_city": "Holon",
+            "employer_file_number": "940123456",
+        },
+        headers=headers,
+    )
+    assert details.status_code == 200, details.text
+
+
 def _setup(client: TestClient, studio: dict, engine: Engine) -> dict:
     headers = studio["headers"]
+    open_payroll(client, headers)
     coach, owner = studio["coach"], studio["owner"]
     assert (
         client.put(
@@ -281,6 +304,7 @@ def test_typed_amounts_the_owner_only_approval_and_who_may_look(
 ) -> None:
     headers, tenant_id = studio["headers"], studio["tenant_id"]
     owner = studio["owner"]
+    open_payroll(client, headers)
     client.put(
         f"/staff/{owner}/employment",
         json={"employment_type": "global", "monthly_amount_minor": 1000000},
@@ -343,3 +367,19 @@ def test_typed_amounts_the_owner_only_approval_and_who_may_look(
     assert back.status_code == 200 and back.json()["stage"] == "hours"
     assert client.get("/payroll/runs/2025-01", headers=headers).status_code == 404
     assert UUID(str(tenant_id))
+
+
+def test_the_server_gates_payroll_on_the_module_and_the_legal_details(
+    client: TestClient, studio: dict
+) -> None:
+    headers = studio["headers"]
+    blocked = client.post("/payroll/runs", json={"period": "2026-03"}, headers=headers)
+    assert (blocked.status_code, blocked.json()["detail"]) == (403, "module_disabled")
+    client.put("/tenants/current/modules", json={"modules": {"payroll": 1}}, headers=headers)
+    blocked = client.post("/payroll/runs", json={"period": "2026-03"}, headers=headers)
+    assert (blocked.status_code, blocked.json()["detail"]) == (409, "payroll_details_missing")
+    assert client.get("/payroll/runs", headers=headers).status_code == 200  # looking stays open
+    open_payroll(client, headers)
+    assert (
+        client.post("/payroll/runs", json={"period": "2026-03"}, headers=headers).status_code == 201
+    )

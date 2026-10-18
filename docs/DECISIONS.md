@@ -305,6 +305,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 
 - **One order per business** (`app.website_orders`), stages `briefing`, `received`, `building`, `review`, `live`. The business edits the brief until MyBiz starts building; the console cannot move an order that is still `briefing`. When an order goes `live` the site address becomes the business's website (R22).
 - **Prices are configuration** (`app/websites/pricing.py`), not catalog modules: with the system 490 setup + 29 a month, website only 790 + 49 (decision 18.12). The order records the prices it was offered. Nothing is charged before #46. They are not in `MODULES` so the public pricing page and the configurator stay as they are; R25a decides how a "website only" business is priced and billed.
+- **One website price list** (2026-10-18): the public `/websites` page and the pricing page read `GET /public/website-prices`, which serves the same list the order records, so there is no second copy in the web app. The page's USD and EUR figures won over the older API figures, because they were what visitors saw.
 - **The build prompt is generated, not stored**: the console builds it from the brief plus a snapshot of the business (name, branches, services, join code) taken when the brief is sent, so it always matches what the owner approved.
 - **Visits** are counted per business, day and source (`direct`, `search`, `social`, `other`) by an anonymous call from the finished site, only while the order is `live`; no cookies, nothing personal.
 ### Cities, streets and branch coordinates (2026-10-18, round 7 R34, migration 0129)
@@ -330,6 +331,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Connectors read through the assistant's own tools, a fixed list (`MCP_READ_TOOLS`), so permissions, branches and modules behave exactly as in the app. Anything that proposes a change stays out until R37b adds actions that wait for approval in the CRM.
 - Reads run in a READ ONLY transaction and results are wrapped as untrusted data. Usage is the meter `mcp_calls` (one per call); the ceiling is 600 per business per rolling 24 hours, a setting.
 - Tokens: access 60 minutes, refresh 90 days and rotated on use, code 5 minutes; only SHA-256 hashes are stored. Connection lookups by hash are SECURITY DEFINER functions because the token endpoint knows no business yet.
+
+### Payroll gaps from the coverage audit (2026-10-18)
+
+- Payroll is the paid module `payroll` (placeholder ILS 49 / USD 15 / EUR 14); the K2 readiness gate (business number, address, employer file number) is enforced on the server for every change to a run, not only shown on the card. Reading stays open so a lapsed module never hides past payslips.
+- Filed copies (payslips, signed Form 101, issued documents) go through `files.keep_copy`: the document's own table stays the source of truth, a failed copy never fails the action. Payslips are filed twice, as a draft at approval and as a final set after the accountant check.
+- Pushes about payroll run as jobs (`remind-payroll` daily, `notify-payslips` hourly) because a phone token is readable only by its owner under row level security; each is recorded once in the audit log. No email and no cost.
 
 ### AI connectors: actions that wait for approval (2026-10-18, round 7 R37b, migration 0136)
 
