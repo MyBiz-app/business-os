@@ -1357,6 +1357,8 @@
     "empty": "No one is booked yet.",
     "cancelledCount": "{count, plural, one {# cancellation} other {# cancellations}}",
     "searchLabel": "Find a client to book",
+    "addMe": "Add me to this class",
+    "addMeToWaitlist": "Add me to the waitlist",
     "searchPlaceholder": "Search by name, email or phone",
     "search": "Search",
     "results": "Search results",
@@ -5533,6 +5535,13 @@
     "meta": {
       "title": "Build your plan",
       "description": "Build your MyBiz plan in two minutes: choose what your business needs, see the price live, and try everything free for 14 days."
+    },
+    "path": {
+      "eyebrow": "Let's begin",
+      "title": "Where is your business today?",
+      "subtitle": "Pick the closest one. You can import your clients and schedule later either way.",
+      "new": { "title": "I'm starting a new business", "hint": "We set up your industry, services and a clean workspace." },
+      "existing": { "title": "I already run a business", "hint": "Bring your clients, memberships and schedule over from your current system." }
     },
     "progress": {
       "label": "Your progress",

@@ -38,7 +38,7 @@ import { isolate } from "@/lib/bidi";
 import { industryTexts } from "@/lib/verticals";
 
 import { AddOnRail, Cart, SummaryLines } from "./cart";
-import { AccountStep, BusinessStep, IndustryStep } from "./steps";
+import { AccountStep, BusinessStep, IndustryStep, PathStep } from "./steps";
 import type { Draft } from "./wizard-types";
 import {
   BoardingPass,
@@ -53,9 +53,9 @@ const SIGNUP_VISIT_KEY = `${BRAND.app.storagePrefix}-signup-visit`;
 
 type Catalog = components["schemas"]["Catalog"];
 
-type Step = "account" | "industry" | "business" | "base" | Offer | "summary";
+type Step = "path" | "account" | "industry" | "business" | "base" | Offer | "summary";
 const GROUPS = [
-  { key: "business", steps: ["account", "industry", "business"] },
+  { key: "business", steps: ["path", "account", "industry", "business"] },
   { key: "plan", steps: ["base"] },
   { key: "extras", steps: ["client_app", "ai", "crm", "whatsapp"] },
   { key: "services", steps: ["pack", "support", "setup"] },
@@ -101,8 +101,10 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const { text } = industryTexts(useTranslations());
   const locale = useLocale();
   const router = useRouter();
-  const steps: Step[] = [...(providers.some((button) => button.live) && !signedIn ? (["account"] as const) : []), "industry", "business", "base", ...OFFERS, "summary"];
-  const [stepIndex, setStepIndex] = useState(steps[0] === "account" ? 0 : initial.vertical ? 1 : 0);
+  // Links that preselect an industry or come from the calculator already know the answer.
+  const asksPath = !initial.vertical && !fromCalc;
+  const steps: Step[] = [...(asksPath ? (["path"] as const) : []), ...(providers.some((button) => button.live) && !signedIn ? (["account"] as const) : []), "industry", "business", "base", ...OFFERS, "summary"];
+  const [stepIndex, setStepIndex] = useState(steps.indexOf("account") >= 0 || asksPath ? 0 : initial.vertical ? 1 : 0);
   // The category whose kinds of business are shown in the industry step (null: all categories).
   const [category, setCategory] = useState<string | null>(findVertical(initial.vertical)?.category ?? null);
   const [draft, setDraft] = useState<Draft>(initial);
@@ -140,7 +142,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         sessionStorage.setItem(SIGNUP_VISIT_KEY, visit);
         void reportSignupStep(visit, "signup_started");
       }
-      const group = (OFFERS as readonly string[]).includes(step) ? (["pack", "support", "setup"].includes(step) ? "services" : "extras") : step;
+      const group = (OFFERS as readonly string[]).includes(step) ? (["pack", "support", "setup"].includes(step) ? "services" : "extras") : step === "path" ? "account" : step;
       void reportSignupStep(visit, "signup_step", group as Parameters<typeof reportSignupStep>[2]);
     } catch {
       // Storage can be blocked; the sign-up works the same without the beacon.
@@ -244,7 +246,18 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   // ---- The steps --------------------------------------------------------------------------
 
   let content: ReactNode;
-  if (step === "account") {
+  if (step === "path") {
+    content = (
+      <PathStep
+        draft={draft}
+        headingProps={headingProps}
+        onChoose={(track) => {
+          update({ track });
+          next();
+        }}
+      />
+    );
+  } else if (step === "account") {
     content = <AccountStep providers={providers} returnTo={returnTo} headingProps={headingProps} onEmail={() => goTo(initial.vertical ? "business" : "industry")} />;
   } else if (step === "industry") {
     content = (

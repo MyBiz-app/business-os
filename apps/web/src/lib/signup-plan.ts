@@ -48,6 +48,9 @@ export type SignupPlan = {
   businessNumber?: string;
   /** Legal form: required in Israel (ILS), where it decides which documents the business issues. */
   entityType?: EntityType;
+  /** "existing": already runs a business elsewhere and moves to MyBiz (opens the migration hub
+   * after sign-up); absent or "new": starting a business from scratch. */
+  track?: "new" | "existing";
 };
 
 /** The Israeli ID / company number check digit (the same rule as the API): up to 9 digits. */
@@ -297,6 +300,7 @@ export function decodePlan(value: unknown): SignupPlan | null {
     modules,
     ...(number && number.length <= 20 ? { businessNumber: number } : {}),
     ...(entityType ? { entityType } : {}),
+    ...(raw.track === "existing" ? { track: "existing" as const } : {}),
   };
 }
 
