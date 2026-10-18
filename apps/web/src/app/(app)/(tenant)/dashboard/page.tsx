@@ -52,15 +52,17 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const range = resolveRange(query, today, { presets: PRESETS, fallback: 30 });
   const { start, end } = range;
   const reports = canReadReports(tenant);
+  // "Without team members": clients who are also on the team don't count in the numbers.
+  const excludeStaff = query.staff === "exclude";
 
   const canSeeSchedule = tenant.permissions.includes("schedule.read");
   const series = (key: "revenue" | "attendance") =>
-    api.GET("/metrics/{key}/series", { params: { ...scope, path: { key }, query: { start: addDays(end, -83), end, grain: "week" } } }).then(unwrap);
+    api.GET("/metrics/{key}/series", { params: { ...scope, path: { key }, query: { start: addDays(end, -83), end, grain: "week", exclude_staff: excludeStaff } } }).then(unwrap);
   // Everything at once: each request waits on the API, none waits on another.
   const [todays, [metrics, revenue, attendance], billing, setup] = await Promise.all([
     canSeeSchedule ? api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }).then(unwrap) : [],
     reports
-      ? Promise.all([api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...TILES] } } }).then(unwrap), series("revenue"), series("attendance")])
+      ? Promise.all([api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...TILES], exclude_staff: excludeStaff } } }).then(unwrap), series("revenue"), series("attendance")])
       : ([[], [], []] as const),
     // The MyBiz subscription: remind whoever manages settings before the trial ends or when an
     // invoice is unpaid.
@@ -244,7 +246,17 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             <h2 id="kpi-heading" className="text-lg font-semibold">
               {t("dashboard.kpis")}
             </h2>
-            <PeriodPicker presets={PRESETS} value={range.key} from={start} to={end} today={today} />
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                scroll={false}
+                href={{ pathname: "/dashboard", query: { ...query, staff: excludeStaff ? undefined : "exclude" } }}
+                aria-pressed={excludeStaff}
+                className={excludeStaff ? "btn-primary px-3 py-1.5 text-sm" : "btn-secondary px-3 py-1.5 text-sm"}
+              >
+                {t("dashboard.withoutStaff")}
+              </Link>
+              <PeriodPicker presets={PRESETS} value={range.key} from={start} to={end} today={today} />
+            </div>
           </div>
           <PendingArea>
           <ul className="enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">

@@ -309,6 +309,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Me As Client
+         * @description "Add me": the signed-in team member becomes a client of this business (an owner can book
+         *     a table for themselves, a coach can join a class).
+         */
+        post: operations["add_me_as_client"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}/branches": {
         parameters: {
             query?: never;
@@ -7053,6 +7074,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/businesses/self": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Join Own Business
+         * @description "Sign up as a client too": a team member joins their own business without a code (R36).
+         */
+        post: operations["join_own_business"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/profile": {
         parameters: {
             query?: never;
@@ -10004,6 +10045,12 @@ export interface components {
              * @default false
              */
             email_suppressed: boolean;
+            /**
+             * Is Staff
+             * @description Also a team member of this business (shown as a badge)
+             * @default false
+             */
+            is_staff: boolean;
         };
         /** ClientAppointmentCreate */
         ClientAppointmentCreate: {
@@ -10334,6 +10381,12 @@ export interface components {
              * @default false
              */
             email_suppressed: boolean;
+            /**
+             * Is Staff
+             * @description Also a team member of this business (shown as a badge)
+             * @default false
+             */
+            is_staff: boolean;
             /**
              * Plan Name
              * @description The plan valid today, if any
@@ -13752,6 +13805,14 @@ export interface components {
              * @description Empty means all branches
              */
             location_ids: string[];
+        };
+        /** MemberJoinRequest */
+        MemberJoinRequest: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
         };
         /**
          * MemberOrganization
@@ -19846,6 +19907,8 @@ export interface operations {
                 /** @description With no_show_to: missed a class in this range */
                 no_show_from?: string | null;
                 no_show_to?: string | null;
+                /** @description only: team members who are also clients; exclude: leave them out */
+                staff?: ("only" | "exclude") | null;
                 /** @description Rows per page */
                 limit?: number;
                 /** @description Rows to skip */
@@ -19897,6 +19960,39 @@ export interface operations {
                 "application/json": components["schemas"]["ClientCreate"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_me_as_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             201: {
@@ -33133,6 +33229,8 @@ export interface operations {
                 /** @description Last local date (inclusive) */
                 end: string;
                 keys?: ("revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held")[] | null;
+                /** @description Leave out clients who are also team members */
+                exclude_staff?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -33170,6 +33268,8 @@ export interface operations {
                 start: string;
                 end: string;
                 grain?: "day" | "week" | "month";
+                /** @description Leave out clients who are also team members */
+                exclude_staff?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -36012,6 +36112,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientLocation"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    join_own_business: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberJoinRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBusiness"];
                 };
             };
             /** @description Validation Error */
