@@ -69,7 +69,7 @@ class OrderState(BaseModel):
     missing: list[str] = Field(description="Answers the brief still needs before it can be sent")
     files_folder_id: UUID = Field(description="Where the wizard's images are uploaded")
     prefill: Brief = Field(
-        description="What MyBiz already knows about the business, to start the brief with"
+        description="What we already know about the business, to start the brief with"
     )
 
 

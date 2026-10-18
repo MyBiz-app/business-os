@@ -15501,7 +15501,7 @@ export interface components {
              * @description Where the wizard's images are uploaded
              */
             files_folder_id: string;
-            /** @description What MyBiz already knows about the business, to start the brief with */
+            /** @description What we already know about the business, to start the brief with */
             prefill: components["schemas"]["Brief"];
         };
         /** OtherIncome */
