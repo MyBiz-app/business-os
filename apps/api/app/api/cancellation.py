@@ -16,7 +16,14 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found
-from app.api.deps import ClientDep, TenantContext, TenantDep, ensure_branch_visible, require
+from app.api.deps import (
+    ClientDep,
+    TenantContext,
+    TenantDep,
+    ensure_branch_visible,
+    ensure_client_visible,
+    require,
+)
 from app.api.freeze_requests import local_today
 from app.catalog.cancellation import defaults_for
 from app.catalog.verticals import CATALOG
@@ -434,6 +441,7 @@ def waive(booking_id: UUID, body: WaiveBody, context: SalesDep) -> dict[str, boo
 @router.get("/clients/{client_id}/waivers")
 def client_waivers(client_id: UUID, context: ClientsReadDep) -> WaiverSummary:
     """The visits given back to a client, and how many this year, so it does not become a habit."""
+    ensure_client_visible(context, client_id)
     db = context.session
     year = local_today(db).year
     rows = (
