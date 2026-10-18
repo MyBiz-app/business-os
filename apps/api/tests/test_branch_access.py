@@ -442,3 +442,29 @@ def test_everything_filed_under_a_client_follows_the_clients_branch(
     # The owner still sees everything.
     assert client.get(f"/receipts/{sale['receipt_id']}", headers=owner).status_code == 200
     assert len(client.get("/quotes", headers=owner).json()) == 2
+
+
+def test_client_sub_routes_added_for_gl2_follow_the_clients_branch(
+    client: TestClient, auth: AuthHeaders, engine: Engine, studio: dict, branches: dict
+) -> None:
+    """Consent trail, addresses, retainer and entitlements (export/erase are owner-only)."""
+    mine = member_at_north(client, auth, engine, studio, branches, role="manager")
+    south = branches["south_client"]
+
+    hidden = [
+        client.get(f"/clients/{south}/consent-events", headers=mine),
+        client.put(
+            f"/clients/{south}/marketing-consent",
+            json={"consent": True, "source": "desk_other"},
+            headers=mine,
+        ),
+        client.get(f"/clients/{south}/addresses", headers=mine),
+        client.get(f"/clients/{south}/retainer", headers=mine),
+        client.get(f"/clients/{south}/entitlements", headers=mine),
+    ]
+    codes = [r.status_code for r in hidden]
+    assert codes == [404] * len(hidden), [r.text for r in hidden]
+    assert (
+        client.get(f"/clients/{branches['north_client']}/consent-events", headers=mine).status_code
+        == 200
+    )

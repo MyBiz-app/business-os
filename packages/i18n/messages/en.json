@@ -9234,7 +9234,13 @@
       "support_view": "MyBiz support viewed a page",
       "platform_change": "MyBiz support changed something",
       "tenant_closed": "Closed the business",
-      "tenant_reopened": "Reopened the business"
+      "tenant_reopened": "Reopened the business",
+      "tenant_modules_changed": "Changed the plan modules",
+      "tenant_subscription_canceled": "Cancelled the subscription",
+      "tenant_subscription_resumed": "Resumed the subscription",
+      "export_receipt_pdf": "Downloaded a receipt",
+      "export_platform_invoice_pdf": "Downloaded a MyBiz invoice",
+      "export_issued_document": "Downloaded a tax document"
     }
   },
   "staffCard": {

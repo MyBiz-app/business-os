@@ -24,6 +24,7 @@ from app.api.common import not_found
 from app.api.deps import TenantContext, require
 from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, encode_cursor
 from app.api.pdf import PDF_RESPONSES, _pdf, _watermark
+from app.core.audit import record
 from app.core.legal_readiness import evaluate
 from app.core.permissions import Permission
 from app.documents import issuing, render
@@ -480,6 +481,13 @@ def issued_file(
     db = context.session
     doc = _row(db, document_id)
     name = f"{doc['kind'].replace('_', '-')}-{doc['number']}"
+    record(
+        db,
+        "export.issued_document",
+        entity_type="issued_document",
+        entity_id=document_id,
+        copy=copy,
+    )
     if not copy:
         content = db.execute(
             text("SELECT content FROM app.issued_documents WHERE id = :id"), {"id": document_id}

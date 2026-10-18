@@ -193,3 +193,31 @@ def test_old_entries_are_purged_after_24_months(
         deleted = purge_expired(connection, later)
         left = connection.execute(text("SELECT count(*) FROM app.audit_log")).scalar_one()
     assert deleted["audit_log"] >= 1 and left == 0
+
+
+def test_plan_and_module_changes_are_logged(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    before = len(entries(client, headers, category="settings"))
+    changed = client.put(
+        "/tenants/current/modules", json={"modules": {"ai_pro": 1}}, headers=headers
+    )
+    assert changed.status_code == 200, changed.text
+    client.put("/tenants/current/modules", json={"modules": {"ai_pro": 1}}, headers=headers)
+
+    modules = [e for e in entries(client, headers) if e["action"] == "tenant.modules_changed"]
+    assert len(modules) == 1  # the second, identical save changed nothing
+    assert modules[0]["category"] == "settings"
+    assert modules[0]["details"]["added"] == ["ai_pro"]
+    assert len(entries(client, headers, category="settings")) == before + 1
+
+
+def test_cancelling_and_resuming_the_subscription_is_logged(
+    client: TestClient, studio: dict
+) -> None:
+    headers = studio["headers"]
+    assert client.post("/billing/cancel", headers=headers).status_code == 200
+    assert client.delete("/billing/cancel", headers=headers).status_code == 200
+
+    assert {"tenant.subscription_canceled", "tenant.subscription_resumed"} <= set(
+        actions(client, headers, category="settings")
+    )

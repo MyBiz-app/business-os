@@ -21,6 +21,7 @@ from app.commerce.modules import (
     validate,
 )
 from app.core import events
+from app.core.audit import record
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["modules"])
@@ -187,9 +188,18 @@ def set_modules(db: Session | Connection, tenant_id: object, selection: dict[str
 
 
 def _record_added(db: Session, before: dict[str, int], after: dict[str, int]) -> None:
-    """A product event for each module the business just switched on."""
+    """A product event for each module the business just switched on, and one audit entry for the
+    change (who changed the plan)."""
     for key in after.keys() - before.keys():
         events.record(db, "module_enabled", key)
+    if before != after:
+        record(
+            db,
+            "tenant.modules_changed",
+            entity_type="tenant",
+            added=sorted(after.keys() - before.keys()),
+            removed=sorted(before.keys() - after.keys()),
+        )
 
 
 def _tenant_modules(db: Session) -> TenantModules:
