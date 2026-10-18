@@ -251,7 +251,7 @@ def get_tenant_context(
         closed, billing_state = session.execute(
             text("""
                 SELECT closed_at IS NOT NULL,
-                       CASE WHEN cancel_at <= now() THEN 'suspended' ELSE billing_state END
+                       app.effective_billing_state(tenants)
                 FROM app.tenants WHERE id = app.current_tenant_id()
             """)
         ).one()
@@ -348,7 +348,7 @@ def get_client_context(
     closed, billing_state = session.execute(
         text("""
             SELECT closed_at IS NOT NULL,
-                   CASE WHEN cancel_at <= now() THEN 'suspended' ELSE billing_state END
+                   app.effective_billing_state(tenants)
             FROM app.tenants WHERE id = :id
         """),
         {"id": tenant_id},

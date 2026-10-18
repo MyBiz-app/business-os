@@ -13,7 +13,6 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from app.ai import budget as ai_budget
-from app.api.closure import OwnerDep
 from app.api.common import blank_to_none, check_columns, not_found
 from app.api.deps import TenantContext, require
 from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
@@ -21,7 +20,6 @@ from app.commerce import quotas
 from app.commerce.billing import add_months
 from app.commerce.modules import allowance
 from app.commerce.quotas import QuotaAlert
-from app.core.audit import record
 from app.core.config import get_settings
 from app.core.permissions import Permission
 
@@ -113,6 +111,15 @@ class Collection(BaseModel):
     suspend_on: date | None
     grace_until: datetime | None = Field(description="A grace extension from MyBiz, if any")
     cancel_at: datetime | None = Field(description="The subscription ends then; the business stays")
+    paused_until: datetime | None = Field(
+        default=None, description="The account is paused (read-only, flat fee) until then"
+    )
+    refund_minor: int | None = Field(
+        default=None,
+        description="The refund the cancellation gets (the first payment inside 14 days), "
+        "recorded only: no card is refunded while payments are off",
+    )
+    currency: str | None = Field(default=None, description="The business's currency")
 
 
 class Billing(BaseModel):
@@ -205,8 +212,14 @@ def get_billing(context: SettingsDep) -> Billing:
 def _collection(db: Session, invoices: list[InvoiceSummary], time_zone: str) -> Collection:
     tenant = db.execute(
         text("""
-            SELECT CASE WHEN cancel_at <= now() THEN 'suspended' ELSE billing_state END AS state,
-                   billing_grace_until, cancel_at
+            SELECT app.effective_billing_state(tenants) AS state,
+                   billing_grace_until, cancel_at, currency,
+                   CASE WHEN pause_from <= now() AND pause_until > now()
+                        THEN pause_until END AS paused_until,
+                   (SELECT c.refund_minor FROM app.subscription_cancellations c
+                    WHERE c.outcome = 'cancelled' AND c.resumed_at IS NULL
+                      AND tenants.cancel_at IS NOT NULL
+                    ORDER BY c.created_at DESC LIMIT 1) AS refund_minor
             FROM app.tenants WHERE id = app.current_tenant_id()
         """)
     ).one()
@@ -226,44 +239,10 @@ def _collection(db: Session, invoices: list[InvoiceSummary], time_zone: str) -> 
         suspend_on=on(policy["suspend_after_days"]),
         grace_until=tenant.billing_grace_until,
         cancel_at=tenant.cancel_at,
+        paused_until=tenant.paused_until,
+        refund_minor=tenant.refund_minor or None,
+        currency=tenant.currency,
     )
-
-
-@router.post("/cancel")
-def cancel_subscription(context: OwnerDep) -> Collection:
-    """Ends the subscription at the end of the paid period (or the trial). The business and its
-    data are kept; nothing is billed after that, and the owner can resume until it ends or later."""
-    db = context.session
-    tenant = db.execute(
-        text("SELECT trial_ends_at, time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
-    ).one()
-    zone = ZoneInfo(tenant.time_zone)
-    now = datetime.now(UTC)
-    anchor = tenant.trial_ends_at.astimezone(zone).date()
-    today = now.astimezone(zone).date()
-    if tenant.trial_ends_at > now:
-        end = tenant.trial_ends_at
-    else:
-        months = 0
-        while add_months(anchor, months + 1) <= today:
-            months += 1
-        # The period that contains today is already running; it ends at the start of the next.
-        end = datetime.combine(add_months(anchor, months + 1), datetime.min.time(), tzinfo=zone)
-    db.execute(text("SELECT app.set_subscription_cancel(:at)"), {"at": end})
-    record(db, "tenant.subscription_canceled", entity_type="tenant", ends_at=end)
-    return _collection(db, _invoices(db), tenant.time_zone)
-
-
-@router.delete("/cancel")
-def resume_subscription(context: OwnerDep) -> Collection:
-    """Takes a cancellation back, and brings a business back whose subscription had ended."""
-    db = context.session
-    db.execute(text("SELECT app.set_subscription_cancel(NULL)"))
-    record(db, "tenant.subscription_resumed", entity_type="tenant")
-    time_zone = db.execute(
-        text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
-    ).scalar_one()
-    return _collection(db, _invoices(db), time_zone)
 
 
 def _invoices(db: Session) -> list[InvoiceSummary]:
