@@ -5955,6 +5955,8 @@
     "finish": {
       "title": "Last step: payment details",
       "subtitle": "Add a card for after the trial. Nothing is charged today, and we'll remind you before the first charge.",
+      "sampleData": "Also create a sample business to look around",
+      "sampleDataHint": "A separate business filled with fictitious clients and classes. Close it whenever you like.",
       "card": "Card number",
       "expiry": "Expiry (MM/YY)",
       "cvc": "CVC",

@@ -34,7 +34,7 @@ export default async function AiConnectionsPage() {
   const label = (request: (typeof requests)[number]) => t.has(`kinds.${request.tool_name}`) ? t(`kinds.${request.tool_name}`) : request.tool_name;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle")} />
 
       <section aria-labelledby="ai-waiting" className="flex flex-col gap-3">
