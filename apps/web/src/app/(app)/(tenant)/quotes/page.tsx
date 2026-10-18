@@ -16,6 +16,7 @@ import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
 import { STATUS_TONE } from "./status";
+import { CardTransition } from "@/components/ui/page-transition";
 
 const PAGE_SIZE = 50;
 const MAX_SHOWN = 1000;
@@ -214,7 +215,8 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
             <ul className="flex flex-col divide-y divide-border card">
               {quotes.map((quote) => (
                 <li key={quote.id}>
-                  <Link href={`/quotes/${quote.id}`} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 hover:bg-foreground/[0.03]">
+                  <CardTransition name={`quote-${quote.id}`}>
+<Link href={`/quotes/${quote.id}`} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 hover:bg-foreground/[0.03]">
                     <span className="flex min-w-0 flex-col gap-0.5">
                       <span className="font-semibold">
                         <span className="tabular-nums text-muted">#{quote.number}</span> <span dir="auto">{quote.title}</span>
@@ -229,6 +231,7 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
                       <Pill tone={STATUS_TONE[quote.status]}>{t(`statuses.${quote.status}`)}</Pill>
                     </span>
                   </Link>
+</CardTransition>
                 </li>
               ))}
             </ul>

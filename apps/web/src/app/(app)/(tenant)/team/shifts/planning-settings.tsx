@@ -1,5 +1,6 @@
 "use client";
 
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { Settings2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
@@ -15,18 +16,18 @@ type Branch = { id: string; name: string; color: string; cadence: "daily" | "wee
 export function PlanningSettings({ branches }: { branches: Branch[] }) {
   const t = useTranslations("shifts");
   return (
-    <details className="card group p-0">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 font-medium [&::-webkit-details-marker]:hidden">
-        <Settings2 aria-hidden="true" className="size-4 text-primary-ink" />
-        {t("planning.title")}
-        <span className="ms-2 text-sm font-normal text-muted">{t("planning.hint")}</span>
-      </summary>
-      <ul className="flex flex-col divide-y divide-border border-t border-border">
+    <CollapsibleSection
+      icon={<Settings2 aria-hidden="true" className="size-4 text-primary-ink" />}
+      title={t("planning.title")}
+      description={t("planning.hint")}
+      storageKey="shifts-planning"
+    >
+      <ul className="-mx-5 -my-5 flex flex-col divide-y divide-border">
         {branches.map((branch) => (
           <PlanningRow key={branch.id} branch={branch} />
         ))}
       </ul>
-    </details>
+    </CollapsibleSection>
   );
 }
 

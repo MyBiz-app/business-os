@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 import { getTenantFor } from "@/lib/tenant";
+import { EmptyState } from "@/components/empty-state";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("payRun.annual");
@@ -51,7 +52,7 @@ export default async function AnnualPayrollPage({ searchParams }: PageProps<"/te
         </a>
       </nav>
       {summary.people.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">{t("empty")}</p>
+        <EmptyState variant="chart">{t("empty")}</EmptyState>
       ) : (
         <>
           {summary.draft && <p className="text-sm text-muted">{t("draft")}</p>}

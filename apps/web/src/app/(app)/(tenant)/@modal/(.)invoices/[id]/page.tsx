@@ -9,7 +9,7 @@ export default async function InvoiceModal({ params }: PageProps<"/invoices/[id]
   const t = await getTranslations("invoices");
   const { doc } = await loadInvoice(id);
   return (
-    <RouteModal title={`${t(`kinds.${doc.kind}`)} #${doc.number}`} size="lg">
+    <RouteModal title={`${t(`kinds.${doc.kind}`)} #${doc.number}`} transitionName={`invoice-${id}`} size="lg">
       <div className="flex flex-col gap-6">
         <div className="flex flex-wrap gap-2">
           <InvoiceActions id={id} />

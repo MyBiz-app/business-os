@@ -11,6 +11,7 @@ import { getTenant } from "@/lib/tenant";
 import { TopicHeader } from "../topic-header";
 
 import { decideRequest, disconnectApp } from "./actions";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 const TONE: Record<string, Tone> = { pending: "warning", executed: "success", rejected: "muted", expired: "muted", failed: "danger" };
 const DETAILS = ["client", "service", "starts", "dependent", "date", "hours", "description", "month", "clients", "total"] as const;
@@ -83,9 +84,8 @@ export default async function AiConnectionsPage() {
           </ul>
         )}
         {recent.length > 0 && (
-          <details className="card p-4">
-            <summary className="cursor-pointer text-sm font-medium">{t("historyTitle")}</summary>
-            <ul className="flex flex-col gap-2 pt-3 text-sm">
+          <CollapsibleSection title={t("historyTitle")} storageKey="ai-connections-history">
+            <ul className="flex flex-col gap-2 text-sm">
               {recent.map((request) => (
                 <li key={request.id} className="flex flex-wrap items-center justify-between gap-2">
                   <span dir="auto">
@@ -99,7 +99,7 @@ export default async function AiConnectionsPage() {
                 </li>
               ))}
             </ul>
-          </details>
+          </CollapsibleSection>
         )}
       </section>
 
