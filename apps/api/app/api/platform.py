@@ -555,6 +555,43 @@ def overdue_businesses(db: BillingDep) -> list[OverdueBusiness]:
     return [OverdueBusiness.model_validate(dict(row)) for row in rows]
 
 
+class Cancellation(BaseModel):
+    id: UUID
+    tenant_id: UUID
+    name: str
+    owner_email: str | None
+    outcome: Literal["cancelled", "paused"]
+    reason: str | None
+    note: str | None
+    created_at: dt.datetime
+    ends_at: dt.datetime | None
+    refund_minor: int = Field(description="Recorded refund of the first payment, minor units")
+    currency: str
+    resumed_at: dt.datetime | None = Field(description="Set when the owner took it back")
+
+
+class ChurnMonth(BaseModel):
+    month: dt.date
+    cancelled: int
+    paused: int
+    resumed: int
+    paying_at_start: int = Field(description="Businesses past their trial at the month's start")
+
+
+@router.get("/billing/cancellations")
+def cancellations(db: BillingDep) -> list[Cancellation]:
+    """The last year's cancellations and pauses with the reasons, newest first."""
+    rows = db.execute(text("SELECT * FROM app.platform_cancellations()")).mappings()
+    return [Cancellation.model_validate(dict(row)) for row in rows]
+
+
+@router.get("/billing/churn")
+def churn(db: BillingDep) -> list[ChurnMonth]:
+    """Per month for the last year: cancellations, pauses and those taken back."""
+    rows = db.execute(text("SELECT * FROM app.platform_churn_months()")).mappings()
+    return [ChurnMonth.model_validate(dict(row)) for row in rows]
+
+
 class GraceExtension(BaseModel):
     days: int = Field(ge=1, le=90)
 
