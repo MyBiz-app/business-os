@@ -1,11 +1,11 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from app.jobs import HORIZON_DAYS, _publish_moment, extend_series, publish_shifts
-from tests.conftest import local_today
+from tests.conftest import STUDIO, local_today
 from tests.test_bookings import book, new_client
 
 
@@ -47,7 +47,11 @@ def test_open_series_is_extended_and_reruns_add_nothing(
     session = client.get(f"/sessions/{series['session_ids'][0]}", headers=studio["headers"]).json()
     assert session["series_open_ended"] is True
 
-    in_four_weeks = datetime.now(UTC) + timedelta(days=28)
+    # Noon four calendar weeks from the business's today: adding 28 days of UTC time would land on
+    # another local date for an hour of the evening when daylight saving time ends in between.
+    in_four_weeks = datetime.combine(
+        local_today() + timedelta(days=28), time(12), tzinfo=ZoneInfo(STUDIO["time_zone"])
+    )
     with engine.begin() as connection:
         added = extend_series(connection, in_four_weeks)
     with engine.begin() as connection:
