@@ -9337,7 +9337,13 @@
       "support_view": "תמיכת MyBiz צפתה בעמוד",
       "platform_change": "תמיכת MyBiz שינתה משהו",
       "tenant_closed": "סגר את העסק",
-      "tenant_reopened": "פתח מחדש את העסק"
+      "tenant_reopened": "פתח מחדש את העסק",
+      "tenant_modules_changed": "שינה את המודולים במסלול",
+      "tenant_subscription_canceled": "ביטל את המנוי",
+      "tenant_subscription_resumed": "חידש את המנוי",
+      "export_receipt_pdf": "הוריד קבלה",
+      "export_platform_invoice_pdf": "הוריד חשבונית של MyBiz",
+      "export_issued_document": "הוריד מסמך מס"
     }
   },
   "staffCard": {

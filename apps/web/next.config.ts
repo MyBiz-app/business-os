@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin();
@@ -35,4 +36,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+const config = withNextIntl(nextConfig);
+
+// Source maps are uploaded to Sentry (readable stack traces) only in a build that has an auth
+// token; without SENTRY_AUTH_TOKEN the build is exactly as before.
+export default process.env.SENTRY_AUTH_TOKEN
+  ? // The organisation, project and token come from SENTRY_ORG, SENTRY_PROJECT and SENTRY_AUTH_TOKEN.
+    withSentryConfig(config, { sourcemaps: { deleteSourcemapsAfterUpload: true } })
+  : config;

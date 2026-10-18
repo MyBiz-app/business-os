@@ -36,6 +36,15 @@ click.
 Check: the project shows "healthy" and the pooler string connects (`psql "<string>" -c "select 1"`
 from your machine).
 
+**Connection budget (GL18).** Each API worker keeps up to `API_DB_POOL_SIZE` (5) plus
+`API_DB_MAX_OVERFLOW` (10) connections, so the API service can open at most
+`WEB_CONCURRENCY` (2) x 15 = **30** connections. The two cron jobs each open a few more while they
+run (one worker, same pool settings, so up to 15 each): worst case 30 + 15 + 15 = **60**. Compare
+that with the limit for your Supabase compute size (Settings, Database, "Connection pooling" shows
+the pooler's client limit; the direct-connection limit is on the compute page) and keep the worst
+case at or below about 60% of it. Before adding a second API instance or raising `WEB_CONCURRENCY`,
+redo the sum: instances x workers x 15, plus the crons.
+
 ## 2. Render Blueprint (API Starter about $7, two cron jobs about $7 each)
 
 [`render.production.yaml`](../../render.production.yaml) defines the API web service
