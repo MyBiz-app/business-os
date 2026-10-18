@@ -156,6 +156,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
               <div className="flex flex-wrap items-center gap-2">
                 <h1 dir="auto" className="truncate text-3xl font-extrabold tracking-tight">{name}</h1>
                 <StatusBadge status={client.status} />
+                {client.is_staff && <Pill tone="primary">{t("staffBadge")}</Pill>}
               </div>
               <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
                 <span>{t("joined", { date: joined })}</span>

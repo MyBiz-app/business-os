@@ -22,6 +22,7 @@ from app.catalog.verticals import CATALOG, VerticalPack
 from app.core import events
 from app.core.permissions import Permission
 from app.messaging.notifications import notify_booking
+from app.schedule.waitlist import mode_for, spot_opened, spot_taken
 
 router = APIRouter(tags=["bookings"])
 
@@ -166,6 +167,7 @@ def promote_waitlist(db: Session, session_id: UUID) -> None:
     """Moves the earliest waitlisted clients into free spots of an upcoming session.
     The caller must hold the session lock (`lock_session`)."""
     db.execute(text("SELECT app.promote_waitlist(:id)"), {"id": session_id})
+    spot_opened(db, session_id)  # whoever is still waiting hears about a spot that stays free
 
 
 def place_booking(
@@ -206,6 +208,12 @@ def place_booking(
     booked, _ = session_counts(db, session_id)
     full = booked >= session["capacity"]
     over = full and over_capacity
+    if full and not over:
+        service_id = db.execute(
+            text("SELECT service_id FROM app.sessions WHERE id = :id"), {"id": session_id}
+        ).scalar_one()
+        if mode_for(db, service_id) == "off":
+            raise _conflict("session_full")  # the business does not keep a waitlist
     try:
         booking_id = db.execute(
             text("""
@@ -231,6 +239,8 @@ def place_booking(
         ).scalar_one()
     except IntegrityError as error:
         raise HTTPException(status_code=422, detail="invalid_reference") from error
+    if not (full and not over):
+        spot_taken(db, session_id, client_id)
     events.record(db, "first_booking", once=True)
     return booking_id
 

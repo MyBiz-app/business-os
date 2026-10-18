@@ -22,6 +22,7 @@ export async function MarketingFooter() {
       title: t("footer.product"),
       links: [
         { href: "/features", label: t("nav.features") },
+        { href: "/websites", label: t("nav.websites") },
         { href: "/pricing", label: t("nav.pricing") },
         { href: "/login", label: t("nav.login") },
         { href: "/start", label: t("nav.start") },

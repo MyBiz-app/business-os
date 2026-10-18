@@ -5,3 +5,5 @@ export type Team = components["schemas"]["app__api__ai_team__Team"];
 
 /** A module that unlocks agents: its display name and monthly price, ready to show. */
 export type Upsell = { name: string; price: string };
+
+export type Meter = components["schemas"]["Meter"];

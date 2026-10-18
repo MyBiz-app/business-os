@@ -2,7 +2,7 @@ from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request, status
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
@@ -23,6 +23,7 @@ from app.commerce.modules import PRESETS
 from app.core import events
 from app.core.db import set_tenant
 from app.core.permissions import Permission, effective_permissions
+from app.geo.addresses import ADDRESS_KEYS, AddressFields, resolve_address
 from app.legal.documents import check_versions, pending_documents, record_acceptance
 from app.messaging.email import load_all_messages
 
@@ -56,7 +57,9 @@ def load_current_tenant(session: Session) -> Tenant:
                        t.weekly_release_weekday, t.weekly_release_time, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales, t.require_mfa_for_staff,
                        t.network_scope, t.resource_payment, t.client_id_number,
-                       t.schedule_default_view,
+                       t.schedule_default_view, t.waitlist_enabled, t.waitlist_class_mode,
+                       t.waitlist_appointment_mode, t.waitlist_resource_mode,
+                       t.waitlist_auto_hours,
                        coalesce(t.schedule_default_branches, '{}') AS schedule_default_branches,
                        t.shifts_default_view, t.shifts_default_range,
                        coalesce(t.shifts_default_branches, '{}') AS shifts_default_branches,
@@ -69,7 +72,7 @@ def load_current_tenant(session: Session) -> Tenant:
                                 CASE WHEN app.support_tenant_id() IS NOT NULL THEN 'support'
                                      ELSE 'platform' END) AS role,
                        r.name AS custom_role_name,
-                       r.permissions AS custom_permissions,
+                       r.permissions AS custom_permissions, m.ai_access,
                        coalesce((SELECT array_agg(tm.module_key ORDER BY tm.module_key)
                                  FROM app.tenant_modules tm WHERE tm.tenant_id = t.id), '{}')
                            AS modules,
@@ -94,7 +97,7 @@ def load_current_tenant(session: Session) -> Tenant:
     )
     data = dict(row)
     data["permissions"] = sorted(
-        effective_permissions(data["role"], data.pop("custom_permissions"))
+        effective_permissions(data["role"], data.pop("custom_permissions"), data.pop("ai_access"))
     )
     # The registration number is for the people who manage the business, not the whole team.
     if Permission.BUSINESS_SETTINGS.value not in data["permissions"]:
@@ -120,13 +123,19 @@ def apply_vertical_pack(
         text("""
             UPDATE app.tenants
             SET cancellation_window_minutes = :minutes, booking_requires_plan = :requires_plan,
-                requires_health_declaration = :requires_health
+                requires_health_declaration = :requires_health, waitlist_enabled = :wl_enabled,
+                waitlist_class_mode = :wl_classes, waitlist_appointment_mode = :wl_appointments,
+                waitlist_resource_mode = :wl_resources
             WHERE id = :id
         """),
         {
             "minutes": pack.cancellation_window_minutes,
             "requires_plan": pack.booking_requires_plan,
             "requires_health": pack.requires_health_declaration,
+            "wl_enabled": pack.waitlist.enabled,
+            "wl_classes": pack.waitlist.classes,
+            "wl_appointments": pack.waitlist.appointments,
+            "wl_resources": pack.waitlist.resources,
             "id": tenant_id,
         },
     )
@@ -237,6 +246,13 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
             text("""
                 SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin,
                        phone, birth_date, address_line, city, postal_code, email_roster,
+                       city_code, street_code, house_number, address_details, street_unlisted,
+                       (SELECT st.name_he FROM app.geo_streets st
+                        WHERE st.city_code = app.users.city_code
+                          AND st.code = app.users.street_code) AS street_name,
+                       (city_code IS NOT NULL AND (street_code IS NOT NULL
+                                                   OR street_unlisted IS NOT NULL)
+                        AND house_number IS NOT NULL) AS address_complete,
                        marketing_consent_at IS NOT NULL AS marketing_consent, palette,
                        CASE WHEN palette_background IS NULL THEN NULL
                             ELSE jsonb_build_object('background', palette_background,
@@ -333,7 +349,7 @@ def get_current_tenant(context: TenantDep) -> Tenant:
     return load_current_tenant(context.session)
 
 
-class ProfileUpdate(BaseModel):
+class ProfileUpdate(AddressFields):
     full_name: str | None = Field(default=None, max_length=120)
     phone: str | None = Field(default=None, max_length=30, pattern=r"^[0-9+()\- ]*$")
     birth_date: date | None = None
@@ -372,6 +388,22 @@ PROFILE_COLUMNS = frozenset(
 )
 
 
+def _profile_address(session: Session, user_id: UUID, changes: dict) -> dict:
+    """A home address chosen from the official lists (all optional): the structured columns, and
+    the text columns the rest of the system reads kept in step."""
+    current = (
+        session.execute(
+            text(f"SELECT {', '.join(ADDRESS_KEYS)} FROM app.users WHERE id = :id"),
+            {"id": user_id},
+        )
+        .mappings()
+        .one()
+    )
+    resolved = resolve_address(session, {**current, **changes}, required=False)
+    line = " ".join(p for p in (resolved.street, resolved.columns["house_number"]) if p)
+    return {**resolved.columns, "address_line": line or None, "city": resolved.city}
+
+
 @router.patch("/me", tags=["account"])
 def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     """The signed-in person's own profile: the name the team, clients and reports see, a phone
@@ -380,6 +412,8 @@ def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     they are."""
     ensure_profile(session, user.id, user.email)
     changes = body.model_dump(exclude_unset=True)
+    if body.address_given():
+        changes |= _profile_address(session, user.id, changes)
     colors = changes.pop("palette_colors", None)
     if changes.get("email_roster", True) is None:
         del changes["email_roster"]
