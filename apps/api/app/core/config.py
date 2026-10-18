@@ -27,6 +27,8 @@ class Settings(BaseSettings):
 
     # Local defaults match `supabase start`. Other environments set these explicitly.
     database_url: str = "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
+    # Background jobs switch to this role after connecting; empty runs them as the login itself.
+    jobs_db_role: str = "app_jobs"
     jwks_url: str = "http://127.0.0.1:54321/auth/v1/.well-known/jwks.json"
     jwt_audience: str = "authenticated"
 
