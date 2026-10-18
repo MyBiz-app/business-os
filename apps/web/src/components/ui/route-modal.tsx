@@ -20,6 +20,7 @@ export function RouteModal({
   description,
   size,
   transitionName,
+  closeHref,
   children,
 }: {
   title: string;
@@ -27,18 +28,25 @@ export function RouteModal({
   size?: "sm" | "md" | "lg";
   /** The card in the list behind that this window grows out of; pair it with `CardTransition`. */
   transitionName?: string;
+  /** For a window that a list page opens itself with `?open=<id>` (no route of its own): closing
+   * goes to this address, the same page without the `open`, instead of back one step. */
+  closeHref?: string;
   children: ReactNode;
 }) {
   const router = useRouter();
   const [dirty, setDirty] = useState(false);
-  const close = useCallback(() => router.back(), [router]);
+  const leave = useCallback(() => {
+    if (closeHref) router.replace(closeHref, { scroll: false });
+    else router.back();
+  }, [router, closeHref]);
+  const close = leave;
   const finish = useCallback(
     (next?: string) => {
       setDirty(false);
       if (next) router.replace(next);
-      else router.back();
+      else leave();
     },
-    [router],
+    [router, leave],
   );
   const value = useMemo(() => ({ finish }), [finish]);
 

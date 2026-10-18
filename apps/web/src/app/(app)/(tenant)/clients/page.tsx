@@ -18,6 +18,9 @@ import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { ScrollRegion } from "@/components/scroll-region";
 import { EmptyState } from "@/components/empty-state";
+import { openedId, withOpen } from "@/lib/open-window";
+
+import { ClientWindow } from "./client-window";
 
 const PAGE_SIZE = 25;
 const STATUSES = ["active", "lead", "inactive"] as const;
@@ -102,6 +105,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     return `/clients?${query}`;
   };
 
+  const opened = openedId(params);
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader
@@ -241,7 +245,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                 <tr key={client.id} className="border-t border-border transition-colors hover:bg-primary/4">
                   <td className="px-4 py-2.5">
                     <CardTransition name={`client-${client.id}`}>
-                    <Link href={`/clients/${client.id}`} className="group flex items-center gap-3 font-medium">
+                    <Link scroll={false} href={withOpen("/clients", params, client.id)} className="group flex items-center gap-3 font-medium">
                       <Avatar id={client.id} name={[client.first_name, client.last_name].filter(Boolean).join(" ")} />
                       <span dir="auto" className="text-primary-ink underline-offset-4 group-hover:underline">
                         {[client.first_name, client.last_name].filter(Boolean).join(" ")}
@@ -284,6 +288,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           {page < pages ? <Link scroll={false} href={pageHref(page + 1)} className="text-primary-ink">{t("clients.next")}</Link> : <span />}
         </nav>
       )}
+      {opened && <ClientWindow id={opened} closeHref={withOpen("/clients", params, null)} />}
     </Container>
   );
 }

@@ -103,9 +103,11 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   No `next.config` flag is needed (Next.js 16 runs `<ViewTransition>` as is). Cards with a window
   today: lead, client, quote, invoice, receipt, session, service, plan, promo; a test
   (`lib/view-transitions.test.ts`) fails when a card name has no window name or the other way round.
-  To give a new list this: wrap the card link in `CardTransition`, add the intercepting page under
-  `@modal/(.)<route>/[id]` with `RouteModal transitionName`, and keep the page body in a shared
-  `*-body.tsx` (see `clients/[id]/client-body.tsx`).
+  To give a new list this: wrap the card link in `CardTransition` and keep the page body in a shared
+  `*-body.tsx`. Then either add an intercepting page under `@modal/(.)<route>/[id]` with
+  `RouteModal transitionName` (only when the route has no static sibling such as `/clients/join`,
+  because a dynamic intercept would also catch those), or open the window from the list page itself
+  with `?open=<id>` (`lib/open-window.ts`, `RouteModal closeHref`; see `clients/client-window.tsx`).
 - Route progress bar: `components/ui/route-progress.tsx`, mounted once in the root layout. It shows
   only when a page change takes longer than 300ms. Do not add your own spinner for page changes;
   add a `loading.tsx` with a skeleton of the page's shape instead (`components/layout/page-skeletons.tsx`).
