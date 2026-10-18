@@ -6,10 +6,12 @@ from typing import Literal
 
 Product = Literal["landing_only", "landing_with_system"]
 
-# product -> currency -> (one-time setup, monthly), minor units.
+# The one price list: the order, the CRM offer and the public /websites page all read it (the
+# page through GET /public/website-prices). product -> currency -> (one-time setup, monthly),
+# minor units.
 PRICES: dict[str, dict[str, tuple[int, int]]] = {
-    "landing_only": {"ILS": (79000, 4900), "USD": (22900, 1400), "EUR": (20900, 1300)},
-    "landing_with_system": {"ILS": (49000, 2900), "USD": (13900, 800), "EUR": (12900, 700)},
+    "landing_only": {"ILS": (79000, 4900), "USD": (22900, 1400), "EUR": (21900, 1300)},
+    "landing_with_system": {"ILS": (49000, 2900), "USD": (14900, 900), "EUR": (13900, 800)},
 }
 
 

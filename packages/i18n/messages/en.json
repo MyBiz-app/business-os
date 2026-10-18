@@ -2143,7 +2143,8 @@
       "alertOver": "The month's AI is used up. New questions wait until next month unless you turn on pay-as-you-go or move to AI Pro.",
       "enablePayg": "Turn on pay-as-you-go",
       "upgrade": "Upgrade to AI Pro",
-      "limitPerson": "Limit a person"
+      "limitPerson": "Limit a person",
+      "buyUser": "Add an AI user"
     },
     "state": {
       "active": "Available",
@@ -3981,7 +3982,8 @@
         "ai": "AI assistant and agents",
         "growth": "Growth and sales"
       },
-      "websiteAddon": "Add a website to your plan: from setup price shown on the websites page."
+      "websiteAddon": "Add a website to your plan",
+      "websiteAddonPrice": "With MyBiz: {setup} once and {monthly} a month. Website only: from {alone} once."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -5277,6 +5279,20 @@
       "nextPayment": "Next payment",
       "method": "Payment method",
       "noMethod": "No card yet"
+    },
+    "aiUsers": {
+      "title": "AI users",
+      "intro": "Your plan lets {allowed} people use the AI team. Each extra AI user lets one more person in and adds 150 AI credits to the month, for {price} a month.",
+      "using": "{count} of {allowed} AI users in use",
+      "extra": "Extra AI users",
+      "less": "One fewer",
+      "more": "One more",
+      "cost": "Extra AI users: {amount} a month",
+      "save": "Save",
+      "saved": "Saved",
+      "inUse": "Some of these AI users are in use. Take away someone's AI access first, then lower the number.",
+      "needModule": "Choose an AI plan to add AI users.",
+      "generic": "Could not save. Try again."
     }
   },
   "visitNotes": {
@@ -9355,7 +9371,8 @@
         "owner_always_has_ai": "The owner always has access.",
         "invalid": "Check the numbers and try again.",
         "generic": "Something went wrong. Try again."
-      }
+      },
+      "buyExtra": "Add an extra AI user"
     },
     "openAi": "Open the AI team",
     "permissionsTitle": "Role and permissions",
