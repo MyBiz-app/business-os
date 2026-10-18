@@ -4,11 +4,15 @@ import { createNonce, NONCE_HEADER, REPORTING_ENDPOINTS, strictCsp } from "@/lib
 import { cspReportOnly, hstsHeader, indexingAllowed } from "@/lib/site-config";
 import { updateSession } from "@/lib/supabase/proxy";
 
+/** Pages under this path may be shown in a business's own website (see next.config.ts). */
+const EMBED_PREFIX = "/embed/";
+
 export async function proxy(request: NextRequest) {
   // A fresh nonce per request. Next.js reads it from the CSP request header and puts it on its own
   // scripts; our inline scripts read it from NONCE_HEADER (see app/layout.tsx).
   const nonce = createNonce();
-  const policy = strictCsp(nonce, { dev: process.env.NODE_ENV !== "production" });
+  const embeddable = request.nextUrl.pathname.startsWith(EMBED_PREFIX);
+  const policy = strictCsp(nonce, { dev: process.env.NODE_ENV !== "production", embeddable });
   const cspHeader = cspReportOnly() ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
   request.headers.set(NONCE_HEADER, nonce);
   request.headers.set("x-pathname", request.nextUrl.pathname);

@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { AttentionPanel } from "./attention-panel";
+import { WebsiteOfferCard } from "./website-offer-card";
 import { usageWarnings } from "@business-os/i18n/usage";
 import { termsOf } from "@business-os/verticals";
 
@@ -59,7 +60,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const series = (key: "revenue" | "attendance") =>
     api.GET("/metrics/{key}/series", { params: { ...scope, path: { key }, query: { start: addDays(end, -83), end, grain: "week", exclude_staff: excludeStaff } } }).then(unwrap);
   // Everything at once: each request waits on the API, none waits on another.
-  const [todays, [metrics, revenue, attendance], billing, setup] = await Promise.all([
+  const [todays, [metrics, revenue, attendance], billing, setup, websiteOffer] = await Promise.all([
     canSeeSchedule ? api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }).then(unwrap) : [],
     reports
       ? Promise.all([api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...TILES], exclude_staff: excludeStaff } } }).then(unwrap), series("revenue"), series("attendance")])
@@ -69,6 +70,8 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
     canManageSettings(tenant) ? api.GET("/billing", { params: scope }).then((r) => r.data) : undefined,
     // The first-steps checklist, for whoever sets the business up, until it's all done.
     canManageSettings(tenant) ? api.GET("/tenants/current/getting-started", { params: scope }).then((r) => r.data) : undefined,
+    // Once, after the first 30 days, for a business without a website (the person can close it).
+    canManageSettings(tenant) ? api.GET("/website/offer-card", { params: scope }).then((r) => r.data) : undefined,
   ]);
   const welcome = query.welcome === "1";
   const billingNotice = !billing
@@ -190,6 +193,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
         </Link>
       ))}
+      {websiteOffer?.show && <WebsiteOfferCard />}
       {setup && (welcome || setup.done < setup.total) && <GettingStartedCard setup={setup} welcome={welcome} business={tenant.name} />}
       <div className="card-accent relative flex flex-wrap items-end justify-between gap-6 overflow-hidden p-0">
         {tenant.cover_url ? (
