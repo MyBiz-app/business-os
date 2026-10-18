@@ -6,6 +6,7 @@
   "color": "from-teal-500 to-emerald-500",
   "terms": "clinic",
   "schedule_view": "appointments",
+  "waitlist": { "enabled": true, "classes": "manual", "appointments": "manual", "resources": "manual" },
   "social": "off",
   "client_term": "patient",
   "booking_modes": [

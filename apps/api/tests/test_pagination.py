@@ -62,6 +62,12 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # waiting requests first, then the latest decided: LIMIT 200 (a business) and 50 (a client)
+    "/freeze-requests": "limit in SQL",
+    "/client/freeze-requests": "limit in SQL",
+    # the SQL returns at most 200 (staff) or 50 (one client: five requests and a few class places)
+    "/waitlist": "limit in SQL",
+    "/client/waitlist": "limit in SQL",
     # one person's AI connections in one business: at most 20 (the cap when approving)
     "/mcp-connections": "capped",
     # the changes AI apps proposed to one person in the last 30 days: the query returns at most 50
@@ -71,6 +77,8 @@ BOUNDED = {
     # the SQL function returns at most 5 open banners, or the latest 50
     "/public/incidents": "limit in SQL",
     "/platform/incidents": "limit in SQL",
+    # one row per quote status and currency
+    "/quotes/summary": "grouped",
     # a required date window of at most 42 days
     "/sessions": "window",
     "/client/sessions": "window",

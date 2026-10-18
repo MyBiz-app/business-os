@@ -15,6 +15,7 @@ import {
   PRESETS,
   RECOMMENDABLE,
   STATUSES,
+  WAITLIST_MODES,
   categories,
   childrenOf,
   isOpen,
@@ -62,7 +63,7 @@ test("keys are unique, lower snake case, and statuses known", () => {
 test("every open category sets everything its sub-categories inherit", () => {
   for (const category of CATEGORIES.filter((c) => c.status !== "planned")) {
     for (const name of ["terms", "client_term", "booking_modes", "cancellation_window_minutes",
-      "booking_requires_plan", "default_preset", "recommended_modules", "client_fields", "client_home", "schedule_view", "social"] as const) {
+      "booking_requires_plan", "default_preset", "recommended_modules", "client_fields", "client_home", "schedule_view", "social", "waitlist"] as const) {
       assert.notEqual(category[name], undefined, `${category.key}: ${name}`);
     }
   }
@@ -93,6 +94,11 @@ test("settings, starter content and client fields are valid", () => {
       assert.ok(CLIENT_HOME_CARDS.includes(card), `${where}: client_home card ${card}`);
     }
     if (entry.client_home) assert.ok(home.includes("next_booking"), `${where}: client_home needs next_booking`);
+    if (entry.waitlist) {
+      for (const kind of ["classes", "appointments", "resources"] as const) {
+        assert.ok(WAITLIST_MODES.includes(entry.waitlist[kind]), `${where}: waitlist ${kind}`);
+      }
+    }
     for (const mode of entry.booking_modes ?? []) {
       assert.ok(BOOKING_MODES.includes(mode as (typeof BOOKING_MODES)[number]), `${where}: mode ${mode}`);
     }

@@ -26,10 +26,11 @@ export function useNotificationText(): (n: Notification) => string {
       previous: when(p.previous_starts_at),
       note: String(p.note ?? ""),
       plan: String(p.plan_name ?? ""),
+      from: typeof p.starts_on === "string" ? planDay.format(new Date(`${p.starts_on}T12:00:00Z`)) : "",
       date: typeof p.ends_on === "string" ? planDay.format(new Date(`${p.ends_on}T12:00:00Z`)) : "",
     };
     if (n.kind === "booked_by_studio" && p.status === "waitlisted") return t("kinds.waitlisted_by_studio", values);
-    if ((n.kind === "health_approved" || n.kind === "health_rejected") && p.note) {
+    if ((n.kind === "health_approved" || n.kind === "health_rejected" || n.kind === "freeze_approved" || n.kind === "freeze_rejected") && p.note) {
       return `${t(`kinds.${n.kind}`, values)} ${t("note", values)}`;
     }
     return t(`kinds.${n.kind}`, values);
@@ -38,6 +39,7 @@ export function useNotificationText(): (n: Notification) => string {
 
 /** An icon (Ionicons name) for the kind of update, so the list can be scanned. */
 export function notificationIcon(kind: string): "calendar-outline" | "checkmark-circle-outline" | "close-circle-outline" | "heart-outline" | "card-outline" | "notifications-outline" {
+  if (kind === "waitlist_spot_open") return "notifications-outline";
   if (kind.includes("cancel") || kind.includes("rejected")) return "close-circle-outline";
   if (kind.includes("health")) return "heart-outline";
   if (kind.includes("plan") || kind.includes("entitlement")) return "card-outline";

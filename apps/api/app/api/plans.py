@@ -31,11 +31,15 @@ ClientsReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_REA
 SalesDep = Annotated[TenantContext, Depends(require(Permission.SALES_MANAGE))]
 
 PlanKind = Literal["membership", "punch_card"]
+BillingCycle = Literal["monthly", "quarterly", "yearly", "custom"]
 MAX_FREEZE_DAYS = 90
+# The length of a plan with a billing cycle: what the entitlement is valid for before the next
+# charge (a custom cycle says its own days).
+CYCLE_VALIDITY_DAYS = {"monthly": 30, "quarterly": 91, "yearly": 365}
 
 PLAN_COLUMNS = (
     "id, name, description, kind, price_amount, price_currency, validity_days, credits, active, "
-    "created_at, updated_at"
+    "billing_cycle, billing_cycle_days, auto_renew, created_at, updated_at"
 )
 
 
@@ -58,6 +62,15 @@ class PlanCreate(PlanFields):
     validity_days: int = Field(ge=1, le=1095)
     credits: int | None = Field(default=None, ge=1, le=1000, description="Punch cards only")
     active: bool = True
+    billing_cycle: BillingCycle | None = Field(
+        default=None,
+        description="Memberships only: how often it is billed. With a cycle, validity_days "
+        "follows it (30, 91, 365 or billing_cycle_days)",
+    )
+    billing_cycle_days: int | None = Field(
+        default=None, ge=1, le=1095, description="Only for the custom cycle"
+    )
+    auto_renew: bool = Field(default=False, description="Needs a billing cycle")
 
     @field_validator("name")
     @classmethod
@@ -70,6 +83,15 @@ class PlanCreate(PlanFields):
     def credits_match_kind(self) -> "PlanCreate":
         if (self.kind == "punch_card") != (self.credits is not None):
             raise ValueError("punch cards need credits; memberships must not have credits")
+        if self.billing_cycle is None:
+            if self.billing_cycle_days is not None or self.auto_renew:
+                raise ValueError("a billing cycle is needed for renewing or cycle days")
+            return self
+        if self.kind != "membership":
+            raise ValueError("only memberships have a billing cycle")
+        if (self.billing_cycle == "custom") != (self.billing_cycle_days is not None):
+            raise ValueError("billing_cycle_days goes with the custom cycle, and only with it")
+        self.validity_days = self.billing_cycle_days or CYCLE_VALIDITY_DAYS[self.billing_cycle]
         return self
 
 
@@ -80,6 +102,7 @@ class PlanUpdate(PlanFields):
     price_amount: int | None = Field(default=None, ge=0)
     validity_days: int | None = Field(default=None, ge=1, le=1095)
     active: bool | None = None
+    auto_renew: bool | None = Field(default=None, description="Needs a billing cycle")
 
 
 class Plan(BaseModel):
@@ -92,6 +115,9 @@ class Plan(BaseModel):
     validity_days: int
     credits: int | None
     active: bool
+    billing_cycle: BillingCycle | None
+    billing_cycle_days: int | None
+    auto_renew: bool
     created_at: datetime
     updated_at: datetime
 
@@ -111,6 +137,13 @@ class Freeze(BaseModel):
     starts_on: dt.date
     ends_on: dt.date
     reason: str | None
+    request_id: UUID | None = Field(description="The client's request, if it came from one")
+    billing_mode: Literal["none", "defer", "credit"] = Field(
+        description="What it did to the billing: deferred the next charge, credited it, or neither"
+    )
+    billing_shift_days: int = Field(description="Days the next charge moved")
+    credit_amount: int = Field(description="Credit for the next charge, in minor units")
+    fee_amount: int = Field(description="Freeze fee for the next charge, in minor units")
 
 
 class Entitlement(BaseModel):
@@ -131,6 +164,14 @@ class Entitlement(BaseModel):
     created_at: datetime
     receipt_id: UUID | None = Field(description="The receipt of the payment for this plan")
     receipt_number: int | None
+    billing_cycle: BillingCycle | None
+    billing_cycle_days: int | None
+    auto_renew: bool
+    next_billing_on: dt.date | None = Field(description="Renewing memberships: the next charge")
+    next_billing_amount: int | None = Field(
+        description="What the next charge will be after freeze credits and fees (minor units)"
+    )
+    freezable: bool = Field(description="A membership that is not over, cancelled or used up")
 
 
 PaymentMethod = Literal["card", "cash", "transfer", "other"]
@@ -165,11 +206,15 @@ CREDIT_USED = "(b.status <> 'cancelled' OR b.late_cancel)"
 ENTITLEMENT_SELECT = f"""
     SELECT e.id, e.client_id, e.plan_id, e.name, e.kind, e.credits, e.starts_on, e.ends_on,
            e.status, e.price_amount, e.price_currency, e.created_at,
-           used.count AS credits_used,
+           e.billing_cycle, e.billing_cycle_days, e.auto_renew, e.next_billing_on,
+           e.billing_adjustment, used.count AS credits_used,
            (now() AT TIME ZONE t.time_zone)::date AS today,
            coalesce((
                SELECT json_agg(json_build_object(
-                   'id', f.id, 'starts_on', f.starts_on, 'ends_on', f.ends_on, 'reason', f.reason
+                   'id', f.id, 'starts_on', f.starts_on, 'ends_on', f.ends_on, 'reason', f.reason,
+                   'request_id', f.request_id, 'billing_mode', f.billing_mode,
+                   'billing_shift_days', f.billing_shift_days, 'credit_amount', f.credit_amount,
+                   'fee_amount', f.fee_amount
                ) ORDER BY f.starts_on)
                FROM app.entitlement_freezes f WHERE f.entitlement_id = e.id
            ), '[]') AS freezes,
@@ -207,6 +252,13 @@ def to_entitlement(row: Any) -> Entitlement:
     else:
         state = "active"
     data["state"] = state
+    adjustment = data.pop("billing_adjustment")
+    data["next_billing_amount"] = (
+        max(data["price_amount"] - adjustment, 0)
+        if data["auto_renew"] and data["next_billing_on"] is not None
+        else None
+    )
+    data["freezable"] = data["kind"] == "membership" and state in ("active", "upcoming", "frozen")
     return Entitlement.model_validate(data)
 
 
@@ -324,9 +376,10 @@ def create_plan(body: PlanCreate, context: CatalogWriteDep) -> Plan:
             text(f"""
                 INSERT INTO app.plans
                     (tenant_id, name, description, kind, price_amount, price_currency,
-                     validity_days, credits, active)
+                     validity_days, credits, active, billing_cycle, billing_cycle_days, auto_renew)
                 SELECT :tenant_id, :name, :description, :kind, :price_amount,
-                       coalesce(:price_currency, t.currency), :validity_days, :credits, :active
+                       coalesce(:price_currency, t.currency), :validity_days, :credits, :active,
+                       :billing_cycle, :billing_cycle_days, :auto_renew
                 FROM app.tenants t WHERE t.id = :tenant_id
                 RETURNING {PLAN_COLUMNS}
             """),
@@ -360,6 +413,12 @@ def update_plan(plan_id: UUID, body: PlanUpdate, context: CatalogWriteDep) -> Pl
         for key, value in body.model_dump(exclude_unset=True).items()
         if value is not None or key == "description"
     }
+    if changes.get("auto_renew"):
+        has_cycle = context.session.execute(
+            text("SELECT billing_cycle IS NOT NULL FROM app.plans WHERE id = :id"), {"id": plan_id}
+        ).scalar()
+        if has_cycle is False:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="no_billing_cycle")
     row = (
         context.session.execute(
             text(f"""
@@ -430,10 +489,12 @@ def sell_plan(client_id: UUID, body: Sale, context: SalesDep) -> Entitlement:
         text("""
             INSERT INTO app.entitlements
                 (tenant_id, client_id, plan_id, name, kind, credits, starts_on, ends_on,
-                 price_amount, price_currency, sold_by)
+                 price_amount, price_currency, sold_by, billing_cycle, billing_cycle_days,
+                 auto_renew, next_billing_on)
             SELECT p.tenant_id, :client_id, p.id, p.name, p.kind, p.credits, start.value,
                    start.value + p.validity_days - 1, p.price_amount, p.price_currency,
-                   app.current_user_id()
+                   app.current_user_id(), p.billing_cycle, p.billing_cycle_days, p.auto_renew,
+                   CASE WHEN p.auto_renew THEN start.value + p.validity_days END
             FROM app.plans p
             JOIN app.tenants t ON t.id = p.tenant_id
             CROSS JOIN LATERAL (
@@ -458,6 +519,8 @@ def freeze_entitlement(entitlement_id: UUID, body: FreezeCreate, context: SalesD
     """Pauses the entitlement for the given days and extends its end date by as many days."""
     db = context.session
     current = load_entitlement(db, entitlement_id)
+    if current.kind != "membership":
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_a_membership")
     if current.state in ("cancelled", "expired"):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_active")
     if body.starts_on < current.starts_on or body.starts_on > current.ends_on:
@@ -467,18 +530,9 @@ def freeze_entitlement(entitlement_id: UUID, body: FreezeCreate, context: SalesD
 
     db.execute(
         text("""
-            INSERT INTO app.entitlement_freezes
-                (tenant_id, entitlement_id, starts_on, ends_on, reason, created_by)
-            VALUES (:tenant_id, :id, :starts_on, :ends_on, :reason, app.current_user_id())
+            SELECT app.apply_freeze(:id, :starts_on, :ends_on, :reason, NULL, false, false, NULL)
         """),
-        {**body.model_dump(), "tenant_id": context.tenant_id, "id": entitlement_id},
-    )
-    db.execute(
-        text("""
-            UPDATE app.entitlements SET ends_on = ends_on + :days, updated_at = now()
-            WHERE id = :id
-        """),
-        {"days": (body.ends_on - body.starts_on).days + 1, "id": entitlement_id},
+        {**body.model_dump(), "id": entitlement_id},
     )
     return load_entitlement(db, entitlement_id)
 
