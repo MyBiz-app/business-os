@@ -34077,6 +34077,98 @@
         }
       }
     },
+    "/metrics/branch-insights": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Branch Insights",
+        "description": "What the branches map shows beyond the metrics: where each branch's clients come from\nand what its team costs. Only branches the person may see.",
+        "operationId": "branch_insights",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date",
+              "title": "Start"
+            },
+            "description": "First local date"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Last local date (inclusive)",
+              "title": "End"
+            },
+            "description": "Last local date (inclusive)"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchInsights"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/reviews": {
       "get": {
         "tags": [
@@ -47770,6 +47862,71 @@
         ],
         "title": "BookingUpdate"
       },
+      "BranchInsight": {
+        "properties": {
+          "location_id": {
+            "type": "string",
+            "title": "Location Id"
+          },
+          "origins": {
+            "items": {
+              "$ref": "#/components/schemas/ClientOriginOut"
+            },
+            "type": "array",
+            "title": "Origins",
+            "description": "Cities of the clients who booked there in the period, most first"
+          },
+          "staff_cost_minor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Cost Minor",
+            "description": "The branch's share of the latest payroll month's gross pay (needs payroll access; people who did not clock in are not counted)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_id",
+          "origins",
+          "staff_cost_minor"
+        ],
+        "title": "BranchInsight"
+      },
+      "BranchInsights": {
+        "properties": {
+          "staff_cost_period": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Cost Period",
+            "description": "The payroll month the cost is from"
+          },
+          "branches": {
+            "items": {
+              "$ref": "#/components/schemas/BranchInsight"
+            },
+            "type": "array",
+            "title": "Branches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_cost_period",
+          "branches"
+        ],
+        "title": "BranchInsights"
+      },
       "BranchManager": {
         "properties": {
           "user_id": {
@@ -50975,6 +51132,54 @@
           "created_at"
         ],
         "title": "ClientNote"
+      },
+      "ClientOriginOut": {
+        "properties": {
+          "city_code": {
+            "type": "integer",
+            "title": "City Code"
+          },
+          "city_name": {
+            "type": "string",
+            "title": "City Name"
+          },
+          "clients": {
+            "type": "integer",
+            "title": "Clients"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "The city's centre, when it could be found"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_code",
+          "city_name",
+          "clients",
+          "latitude",
+          "longitude"
+        ],
+        "title": "ClientOriginOut"
       },
       "ClientPage": {
         "properties": {

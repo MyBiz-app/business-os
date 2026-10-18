@@ -6574,6 +6574,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/metrics/branch-insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Branch Insights
+         * @description What the branches map shows beyond the metrics: where each branch's clients come from
+         *     and what its team costs. Only branches the person may see.
+         */
+        get: operations["branch_insights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reviews": {
         parameters: {
             query?: never;
@@ -10519,6 +10540,31 @@ export interface components {
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
         };
+        /** BranchInsight */
+        BranchInsight: {
+            /** Location Id */
+            location_id: string;
+            /**
+             * Origins
+             * @description Cities of the clients who booked there in the period, most first
+             */
+            origins: components["schemas"]["ClientOriginOut"][];
+            /**
+             * Staff Cost Minor
+             * @description The branch's share of the latest payroll month's gross pay (needs payroll access; people who did not clock in are not counted)
+             */
+            staff_cost_minor: number | null;
+        };
+        /** BranchInsights */
+        BranchInsights: {
+            /**
+             * Staff Cost Period
+             * @description The payroll month the cost is from
+             */
+            staff_cost_period: string | null;
+            /** Branches */
+            branches: components["schemas"]["BranchInsight"][];
+        };
         /** BranchManager */
         BranchManager: {
             /**
@@ -11734,6 +11780,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** ClientOriginOut */
+        ClientOriginOut: {
+            /** City Code */
+            city_code: number;
+            /** City Name */
+            city_name: string;
+            /** Clients */
+            clients: number;
+            /**
+             * Latitude
+             * @description The city's centre, when it could be found
+             */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
         };
         /** ClientPage */
         ClientPage: {
@@ -37442,6 +37504,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BranchMetrics"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    branch_insights: {
+        parameters: {
+            query: {
+                /** @description First local date */
+                start: string;
+                /** @description Last local date (inclusive) */
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchInsights"];
                 };
             };
             /** @description Validation Error */
