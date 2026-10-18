@@ -87,6 +87,11 @@ class ScheduledSession(BaseModel):
     capacity: int
     booked: int
     waitlisted: int
+    waiting_requests: int = Field(
+        default=0,
+        description="Clients waiting for a spot like this one (a range, a whole day or this exact"
+        " time), on top of those on the class's own waitlist",
+    )
     series_open_ended: bool | None = Field(
         description="For a session in a weekly series: whether the series keeps going"
     )

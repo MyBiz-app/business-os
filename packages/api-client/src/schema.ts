@@ -19035,6 +19035,12 @@ export interface components {
             /** Waitlisted */
             waitlisted: number;
             /**
+             * Waiting Requests
+             * @description Clients waiting for a spot like this one (a range, a whole day or this exact time), on top of those on the class's own waitlist
+             * @default 0
+             */
+            waiting_requests: number;
+            /**
              * Series Open Ended
              * @description For a session in a weekly series: whether the series keeps going
              */

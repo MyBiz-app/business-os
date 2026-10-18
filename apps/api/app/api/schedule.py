@@ -40,7 +40,13 @@ SESSION_SELECT = """
     SELECT s.id, s.series_id, s.location_id, l.name AS location_name, s.room_id,
            r.name AS room_name, s.instructor_user_id, u.email AS instructor_email,
            s.starts_at, s.ends_at, s.capacity, s.status, s.notes,
-           bk.booked, bk.waitlisted, ss.open_ended AS series_open_ended,
+           bk.booked, bk.waitlisted,
+           CASE WHEN s.starts_at > now() THEN (
+               SELECT count(*) FROM app.waitlist_requests r
+               WHERE r.service_id = s.service_id AND r.status IN ('active', 'offered')
+                 AND r.expires_at > now() AND app.waitlist_matches(r.id, s.id)
+           ) ELSE 0 END::int AS waiting_requests,
+           ss.open_ended AS series_open_ended,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
            sv.booking_mode, s.price_amount, s.price_currency,
            CASE WHEN s.reserved THEN EXISTS (

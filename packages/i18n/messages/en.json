@@ -1252,6 +1252,7 @@
     "cancelled": "Cancelled",
     "spots": "{booked}/{capacity}",
     "spotsLabel": "{booked} of {capacity} booked",
+    "waitingLabel": "{count} waiting",
     "service": "Service",
     "date": "Date",
     "startTime": "Start time",
@@ -1829,6 +1830,10 @@
       "earlier": "{what}: 30 minutes earlier",
       "later": "{what}: 30 minutes later",
       "submit": "Add me to the list",
+      "withWhom": "With whom",
+      "anyone": "Anyone",
+      "branch": "Branch",
+      "anyBranch": "Any branch",
       "notifyMe": "Tell me if a time opens",
       "errors": {
         "generic": "Something went wrong. Try again.",
