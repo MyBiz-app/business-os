@@ -18862,6 +18862,11 @@ export interface components {
             gross_minor: number;
             /** Deductions Minor */
             deductions_minor: number;
+            /**
+             * Employer Cost Minor
+             * @description Gross pay plus what the employer pays on top (pension, severance, insurance)
+             */
+            employer_cost_minor: number;
             /** Previous Gross Minor */
             previous_gross_minor: number | null;
             /** Open Errors */

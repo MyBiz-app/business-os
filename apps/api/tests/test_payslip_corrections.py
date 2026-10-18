@@ -57,6 +57,16 @@ def test_a_correction_is_a_new_version_with_the_difference_and_a_pdf(
     )
     assert after == before
 
+    # Each corrective payslip is also filed in the payroll folder and in the person's own files.
+    folders = client.get("/files/folders", headers=headers).json()
+    payroll = next(f for f in folders if f["system_key"] == "payroll")
+    filed = [
+        f["name"]
+        for f in client.get("/files", params={"folder_id": payroll["id"]}, headers=headers).json()
+    ]
+    assert sum(n.startswith("payslip-2026-03-") and n.endswith("-v1.pdf") for n in filed) == 1
+    assert sum(n.startswith("payslip-2026-03-") and n.endswith("-v2.pdf") for n in filed) == 1
+
     base = f"/payroll/runs/2026-03/payslips/{coach}/pdf"
     for params in ({}, {"version": 0}, {"version": 1}):
         pdf = client.get(base, params=params, headers=headers)
