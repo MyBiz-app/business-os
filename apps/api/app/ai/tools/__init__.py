@@ -381,10 +381,8 @@ TOOL_DOMAINS: dict[str, str] = {
 BRANCH_BLIND: frozenset[str] = frozenset({"lead_pipeline"})
 
 
-# What an AI connector (MCP, round 7 R37a) may use: the tools that only read. Anything that
-# proposes a change (book, cancel, bill, publish, schedule) stays with the built-in assistant
-# until connectors get actions that wait for approval (R37b). A test runs every one of these in a
-# read-only transaction.
+# What an AI connector (MCP, round 7 R37a) may use: the tools that only read. A test runs every
+# one of these in a read-only transaction.
 MCP_READ_TOOLS: frozenset[str] = frozenset(
     {
         "find_clients",
@@ -405,6 +403,15 @@ MCP_READ_TOOLS: frozenset[str] = frozenset(
         "audience_summary",
         "list_drafts",
     }
+)
+
+
+# What a connector may also propose (R37b), when the person allowed it: the tools that only create
+# a pending action. The connector never changes anything; the person approves each request in
+# MyBiz, where it is checked again (app/ai/actions.py). Publishing and scheduled tasks stay with
+# the built-in assistant.
+MCP_ACTION_TOOLS: frozenset[str] = frozenset(
+    {"book_client", "cancel_booking", "log_time", "bill_month"}
 )
 
 
@@ -435,13 +442,16 @@ def tools_for(
 
 
 def mcp_tools_for(
-    permissions: frozenset[str], modules: set[str], narrowed: bool = False
+    permissions: frozenset[str],
+    modules: set[str],
+    narrowed: bool = False,
+    propose: bool = False,
 ) -> list[Tool]:
-    """The read tools a connection's person may use in their business."""
+    """The tools a connection's person may use in their business: the read tools, and the ones
+    that propose a change when the connection was allowed to."""
+    names = MCP_READ_TOOLS | MCP_ACTION_TOOLS if propose else MCP_READ_TOOLS
     return [
-        tool
-        for tool in tools_for(permissions, modules, narrowed=narrowed)
-        if tool.name in MCP_READ_TOOLS
+        tool for tool in tools_for(permissions, modules, narrowed=narrowed) if tool.name in names
     ]
 
 

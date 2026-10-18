@@ -632,6 +632,145 @@
         }
       }
     },
+    "/mcp-info": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Info",
+        "operationId": "mcp_info",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-requests": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "List Requests",
+        "description": "The changes AI apps proposed to the signed-in person: the ones waiting first, then what\nhappened to the recent ones. Only the person the app acted for sees and decides them.",
+        "operationId": "list_mcp_requests",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/McpRequest"
+                  },
+                  "title": "Response List Mcp Requests"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ai/tasks": {
       "get": {
         "tags": [
@@ -16248,6 +16387,50 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/website-prices": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Website Prices",
+        "description": "The website price list in one currency (unknown currencies get USD), for the public\n/websites and pricing pages. The same list the order records.",
+        "operationId": "website_prices",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "USD",
+              "title": "Currency"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebsitePrices"
                 }
               }
             }
@@ -36268,6 +36451,7 @@
                 "agent_finance",
                 "agent_marketing",
                 "social_studio",
+                "payroll",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -38618,6 +38802,57 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AICostBoard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/connectors": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Ai Connectors",
+        "description": "Who uses the AI connectors (Claude, ChatGPT): per business, the apps, the calls and what\nbecame of the changes they proposed.",
+        "operationId": "ai_connectors",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorBoard"
                 }
               }
             }
@@ -45837,6 +46072,12 @@
             "maxLength": 500,
             "title": "State",
             "default": ""
+          },
+          "propose": {
+            "type": "boolean",
+            "title": "Propose",
+            "description": "Also let the app propose changes; each one waits for this person's approval",
+            "default": false
           }
         },
         "type": "object",
@@ -48589,6 +48830,7 @@
                   "agent_finance",
                   "agent_marketing",
                   "social_studio",
+                  "payroll",
                   "whatsapp",
                   "whatsapp_ai",
                   "pack_plus",
@@ -48637,6 +48879,7 @@
               "agent_finance",
               "agent_marketing",
               "social_studio",
+              "payroll",
               "whatsapp",
               "whatsapp_ai",
               "pack_plus",
@@ -48676,6 +48919,7 @@
                 "agent_finance",
                 "agent_marketing",
                 "social_studio",
+                "payroll",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -48704,6 +48948,7 @@
                 "agent_finance",
                 "agent_marketing",
                 "social_studio",
+                "payroll",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -50399,6 +50644,29 @@
             ],
             "title": "Website Url",
             "description": "The branch's website, else the business's; none if neither set"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "The branch's point on the map, for navigation links"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
           }
         },
         "type": "object",
@@ -51633,6 +51901,127 @@
           "accounts"
         ],
         "title": "ConnectResult"
+      },
+      "ConnectorBoard": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "daily_limit": {
+            "type": "integer",
+            "title": "Daily Limit",
+            "description": "Calls per business per rolling 24 hours"
+          },
+          "businesses": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorUse"
+            },
+            "type": "array",
+            "title": "Businesses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "daily_limit",
+          "businesses"
+        ],
+        "title": "ConnectorBoard"
+      },
+      "ConnectorInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "What to call the connector in the AI app"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url",
+            "description": "The address to paste into the AI app"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "title": "ConnectorInfo"
+      },
+      "ConnectorUse": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "connections": {
+            "type": "integer",
+            "title": "Connections",
+            "description": "AI apps connected now"
+          },
+          "apps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Apps"
+          },
+          "calls": {
+            "type": "integer",
+            "title": "Calls",
+            "description": "Calls in the window"
+          },
+          "last_call": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Call"
+          },
+          "proposed": {
+            "type": "integer",
+            "title": "Proposed",
+            "description": "Changes the apps proposed in the window"
+          },
+          "executed": {
+            "type": "integer",
+            "title": "Executed"
+          },
+          "rejected": {
+            "type": "integer",
+            "title": "Rejected"
+          },
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting",
+            "description": "Proposals waiting for approval now"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "connections",
+          "apps",
+          "calls",
+          "last_call",
+          "proposed",
+          "executed",
+          "rejected",
+          "waiting"
+        ],
+        "title": "ConnectorUse"
       },
       "ConsentBody": {
         "properties": {
@@ -59813,6 +60202,11 @@
           "calls": {
             "type": "integer",
             "title": "Calls"
+          },
+          "can_propose": {
+            "type": "boolean",
+            "title": "Can Propose",
+            "description": "May also propose changes, which wait for approval"
           }
         },
         "type": "object",
@@ -59821,9 +60215,85 @@
           "client_name",
           "created_at",
           "last_used_at",
-          "calls"
+          "calls",
+          "can_propose"
         ],
         "title": "McpConnection"
+      },
+      "McpRequest": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "tool_name": {
+            "type": "string",
+            "title": "Tool Name"
+          },
+          "preview": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Preview"
+          },
+          "client_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Name",
+            "description": "The AI app that asked"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "rejected",
+              "expired",
+              "executed",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tool_name",
+          "preview",
+          "client_name",
+          "status",
+          "created_at",
+          "expires_at",
+          "result"
+        ],
+        "title": "McpRequest"
       },
       "Me": {
         "properties": {
@@ -64759,6 +65229,26 @@
         ],
         "title": "ProactiveSetting"
       },
+      "ProductPrice": {
+        "properties": {
+          "setup": {
+            "type": "integer",
+            "title": "Setup",
+            "description": "One-time, minor units"
+          },
+          "monthly": {
+            "type": "integer",
+            "title": "Monthly",
+            "description": "Minor units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "setup",
+          "monthly"
+        ],
+        "title": "ProductPrice"
+      },
       "PromoCode": {
         "properties": {
           "id": {
@@ -66065,6 +66555,7 @@
                 "agent_finance",
                 "agent_marketing",
                 "social_studio",
+                "payroll",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -66095,6 +66586,7 @@
                 "agent_finance",
                 "agent_marketing",
                 "social_studio",
+                "payroll",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -66707,6 +67199,7 @@
                 "agent_finance",
                 "agent_marketing",
                 "social_studio",
+                "payroll",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -69119,6 +69612,7 @@
                 "agent_finance",
                 "agent_marketing",
                 "social_studio",
+                "payroll",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -72879,6 +73373,7 @@
                 "agent_finance",
                 "agent_marketing",
                 "social_studio",
+                "payroll",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -74937,6 +75432,27 @@
         },
         "type": "object",
         "title": "WebsiteOrderUpdate"
+      },
+      "WebsitePrices": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "landing_only": {
+            "$ref": "#/components/schemas/ProductPrice"
+          },
+          "landing_with_system": {
+            "$ref": "#/components/schemas/ProductPrice"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "landing_only",
+          "landing_with_system"
+        ],
+        "title": "WebsitePrices"
       },
       "WeekCopied": {
         "properties": {

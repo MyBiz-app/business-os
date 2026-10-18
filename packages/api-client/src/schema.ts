@@ -183,6 +183,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/mcp-info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Info */
+        get: operations["mcp_info"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mcp-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Requests
+         * @description The changes AI apps proposed to the signed-in person: the ones waiting first, then what
+         *     happened to the recent ones. Only the person the app acted for sees and decides them.
+         */
+        get: operations["list_mcp_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/tasks": {
         parameters: {
             query?: never;
@@ -3060,6 +3098,27 @@ export interface paths {
          *     (the order goes back to "building" with the request).
          */
         post: operations["respond"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/website-prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Website Prices
+         * @description The website price list in one currency (unknown currencies get USD), for the public
+         *     /websites and pricing pages. The same list the order records.
+         */
+        get: operations["website_prices"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -7708,6 +7767,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/ai/connectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Connectors
+         * @description Who uses the AI connectors (Claude, ChatGPT): per business, the apps, the calls and what
+         *     became of the changes they proposed.
+         */
+        get: operations["ai_connectors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/ai/settings": {
         parameters: {
             query?: never;
@@ -9771,6 +9851,12 @@ export interface components {
              * @default
              */
             state: string;
+            /**
+             * Propose
+             * @description Also let the app propose changes; each one waits for this person's approval
+             * @default false
+             */
+            propose: boolean;
         };
         /** ApprovalResult */
         ApprovalResult: {
@@ -10854,7 +10940,7 @@ export interface components {
             modules: components["schemas"]["CatalogModule"][];
             /** Presets */
             presets: {
-                [key: string]: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+                [key: string]: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "payroll" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             };
         };
         /** CatalogModule */
@@ -10863,7 +10949,7 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
+            key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "payroll" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
             /**
              * Price
              * @description Monthly, minor units (per unit when per_unit)
@@ -10874,9 +10960,9 @@ export interface components {
             /** Per Unit */
             per_unit: boolean;
             /** Requires Any */
-            requires_any: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+            requires_any: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "payroll" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             /** Requires All */
-            requires_all: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+            requires_all: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "payroll" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             /**
              * Group
              * @description Tiers of one thing: at most one per group
@@ -11552,6 +11638,13 @@ export interface components {
              * @description The branch's website, else the business's; none if neither set
              */
             website_url?: string | null;
+            /**
+             * Latitude
+             * @description The branch's point on the map, for navigation links
+             */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
         };
         /** ClientNote */
         ClientNote: {
@@ -11984,6 +12077,69 @@ export interface components {
             accounts: components["schemas"]["SocialAccount"][];
             /** Authorize Url */
             authorize_url?: string | null;
+        };
+        /** ConnectorBoard */
+        ConnectorBoard: {
+            /** Days */
+            days: number;
+            /**
+             * Daily Limit
+             * @description Calls per business per rolling 24 hours
+             */
+            daily_limit: number;
+            /** Businesses */
+            businesses: components["schemas"]["ConnectorUse"][];
+        };
+        /** ConnectorInfo */
+        ConnectorInfo: {
+            /**
+             * Name
+             * @description What to call the connector in the AI app
+             */
+            name: string;
+            /**
+             * Url
+             * @description The address to paste into the AI app
+             */
+            url: string;
+        };
+        /** ConnectorUse */
+        ConnectorUse: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Connections
+             * @description AI apps connected now
+             */
+            connections: number;
+            /** Apps */
+            apps: string[];
+            /**
+             * Calls
+             * @description Calls in the window
+             */
+            calls: number;
+            /** Last Call */
+            last_call: string | null;
+            /**
+             * Proposed
+             * @description Changes the apps proposed in the window
+             */
+            proposed: number;
+            /** Executed */
+            executed: number;
+            /** Rejected */
+            rejected: number;
+            /**
+             * Waiting
+             * @description Proposals waiting for approval now
+             */
+            waiting: number;
         };
         /** ConsentBody */
         ConsentBody: {
@@ -15127,6 +15283,49 @@ export interface components {
             last_used_at: string | null;
             /** Calls */
             calls: number;
+            /**
+             * Can Propose
+             * @description May also propose changes, which wait for approval
+             */
+            can_propose: boolean;
+        };
+        /** McpRequest */
+        McpRequest: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Tool Name */
+            tool_name: string;
+            /** Preview */
+            preview: {
+                [key: string]: unknown;
+            };
+            /**
+             * Client Name
+             * @description The AI app that asked
+             */
+            client_name: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "rejected" | "expired" | "executed" | "failed";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Result */
+            result: {
+                [key: string]: unknown;
+            } | null;
         };
         /** Me */
         Me: {
@@ -17126,6 +17325,19 @@ export interface components {
             last_run_at: string | null;
             /** Agent Key */
             agent_key: string;
+        };
+        /** ProductPrice */
+        ProductPrice: {
+            /**
+             * Setup
+             * @description One-time, minor units
+             */
+            setup: number;
+            /**
+             * Monthly
+             * @description Minor units
+             */
+            monthly: number;
         };
         /** PromoCode */
         PromoCode: {
@@ -20955,6 +21167,13 @@ export interface components {
              */
             message?: string | null;
         };
+        /** WebsitePrices */
+        WebsitePrices: {
+            /** Currency */
+            currency: string;
+            landing_only: components["schemas"]["ProductPrice"];
+            landing_with_system: components["schemas"]["ProductPrice"];
+        };
         /** WeekCopied */
         WeekCopied: {
             /** Created */
@@ -21837,6 +22056,72 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mcp_info: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_mcp_requests: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["McpRequest"][];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -28926,6 +29211,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrderState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    website_prices: {
+        parameters: {
+            query?: {
+                currency?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebsitePrices"];
                 };
             };
             /** @description Validation Error */
@@ -38114,7 +38430,7 @@ export interface operations {
                 "X-Location-Id"?: string | null;
             };
             path: {
-                key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
+                key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "payroll" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
             };
             cookie?: never;
         };
@@ -39391,6 +39707,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AICostBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_connectors: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorBoard"];
                 };
             };
             /** @description Validation Error */

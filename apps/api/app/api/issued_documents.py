@@ -29,6 +29,7 @@ from app.core.legal_readiness import evaluate
 from app.core.permissions import Permission
 from app.documents import issuing, render
 from app.documents.issuing import FIRST_NUMBER, Kind
+from app.files import keep_copy
 
 router = APIRouter(prefix="/issued-documents", tags=["documents"])
 
@@ -414,6 +415,13 @@ def issue(body: IssueRequest, context: SalesDep) -> IssuedDocument:
             "content": content,
             "content_hash": hashlib.sha256(content).hexdigest(),
         },
+    )
+    keep_copy(
+        db,
+        context.tenant_id,
+        "business_docs",
+        name=f"{body.kind}-{number}.pdf",
+        content=content,
     )
     return IssuedDocument.model_validate(_row(db, document_id))
 
