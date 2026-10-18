@@ -645,6 +645,7 @@ def test_curated_demo_fills_every_tenant_table_or_says_why_not(engine: Engine) -
         "audit_log",
     ):
         assert filled[table] == 3, table
+    assert filled["subscription_cancellations"] == 1
     assert filled["website_orders"] == 2 and filled["entitlement_freezes"] >= 1
     for table in (
         "waitlist_requests",

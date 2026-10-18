@@ -66,7 +66,6 @@ NO_DEMO: dict[str, str] = {
 # tenant tables until it is filled or listed in NO_DEMO.
 PENDING_FEATURES = (
     "R25b CRM website area (the website order and visits are already filled)",
-    "R33 subscription cancellation by the business (console churn view)",
     "R28 solo mode: a solo demo business needs no team, so it would be a fourth business "
     "(the curated account keeps exactly three); the three get a business size instead",
 )
@@ -1107,6 +1106,26 @@ def _people(conn: Connection, tenant_id: UUID, owner: UUID, name: str, clients: 
     return added
 
 
+def _subscription_history(conn: Connection, tenant_id: UUID, owner: UUID, name: str,
+                          currency: str) -> int:  # fmt: skip
+    """R33: Studio Bloom paused its subscription a while ago and took it back, so the console's
+    churn view and the business's history have a row. Nothing is cancelled now."""
+    if name != SALON or _has(conn, "subscription_cancellations", tenant_id):
+        return 0
+    conn.execute(
+        text("""
+            INSERT INTO app.subscription_cancellations
+                (tenant_id, user_id, outcome, reason, note, ends_at, currency, created_at,
+                 resumed_at)
+            VALUES (:t, :u, 'paused', 'other', 'הפסקה קצרה בקיץ (נתוני דמו)',
+                    now() - interval '35 days', :c, now() - interval '50 days',
+                    now() - interval '35 days')
+        """),
+        {"t": tenant_id, "u": owner, "c": currency.strip()},
+    )
+    return 1
+
+
 def _business_size(conn: Connection, tenant_id: UUID, name: str) -> int:
     """The size each demo business answered at sign-up (a solo business has no team, so none of
     the three is solo). Only fills an empty answer."""
@@ -1377,6 +1396,9 @@ def seed_round7(conn: Connection, tenant_id: UUID, tenant_name: str, today: date
         "whatsapp": _whatsapp(conn, tenant_id, clients),
         "people": _people(conn, tenant_id, owner, tenant_name, clients),
         "size": _business_size(conn, tenant_id, tenant_name),
+        "subscription_history": _subscription_history(
+            conn, tenant_id, owner, tenant_name, currency
+        ),
         "cancellation": _cancellation(conn, tenant_id, owner, currency, clients, today),
         "waitlist": _waitlist(conn, tenant_id, clients, today),
         "freeze_requests": _freeze_requests(conn, tenant_id, owner, clients, today),
