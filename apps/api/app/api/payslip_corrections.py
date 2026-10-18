@@ -42,8 +42,10 @@ from app.api.payslips import (
     _line_rows,
     _profiles,
     correction_row,
+    payslip_pdf,
 )
 from app.core.permissions import Permission
+from app.files import keep_copy, safe_name
 from app.payroll.gate import require_open
 from app.payroll.net import compute_net
 from app.payroll.rates import resolve
@@ -196,6 +198,16 @@ def issue_correction(
         member=str(user_id),
         version=version,
         difference_minor=row["difference_minor"],
+    )
+    # A copy goes to the employee's Files area like the regular payslips; a full or unreachable
+    # storage skips the copy and never fails the correction.
+    keep_copy(
+        session,
+        context.tenant_id,
+        "payroll",
+        name=f"payslip-{first:%Y-%m}-{safe_name(line['full_name'])}-v{version}.pdf",
+        content=payslip_pdf(session, context.tenant_id, run, user_id, row),
+        owner_user_id=user_id,
     )
     return _present(row)
 

@@ -8973,6 +8973,8 @@
     "summary": {
       "gross": "Gross pay",
       "deductions": "Deductions",
+      "employerCost": "Total cost to the employer",
+      "employerCostNote": "Gross pay plus employer pension, severance and insurance",
       "people": "People",
       "vsPrevious": "{percent} against last month",
       "noPrevious": "No earlier month to compare"

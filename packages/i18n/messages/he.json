@@ -8973,6 +8973,8 @@
     "summary": {
       "gross": "ברוטו",
       "deductions": "ניכויים",
+      "employerCost": "עלות מעסיק כוללת",
+      "employerCostNote": "ברוטו בתוספת פנסיה, פיצויים וביטוחים על חשבון המעסיק",
       "people": "אנשים",
       "vsPrevious": "{percent} לעומת החודש הקודם",
       "noPrevious": "אין חודש קודם להשוואה"
