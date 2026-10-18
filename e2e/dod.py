@@ -159,6 +159,12 @@ with sync_playwright() as p:
 
     # Owner sees the booking.
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
+    try:
+        owner.locator(SESSION_LINK).first.wait_for(state="attached", timeout=20000)
+    except Exception:  # diagnostics for a board that shows no session
+        links = owner.eval_on_selector_all("main a", "els => els.map(e => e.getAttribute('href')).slice(0, 40)")
+        print("schedule board has no session link:", owner.url, links, owner.locator("main").inner_text()[:800])
+        raise
     owner.locator(SESSION_LINK).first.click(); h.ready(owner)
     expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("נועה כהן")).to_be_visible()
     print("6. owner sees the booking: ok")
