@@ -31,7 +31,7 @@ describe("wide-screen policy", () => {
   });
 
   it("adds columns to the cards from 1920px and keeps six dashboard tiles in a row", () => {
-    assert.ok(read("app/(app)/(tenant)/clients/[id]/page.tsx").includes("min-[120rem]:grid-cols-7"));
+    assert.ok(read("app/(app)/(tenant)/clients/[id]/client-body.tsx").includes("min-[120rem]:grid-cols-7"));
     assert.ok(read("app/(app)/(tenant)/team/[userId]/card-sections.tsx").includes("min-[120rem]:grid-cols-3"));
     assert.ok(read("app/(app)/(tenant)/dashboard/page.tsx").includes("2xl:grid-cols-6"));
   });

@@ -7339,31 +7339,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/billing/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Cancel Subscription
-         * @description Ends the subscription at the end of the paid period (or the trial). The business and its
-         *     data are kept; nothing is billed after that, and the owner can resume until it ends or later.
-         */
-        post: operations["cancel_subscription"];
-        /**
-         * Resume Subscription
-         * @description Takes a cancellation back, and brings a business back whose subscription had ended.
-         */
-        delete: operations["resume_subscription"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/billing/usage": {
         parameters: {
             query?: never;
@@ -7454,6 +7429,58 @@ export interface paths {
          */
         post: operations["pay_invoice"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cancel Options */
+        get: operations["cancel_options"];
+        put?: never;
+        /**
+         * Cancel Subscription
+         * @description Ends the subscription at the end of the paid period (or the trial). The business and its
+         *     data are kept; nothing is billed after that, and the owner can resume until it ends or later.
+         *     The first payment is refunded (recorded) when this is inside 14 days of it.
+         */
+        post: operations["cancel_subscription"];
+        /**
+         * Resume Subscription
+         * @description Takes a cancellation back, and brings a business back whose subscription had ended.
+         */
+        delete: operations["resume_subscription"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause Subscription
+         * @description Pauses the account for 1 to 3 months: the data is kept, everything is read-only and the
+         *     flat pause fee replaces the modules' price. Billing goes back to normal after it.
+         */
+        post: operations["pause_subscription"];
+        /**
+         * End Pause
+         * @description Ends a pause now; billing is normal again from the next period.
+         */
+        delete: operations["end_pause"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7904,6 +7931,46 @@ export interface paths {
          * @description Businesses with an unpaid invoice, the oldest first.
          */
         get: operations["overdue_businesses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/billing/cancellations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cancellations
+         * @description The last year's cancellations and pauses with the reasons, newest first.
+         */
+        get: operations["cancellations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/billing/churn": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Churn
+         * @description Per month for the last year: cancellations, pauses and those taken back.
+         */
+        get: operations["churn"];
         put?: never;
         post?: never;
         delete?: never;
@@ -11341,6 +11408,37 @@ export interface components {
              */
             warnings?: components["schemas"]["PlaceholderWarning"][];
         };
+        /**
+         * CancelOptions
+         * @description What cancelling would do now, and what a pause costs, shown before the owner decides.
+         */
+        CancelOptions: {
+            /**
+             * Ends At
+             * Format: date-time
+             * @description When the subscription would end
+             */
+            ends_at: string;
+            /** Currency */
+            currency: string;
+            /**
+             * Refund Minor
+             * @description The first payment, refunded inside 14 days
+             */
+            refund_minor: number | null;
+            /**
+             * Pause Fee Minor
+             * @description Per month while paused, minor units
+             */
+            pause_fee_minor: number;
+            /** Pause Max Months */
+            pause_max_months: number;
+            /**
+             * Pause Available
+             * @description False in the trial, when cancelling or overdue
+             */
+            pause_available: boolean;
+        };
         /** CancelPreview */
         CancelPreview: {
             /**
@@ -11381,6 +11479,61 @@ export interface components {
              * @description Visits already counted in that period
              */
             period_used: number | null;
+        };
+        /** CancelRequest */
+        CancelRequest: {
+            /**
+             * Reason
+             * @description Why, from a short list (optional)
+             */
+            reason?: ("too_expensive" | "missing_feature" | "not_using" | "switched" | "other") | null;
+            /** Note */
+            note?: string | null;
+        };
+        /** Cancellation */
+        Cancellation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /** Owner Email */
+            owner_email: string | null;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "cancelled" | "paused";
+            /** Reason */
+            reason: string | null;
+            /** Note */
+            note: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Ends At */
+            ends_at: string | null;
+            /**
+             * Refund Minor
+             * @description Recorded refund of the first payment, minor units
+             */
+            refund_minor: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Resumed At
+             * @description Set when the owner took it back
+             */
+            resumed_at: string | null;
         };
         /** Catalog */
         Catalog: {
@@ -11574,6 +11727,25 @@ export interface components {
              * @default true
              */
             lives_with_me: boolean;
+        };
+        /** ChurnMonth */
+        ChurnMonth: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /** Cancelled */
+            cancelled: number;
+            /** Paused */
+            paused: number;
+            /** Resumed */
+            resumed: number;
+            /**
+             * Paying At Start
+             * @description Businesses past their trial at the month's start
+             */
+            paying_at_start: number;
         };
         /** City */
         City: {
@@ -12460,6 +12632,21 @@ export interface components {
              * @description The subscription ends then; the business stays
              */
             cancel_at: string | null;
+            /**
+             * Paused Until
+             * @description The account is paused (read-only, flat fee) until then
+             */
+            paused_until?: string | null;
+            /**
+             * Refund Minor
+             * @description The refund the cancellation gets (the first payment inside 14 days), recorded only: no card is refunded while payments are off
+             */
+            refund_minor?: number | null;
+            /**
+             * Currency
+             * @description The business's currency
+             */
+            currency?: string | null;
         };
         /** Complaint */
         Complaint: {
@@ -17117,6 +17304,13 @@ export interface components {
             paused: boolean;
             /** Reason */
             reason?: string | null;
+        };
+        /** PauseRequest */
+        PauseRequest: {
+            /** Months */
+            months: number;
+            /** Reason */
+            reason?: ("too_expensive" | "missing_feature" | "not_using" | "switched" | "other") | null;
         };
         /** PayComponent */
         PayComponent: {
@@ -39882,72 +40076,6 @@ export interface operations {
             };
         };
     };
-    cancel_subscription: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-Tenant-Id": string;
-                /** @description The current branch (none: all branches) */
-                "X-Location-Id"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Collection"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    resume_subscription: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-Tenant-Id": string;
-                /** @description The current branch (none: all branches) */
-                "X-Location-Id"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Collection"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     get_usage: {
         parameters: {
             query?: never;
@@ -40143,6 +40271,179 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Invoice"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_options: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CancelOptions"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_subscription: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CancelRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Collection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_subscription: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Collection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pause_subscription: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PauseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Collection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_pause: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Collection"];
                 };
             };
             /** @description Validation Error */
@@ -40904,6 +41205,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OverdueBusiness"][];
+                };
+            };
+        };
+    };
+    cancellations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cancellation"][];
+                };
+            };
+        };
+    };
+    churn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChurnMonth"][];
                 };
             };
         };

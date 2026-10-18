@@ -19,7 +19,9 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import Connection, text
 
 from app.seed.common import TIME_ZONE
+from app.seed.guard import refuse_blocked_owner
 from app.seed.round6 import seed_round6
+from app.seed.round7 import seed_round7
 from app.seed.workspace import OPENING_HOURS
 
 ASSETS = Path(__file__).parent / "assets"
@@ -136,6 +138,7 @@ def _add_crossfit_branch(conn: Connection, tenant_id: UUID) -> UUID | None:
 
 def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
     """Adds logos and portraits (and the crossfit branch) to the owner's businesses."""
+    refuse_blocked_owner(owner_email)
     manifest = _manifest()
     counts = {
         "businesses": 0,
@@ -146,6 +149,7 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
         "pay_setups": 0,
         "payroll_runs": 0,
         "move_sessions": 0,
+        "round7": 0,
     }
     today = datetime.now(ZoneInfo(TIME_ZONE)).date()
     tenants = conn.execute(
@@ -245,4 +249,7 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
         added = seed_round6(conn, tenant_id, tenant_name, today)
         for key in ("pay_setups", "payroll_runs", "move_sessions"):
             counts[key] += added[key]
+
+        # Round 7: quotes, documents, AI chats, announcements, planning, a website and more.
+        counts["round7"] += sum(seed_round7(conn, tenant_id, tenant_name, today).values())
     return counts

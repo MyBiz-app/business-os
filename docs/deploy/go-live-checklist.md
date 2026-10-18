@@ -107,6 +107,17 @@ stays an off adapter. What waits for you, when the business really operates:
 | 4 | Real card payments | Provider fees | Needs the payment provider (#46): create the account, then ask Claude to turn on the adapter. Until then paying a late invoice only works with the test card |
 | 5 | Allocation numbers for MyBiz's own invoices | Free | Israel's tax authority may require an allocation number on invoices above a threshold; ask your accountant, and if needed connect the invoicing provider (#47) |
 
+## Cancelling a MyBiz subscription (R33)
+
+Built: the cancel flow, the pause, the 14 day refund (recorded), the `/legal/cancellation` page and
+the console's Churn view. What waits for you:
+
+| # | Step | Cost | Click by click |
+|---|---|---|---|
+| 1 | Have a lawyer read `/legal/cancellation` | Lawyer's fee | The text is in `packages/i18n/messages/he.json` and `en.json` under `marketing.legal.cancellation`. Tell Claude the changes; the date in `brand.json` (`legal.versions.cancellation`) is raised with them |
+| 2 | Confirm the pause fee | Free | ILS 19 a month (USD and EUR 5) is `PAUSE_FEE` in `apps/api/app/commerce/billing.py`. Tell Claude if you want another amount |
+| 3 | Pay out refunds once card payments are on | Provider fees | Refunds are only recorded today (table `subscription_cancellations`, `refund_minor`). When the payment provider (#46) is switched on, ask Claude to add the job that pays them back |
+
 ## App stores (GL19)
 
 Built and ready: app config, build profiles, listing texts (Hebrew and English), privacy and Data

@@ -57,6 +57,10 @@
       "accessibility": {
         "version": "2026-10-17",
         "date": "2026-10-17"
+      },
+      "cancellation": {
+        "version": "2026-10-18",
+        "date": "2026-10-18"
       }
     },
     "accessibilityCoordinator": {

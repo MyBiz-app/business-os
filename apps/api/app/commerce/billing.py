@@ -11,6 +11,7 @@ import json
 from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
+from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -19,6 +20,9 @@ from sqlalchemy import Connection, text
 from app.commerce.modules import quote
 from app.core.tenant_scope import tenant_scope
 
+# A paused account keeps its data and pays this flat monthly fee instead of its modules (R33).
+PAUSE_FEE: dict[str, int] = {"ILS": 1900, "USD": 500, "EUR": 500}
+MAX_PAUSE_MONTHS = 3
 MAX_PERIODS_PER_RUN = 24  # a business that was never billed catches up at most two years
 
 
@@ -46,6 +50,17 @@ def periods_due(anchor: date, last_start: date | None, today: date) -> list[Peri
         if last_start is None or start > last_start:
             due.append(Period(start, end))
     return due
+
+
+def paused_in(tenant: Any, period: Period, zone: ZoneInfo) -> bool:
+    """Whether a period starts while the account is paused."""
+    if tenant.pause_from is None or tenant.pause_until is None:
+        return False
+    return (
+        tenant.pause_from.astimezone(zone).date()
+        <= period.start
+        < (tenant.pause_until.astimezone(zone).date())
+    )
 
 
 def vat_rate_bp(conn: Connection, currency: str, day: date) -> int:
@@ -87,7 +102,7 @@ def bill_businesses(
     tenants = conn.execute(
         text("""
             SELECT t.id, t.time_zone, t.currency, t.trial_ends_at, t.cancel_at,
-                   t.billing_resumed_on,
+                   t.billing_resumed_on, t.pause_from, t.pause_until,
                    (SELECT max(period_start) FROM app.platform_invoices i
                     WHERE i.tenant_id = t.id) AS last_start,
                    a.card_last4
@@ -119,19 +134,25 @@ def bill_businesses(
                 if tenant.cancel_at and period.start >= tenant.cancel_at.astimezone(zone).date():
                     break
                 clients = active_clients_on(conn, tenant.id, period.end)
-                priced = quote(modules, clients, tenant.currency)
-                lines = [{"key": "core", "quantity": 1, "amount": priced.core}] + [
-                    {"key": key, "quantity": modules[key], "amount": amount}
-                    for key, amount in priced.lines.items()
-                ]
-                total = priced.total
-                # One-time services (the setup bought in the sign-up journey) ride on the first one.
-                if period.start == anchor:
-                    lines += [
-                        {"key": key, "quantity": 1, "amount": amount}
-                        for key, amount in priced.once.items()
+                if paused_in(tenant, period, zone):
+                    # A pause: the data is kept and the account pays the flat fee.
+                    total = PAUSE_FEE.get(tenant.currency, PAUSE_FEE["USD"])
+                    lines = [{"key": "pause", "quantity": 1, "amount": total}]
+                else:
+                    priced = quote(modules, clients, tenant.currency)
+                    lines = [{"key": "core", "quantity": 1, "amount": priced.core}] + [
+                        {"key": key, "quantity": modules[key], "amount": amount}
+                        for key, amount in priced.lines.items()
                     ]
-                    total += sum(priced.once.values())
+                    total = priced.total
+                    # One-time services (the setup bought in the sign-up journey) ride on the
+                    # first one.
+                    if period.start == anchor:
+                        lines += [
+                            {"key": key, "quantity": 1, "amount": amount}
+                            for key, amount in priced.once.items()
+                        ]
+                        total += sum(priced.once.values())
                 charged = tenant.card_last4 is not None
                 rate = vat_rate_bp(conn, tenant.currency, today)
                 vat = vat_of(total, rate)

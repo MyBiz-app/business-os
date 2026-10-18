@@ -20,6 +20,9 @@ import { SaveDefault } from "./save-default";
 import { Container } from "@/components/layout/container";
 import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
+import { openedId } from "@/lib/open-window";
+
+import { SessionWindow } from "./session-window";
 
 export default async function SchedulePage({ searchParams }: PageProps<"/schedule">) {
   const t = await getTranslations("schedule");
@@ -163,6 +166,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
       : view === "week"
         ? `${formatDay(days[0], locale, { day: "numeric", month: "short" })} - ${formatDay(days[6], locale, { day: "numeric", month: "short", year: "numeric" })}`
         : formatDay(monthStart(anchor), locale, { month: "long", year: "numeric" });
+  const openedSession = openedId(query);
   const link = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams();
     const merged = { view: isBoardRange(query.view) ? query.view : null, date: anchor === today ? null : anchor, branches: explicit ? String(query.branches) : null, service: serviceId, instructor: instructorId, ...changes };
@@ -348,7 +352,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           month={anchor.slice(0, 7)}
           today={today}
           locale={locale}
-          events={events}
+          events={events.map((event) => ({ ...event, href: link({ open: event.id }) }))}
           closed={closed}
           labels={{ closed: t("closedDay"), more: t.raw("more") as string, empty: term("noSessions") }}
           dayHref={link({ view: "day", date: "__day__" })}
@@ -358,7 +362,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           days={days}
           timeZone={tenant.time_zone}
           locale={locale}
-          events={events}
+          events={events.map((event) => ({ ...event, href: link({ open: event.id }) }))}
           shifts={gridShifts}
           lanes={lanes}
           closed={closed}
@@ -368,6 +372,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         />
       )}
       {gridShifts.length > 0 && <p className="text-xs text-muted">{t("shiftsLegend")}</p>}
+      {openedSession && <SessionWindow id={openedSession} closeHref={link({})} />}
     </Container>
   );
 }
