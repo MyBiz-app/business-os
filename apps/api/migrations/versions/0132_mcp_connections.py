@@ -40,7 +40,7 @@ FUNCTIONS = (
 def upgrade() -> None:
     op.execute("""
         CREATE TABLE app.mcp_clients (
-            client_id     text PRIMARY KEY,
+            id            text PRIMARY KEY,
             client_name   text NOT NULL CHECK (length(client_name) BETWEEN 1 AND 100),
             redirect_uris text[] NOT NULL CHECK (cardinality(redirect_uris) BETWEEN 1 AND 5),
             created_at    timestamptz NOT NULL DEFAULT now()
@@ -51,7 +51,7 @@ def upgrade() -> None:
             id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
             tenant_id          uuid NOT NULL REFERENCES app.tenants (id) ON DELETE CASCADE,
             user_id            uuid NOT NULL REFERENCES app.users (id) ON DELETE CASCADE,
-            client_id          text NOT NULL REFERENCES app.mcp_clients (client_id),
+            mcp_client         text NOT NULL REFERENCES app.mcp_clients (id),
             client_name        text NOT NULL,
             scopes             text[] NOT NULL DEFAULT '{read}',
             redirect_uri       text,
@@ -72,7 +72,7 @@ def upgrade() -> None:
         "CREATE INDEX mcp_connections_tenant_idx ON app.mcp_connections (tenant_id, user_id)"
     )
     op.execute("CREATE INDEX mcp_connections_user_idx ON app.mcp_connections (user_id)")
-    op.execute("CREATE INDEX mcp_connections_client_idx ON app.mcp_connections (client_id)")
+    op.execute("CREATE INDEX mcp_connections_client_idx ON app.mcp_connections (mcp_client)")
     for table in ("mcp_clients", "mcp_connections"):
         op.execute(f"ALTER TABLE app.{table} ENABLE ROW LEVEL SECURITY")
     op.execute("GRANT SELECT, INSERT ON app.mcp_clients TO app_api")
@@ -107,7 +107,7 @@ def upgrade() -> None:
                 access_hash = p_access_hash, access_expires_at = p_access_expires,
                 refresh_hash = p_refresh_hash, refresh_expires_at = p_refresh_expires
             WHERE c.code_hash = p_code_hash AND c.code_expires_at > now()
-              AND c.revoked_at IS NULL AND c.client_id = p_client_id
+              AND c.revoked_at IS NULL AND c.mcp_client = p_client_id
               AND c.redirect_uri = p_redirect_uri
               AND c.code_challenge = rtrim(translate(
                     encode(sha256(convert_to(p_verifier, 'UTF8')), 'base64'), '+/', '-_'), '=')
@@ -127,7 +127,7 @@ def upgrade() -> None:
                 access_hash = p_access_hash, access_expires_at = p_access_expires,
                 refresh_hash = p_new_refresh_hash, refresh_expires_at = p_refresh_expires
             WHERE c.refresh_hash = p_refresh_hash AND c.refresh_expires_at > now()
-              AND c.revoked_at IS NULL AND c.client_id = p_client_id
+              AND c.revoked_at IS NULL AND c.mcp_client = p_client_id
             RETURNING c.id
         $$
     """)

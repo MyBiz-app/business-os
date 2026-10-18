@@ -120,7 +120,7 @@ def register_client(body: ClientRegistration, engine: EngineDep) -> JSONResponse
     with anonymous_session(engine) as session:
         session.execute(
             text("""
-                INSERT INTO app.mcp_clients (client_id, client_name, redirect_uris)
+                INSERT INTO app.mcp_clients (id, client_name, redirect_uris)
                 VALUES (:id, :name, :uris)
             """),
             {"id": client_id, "name": name, "uris": uris},
@@ -142,7 +142,7 @@ def register_client(body: ClientRegistration, engine: EngineDep) -> JSONResponse
 
 def _client(session: Any, client_id: str) -> Any:
     return session.execute(
-        text("SELECT client_name, redirect_uris FROM app.mcp_clients WHERE client_id = :id"),
+        text("SELECT client_name, redirect_uris FROM app.mcp_clients WHERE id = :id"),
         {"id": client_id},
     ).first()
 
@@ -234,7 +234,7 @@ def approve(body: Approval, tenant: TenantDep) -> ApprovalResult:
     connection_id = db.execute(
         text("""
             INSERT INTO app.mcp_connections
-                (tenant_id, user_id, client_id, client_name, redirect_uri, code_hash,
+                (tenant_id, user_id, mcp_client, client_name, redirect_uri, code_hash,
                  code_challenge, code_expires_at)
             VALUES (app.current_tenant_id(), app.current_user_id(), :client, :name, :redirect,
                     :code_hash, :challenge, now() + make_interval(mins => :minutes))
