@@ -28,7 +28,7 @@ export default async function PlatformIntegrationsPage() {
       : t(`capabilities.${capability as "email"}`);
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("subtitle")} />
       <div className="grid gap-4 md:grid-cols-2">
         {capabilities.map((capability) => (

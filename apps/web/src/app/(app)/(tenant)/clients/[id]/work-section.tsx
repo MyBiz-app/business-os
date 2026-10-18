@@ -11,6 +11,7 @@ import type { getTenant } from "@/lib/tenant";
 
 import { deleteDocument, updateDocument } from "./work-actions";
 import { BillForm, DocumentForm, RetainerForm, TimeForm } from "./work-forms";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 type Props = { clientId: string; context: Context; locked: boolean };
@@ -71,12 +72,11 @@ export async function DocumentsSection({ clientId, context, locked }: Props) {
         ))}
       </ul>
       {writable && (
-        <details className="rounded-xl bg-foreground/[0.03] p-3">
-          <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("add")}</summary>
+        <CollapsibleSection variant="inline" className="rounded-xl bg-foreground/[0.03] p-3" triggerClassName="font-medium text-primary-ink" title={t("add")}>
           <div className="pt-3">
             <DocumentForm clientId={clientId} />
           </div>
-        </details>
+        </CollapsibleSection>
       )}
     </section>
   );
@@ -146,8 +146,7 @@ export async function TimeSection({ clientId, context, locked }: Props) {
       {canSell && (
         <div className="flex flex-col gap-4 border-t border-border pt-4">
           <BillForm clientId={clientId} months={months} />
-          <details>
-            <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("retainer.edit")}</summary>
+          <CollapsibleSection variant="inline" triggerClassName="font-medium text-primary-ink" title={t("retainer.edit")}>
             <div className="pt-3">
               <RetainerForm
                 clientId={clientId}
@@ -159,7 +158,7 @@ export async function TimeSection({ clientId, context, locked }: Props) {
                 }}
               />
             </div>
-          </details>
+          </CollapsibleSection>
         </div>
       )}
     </section>

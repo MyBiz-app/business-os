@@ -11,7 +11,7 @@ export default async function ReceiptModal({ params }: PageProps<"/receipts/[id]
   const t = await getTranslations("receipts");
   const { receipt } = await loadReceipt(id);
   return (
-    <RouteModal title={t("title", { number: receipt.number })} size="md">
+    <RouteModal title={t("title", { number: receipt.number })} size="md" transitionName={`receipt-${id}`}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2 print:hidden">
           <DownloadLink href={`/receipts/${id}/pdf`} label={t("download")} />

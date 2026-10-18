@@ -17,6 +17,7 @@ import {
   sellPlan,
 } from "./plan-actions";
 import { EndFreezeButton, FreezeForm, RequestDecision, SellPlanForm } from "./plan-forms";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 const TONE: Record<string, Tone> = {
   active: "success",
@@ -173,10 +174,9 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
                 {selling && open && (
                   <div className="flex flex-wrap items-start gap-4">
                     {entitlement.freezable ? (
-                      <details className="flex-1">
-                        <summary className="cursor-pointer text-sm text-primary-ink">{t("freeze")}</summary>
+                      <CollapsibleSection variant="inline" className="flex-1" title={t("freeze")}>
                         <FreezeForm action={freezeEntitlement.bind(null, clientId, entitlement.id)} today={today} />
-                      </details>
+                      </CollapsibleSection>
                     ) : (
                       <span className="flex-1 text-sm text-muted">{entitlement.kind === "punch_card" ? t("punchNoFreeze") : ""}</span>
                     )}

@@ -17,6 +17,7 @@ import { ScrollRegion } from "@/components/scroll-region";
 import { BranchComparison } from "./branch-comparison";
 import { BranchLink } from "./branch-link";
 import { BusyHours } from "./busy-hours";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Row = components["schemas"]["BreakdownItem"];
 
@@ -34,19 +35,21 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const chosen = resolveRange(query, today, { presets: PRESETS, fallback: 30 });
   const { start, end } = chosen;
   const range = { start, end };
+  const excludeStaff = query.staff === "exclude";
+  const filtered = { ...range, exclude_staff: excludeStaff };
 
   const [byService, byInstructor, bySlot, byBranch, atRisk, reviews, courts, compared] = await Promise.all([
-    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "service" }, query: range } }).then(unwrap),
-    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "instructor" }, query: range } }).then(unwrap),
-    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "time_slot" }, query: range } }).then(unwrap),
-    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "branch" }, query: range } }).then(unwrap),
-    api.GET("/metrics/members-at-risk", { params: { ...scope, query: { days: AT_RISK_DAYS } } }).then(unwrap),
+    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "service" }, query: filtered } }).then(unwrap),
+    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "instructor" }, query: filtered } }).then(unwrap),
+    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "time_slot" }, query: filtered } }).then(unwrap),
+    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "branch" }, query: filtered } }).then(unwrap),
+    api.GET("/metrics/members-at-risk", { params: { ...scope, query: { days: AT_RISK_DAYS, exclude_staff: excludeStaff } } }).then(unwrap),
     api.GET("/reviews", { params: { ...scope, query: { days: chosen.days } } }).then(unwrap),
     api.GET("/reports/resources", { params: { ...scope, query: range } }).then(unwrap),
     // Branch by branch, across the person's branches (not just the one picked in the menu).
     api
       .GET("/metrics/branches", {
-        params: { header: { "X-Tenant-Id": scope.header["X-Tenant-Id"] }, query: { ...range, keys: [...COMPARED] } },
+        params: { header: { "X-Tenant-Id": scope.header["X-Tenant-Id"] }, query: { ...range, keys: [...COMPARED], exclude_staff: excludeStaff } },
       })
       .then((r) => r.data ?? []),
   ]);
@@ -133,7 +136,19 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       <PageHeader
         title={t("title")}
         description={t("intro")}
-        actions={<PeriodPicker presets={PRESETS} value={chosen.key} from={start} to={end} today={today} reset={["sort"]} />}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              scroll={false}
+              href={{ pathname: "/reports", query: { ...query, staff: excludeStaff ? undefined : "exclude" } }}
+              aria-pressed={excludeStaff}
+              className={excludeStaff ? "btn-primary px-3 py-1.5 text-sm" : "btn-secondary px-3 py-1.5 text-sm"}
+            >
+              {t("withoutStaff")}
+            </Link>
+            <PeriodPicker presets={PRESETS} value={chosen.key} from={start} to={end} today={today} reset={["sort"]} />
+          </div>
+        }
       />
 
       <PendingArea className="flex flex-col gap-6">
@@ -219,10 +234,9 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           </ul>
         )}
         {atRisk.length > SHOWN && (
-          <details>
-            <summary className="cursor-pointer text-sm text-primary-ink">{t("showAll", { count: atRisk.length })}</summary>
-            <ul className="mt-2 flex flex-col divide-y divide-border">{atRisk.slice(SHOWN).map(memberRow)}</ul>
-          </details>
+          <CollapsibleSection variant="inline" title={t("showAll", { count: atRisk.length })}>
+            <ul className="flex flex-col divide-y divide-border">{atRisk.slice(SHOWN).map(memberRow)}</ul>
+          </CollapsibleSection>
         )}
       </section>
       </PendingArea>

@@ -6,6 +6,8 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useId, useState, useSyncExternalStore } from "react";
 
+import { anchorOf, matchArea, matchQueryChild, pathOf, sectionAnchors } from "@/lib/nav-match";
+
 import { useScrollSpy } from "./use-scroll-spy";
 
 const ICONS = {
@@ -47,8 +49,6 @@ export type NavChild = { href: string; label: string; locked?: boolean };
 export type NavItem = { href: string; label: string; icon: NavIcon; locked?: boolean; group?: string; children?: NavChild[] };
 
 const STORAGE_KEY = "crm.nav.open";
-const pathOf = (href: string) => href.split("#")[0];
-const anchorOf = (href: string) => (href.includes("#") ? href.split("#")[1] : null);
 
 // Which areas the user opened or closed by hand, kept in the browser.
 const listeners = new Set<() => void>();
@@ -90,19 +90,11 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
   const [open, setOpen] = useState(false);
   const listId = useId();
   // The most specific match wins (/clients/join over /clients); a sub-page wins a tie with its area.
-  const links = items.flatMap((item) => [
-    { href: item.href, item, child: false },
-    ...(item.children ?? []).filter((c) => !c.href.includes("#")).map((c) => ({ href: c.href, item, child: true })),
-  ]);
-  const match = links
-    .filter((link) => pathname === link.href || pathname.startsWith(`${link.href}/`))
-    .sort((a, b) => b.href.length - a.href.length || Number(b.child) - Number(a.child))[0];
+  const match = matchArea(items, pathname);
   const current = match?.item;
   // Sub-items that differ by a query (`/catalog?tab=plans`): the one named in the address, else the first.
   const params = useSearchParams();
-  const queryKids = (current?.children ?? []).filter((c) => c.href.includes("?") && pathOf(c.href.split("?")[0]) === pathname);
-  const tab = params.get("tab");
-  const queryChild = queryKids.length > 0 ? (queryKids.find((c) => new URLSearchParams(c.href.split("?")[1]).get("tab") === tab) ?? queryKids[0]).href : null;
+  const queryChild = matchQueryChild(current?.children ?? [], pathname, params.get("tab"));
   const currentChild = queryChild ?? (match?.child ? match.href : null);
   const CurrentIcon = current ? ICONS[current.icon] : Menu;
 
@@ -119,7 +111,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
   };
 
   // Sections of the open page, for the marker that follows the scroll.
-  const anchors = (current?.children ?? []).flatMap((c) => (c.href.includes("#") && pathOf(c.href) === pathname ? [anchorOf(c.href) as string] : []));
+  const anchors = sectionAnchors(current?.children ?? [], pathname);
   const spied = useScrollSpy(anchors);
 
   return (

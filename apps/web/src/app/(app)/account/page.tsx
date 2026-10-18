@@ -55,12 +55,12 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
   const key = (id: string) => `account:${id}`;
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("account.title")} description={t("account.subtitle")} />
       <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start xl:gap-10">
         <AccountMenu items={menu} />
-        <div className="flex min-w-0 flex-col gap-4">
-          <CollapsibleSection id="profile" storageKey={key("profile")} defaultOpen title={t("account.detailsTitle")}>
+        <div className="form-columns @container min-w-0">
+          <CollapsibleSection id="profile" className="form-span" storageKey={key("profile")} defaultOpen title={t("account.detailsTitle")}>
             <div className="flex flex-col gap-6">
               <PictureForm id={me.id} name={name} src={avatarSrc(me.id, me.avatar_url)} />
               <div className="border-t border-border" />

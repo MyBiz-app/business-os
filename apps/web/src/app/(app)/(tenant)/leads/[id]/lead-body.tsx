@@ -15,6 +15,7 @@ import { LeadForm } from "../lead-form";
 import { ActivityForm, StageControl } from "./lead-controls";
 import { MessagesSection } from "../../messages/messages-section";
 import { Timeline } from "./timeline";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 /** One lead: the page and the window over the leads list show the same thing. */
 export async function LeadBody({ id, inModal = false }: { id: string; inModal?: boolean }) {
@@ -111,15 +112,14 @@ export async function LeadBody({ id, inModal = false }: { id: string; inModal?: 
             readOnly={!writable}
           />
           {writable && (
-            <details className="border-t border-border pt-4 text-sm">
-              <summary className="cursor-pointer text-danger">{t("delete")}</summary>
-              <form action={deleteLead.bind(null, lead.id)} className="mt-3 flex flex-wrap items-center gap-3">
+            <CollapsibleSection variant="inline" className="border-t border-border pt-4 text-sm" triggerClassName="text-danger" title={t("delete")}>
+              <form action={deleteLead.bind(null, lead.id)} className="flex flex-wrap items-center gap-3">
                 <span>{t("deleteConfirm")}</span>
                 <button type="submit" className="btn-danger">
                   {t("deleteYes")}
                 </button>
               </form>
-            </details>
+            </CollapsibleSection>
           )}
         </section>
       </div>

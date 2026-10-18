@@ -41,7 +41,7 @@ export default async function PlatformInboxPage({ searchParams }: PageProps<"/pl
   };
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("subtitle")} />
       <div>
         <LinkSegmented

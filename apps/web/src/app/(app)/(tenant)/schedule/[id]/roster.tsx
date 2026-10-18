@@ -17,6 +17,7 @@ import {
   waiveBooking,
 } from "../actions";
 import { OverCapacityButton } from "./over-capacity-button";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 // Who may add a client to a full class (the API enforces the same list).
 const OVER_CAPACITY_ROLES = ["owner", "manager", "branch_manager"];
@@ -307,10 +308,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
       )}
 
       {cancelled.length > 0 && (
-        <details className="border-t border-border pt-4">
-          <summary className="cursor-pointer text-sm text-muted">{t("cancelledCount", { count: cancelled.length })}</summary>
+        <CollapsibleSection variant="inline" className="border-t border-border pt-4" triggerClassName="text-muted" title={t("cancelledCount", { count: cancelled.length })}>
           <ul className="flex flex-col divide-y divide-border">{cancelled.map(row)}</ul>
-        </details>
+        </CollapsibleSection>
       )}
     </section>
   );

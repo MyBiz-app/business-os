@@ -19,7 +19,11 @@ function remembered(key: string | undefined): boolean | null {
 
 /** One foldable section: a title, an optional description line and an arrow at the start that
  * folds and unfolds it. With `storageKey` the choice is remembered per browser (the first section
- * is open by default, the rest as the person left them). Replaces the bare `<details>` blocks. */
+ * is open by default, the rest as the person left them). Replaces the bare `<details>` blocks.
+ *
+ * `variant="inline"` is the light version for a "show all", an "add" form or a danger zone inside
+ * a card: no frame of its own, just the arrow and the title as a button (`className` frames the
+ * wrapper (on a card too: a tint or border), `triggerClassName` replaces the button's weight and colour, `bodyClassName` the content). */
 export function CollapsibleSection({
   title,
   description,
@@ -29,8 +33,12 @@ export function CollapsibleSection({
   actions,
   icon,
   id,
+  variant = "card",
+  className,
+  triggerClassName,
+  bodyClassName,
 }: {
-  title: string;
+  title: ReactNode;
   description?: string;
   children: ReactNode;
   defaultOpen?: boolean;
@@ -41,6 +49,10 @@ export function CollapsibleSection({
   icon?: ReactNode;
   /** Anchor of the section: a link to `#id` (or the section menu) opens it and scrolls to it. */
   id?: string;
+  variant?: "card" | "inline";
+  className?: string;
+  triggerClassName?: string;
+  bodyClassName?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const panel = useId();
@@ -80,8 +92,30 @@ export function CollapsibleSection({
     }
   }
 
+  if (variant === "inline") {
+    return (
+      <div id={id} className={className}>
+        <button
+          type="button"
+          className={`btn-plain flex max-w-full items-center gap-1.5 text-start text-sm ${triggerClassName ?? "font-medium text-primary-ink"}`}
+          aria-expanded={open}
+          aria-controls={panel}
+          onClick={toggle}
+        >
+          <ChevronDown aria-hidden="true" className="section-chevron size-4 shrink-0" data-open={open || undefined} />
+          <span className="min-w-0">{title}</span>
+        </button>
+        <div id={panel} className="section-body" data-open={open || undefined} inert={!open}>
+          <div className="min-h-0 overflow-hidden">
+            <div className={bodyClassName ?? "pt-3"}>{children}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <section id={id} className="card scroll-mt-24 overflow-hidden">
+    <section id={id} className={`card scroll-mt-24 overflow-hidden ${className ?? ""}`}>
       <div className="flex items-center gap-3 pe-4">
         <button
           type="button"

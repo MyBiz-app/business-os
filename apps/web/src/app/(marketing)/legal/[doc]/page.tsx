@@ -7,7 +7,7 @@ import { BRAND } from "@business-os/i18n/brand";
 import { Container } from "@/components/layout/container";
 import { PrintButton } from "@/components/marketing/print-button";
 
-const DOCS = ["terms", "privacy", "dpa", "subprocessors", "accessibility"] as const;
+const DOCS = ["terms", "privacy", "cancellation", "dpa", "subprocessors", "accessibility"] as const;
 type Doc = (typeof DOCS)[number];
 
 /** Date of the last content change of each document: `legal.versions` in brand.json, which also

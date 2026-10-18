@@ -33,7 +33,7 @@ export default async function PlatformPage() {
   });
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <PageHeader title={t("platform.title")} description={t("platform.subtitle")} />
 
       {spend?.over && (

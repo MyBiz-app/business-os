@@ -86,6 +86,10 @@ jobs:
           uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
             python e2e/round6.py
 
+      - name: Check the wide-screen layouts (phone to ultra-wide)
+        run: |
+          uv run --with playwright --with "psycopg[binary]" python e2e/wide_screens.py "$ADMIN_EMAIL"
+
       - name: Show the API log
         if: failure()
         run: tail -n 60 api.log || true
