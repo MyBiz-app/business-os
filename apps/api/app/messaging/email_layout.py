@@ -69,6 +69,8 @@ ICONS = {
     "plan_ending": "💳",
     "friend_request": "🤝",
     "class_invite": "💌",
+    "waitlist_spot_open": "🎟️",
+    "waitlist_spot_taken": "⏳",
     "roster": "📅",
     "broadcast": "📣",
 }

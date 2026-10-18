@@ -1,7 +1,7 @@
 import type { components } from "@business-os/api-client";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { addDays, dayOf, todayIn } from "@business-os/i18n/dates";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { tint } from "@business-os/app-kit/lib/brand";
 import { groupByRecency } from "@business-os/app-kit/lib/client-home";
+import { PressableScale } from "@business-os/app-kit/components/motion";
 import { notificationIcon, useNotificationText } from "@/lib/notification-text";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { Button, Card, EmptyState, Heading, Screen } from "@business-os/app-kit/components/ui";
@@ -88,11 +89,13 @@ export default function Updates() {
             {group.items.map((n, index) => {
               const isNew = fresh.has(n.id);
               return (
-                <View
+                <PressableScale
                   key={n.id}
                   style={[local.row, index > 0 && { borderTopWidth: 1, borderTopColor: palette.border }]}
                   accessible
+                  accessibilityRole={n.kind === "waitlist_spot_open" ? "button" : undefined}
                   accessibilityLabel={`${isNew ? `${t("new")}. ` : ""}${message(n)}`}
+                  onPress={n.kind === "waitlist_spot_open" ? () => router.push("/waitlist") : undefined}
                 >
                   <View style={[local.icon, { backgroundColor: tint(palette.primary, isNew ? 0.2 : 0.1) }]}>
                     <Ionicons name={notificationIcon(n.kind)} size={20} color={palette.primary} />
@@ -102,7 +105,7 @@ export default function Updates() {
                     <Text style={[local.meta, { color: palette.muted }]}>{received.format(new Date(n.created_at))}</Text>
                   </View>
                   {isNew && <View aria-hidden style={[local.dot, { backgroundColor: palette.primary }]} />}
-                </View>
+                </PressableScale>
               );
             })}
           </Card>

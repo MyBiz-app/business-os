@@ -202,6 +202,11 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               {t("closedDays")}
             </Link>
           )}
+          {tenant.waitlist_enabled && (
+            <Link href="/schedule/waitlist" className="btn-ghost px-3 py-2 text-sm">
+              {t("waitlists")}
+            </Link>
+          )}
           {canWriteSchedule(tenant) && <PublishWeek />}
           {canWriteSchedule(tenant) && view === "week" && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
           {tenant.permissions.includes("bookings.manage") && (

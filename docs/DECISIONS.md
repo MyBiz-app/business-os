@@ -307,6 +307,16 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - A branch's map point is looked up once per saved address through Nominatim (OpenStreetMap), never blocking the save; the pin can be placed by hand through the API (the draggable-pin screen is part of the branches map slice, R35).
 - Home addresses of people stay visible only to the person (existing row policy); a team member without a full home address sees a reminder line until they fill it in (nobody is locked out).
 
+### Smart waitlist (2026-10-18, round 7 R30, migration 0132)
+
+- Four modes per kind (classes, appointments, courts or rooms): off, auto, first come, manual. A service can override the business mode.
+- **Auto** only means the class's own waitlist: the first person is promoted when a spot opens, but only when the class starts later than the configured hours (default 3, 0 to 72), so nobody is booked at the last minute. Requests for a day or a time range behave as first come, since nobody is on a class list.
+- **First come**: everyone whose request or waitlisted place matches is notified; the first to claim takes it (server decides, the others are told it was taken and stay on the list).
+- **Manual**: nothing is sent automatically; the team admits or notifies from the waitlist screen.
+- Up to 5 active requests per client; a request expires after its day. Courts paid in the app need the client's explicit payment on claim.
+- Appointments and courts have no session to promote, so claiming creates a new one through the normal booking functions.
+- Vertical defaults: fitness and classes auto/first come, sports first come, beauty no waitlist for courts, clinic manual, other categories disabled.
+
 ## Open
 
 | # | Question |

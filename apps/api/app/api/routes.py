@@ -57,7 +57,9 @@ def load_current_tenant(session: Session) -> Tenant:
                        t.weekly_release_weekday, t.weekly_release_time, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales, t.require_mfa_for_staff,
                        t.network_scope, t.resource_payment, t.client_id_number,
-                       t.schedule_default_view,
+                       t.schedule_default_view, t.waitlist_enabled, t.waitlist_class_mode,
+                       t.waitlist_appointment_mode, t.waitlist_resource_mode,
+                       t.waitlist_auto_hours,
                        coalesce(t.schedule_default_branches, '{}') AS schedule_default_branches,
                        t.shifts_default_view, t.shifts_default_range,
                        coalesce(t.shifts_default_branches, '{}') AS shifts_default_branches,
@@ -121,13 +123,19 @@ def apply_vertical_pack(
         text("""
             UPDATE app.tenants
             SET cancellation_window_minutes = :minutes, booking_requires_plan = :requires_plan,
-                requires_health_declaration = :requires_health
+                requires_health_declaration = :requires_health, waitlist_enabled = :wl_enabled,
+                waitlist_class_mode = :wl_classes, waitlist_appointment_mode = :wl_appointments,
+                waitlist_resource_mode = :wl_resources
             WHERE id = :id
         """),
         {
             "minutes": pack.cancellation_window_minutes,
             "requires_plan": pack.booking_requires_plan,
             "requires_health": pack.requires_health_declaration,
+            "wl_enabled": pack.waitlist.enabled,
+            "wl_classes": pack.waitlist.classes,
+            "wl_appointments": pack.waitlist.appointments,
+            "wl_resources": pack.waitlist.resources,
             "id": tenant_id,
         },
     )

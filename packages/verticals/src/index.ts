@@ -74,6 +74,9 @@ export type DefaultPlan = {
   credits?: number;
 };
 
+export const WAITLIST_MODES = ["off", "auto", "first_come", "manual"] as const;
+export type WaitlistMode = (typeof WAITLIST_MODES)[number];
+
 /** One catalog entry as written in catalog/*.json: everything but the key and status is
  * optional on a sub-category, which inherits what it leaves out. */
 export type Entry = {
@@ -112,6 +115,14 @@ export type Entry = {
   time_billing?: boolean;
   /** The schedule a client sees by default: class blocks, appointments, or a courts-by-hours table. */
   schedule_view?: "class_blocks" | "appointments" | "courts";
+  /** The waitlist a new business starts with: on or off, and what happens when a spot opens
+   * (off, auto, first_come or manual) for classes, personal appointments and courts or rooms. */
+  waitlist?: {
+    enabled: boolean;
+    classes: WaitlistMode;
+    appointments: WaitlistMode;
+    resources: WaitlistMode;
+  };
   /** Friends and participant lists: on, off, or available but off until the business turns it on. */
   social?: "on" | "off" | "default_off";
   /** The sub-categories a branch of the business may be (default: the category's own children). */
