@@ -17,7 +17,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0130"
-down_revision: str | None = "0128"  # re-chained on the real head before merge
+down_revision: str | None = "0129"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
