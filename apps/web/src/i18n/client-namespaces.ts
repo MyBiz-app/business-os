@@ -89,7 +89,8 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "timeOff",
     "timeOffQueue",
     "verticals",
-    "visitNotes"
+    "visitNotes",
+    "website"
   ],
   "platform": [
     "billing",

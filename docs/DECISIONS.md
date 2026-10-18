@@ -299,6 +299,13 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - The leaked-password check is built and off until a paid Supabase plan (`go-live-checklist.md`).
 - Staging demo browsing (2026-10-17): the demo owner `adiredri73@gmail.com` is listed in `API_MFA_DEMO_EXEMPT_EMAILS` (and `MFA_DEMO_EXEMPT_EMAILS` on the web app) so it can read the demo without a code. The API honors the list only when `API_ENVIRONMENT=staging`; production, local and test ignore it. No other account is affected.
 
+### MyBiz Sites core (2026-10-18, round 7 R24, migration 0129)
+
+- **One order per business** (`app.website_orders`), stages `briefing`, `received`, `building`, `review`, `live`. The business edits the brief until MyBiz starts building; the console cannot move an order that is still `briefing`. When an order goes `live` the site address becomes the business's website (R22).
+- **Prices are configuration** (`app/websites/pricing.py`), not catalog modules: with the system 490 setup + 29 a month, website only 790 + 49 (decision 18.12). The order records the prices it was offered. Nothing is charged before #46. They are not in `MODULES` so the public pricing page and the configurator stay as they are; R25a decides how a "website only" business is priced and billed.
+- **The build prompt is generated, not stored**: the console builds it from the brief plus a snapshot of the business (name, branches, services, join code) taken when the brief is sent, so it always matches what the owner approved.
+- **Visits** are counted per business, day and source (`direct`, `search`, `social`, `other`) by an anonymous call from the finished site, only while the order is `live`; no cookies, nothing personal.
+
 ## Open
 
 | # | Question |
