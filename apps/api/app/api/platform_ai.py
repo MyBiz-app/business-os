@@ -21,6 +21,7 @@ from app.api.common import not_found
 from app.api.deps import UserDep
 from app.api.platform import BillingDep, StaffDep, UsageDep, run_rule
 from app.commerce.modules import MODULES
+from app.core.config import get_settings
 
 router = APIRouter(prefix="/platform/ai", tags=["platform"])
 
@@ -93,6 +94,37 @@ def ai_costs(db: UsageDep, days: Annotated[int, Query(ge=1, le=90)] = 30) -> AIC
         previous_total_credits=sum(i.previous_credits for i in items),
         revenue=[CurrencyRevenue(currency=c, revenue_monthly_minor=v) for c, v in revenue.items()],
         businesses=items,
+    )
+
+
+class ConnectorUse(BaseModel):
+    tenant_id: UUID
+    name: str
+    connections: int = Field(description="AI apps connected now")
+    apps: list[str]
+    calls: int = Field(description="Calls in the window")
+    last_call: dt.datetime | None
+    proposed: int = Field(description="Changes the apps proposed in the window")
+    executed: int
+    rejected: int
+    waiting: int = Field(description="Proposals waiting for approval now")
+
+
+class ConnectorBoard(BaseModel):
+    days: int
+    daily_limit: int = Field(description="Calls per business per rolling 24 hours")
+    businesses: list[ConnectorUse]
+
+
+@router.get("/connectors")
+def ai_connectors(db: UsageDep, days: Annotated[int, Query(ge=1, le=90)] = 30) -> ConnectorBoard:
+    """Who uses the AI connectors (Claude, ChatGPT): per business, the apps, the calls and what
+    became of the changes they proposed."""
+    rows = db.execute(text("SELECT * FROM app.platform_mcp_usage(:d)"), {"d": days}).mappings()
+    return ConnectorBoard(
+        days=days,
+        daily_limit=get_settings().mcp_daily_calls_per_business,
+        businesses=[ConnectorUse.model_validate(dict(r)) for r in rows],
     )
 
 

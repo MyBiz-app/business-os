@@ -63,6 +63,17 @@ class ClientField:
 
 
 @dataclass(frozen=True)
+class WaitlistDefaults:
+    """The waitlist a new business starts with: on or off, and what happens when a spot opens
+    (`off`, `auto`, `first_come` or `manual`) for classes, appointments and courts or rooms."""
+
+    enabled: bool = True
+    classes: str = "auto"
+    appointments: str = "off"
+    resources: str = "off"
+
+
+@dataclass(frozen=True)
 class VerticalPack:
     """A catalog entry with everything it inherits from its parents filled in."""
 
@@ -90,6 +101,7 @@ class VerticalPack:
     time_billing: bool = False  # time entries, retainers and monthly bills (#45)
     # The schedule a client sees by default: "class_blocks" | "appointments" | "courts".
     schedule_view: str = "appointments"
+    waitlist: WaitlistDefaults = field(default_factory=WaitlistDefaults)
     # Friends and participant lists: "on" | "off" | "default_off" (a category-wide decision).
     social: str = "off"
     # The sub-categories a branch of a business in this category may be (empty on a sub-category).
@@ -154,6 +166,10 @@ def _plan(raw: dict[str, Any]) -> DefaultPlan:
     )
 
 
+def _waitlist(value: Any) -> WaitlistDefaults:
+    return value if isinstance(value, WaitlistDefaults) else WaitlistDefaults(**value)
+
+
 def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
     """The entry with what it leaves out taken from its parent."""
 
@@ -184,6 +200,7 @@ def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
         default_preset=get("default_preset", "starter"),
         health_form=get("health_form"),
         recommended_modules=tuple(get("recommended_modules", ())),
+        waitlist=_waitlist(get("waitlist", {})),
         client_home=tuple(get("client_home", VerticalPack.client_home)),
         default_plans=(
             tuple(_plan(p) for p in raw["default_plans"])

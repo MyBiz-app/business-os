@@ -30,6 +30,7 @@ const KNOWN = ["slot_taken", "outside_hours", "length_not_offered", "health_decl
 /** Reserve a court or room by the hour: what → how long → day → court and time → pay. */
 export default function Court() {
   const t = useTranslations("client.court");
+  const tWaitlist = useTranslations("client.waitlist");
   const tAppointment = useTranslations("client.appointment");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
@@ -335,7 +336,12 @@ export default function Court() {
               {slots === null ? (
                 <ActivityIndicator color={palette.primary} />
               ) : slots.length === 0 ? (
-                <Text style={[styles.muted, { color: palette.muted }]}>{t("noSlots")}</Text>
+                <>
+                  <Text style={[styles.muted, { color: palette.muted }]}>{t("noSlots")}</Text>
+                  {business.waitlist_resource !== "off" && (
+                    <Button label={tWaitlist("notifyMe")} variant="secondary" palette={palette} onPress={() => router.push({ pathname: "/waitlist-new", params: { service_id: service.id, day } })} />
+                  )}
+                </>
               ) : (
                 groupByCourt(slots).map((court) => (
                   <View key={court.roomId} style={local.court}>

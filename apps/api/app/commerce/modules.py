@@ -18,6 +18,7 @@ ModuleKey = Literal[
     "agent_finance",
     "agent_marketing",
     "social_studio",
+    "payroll",
     "whatsapp",
     "whatsapp_ai",
     "pack_plus",
@@ -72,6 +73,9 @@ MODULES: dict[str, Module] = {
         ),
         # Content studio: social networks connected, one analytics dashboard (migration 0093).
         Module("social_studio", {"ILS": 3900, "USD": 1200, "EUR": 1100}),
+        # Payroll runs, payslips and the bank file (round 6, P4). Up to 10 staff are included;
+        # the per-person price above that is not billed yet.
+        Module("payroll", {"ILS": 4900, "USD": 1500, "EUR": 1400}),
         Module("whatsapp", {"ILS": 2900, "USD": 900, "EUR": 800}),
         Module(
             "whatsapp_ai",

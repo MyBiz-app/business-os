@@ -155,6 +155,9 @@ def test_form101_request_sign_and_override(
     with engine.begin() as connection:
         blob = connection.execute(text("SELECT answers_encrypted FROM app.form101_forms")).scalar()
     assert b"Dana" not in bytes(blob)
+    # The signed form is filed in the employee's own documents too.
+    mine = client.get("/files/mine", headers=coach_headers).json()
+    assert [f["name"] for f in mine] == ["form-101-2026-Dana-Levi.pdf"]
 
     # The payroll manager sees the answers and may overwrite the points, with a note.
     seen = client.get(f"/staff/{coach}/form101/2026", headers=headers).json()

@@ -1864,6 +1864,56 @@ h1[tabindex="-1"]:focus {
   translate: -50% 0;
 }
 
+/* The branches map (R35): a dot per branch, sized and tinted by the chosen number. The color is
+   the brand color mixed toward the muted one, so it follows the palette and dark mode. */
+.branch-dot {
+  --dot-size: 20px;
+  --dot-weight: 60%;
+  position: relative;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+  background: color-mix(in srgb, var(--primary) var(--dot-weight), var(--muted));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+  cursor: pointer;
+  transition:
+    width 500ms var(--ease-out),
+    height 500ms var(--ease-out),
+    background-color 500ms var(--ease-out);
+}
+.branch-dot[data-selected="true"] {
+  outline: 3px solid var(--primary-ink);
+  outline-offset: 2px;
+}
+.branch-dot[data-live="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid var(--primary);
+  animation: branch-pulse 2.4s ease-out infinite;
+}
+@keyframes branch-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .branch-dot[data-live="true"]::after {
+    animation: none;
+    opacity: 0.5;
+  }
+  .branch-dot {
+    transition: none;
+  }
+}
+
 /* ---- Page transitions (view transitions; see docs/design-system.md) ------------------------ */
 
 /* Clicks go through to the live page while a transition runs. */

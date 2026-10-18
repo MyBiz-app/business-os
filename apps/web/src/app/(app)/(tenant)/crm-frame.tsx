@@ -6,15 +6,17 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { termsOf, vertical } from "@business-os/verticals";
 
-import { type NavItem, SideNav } from "@/components/side-nav";
+import { type NavChild, type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
-import { canManageSettings, canManageTeam, canUseAssistant } from "@/lib/permissions";
+import { canManageSettings, canManageTeam, canReadPayroll, canUseAssistant } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
 import { getBranches, getTenant, hasBookableRooms } from "@/lib/tenant";
 
 import { leaveSupport } from "../platform/actions";
+import { tabOrder } from "./catalog/tabs";
+import { topicsFor } from "./settings/topics";
 import { CrmAside, NAV_TONE_COOKIE } from "./_menu/crm-aside";
 import { WorkspaceSwitcher } from "./_menu/workspace-switcher";
 import { AiBubble } from "./ai-bubble/ai-bubble";
@@ -37,18 +39,30 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
   const allowed = (permission: string) => tenant.permissions.includes(permission);
   const order = ["overview", "work", "clients", "catalog", "money", "business"] as const;
   const g = (key: (typeof order)[number]) => t(`nav.groups.${key}`);
+  const sub = (key: string) => t(`nav.sub.${key}` as "nav.sub.people");
+  const clientAppLocked = !hasUpgrade(tenant.modules, "client_app");
   const candidates: (NavItem & { permission?: string; upgrade?: Upgrade })[] = [
     { href: "/dashboard", group: g("overview"), label: t("nav.dashboard"), icon: "dashboard" },
     { href: "/reports", group: g("overview"), label: t("nav.reports"), icon: "reports", permission: "reports.read" },
-    { href: "/ai", group: g("overview"), label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
+    {
+      href: "/ai", group: g("overview"), label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai",
+      children: [{ href: "/ai#ai-team", label: sub("aiTeam") }, { href: "/ai#ai-tasks", label: sub("aiTasks") }],
+    },
     { href: "/schedule", group: g("work"), label: t(`terms.${termsOf(tenant.vertical)}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
     ...(rents ? [{ href: "/resources", group: g("work"), label: t("nav.resources"), icon: "resources" as const, permission: "schedule.read" }] : []),
-    { href: "/clients", group: g("clients"), label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
-    { href: "/clients/join", group: g("clients"), label: t("nav.clientApp"), icon: "clientApp", permission: "clients.read", upgrade: "client_app" },
+    { href: "/clients", group: g("clients"), label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read",
+      children: [
+        { href: "/clients", label: sub("clientList") },
+        clientAppLocked ? { href: "/upgrade/client_app", label: t("nav.clientApp"), locked: true } : { href: "/clients/join", label: t("nav.clientApp") },
+        { href: "/clients/import", label: sub("clientImport") },
+      ],
+    },
     { href: "/leads", group: g("clients"), label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
     { href: "/messages", group: g("clients"), label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },
     { href: "/content", group: g("clients"), label: t("nav.content"), icon: "content", permission: "social.read", upgrade: "social" },
-    { href: "/catalog", group: g("catalog"), label: t("nav.catalog"), icon: "catalog", permission: "catalog.read" },
+    { href: "/catalog", group: g("catalog"), label: t("nav.catalog"), icon: "catalog", permission: "catalog.read",
+      children: tabOrder(tenant.booking_requires_plan).map((key) => ({ href: `/catalog?tab=${key}`, label: t(`catalog.tabs.${key}`) })),
+    },
     { href: "/quotes", group: g("money"), label: t(termsOf(tenant.vertical) === "events" ? "nav.quotesEvents" : "nav.quotes"), icon: "quotes", permission: "clients.read" },
     { href: "/invoices", group: g("money"), label: t("nav.invoices"), icon: "invoices", permission: "sales.manage" },
     ...(vertical(tenant.vertical)?.timeBilling
@@ -57,7 +71,9 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
           { href: "/bills", group: g("money"), label: t("nav.billingRun"), icon: "billing" as const, permission: "sales.manage" },
         ]
       : []),
-    { href: "/sales", group: g("money"), label: t("nav.sales"), icon: "sales", permission: "reports.read" },
+    { href: "/sales", group: g("money"), label: t("nav.sales"), icon: "sales", permission: "reports.read",
+      children: [{ href: "/sales", label: t("nav.sales") }, { href: "/sales/orders", label: sub("orders") }],
+    },
     { href: "/locations", group: g("business"), label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
     { href: "/files", group: g("business"), label: t("nav.files"), icon: "files", permission: "files.read" },
     { href: "/website", group: g("business"), label: t("nav.website"), icon: "website", permission: "business.settings" },
@@ -66,11 +82,24 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
   // Modules the business doesn't have stay in the menu, locked, and open a preview.
   const items: NavItem[] = candidates
     .filter((item) => !item.permission || allowed(item.permission))
-    .map(({ href, label, icon, upgrade, group }) =>
-      upgrade && !hasUpgrade(tenant.modules, upgrade) ? { href: `/upgrade/${upgrade}`, label, icon, group, locked: true } : { href, label, icon, group },
+    .map(({ href, label, icon, upgrade, group, children }) =>
+      upgrade && !hasUpgrade(tenant.modules, upgrade) ? { href: `/upgrade/${upgrade}`, label, icon, group, locked: true } : { href, label, icon, group, children },
     );
-  if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team", group: g("business") });
-  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings", group: g("business") });
+  // A sub-item shows only if the user may open its page.
+  const teamChildren: NavChild[] = [
+    { href: "/team", label: sub("people") },
+    { href: "/team/organization", label: sub("organization") },
+    { href: "/team/shifts", label: sub("shifts") },
+    { href: "/team/time-off", label: sub("timeOff") },
+    { href: "/team/shift-swaps", label: sub("shiftSwaps") },
+    ...(allowed("time.approve") ? [{ href: "/team/time-clock", label: sub("timeClock") }] : []),
+    ...(canReadPayroll(tenant) ? [{ href: "/team/payroll", label: sub("payroll") }] : []),
+    ...(canReadPayroll(tenant) || allowed("payroll.propose") ? [{ href: "/team/bonuses", label: sub("bonuses") }] : []),
+    { href: "/team/roles", label: sub("roles") },
+  ];
+  const settingsChildren: NavChild[] = topicsFor(tenant.role).map(({ key, href }) => ({ href, label: t(`settings.nav.items.${key}` as "settings.nav.items.business") }));
+  if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team", group: g("business"), children: teamChildren });
+  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings", group: g("business"), children: settingsChildren });
 
   // Items of one section sit together (the sort is stable, so the order inside a section stays).
   const rank = (item: NavItem) => order.findIndex((key) => g(key) === item.group);

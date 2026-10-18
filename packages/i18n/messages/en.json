@@ -245,13 +245,19 @@
         "integrations": "Integrations",
         "audit": "Activity log",
         "data": "Export and close",
-        "help": "Support"
+        "help": "Support",
+        "aiConnections": "AI connections",
+        "bookings": "Bookings and waitlists",
+        "memberships": "Memberships and freezes"
       },
       "hints": {
         "business": "Details, legal identity, legal readiness and your business emails.",
         "branding": "Name, color, logo and cover, with a live preview.",
         "data": "Download your business data, or close the business.",
-        "help": "Let our team look at your account, or write to us."
+        "help": "Let our team look at your account, or write to us.",
+        "aiConnections": "Connect Claude or ChatGPT to your business, and approve what they ask to change.",
+        "bookings": "What happens when a class, an appointment or a court is full.",
+        "memberships": "Whether clients can ask to freeze from the app, and the rules."
       }
     },
     "branding": {
@@ -297,6 +303,56 @@
         "joinButton": "Join"
       },
       "presetsLabel": "Ready-made colors"
+    },
+    "waitlist": {
+      "title": "Waitlists",
+      "subtitle": "What happens when a spot opens in a class, an appointment or a court that was full.",
+      "enabled": "Keep waitlists",
+      "enabledHint": "Off: a full class cannot be joined and nobody can ask to be told about a free spot.",
+      "classes": "Classes",
+      "appointments": "Personal appointments",
+      "resources": "Courts and rooms",
+      "modes": {
+        "off": "Off",
+        "auto": "Sign in automatically",
+        "first_come": "First to take it",
+        "manual": "Team decides"
+      },
+      "modeHints": {
+        "off": "No waitlist for this kind.",
+        "auto": "The first in line is signed in and told. For requests for a range of hours or a whole day, it works as first to take it.",
+        "first_come": "Everyone waiting is told right away, and whoever takes the spot first gets it.",
+        "manual": "Nobody is told. The team sees the free spot and the waiting list and lets someone in."
+      },
+      "autoHours": "Stop signing in automatically before the class",
+      "hoursBefore": "{hours, plural, =0 {Never stop} one {# hour before} other {# hours before}}",
+      "autoHoursHint": "Closer to the class than this, a free spot is offered to everyone waiting instead, so nobody is signed in without knowing.",
+      "save": "Save",
+      "perService": "A service that works differently",
+      "perServiceHint": "Choose a mode for one service. The business setting applies to the others.",
+      "followBusiness": "Same as the business"
+    },
+    "freezeRules": {
+      "title": "Freezing a membership",
+      "intro": "Clients can ask to freeze a membership from the app. You approve each request, or let some reasons be approved automatically.",
+      "allow": "Let clients ask to freeze in the app",
+      "minDays": "Shortest freeze (days)",
+      "maxDays": "Longest freeze (days)",
+      "bank": "Freeze days per client per year",
+      "bankHint": "Leave empty for no limit. Clients see how many days are left.",
+      "notice": "Notice before the freeze (days)",
+      "fee": "Freeze fee",
+      "feeHint": "Added to the next charge. Leave 0 for no fee.",
+      "billingMode": "Renewing memberships",
+      "billingModes": {
+        "defer": "Move the next charge by the frozen days",
+        "credit": "Credit the frozen days on the next charge"
+      },
+      "billingHint": "Prepaid memberships always get their end date extended by the frozen days.",
+      "autoApprove": "Approve these reasons automatically",
+      "autoApproveHint": "A request for one of these takes effect at once, without a manager.",
+      "save": "Save",
+      "saved": "Saved."
     }
   },
   "locales": {
@@ -485,17 +541,23 @@
         "inactive": "Haven't come in lately",
         "leads_due": "Leads to call back",
         "health_review": "Health declarations to review",
-        "license_expiring": "Business licence about to expire"
+        "license_expiring": "Business licence about to expire",
+        "freeze_requests": "Freeze requests to decide"
       },
       "dates": {
         "plan_ending": "until {date}",
         "inactive": "last visit {date}",
         "leads_due": "since {date}",
         "health_review": "signed {date}",
-        "license_expiring": "expires {date}"
+        "license_expiring": "expires {date}",
+        "freeze_requests": "from {date}"
       },
       "never": "no visit yet",
       "all": "See all {count}"
+    },
+    "waitlist": {
+      "waiting": "{count, plural, one {# person is waiting for a spot} other {# people are waiting for a spot}}",
+      "top": "Most wanted: {service} ({count})"
     }
   },
   "roles": {
@@ -545,7 +607,25 @@
     "sidebarDark": "Use a dark sidebar",
     "quotesEvents": "Quotes and events",
     "catalog": "Catalog",
-    "website": "My website"
+    "website": "My website",
+    "expand": "Open {name} menu",
+    "collapse": "Close {name} menu",
+    "sub": {
+      "people": "People",
+      "organization": "Organization",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "shiftSwaps": "Shift swaps",
+      "timeClock": "Time clock",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "roles": "Roles",
+      "clientList": "List",
+      "clientImport": "Import",
+      "orders": "Orders",
+      "aiTeam": "Team",
+      "aiTasks": "Tasks"
+    }
   },
   "terms": {
     "fitness": {
@@ -964,6 +1044,44 @@
       "action": "Fill in the address"
     }
   },
+  "branchMap": {
+    "title": "Branches map",
+    "subtitle": "Where your branches are, sized by the numbers of the last 30 days. Pick one to fly to its street.",
+    "mapLabel": "Map of the branches",
+    "failed": "The map could not be loaded. Try again in a moment.",
+    "colorByLabel": "Color and size by",
+    "colorBy": {
+      "revenue": "Revenue",
+      "clients": "Clients",
+      "occupancy": "Occupancy"
+    },
+    "hover": {
+      "clients": "Active clients: {value}",
+      "revenue": "Revenue: {value}",
+      "occupancy": "Occupancy: {value}"
+    },
+    "panel": {
+      "revenue": "Revenue",
+      "clients": "Active clients",
+      "bookings": "Sessions held",
+      "occupancy": "Average occupancy",
+      "trend": "Revenue per day, last 30 days",
+      "report": "Branch report",
+      "schedule": "Branch schedule"
+    },
+    "close": "Close",
+    "openFull": "Open the full map",
+    "empty": "No branch has a point on the map yet. Add the address of a branch and it appears here.",
+    "emptyLink": "To the branches",
+    "pin": {
+      "label": "The branch's point on the map",
+      "none": "The point on the map appears after you save an address.",
+      "hint": "Drag the pin if the point is not exactly right, then save.",
+      "moved": "The new point is saved with the branch.",
+      "readOnly": "The branch's point on the map.",
+      "failed": "The map could not be loaded."
+    }
+  },
   "locations": {
     "manager": {
       "title": "Branch manager",
@@ -1228,7 +1346,8 @@
     "publishWeekHint": "Opens the next week of classes for clients now, ahead of the scheduled release.",
     "publishWeekDone": "The schedule is open for clients until {date}.",
     "publishWeekAlready": "The next week is already published.",
-    "publishWeekError": "Couldn't publish the week. Try again."
+    "publishWeekError": "Couldn't publish the week. Try again.",
+    "waitlists": "Waitlists"
   },
   "bookings": {
     "title": "Bookings",
@@ -1524,7 +1643,11 @@
         "health_approved": "The business approved your health declaration. You can book now.",
         "health_rejected": "The business couldn't approve your health declaration. Please contact them.",
         "session_reminder": "Reminder: you're booked into {service} today, {when}.",
-        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking."
+        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking.",
+        "waitlist_spot_open": "A spot opened for {service}, {when}. Open the app to take it.",
+        "waitlist_spot_taken": "The spot for {service}, {when} was taken. You stay on the list.",
+        "freeze_approved": "Your freeze of {plan} was approved: {from} - {date}.",
+        "freeze_rejected": "Your freeze request for {plan} wasn't approved."
       }
     },
     "pay": {
@@ -1648,6 +1771,8 @@
       "nothingBooked": "Nothing booked yet.",
       "bookNow": "Book now",
       "navigate": "Navigate",
+      "navigateWaze": "Navigate with Waze",
+      "navigateGoogle": "Navigate with Google Maps",
       "website": "Website",
       "addToCalendar": "Add to calendar",
       "cancelFailed": "The cancellation didn't go through. Try again.",
@@ -1678,6 +1803,73 @@
         "week": "This week",
         "earlier": "Earlier"
       }
+    },
+    "waitlist": {
+      "title": "My waitlists",
+      "empty": "You are not waiting for anything. Ask to be told when a time opens up.",
+      "add": "Tell me when something opens",
+      "leave": "Leave the list",
+      "take": "Take it now",
+      "position": "Place {position} in the queue",
+      "spotOpen": "A spot opened: {day}, {time}",
+      "rangeAt": "{day}, {from}-{to}",
+      "slotAt": "{day}, {time}",
+      "dayAt": "{day}, any time",
+      "newTitle": "Tell me when a time opens",
+      "newBody": "We will send you an update as soon as a time matches. The first to take it gets it.",
+      "service": "Service",
+      "day": "Day",
+      "when": "When",
+      "allDay": "Any time that day",
+      "range": "A time range",
+      "from": "From",
+      "to": "Until",
+      "earlier": "{what}: 30 minutes earlier",
+      "later": "{what}: 30 minutes later",
+      "submit": "Add me to the list",
+      "notifyMe": "Tell me if a time opens",
+      "errors": {
+        "generic": "Something went wrong. Try again.",
+        "waitlist_off": "This business does not use a waitlist for this.",
+        "already_waiting": "You are already waiting for this.",
+        "in_the_past": "Pick a day that has not passed.",
+        "too_many": "You can wait for up to 5 things at once.",
+        "on_site": "Visits at your address cannot have a waitlist.",
+        "spot_taken": "Someone was faster. You stay on the list.",
+        "payment_required": "This spot needs payment in the app."
+      }
+    },
+    "freeze": {
+      "title": "Freeze my plan",
+      "request": "Freeze",
+      "backTo": "My bookings",
+      "off": "This business doesn't take freeze requests in the app. Ask the front desk.",
+      "pickStart": "Tap the first day of the freeze",
+      "pickEnd": "Now tap the last day",
+      "range": "{from} - {to} · {days, plural, one {# day} other {# days}}",
+      "reason": "Reason",
+      "note": "Note (optional)",
+      "bank": "{remaining, plural, one {# freeze day left this year} other {# freeze days left this year}} of {total}",
+      "whatHappens": "What will happen",
+      "newEnd": "Your plan will be valid until {date}.",
+      "shift": "Your next charge moves from {from} to {to}.",
+      "credit": "You'll get a credit of {amount} on your next charge.",
+      "fee": "A freeze fee of {amount} is added to your next charge.",
+      "nextAmount": "Your next charge will be {amount}.",
+      "auto": "This reason is approved right away.",
+      "manual": "The business will review your request and let you know.",
+      "send": "Send request",
+      "sendNow": "Freeze now",
+      "sent": "Your request was sent. You'll get an update when the business decides.",
+      "done": "Done. Your plan is frozen.",
+      "myRequests": "My requests",
+      "withdraw": "Withdraw",
+      "backEarly": "I'm back early",
+      "backEarlyTitle": "End the freeze now?",
+      "backEarlyMessage": "Your plan opens again today, and the dates and next charge go back by the unused days.",
+      "backEarlyDone": "Welcome back! Your plan is active again.",
+      "frozenRange": "Frozen {from} - {to}",
+      "keep": "Keep frozen"
     }
   },
   "join": {
@@ -1753,7 +1945,11 @@
       "generic": "Something went wrong. Try again.",
       "not_active": "This plan is no longer active.",
       "outside_validity": "The freeze must start while the plan is valid.",
-      "overlapping_freeze": "That overlaps an existing freeze."
+      "overlapping_freeze": "That overlaps an existing freeze.",
+      "not_a_membership": "Only memberships can be frozen.",
+      "request_not_pending": "This request was already decided.",
+      "not_freezable": "This plan can't be frozen now.",
+      "freeze_over": "That freeze is already over."
     },
     "validityRange": "Valid {from} - {to}",
     "paymentMethod": "Payment method",
@@ -1761,7 +1957,36 @@
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
       "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
     },
-    "created": "Plan created."
+    "created": "Plan created.",
+    "cycle": "Billing cycle",
+    "cycles": {
+      "none": "Paid in advance, no renewal",
+      "monthly": "Monthly",
+      "quarterly": "Every 3 months",
+      "yearly": "Yearly",
+      "custom": "Every N days"
+    },
+    "cycleDays": "Days in a cycle",
+    "cycleHint": "The membership is valid for one cycle at a time.",
+    "autoRenew": "Renews automatically",
+    "autoRenewHint": "Charged at the start of each cycle. Payments are simulated until a payment provider is connected.",
+    "renews": "Renews {date} · {amount}",
+    "renewsOff": "Next billing {date}",
+    "freezeShifted": "Next charge moved by {days, plural, one {# day} other {# days}}",
+    "freezeCredit": "Credit {amount}",
+    "freezeFee": "Fee {amount}",
+    "punchNoFreeze": "Punch cards can't be frozen.",
+    "endEarly": "Client is back",
+    "endEarlyDone": "The freeze ended. Dates and the next charge were updated.",
+    "requestsTitle": "Freeze requests",
+    "requestLine": "{from} - {to} · {days, plural, one {# day} other {# days}} · {reason}",
+    "approve": "Approve",
+    "approvePartial": "Approve until",
+    "reject": "Decline",
+    "decisionNote": "Message to the client (optional)",
+    "decided": "Done.",
+    "requestsRequestedBy": "Requested by the client in the app",
+    "autoApproved": "Approved automatically"
   },
   "metrics": {
     "revenue": "Revenue",
@@ -1918,7 +2143,8 @@
       "alertOver": "The month's AI is used up. New questions wait until next month unless you turn on pay-as-you-go or move to AI Pro.",
       "enablePayg": "Turn on pay-as-you-go",
       "upgrade": "Upgrade to AI Pro",
-      "limitPerson": "Limit a person"
+      "limitPerson": "Limit a person",
+      "buyUser": "Add an AI user"
     },
     "state": {
       "active": "Available",
@@ -2385,7 +2611,8 @@
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
       "noPack": "Included amount",
-      "social_studio": "Content studio"
+      "social_studio": "Content studio",
+      "payroll": "Payroll"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -2409,7 +2636,8 @@
       "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
       "noSupport": "Email and help center, an answer by the next business day.",
       "noPack": "2 GB for files and 200 messages a month.",
-      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post."
+      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post.",
+      "payroll": "Monthly payroll runs, payslips, Form 101 and the bank transfer file, for up to 10 staff."
     },
     "followsBranches": "Follows your active branches",
     "supportTier": "Support",
@@ -2889,6 +3117,22 @@
         "ai_busy": "The AI is busy. Try again in a moment.",
         "ai_unavailable": "The AI is not answering right now.",
         "ai_not_configured": "AI is not set up on this server."
+      },
+      "connectors": {
+        "title": "AI connectors",
+        "hint": "Which businesses connected Claude or ChatGPT, how much they use it, and what became of the changes the apps proposed.",
+        "limit": "Daily limit: {count} calls per business.",
+        "empty": "No business has connected an AI app yet.",
+        "columns": {
+          "business": "Business",
+          "apps": "Apps",
+          "calls": "Calls",
+          "proposed": "Proposed",
+          "executed": "Approved",
+          "rejected": "Rejected",
+          "waiting": "Waiting",
+          "last": "Last call"
+        }
       }
     },
     "health": {
@@ -3263,7 +3507,11 @@
       "session_reminder": "Today: {service} at {when}",
       "plan_ending": "Your plan ends on {date}",
       "friend_request": "{friend} wants to be your friend",
-      "class_invite": "{friend} invited you: {service} on {when}"
+      "class_invite": "{friend} invited you: {service} on {when}",
+      "waitlist_spot_open": "A spot opened: {service} on {when}",
+      "waitlist_spot_taken": "Someone was quicker: {service} on {when}",
+      "freeze_approved": "Your freeze was approved: {from} to {date}",
+      "freeze_rejected": "About your freeze request"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -3277,7 +3525,11 @@
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
       "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking.",
       "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
-      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time."
+      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time.",
+      "waitlist_spot_open": "A spot opened up for {service} on {when}, and whoever takes it first gets it. Open the app to take it.",
+      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens.",
+      "freeze_approved": "{business} approved freezing your {plan} from {from} to {date}. Your end date moves by the same number of days.",
+      "freeze_rejected": "{business} couldn't approve freezing your {plan} from {from} to {date}."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -3308,6 +3560,14 @@
     "leadFollowUp": {
       "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
       "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
+    },
+    "payrollReminder": {
+      "title": "Payroll for {month} is waiting",
+      "body": "{business}: the payroll run for {month} is not approved yet. Open payroll to finish it."
+    },
+    "payslipReady": {
+      "title": "Your payslip is ready",
+      "body": "{business}: your payslip for {month} is in your documents."
     },
     "roster": {
       "subject": "Your new shifts at {business}",
@@ -3732,7 +3992,8 @@
         "ai": "AI assistant and agents",
         "growth": "Growth and sales"
       },
-      "websiteAddon": "Add a website to your plan: from setup price shown on the websites page."
+      "websiteAddon": "Add a website to your plan",
+      "websiteAddonPrice": "With MyBiz: {setup} once and {monthly} a month. Website only: from {alone} once."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -5028,6 +5289,20 @@
       "nextPayment": "Next payment",
       "method": "Payment method",
       "noMethod": "No card yet"
+    },
+    "aiUsers": {
+      "title": "AI users",
+      "intro": "Your plan lets {allowed} people use the AI team. Each extra AI user lets one more person in and adds 150 AI credits to the month, for {price} a month.",
+      "using": "{count} of {allowed} AI users in use",
+      "extra": "Extra AI users",
+      "less": "One fewer",
+      "more": "One more",
+      "cost": "Extra AI users: {amount} a month",
+      "save": "Save",
+      "saved": "Saved",
+      "inUse": "Some of these AI users are in use. Take away someone's AI access first, then lower the number.",
+      "needModule": "Choose an AI plan to add AI users.",
+      "generic": "Could not save. Try again."
     }
   },
   "visitNotes": {
@@ -5674,6 +5949,7 @@
       "card": "Card number",
       "expiry": "Expiry (MM/YY)",
       "cvc": "CVC",
+      "branchAddress": "Main branch address",
       "holder": "Name on card",
       "simulated": "Test mode: the card is filled in for you and nothing is charged.",
       "secure": "Secure, encrypted payment",
@@ -9105,7 +9381,8 @@
         "owner_always_has_ai": "The owner always has access.",
         "invalid": "Check the numbers and try again.",
         "generic": "Something went wrong. Try again."
-      }
+      },
+      "buyExtra": "Add an extra AI user"
     },
     "openAi": "Open the AI team",
     "permissionsTitle": "Role and permissions",
@@ -9178,12 +9455,14 @@
       "Plans, punch cards and open balances",
       "Metrics and reports"
     ],
-    "returns": "The app can only read; it cannot change anything. You can disconnect it at any time. After you approve you return to {host}.",
+    "returns": "The app reads as you. Any change it suggests waits for your approval in MyBiz, under Settings, AI connections. You can disconnect it at any time. After you approve you return to {host}.",
     "business": "Business",
     "approve": "Approve the connection",
     "deny": "Cancel",
     "invalid": "This connection link is not valid. Start again from the app.",
-    "noBusiness": "You have no business in MyBiz yet. Create one and try again."
+    "noBusiness": "You have no business in MyBiz yet. Create one and try again.",
+    "propose": "Also let it suggest changes",
+    "proposeHint": "It can propose bookings and cancellations. Nothing changes until you approve each one in MyBiz."
   },
   "website": {
     "title": "My website",
@@ -9429,6 +9708,151 @@
       "sendChanges": "Send the request",
       "cancel": "Cancel",
       "approved": "You approved the website. We are putting it live."
+    }
+  },
+  "aiConnections": {
+    "title": "AI connections",
+    "subtitle": "Use your own Claude or ChatGPT with your business. They read as you, with your permissions, and any change they suggest waits here for your approval.",
+    "waitingTitle": "Waiting for your approval",
+    "waitingEmpty": "Nothing is waiting. When an AI app suggests a change, it appears here.",
+    "waitingHint": "Nothing happens until you approve. Everything is checked again at the moment you approve.",
+    "from": "Suggested by {app}",
+    "expires": "Open until {when}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveFor": "Approve: {what}",
+    "rejectFor": "Reject: {what}",
+    "kinds": {
+      "book_client": "Book a client",
+      "cancel_booking": "Cancel a booking",
+      "log_time": "Log time",
+      "bill_month": "Bill a month"
+    },
+    "fields": {
+      "client": "Client",
+      "service": "Class",
+      "starts": "Starts",
+      "dependent": "For",
+      "date": "Date",
+      "hours": "Hours",
+      "description": "Work",
+      "month": "Month",
+      "clients": "Clients",
+      "total": "Total"
+    },
+    "full": "The class is full: the client joins the waitlist.",
+    "historyTitle": "Recent requests",
+    "status": {
+      "pending": "Waiting",
+      "executed": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "failed": "Could not be done"
+    },
+    "appsTitle": "Connected apps",
+    "appsEmpty": "No AI app is connected yet.",
+    "canPropose": "Reads and suggests changes",
+    "readOnly": "Reads only",
+    "lastUsed": "Last used {when}",
+    "neverUsed": "Not used yet",
+    "calls": "{count} calls",
+    "disconnect": "Disconnect",
+    "disconnectApp": "Disconnect {app}",
+    "howTitle": "How to connect",
+    "howIntro": "The same address works for every AI app. You need a paid Claude or ChatGPT plan that supports custom connectors.",
+    "address": "Connector address",
+    "addressHint": "Paste this address into the AI app.",
+    "claudeTitle": "Claude",
+    "claudeSteps": [
+      "Open Claude and go to Settings, then Connectors.",
+      "Choose Add custom connector.",
+      "Paste the address above, name it MyBiz and add it.",
+      "Sign in to MyBiz when asked, pick your business and approve.",
+      "Ask something like: how many new clients did I get this week?"
+    ],
+    "chatgptTitle": "ChatGPT",
+    "chatgptSteps": [
+      "Open ChatGPT and go to Settings, then Connectors, and turn on Developer mode.",
+      "Choose Create and paste the address above as the connector's address.",
+      "Choose OAuth for sign-in and save.",
+      "Sign in to MyBiz when asked, pick your business and approve.",
+      "Start a chat, add the connector from the tools menu and ask your question."
+    ],
+    "safetyTitle": "What the apps can and cannot do",
+    "safety": [
+      "They see only what you could see in MyBiz, in the business you picked.",
+      "They never change anything themselves: a suggested change waits here until you approve it.",
+      "You can disconnect an app at any moment, and it stops at once.",
+      "Every use is counted, and there is a daily limit per business."
+    ]
+  },
+  "waitlist": {
+    "title": "Waitlists",
+    "subtitle": "Everyone waiting for a class, an appointment or a court. Let someone in when a spot is free, or tell them about it.",
+    "empty": "Nobody is waiting right now.",
+    "filters": {
+      "label": "Filter the waitlists",
+      "day": "Day",
+      "branch": "Branch",
+      "allBranches": "All branches",
+      "service": "Service",
+      "allServices": "All services",
+      "mode": "Mode",
+      "allModes": "All modes",
+      "apply": "Show",
+      "clear": "Clear filters"
+    },
+    "modes": {
+      "off": "Off",
+      "auto": "Sign in automatically",
+      "first_come": "First to take it",
+      "manual": "Team decides"
+    },
+    "kinds": {
+      "session": "Class at {time}",
+      "slot": "Exactly {time}",
+      "range": "Between {from} and {to}",
+      "day": "Any time that day"
+    },
+    "told": "Told about a spot",
+    "openSpot": "Free spot: {when}",
+    "admit": "Let in",
+    "notify": "Tell them",
+    "remove": "Remove",
+    "admitted": "{name} was let in and has been told.",
+    "notified": "{name} was told about the free spot.",
+    "removed": "{name} was taken off the list.",
+    "errors": {
+      "spot_taken": "Someone was faster, the spot is taken.",
+      "no_free_spot": "There is no free spot for this person right now.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "freeze": {
+    "reasons": {
+      "travel": "Travel abroad",
+      "reserve_duty": "Reserve duty",
+      "illness": "Illness or injury",
+      "pregnancy": "Pregnancy",
+      "other": "Other"
+    },
+    "problems": {
+      "freeze_requests_off": "This business doesn't take freeze requests in the app. Ask the front desk.",
+      "not_freezable": "This plan can't be frozen.",
+      "too_short": "The freeze is shorter than the business allows.",
+      "too_long": "The freeze is longer than the business allows.",
+      "notice_required": "Freezes must be requested earlier than that.",
+      "outside_validity": "The freeze must start while the plan is valid.",
+      "overlapping_freeze": "That overlaps an existing freeze.",
+      "overlapping_request": "You already have a request for those days.",
+      "bank_exceeded": "That is more freeze days than you have left this year.",
+      "generic": "Something went wrong. Try again."
+    },
+    "status": {
+      "pending": "Waiting for approval",
+      "approved": "Approved",
+      "rejected": "Declined",
+      "cancelled": "Withdrawn"
     }
   }
 }

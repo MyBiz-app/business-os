@@ -77,6 +77,15 @@ class ClientBusiness(BaseModel):
     resource_payment: Literal["app", "venue"] = Field(
         default="app", description="Reservations: paid in the app when booking, or at the venue"
     )
+    waitlist_class: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for classes (off: none)"
+    )
+    waitlist_appointment: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for personal appointments"
+    )
+    waitlist_resource: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for courts and rooms"
+    )
     dependents: Literal["pet", "child"] | None = Field(
         default=None, description="The industry keeps the client's pets / children (#43)"
     )
@@ -107,6 +116,10 @@ class ClientLocation(BaseModel):
     website_url: str | None = Field(
         default=None, description="The branch's website, else the business's; none if neither set"
     )
+    latitude: float | None = Field(
+        default=None, description="The branch's point on the map, for navigation links"
+    )
+    longitude: float | None = None
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
@@ -220,6 +233,11 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
            t.cancellation_window_minutes, t.online_sales, t.resource_payment, t.website_url,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_class_mode ELSE 'off' END AS waitlist_class,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_appointment_mode ELSE 'off' END
+               AS waitlist_appointment,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_resource_mode ELSE 'off' END
+               AS waitlist_resource,
            {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
@@ -239,7 +257,7 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
     """The business's branches with their addresses (the home screen's business details)."""
     rows = context.session.execute(
         text("""
-            SELECT l.id, l.name, l.address, l.kind,
+            SELECT l.id, l.name, l.address, l.kind, l.latitude, l.longitude,
                    coalesce(l.website_url, (SELECT website_url FROM app.tenants
                                             WHERE id = l.tenant_id)) AS website_url,
                    coalesce(

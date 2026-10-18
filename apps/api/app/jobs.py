@@ -3,6 +3,8 @@
     uv run python -m app.jobs extend-series [--database-url URL]
     uv run python -m app.jobs remind-sessions
     uv run python -m app.jobs remind-plans
+    uv run python -m app.jobs remind-payroll  (daily: owners are reminded on the 1st and 5th)
+    uv run python -m app.jobs notify-payslips (hourly: "your payslip is ready" after an approval)
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/messaging/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
     uv run python -m app.jobs bill-businesses (simulated platform billing; app/commerce/billing.py)
@@ -57,6 +59,7 @@ from app.messaging.email import (
     send_emails,
     sender_from_settings,
 )
+from app.messaging.payroll_notices import notify_payslips_ready, remind_payroll
 from app.messaging.push import push_sender_from_settings
 from app.messaging.roster import notify_roster, notify_roster_changes
 from app.messaging.whatsapp_ai import answer_inbox
@@ -615,6 +618,20 @@ def notify_shifts(conn: Connection) -> dict[str, int] | str:
     return published | {f"changes_{key}": value for key, value in edits.items()}
 
 
+def remind_payroll_job(conn: Connection) -> dict[str, int] | str:
+    push = push_sender_from_settings()
+    if push is None:
+        return "no push provider configured; nothing sent"
+    return remind_payroll(conn, push)
+
+
+def notify_payslips(conn: Connection) -> dict[str, int] | str:
+    push = push_sender_from_settings()
+    if push is None:
+        return "no push provider configured; nothing sent"
+    return notify_payslips_ready(conn, push)
+
+
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
     push = push_sender_from_settings()
@@ -689,6 +706,8 @@ JOBS = {
     "remind-plans": remind_plans,
     "send-emails": send_notification_emails,
     "notify-shifts": notify_shifts,
+    "remind-payroll": remind_payroll_job,
+    "notify-payslips": notify_payslips,
     "message-reminders": message_reminders,
     "follow-up-leads": follow_up_leads,
     "purge-expired": purge_expired,
@@ -715,6 +734,7 @@ DAILY = [
     "extend-series",
     "remind-sessions",
     "remind-plans",
+    "remind-payroll",
     "bill-businesses",
     "dunning",
     "message-reminders",
@@ -725,7 +745,13 @@ DAILY = [
     "issue-documents",
     "sync-social",
 ]
-HOURLY = ["publish-shifts", "send-emails", "notify-shifts", "send-announcements"]
+HOURLY = [
+    "publish-shifts",
+    "send-emails",
+    "notify-shifts",
+    "send-announcements",
+    "notify-payslips",
+]
 # GitHub's free scheduler throttles "hourly" crons on staging to a run every 1-6 hours (observed
 # gaps up to ~6h), so an hourly job is late only after 8 hours without a success.
 MAX_HOURS = {**{job: 27 for job in DAILY}, **{job: 8 for job in HOURLY}}

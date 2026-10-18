@@ -2,6 +2,7 @@
 
 import {
   Building2,
+  CalendarClock,
   ChevronLeft,
   CreditCard,
   Database,
@@ -11,6 +12,8 @@ import {
   Palette,
   Plug,
   Puzzle,
+  Snowflake,
+  Sparkles,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -24,10 +27,13 @@ import type { TopicGroup, TopicKey } from "./topics";
 
 const ICONS: Record<TopicKey, LucideIcon> = {
   business: Building2,
+  memberships: Snowflake,
+  bookings: CalendarClock,
   branding: Palette,
   modules: Puzzle,
   billing: CreditCard,
   integrations: Plug,
+  aiConnections: Sparkles,
   audit: History,
   data: Database,
   help: LifeBuoy,

@@ -132,3 +132,13 @@ second); if branch saves ever become frequent, host Nominatim or switch the clas
   (each payment, receipt and message keeps the provider that handled it).
 - **The platform default**: change `API_<CAPABILITY>_PROVIDER` (and `API_<CAPABILITY>_SETTINGS`,
   a JSON object of its settings) in the environment and restart the API.
+
+## Branches map (OpenFreeMap)
+
+The branches map and the branch pin use MapLibre with free OpenFreeMap vector tiles
+(`tiles.openfreemap.org`, OpenStreetMap data, no key, no sign-up, credit shown on the map). The
+library loads only on the map page, the dashboard map card and the branch editor. The browser
+fetches tiles itself, so `connect-src` and `img-src` in `apps/web/src/lib/csp.ts` list that host
+(`MAP_ORIGIN`) and `worker-src` allows blobs. To switch provider (for example MapTiler, free up
+to 100,000 loads a month), change the two style URLs in `components/branch-map/map-core.ts` and
+`MAP_ORIGIN`.
