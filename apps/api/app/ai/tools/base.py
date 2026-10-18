@@ -24,7 +24,7 @@ MAX_ROSTER = 200
 class ToolContext:
     tenant: TenantContext
     user_id: UUID
-    conversation_id: UUID
+    conversation_id: UUID | None
     time_zone: str
     modules: set[str]
     # The agent talking (its key is filed on the actions it proposes) and the agents the user
@@ -36,6 +36,9 @@ class ToolContext:
     # How long a card this conversation proposes stays open (a scheduled run nobody watches
     # leaves its cards for days).
     pending_ttl: dt.timedelta = PENDING_ACTION_TTL
+    # Set when an outside AI app (an MCP connector) proposes: who is asking. It is filed with the
+    # card, and the app is told where the person approves.
+    source: dict[str, Any] | None = None
 
 
 class ToolError(Exception):
