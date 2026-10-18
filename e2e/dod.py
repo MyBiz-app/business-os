@@ -24,6 +24,9 @@ a11y: list[str] = []
 
 def check_a11y(page, label):
     h.ready(page)  # client-side navigations can still be fading in
+    # A page that redirects after its shell streamed (a module the plan lacks) renders a meta refresh first.
+    page.wait_for_function("!document.getElementById('__next-page-redirect')", timeout=10000)
+    h.ready(page)
     results = axe.run(page)
     serious = [v for v in results.response["violations"] if v["impact"] in ("serious", "critical")]
     for v in serious:
