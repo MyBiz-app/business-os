@@ -89,6 +89,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "timeClock",
     "timeOff",
     "timeOffQueue",
+    "tour",
     "verticals",
     "visitNotes"
   ],
@@ -163,6 +164,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "start",
     "team",
     "terms",
+    "tour",
     "userMenu",
     "verticals"
   ]

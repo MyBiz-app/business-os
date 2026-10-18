@@ -326,6 +326,8 @@ def _check_ai_budget(context: TenantContext, provider: LLMProvider) -> None:
     user_id = db.execute(text("SELECT app.current_user_id()")).scalar_one()
     if budget.over_person_limit(db, user_id, member_role_keys(db, context.role), month_start):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_user_limit_reached")
+    if budget.over_day_pace(db, user_id, context.role):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_daily_pace_reached")
 
 
 @router.post("/sessions/{session_id}/files/{file_id}/ai-map")

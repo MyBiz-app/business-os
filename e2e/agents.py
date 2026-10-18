@@ -51,6 +51,23 @@ with sync_playwright() as p:
 
     # The AI team: the built-in agents, the custom one, and the scheduled tasks board.
     page.goto(f"{h.BASE}/ai"); h.ready(page)
+    # The first visit opens the guide by itself: walk through it, once.
+    tour = page.get_by_role("dialog", name="הכירו את הצוות שלכם")
+    expect(tour).to_be_visible()
+    check(page, "ai tour")
+    for _ in range(4):
+        page.get_by_role("button", name="הבא", exact=True).click()
+    expect(page.get_by_role("dialog", name="הכירו את הצוות שלכם")).to_have_count(0)
+    expect(page.get_by_role("dialog", name="גייסו סוכן משלכם")).to_be_visible()
+    page.get_by_role("button", name="הבא", exact=True).click()
+    for _ in range(3):  # the three highlighted parts of the page
+        page.get_by_role("button", name="הבא", exact=True).or_(page.get_by_role("button", name="סיום", exact=True)).click()
+    expect(page.get_by_role("button", name="הדרכה", exact=True)).to_be_focused()
+    page.reload(); h.ready(page)  # finished once: it does not open again
+    expect(page.get_by_role("dialog")).to_have_count(0)
+    page.get_by_role("button", name="הדרכה", exact=True).click()  # but the help button starts it again
+    expect(page.get_by_role("dialog", name="הכירו את הצוות שלכם")).to_be_visible()
+    page.keyboard.press("Escape")
     expect(page.get_by_role("heading", level=1)).to_have_text("צוות ה-AI")
     expect(page.get_by_text("דנה").first).to_be_visible()  # the custom front-desk agent
     expect(page.get_by_role("heading", name="משימות מתוזמנות")).to_be_visible()

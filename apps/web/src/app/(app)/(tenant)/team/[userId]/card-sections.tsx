@@ -12,6 +12,7 @@ import { hm } from "@/lib/time-clock";
 import { getBranches, getTenant } from "@/lib/tenant";
 import { canManagePayroll } from "@/lib/permissions";
 
+import { AiMemberForm } from "./ai-member-form";
 import { PayrollFile } from "./payroll/payroll-file";
 import { saveAvailability } from "./availability/actions";
 import { removeTimeOff, saveHours } from "./hours/actions";
@@ -251,29 +252,31 @@ export async function DocumentsTab({ member, context }: { member: Member; contex
   );
 }
 
-/** Whether the person may use the AI team and how many credits they used this month. Their own
- * quota and pace arrive with the AI usage rules; until then everyone shares the business budget. */
+/** Whether the person may use the AI team, their own monthly limit and daily pace, and what they used. */
 export async function AiTab({ member, context }: { member: Member; context: Context }) {
   const t = await getTranslations("staffCard");
   const locale = await getLocale();
   const { api, scope } = context;
-  const usage = await api.GET("/ai/usage", { params: scope }).then((r) => r.data ?? null);
-  const allowed = member.permissions.includes("ai.use");
+  const ai = await api.GET("/ai/members/{user_id}", { params: { ...scope, path: { user_id: member.user_id } } }).then((r) => r.data ?? null);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
-  const mine = usage?.by_user.find((row) => row.key === member.user_id)?.credits ?? 0;
   return (
     <Block title={t("aiTitle")}>
-      <p className="flex items-center gap-2 text-sm">
-        <span aria-hidden="true" className={`size-2 rounded-full ${allowed ? "bg-success" : "bg-muted"}`} />
-        {allowed ? t("aiAllowed") : t("aiNotAllowed")}
-      </p>
-      {usage && (
+      {ai ? (
         <>
-          <p className="text-3xl font-bold tabular-nums">{number.format(mine)}</p>
-          <p className="text-sm text-muted">
-            {t("aiUsedThisMonth", { used: number.format(usage.credits_used), included: number.format(usage.credits_included) })}
-          </p>
+          <dl className="grid grid-cols-2 gap-4 sm:max-w-md">
+            <div>
+              <dt className="text-sm text-muted">{t("ai.usedMonth")}</dt>
+              <dd className="text-3xl font-bold tabular-nums">{number.format(ai.used_month)}</dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted">{t("ai.usedToday", { limit: ai.day_limit === null ? "∞" : number.format(ai.day_limit) })}</dt>
+              <dd className="text-3xl font-bold tabular-nums">{number.format(ai.used_today)}</dd>
+            </div>
+          </dl>
+          <AiMemberForm ai={ai} />
         </>
+      ) : (
+        <p className="text-sm text-muted">{t("aiNotAllowed")}</p>
       )}
       <p className="text-sm text-muted">{t("aiHint")}</p>
       <Link href="/ai" className="w-fit text-sm text-primary-ink underline-offset-4 hover:underline">

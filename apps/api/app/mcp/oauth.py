@@ -11,7 +11,7 @@
   a refresh token is used once and replaced.
 
 A person sees and cuts their own connections with `/mcp-connections`. Nothing here stores a token:
-only hashes (see `tokens.py` and migration 0130)."""
+only hashes (see `tokens.py` and migration 0132)."""
 
 import datetime as dt
 from typing import Annotated, Any

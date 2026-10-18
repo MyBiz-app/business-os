@@ -16,8 +16,8 @@ Expand step only: two new tables and three functions.
 # contract: only the downgrade drops anything (the two tables and the functions); the upgrade
 # adds them and touches nothing that exists, so the previous API version keeps working.
 
-Revision ID: 0130
-Revises: 0129
+Revision ID: 0132
+Revises: 0131
 Create Date: 2026-10-18
 """
 
@@ -25,8 +25,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0130"
-down_revision: str | None = "0129"
+revision: str = "0132"
+down_revision: str | None = "0131"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
