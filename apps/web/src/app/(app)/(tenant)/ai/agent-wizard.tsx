@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, Send, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { Field, SelectField, TextAreaField } from "@/components/form/field";
+import { Modal } from "@/components/ui/modal";
 
 import {
   type AgentError,
@@ -31,7 +32,6 @@ type Props = { branches: Branch[]; roles: RoleOption[]; limit: number; count: nu
 export function AgentWizard({ branches, roles, limit, count, onClose, onDone }: Props) {
   const t = useTranslations("aiTeam.wizard");
   const tTeam = useTranslations("aiTeam");
-  const dialog = useRef<HTMLDialogElement>(null);
   const [step, setStep] = useState(0);
   const [template, setTemplate] = useState<(typeof TEMPLATES)[number]["key"] | null>(null);
   const [name, setName] = useState("");
@@ -52,11 +52,6 @@ export function AgentWizard({ branches, roles, limit, count, onClose, onDone }: 
   const [waiting, setWaiting] = useState<string | null>(null);
   const [text, setText] = useState("");
   const done = useRef(false);
-
-  useEffect(() => {
-    const element = dialog.current;
-    if (element && !element.open) element.showModal();
-  }, []);
 
   const full = count >= limit;
   const valid = [template !== null, name.trim().length > 0, does.trim().length > 0, domains.length > 0, allowed.length > 0, true][step];
@@ -162,26 +157,43 @@ export function AgentWizard({ branches, roles, limit, count, onClose, onDone }: 
   const previewAgent = { key: draft?.key ?? "draft", name: name || "?", color, avatar_preset: face.preset, avatar_key: draft?.avatar_key ?? null, avatar_url: draft?.avatar_url ?? null };
 
   return (
-    <dialog ref={dialog} onClose={close} aria-labelledby="wizard-title" className="m-auto max-h-[calc(100dvh-2rem)] w-[min(44rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-border bg-background p-0 text-foreground backdrop:bg-black/50 backdrop:backdrop-blur-sm">
-      <div className="flex max-h-[calc(100dvh-2rem)] flex-col">
-        <header className="flex items-center gap-3 border-b border-border p-4">
-          <div className="min-w-0 flex-1">
-            <h2 id="wizard-title" className="font-semibold">
-              {t("title")}
-            </h2>
-            <p className="text-sm text-muted" aria-live="polite">
-              {t("stepOf", { step: step + 1, total: STEPS.length, name: t(`steps.${STEPS[step]}`) })}
-            </p>
-          </div>
-          <button type="button" onClick={() => dialog.current?.close()} className="btn-plain rounded-full p-2 hover:bg-surface" aria-label={tTeam("close")}>
-            <X aria-hidden="true" className="size-5" />
-          </button>
-        </header>
-        <div role="progressbar" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-label={t("title")} className="h-1 bg-surface">
-          <div className="h-full bg-primary transition-[width]" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+    <Modal
+      title={t("title")}
+      description={t("stepOf", { step: step + 1, total: STEPS.length, name: t(`steps.${STEPS[step]}`) })}
+      size="md"
+      onClose={close}
+      footer={
+        <div className="flex w-full items-center justify-between gap-2">
+            <button type="button" onClick={() => setStep((s) => s - 1)} disabled={step === 0 || busy} className="btn-secondary px-3 py-2 text-sm">
+              <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
+              {t("back")}
+            </button>
+            {step < 4 && (
+              <button type="button" onClick={() => setStep((s) => s + 1)} disabled={!valid || full} className="btn-primary px-4 py-2 text-sm">
+                {t("next")}
+                <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+              </button>
+            )}
+            {step === 4 && (
+              <button type="button" onClick={toTrial} disabled={!valid || busy || full} className="btn-primary px-4 py-2 text-sm">
+                {busy ? t("preparing") : t("tryIt")}
+                <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+              </button>
+            )}
+            {step === 5 && (
+              <button type="button" onClick={finish} disabled={busy} className="btn-primary px-4 py-2 text-sm">
+                <Check aria-hidden="true" className="size-4" />
+                {t("hireNamed", { name })}
+              </button>
+            )}
         </div>
-
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-6">
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <div role="progressbar" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-label={t("title")} className="h-1 rounded-full bg-surface">
+          <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+        </div>
+        <div className="flex flex-col gap-4">
           {full && step === 0 && (
             <p role="alert" className="rounded-xl border border-warning/50 bg-warning/10 p-3 text-sm">
               {t("limitReached", { limit })}
@@ -291,31 +303,7 @@ export function AgentWizard({ branches, roles, limit, count, onClose, onDone }: 
           )}
         </div>
 
-        <footer className="flex items-center justify-between gap-2 border-t border-border p-4">
-          <button type="button" onClick={() => setStep((s) => s - 1)} disabled={step === 0 || busy} className="btn-secondary px-3 py-2 text-sm">
-            <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
-            {t("back")}
-          </button>
-          {step < 4 && (
-            <button type="button" onClick={() => setStep((s) => s + 1)} disabled={!valid || full} className="btn-primary px-4 py-2 text-sm">
-              {t("next")}
-              <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-            </button>
-          )}
-          {step === 4 && (
-            <button type="button" onClick={toTrial} disabled={!valid || busy || full} className="btn-primary px-4 py-2 text-sm">
-              {busy ? t("preparing") : t("tryIt")}
-              <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-            </button>
-          )}
-          {step === 5 && (
-            <button type="button" onClick={finish} disabled={busy} className="btn-primary px-4 py-2 text-sm">
-              <Check aria-hidden="true" className="size-4" />
-              {t("hireNamed", { name })}
-            </button>
-          )}
-        </footer>
       </div>
-    </dialog>
+    </Modal>
   );
 }

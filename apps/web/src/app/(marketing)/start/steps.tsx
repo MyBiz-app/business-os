@@ -87,6 +87,40 @@ export function AccountStep({
 }
 
 /** The kind of business: a category first, then (for a category with kinds) the kind. */
+/** The first question of the journey: starting from scratch, or moving a running business. */
+export function PathStep({
+  draft,
+  headingProps,
+  onChoose,
+}: {
+  draft: Draft;
+  headingProps: HeadingProps;
+  onChoose: (track: "new" | "existing") => void;
+}) {
+  const t = useTranslations("start.path");
+  const options = ["new", "existing"] as const;
+  return (
+    <>
+      <StepHeading eyebrow={t("eyebrow")} title={<h1 {...headingProps}>{t("title")}</h1>} subtitle={t("subtitle")} />
+      <ul className="enter-items grid gap-3 sm:grid-cols-2">
+        {options.map((option) => (
+          <li key={option}>
+            <button
+              type="button"
+              aria-pressed={(draft.track ?? "new") === option}
+              onClick={() => onChoose(option)}
+              className={`btn-plain card card-hover flex h-full w-full flex-col gap-1 p-5 text-start ${(draft.track ?? "new") === option ? "ring-2 ring-primary" : ""}`}
+            >
+              <span className="text-lg font-bold">{t(`${option}.title`)}</span>
+              <span className="text-sm text-muted">{t(`${option}.hint`)}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 export function IndustryStep({
   draft,
   category,

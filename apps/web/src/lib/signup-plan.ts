@@ -41,9 +41,10 @@ export type EntityType = (typeof ENTITY_TYPES)[number];
 export const SITE_CHOICES = ["have", "none", "build"] as const;
 export type SiteChoice = (typeof SITE_CHOICES)[number];
 
-/** `full`: the system (the usual sign-up). `website_only`: a business that ordered a website and
- * nothing else; it can add the system later without signing up again. */
-export type Track = "full" | "website_only";
+/** `new` / `existing`: the usual sign-up (from scratch, or moving from another system).
+ * `website_only`: a business that ordered a website and nothing else; it can add the system
+ * later without signing up again. */
+export type Track = "new" | "existing" | "website_only";
 
 /** How big the business said it is, kept with the business (the API's `business_size`). */
 export type BusinessSize = "solo" | "small" | "medium" | "network";
@@ -88,7 +89,9 @@ export type SignupPlan = {
   site?: SiteChoice;
   /** The address of the website the business already has (with `site: "have"`). */
   websiteUrl?: string;
-  /** Left out for the usual sign-up. */
+  /** "existing": already runs a business elsewhere and moves to MyBiz (opens the migration hub
+   * after sign-up); "new" or absent: starting from scratch; "website_only": ordered a website and
+   * nothing else. */
   track?: Track;
 };
 
@@ -351,7 +354,7 @@ export function decodePlan(value: unknown): SignupPlan | null {
   const entityType = (ENTITY_TYPES as readonly unknown[]).includes(raw.entityType) ? (raw.entityType as EntityType) : undefined;
   const site = (SITE_CHOICES as readonly unknown[]).includes(raw.site) ? (raw.site as SiteChoice) : undefined;
   const websiteUrl = typeof raw.websiteUrl === "string" && site === "have" ? normalizeWebsiteUrl(raw.websiteUrl) : null;
-  const track: Track | undefined = raw.track === "website_only" ? "website_only" : undefined;
+  const track: Track | undefined = raw.track === "website_only" || raw.track === "existing" ? raw.track : undefined;
   return {
     vertical: raw.vertical,
     name,

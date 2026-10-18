@@ -19509,7 +19509,7 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "branding" | "services" | "schedule" | "team" | "clients" | "card";
+            key: "branding" | "services" | "schedule" | "team" | "clients" | "card" | "post";
             /** Done */
             done: boolean;
         };

@@ -79,6 +79,7 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
       .POST("/tenants/current/welcome-email", { params: scope, body: { expected_active_clients: plan.clients } })
       .catch(() => null);
   }
-  // Whoever asked for a website goes straight to the brief, with what is known already filled in.
-  redirect(websiteOnly || plan.site === "build" ? "/website/brief" : "/dashboard?welcome=1");
+  // Whoever asked for a website goes straight to the brief, with what is known already filled in;
+  // moving from another system opens the migration hub; starting fresh gets the welcome tour.
+  redirect(websiteOnly || plan.site === "build" ? "/website/brief" : plan.track === "existing" ? "/migration" : "/dashboard?welcome=1");
 }
