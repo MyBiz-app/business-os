@@ -10,7 +10,7 @@ const BARS = [34, 48, 41, 58, 55, 70, 64, 82, 76, 92];
 
 const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
-function subscribeMotion(notify: () => void) {
+export function subscribeMotion(notify: () => void) {
   const media = window.matchMedia(MOTION_QUERY);
   media.addEventListener("change", notify);
   window.addEventListener("a11y-change", notify);
@@ -21,7 +21,7 @@ function subscribeMotion(notify: () => void) {
 }
 
 /** True when the device or the person's accessibility choice asks for less motion. */
-function reducedMotion() {
+export function reducedMotion() {
   return window.matchMedia(MOTION_QUERY).matches || document.documentElement.dataset.motion === "reduce";
 }
 
