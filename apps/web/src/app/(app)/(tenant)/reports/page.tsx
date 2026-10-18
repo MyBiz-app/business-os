@@ -141,7 +141,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
             <Link
               scroll={false}
               href={{ pathname: "/reports", query: { ...query, staff: excludeStaff ? undefined : "exclude" } }}
-              aria-pressed={excludeStaff}
+              aria-current={excludeStaff ? "true" : undefined}
               className={excludeStaff ? "btn-primary px-3 py-1.5 text-sm" : "btn-secondary px-3 py-1.5 text-sm"}
             >
               {t("withoutStaff")}
