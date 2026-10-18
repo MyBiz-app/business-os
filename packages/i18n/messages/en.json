@@ -246,6 +246,7 @@
         "audit": "Activity log",
         "data": "Export and close",
         "help": "Support",
+        "aiConnections": "AI connections",
         "bookings": "Bookings and waitlists",
         "memberships": "Memberships and freezes"
       },
@@ -254,6 +255,7 @@
         "branding": "Name, color, logo and cover, with a live preview.",
         "data": "Download your business data, or close the business.",
         "help": "Let our team look at your account, or write to us.",
+        "aiConnections": "Connect Claude or ChatGPT to your business, and approve what they ask to change.",
         "bookings": "What happens when a class, an appointment or a court is full.",
         "memberships": "Whether clients can ask to freeze from the app, and the rules."
       }
@@ -3072,6 +3074,22 @@
         "ai_busy": "The AI is busy. Try again in a moment.",
         "ai_unavailable": "The AI is not answering right now.",
         "ai_not_configured": "AI is not set up on this server."
+      },
+      "connectors": {
+        "title": "AI connectors",
+        "hint": "Which businesses connected Claude or ChatGPT, how much they use it, and what became of the changes the apps proposed.",
+        "limit": "Daily limit: {count} calls per business.",
+        "empty": "No business has connected an AI app yet.",
+        "columns": {
+          "business": "Business",
+          "apps": "Apps",
+          "calls": "Calls",
+          "proposed": "Proposed",
+          "executed": "Approved",
+          "rejected": "Rejected",
+          "waiting": "Waiting",
+          "last": "Last call"
+        }
       }
     },
     "health": {
@@ -9369,12 +9387,14 @@
       "Plans, punch cards and open balances",
       "Metrics and reports"
     ],
-    "returns": "The app can only read; it cannot change anything. You can disconnect it at any time. After you approve you return to {host}.",
+    "returns": "The app reads as you. Any change it suggests waits for your approval in MyBiz, under Settings, AI connections. You can disconnect it at any time. After you approve you return to {host}.",
     "business": "Business",
     "approve": "Approve the connection",
     "deny": "Cancel",
     "invalid": "This connection link is not valid. Start again from the app.",
-    "noBusiness": "You have no business in MyBiz yet. Create one and try again."
+    "noBusiness": "You have no business in MyBiz yet. Create one and try again.",
+    "propose": "Also let it suggest changes",
+    "proposeHint": "It can propose bookings and cancellations. Nothing changes until you approve each one in MyBiz."
   },
   "website": {
     "title": "My website",
@@ -9621,6 +9641,82 @@
       "cancel": "Cancel",
       "approved": "You approved the website. We are putting it live."
     }
+  },
+  "aiConnections": {
+    "title": "AI connections",
+    "subtitle": "Use your own Claude or ChatGPT with your business. They read as you, with your permissions, and any change they suggest waits here for your approval.",
+    "waitingTitle": "Waiting for your approval",
+    "waitingEmpty": "Nothing is waiting. When an AI app suggests a change, it appears here.",
+    "waitingHint": "Nothing happens until you approve. Everything is checked again at the moment you approve.",
+    "from": "Suggested by {app}",
+    "expires": "Open until {when}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveFor": "Approve: {what}",
+    "rejectFor": "Reject: {what}",
+    "kinds": {
+      "book_client": "Book a client",
+      "cancel_booking": "Cancel a booking",
+      "log_time": "Log time",
+      "bill_month": "Bill a month"
+    },
+    "fields": {
+      "client": "Client",
+      "service": "Class",
+      "starts": "Starts",
+      "dependent": "For",
+      "date": "Date",
+      "hours": "Hours",
+      "description": "Work",
+      "month": "Month",
+      "clients": "Clients",
+      "total": "Total"
+    },
+    "full": "The class is full: the client joins the waitlist.",
+    "historyTitle": "Recent requests",
+    "status": {
+      "pending": "Waiting",
+      "executed": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "failed": "Could not be done"
+    },
+    "appsTitle": "Connected apps",
+    "appsEmpty": "No AI app is connected yet.",
+    "canPropose": "Reads and suggests changes",
+    "readOnly": "Reads only",
+    "lastUsed": "Last used {when}",
+    "neverUsed": "Not used yet",
+    "calls": "{count} calls",
+    "disconnect": "Disconnect",
+    "disconnectApp": "Disconnect {app}",
+    "howTitle": "How to connect",
+    "howIntro": "The same address works for every AI app. You need a paid Claude or ChatGPT plan that supports custom connectors.",
+    "address": "Connector address",
+    "addressHint": "Paste this address into the AI app.",
+    "claudeTitle": "Claude",
+    "claudeSteps": [
+      "Open Claude and go to Settings, then Connectors.",
+      "Choose Add custom connector.",
+      "Paste the address above, name it MyBiz and add it.",
+      "Sign in to MyBiz when asked, pick your business and approve.",
+      "Ask something like: how many new clients did I get this week?"
+    ],
+    "chatgptTitle": "ChatGPT",
+    "chatgptSteps": [
+      "Open ChatGPT and go to Settings, then Connectors, and turn on Developer mode.",
+      "Choose Create and paste the address above as the connector's address.",
+      "Choose OAuth for sign-in and save.",
+      "Sign in to MyBiz when asked, pick your business and approve.",
+      "Start a chat, add the connector from the tools menu and ask your question."
+    ],
+    "safetyTitle": "What the apps can and cannot do",
+    "safety": [
+      "They see only what you could see in MyBiz, in the business you picked.",
+      "They never change anything themselves: a suggested change waits here until you approve it.",
+      "You can disconnect an app at any moment, and it stops at once.",
+      "Every use is counted, and there is a daily limit per business."
+    ]
   },
   "waitlist": {
     "title": "Waitlists",

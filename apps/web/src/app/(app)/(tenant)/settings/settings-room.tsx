@@ -13,6 +13,7 @@ import {
   Plug,
   Puzzle,
   Snowflake,
+  Sparkles,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -32,6 +33,7 @@ const ICONS: Record<TopicKey, LucideIcon> = {
   modules: Puzzle,
   billing: CreditCard,
   integrations: Plug,
+  aiConnections: Sparkles,
   audit: History,
   data: Database,
   help: LifeBuoy,
