@@ -455,6 +455,7 @@
     "business": "Business",
     "openDetails": "Open the details",
     "kpis": "Key numbers",
+    "withoutStaff": "Without team members",
     "period": "Period",
     "lastDays": "Last {count} days",
     "vsPrevious": "vs. the previous period",
@@ -541,7 +542,9 @@
     "migration": "Move to MyBiz",
     "invoices": "Invoices",
     "sidebarLight": "Use a light sidebar",
-    "sidebarDark": "Use a dark sidebar"
+    "sidebarDark": "Use a dark sidebar",
+    "quotesEvents": "Quotes and events",
+    "catalog": "Catalog"
   },
   "terms": {
     "fitness": {
@@ -809,6 +812,14 @@
     },
     "absentFilter": "Last visit",
     "absentAny": "Any time",
+    "staffFilter": "Team members",
+    "staffAny": "Everyone",
+    "staffOptions": {
+      "only": "Team members only",
+      "exclude": "Without team members"
+    },
+    "staffBadge": "Team",
+    "addMe": "Add me",
     "absentDays": "Not in {days} days",
     "homeBranch": "Home branch",
     "allBranches": "All branches",
@@ -891,7 +902,8 @@
     "loading": "Loading…",
     "chooseFile": "Choose a file",
     "noFile": "No file chosen",
-    "edit": "Edit"
+    "edit": "Edit",
+    "close": "Close"
   },
   "services": {
     "title": "Services",
@@ -926,6 +938,29 @@
     "stats": {
       "sessions": "{count, plural, =0 {No sessions in 30 days} one {One session in 30 days} other {# sessions in 30 days}}",
       "occupancy": "{value} full"
+    },
+    "created": "Service created."
+  },
+  "address": {
+    "city": "City",
+    "cityPlaceholder": "Start typing a city",
+    "street": "Street",
+    "streetPlaceholder": "Start typing a street",
+    "streetNeedsCity": "Choose a city first",
+    "houseNumber": "House number",
+    "details": "Apartment, floor, entrance",
+    "optional": "optional",
+    "unlisted": "My street is not on the list",
+    "unlistedStreet": "Street name",
+    "unlistedNote": "The street will be flagged for review and added to the list.",
+    "current": "Saved address: {address}. Choosing from the list replaces it.",
+    "backToList": "Choose from the list",
+    "noResults": "No results",
+    "chooseCity": "Choose a city from the list",
+    "chooseStreet": "Choose a street from the list",
+    "reminder": {
+      "text": "Complete your home address: city, street and house number.",
+      "action": "Fill in the address"
     }
   },
   "locations": {
@@ -1724,7 +1759,8 @@
     "stats": {
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
       "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
-    }
+    },
+    "created": "Plan created."
   },
   "metrics": {
     "revenue": "Revenue",
@@ -1776,6 +1812,8 @@
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
+      "ai_user_limit_reached": "You've reached your personal AI limit for this month.",
+      "ai_daily_pace_reached": "You've used your share of the AI for today. It opens again tomorrow.",
       "ai_rate_limited": "You're sending questions too fast. Wait a minute and try again.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
@@ -1853,7 +1891,34 @@
       "map": "Map",
       "list": "List"
     },
-    "usage": "{used} of {included} AI credits used this month",
+    "meter": {
+      "business": "{percent}% of this month's AI used",
+      "person": "{percent}% of your daily AI allowance used",
+      "reach": "At this pace the month's AI runs out on {date}",
+      "left": "About {count, plural, one {# question} other {# questions}} left this month",
+      "leftToday": "About {count, plural, one {# question} other {# questions}} left for you today",
+      "noPace": "No daily limit for you",
+      "paceMark": "Where an even pace would be today",
+      "openWindow": "Open the AI usage window",
+      "windowTitle": "AI usage",
+      "windowSubtitle": "{used} of {included} credits used this month",
+      "byDay": "Credits per day",
+      "byPerson": "By person",
+      "byAgent": "By agent",
+      "byKind": "Questions and tasks",
+      "kind": {
+        "asked": "Questions people asked",
+        "scheduled": "Tasks that ran by themselves"
+      },
+      "none": "Nothing used yet this month.",
+      "unknownPerson": "Someone who left or is unknown",
+      "aiUsers": "{count} of {allowed} people have access to the AI team",
+      "alertWarn": "The month's AI is almost used up. You can turn on pay-as-you-go or move to AI Pro.",
+      "alertOver": "The month's AI is used up. New questions wait until next month unless you turn on pay-as-you-go or move to AI Pro.",
+      "enablePayg": "Turn on pay-as-you-go",
+      "upgrade": "Upgrade to AI Pro",
+      "limitPerson": "Limit a person"
+    },
     "state": {
       "active": "Available",
       "locked": "Locked: not in your plan",
@@ -2021,7 +2086,8 @@
         "agent_unavailable": "The agent is not available",
         "business_closed": "The business is closed",
         "generic": "Something went wrong",
-        "ai_user_limit_reached": "The AI limit set for this person was reached"
+        "ai_user_limit_reached": "The AI limit set for this person was reached",
+        "ai_daily_pace_reached": "The person reached their daily AI pace"
       },
       "credits": "{credits} credits",
       "frequency": {
@@ -2277,6 +2343,8 @@
     }
   },
   "aiBubble": {
+    "levelWarn": "The month's AI is almost used up",
+    "levelOver": "The month's AI is used up",
     "open": "Ask {name} or the AI team",
     "close": "Close the chat",
     "openFull": "Open in the full team",
@@ -4819,7 +4887,14 @@
       "invalid": "Some details aren't valid.",
       "code_taken": "That code already exists.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "new": "New discount code",
+    "removed": "The code was deleted.",
+    "deleteConfirm": "Delete the code {code}?",
+    "usesLabel": "Uses",
+    "givenLabel": "Discount given",
+    "statusLabel": "Status",
+    "activeNow": "Working"
   },
   "start": {
     "meta": {
@@ -5421,7 +5496,9 @@
       "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
       "unsupported_image": "Choose a PNG, JPEG or WebP picture."
     },
-    "nav": { "label": "Profile sections" },
+    "nav": {
+      "label": "Profile sections"
+    },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
     "birthDate": "Date of birth",
@@ -5628,6 +5705,11 @@
       "allBranches": "All branches",
       "rosterEmails": "Email me about my shifts",
       "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
+      "signUpClientTitle": "Join as a client too",
+      "signUpClientHint": "Get your own client card in this business, so you can book and pay like any client. You switch between the two areas below.",
+      "signUpClientButton": "Sign me up as a client",
+      "signUpClientDone": "Done. Switch to the client area below.",
+      "signUpClientError": "Could not sign you up. Try again.",
       "colors": "My colors",
       "colorsHint": "Pick your brand color. It colors your clients' app, your web app and this app.",
       "colorHex": "Color code (#rrggbb)",
@@ -6635,7 +6717,7 @@
       "inactive": "Not in use",
       "retire": "Stop using",
       "restore": "Use again",
-      "required": "Enter the street and the city.",
+      "required": "Choose the city and street from the list and enter the house number.",
       "saveFailed": "Couldn't save. Try again."
     },
     "myDay": "My jobs",
@@ -6793,7 +6875,41 @@
       "draft": "Drafts",
       "sent": "Waiting for an answer",
       "accepted": "Accepted",
-      "declined": "Declined or expired"
+      "declined": "Declined or expired",
+      "closeRate": "Close rate",
+      "closeRateHint": "{won} of {decided} decided"
+    },
+    "titleEvents": "Quotes and events",
+    "subtitleEvents": "Send a quote, the client accepts it with one tap and pays the deposit. Accepted quotes with a date become events.",
+    "views": {
+      "label": "View",
+      "quotes": "Quotes",
+      "events": "Events"
+    },
+    "eventsMonth": "Events in {month}",
+    "monthPrev": "Previous month",
+    "monthNext": "Next month",
+    "calendar": {
+      "closed": "Closed",
+      "more": "+{count} more",
+      "empty": "No events this month."
+    },
+    "empty": {
+      "title": "Your first quote in three steps",
+      "step1": "Create a quote",
+      "step1Body": "Pick a client, list what is included and the price.",
+      "step2": "Send it by link",
+      "step2Body": "The client opens a private page, no sign-in needed.",
+      "step3": "They accept and pay the deposit",
+      "step3Body": "You see the answer here and the event lands in the calendar.",
+      "first": "Create the first quote",
+      "example": "Try with an example"
+    },
+    "example": {
+      "title": "Example: full-day service",
+      "line1": "Full-day service",
+      "line2": "Travel and set-up",
+      "notes": "This is an example: change the items, prices and terms before you send it."
     }
   },
   "bills": {
@@ -8113,6 +8229,7 @@
       "ai_not_configured": "The AI is not available right now.",
       "ai_limit_reached": "The monthly AI allowance is used up. You can still map the columns by hand.",
       "ai_user_limit_reached": "Your personal AI limit for this month is used up.",
+      "ai_daily_pace_reached": "You used your share of the AI for today. Map the rest by hand or try tomorrow.",
       "ai_busy": "The AI is busy. Try again in a moment.",
       "ai_unavailable": "The AI could not be reached. Try again later.",
       "ai_map_limit": "You used the AI mapping many times in this move. Map the rest by hand.",
@@ -8609,10 +8726,27 @@
     "noClasses": "Nothing to teach in the next {days} days.",
     "openPayRun": "Open the pay run",
     "aiTitle": "AI team",
-    "aiAllowed": "Can use the AI team",
-    "aiNotAllowed": "No access to the AI team",
-    "aiUsedThisMonth": "credits this month (the whole business: {used} of {included})",
-    "aiHint": "Access follows the role. Change it under Permissions.",
+    "aiNotAllowed": "The AI settings could not be loaded.",
+    "aiHint": "Without a personal switch, access follows the role. The owner is not limited.",
+    "ai": {
+      "usedMonth": "Credits this month",
+      "usedToday": "Credits today (pace: {limit})",
+      "access": "Can use the AI team",
+      "accessHint": "{count} of {allowed} people have access under the plan. An extra AI user costs a little more each month.",
+      "monthly": "Personal monthly limit (credits)",
+      "monthlyPlaceholder": "As the business",
+      "daily": "Daily pace (% of the month's AI, usually {default})",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "owner": "The owner always has access to the AI team and no daily pace.",
+      "errors": {
+        "ai_users_full": "The plan's AI users are all taken. Add an extra AI user first.",
+        "owner_always_has_ai": "The owner always has access.",
+        "invalid": "Check the numbers and try again.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
     "openAi": "Open the AI team",
     "permissionsTitle": "Role and permissions",
     "roleIs": "Role: {role}",
@@ -8624,6 +8758,55 @@
       "documents": "Documents",
       "ai": "AI",
       "permissions": "Permissions"
+    }
+  },
+  "catalog": {
+    "title": "Catalog",
+    "subtitle": "What you sell: services, memberships and punch cards, and discount codes.",
+    "tabs": {
+      "label": "Catalog sections",
+      "services": "Services",
+      "plans": "Memberships and punch cards",
+      "codes": "Discount codes"
+    },
+    "add": {
+      "services": "Add service",
+      "plans": "Add plan",
+      "codes": "Add code"
+    },
+    "tiles": {
+      "label": "Catalog numbers",
+      "services": {
+        "all": "All services",
+        "active": "Open for booking",
+        "paused": "Hidden"
+      },
+      "plans": {
+        "all": "All plans",
+        "active": "On sale",
+        "paused": "Not on sale"
+      },
+      "codes": {
+        "all": "All codes",
+        "active": "Working now",
+        "paused": "Paused"
+      }
+    },
+    "soldLast30": "{count, plural, =0 {None sold in 30 days} one {One sold in 30 days} other {# sold in 30 days}}",
+    "servicesEmpty": {
+      "title": "No services yet",
+      "body": "A service is what clients book: a class, a personal appointment or a court by the hour. Add your first one and it shows on the schedule and in the client app.",
+      "cta": "Create your first service"
+    },
+    "plansEmpty": {
+      "title": "Nothing here yet",
+      "body": "Memberships and punch cards let clients pay once and come again and again. They are optional: businesses that charge per visit can skip them.",
+      "cta": "Create your first plan"
+    },
+    "codesEmpty": {
+      "title": "No discount codes yet",
+      "body": "A code gives a percent or a fixed amount off a plan. Share it in a message or a post and clients enter it when they buy.",
+      "cta": "Create your first code"
     }
   }
 }

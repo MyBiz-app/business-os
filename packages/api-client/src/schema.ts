@@ -309,6 +309,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Me As Client
+         * @description "Add me": the signed-in team member becomes a client of this business (an owner can book
+         *     a table for themselves, a coach can join a class).
+         */
+        post: operations["add_me_as_client"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}/branches": {
         parameters: {
             query?: never;
@@ -3186,6 +3207,46 @@ export interface paths {
          * @description The branch has no appointed manager (its owner still reaches it).
          */
         delete: operations["remove_branch_manager"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/geo/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Cities
+         * @description Cities and towns whose name contains the letters, names starting with them first.
+         */
+        get: operations["list_cities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/geo/cities/{city_code}/streets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Streets
+         * @description Streets of one city whose name (or an alternative spelling) contains the letters.
+         */
+        get: operations["list_streets"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -6159,6 +6220,90 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/meter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Meter
+         * @description The month's AI meter: where the business is against its pool and against the calendar
+         *     (managers), and the person's own allowance for today and the month.
+         */
+        get: operations["ai_meter"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/usage/breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Usage Breakdown
+         * @description What the usage window adds to /ai/usage: questions people asked against tasks that ran by
+         *     themselves, and how many people have AI access against what the module includes.
+         */
+        get: operations["ai_usage_breakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/extra-users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Extra Ai Users
+         * @description The paid "extra AI user" add-ons: each lets one more person use the AI team and adds 150
+         *     credits to the month's pool. Cannot go below the people who already have access.
+         */
+        put: operations["set_extra_ai_users"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Member Ai
+         * @description One team member's AI settings and use, for the AI tab of the staff card.
+         */
+        get: operations["get_member_ai"];
+        /** Update Member Ai */
+        put: operations["update_member_ai"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/modules/catalog": {
         parameters: {
             query?: never;
@@ -7091,6 +7236,26 @@ export interface paths {
         get: operations["business_locations"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/businesses/self": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Join Own Business
+         * @description "Sign up as a client too": a team member joins their own business without a code (R36).
+         */
+        post: operations["join_own_business"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8422,15 +8587,55 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * City Code
+             * @description From the official city list, when chosen there
+             */
+            city_code: number | null;
+            /** Street Code */
+            street_code: number | null;
+            /** House Number */
+            house_number: string | null;
+            /** Address Details */
+            address_details: string | null;
+            /** Street Unlisted */
+            street_unlisted: string | null;
+            /**
+             * Street Name
+             * @description The chosen street's own name
+             */
+            street_name?: string | null;
         };
         /** AddressCreate */
         AddressCreate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Label */
             label?: string | null;
             /** Street */
-            street: string;
+            street?: string | null;
             /** City */
-            city: string;
+            city?: string | null;
             /** Details */
             details?: string | null;
             /** Notes */
@@ -8438,6 +8643,28 @@ export interface components {
         };
         /** AddressUpdate */
         AddressUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Label */
             label?: string | null;
             /** Street */
@@ -9497,6 +9724,28 @@ export interface components {
         };
         /** BranchSetup */
         BranchSetup: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name: string;
             /** Address */
@@ -9622,6 +9871,38 @@ export interface components {
              * Format: date-time
              */
             issued_at: string;
+        };
+        /** BusinessMeter */
+        BusinessMeter: {
+            /** Used */
+            used: number;
+            /** Included */
+            included: number;
+            /**
+             * Limit
+             * @description Where questions stop; null: no limit
+             */
+            limit: number | null;
+            /**
+             * Percent
+             * @description Used / included, in percent
+             */
+            percent: number;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
+            /**
+             * Reach Date
+             * @description When the month's pool runs out at this pace; null if it will not
+             */
+            reach_date: string | null;
+            /**
+             * Questions Left
+             * @description About, at one credit per question
+             */
+            questions_left: number | null;
         };
         /**
          * BusinessProfile
@@ -9974,6 +10255,17 @@ export interface components {
              */
             lives_with_me: boolean;
         };
+        /** City */
+        City: {
+            /** Code */
+            code: number;
+            /** Name He */
+            name_he: string;
+            /** Name En */
+            name_en: string | null;
+            /** Region Name */
+            region_name: string | null;
+        };
         /** Client */
         Client: {
             /**
@@ -10048,6 +10340,12 @@ export interface components {
              * @default false
              */
             email_suppressed: boolean;
+            /**
+             * Is Staff
+             * @description Also a team member of this business (shown as a badge)
+             * @default false
+             */
+            is_staff: boolean;
         };
         /** ClientAppointmentCreate */
         ClientAppointmentCreate: {
@@ -10378,6 +10676,12 @@ export interface components {
              * @default false
              */
             email_suppressed: boolean;
+            /**
+             * Is Staff
+             * @description Also a team member of this business (shown as a badge)
+             * @default false
+             */
+            is_staff: boolean;
             /**
              * Plan Name
              * @description The plan valid today, if any
@@ -12007,6 +12311,11 @@ export interface components {
              */
             url: string;
         };
+        /** ExtraUsers */
+        ExtraUsers: {
+            /** Extra Ai Users */
+            extra_ai_users: number;
+        };
         /** FileLink */
         FileLink: {
             /**
@@ -13238,6 +13547,16 @@ export interface components {
             /** Engagements */
             engagements: number;
         };
+        /** KindRow */
+        KindRow: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "asked" | "scheduled";
+            /** Credits */
+            credits: number;
+        };
         /** Kpi */
         Kpi: {
             /** Value */
@@ -13477,6 +13796,33 @@ export interface components {
             name: string;
             /** Address */
             address: string | null;
+            /**
+             * City Code
+             * @description The branch's city, from the official list
+             */
+            city_code: number | null;
+            /** Street Code */
+            street_code: number | null;
+            /** House Number */
+            house_number: string | null;
+            /** Address Details */
+            address_details: string | null;
+            /**
+             * Street Unlisted
+             * @description A street typed because it is not on the list
+             */
+            street_unlisted: string | null;
+            /** City Name */
+            city_name: string | null;
+            /** Street Name */
+            street_name: string | null;
+            /**
+             * Latitude
+             * @description The branch's point on the map, if known
+             */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
             /** Active */
             active: boolean;
             /**
@@ -13549,6 +13895,28 @@ export interface components {
         };
         /** LocationCreate */
         LocationCreate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name: string;
             /** Address */
@@ -13581,6 +13949,28 @@ export interface components {
         };
         /** LocationUpdate */
         LocationUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name?: string | null;
             /** Address */
@@ -13597,6 +13987,13 @@ export interface components {
              * @description The branch's own accent color; null falls back to the network's
              */
             primary_color?: string | null;
+            /**
+             * Latitude
+             * @description The pin, moved by hand (with longitude)
+             */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
             /**
              * Website Url
              * @description The branch's own website; null: the business's
@@ -13664,6 +14061,30 @@ export interface components {
             city?: string | null;
             /** Postal Code */
             postal_code?: string | null;
+            /**
+             * City Code
+             * @description Home city, from the official list
+             */
+            city_code?: number | null;
+            /** Street Code */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /** Address Details */
+            address_details?: string | null;
+            /** Street Unlisted */
+            street_unlisted?: string | null;
+            /**
+             * Street Name
+             * @description The home street's name
+             */
+            street_name?: string | null;
+            /**
+             * Address Complete
+             * @description City, street and house number are all filled in
+             * @default false
+             */
+            address_complete: boolean;
             /**
              * Email Roster
              * @description Email the person when their roster is published
@@ -13761,6 +14182,65 @@ export interface components {
              */
             permissions: string[];
         };
+        /** MemberAi */
+        MemberAi: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Role Default
+             * @description Whether their role gives AI access without a switch
+             */
+            role_default: boolean;
+            /**
+             * Ai Access
+             * @description Their own switch; null: follow the role
+             */
+            ai_access: boolean | null;
+            /** Has Access */
+            has_access: boolean;
+            /**
+             * Monthly Credits
+             * @description Their own monthly limit; null: the business's
+             */
+            monthly_credits: number | null;
+            /**
+             * Daily Percent
+             * @description Their own daily pace; null: the default
+             */
+            daily_percent: number | null;
+            /**
+             * Default Daily Percent
+             * @default 15
+             */
+            default_daily_percent: number;
+            /** Day Limit */
+            day_limit: number | null;
+            /** Used Month */
+            used_month: number;
+            /** Used Today */
+            used_today: number;
+            /** Ai Users Allowed */
+            ai_users_allowed: number;
+            /** Ai Users Count */
+            ai_users_count: number;
+            /** Is Owner */
+            is_owner: boolean;
+        };
+        /**
+         * MemberAiUpdate
+         * @description Fields left out stay as they are; `null` clears a personal setting back to the default.
+         */
+        MemberAiUpdate: {
+            /** Ai Access */
+            ai_access?: boolean | null;
+            /** Monthly Credits */
+            monthly_credits?: number | null;
+            /** Daily Percent */
+            daily_percent?: number | null;
+        };
         /** MemberAtRisk */
         MemberAtRisk: {
             /** Client Id */
@@ -13796,6 +14276,14 @@ export interface components {
              * @description Empty means all branches
              */
             location_ids: string[];
+        };
+        /** MemberJoinRequest */
+        MemberJoinRequest: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
         };
         /**
          * MemberOrganization
@@ -13869,6 +14357,32 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** Meter */
+        Meter: {
+            /**
+             * Month Start
+             * Format: date
+             */
+            month_start: string;
+            /** Day Of Month */
+            day_of_month: number;
+            /** Days In Month */
+            days_in_month: number;
+            /**
+             * Pace Percent
+             * @description How far into the month we are, in percent
+             */
+            pace_percent: number;
+            /** @description Only for those who manage the AI team */
+            business: components["schemas"]["BusinessMeter"] | null;
+            person: components["schemas"]["PersonMeter"];
+            /**
+             * Level
+             * @description The worse of the two: what the small dot shows
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
         };
         /** MethodTotal */
         MethodTotal: {
@@ -14831,6 +15345,33 @@ export interface components {
             };
             /** Entries */
             entries: components["schemas"]["Entry"][];
+        };
+        /** PersonMeter */
+        PersonMeter: {
+            /** Used Month */
+            used_month: number;
+            /**
+             * Month Limit
+             * @description Their own monthly limit, if one is set
+             */
+            month_limit: number | null;
+            /** Used Today */
+            used_today: number;
+            /**
+             * Day Limit
+             * @description Their daily pace; null: none (the owner)
+             */
+            day_limit: number | null;
+            /**
+             * Questions Left Today
+             * @description About, at one credit per question
+             */
+            questions_left_today: number | null;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
         };
         /** PersonMonth */
         PersonMonth: {
@@ -17814,6 +18355,15 @@ export interface components {
             /** Status */
             status: ("trial" | "active") | null;
         };
+        /** Street */
+        Street: {
+            /** Code */
+            code: number;
+            /** Name He */
+            name_he: string;
+            /** Aliases */
+            aliases: string[];
+        };
         /**
          * StructureUpdate
          * @description The whole structure at once: every team and where each agent stands. Agents left out keep
@@ -18742,6 +19292,21 @@ export interface components {
              */
             amount_minor: number | null;
         };
+        /** UsageBreakdown */
+        UsageBreakdown: {
+            /** By Kind */
+            by_kind: components["schemas"]["KindRow"][];
+            /** Ai Users Allowed */
+            ai_users_allowed: number;
+            /** Ai Users Count */
+            ai_users_count: number;
+            /** Extra Ai Users */
+            extra_ai_users: number;
+            /** Extra User Price Minor */
+            extra_user_price_minor: number;
+            /** Currency */
+            currency: string;
+        };
         /** UsagePoint */
         UsagePoint: {
             /**
@@ -19132,6 +19697,28 @@ export interface components {
         };
         /** ProfileUpdate */
         app__api__routes__ProfileUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Full Name */
             full_name?: string | null;
             /** Phone */
@@ -19895,6 +20482,8 @@ export interface operations {
                 /** @description With no_show_to: missed a class in this range */
                 no_show_from?: string | null;
                 no_show_to?: string | null;
+                /** @description only: team members who are also clients; exclude: leave them out */
+                staff?: ("only" | "exclude") | null;
                 /** @description Rows per page */
                 limit?: number;
                 /** @description Rows to skip */
@@ -19946,6 +20535,39 @@ export interface operations {
                 "application/json": components["schemas"]["ClientCreate"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_me_as_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             201: {
@@ -27392,6 +28014,74 @@ export interface operations {
             };
         };
     };
+    list_cities: {
+        parameters: {
+            query?: {
+                /** @description Letters from the name; empty: all */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["City"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_streets: {
+        parameters: {
+            query?: {
+                /** @description Letters from the name; empty: all */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                city_code: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Street"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_team: {
         parameters: {
             query?: never;
@@ -33260,6 +33950,8 @@ export interface operations {
                 /** @description Last local date (inclusive) */
                 end: string;
                 keys?: ("revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held")[] | null;
+                /** @description Leave out clients who are also team members */
+                exclude_staff?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -33297,6 +33989,8 @@ export interface operations {
                 start: string;
                 end: string;
                 grain?: "day" | "week" | "month";
+                /** @description Leave out clients who are also team members */
+                exclude_staff?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -34294,6 +34988,183 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiSpend"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_meter: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Meter"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_usage_breakdown: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageBreakdown"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_extra_ai_users: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtraUsers"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageBreakdown"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_member_ai: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAi"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_member_ai: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberAiUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAi"];
                 };
             };
             /** @description Validation Error */
@@ -36139,6 +37010,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientLocation"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    join_own_business: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberJoinRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBusiness"];
                 };
             };
             /** @description Validation Error */

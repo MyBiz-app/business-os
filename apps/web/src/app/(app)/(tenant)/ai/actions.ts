@@ -12,10 +12,10 @@ import type { Agent, Team } from "./types";
 export type Conversation = components["schemas"]["app__api__assistant__Conversation"];
 export type ConversationSummary = components["schemas"]["app__api__assistant__ConversationSummary"];
 
-export type ChatError = "ai_not_configured" | "ai_busy" | "ai_unavailable" | "ai_limit_reached" | "ai_rate_limited" | "generic";
+export type ChatError = "ai_not_configured" | "ai_busy" | "ai_unavailable" | "ai_limit_reached" | "ai_user_limit_reached" | "ai_daily_pace_reached" | "ai_rate_limited" | "generic";
 export type ChatResult = { conversation?: Conversation; error?: ChatError };
 
-const KNOWN: readonly string[] = ["ai_not_configured", "ai_busy", "ai_unavailable", "ai_limit_reached", "ai_rate_limited"];
+const KNOWN: readonly string[] = ["ai_not_configured", "ai_busy", "ai_unavailable", "ai_limit_reached", "ai_user_limit_reached", "ai_daily_pace_reached", "ai_rate_limited"];
 
 function errorOf(error: unknown): ChatError {
   const detail = error instanceof ApiError ? (error.body as { detail?: unknown } | null)?.detail : null;

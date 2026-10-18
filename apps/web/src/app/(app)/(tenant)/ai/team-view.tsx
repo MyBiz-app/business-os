@@ -1,7 +1,7 @@
 "use client";
 
 import { CircleHelp, FlaskConical, GitBranch, MessageCircle, Maximize2, Minimize2, RotateCcw, UserPlus } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -32,7 +32,8 @@ import { type Branch } from "./scope-picker";
 import { StructurePanel } from "./structure-panel";
 import { TeamList } from "./team-list";
 import { TeamMap } from "./team-map";
-import type { Agent, Team, Upsell } from "./types";
+import { type MeterDetails, UsageMeter } from "./usage-meter";
+import type { Agent, Meter, Team, Upsell } from "./types";
 
 const MAP_WIDE_KEY = "ai-team-map-wide";
 
@@ -52,12 +53,14 @@ type Props = {
   tourSeen?: boolean;
   /** An agent to open straight away (the floating bubble links here). */
   initialAgent?: string | null;
+  /** The month's AI meter; the details (the usage window) only for those who manage the team. */
+  meter: Meter;
+  meterDetails: MeterDetails | null;
 };
 
-export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone, roles, tourSeen = true, initialAgent = null }: Props) {
+export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone, roles, tourSeen = true, initialAgent = null, meter, meterDetails }: Props) {
   const t = useTranslations("aiTeam");
   const tAssistant = useTranslations("assistant");
-  const locale = useLocale();
   const [selected, setSelected] = useState<string | null>(null);
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [history, setHistory] = useState<ConversationSummary[]>([]);
@@ -110,7 +113,6 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   }
 
   const agent = team.agents.find((a) => a.key === selected) ?? null;
-  const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
 
   async function open(next: Agent) {
     if (next.state !== "active") {
@@ -296,7 +298,9 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
           </>
         ) : (
           <>
-            <p data-tour="ai-usage" className="text-sm text-muted">{t("usage", { used: number.format(team.credits_used), included: number.format(team.credits_included) })}</p>
+            <div data-tour="ai-usage">
+              <UsageMeter meter={meter} details={meterDetails} />
+            </div>
             <div className="flex items-center gap-2">
               <div className="hidden md:block">
                 <SegmentedControl label={t("view")} value={view} onChange={setView} options={[{ value: "map", label: t("views.map") }, { value: "list", label: t("views.list") }]} />

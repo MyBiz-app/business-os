@@ -49,6 +49,8 @@ export async function createQuote(_state: FormState, formData: FormData): Promis
     return errorState(error);
   }
   revalidatePath("/quotes");
+  // In a window over the list the form closes itself, shows the confirmation and opens the quote.
+  if (formData.get("_modal")) return { saved: true, next: `/quotes/${id}` };
   redirect(`/quotes/${id}`);
 }
 

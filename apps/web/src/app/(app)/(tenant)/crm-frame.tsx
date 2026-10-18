@@ -48,9 +48,8 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     { href: "/leads", group: g("clients"), label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
     { href: "/messages", group: g("clients"), label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },
     { href: "/content", group: g("clients"), label: t("nav.content"), icon: "content", permission: "social.read", upgrade: "social" },
-    { href: "/services", group: g("catalog"), label: t("nav.services"), icon: "services", permission: "catalog.read" },
-    { href: "/plans", group: g("catalog"), label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
-    { href: "/quotes", group: g("money"), label: t("nav.quotes"), icon: "quotes", permission: "clients.read" },
+    { href: "/catalog", group: g("catalog"), label: t("nav.catalog"), icon: "catalog", permission: "catalog.read" },
+    { href: "/quotes", group: g("money"), label: t(termsOf(tenant.vertical) === "events" ? "nav.quotesEvents" : "nav.quotes"), icon: "quotes", permission: "clients.read" },
     { href: "/invoices", group: g("money"), label: t("nav.invoices"), icon: "invoices", permission: "sales.manage" },
     ...(vertical(tenant.vertical)?.timeBilling
       ? [
