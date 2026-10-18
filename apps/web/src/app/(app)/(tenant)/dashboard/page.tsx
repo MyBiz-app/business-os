@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { AttentionPanel } from "./attention-panel";
+import { WaitlistHint } from "./waitlist-hint";
 import { usageWarnings } from "@business-os/i18n/usage";
 import { termsOf } from "@business-os/verticals";
 
@@ -238,6 +239,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       )}
 
       <AttentionPanel context={{ api, scope }} />
+      <WaitlistHint context={{ api, scope, tenant }} />
 
       {reports && (
         <PeriodProvider>

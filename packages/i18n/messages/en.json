@@ -245,13 +245,15 @@
         "integrations": "Integrations",
         "audit": "Activity log",
         "data": "Export and close",
-        "help": "Support"
+        "help": "Support",
+        "bookings": "Bookings and waitlists"
       },
       "hints": {
         "business": "Details, legal identity, legal readiness and your business emails.",
         "branding": "Name, color, logo and cover, with a live preview.",
         "data": "Download your business data, or close the business.",
-        "help": "Let our team look at your account, or write to us."
+        "help": "Let our team look at your account, or write to us.",
+        "bookings": "What happens when a class, an appointment or a court is full."
       }
     },
     "branding": {
@@ -297,6 +299,34 @@
         "joinButton": "Join"
       },
       "presetsLabel": "Ready-made colors"
+    },
+    "waitlist": {
+      "title": "Waitlists",
+      "subtitle": "What happens when a spot opens in a class, an appointment or a court that was full.",
+      "enabled": "Keep waitlists",
+      "enabledHint": "Off: a full class cannot be joined and nobody can ask to be told about a free spot.",
+      "classes": "Classes",
+      "appointments": "Personal appointments",
+      "resources": "Courts and rooms",
+      "modes": {
+        "off": "Off",
+        "auto": "Sign in automatically",
+        "first_come": "First to take it",
+        "manual": "Team decides"
+      },
+      "modeHints": {
+        "off": "No waitlist for this kind.",
+        "auto": "The first in line is signed in and told. For requests for a range of hours or a whole day, it works as first to take it.",
+        "first_come": "Everyone waiting is told right away, and whoever takes the spot first gets it.",
+        "manual": "Nobody is told. The team sees the free spot and the waiting list and lets someone in."
+      },
+      "autoHours": "Stop signing in automatically before the class",
+      "hoursBefore": "{hours, plural, =0 {Never stop} one {# hour before} other {# hours before}}",
+      "autoHoursHint": "Closer to the class than this, a free spot is offered to everyone waiting instead, so nobody is signed in without knowing.",
+      "save": "Save",
+      "perService": "A service that works differently",
+      "perServiceHint": "Choose a mode for one service. The business setting applies to the others.",
+      "followBusiness": "Same as the business"
     }
   },
   "locales": {
@@ -496,6 +526,10 @@
       },
       "never": "no visit yet",
       "all": "See all {count}"
+    },
+    "waitlist": {
+      "waiting": "{count, plural, one {# person is waiting for a spot} other {# people are waiting for a spot}}",
+      "top": "Most wanted: {service} ({count})"
     }
   },
   "roles": {
@@ -1228,7 +1262,8 @@
     "publishWeekHint": "Opens the next week of classes for clients now, ahead of the scheduled release.",
     "publishWeekDone": "The schedule is open for clients until {date}.",
     "publishWeekAlready": "The next week is already published.",
-    "publishWeekError": "Couldn't publish the week. Try again."
+    "publishWeekError": "Couldn't publish the week. Try again.",
+    "waitlists": "Waitlists"
   },
   "bookings": {
     "title": "Bookings",
@@ -1524,7 +1559,9 @@
         "health_approved": "The business approved your health declaration. You can book now.",
         "health_rejected": "The business couldn't approve your health declaration. Please contact them.",
         "session_reminder": "Reminder: you're booked into {service} today, {when}.",
-        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking."
+        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking.",
+        "waitlist_spot_open": "A spot opened for {service}, {when}. Open the app to take it.",
+        "waitlist_spot_taken": "The spot for {service}, {when} was taken. You stay on the list."
       }
     },
     "pay": {
@@ -1677,6 +1714,41 @@
         "today": "Today",
         "week": "This week",
         "earlier": "Earlier"
+      }
+    },
+    "waitlist": {
+      "title": "My waitlists",
+      "empty": "You are not waiting for anything. Ask to be told when a time opens up.",
+      "add": "Tell me when something opens",
+      "leave": "Leave the list",
+      "take": "Take it now",
+      "position": "Place {position} in the queue",
+      "spotOpen": "A spot opened: {day}, {time}",
+      "rangeAt": "{day}, {from}-{to}",
+      "slotAt": "{day}, {time}",
+      "dayAt": "{day}, any time",
+      "newTitle": "Tell me when a time opens",
+      "newBody": "We will send you an update as soon as a time matches. The first to take it gets it.",
+      "service": "Service",
+      "day": "Day",
+      "when": "When",
+      "allDay": "Any time that day",
+      "range": "A time range",
+      "from": "From",
+      "to": "Until",
+      "earlier": "{what}: 30 minutes earlier",
+      "later": "{what}: 30 minutes later",
+      "submit": "Add me to the list",
+      "notifyMe": "Tell me if a time opens",
+      "errors": {
+        "generic": "Something went wrong. Try again.",
+        "waitlist_off": "This business does not use a waitlist for this.",
+        "already_waiting": "You are already waiting for this.",
+        "in_the_past": "Pick a day that has not passed.",
+        "too_many": "You can wait for up to 5 things at once.",
+        "on_site": "Visits at your address cannot have a waitlist.",
+        "spot_taken": "Someone was faster. You stay on the list.",
+        "payment_required": "This spot needs payment in the app."
       }
     }
   },
@@ -3263,7 +3335,9 @@
       "session_reminder": "Today: {service} at {when}",
       "plan_ending": "Your plan ends on {date}",
       "friend_request": "{friend} wants to be your friend",
-      "class_invite": "{friend} invited you: {service} on {when}"
+      "class_invite": "{friend} invited you: {service} on {when}",
+      "waitlist_spot_open": "A spot opened: {service} on {when}",
+      "waitlist_spot_taken": "Someone was quicker: {service} on {when}"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -3277,7 +3351,9 @@
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
       "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking.",
       "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
-      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time."
+      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time.",
+      "waitlist_spot_open": "A spot opened up for {service} on {when}, and whoever takes it first gets it. Open the app to take it.",
+      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -9491,6 +9567,48 @@
       "title": "Add the system",
       "body": "Your business is on the website-only track. Add the system (clients, schedule, payments and more) without signing up again. The website price changes to the with-system price.",
       "add": "Add the system"
+    }
+  },
+  "waitlist": {
+    "title": "Waitlists",
+    "subtitle": "Everyone waiting for a class, an appointment or a court. Let someone in when a spot is free, or tell them about it.",
+    "empty": "Nobody is waiting right now.",
+    "filters": {
+      "label": "Filter the waitlists",
+      "day": "Day",
+      "branch": "Branch",
+      "allBranches": "All branches",
+      "service": "Service",
+      "allServices": "All services",
+      "mode": "Mode",
+      "allModes": "All modes",
+      "apply": "Show",
+      "clear": "Clear filters"
+    },
+    "modes": {
+      "off": "Off",
+      "auto": "Sign in automatically",
+      "first_come": "First to take it",
+      "manual": "Team decides"
+    },
+    "kinds": {
+      "session": "Class at {time}",
+      "slot": "Exactly {time}",
+      "range": "Between {from} and {to}",
+      "day": "Any time that day"
+    },
+    "told": "Told about a spot",
+    "openSpot": "Free spot: {when}",
+    "admit": "Let in",
+    "notify": "Tell them",
+    "remove": "Remove",
+    "admitted": "{name} was let in and has been told.",
+    "notified": "{name} was told about the free spot.",
+    "removed": "{name} was taken off the list.",
+    "errors": {
+      "spot_taken": "Someone was faster, the spot is taken.",
+      "no_free_spot": "There is no free spot for this person right now.",
+      "generic": "Something went wrong. Please try again."
     }
   }
 }
