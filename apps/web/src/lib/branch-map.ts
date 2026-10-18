@@ -63,6 +63,7 @@ export async function loadBranchMap({ api, scope, tenant }: Pick<Context, "api" 
       origins: (insightOf(location.id)?.origins ?? []).map((o) => ({ city: o.city_name, clients: o.clients, latitude: o.latitude, longitude: o.longitude })),
       staffCost: insightOf(location.id)?.staff_cost_minor ?? null,
       staffCostMonth: insights?.staff_cost_period ?? null,
+      staffCount: insightOf(location.id)?.staff_count ?? 0,
     };
   });
 }

@@ -538,6 +538,12 @@ def join_waitlist(body: WaitlistRequestCreate, context: ClientDep) -> MyWaitlist
     if day < today or expires_at <= datetime.now(dt.UTC):
         raise HTTPException(status_code=422, detail="in_the_past")
     ensure_may_book(db, context.tenant_id, context.client_id)
+    # Two requests from one client at the same moment must not both pass the cap below: the
+    # second waits here until the first has been saved (the lock ends with the transaction).
+    db.execute(
+        text("SELECT pg_advisory_xact_lock(hashtextextended(:client, 0))"),
+        {"client": str(context.client_id)},
+    )
     active = db.execute(
         text("""
             SELECT count(*) FROM app.waitlist_requests

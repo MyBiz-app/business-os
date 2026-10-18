@@ -1117,8 +1117,9 @@
       "clients": "Active clients",
       "bookings": "Sessions held",
       "occupancy": "Average occupancy",
-      "staffCost": "Team cost (gross pay), {month}",
-      "staffCostHint": "Gross pay only, from the latest payroll month, split by where people clocked in. Employer contributions and other expenses are not included, because there is no expense ledger yet",
+      "staffCost": "Expenses: team cost (gross pay), {month}",
+      "staffCostHint": "Gross pay only, from the latest payroll month, split by where people clocked in. It is the only expense we track: employer contributions and other expenses are not included, because there is no expense ledger yet",
+      "staffCount": "Team members",
       "origins": "Where clients come from",
       "originsEmpty": "No client addresses yet for the people who came in the last 30 days.",
       "originRow": "{city}: {count}",
@@ -1528,6 +1529,9 @@
       "emailNotAllowed": "We can't send email to this address yet. Try another address or contact support.",
       "genericWithCode": "Something went wrong sending the code ({code}). Try again."
     },
+    "cancellationPolicy": {
+      "title": "Cancellation policy"
+    },
     "join": {
       "title": "Join a business",
       "subtitle": "Enter the code the business gave you (it's on their sign or QR code).",
@@ -1545,6 +1549,9 @@
       "lastName": "Last name",
       "nameRequired": "Please enter your first name, so the business knows who you are.",
       "marketing": "Send me offers and news from this business (optional). You can change this any time in your profile.",
+      "joinedTitle": "Welcome to {name}",
+      "joinedBody": "You joined. Before your first booking, here are the business's rules for cancelling.",
+      "toHome": "Continue",
       "legal": "By joining you agree to the business's terms of use and the privacy policy, which you can read on our website."
     },
     "home": {
@@ -1672,6 +1679,8 @@
       "not_found": "This booking no longer exists. Pull down to refresh.",
       "generic": "Something went wrong. Try again.",
       "no_valid_plan": "You need a valid membership or punch card to book. Ask the business.",
+      "period_quota_reached": "You used all the visits your plan allows in this period.",
+      "no_show_limit": "Booking in the app is paused because of missed sessions. Contact the business.",
       "health_declaration_required": "Please fill in the health declaration before booking.",
       "health_declaration_review": "The business needs to approve your health declaration before you can book.",
       "dependent_required": "Choose who's coming.",
@@ -1766,6 +1775,8 @@
         "slot_taken": "That time was just taken. Choose another.",
         "outside_hours": "That time is no longer available. Choose another.",
         "no_valid_plan": "You need a valid plan to book.",
+        "period_quota_reached": "You used all the visits your plan allows in this period.",
+        "no_show_limit": "Booking in the app is paused because of missed sessions. Contact the business.",
         "health_declaration_required": "Please fill in the health declaration before booking.",
         "health_declaration_review": "Your health declaration is waiting for review.",
         "generic": "Something went wrong. Please try again.",
@@ -3541,6 +3552,7 @@
   },
   "reports": {
     "title": "Reports",
+    "withoutStaff": "Without team members",
     "intro": "Which services, staff and hours work best, and which clients need attention.",
     "period": "Period",
     "lastDays": "Last {count} days",
