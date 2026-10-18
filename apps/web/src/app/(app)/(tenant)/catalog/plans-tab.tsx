@@ -70,7 +70,6 @@ export async function PlansTab({ show }: { show: CatalogShow }) {
                       {plan.billing_cycle
                         ? `${t(`plans.cycles.${plan.billing_cycle}`)}${plan.auto_renew ? ` · ${t("plans.autoRenew")}` : ""}`
                         : t("plans.days", { count: plan.validity_days })}
-                      {plan.period_quota && plan.period_unit && ` · ${t(`plans.quotaShort.${plan.period_unit}`, { count: plan.period_quota })}`}
                       {!plan.active && ` · ${t("common.inactive")}`}
                     </span>
                   </span>

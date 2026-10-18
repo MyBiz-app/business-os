@@ -191,23 +191,6 @@ export async function setBookingStatus(
   refreshSession(sessionId);
 }
 
-/** Gives the visit back to a client whose late cancellation or no-show used it up (an exception;
- * the reason is required and kept with who and when). */
-export async function waiveBooking(sessionId: string, bookingId: string, formData: FormData): Promise<void> {
-  const { api, scope } = await getTenant();
-  try {
-    unwrap(
-      await api.POST("/bookings/{booking_id}/waive", {
-        params: { ...scope, path: { booking_id: bookingId } },
-        body: { reason: String(formData.get("reason") ?? "").trim() },
-      }),
-    );
-  } catch (error) {
-    redirect(`/schedule/${sessionId}?error=${bookingError(error)}`);
-  }
-  refreshSession(sessionId);
-}
-
 export async function endSeries(seriesId: string, sessionId: string, lastDate: string): Promise<void> {
   const { api, scope } = await getTenant();
   const result = unwrap(

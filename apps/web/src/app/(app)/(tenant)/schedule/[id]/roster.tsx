@@ -6,10 +6,9 @@ import type { getTenant } from "@/lib/tenant";
 import { Pill, type Tone } from "@/components/pill";
 import { ToastOnChange } from "@/components/toast/toaster";
 import { unwrap } from "@/lib/api";
-import { canSell } from "@/lib/permissions";
 
 import { HEALTH_TONE } from "../../clients/[id]/health-section";
-import { bookClient, bookClientOverCapacity, setBookingStatus, waiveBooking } from "../actions";
+import { bookClient, bookClientOverCapacity, setBookingStatus } from "../actions";
 import { OverCapacityButton } from "./over-capacity-button";
 
 // Who may add a client to a full class (the API enforces the same list).
@@ -28,7 +27,6 @@ const ERRORS = [
   "not_found",
   "dependent_required",
   "unknown_dependent",
-  "nothing_to_return",
 ] as const;
 type BookingErrorKey = (typeof ERRORS)[number];
 const isKnownError = (value: string | undefined): value is BookingErrorKey =>
@@ -106,7 +104,6 @@ export async function Roster({ session, context, manageable, search, error }: Pr
   const full = session.booked >= session.capacity;
   const over = Math.max(0, session.booked - session.capacity);
   const canOverbook = full && OVER_CAPACITY_ROLES.includes(context.tenant.role);
-  const canWaive = canSell(context.tenant);
 
   const row = (booking: Booking) => (
     <li key={booking.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
@@ -131,12 +128,6 @@ export async function Roster({ session, context, manageable, search, error }: Pr
           <Pill tone="warning">{t("overCapacity")}</Pill>
         )}
         {booking.late_cancel && <span className="text-xs text-danger">{t("lateCancel")}</span>}
-        {booking.waived_at ? (
-          <Pill tone="success">{t("waived")}</Pill>
-        ) : (
-          booking.credit_released &&
-          (booking.late_cancel || booking.status === "no_show") && <span className="text-xs text-muted">{t("notCounted")}</span>
-        )}
         {booking.status !== "cancelled" && showHealth(booking.health_state) && (
           <Pill tone={HEALTH_TONE[booking.health_state]}>{tHealth(`states.${booking.health_state}`)}</Pill>
         )}
@@ -148,25 +139,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
           ))}
       </div>
       {manageable && (
-        <div className="flex flex-wrap items-start gap-2">
-          {canWaive && !booking.credit_released && ((booking.status === "cancelled" && booking.late_cancel) || booking.status === "no_show") && (
-            <details className="group relative">
-              <summary className="btn-secondary cursor-pointer px-2.5 py-1 text-xs font-medium">{t("waive.button")}</summary>
-              <form
-                action={waiveBooking.bind(null, session.id, booking.id)}
-                className="absolute end-0 z-10 mt-1 flex w-72 flex-col gap-2 rounded-xl border border-border bg-surface p-3 shadow-lg"
-              >
-                <label className="flex flex-col gap-1 text-xs font-medium">
-                  {t("waive.reason")}
-                  <input name="reason" required minLength={3} maxLength={300} className="control w-full px-3 py-2" placeholder={t("waive.placeholder")} />
-                </label>
-                <p className="text-xs text-muted">{t("waive.note")}</p>
-                <button type="submit" className="btn-primary px-3 py-1.5 text-xs font-medium">
-                  {t("waive.confirm")}
-                </button>
-              </form>
-            </details>
-          )}
+        <div className="flex flex-wrap gap-2">
           {NEXT_ACTIONS[booking.status].map((next) => (
             <form key={next} action={setBookingStatus.bind(null, session.id, booking.id, next)}>
               <button

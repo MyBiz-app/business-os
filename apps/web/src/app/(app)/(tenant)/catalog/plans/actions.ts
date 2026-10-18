@@ -11,13 +11,6 @@ import { getTenant } from "@/lib/tenant";
 const value = (formData: FormData, name: string) => String(formData.get(name) ?? "");
 
 const CYCLES = ["monthly", "quarterly", "yearly", "custom"] as const;
-const UNITS = ["week", "month"] as const;
-
-/** "N visits per week or month" (memberships only); an empty unit means no limit. */
-function readQuota(formData: FormData) {
-  const unit = UNITS.find((option) => option === value(formData, "period_unit"));
-  return unit ? { period_unit: unit, period_quota: Number(value(formData, "period_quota")) || 1 } : { period_unit: null, period_quota: null };
-}
 
 function readCommon(formData: FormData, currency: string) {
   const price = toMinorUnits(value(formData, "price"), currency);
@@ -50,7 +43,6 @@ export async function createPlan(_state: FormState, formData: FormData): Promise
           billing_cycle: renewing ? cycle : null,
           billing_cycle_days: renewing && cycle === "custom" ? Number(value(formData, "billing_cycle_days")) : null,
           auto_renew: renewing && formData.get("auto_renew") === "on",
-          ...(kind === "membership" ? readQuota(formData) : {}),
         },
       }),
     );
@@ -71,7 +63,6 @@ export async function updatePlan(planId: string, _state: FormState, formData: Fo
     ...rest,
     ...(formData.has("validity_days") ? { validity_days: common.validity_days } : {}),
     ...(formData.has("auto_renew_shown") ? { auto_renew: formData.get("auto_renew") === "on" } : {}),
-    ...(formData.has("period_unit") ? readQuota(formData) : {}),
   };
   try {
     unwrap(await api.PATCH("/plans/{plan_id}", { params: { ...scope, path: { plan_id: planId } }, body }));

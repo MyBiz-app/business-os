@@ -33,30 +33,9 @@ export function BookingActions({
   const [failed, setFailed] = useState(false);
   if (!business) return null;
 
-  /** What cancelling now would do, from the business's cancellation policy (the server decides). */
-  const warning = async (): Promise<string> => {
-    const preview = await api
-      .GET("/client/bookings/{booking_id}/cancel-preview", { params: { ...scope, path: { booking_id: booking.id } } })
-      .then((r) => r.data)
-      .catch(() => undefined);
-    if (!preview) {
-      const late = isLateCancel(booking.starts_at, business.cancellation_window_minutes, Date.now());
-      return late ? t("cancelLateMessage") : t("cancelMessage");
-    }
-    if (preview.outcome === "free") return t("cancelMessage");
-    if (preview.outcome === "recorded") return t("cancelLateRecorded");
-    if (preview.period_quota && preview.period_unit) {
-      return t("cancelLateQuota", { count: preview.period_quota, unit: preview.period_unit, used: preview.period_used ?? 0 });
-    }
-    if (preview.plan_kind === "punch_card") return t("cancelLateCard", { plan: preview.plan_name ?? "" });
-    return t("cancelLateCounts");
-  };
-
   const cancel = async () => {
-    setBusy(true);
-    const message = await warning();
-    setBusy(false);
-    const ok = await confirm(t("cancelTitle"), message, t("cancelConfirm"), t("keep"));
+    const late = isLateCancel(booking.starts_at, business.cancellation_window_minutes, Date.now());
+    const ok = await confirm(t("cancelTitle"), late ? t("cancelLateMessage") : t("cancelMessage"), t("cancelConfirm"), t("keep"));
     if (!ok) return;
     setBusy(true);
     setFailed(false);

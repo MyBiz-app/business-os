@@ -22,7 +22,6 @@ from app.api.bookings import (
     lock_session,
     place_booking,
 )
-from app.api.cancellation import ensure_within_no_show_limit
 from app.api.clients import join_as_member, member_join_code
 from app.api.closed_days import ClosedDay
 from app.api.common import blank_to_none, not_found
@@ -524,7 +523,6 @@ def book_session(
     if starts_at >= release.opens_before(time_zone):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_released")
     ensure_may_book(context.session, context.tenant_id, context.client_id)
-    ensure_within_no_show_limit(context.session, context.client_id)
     requires_plan = context.session.execute(
         text("SELECT booking_requires_plan FROM app.tenants WHERE id = :id"),
         {"id": context.tenant_id},
@@ -562,15 +560,11 @@ def my_bookings(context: ClientDep) -> list[ClientBooking]:
             SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
                    s.status AS session_status, b.status, b.late_cancel,
                    d.name AS dependent_name,
-                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating,
-                   CASE WHEN b.status IN ('booked', 'waitlisted') THEN
-                       s.starts_at - make_interval(mins => ct.free_minutes)
-                   END AS free_cancel_until
+                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating
             FROM app.bookings b
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
             LEFT JOIN app.dependents d ON d.id = b.dependent_id
-            CROSS JOIN LATERAL app.cancellation_terms(b.session_id, b.entitlement_id) ct
             WHERE b.client_id = app.current_client_id()
             ORDER BY s.starts_at DESC
             LIMIT 200

@@ -99,17 +99,6 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
         text(f"UPDATE app.tenants SET {assignments} WHERE id = app.current_tenant_id()"),
         changes,
     )
-    if "cancellation_window_minutes" in changes:
-        # The one window set the old way: a saved cancellation policy follows it for every kind.
-        context.session.execute(
-            text("""
-                UPDATE app.cancellation_policies
-                SET group_minutes = :minutes, personal_minutes = :minutes,
-                    resource_minutes = :minutes, updated_at = now()
-                WHERE scope = 'business'
-            """),
-            {"minutes": changes["cancellation_window_minutes"]},
-        )
     # The names of what changed, never the values (an address, a business number).
     record(
         context.session,
