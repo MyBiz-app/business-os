@@ -1919,7 +1919,61 @@
     "firstRun": "First run: {when}",
     "upTo": "Up to {credits} credits per run, read-only; anything it proposes waits for your approval."
   },
+  "tour": {
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip the guide",
+    "done": "Done",
+    "progress": "Step {current} of {total}"
+  },
   "aiTeam": {
+    "tour": {
+      "help": "Guide",
+      "team": {
+        "title": "Meet your team",
+        "body": "Every agent has a job of its own. The chief knows who to send you to, so you can always start with it."
+      },
+      "talk": {
+        "title": "How to talk to them",
+        "body": "Click an agent on the map to open a chat. On every other screen a round button sits in the corner: click it to talk to the agent that fits the screen, or press and hold to see the whole team. Ask in plain words, for example \"Who didn't show up this week?\".",
+        "appBody": "In the app, open the AI team from the menu and tap an agent to talk. Ask in plain words, for example \"Who didn't show up this week?\"."
+      },
+      "approvals": {
+        "title": "What they do alone, and what waits for you",
+        "body": "Reading, searching and summing up they do on their own. Anything sensitive, like messaging your clients or changing something in the system, waits for your approval on a card, and the system checks it again before it happens. Try it on this example:"
+      },
+      "usage": {
+        "title": "How much AI was used",
+        "body": "Every chat uses credits from your monthly plan. The bar above the map shows how much of what is included has been used so far."
+      },
+      "hire": {
+        "title": "Hire an agent of your own",
+        "body": "Use \"Hire an agent\" to set up a new one: a name, a job, a way of speaking, the branches it knows and who may use it.",
+        "bodyMember": "Owners and managers can hire an agent of their own: a name, a job, a way of speaking, the branches it knows and who may use it."
+      },
+      "spots": {
+        "map": {
+          "title": "The map",
+          "body": "Click an agent to talk to it. On a wide screen you can also switch to a list."
+        },
+        "toolbar": {
+          "title": "The toolbar",
+          "body": "Switch between the map and the list here. Whoever may edit the team also changes its structure from here."
+        },
+        "meter": {
+          "title": "The usage meter",
+          "body": "This is how many of this month's credits have been used."
+        }
+      },
+      "simulation": {
+        "label": "Example chat, nothing is sent",
+        "question": "Who didn't show up this week?",
+        "answer": "{name}: three clients booked and didn't come this week: Dana Cohen, Yossi Levi and Michal Barak. Want me to send them a reminder with a link to book a new class?",
+        "card": "Send a reminder to 3 clients",
+        "confirmed": "In this example nothing was sent. In a real chat the message goes out only after you confirm.",
+        "rejected": "In this example nothing was sent. In a real chat the request would simply be dropped."
+      }
+    },
     "title": "AI team",
     "subtitle": "Your agents, each with a job. Pick one to talk, or ask the chief and it will point you to the right one.",
     "mapLabel": "The AI team",

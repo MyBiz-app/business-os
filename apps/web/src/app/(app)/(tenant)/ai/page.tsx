@@ -27,7 +27,7 @@ export default async function AiTeamPage({ searchParams }: PageProps<"/ai">) {
   if (!canUseAssistant(tenant)) redirect("/dashboard");
   if (!tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")) redirect("/upgrade/ai");
 
-  const [team, status, catalog, branches, roles, tasks, proactive, meter] = await Promise.all([
+  const [team, status, catalog, branches, roles, tasks, proactive, meter, tours] = await Promise.all([
     api.GET("/ai/team", { params: scope }).then(unwrap),
     api.GET("/ai/status", { params: scope }).then(unwrap),
     api.GET("/modules/catalog", { params: { query: { currency: tenant.currency } } }).then(unwrap),
@@ -37,6 +37,8 @@ export default async function AiTeamPage({ searchParams }: PageProps<"/ai">) {
     api.GET("/ai/tasks", { params: scope }).then(unwrap),
     api.GET("/ai/tasks/proactive", { params: scope }).then(unwrap),
     api.GET("/ai/meter", { params: scope }).then(unwrap),
+    // The first-time guide is a nicety: if this fails the page still opens, without it.
+    api.GET("/me/tours").then((r) => r.data?.seen ?? ["ai_team"]),
   ]);
 
   // The usage window is for those who manage the team: the whole business, by person and agent.
@@ -63,7 +65,7 @@ export default async function AiTeamPage({ searchParams }: PageProps<"/ai">) {
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <TeamView team={team} branches={branches.map(({ id, name }) => ({ id, name }))} enabled={status.enabled} demo={status.demo} upsells={upsells} canAdd={canManageSettings(tenant)} timeZone={tenant.time_zone} roles={roles} initialAgent={typeof agent === "string" ? agent : null} meter={meter} meterDetails={meterDetails} />
+      <TeamView team={team} branches={branches.map(({ id, name }) => ({ id, name }))} enabled={status.enabled} demo={status.demo} upsells={upsells} canAdd={canManageSettings(tenant)} timeZone={tenant.time_zone} roles={roles} tourSeen={tours.includes("ai_team")} initialAgent={typeof agent === "string" ? agent : null} meter={meter} meterDetails={meterDetails} />
       {/* The two cards share one width, padding and header, side by side on a wide screen. */}
       <div className="grid gap-6 xl:grid-cols-2 xl:items-start">
         <ProactiveSettingsPanel settings={proactive} timeZone={tenant.time_zone} />
