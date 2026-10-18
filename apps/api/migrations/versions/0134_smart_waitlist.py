@@ -393,8 +393,24 @@ def upgrade() -> None:
         )
     """)
     op.execute("CREATE INDEX waitlist_offers_client ON app.waitlist_offers (tenant_id, client_id)")
+    # Foreign keys are indexed so deleting a service, branch, class or booking stays cheap.
+    for statement in (
+        "CREATE INDEX waitlist_requests_service ON app.waitlist_requests (service_id)",
+        "CREATE INDEX waitlist_requests_staff ON app.waitlist_requests (staff_user_id)"
+        " WHERE staff_user_id IS NOT NULL",
+        "CREATE INDEX waitlist_requests_location ON app.waitlist_requests (location_id)"
+        " WHERE location_id IS NOT NULL",
+        "CREATE INDEX waitlist_requests_offered ON app.waitlist_requests (offered_session_id)"
+        " WHERE offered_session_id IS NOT NULL",
+        "CREATE INDEX waitlist_offers_request ON app.waitlist_offers (request_id)"
+        " WHERE request_id IS NOT NULL",
+        "CREATE INDEX waitlist_offers_booking ON app.waitlist_offers (booking_id)"
+        " WHERE booking_id IS NOT NULL",
+        "CREATE INDEX waitlist_offers_tenant ON app.waitlist_offers (tenant_id)",
+    ):
+        op.execute(statement)
     op.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON app.waitlist_requests TO app_api")
-    op.execute("GRANT SELECT, UPDATE ON app.waitlist_offers TO app_api")
+    op.execute("GRANT SELECT, UPDATE, DELETE ON app.waitlist_offers TO app_api")
     for table in ("waitlist_requests", "waitlist_offers"):
         op.execute(f"ALTER TABLE app.{table} ENABLE ROW LEVEL SECURITY")
         op.execute(f"""

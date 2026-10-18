@@ -168,7 +168,7 @@ ENTRIES_SQL = """
       AND (CAST(:service AS uuid) IS NULL OR e.service_id = CAST(:service AS uuid))
       AND (CAST(:mode AS text) IS NULL OR app.waitlist_mode_for(e.service_id) = CAST(:mode AS text))
     ORDER BY e.day, sv.name, e.position, e.id
-    LIMIT 300
+    LIMIT 200
 """
 
 
@@ -493,6 +493,7 @@ MY_ENTRIES_SQL = """
     ) o ON true
     LEFT JOIN app.sessions os ON os.id = o.session_id
     ORDER BY e.day, e.starts_at NULLS LAST, e.created_at
+    LIMIT 50
 """
 
 

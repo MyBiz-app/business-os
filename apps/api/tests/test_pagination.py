@@ -62,6 +62,9 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # the SQL returns at most 200 (staff) or 50 (one client: five requests and a few class places)
+    "/waitlist": "limit in SQL",
+    "/client/waitlist": "limit in SQL",
     # one person's AI connections in one business: at most 20 (the cap when approving)
     "/mcp-connections": "capped",
     # the console's unpaid-invoice list: the function returns at most 500 businesses
