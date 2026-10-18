@@ -1,10 +1,22 @@
+# ruff: noqa: F811, F401
 import calendar
+import json
 from datetime import date, timedelta
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
+from app.ai.untrusted import unwrap
 from tests.conftest import AuthHeaders, local_today
+from tests.test_assistant import (
+    FakeProvider,
+    ask,
+    calls,
+    conversation,
+    enable_ai_pro,
+    says,
+    use_provider,
+)
 from tests.test_client_app import member
 from tests.test_plans import card, sell
 
@@ -336,3 +348,113 @@ def test_a_punch_card_cannot_be_frozen_by_request(
     response = request_freeze(client, auth(user, studio["tenant_id"]), entitlement["id"], 2, 3)
 
     assert response.status_code == 409 and response.json()["detail"] == "not_freezable"
+
+
+PDF = b"%PDF-1.4 a medical note"
+
+
+def test_a_paper_can_be_attached_to_a_request(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    staff = studio["headers"]
+    set_rules(client, staff)
+    alice, entitlement, joined = renewing_client(client, auth, studio)
+    bob, bob_entitlement, _ = renewing_client(client, auth, studio)
+
+    uploaded = client.post(
+        "/client/documents",
+        files={"file": ("medical-note.pdf", PDF, "application/pdf")},
+        headers=alice,
+    )
+    assert uploaded.status_code == 201, uploaded.text
+    document = uploaded.json()
+
+    sent = request_freeze(client, alice, entitlement["id"], 3, 10, document_id=document["id"])
+    assert sent.status_code == 201, sent.text
+    request = sent.json()
+    assert request["document_id"] == document["id"]
+    assert request["document_name"] == "medical-note.pdf"
+
+    # The manager sees the request with the paper and opens it from Files.
+    waiting = client.get("/freeze-requests", params={"status": "pending"}, headers=staff).json()
+    assert [r["document_id"] for r in waiting] == [document["id"]]
+    opened = client.get(f"/documents/{document['id']}/file", headers=staff)
+    assert opened.status_code == 200 and opened.content == PDF
+
+    # Someone else's paper, a paper the business shared, or no paper at all is refused.
+    theirs = client.post(
+        "/client/documents",
+        files={"file": ("other.pdf", PDF, "application/pdf")},
+        headers=bob,
+    ).json()
+    stolen = request_freeze(client, alice, entitlement["id"], 15, 3, document_id=theirs["id"])
+    assert stolen.status_code == 422 and stolen.json()["detail"] == "bad_document"
+    missing = request_freeze(client, alice, entitlement["id"], 15, 3, document_id=str(uuid4()))
+    assert missing.status_code == 422 and missing.json()["detail"] == "bad_document"
+    shared = client.post(
+        f"/clients/{joined['client_id']}/documents",
+        files={"file": ("contract.pdf", PDF, "application/pdf")},
+        data={"name": "contract.pdf", "kind": "contract", "shared": "true"},
+        headers=staff,
+    ).json()
+    assert (
+        request_freeze(
+            client, alice, entitlement["id"], 15, 3, document_id=shared["id"]
+        ).status_code
+        == 422
+    )
+    plain = request_freeze(client, bob, bob_entitlement["id"], 3, 3)
+    assert plain.json()["document_id"] is None
+
+
+def test_the_defaults_follow_decision_18_11(client: TestClient, studio: dict) -> None:
+    rules = client.get("/freeze-rules", headers=studio["headers"]).json()
+    assert rules["yearly_bank_days"] == 30 and rules["max_days"] == 90
+    assert rules["billing_mode"] == "defer" and rules["allow_requests"] is False
+    # A business can still lift the bank.
+    saved = client.put(
+        "/freeze-rules",
+        json={"allow_requests": True, "yearly_bank_days": None},
+        headers=studio["headers"],
+    )
+    assert saved.json()["yearly_bank_days"] is None
+
+
+def test_the_assistant_suggests_a_freeze_but_never_makes_one(
+    client: TestClient, studio: dict, auth: AuthHeaders, use_provider
+) -> None:
+    staff = studio["headers"]
+    enable_ai_pro(client, studio)
+    set_rules(client, staff, yearly_bank_days=30)
+    _, entitlement, joined = renewing_client(client, auth, studio)
+    start = local_today() + timedelta(days=3)
+    provider = FakeProvider(
+        [
+            calls(
+                "suggest_freeze",
+                {
+                    "client_id": joined["client_id"],
+                    "start_date": start.isoformat(),
+                    "end_date": (start + timedelta(days=13)).isoformat(),
+                },
+            ),
+            says("They could freeze for two weeks."),
+        ]
+    )
+    use_provider(provider)
+
+    ask(client, staff, conversation(client, staff), "Dana is travelling, can we keep her?")
+
+    result = json.loads(unwrap(provider.calls[1]["messages"][-1]["content"][0]["content"]))
+    assert result["business_accepts_requests"] is True
+    assert result["days"] == 14 and result["freeze_days_left_this_year"] == 30
+    [membership] = [m for m in result["memberships"] if m["entitlement_id"] == entitlement["id"]]
+    assert membership["would_be_refused_because"] == []
+    assert (
+        membership["would_end_on"]
+        == (date.fromisoformat(entitlement["ends_on"]) + timedelta(days=14)).isoformat()
+    )
+    # Nothing changed: no freeze, no request.
+    after = client.get(f"/clients/{joined['client_id']}/entitlements", headers=staff).json()
+    assert after[0]["freezes"] == []
+    assert client.get("/freeze-requests", headers=staff).json() == []

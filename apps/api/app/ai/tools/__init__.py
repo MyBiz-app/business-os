@@ -25,6 +25,7 @@ from app.ai.tools.reading import (
     list_sessions,
     logged_time,
     open_balances,
+    suggest_freeze,
 )
 from app.ai.tools.social import (
     audience_summary,
@@ -123,6 +124,16 @@ TOOLS: dict[str, Tool] = {
             {"days": {"type": "integer"}},
             Permission.CLIENTS_READ,
             inactive_members,
+        ),
+        Tool(
+            "suggest_freeze",
+            "Suggest freezing a member's plan instead of letting them leave (they are away, "
+            "injured, or stopped coming): for the local dates (inclusive) it shows, per "
+            "membership, the new end date, how the next charge moves and why the business would "
+            "refuse. Only a suggestion: nothing is frozen; the client asks in the app.",
+            {"client_id": ID, "start_date": DATE, "end_date": DATE},
+            Permission.CLIENTS_READ,
+            suggest_freeze,
         ),
         Tool(
             "lead_pipeline",
@@ -349,6 +360,7 @@ TOOL_DOMAINS: dict[str, str] = {
     "find_clients": "clients",
     "get_client": "clients",
     "inactive_members": "clients",
+    "suggest_freeze": "clients",
     "list_sessions": "schedule",
     "free_courts": "schedule",
     "get_session_roster": "bookings",
@@ -388,6 +400,7 @@ MCP_READ_TOOLS: frozenset[str] = frozenset(
         "find_clients",
         "get_client",
         "inactive_members",
+        "suggest_freeze",
         "list_sessions",
         "free_courts",
         "get_session_roster",
