@@ -607,7 +607,25 @@
     "sidebarDark": "Use a dark sidebar",
     "quotesEvents": "Quotes and events",
     "catalog": "Catalog",
-    "website": "My website"
+    "website": "My website",
+    "expand": "Open {name} menu",
+    "collapse": "Close {name} menu",
+    "sub": {
+      "people": "People",
+      "organization": "Organization",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "shiftSwaps": "Shift swaps",
+      "timeClock": "Time clock",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "roles": "Roles",
+      "clientList": "List",
+      "clientImport": "Import",
+      "orders": "Orders",
+      "aiTeam": "Team",
+      "aiTasks": "Tasks"
+    }
   },
   "terms": {
     "fitness": {
