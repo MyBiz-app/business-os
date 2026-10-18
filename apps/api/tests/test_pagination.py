@@ -62,6 +62,9 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # waiting requests first, then the latest decided: LIMIT 200 (a business) and 50 (a client)
+    "/freeze-requests": "limit in SQL",
+    "/client/freeze-requests": "limit in SQL",
     # the console's unpaid-invoice list: the function returns at most 500 businesses
     "/platform/billing/overdue": "capped",
     # the SQL function returns at most 5 open banners, or the latest 50
