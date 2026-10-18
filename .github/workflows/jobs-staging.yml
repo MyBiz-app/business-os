@@ -1,6 +1,6 @@
 name: Background jobs on staging
 
-# Daily system jobs (see apps/api/app/jobs.py). Scheduled runs use the default branch.
+# Daily system jobs (see apps/api/app/jobs/). Scheduled runs use the default branch.
 on:
   schedule:
     - cron: "17 2 * * *"  # 02:17 UTC, early morning in Israel

@@ -1,6 +1,6 @@
 name: Hourly jobs on staging
 
-# Jobs that must run close to a business's chosen time of day (see apps/api/app/jobs.py).
+# Jobs that must run close to a business's chosen time of day (see apps/api/app/jobs/).
 # Scheduled runs use the default branch.
 on:
   schedule:

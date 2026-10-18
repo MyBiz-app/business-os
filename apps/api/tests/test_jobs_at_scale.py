@@ -146,7 +146,7 @@ def test_a_job_never_runs_twice_at_once(engine: Engine, monkeypatch: pytest.Monk
 
 
 def test_retention_deletes_in_batches(engine: Engine, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(jobs, "PURGE_BATCH", 3)
+    monkeypatch.setattr(jobs.retention, "PURGE_BATCH", 3)
     old = datetime.now(UTC) - timedelta(days=800)
     with engine.begin() as conn:
         conn.execute(
