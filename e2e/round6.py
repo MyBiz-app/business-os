@@ -93,7 +93,7 @@ with sync_playwright() as p:
             before = acknowledge.count()
             acknowledge.first.click()
             expect(acknowledge).to_have_count(before - 1, timeout=15000)
-        sheet.get_by_role("button", name="סגירה").click()
+        sheet.get_by_role("button", name="סגירת החלון").click()
     for step, hint in (
         ("נעילת השעות והמשך", "להוסיף בונוסים"),
         ("המשך לבדיקה", "לתקן כל שגיאה"),
