@@ -246,14 +246,16 @@
         "audit": "Activity log",
         "data": "Export and close",
         "help": "Support",
-        "bookings": "Bookings and waitlists"
+        "bookings": "Bookings and waitlists",
+        "memberships": "Memberships and freezes"
       },
       "hints": {
         "business": "Details, legal identity, legal readiness and your business emails.",
         "branding": "Name, color, logo and cover, with a live preview.",
         "data": "Download your business data, or close the business.",
         "help": "Let our team look at your account, or write to us.",
-        "bookings": "What happens when a class, an appointment or a court is full."
+        "bookings": "What happens when a class, an appointment or a court is full.",
+        "memberships": "Whether clients can ask to freeze from the app, and the rules."
       }
     },
     "branding": {
@@ -327,6 +329,28 @@
       "perService": "A service that works differently",
       "perServiceHint": "Choose a mode for one service. The business setting applies to the others.",
       "followBusiness": "Same as the business"
+    },
+    "freezeRules": {
+      "title": "Freezing a membership",
+      "intro": "Clients can ask to freeze a membership from the app. You approve each request, or let some reasons be approved automatically.",
+      "allow": "Let clients ask to freeze in the app",
+      "minDays": "Shortest freeze (days)",
+      "maxDays": "Longest freeze (days)",
+      "bank": "Freeze days per client per year",
+      "bankHint": "Leave empty for no limit. Clients see how many days are left.",
+      "notice": "Notice before the freeze (days)",
+      "fee": "Freeze fee",
+      "feeHint": "Added to the next charge. Leave 0 for no fee.",
+      "billingMode": "Renewing memberships",
+      "billingModes": {
+        "defer": "Move the next charge by the frozen days",
+        "credit": "Credit the frozen days on the next charge"
+      },
+      "billingHint": "Prepaid memberships always get their end date extended by the frozen days.",
+      "autoApprove": "Approve these reasons automatically",
+      "autoApproveHint": "A request for one of these takes effect at once, without a manager.",
+      "save": "Save",
+      "saved": "Saved."
     }
   },
   "locales": {
@@ -515,14 +539,16 @@
         "inactive": "Haven't come in lately",
         "leads_due": "Leads to call back",
         "health_review": "Health declarations to review",
-        "license_expiring": "Business licence about to expire"
+        "license_expiring": "Business licence about to expire",
+        "freeze_requests": "Freeze requests to decide"
       },
       "dates": {
         "plan_ending": "until {date}",
         "inactive": "last visit {date}",
         "leads_due": "since {date}",
         "health_review": "signed {date}",
-        "license_expiring": "expires {date}"
+        "license_expiring": "expires {date}",
+        "freeze_requests": "from {date}"
       },
       "never": "no visit yet",
       "all": "See all {count}"
@@ -1561,7 +1587,9 @@
         "session_reminder": "Reminder: you're booked into {service} today, {when}.",
         "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking.",
         "waitlist_spot_open": "A spot opened for {service}, {when}. Open the app to take it.",
-        "waitlist_spot_taken": "The spot for {service}, {when} was taken. You stay on the list."
+        "waitlist_spot_taken": "The spot for {service}, {when} was taken. You stay on the list.",
+        "freeze_approved": "Your freeze of {plan} was approved: {from} - {date}.",
+        "freeze_rejected": "Your freeze request for {plan} wasn't approved."
       }
     },
     "pay": {
@@ -1750,6 +1778,38 @@
         "spot_taken": "Someone was faster. You stay on the list.",
         "payment_required": "This spot needs payment in the app."
       }
+    },
+    "freeze": {
+      "title": "Freeze my plan",
+      "request": "Freeze",
+      "backTo": "My bookings",
+      "off": "This business doesn't take freeze requests in the app. Ask the front desk.",
+      "pickStart": "Tap the first day of the freeze",
+      "pickEnd": "Now tap the last day",
+      "range": "{from} - {to} · {days, plural, one {# day} other {# days}}",
+      "reason": "Reason",
+      "note": "Note (optional)",
+      "bank": "{remaining, plural, one {# freeze day left this year} other {# freeze days left this year}} of {total}",
+      "whatHappens": "What will happen",
+      "newEnd": "Your plan will be valid until {date}.",
+      "shift": "Your next charge moves from {from} to {to}.",
+      "credit": "You'll get a credit of {amount} on your next charge.",
+      "fee": "A freeze fee of {amount} is added to your next charge.",
+      "nextAmount": "Your next charge will be {amount}.",
+      "auto": "This reason is approved right away.",
+      "manual": "The business will review your request and let you know.",
+      "send": "Send request",
+      "sendNow": "Freeze now",
+      "sent": "Your request was sent. You'll get an update when the business decides.",
+      "done": "Done. Your plan is frozen.",
+      "myRequests": "My requests",
+      "withdraw": "Withdraw",
+      "backEarly": "I'm back early",
+      "backEarlyTitle": "End the freeze now?",
+      "backEarlyMessage": "Your plan opens again today, and the dates and next charge go back by the unused days.",
+      "backEarlyDone": "Welcome back! Your plan is active again.",
+      "frozenRange": "Frozen {from} - {to}",
+      "keep": "Keep frozen"
     }
   },
   "join": {
@@ -1825,7 +1885,11 @@
       "generic": "Something went wrong. Try again.",
       "not_active": "This plan is no longer active.",
       "outside_validity": "The freeze must start while the plan is valid.",
-      "overlapping_freeze": "That overlaps an existing freeze."
+      "overlapping_freeze": "That overlaps an existing freeze.",
+      "not_a_membership": "Only memberships can be frozen.",
+      "request_not_pending": "This request was already decided.",
+      "not_freezable": "This plan can't be frozen now.",
+      "freeze_over": "That freeze is already over."
     },
     "validityRange": "Valid {from} - {to}",
     "paymentMethod": "Payment method",
@@ -1833,7 +1897,36 @@
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
       "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
     },
-    "created": "Plan created."
+    "created": "Plan created.",
+    "cycle": "Billing cycle",
+    "cycles": {
+      "none": "Paid in advance, no renewal",
+      "monthly": "Monthly",
+      "quarterly": "Every 3 months",
+      "yearly": "Yearly",
+      "custom": "Every N days"
+    },
+    "cycleDays": "Days in a cycle",
+    "cycleHint": "The membership is valid for one cycle at a time.",
+    "autoRenew": "Renews automatically",
+    "autoRenewHint": "Charged at the start of each cycle. Payments are simulated until a payment provider is connected.",
+    "renews": "Renews {date} · {amount}",
+    "renewsOff": "Next billing {date}",
+    "freezeShifted": "Next charge moved by {days, plural, one {# day} other {# days}}",
+    "freezeCredit": "Credit {amount}",
+    "freezeFee": "Fee {amount}",
+    "punchNoFreeze": "Punch cards can't be frozen.",
+    "endEarly": "Client is back",
+    "endEarlyDone": "The freeze ended. Dates and the next charge were updated.",
+    "requestsTitle": "Freeze requests",
+    "requestLine": "{from} - {to} · {days, plural, one {# day} other {# days}} · {reason}",
+    "approve": "Approve",
+    "approvePartial": "Approve until",
+    "reject": "Decline",
+    "decisionNote": "Message to the client (optional)",
+    "decided": "Done.",
+    "requestsRequestedBy": "Requested by the client in the app",
+    "autoApproved": "Approved automatically"
   },
   "metrics": {
     "revenue": "Revenue",
@@ -3337,7 +3430,9 @@
       "friend_request": "{friend} wants to be your friend",
       "class_invite": "{friend} invited you: {service} on {when}",
       "waitlist_spot_open": "A spot opened: {service} on {when}",
-      "waitlist_spot_taken": "Someone was quicker: {service} on {when}"
+      "waitlist_spot_taken": "Someone was quicker: {service} on {when}",
+      "freeze_approved": "Your freeze was approved: {from} to {date}",
+      "freeze_rejected": "About your freeze request"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -3353,7 +3448,9 @@
       "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
       "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time.",
       "waitlist_spot_open": "A spot opened up for {service} on {when}, and whoever takes it first gets it. Open the app to take it.",
-      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens."
+      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens.",
+      "freeze_approved": "{business} approved freezing your {plan} from {from} to {date}. Your end date moves by the same number of days.",
+      "freeze_rejected": "{business} couldn't approve freezing your {plan} from {from} to {date}."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -9547,6 +9644,33 @@
       "spot_taken": "Someone was faster, the spot is taken.",
       "no_free_spot": "There is no free spot for this person right now.",
       "generic": "Something went wrong. Please try again."
+    }
+  },
+  "freeze": {
+    "reasons": {
+      "travel": "Travel abroad",
+      "reserve_duty": "Reserve duty",
+      "illness": "Illness or injury",
+      "pregnancy": "Pregnancy",
+      "other": "Other"
+    },
+    "problems": {
+      "freeze_requests_off": "This business doesn't take freeze requests in the app. Ask the front desk.",
+      "not_freezable": "This plan can't be frozen.",
+      "too_short": "The freeze is shorter than the business allows.",
+      "too_long": "The freeze is longer than the business allows.",
+      "notice_required": "Freezes must be requested earlier than that.",
+      "outside_validity": "The freeze must start while the plan is valid.",
+      "overlapping_freeze": "That overlaps an existing freeze.",
+      "overlapping_request": "You already have a request for those days.",
+      "bank_exceeded": "That is more freeze days than you have left this year.",
+      "generic": "Something went wrong. Try again."
+    },
+    "status": {
+      "pending": "Waiting for approval",
+      "approved": "Approved",
+      "rejected": "Declined",
+      "cancelled": "Withdrawn"
     }
   }
 }

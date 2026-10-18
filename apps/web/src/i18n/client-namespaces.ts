@@ -48,6 +48,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "dependents",
     "documents",
     "files",
+    "freeze",
     "hours",
     "identity",
     "imageCrop",

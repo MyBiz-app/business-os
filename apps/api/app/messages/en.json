@@ -21,7 +21,9 @@
       "friend_request": "{friend} wants to be your friend",
       "class_invite": "{friend} invited you: {service} on {when}",
       "waitlist_spot_open": "A spot opened: {service} on {when}",
-      "waitlist_spot_taken": "Someone was quicker: {service} on {when}"
+      "waitlist_spot_taken": "Someone was quicker: {service} on {when}",
+      "freeze_approved": "Your freeze was approved: {from} to {date}",
+      "freeze_rejected": "About your freeze request"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -37,7 +39,9 @@
       "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
       "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time.",
       "waitlist_spot_open": "A spot opened up for {service} on {when}, and whoever takes it first gets it. Open the app to take it.",
-      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens."
+      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens.",
+      "freeze_approved": "{business} approved freezing your {plan} from {from} to {date}. Your end date moves by the same number of days.",
+      "freeze_rejected": "{business} couldn't approve freezing your {plan} from {from} to {date}."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
