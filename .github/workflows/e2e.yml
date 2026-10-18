@@ -87,6 +87,7 @@ jobs:
             python e2e/round6.py
 
       - name: Check the wide-screen layouts (phone to ultra-wide)
+        timeout-minutes: 10
         run: |
           uv run --with playwright --with "psycopg[binary]" python e2e/wide_screens.py "$ADMIN_EMAIL"
 

@@ -23,7 +23,9 @@ faulthandler.dump_traceback_later(300, exit=True)  # a hang shows where it stood
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=h.chromium())
     page = browser.new_context(locale="he-IL", viewport={"width": 1440, "height": 900}).new_page()
+    print("signing in", flush=True)
     h.login(page, OWNER)
+    print("signed in", flush=True)
     for width in WIDTHS:
         page.set_viewport_size({"width": width, "height": 1000})
         for path, kind in PAGES:
