@@ -67,7 +67,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
           </h1>
           <p className="text-lg text-muted">{t("finish.subtitle")}</p>
         </div>
-        <FinishForm plan={encodePlan(plan)} />
+        <FinishForm plan={encodePlan(plan)} offerSample={plan.track !== "existing"} />
         <p className="flex items-center gap-2 text-sm text-muted">
           <Lock aria-hidden="true" className="size-4" />
           {t("finish.secure")}
