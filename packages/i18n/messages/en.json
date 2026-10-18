@@ -2550,7 +2550,8 @@
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
       "noPack": "Included amount",
-      "social_studio": "Content studio"
+      "social_studio": "Content studio",
+      "payroll": "Payroll"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -2574,7 +2575,8 @@
       "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
       "noSupport": "Email and help center, an answer by the next business day.",
       "noPack": "2 GB for files and 200 messages a month.",
-      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post."
+      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post.",
+      "payroll": "Monthly payroll runs, payslips, Form 101 and the bank transfer file, for up to 10 staff."
     },
     "followsBranches": "Follows your active branches",
     "supportTier": "Support",
