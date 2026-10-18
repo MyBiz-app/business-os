@@ -88,7 +88,7 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
     const nodes = markers.current;
     (async () => {
       try {
-        const maplibre = (await import("maplibre-gl")).default;
+        const maplibre = await import("maplibre-gl");
         if (cancelled || !container.current) return;
         const map = new maplibre.Map({
           container: container.current,

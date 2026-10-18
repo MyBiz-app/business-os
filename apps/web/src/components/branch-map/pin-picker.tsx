@@ -32,7 +32,7 @@ export function PinPicker({ latitude, longitude, readOnly = false }: Props) {
     let marker: Marker | null = null;
     (async () => {
       try {
-        const maplibre = (await import("maplibre-gl")).default;
+        const maplibre = await import("maplibre-gl");
         if (cancelled || !container.current) return;
         map = new maplibre.Map({
           container: container.current,
