@@ -77,7 +77,7 @@ export function SettingsRoom({
                           href={item.href}
                           aria-current={active ? "page" : undefined}
                           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
-                            active ? "bg-primary/10 font-semibold text-primary-ink" : "text-foreground hover:bg-foreground/5"
+                            active ? "bg-primary/10 font-semibold text-foreground" : "text-foreground hover:bg-foreground/5"
                           }`}
                         >
                           <Icon aria-hidden="true" className="size-4 shrink-0" />

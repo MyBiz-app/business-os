@@ -232,6 +232,9 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
           <Container as="p" className="pb-10 text-center text-sm text-muted">{t("note")}</Container>
         </>
       )}
+      <Container className="pb-10 text-center">
+        <Link href="/websites" className="font-semibold text-primary-ink">{t("websiteAddon")}</Link>
+      </Container>
       <Faq />
       <CtaBand />
     </main>

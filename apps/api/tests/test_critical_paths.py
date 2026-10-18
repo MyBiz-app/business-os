@@ -127,6 +127,7 @@ PUBLIC_ROUTES = {
     ("GET", "/public/businesses/{code}"),
     ("GET", "/public/tenants/{tenant_id}/logo"),
     ("GET", "/public/locations/{location_id}/logo"),
+    ("POST", "/public/website-visits"),
 }
 
 

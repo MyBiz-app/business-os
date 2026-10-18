@@ -345,6 +345,8 @@ def _check_budget(context: TenantContext, user_id: UUID, provider: LLMProvider) 
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_limit_reached")
     if budget.over_person_limit(db, user_id, member_role_keys(db, context.role), month_start):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_user_limit_reached")
+    if budget.over_day_pace(db, user_id, context.role):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_daily_pace_reached")
 
 
 # Concurrent model calls in this worker (a call holds a request thread and a connection).

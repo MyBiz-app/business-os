@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, Clock, CreditCard, Dumbbell, FileSignature, FileText, FolderOpen, Inbox, LayoutDashboard, LayoutGrid, Lock, MapPin, Megaphone, Menu, MessageCircle, Plug, Receipt, ScrollText, Settings, Smartphone, Sparkles, Target, Truck, TriangleAlert, Users, UsersRound, Wallet } from "lucide-react";
+import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, Clock, FileSignature, FileText, FolderOpen, Globe, Inbox, LayoutDashboard, LayoutGrid, Lock, MapPin, Megaphone, Menu, MessageCircle, Plug, Receipt, ScrollText, Settings, Smartphone, Sparkles, Tags, Target, Truck, TriangleAlert, Users, UsersRound, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,8 +17,7 @@ const ICONS = {
   leads: Target,
   messages: MessageCircle,
   content: Sparkles,
-  services: Dumbbell,
-  plans: CreditCard,
+  catalog: Tags,
   sales: Receipt,
   locations: MapPin,
   team: UsersRound,
@@ -36,6 +35,7 @@ const ICONS = {
   time: Clock,
   files: FolderOpen,
   migration: Truck,
+  website: Globe,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;

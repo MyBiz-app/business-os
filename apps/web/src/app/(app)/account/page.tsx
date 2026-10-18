@@ -71,6 +71,7 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
                 birthDate={me.birth_date ?? null}
                 addressLine={me.address_line ?? null}
                 city={me.city ?? null}
+                address={{ ...me, city_name: me.city_code ? me.city : null }}
                 postalCode={me.postal_code ?? null}
               />
             </div>

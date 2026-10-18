@@ -381,6 +381,33 @@ TOOL_DOMAINS: dict[str, str] = {
 BRANCH_BLIND: frozenset[str] = frozenset({"lead_pipeline"})
 
 
+# What an AI connector (MCP, round 7 R37a) may use: the tools that only read. Anything that
+# proposes a change (book, cancel, bill, publish, schedule) stays with the built-in assistant
+# until connectors get actions that wait for approval (R37b). A test runs every one of these in a
+# read-only transaction.
+MCP_READ_TOOLS: frozenset[str] = frozenset(
+    {
+        "find_clients",
+        "get_client",
+        "inactive_members",
+        "list_sessions",
+        "free_courts",
+        "get_session_roster",
+        "get_metrics",
+        "client_sources",
+        "lead_pipeline",
+        "list_plans",
+        "open_balances",
+        "logged_time",
+        "billing_preview",
+        "social_overview",
+        "top_posts",
+        "audience_summary",
+        "list_drafts",
+    }
+)
+
+
 def _allowed(tool: Tool, permissions: frozenset[str], modules: set[str]) -> bool:
     return (
         tool.permission in permissions
@@ -404,6 +431,17 @@ def tools_for(
         if _allowed(tool, permissions, modules)
         and (domains is None or TOOL_DOMAINS[tool.name] in domains)
         and not (narrowed and tool.name in BRANCH_BLIND)
+    ]
+
+
+def mcp_tools_for(
+    permissions: frozenset[str], modules: set[str], narrowed: bool = False
+) -> list[Tool]:
+    """The read tools a connection's person may use in their business."""
+    return [
+        tool
+        for tool in tools_for(permissions, modules, narrowed=narrowed)
+        if tool.name in MCP_READ_TOOLS
     ]
 
 
