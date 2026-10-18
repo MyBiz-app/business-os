@@ -16,7 +16,7 @@ export default async function BrandingSettingsPage() {
   if (!canManageSettings(tenant)) redirect("/dashboard");
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("nav.items.branding")} description={t("nav.hints.branding")} />
       <BrandingEditor
         key={`${tenant.name}-${tenant.primary_color}-${tenant.logo_url}-${tenant.cover_url}`}

@@ -47,7 +47,7 @@ export default async function StaffCardPage({ params, searchParams }: PageProps<
   const href = (tab: Tab) => (tab === "overview" ? `/team/${userId}` : `/team/${userId}?tab=${tab}`);
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/team" label={tAll("team.title")} />
       <header className="flex flex-wrap items-center gap-4">
         <Avatar id={userId} name={name} size="xl" src={avatarSrc(userId, member.avatar_url)} />

@@ -64,7 +64,7 @@ export async function OverviewTab({ member, context }: { member: Member; context
   ];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid items-start gap-6 lg:grid-cols-2 min-[120rem]:grid-cols-3">
       <Block title={t("details")}>
         <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
           {facts.map(([label, value]) => (
