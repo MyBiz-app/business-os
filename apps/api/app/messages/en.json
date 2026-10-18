@@ -140,6 +140,22 @@
       "amount": "Amount"
     }
   },
+  "cancellationEmail": {
+    "greeting": "Hi,",
+    "footer": "The MyBiz team",
+    "subject": {
+      "cancelled": "Your MyBiz subscription ends on {date}",
+      "paused": "{business} is paused until {date}"
+    },
+    "body": {
+      "cancelled": "We cancelled the MyBiz subscription of {business}. It stays active until {date} and you are not billed again.\n\nYour data is kept for 90 days after that, and you can export it any time. Changed your mind? Sign in and choose Keep my subscription under Settings, Billing.",
+      "paused": "{business} is paused until {date}. Your data is kept and the account is read-only until then.\n\nYou pay a small flat fee while it is paused, and your usual price returns afterwards. You can end the pause any time under Settings, Billing."
+    },
+    "refund": "Your first payment of {refund} is refunded in full under our 14 day policy.",
+    "details": {
+      "date": "Ends on"
+    }
+  },
   "pdfDocuments": {
     "receipt": "Receipt",
     "receiptNumber": "Receipt no. {number}",

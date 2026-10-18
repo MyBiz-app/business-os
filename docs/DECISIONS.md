@@ -321,6 +321,14 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Reads run in a READ ONLY transaction and results are wrapped as untrusted data. Usage is the meter `mcp_calls` (one per call); the ceiling is 600 per business per rolling 24 hours, a setting.
 - Tokens: access 60 minutes, refresh 90 days and rotated on use, code 5 minutes; only SHA-256 hashes are stored. Connection lookups by hash are SECURITY DEFINER functions because the token endpoint knows no business yet.
 
+### Cancelling and pausing the MyBiz subscription (2026-10-18, round 7 R33, migration 0134)
+
+- The policy is the one in the approved spec (section 30.1): cancel any time with no penalty, the account works to the end of the paid month; the first payment is refunded in full inside 14 days (once per business, enforced by a unique index on the refunded invoice); no refund for part of a month. Only the first payment is refunded: there is no annual plan and no setup-fee refund path in the code yet (setup and website fees are in the public text only).
+- A pause costs a flat fee (ILS 19, USD 5, EUR 5 a month, `PAUSE_FEE`) for 1 to 3 months. The API treats a paused account as read-only through one SQL function (`app.effective_billing_state`) that replaced four copies of the same CASE; the monthly billing job writes one "pause" line for each period that starts inside the pause. A pause is refused in the trial, while a payment is overdue and after cancelling.
+- Refunds are recorded in `app.subscription_cancellations` and nothing else: no card is charged or refunded while payments (#46) are off. When #46 is switched on, a job must pay out the rows with `refund_minor > 0` and no `resumed_at`.
+- The reason is optional and one of five fixed values; the free note is capped at 1000 characters. The owner's confirmation email is sent from the request (a mail failure is logged, never raised).
+- The text of `/legal/cancellation` is a draft; the lawyer review is part of the pre-launch list (A-list), and `legal.versions.cancellation` in `brand.json` holds its date. It is not an acceptance document (`VERSIONS` in `legal/documents.py` is unchanged).
+
 ## Open
 
 | # | Question |

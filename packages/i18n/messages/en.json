@@ -2473,7 +2473,8 @@
       "health": "System health",
       "incidents": "Incident banners",
       "growth": "Growth",
-      "websiteOrders": "Website orders"
+      "websiteOrders": "Website orders",
+      "churn": "Churn"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -3040,6 +3041,39 @@
         "review": "With the customer for approval",
         "live": "Live"
       }
+    },
+    "churn": {
+      "title": "Churn",
+      "hint": "Businesses that cancelled or paused their MyBiz subscription, and why.",
+      "chart": "Cancellations per month",
+      "month": "Month",
+      "cancelled": "Cancelled",
+      "paused": "Paused",
+      "resumed": "Took it back",
+      "rate": "Churn",
+      "reasonsTitle": "Why they left",
+      "noReason": "No reason given",
+      "reasons": {
+        "too_expensive": "It costs too much",
+        "missing_feature": "Something is missing",
+        "not_using": "Not using it",
+        "switched": "Moved to another system",
+        "other": "Something else"
+      },
+      "listTitle": "Cancellations and pauses",
+      "empty": "Nobody has cancelled or paused in the last 12 months.",
+      "business": "Business",
+      "owner": "Owner",
+      "outcome": "What",
+      "outcomes": {
+        "cancelled": "Cancelled",
+        "paused": "Paused"
+      },
+      "when": "When",
+      "ends": "Ends",
+      "refund": "Refund (recorded)",
+      "note": "Note",
+      "back": "Taken back"
     }
   },
   "permissions": {
@@ -3786,7 +3820,8 @@
       "storeAndroid": "Google Play",
       "comingSoon": "Coming soon",
       "dpa": "Data processing agreement",
-      "subprocessors": "Sub-processors"
+      "subprocessors": "Sub-processors",
+      "cancellation": "Cancellation and refunds"
     },
     "about": {
       "title": "Building the system small businesses deserve",
@@ -4275,6 +4310,73 @@
             "title": "Changes",
             "p": [
               "We update this page before adding or replacing a sub-processor, and Businesses can object under the data processing agreement."
+            ]
+          }
+        ]
+      },
+      "cancellation": {
+        "title": "Cancellation and refunds",
+        "intro": "How to cancel your MyBiz subscription, what you get back, and what happens to your data. This page is about your subscription to MyBiz. How your own clients cancel classes or appointments is set by your business.",
+        "sections": [
+          {
+            "id": "monthly",
+            "title": "Monthly subscription",
+            "p": [
+              "You can cancel at any time from Settings, Billing, with no penalty. The system keeps working until the end of the month you paid for and you are not billed again. There is no refund for part of a month."
+            ]
+          },
+          {
+            "id": "first-14-days",
+            "title": "The first 14 days",
+            "p": [
+              "If you cancel within 14 days of your first payment, you get that payment back in full, no questions asked. This applies once per business."
+            ]
+          },
+          {
+            "id": "pause",
+            "title": "Pause instead of cancelling",
+            "p": [
+              "You can pause the account for 1 to 3 months. Your data is kept, everything is read-only, and you pay a small flat monthly fee instead of your usual price. You can end the pause at any time."
+            ]
+          },
+          {
+            "id": "modules",
+            "title": "Modules and add-ons",
+            "p": [
+              "You can remove a module at any time. It stops at the end of the month and is not billed after that."
+            ]
+          },
+          {
+            "id": "setup",
+            "title": "Setup and website fees",
+            "p": [
+              "One-time fees are refunded as follows:"
+            ],
+            "items": [
+              "Before we started working: in full.",
+              "After the brief was approved and before the first draft: 50%.",
+              "After delivery: no refund."
+            ]
+          },
+          {
+            "id": "data",
+            "title": "Your data",
+            "p": [
+              "You can export all your data at any time. After the subscription ends you have 90 days to come back, and then the business and its data are deleted."
+            ]
+          },
+          {
+            "id": "payments",
+            "title": "How refunds are paid",
+            "p": [
+              "Refunds go back to the card you paid with. While online payments are not yet switched on, refunds are recorded in the system only."
+            ]
+          },
+          {
+            "id": "law",
+            "title": "The law",
+            "p": [
+              "Nothing here limits your rights under consumer protection law. If the law gives you more, the law applies. This text is a draft for review by a lawyer before launch."
             ]
           }
         ]
@@ -5010,7 +5112,12 @@
       "keep": "Keep my subscription",
       "cancelling": "Your subscription ends on {date}. Until then everything works as usual.",
       "resume": "Keep my subscription",
-      "ended": "Your subscription has ended. Your business and data are kept; resume to use them again."
+      "ended": "Your subscription has ended. Your business and data are kept; resume to use them again.",
+      "cancelStart": "Cancel or pause the subscription",
+      "policy": "Cancellation policy",
+      "paused": "The account is paused until {date}. Your data is kept and everything is read-only.",
+      "endPause": "End the pause now",
+      "refund": "Your first payment of {amount} is refunded in full under the 14 day policy (recorded; it is paid back to your card once payments are switched on)."
     },
     "suspended": {
       "title": "This business is suspended",
@@ -5028,6 +5135,61 @@
       "nextPayment": "Next payment",
       "method": "Payment method",
       "noMethod": "No card yet"
+    },
+    "cancelFlow": {
+      "title": "Cancel your subscription",
+      "intro": "We are sorry to see you go. Three short steps and you are done. Nothing happens until you confirm on the last one.",
+      "steps": {
+        "reason": "Why",
+        "offer": "Before you go",
+        "confirm": "Confirm"
+      },
+      "reasonTitle": "Why are you leaving?",
+      "reasonHint": "Optional. It helps us improve.",
+      "reasons": {
+        "too_expensive": "It costs too much",
+        "missing_feature": "Something I need is missing",
+        "not_using": "I am not using it",
+        "switched": "I moved to another system",
+        "other": "Something else"
+      },
+      "noteLabel": "Anything you want to add",
+      "offerTitle": "Before you cancel, two ways to pay less",
+      "offerPauseTitle": "Pause the account",
+      "offerPauseText": "Keep your data and pay only {fee} a month for up to {months} months. The account is read-only while paused.",
+      "offerPauseMonths": "How long",
+      "offerPauseMonthsValue": "{count, plural, one {# month} other {# months}}",
+      "offerPauseCta": "Pause the account",
+      "offerPauseUnavailable": "A pause is not available right now (during the free trial, when a payment is overdue, or after cancelling).",
+      "offerModulesTitle": "Switch off what you do not use",
+      "offerModulesText": "You only pay for the modules that are on. Turn off the ones you do not need.",
+      "offerModulesCta": "Choose modules",
+      "continue": "Continue to cancel",
+      "confirmTitle": "Confirm the cancellation",
+      "confirmEnds": "The subscription ends on {date}. Until then everything works as usual, and you are not billed again.",
+      "confirmRefund": "You get your first payment of {amount} back in full.",
+      "confirmNoRefund": "There is no refund for the current month.",
+      "confirmData": "Your business and data are kept for 90 days after it ends, and you can export them at any time.",
+      "confirmCta": "Yes, cancel the subscription",
+      "back": "Back",
+      "keep": "No, keep my subscription",
+      "done": "The subscription is cancelled. It ends on {date}. We sent a confirmation email."
+    },
+    "cancellationEmail": {
+      "greeting": "Hi,",
+      "footer": "The MyBiz team",
+      "subject": {
+        "cancelled": "Your MyBiz subscription ends on {date}",
+        "paused": "{business} is paused until {date}"
+      },
+      "body": {
+        "cancelled": "We cancelled the MyBiz subscription of {business}. It stays active until {date} and you are not billed again.\n\nYour data is kept for 90 days after that, and you can export it any time. Changed your mind? Sign in and choose Keep my subscription under Settings, Billing.",
+        "paused": "{business} is paused until {date}. Your data is kept and the account is read-only until then.\n\nYou pay a small flat fee while it is paused, and your usual price returns afterwards. You can end the pause any time under Settings, Billing."
+      },
+      "refund": "Your first payment of {refund} is refunded in full under our 14 day policy.",
+      "details": {
+        "date": "Ends on"
+      }
     }
   },
   "visitNotes": {
@@ -5666,7 +5828,8 @@
       "passSizeValue": "{staff, plural, one {# employee} other {# employees}} · {locations, plural, one {# location} other {# locations}}",
       "passAddons": "Add-ons",
       "passNoAddons": "Core only",
-      "passEntity": "Business type"
+      "passEntity": "Business type",
+      "cancellationLink": "Cancel any time. Full refund in the first 14 days. Read the cancellation policy"
     },
     "finish": {
       "title": "Last step: payment details",

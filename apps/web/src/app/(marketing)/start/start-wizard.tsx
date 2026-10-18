@@ -504,6 +504,11 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             </li>
           ))}
         </ul>
+        <p className="text-sm text-muted">
+          <Link href="/legal/cancellation" target="_blank" className="font-semibold text-primary-ink underline underline-offset-4">
+            {t("summary.cancellationLink")}
+          </Link>
+        </p>
       </>
     );
   }
