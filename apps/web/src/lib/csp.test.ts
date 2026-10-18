@@ -20,6 +20,11 @@ test("the policy allows scripts only by nonce and reports violations", () => {
   assert.match(policy, /report-uri \/api\/csp-report/);
 });
 
+test("only the embeddable contact form may be shown in another site's frame", () => {
+  assert.match(strictCsp("abc", { dev: false, embeddable: true }), /frame-ancestors \*(;|$)/);
+  assert.doesNotMatch(strictCsp("abc", { dev: false }), /frame-ancestors \*/);
+});
+
 test("images may load from the API origin (business logos)", () => {
   assert.equal(apiOrigin("https://api.example.com/v1"), "https://api.example.com");
   assert.equal(apiOrigin("not a url"), undefined);

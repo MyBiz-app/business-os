@@ -24,9 +24,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Everything except /embed/: those pages are made to be framed by other sites (the CSP
+        // frame-ancestors in src/proxy.ts decides, and X-Frame-Options would override it).
+        source: "/((?!embed/).*)",
+        headers: [{ key: "X-Frame-Options", value: "DENY" }],
+      },
+      {
         source: "/:path*",
         headers: [
-          { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },

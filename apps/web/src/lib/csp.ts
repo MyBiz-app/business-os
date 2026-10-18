@@ -19,7 +19,9 @@ export function createNonce(): string {
   return btoa(String.fromCharCode(...bytes));
 }
 
-type Options = { dev: boolean };
+/** `embeddable`: a page other sites may show in a frame (the contact form a business pastes into
+ * its own website). */
+type Options = { dev: boolean; embeddable?: boolean };
 
 /** The host error reports go to (Sentry), from the DSN; nothing when monitoring is off. */
 export function sentryIngestOrigin(dsn: string | undefined = process.env.NEXT_PUBLIC_SENTRY_DSN): string | undefined {
@@ -43,7 +45,7 @@ export function apiOrigin(url: string | undefined = process.env.NEXT_PUBLIC_API_
   }
 }
 
-function directives(scriptSrc: string, { dev }: Options): string[] {
+function directives(scriptSrc: string, { dev, embeddable }: Options): string[] {
   return [
     "default-src 'self'",
     `script-src ${scriptSrc}${dev ? " 'unsafe-eval'" : ""}`,
@@ -57,8 +59,9 @@ function directives(scriptSrc: string, { dev }: Options): string[] {
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    // The app is never shown inside another site's frame (clickjacking).
-    "frame-ancestors 'none'",
+    // The app is never shown inside another site's frame (clickjacking), except the one public
+    // page built for it.
+    embeddable ? "frame-ancestors *" : "frame-ancestors 'none'",
   ];
 }
 
