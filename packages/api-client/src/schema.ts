@@ -6115,6 +6115,90 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/meter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Meter
+         * @description The month's AI meter: where the business is against its pool and against the calendar
+         *     (managers), and the person's own allowance for today and the month.
+         */
+        get: operations["ai_meter"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/usage/breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Usage Breakdown
+         * @description What the usage window adds to /ai/usage: questions people asked against tasks that ran by
+         *     themselves, and how many people have AI access against what the module includes.
+         */
+        get: operations["ai_usage_breakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/extra-users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Extra Ai Users
+         * @description The paid "extra AI user" add-ons: each lets one more person use the AI team and adds 150
+         *     credits to the month's pool. Cannot go below the people who already have access.
+         */
+        put: operations["set_extra_ai_users"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Member Ai
+         * @description One team member's AI settings and use, for the AI tab of the staff card.
+         */
+        get: operations["get_member_ai"];
+        /** Update Member Ai */
+        put: operations["update_member_ai"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/modules/catalog": {
         parameters: {
             query?: never;
@@ -9579,6 +9663,38 @@ export interface components {
              */
             issued_at: string;
         };
+        /** BusinessMeter */
+        BusinessMeter: {
+            /** Used */
+            used: number;
+            /** Included */
+            included: number;
+            /**
+             * Limit
+             * @description Where questions stop; null: no limit
+             */
+            limit: number | null;
+            /**
+             * Percent
+             * @description Used / included, in percent
+             */
+            percent: number;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
+            /**
+             * Reach Date
+             * @description When the month's pool runs out at this pace; null if it will not
+             */
+            reach_date: string | null;
+            /**
+             * Questions Left
+             * @description About, at one credit per question
+             */
+            questions_left: number | null;
+        };
         /**
          * BusinessProfile
          * @description What anyone holding a join code may see before signing in.
@@ -11963,6 +12079,11 @@ export interface components {
              */
             url: string;
         };
+        /** ExtraUsers */
+        ExtraUsers: {
+            /** Extra Ai Users */
+            extra_ai_users: number;
+        };
         /** FileLink */
         FileLink: {
             /**
@@ -13194,6 +13315,16 @@ export interface components {
             /** Engagements */
             engagements: number;
         };
+        /** KindRow */
+        KindRow: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "asked" | "scheduled";
+            /** Credits */
+            credits: number;
+        };
         /** Kpi */
         Kpi: {
             /** Value */
@@ -13717,6 +13848,65 @@ export interface components {
              */
             permissions: string[];
         };
+        /** MemberAi */
+        MemberAi: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Role Default
+             * @description Whether their role gives AI access without a switch
+             */
+            role_default: boolean;
+            /**
+             * Ai Access
+             * @description Their own switch; null: follow the role
+             */
+            ai_access: boolean | null;
+            /** Has Access */
+            has_access: boolean;
+            /**
+             * Monthly Credits
+             * @description Their own monthly limit; null: the business's
+             */
+            monthly_credits: number | null;
+            /**
+             * Daily Percent
+             * @description Their own daily pace; null: the default
+             */
+            daily_percent: number | null;
+            /**
+             * Default Daily Percent
+             * @default 15
+             */
+            default_daily_percent: number;
+            /** Day Limit */
+            day_limit: number | null;
+            /** Used Month */
+            used_month: number;
+            /** Used Today */
+            used_today: number;
+            /** Ai Users Allowed */
+            ai_users_allowed: number;
+            /** Ai Users Count */
+            ai_users_count: number;
+            /** Is Owner */
+            is_owner: boolean;
+        };
+        /**
+         * MemberAiUpdate
+         * @description Fields left out stay as they are; `null` clears a personal setting back to the default.
+         */
+        MemberAiUpdate: {
+            /** Ai Access */
+            ai_access?: boolean | null;
+            /** Monthly Credits */
+            monthly_credits?: number | null;
+            /** Daily Percent */
+            daily_percent?: number | null;
+        };
         /** MemberAtRisk */
         MemberAtRisk: {
             /** Client Id */
@@ -13825,6 +14015,32 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** Meter */
+        Meter: {
+            /**
+             * Month Start
+             * Format: date
+             */
+            month_start: string;
+            /** Day Of Month */
+            day_of_month: number;
+            /** Days In Month */
+            days_in_month: number;
+            /**
+             * Pace Percent
+             * @description How far into the month we are, in percent
+             */
+            pace_percent: number;
+            /** @description Only for those who manage the AI team */
+            business: components["schemas"]["BusinessMeter"] | null;
+            person: components["schemas"]["PersonMeter"];
+            /**
+             * Level
+             * @description The worse of the two: what the small dot shows
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
         };
         /** MethodTotal */
         MethodTotal: {
@@ -14787,6 +15003,33 @@ export interface components {
             };
             /** Entries */
             entries: components["schemas"]["Entry"][];
+        };
+        /** PersonMeter */
+        PersonMeter: {
+            /** Used Month */
+            used_month: number;
+            /**
+             * Month Limit
+             * @description Their own monthly limit, if one is set
+             */
+            month_limit: number | null;
+            /** Used Today */
+            used_today: number;
+            /**
+             * Day Limit
+             * @description Their daily pace; null: none (the owner)
+             */
+            day_limit: number | null;
+            /**
+             * Questions Left Today
+             * @description About, at one credit per question
+             */
+            questions_left_today: number | null;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
         };
         /** PersonMonth */
         PersonMonth: {
@@ -18692,6 +18935,21 @@ export interface components {
              * @description The amount for this month; null takes the typed amount away
              */
             amount_minor: number | null;
+        };
+        /** UsageBreakdown */
+        UsageBreakdown: {
+            /** By Kind */
+            by_kind: components["schemas"]["KindRow"][];
+            /** Ai Users Allowed */
+            ai_users_allowed: number;
+            /** Ai Users Count */
+            ai_users_count: number;
+            /** Extra Ai Users */
+            extra_ai_users: number;
+            /** Extra User Price Minor */
+            extra_user_price_minor: number;
+            /** Currency */
+            currency: string;
         };
         /** UsagePoint */
         UsagePoint: {
@@ -34167,6 +34425,183 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiSpend"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_meter: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Meter"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_usage_breakdown: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageBreakdown"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_extra_ai_users: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtraUsers"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageBreakdown"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_member_ai: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAi"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_member_ai: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberAiUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAi"];
                 };
             };
             /** @description Validation Error */

@@ -9,6 +9,7 @@ import { Card, EmptyState, Heading, LoadError, Screen, Skeleton, styles } from "
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { type Agent, AgentFace } from "@/components/agent-face";
+import { AiMeter } from "@/components/ai-meter";
 import { useStaff } from "@/providers/staff-provider";
 
 /** The business's AI team: every agent with its job, tap one to talk. */
@@ -18,6 +19,8 @@ export default function AiTeam() {
   const { api, scope, palette } = useStaff();
   const load = useCallback(async () => unwrap(await api.GET("/ai/team", { params: scope })), [api, scope]);
   const { data, error, loading, reload } = useLoad(load);
+  const loadMeter = useCallback(async () => unwrap(await api.GET("/ai/meter", { params: scope })), [api, scope]);
+  const { data: meter } = useLoad(loadMeter);
 
   const open = (agent: Agent) => router.push({ pathname: "/ai-chat", params: { agent: agent.key } });
 
@@ -27,12 +30,8 @@ export default function AiTeam() {
       <View style={{ gap: 4 }}>
         <Heading palette={palette}>{tTeam("title")}</Heading>
         <Text style={[styles.muted, { color: palette.muted }]}>{tTeam("subtitle")}</Text>
-        {data && (
-          <Text style={[styles.muted, { color: palette.muted }]}>
-            {tTeam("usage", { used: Math.round(data.credits_used), included: data.credits_included })}
-          </Text>
-        )}
       </View>
+      {meter && <AiMeter meter={meter} palette={palette} />}
 
       {error ? (
         <LoadError palette={palette} onRetry={() => void reload()} />

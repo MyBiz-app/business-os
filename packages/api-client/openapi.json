@@ -32778,6 +32778,383 @@
         }
       }
     },
+    "/ai/meter": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Ai Meter",
+        "description": "The month's AI meter: where the business is against its pool and against the calendar\n(managers), and the person's own allowance for today and the month.",
+        "operationId": "ai_meter",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Meter"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/usage/breakdown": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Ai Usage Breakdown",
+        "description": "What the usage window adds to /ai/usage: questions people asked against tasks that ran by\nthemselves, and how many people have AI access against what the module includes.",
+        "operationId": "ai_usage_breakdown",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageBreakdown"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/extra-users": {
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Set Extra Ai Users",
+        "description": "The paid \"extra AI user\" add-ons: each lets one more person use the AI team and adds 150\ncredits to the month's pool. Cannot go below the people who already have access.",
+        "operationId": "set_extra_ai_users",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtraUsers"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageBreakdown"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/members/{user_id}": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Get Member Ai",
+        "description": "One team member's AI settings and use, for the AI tab of the staff card.",
+        "operationId": "get_member_ai",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Member Ai",
+        "operationId": "update_member_ai",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberAiUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/catalog": {
       "get": {
         "tags": [
@@ -44081,6 +44458,80 @@
         ],
         "title": "BusinessInvoice"
       },
+      "BusinessMeter": {
+        "properties": {
+          "used": {
+            "type": "number",
+            "title": "Used"
+          },
+          "included": {
+            "type": "integer",
+            "title": "Included"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit",
+            "description": "Where questions stop; null: no limit"
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent",
+            "description": "Used / included, in percent"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warn",
+              "over"
+            ],
+            "title": "Level"
+          },
+          "reach_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reach Date",
+            "description": "When the month's pool runs out at this pace; null if it will not"
+          },
+          "questions_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Questions Left",
+            "description": "About, at one credit per question"
+          }
+        },
+        "type": "object",
+        "required": [
+          "used",
+          "included",
+          "limit",
+          "percent",
+          "level",
+          "reach_date",
+          "questions_left"
+        ],
+        "title": "BusinessMeter"
+      },
       "BusinessProfile": {
         "properties": {
           "id": {
@@ -50246,6 +50697,21 @@
         ],
         "title": "ExportLink"
       },
+      "ExtraUsers": {
+        "properties": {
+          "extra_ai_users": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 0.0,
+            "title": "Extra Ai Users"
+          }
+        },
+        "type": "object",
+        "required": [
+          "extra_ai_users"
+        ],
+        "title": "ExtraUsers"
+      },
       "FileLink": {
         "properties": {
           "url": {
@@ -53488,6 +53954,28 @@
         ],
         "title": "KindEngagement"
       },
+      "KindRow": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "asked",
+              "scheduled"
+            ],
+            "title": "Key"
+          },
+          "credits": {
+            "type": "number",
+            "title": "Credits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "credits"
+        ],
+        "title": "KindRow"
+      },
       "Kpi": {
         "properties": {
           "value": {
@@ -55040,6 +55528,156 @@
         ],
         "title": "Member"
       },
+      "MemberAi": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "role_default": {
+            "type": "boolean",
+            "title": "Role Default",
+            "description": "Whether their role gives AI access without a switch"
+          },
+          "ai_access": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Access",
+            "description": "Their own switch; null: follow the role"
+          },
+          "has_access": {
+            "type": "boolean",
+            "title": "Has Access"
+          },
+          "monthly_credits": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Credits",
+            "description": "Their own monthly limit; null: the business's"
+          },
+          "daily_percent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Percent",
+            "description": "Their own daily pace; null: the default"
+          },
+          "default_daily_percent": {
+            "type": "integer",
+            "title": "Default Daily Percent",
+            "default": 15
+          },
+          "day_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day Limit"
+          },
+          "used_month": {
+            "type": "number",
+            "title": "Used Month"
+          },
+          "used_today": {
+            "type": "number",
+            "title": "Used Today"
+          },
+          "ai_users_allowed": {
+            "type": "integer",
+            "title": "Ai Users Allowed"
+          },
+          "ai_users_count": {
+            "type": "integer",
+            "title": "Ai Users Count"
+          },
+          "is_owner": {
+            "type": "boolean",
+            "title": "Is Owner"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "role_default",
+          "ai_access",
+          "has_access",
+          "monthly_credits",
+          "daily_percent",
+          "day_limit",
+          "used_month",
+          "used_today",
+          "ai_users_allowed",
+          "ai_users_count",
+          "is_owner"
+        ],
+        "title": "MemberAi"
+      },
+      "MemberAiUpdate": {
+        "properties": {
+          "ai_access": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Access"
+          },
+          "monthly_credits": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Credits"
+          },
+          "daily_percent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Percent"
+          }
+        },
+        "type": "object",
+        "title": "MemberAiUpdate",
+        "description": "Fields left out stay as they are; `null` clears a personal setting back to the default."
+      },
       "MemberAtRisk": {
         "properties": {
           "client_id": {
@@ -55343,6 +55981,63 @@
           "created_at"
         ],
         "title": "Message"
+      },
+      "Meter": {
+        "properties": {
+          "month_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Month Start"
+          },
+          "day_of_month": {
+            "type": "integer",
+            "title": "Day Of Month"
+          },
+          "days_in_month": {
+            "type": "integer",
+            "title": "Days In Month"
+          },
+          "pace_percent": {
+            "type": "number",
+            "title": "Pace Percent",
+            "description": "How far into the month we are, in percent"
+          },
+          "business": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BusinessMeter"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only for those who manage the AI team"
+          },
+          "person": {
+            "$ref": "#/components/schemas/PersonMeter"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warn",
+              "over"
+            ],
+            "title": "Level",
+            "description": "The worse of the two: what the small dot shows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month_start",
+          "day_of_month",
+          "days_in_month",
+          "pace_percent",
+          "business",
+          "person",
+          "level"
+        ],
+        "title": "Meter"
       },
       "MethodTotal": {
         "properties": {
@@ -57548,6 +58243,73 @@
           "entries"
         ],
         "title": "PersonDetail"
+      },
+      "PersonMeter": {
+        "properties": {
+          "used_month": {
+            "type": "number",
+            "title": "Used Month"
+          },
+          "month_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Month Limit",
+            "description": "Their own monthly limit, if one is set"
+          },
+          "used_today": {
+            "type": "number",
+            "title": "Used Today"
+          },
+          "day_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day Limit",
+            "description": "Their daily pace; null: none (the owner)"
+          },
+          "questions_left_today": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Questions Left Today",
+            "description": "About, at one credit per question"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warn",
+              "over"
+            ],
+            "title": "Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "used_month",
+          "month_limit",
+          "used_today",
+          "day_limit",
+          "questions_left_today",
+          "level"
+        ],
+        "title": "PersonMeter"
       },
       "PersonMonth": {
         "properties": {
@@ -67844,6 +68606,47 @@
           "amount_minor"
         ],
         "title": "TypedAmount"
+      },
+      "UsageBreakdown": {
+        "properties": {
+          "by_kind": {
+            "items": {
+              "$ref": "#/components/schemas/KindRow"
+            },
+            "type": "array",
+            "title": "By Kind"
+          },
+          "ai_users_allowed": {
+            "type": "integer",
+            "title": "Ai Users Allowed"
+          },
+          "ai_users_count": {
+            "type": "integer",
+            "title": "Ai Users Count"
+          },
+          "extra_ai_users": {
+            "type": "integer",
+            "title": "Extra Ai Users"
+          },
+          "extra_user_price_minor": {
+            "type": "integer",
+            "title": "Extra User Price Minor"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "by_kind",
+          "ai_users_allowed",
+          "ai_users_count",
+          "extra_ai_users",
+          "extra_user_price_minor",
+          "currency"
+        ],
+        "title": "UsageBreakdown"
       },
       "UsagePoint": {
         "properties": {
