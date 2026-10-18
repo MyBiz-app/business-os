@@ -22,6 +22,7 @@ from app.api.bookings import (
     lock_session,
     place_booking,
 )
+from app.api.cancellation import ensure_within_no_show_limit
 from app.api.clients import join_as_member, member_join_code
 from app.api.closed_days import ClosedDay
 from app.api.common import blank_to_none, not_found
@@ -77,6 +78,15 @@ class ClientBusiness(BaseModel):
     resource_payment: Literal["app", "venue"] = Field(
         default="app", description="Reservations: paid in the app when booking, or at the venue"
     )
+    waitlist_class: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for classes (off: none)"
+    )
+    waitlist_appointment: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for personal appointments"
+    )
+    waitlist_resource: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for courts and rooms"
+    )
     dependents: Literal["pet", "child"] | None = Field(
         default=None, description="The industry keeps the client's pets / children (#43)"
     )
@@ -107,6 +117,10 @@ class ClientLocation(BaseModel):
     website_url: str | None = Field(
         default=None, description="The branch's website, else the business's; none if neither set"
     )
+    latitude: float | None = Field(
+        default=None, description="The branch's point on the map, for navigation links"
+    )
+    longitude: float | None = None
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
@@ -220,6 +234,11 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
            t.cancellation_window_minutes, t.online_sales, t.resource_payment, t.website_url,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_class_mode ELSE 'off' END AS waitlist_class,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_appointment_mode ELSE 'off' END
+               AS waitlist_appointment,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_resource_mode ELSE 'off' END
+               AS waitlist_resource,
            {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
@@ -239,7 +258,7 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
     """The business's branches with their addresses (the home screen's business details)."""
     rows = context.session.execute(
         text("""
-            SELECT l.id, l.name, l.address, l.kind,
+            SELECT l.id, l.name, l.address, l.kind, l.latitude, l.longitude,
                    coalesce(l.website_url, (SELECT website_url FROM app.tenants
                                             WHERE id = l.tenant_id)) AS website_url,
                    coalesce(
@@ -505,6 +524,7 @@ def book_session(
     if starts_at >= release.opens_before(time_zone):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_released")
     ensure_may_book(context.session, context.tenant_id, context.client_id)
+    ensure_within_no_show_limit(context.session, context.client_id)
     requires_plan = context.session.execute(
         text("SELECT booking_requires_plan FROM app.tenants WHERE id = :id"),
         {"id": context.tenant_id},
@@ -542,11 +562,15 @@ def my_bookings(context: ClientDep) -> list[ClientBooking]:
             SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
                    s.status AS session_status, b.status, b.late_cancel,
                    d.name AS dependent_name,
-                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating
+                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating,
+                   CASE WHEN b.status IN ('booked', 'waitlisted') THEN
+                       s.starts_at - make_interval(mins => ct.free_minutes)
+                   END AS free_cancel_until
             FROM app.bookings b
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
             LEFT JOIN app.dependents d ON d.id = b.dependent_id
+            CROSS JOIN LATERAL app.cancellation_terms(b.session_id, b.entitlement_id) ct
             WHERE b.client_id = app.current_client_id()
             ORDER BY s.starts_at DESC
             LIMIT 200

@@ -67,7 +67,10 @@ export async function PlansTab({ show }: { show: CatalogShow }) {
                     <span className="text-sm text-muted">
                       {t(`plans.kinds.${plan.kind}`)} ·{" "}
                       {plan.credits ? `${t("plans.creditsCount", { count: plan.credits })} · ` : ""}
-                      {t("plans.days", { count: plan.validity_days })}
+                      {plan.billing_cycle
+                        ? `${t(`plans.cycles.${plan.billing_cycle}`)}${plan.auto_renew ? ` · ${t("plans.autoRenew")}` : ""}`
+                        : t("plans.days", { count: plan.validity_days })}
+                      {plan.period_quota && plan.period_unit && ` · ${t(`plans.quotaShort.${plan.period_unit}`, { count: plan.period_quota })}`}
                       {!plan.active && ` · ${t("common.inactive")}`}
                     </span>
                   </span>

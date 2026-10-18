@@ -6,6 +6,7 @@
   "color": "from-lime-500 to-green-600",
   "terms": "sports",
   "schedule_view": "courts",
+  "waitlist": { "enabled": true, "classes": "first_come", "appointments": "first_come", "resources": "first_come" },
   "social": "on",
   "client_term": "player",
   "booking_modes": ["resource", "class"],

@@ -9,7 +9,7 @@ import { Pill, type Tone } from "@/components/pill";
 import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
-import { canWriteClients } from "@/lib/permissions";
+import { canSell, canWriteClients } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 import { whatsappLink } from "@/lib/whatsapp";
 import { vertical } from "@business-os/verticals";
@@ -73,6 +73,10 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
     await api.GET("/clients/{client_id}/bookings", { params: { ...scope, path: { client_id: id } } }),
   );
   const { upcoming, past } = splitByNow(bookings);
+  // Visits given back to this client (an exception, so it is counted): only for those who sell.
+  const waivers = canSell(tenant)
+    ? unwrap(await api.GET("/clients/{client_id}/waivers", { params: { ...scope, path: { client_id: id } } }))
+    : null;
   const consentEvents = unwrap(
     await api.GET("/clients/{client_id}/consent-events", { params: { ...scope, path: { client_id: id } } }),
   );
@@ -219,7 +223,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
         </p>
       )}
 
-      <div className="grid items-start gap-6 lg:grid-cols-5">
+      <div className="grid items-start gap-6 lg:grid-cols-5 min-[120rem]:grid-cols-7">
         <div className="flex min-w-0 flex-col gap-6 lg:col-span-3">
           <PlansSection clientId={client.id} context={context} locked={erased} />
 
@@ -228,6 +232,20 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
               {tBookings("title")}
             </h2>
             {bookings.length === 0 && <p className="text-sm text-muted">{tBookings("noneYet")}</p>}
+            {waivers && waivers.items.length > 0 && (
+              <details className="rounded-xl bg-primary/5 p-3 text-sm">
+                <summary className="cursor-pointer font-medium">{tBookings("waive.thisYear", { count: waivers.this_year })}</summary>
+                <ul className="mt-2 flex flex-col gap-1 text-muted">
+                  {waivers.items.map((item) => (
+                    <li key={item.booking_id}>
+                      {item.service_name} · {dateFormat.format(new Date(item.starts_at))}
+                      {item.reason && ` · ${item.reason}`}
+                      {item.waived_by_name && ` · ${item.waived_by_name}`}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
             {upcoming.length > 0 && (
               <div className="flex flex-col gap-1">
                 <h3 className="font-semibold">{tBookings("upcoming")}</h3>
@@ -265,7 +283,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-6 lg:col-span-2">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-span-2 min-[120rem]:col-span-4 min-[120rem]:grid min-[120rem]:grid-cols-2 min-[120rem]:items-start">
           <section aria-labelledby="details-heading" className="card p-6">
             <h2 id="details-heading" className="mb-4 text-lg font-semibold">
               {t("details")}

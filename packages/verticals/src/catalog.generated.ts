@@ -10,6 +10,12 @@ export const CATALOG: Entry[] = [
     "color": "from-indigo-500 to-violet-500",
     "terms": "fitness",
     "schedule_view": "class_blocks",
+    "waitlist": {
+      "enabled": true,
+      "classes": "auto",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "on",
     "client_term": "member",
     "booking_modes": [
@@ -342,6 +348,12 @@ export const CATALOG: Entry[] = [
     "color": "from-pink-500 to-rose-500",
     "terms": "beauty",
     "schedule_view": "appointments",
+    "waitlist": {
+      "enabled": true,
+      "classes": "first_come",
+      "appointments": "first_come",
+      "resources": "off"
+    },
     "social": "off",
     "client_term": "client",
     "booking_modes": [
@@ -855,6 +867,12 @@ export const CATALOG: Entry[] = [
     "color": "from-teal-500 to-emerald-500",
     "terms": "clinic",
     "schedule_view": "appointments",
+    "waitlist": {
+      "enabled": true,
+      "classes": "manual",
+      "appointments": "manual",
+      "resources": "manual"
+    },
     "social": "off",
     "client_term": "patient",
     "booking_modes": [
@@ -1251,6 +1269,12 @@ export const CATALOG: Entry[] = [
     "color": "from-sky-500 to-blue-600",
     "terms": "classes",
     "schedule_view": "class_blocks",
+    "waitlist": {
+      "enabled": true,
+      "classes": "auto",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "on",
     "client_term": "student",
     "booking_modes": [
@@ -1632,6 +1656,12 @@ export const CATALOG: Entry[] = [
     "color": "from-amber-500 to-orange-500",
     "terms": "automotive",
     "schedule_view": "appointments",
+    "waitlist": {
+      "enabled": false,
+      "classes": "first_come",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "off",
     "client_term": "customer",
     "booking_modes": [
@@ -1891,6 +1921,12 @@ export const CATALOG: Entry[] = [
     "color": "from-lime-500 to-green-600",
     "terms": "sports",
     "schedule_view": "courts",
+    "waitlist": {
+      "enabled": true,
+      "classes": "first_come",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "on",
     "client_term": "player",
     "booking_modes": [
@@ -2165,6 +2201,12 @@ export const CATALOG: Entry[] = [
     "color": "from-slate-500 to-zinc-700",
     "terms": "home_services",
     "schedule_view": "appointments",
+    "waitlist": {
+      "enabled": false,
+      "classes": "first_come",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "off",
     "client_term": "client",
     "booking_modes": [
@@ -2439,6 +2481,12 @@ export const CATALOG: Entry[] = [
     "color": "from-orange-400 to-amber-600",
     "terms": "pets",
     "schedule_view": "appointments",
+    "waitlist": {
+      "enabled": false,
+      "classes": "first_come",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "off",
     "client_term": "owner",
     "booking_modes": [
@@ -2647,6 +2695,12 @@ export const CATALOG: Entry[] = [
     "color": "from-fuchsia-500 to-purple-600",
     "terms": "events",
     "schedule_view": "appointments",
+    "waitlist": {
+      "enabled": false,
+      "classes": "first_come",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "off",
     "client_term": "client",
     "booking_modes": [
@@ -2889,6 +2943,12 @@ export const CATALOG: Entry[] = [
     "color": "from-cyan-600 to-sky-700",
     "terms": "professional",
     "schedule_view": "appointments",
+    "waitlist": {
+      "enabled": false,
+      "classes": "first_come",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "off",
     "client_term": "client",
     "booking_modes": [
@@ -3113,6 +3173,12 @@ export const CATALOG: Entry[] = [
     "color": "from-red-500 to-orange-600",
     "terms": "food",
     "schedule_view": "class_blocks",
+    "waitlist": {
+      "enabled": false,
+      "classes": "first_come",
+      "appointments": "first_come",
+      "resources": "first_come"
+    },
     "social": "off",
     "client_term": "guest",
     "booking_modes": [

@@ -496,6 +496,7 @@ def set_client_marketing_consent(
     """Record that the client agreed to (or stopped) marketing messages, e.g. at the desk. An
     agreement needs a source; a client who stopped ads with the opt-out link agrees again only
     by their own choice, so the desk records it with a source too."""
+    _client_row(context, client_id)
     ensure_not_erased(context.session, client_id)
     if body.consent and body.source is None:
         raise HTTPException(
@@ -518,6 +519,7 @@ def set_client_marketing_consent(
 @router.get("/{client_id}/consent-events")
 def client_consent_events(client_id: UUID, context: ReadDep) -> list[ConsentEvent]:
     """The trail of this client's marketing consent, newest first."""
+    _client_row(context, client_id)
     rows = context.session.execute(
         text("""
             SELECT e.id, e.action, e.source, e.created_at,

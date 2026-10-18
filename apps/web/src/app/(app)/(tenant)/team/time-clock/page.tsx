@@ -12,6 +12,7 @@ import { hm } from "@/lib/time-clock";
 import { getTenantFor } from "@/lib/tenant";
 
 import { RulesForm } from "./rules-form";
+import { EmptyState } from "@/components/empty-state";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("timeClock");
@@ -50,7 +51,7 @@ export default async function TimeClockPage({ searchParams }: PageProps<"/team/t
       </nav>
 
       {overview.people.length === 0 ? (
-        <p className="card p-5 text-sm text-muted">{t("empty")}</p>
+        <EmptyState variant="people">{t("empty")}</EmptyState>
       ) : (
         <div className="card overflow-x-auto">
           <table className="w-full min-w-[40rem] text-sm">

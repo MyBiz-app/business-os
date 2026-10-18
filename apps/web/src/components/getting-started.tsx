@@ -1,5 +1,5 @@
 import type { components } from "@business-os/api-client";
-import { ArrowRight, BookOpen, Check, CreditCard, Palette, CalendarDays, Sparkles, Tags, Users, UsersRound } from "lucide-react";
+import { ArrowRight, BookOpen, Check, CreditCard, Megaphone, Palette, CalendarDays, ShieldCheck, Sparkles, Tags, Users, UsersRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { isolate } from "@/lib/bidi";
@@ -10,10 +10,12 @@ export type SetupStep = GettingStarted["steps"][number]["key"];
 export const SETUP_STEPS: Record<SetupStep, { href: string; Icon: typeof Palette }> = {
   branding: { href: "/settings/branding", Icon: Palette },
   services: { href: "/catalog?tab=services", Icon: Tags },
+  policy: { href: "/settings/bookings", Icon: ShieldCheck },
   schedule: { href: "/schedule", Icon: CalendarDays },
   team: { href: "/team", Icon: UsersRound },
   clients: { href: "/clients", Icon: Users },
   card: { href: "/settings/billing", Icon: CreditCard },
+  post: { href: "/content", Icon: Megaphone },
 };
 
 /** The first-steps checklist on the dashboard, until everything is done. Right after sign-up

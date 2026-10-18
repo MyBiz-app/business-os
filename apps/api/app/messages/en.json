@@ -19,7 +19,12 @@
       "session_reminder": "Today: {service} at {when}",
       "plan_ending": "Your plan ends on {date}",
       "friend_request": "{friend} wants to be your friend",
-      "class_invite": "{friend} invited you: {service} on {when}"
+      "class_invite": "{friend} invited you: {service} on {when}",
+      "waitlist_spot_open": "A spot opened: {service} on {when}",
+      "waitlist_spot_taken": "Someone was quicker: {service} on {when}",
+      "freeze_approved": "Your freeze was approved: {from} to {date}",
+      "freeze_rejected": "About your freeze request",
+      "credit_returned": "We gave you back your visit: {service} on {when}"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -33,7 +38,12 @@
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
       "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking.",
       "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
-      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time."
+      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time.",
+      "waitlist_spot_open": "A spot opened up for {service} on {when}, and whoever takes it first gets it. Open the app to take it.",
+      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens.",
+      "freeze_approved": "{business} approved freezing your {plan} from {from} to {date}. Your end date moves by the same number of days.",
+      "freeze_rejected": "{business} couldn't approve freezing your {plan} from {from} to {date}.",
+      "credit_returned": "{business} gave you back your visit for {service} on {when}. It no longer counts as used."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -64,6 +74,14 @@
     "leadFollowUp": {
       "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
       "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
+    },
+    "payrollReminder": {
+      "title": "Payroll for {month} is waiting",
+      "body": "{business}: the payroll run for {month} is not approved yet. Open payroll to finish it."
+    },
+    "payslipReady": {
+      "title": "Your payslip is ready",
+      "body": "{business}: your payslip for {month} is in your documents."
     },
     "roster": {
       "subject": "Your new shifts at {business}",
@@ -306,7 +324,8 @@
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
       "noPack": "Included amount",
-      "social_studio": "Content studio"
+      "social_studio": "Content studio",
+      "payroll": "Payroll"
     }
   },
   "locations": {
@@ -332,6 +351,32 @@
     "expired": "That offer has expired. Ask again and I'll check what's free.",
     "failed": "Sorry, I couldn't book that one. Ask again and I'll check what's free.",
     "unavailable": "I can't answer right now. The team will get back to you soon."
+  },
+  "cancellationPolicy": {
+    "units": {
+      "none": "any time before",
+      "day": "1 day",
+      "days": "{n} days",
+      "hour": "1 hour",
+      "hours": "{n} hours",
+      "minutes": "{n} minutes"
+    },
+    "free": "You can cancel for free up to {time} before the session.",
+    "freeFor": "You can cancel {kind} for free up to {time} before.",
+    "kinds": {
+      "group": "a class",
+      "personal": "a personal session or appointment",
+      "resource": "a court or room"
+    },
+    "late": {
+      "counts": "A later cancellation counts as a visit you used.",
+      "recorded": "A later cancellation is noted but does not count as a visit you used."
+    },
+    "noShow": {
+      "counts": "If you do not come, the visit counts as used.",
+      "recorded": "If you do not come, it is noted but does not count as a visit you used."
+    },
+    "limit": "After {n} missed visits in a month, booking from the app is paused until you contact the business."
   },
   "verticals": {
     "fitness": {

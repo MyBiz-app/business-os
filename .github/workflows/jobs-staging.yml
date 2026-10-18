@@ -46,6 +46,13 @@ jobs:
           API_ENVIRONMENT: staging
         run: uv run python -m app.jobs remind-plans
 
+      - name: Remind owners to approve last month's payroll (1st and 5th of the month)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs remind-payroll
+
       - name: Invoice businesses for MyBiz (simulated charges)
         working-directory: apps/api
         env:

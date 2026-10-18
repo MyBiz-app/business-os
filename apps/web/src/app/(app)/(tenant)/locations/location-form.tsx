@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 
 import { AddressPicker } from "@/components/address-picker";
+import { PinPicker } from "@/components/branch-map/pin-picker";
 import { CheckboxField, Field, SelectField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -38,6 +39,7 @@ export function LocationForm({ action, location, submitLabel, readOnly = false, 
             legacyText={location?.address}
             disabled={readOnly}
           />
+          {location && <PinPicker latitude={location.latitude} longitude={location.longitude} readOnly={readOnly} />}
         </fieldset>
         <Field label={t("locations.website")} hint={t("locations.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="off" placeholder="www.example.com" defaultValue={location?.website_url ?? ""} />
         {location && kindOptions.length > 1 && (

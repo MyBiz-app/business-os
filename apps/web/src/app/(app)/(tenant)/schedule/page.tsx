@@ -104,7 +104,12 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         ? t("cancelled")
         : session.booking_mode === "appointment"
           ? (session.appointment_client ?? null)
-          : t("spotsLabel", { booked: session.booked, capacity: session.capacity }),
+          : [
+              t("spotsLabel", { booked: session.booked, capacity: session.capacity }),
+              session.waitlisted + session.waiting_requests > 0 ? t("waitingLabel", { count: session.waitlisted + session.waiting_requests }) : null,
+            ]
+              .filter(Boolean)
+              .join(" · "),
       color: session.service.color ?? "var(--primary)",
       branch: mergedBranches && location ? { name: nameOf.get(location) ?? "", color: colorOf.get(location) ?? "var(--primary)" } : null,
       cancelled,
@@ -200,6 +205,11 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           {canWriteSchedule(tenant) && (
             <Link href="/schedule/closed" className="btn-ghost px-3 py-2 text-sm">
               {t("closedDays")}
+            </Link>
+          )}
+          {tenant.waitlist_enabled && (
+            <Link href="/schedule/waitlist" className="btn-ghost px-3 py-2 text-sm">
+              {t("waitlists")}
             </Link>
           )}
           {canWriteSchedule(tenant) && <PublishWeek />}

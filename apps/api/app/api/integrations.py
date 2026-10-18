@@ -262,4 +262,9 @@ def _email_or_ai_default(capability: str) -> str:
     if capability == "email":
         provider = settings.email_provider
         return "smtp" if provider == "gmail" else provider
-    return "anthropic" if settings.anthropic_api_key is not None else "demo"
+    keys = {
+        "anthropic": settings.anthropic_api_key,
+        "openai": settings.openai_api_key,
+        "gemini": settings.gemini_api_key,
+    }
+    return settings.ai_provider if keys.get(settings.ai_provider) is not None else "demo"

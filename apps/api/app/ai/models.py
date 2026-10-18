@@ -15,8 +15,9 @@ Tier = Literal["fast", "standard", "strong"]
 TIERS: tuple[Tier, ...] = ("fast", "standard", "strong")
 
 # Vendors that may be called. The adapters for the others exist and are tested, but they are
-# not reachable until a vendor is added here (a deliberate, reviewed change).
+# not reachable until the vendor is named in API_AI_ENABLED_VENDORS (a deliberate switch-on).
 ENABLED_VENDORS: frozenset[str] = frozenset({"anthropic", "demo"})
+KNOWN_VENDORS: tuple[str, ...] = ("anthropic", "openai", "gemini")
 
 
 @dataclass(frozen=True)
@@ -58,7 +59,7 @@ OVERRIDES: dict[Tier, str] = {}
 def set_overrides(fast: str | None, standard: str | None, strong: str | None) -> None:
     OVERRIDES.clear()
     for tier, model in (("fast", fast), ("standard", standard), ("strong", strong)):
-        if model in MODELS and MODELS[model].vendor in ENABLED_VENDORS:
+        if model in MODELS and MODELS[model].vendor in enabled_vendors():
             OVERRIDES[tier] = model  # type: ignore[index]
 
 
@@ -92,8 +93,14 @@ def model_for_tier(tier: Tier, vendor: str = "anthropic") -> str:
     raise LookupError(f"no {vendor} model for tier {tier}")
 
 
+def enabled_vendors() -> frozenset[str]:
+    """The built-in vendors plus any switched on in settings (API_AI_ENABLED_VENDORS)."""
+    extra = {v.strip() for v in get_settings().ai_enabled_vendors.split(",") if v.strip()}
+    return ENABLED_VENDORS | (extra & set(KNOWN_VENDORS))
+
+
 def vendor_enabled(vendor: str) -> bool:
-    return vendor in ENABLED_VENDORS
+    return vendor in enabled_vendors()
 
 
 _DASHES = re.compile(r"\s*[\u2013\u2014]\s*")

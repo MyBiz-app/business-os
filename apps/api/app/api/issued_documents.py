@@ -24,10 +24,12 @@ from app.api.common import not_found
 from app.api.deps import TenantContext, require
 from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, encode_cursor
 from app.api.pdf import PDF_RESPONSES, _pdf, _watermark
+from app.core.audit import record
 from app.core.legal_readiness import evaluate
 from app.core.permissions import Permission
 from app.documents import issuing, render
 from app.documents.issuing import FIRST_NUMBER, Kind
+from app.files import keep_copy
 
 router = APIRouter(prefix="/issued-documents", tags=["documents"])
 
@@ -414,6 +416,13 @@ def issue(body: IssueRequest, context: SalesDep) -> IssuedDocument:
             "content_hash": hashlib.sha256(content).hexdigest(),
         },
     )
+    keep_copy(
+        db,
+        context.tenant_id,
+        "business_docs",
+        name=f"{body.kind}-{number}.pdf",
+        content=content,
+    )
     return IssuedDocument.model_validate(_row(db, document_id))
 
 
@@ -480,6 +489,13 @@ def issued_file(
     db = context.session
     doc = _row(db, document_id)
     name = f"{doc['kind'].replace('_', '-')}-{doc['number']}"
+    record(
+        db,
+        "export.issued_document",
+        entity_type="issued_document",
+        entity_id=document_id,
+        copy=copy,
+    )
     if not copy:
         content = db.execute(
             text("SELECT content FROM app.issued_documents WHERE id = :id"), {"id": document_id}

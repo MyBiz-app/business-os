@@ -100,6 +100,10 @@ class Me(BaseModel):
     )
 
 
+BusinessSize = Literal["solo", "small", "medium", "network"]
+ProductTrack = Literal["full", "website_only"]
+
+
 class TenantCreate(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     vertical: str
@@ -112,6 +116,14 @@ class TenantCreate(BaseModel):
     accepted_legal: dict[str, str] | None = Field(
         default=None,
         description="Legal documents accepted at sign-up (document -> version)",
+    )
+    product_track: ProductTrack | None = Field(
+        default=None,
+        description="website_only: the business ordered a website and has no system modules yet;"
+        " left out means the full system",
+    )
+    business_size: BusinessSize | None = Field(
+        default=None, description="How big the business said it is at sign-up"
     )
 
     @field_validator("name")
@@ -135,6 +147,9 @@ class TenantCreate(BaseModel):
         if value not in available_timezones():
             raise ValueError("unknown time zone")
         return value
+
+
+WaitlistModeSetting = Literal["off", "auto", "first_come", "manual"]
 
 
 class TenantUpdate(BaseModel):
@@ -167,12 +182,18 @@ class TenantUpdate(BaseModel):
     )
     network_scope: Literal["network", "branch"] | None = None
     client_id_number: Literal["off", "optional", "required"] | None = None
+    waitlist_enabled: bool | None = None
+    waitlist_class_mode: WaitlistModeSetting | None = None
+    waitlist_appointment_mode: WaitlistModeSetting | None = None
+    waitlist_resource_mode: WaitlistModeSetting | None = None
+    waitlist_auto_hours: int | None = Field(default=None, ge=0, le=72)
     shifts_publish_auto: bool | None = None
     shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
     shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
     shifts_publish_day: int | None = Field(default=None, ge=1, le=28)
     shifts_publish_time: dt.time | None = None
     legal_entity_type: LegalEntityType | None = None
+    business_size: BusinessSize | None = None
     business_number: str | None = Field(
         default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
     )
@@ -251,6 +272,12 @@ class Tenant(BaseModel):
     website_url: str | None = Field(
         default=None, description="The business's website (its branches may have their own)"
     )
+    product_track: ProductTrack = Field(
+        default="full", description="website_only: a business that ordered a website only"
+    )
+    business_size: BusinessSize | None = Field(
+        default=None, description="solo, small (2-5), medium (6-20) or network; null if not given"
+    )
     address_line: str | None = Field(default=None, description="Settings managers only")
     address_city: str | None = Field(default=None, description="Settings managers only")
     employer_file_number: str | None = Field(default=None, description="Settings managers only")
@@ -286,6 +313,19 @@ class Tenant(BaseModel):
     )
     client_id_number: Literal["off", "optional", "required"] = Field(
         default="off", description="Whether the business asks its clients for an ID number"
+    )
+    waitlist_enabled: bool = Field(default=True, description="The business keeps waitlists")
+    waitlist_class_mode: WaitlistModeSetting = Field(
+        default="auto", description="What happens when a spot in a class opens"
+    )
+    waitlist_appointment_mode: WaitlistModeSetting = Field(
+        default="off", description="What happens when a personal appointment time opens"
+    )
+    waitlist_resource_mode: WaitlistModeSetting = Field(
+        default="off", description="What happens when a court or room time opens"
+    )
+    waitlist_auto_hours: int = Field(
+        default=3, description="Automatic sign-up stops this many hours before a class starts"
     )
     resource_payment: Literal["app", "venue"] = Field(
         default="app",

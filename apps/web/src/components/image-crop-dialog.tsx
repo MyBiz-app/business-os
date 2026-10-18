@@ -4,6 +4,7 @@ import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Modal } from "@/components/ui/modal";
 import { clampView, type CropView, croppedName, cropSquare, MAX_ZOOM, MIN_ZOOM, zoomTo } from "@/lib/image-crop";
 
 const BOX = 288; // the crop box, in CSS pixels
@@ -37,7 +38,6 @@ async function render(image: HTMLImageElement, view: CropView, name: string): Pr
  * move, slide or scroll to zoom, arrow keys and +/- from the keyboard. */
 export function ImageCropDialog({ file, onDone, onCancel }: { file: File; onDone: (cropped: File) => void; onCancel: () => void }) {
   const t = useTranslations("imageCrop");
-  const dialog = useRef<HTMLDialogElement>(null);
   const image = useRef<HTMLImageElement>(null);
   const drag = useRef<{ pointer: number; x: number; y: number; start: CropView } | null>(null);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
@@ -46,7 +46,6 @@ export function ImageCropDialog({ file, onDone, onCancel }: { file: File; onDone
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    dialog.current?.showModal();
     const url = URL.createObjectURL(file);
     const probe = new Image();
     // A run that was cleaned up (React's development double-run) must not report its revoked URL as a failure.
@@ -81,22 +80,25 @@ export function ImageCropDialog({ file, onDone, onCancel }: { file: File; onDone
   }
 
   return (
-    <dialog
-      ref={dialog}
-      aria-labelledby="crop-title"
-      onCancel={(event) => {
-        event.preventDefault();
-        onCancel();
-      }}
-      className="m-auto w-[min(92vw,26rem)] rounded-3xl border border-border bg-surface p-0 text-foreground shadow-2xl backdrop:bg-black/60"
+    <Modal
+      title={t("title")}
+      description={failed ? t("failed") : t("hint")}
+      size="sm"
+      onClose={onCancel}
+      footer={
+        <>
+          <button type="button" className="btn-secondary px-4 py-2 text-sm" onClick={onCancel}>
+            {t("cancel")}
+          </button>
+          {!failed && (
+            <button type="button" className="btn-primary px-4 py-2 text-sm" disabled={!loaded || busy} onClick={confirm}>
+              {t("use")}
+            </button>
+          )}
+        </>
+      }
     >
-      <div className="flex flex-col gap-4 p-5">
-        <div className="flex flex-col gap-1">
-          <h2 id="crop-title" className="text-lg font-semibold">
-            {t("title")}
-          </h2>
-          <p className="text-sm text-muted">{failed ? t("failed") : t("hint")}</p>
-        </div>
+      <div className="flex flex-col items-center gap-4">
         {!failed && (
           <>
             <div
@@ -166,17 +168,7 @@ export function ImageCropDialog({ file, onDone, onCancel }: { file: File; onDone
             </div>
           </>
         )}
-        <div className="flex justify-end gap-2">
-          <button type="button" className="btn-secondary px-4 py-2 text-sm" onClick={onCancel}>
-            {t("cancel")}
-          </button>
-          {!failed && (
-            <button type="button" className="btn-primary px-4 py-2 text-sm" disabled={!loaded || busy} onClick={confirm}>
-              {t("use")}
-            </button>
-          )}
-        </div>
       </div>
-    </dialog>
+    </Modal>
   );
 }

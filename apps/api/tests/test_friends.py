@@ -293,6 +293,9 @@ def test_invite_rules(client: TestClient, studio: dict, auth: AuthHeaders, engin
 def test_the_hold_stops_at_the_cancellation_deadline(
     client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine
 ) -> None:
+    client.patch(
+        "/tenants/current", json={"cancellation_window_minutes": 120}, headers=studio["headers"]
+    )
     dana = person(client, auth, studio, "Dana")
     noa = person(client, auth, studio, "Noa")
     befriend(client, dana, noa)

@@ -12,6 +12,7 @@ import { hm } from "@/lib/time-clock";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { ApprovalForm, EntryForm, NewEntryForm } from "./entry-forms";
+import { EmptyState } from "@/components/empty-state";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("timeClock");
@@ -68,7 +69,7 @@ export default async function PersonTimeClockPage({ params, searchParams }: Page
         <h2 id="entries-heading" className="text-lg font-semibold">
           {t("entries")}
         </h2>
-        {detail.entries.length === 0 && <p className="card p-5 text-sm text-muted">{t("empty")}</p>}
+        {detail.entries.length === 0 && <EmptyState variant="calendar">{t("empty")}</EmptyState>}
         {detail.entries.map((entry) => (
           <article key={entry.id} className="card flex flex-col gap-3 p-5">
             <p className="text-sm">

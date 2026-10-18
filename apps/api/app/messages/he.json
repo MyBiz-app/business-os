@@ -19,7 +19,12 @@
       "session_reminder": "היום: {service} ב-{when}",
       "plan_ending": "המנוי שלך מסתיים ב-{date}",
       "friend_request": "{friend} רוצה להיות חבר שלך",
-      "class_invite": "{friend} הזמין אותך: {service} ב-{when}"
+      "class_invite": "{friend} הזמין אותך: {service} ב-{when}",
+      "waitlist_spot_open": "התפנה מקום: {service} ב-{when}",
+      "waitlist_spot_taken": "מישהו הקדים אותך: {service} ב-{when}",
+      "freeze_approved": "ההקפאה אושרה: {from} עד {date}",
+      "freeze_rejected": "לגבי בקשת ההקפאה שלך",
+      "credit_returned": "החזרנו לך את השיעור: {service} ב-{when}"
     },
     "body": {
       "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
@@ -33,7 +38,12 @@
       "session_reminder": "תזכורת: נרשמת ל{service} היום ({when}). לא יתאפשר לך להגיע? כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לקבל את המקום.",
       "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם.",
       "friend_request": "{friend} שלח לך בקשת חברות ב{business}. אפשר לאשר באפליקציה.",
-      "class_invite": "{friend} שמר לך מקום ב{service} ב-{when} ב{business}. אפשר להצטרף באפליקציה; המקום שמור לזמן קצר."
+      "class_invite": "{friend} שמר לך מקום ב{service} ב-{when} ב{business}. אפשר להצטרף באפליקציה; המקום שמור לזמן קצר.",
+      "waitlist_spot_open": "התפנה מקום ל{service} ב-{when}, ומי שתופס ראשון לוקח. אפשר לתפוס באפליקציה.",
+      "waitlist_spot_taken": "מישהו תפס את המקום ב{service} ב-{when} רגע לפניך. אתה עדיין ברשימת ההמתנה, ונעדכן אם יתפנה מקום נוסף.",
+      "freeze_approved": "{business} אישר להקפיא את ה{plan} שלך מ-{from} עד {date}. תאריך הסיום זז באותו מספר ימים.",
+      "freeze_rejected": "{business} לא יכול היה לאשר הקפאה של ה{plan} שלך מ-{from} עד {date}.",
+      "credit_returned": "{business} החזיר לך את השיעור {service} ב-{when}. הוא כבר לא נחשב כניצול."
     },
     "welcome": {
       "subject": "ברוכים הבאים ל-MyBiz, {business}! 🎉",
@@ -64,6 +74,14 @@
     "leadFollowUp": {
       "withInterest": "היי {name}, כאן {business}. התעניינת אצלנו ב{interest}: רוצה לקבוע זמן? אפשר פשוט להשיב להודעה הזו ונחזור אליך.",
       "plain": "היי {name}, כאן {business}. נשמח לעזור: רוצה לקבוע זמן? אפשר פשוט להשיב להודעה הזו ונחזור אליך."
+    },
+    "payrollReminder": {
+      "title": "השכר לחודש {month} מחכה",
+      "body": "{business}: ריצת השכר לחודש {month} עדיין לא אושרה. נכנסים לשכר כדי לסיים."
+    },
+    "payslipReady": {
+      "title": "תלוש השכר שלך מוכן",
+      "body": "{business}: תלוש השכר לחודש {month} נמצא במסמכים שלך."
     },
     "roster": {
       "subject": "המשמרות החדשות שלך ב{business}",
@@ -306,7 +324,8 @@
       "setup_full": "הקמה מלאה בשבילך",
       "noSupport": "תמיכה רגילה",
       "noPack": "הכמות הכלולה",
-      "social_studio": "סטודיו תוכן"
+      "social_studio": "סטודיו תוכן",
+      "payroll": "שכר"
     }
   },
   "locations": {
@@ -332,6 +351,32 @@
     "expired": "תוקף ההצעה פג. שאלו שוב ואבדוק מה פנוי.",
     "failed": "מצטערים, לא הצלחתי לקבוע את זה. שאלו שוב ואבדוק מה פנוי.",
     "unavailable": "אין לי אפשרות לענות כרגע. הצוות יחזור אליכם בהקדם."
+  },
+  "cancellationPolicy": {
+    "units": {
+      "none": "עד רגע לפני",
+      "day": "יום",
+      "days": "{n} ימים",
+      "hour": "שעה",
+      "hours": "{n} שעות",
+      "minutes": "{n} דקות"
+    },
+    "free": "אפשר לבטל ללא עלות עד {time} לפני המועד.",
+    "freeFor": "אפשר לבטל {kind} ללא עלות עד {time} לפני.",
+    "kinds": {
+      "group": "שיעור קבוצתי",
+      "personal": "שיעור אישי או תור",
+      "resource": "מגרש או חדר"
+    },
+    "late": {
+      "counts": "ביטול מאוחר נחשב כניצול של הביקור.",
+      "recorded": "ביטול מאוחר נרשם, אבל לא נחשב כניצול של ביקור."
+    },
+    "noShow": {
+      "counts": "אם לא מגיעים, הביקור נחשב כניצול.",
+      "recorded": "אם לא מגיעים, זה נרשם, אבל לא נחשב כניצול של ביקור."
+    },
+    "limit": "אחרי {n} אי-הגעות בחודש, ההזמנה מהאפליקציה נעצרת עד שתיצרו קשר עם העסק."
   },
   "verticals": {
     "fitness": {

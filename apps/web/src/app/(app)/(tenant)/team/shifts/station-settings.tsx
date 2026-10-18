@@ -1,5 +1,6 @@
 "use client";
 
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { DoorOpen, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -14,18 +15,18 @@ type Branch = { id: string; name: string; color: string; stations: { id: string;
 export function StationSettings({ branches }: { branches: Branch[] }) {
   const t = useTranslations("shifts");
   return (
-    <details className="card group p-0">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 font-medium [&::-webkit-details-marker]:hidden">
-        <DoorOpen aria-hidden="true" className="size-4 text-primary-ink" />
-        {t("stations.title")}
-        <span className="ms-2 text-sm font-normal text-muted">{t("stations.hint")}</span>
-      </summary>
-      <ul className="flex flex-col divide-y divide-border border-t border-border">
+    <CollapsibleSection
+      icon={<DoorOpen aria-hidden="true" className="size-4 text-primary-ink" />}
+      title={t("stations.title")}
+      description={t("stations.hint")}
+      storageKey="shifts-stations"
+    >
+      <ul className="-mx-5 -my-5 flex flex-col divide-y divide-border">
         {branches.map((branch) => (
           <StationBranch key={branch.id} branch={branch} />
         ))}
       </ul>
-    </details>
+    </CollapsibleSection>
   );
 }
 

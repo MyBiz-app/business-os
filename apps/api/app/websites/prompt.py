@@ -149,8 +149,8 @@ def build_prompt(
             "- A contact form that posts to the platform: "
             f"POST {api}/public/businesses/{code}/inquiries "
             "with JSON {first_name, last_name?, email?, phone?, interest?} and an empty hidden "
-            'field "website" (spam trap). It answers 202. The inquiry appears as a lead with '
-            'the source "website".',
+            'field "website" (spam trap). It answers 202. The inquiry appears as a new lead in '
+            "the business CRM and counts as an enquiry from the site.",
         ]
     if with_system and "booking" in sections:
         out.append(

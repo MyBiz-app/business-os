@@ -38,6 +38,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "billing",
     "billingRun",
     "bookings",
+    "branchMap",
     "businessMenu",
     "clientFields",
     "clientImport",
@@ -48,6 +49,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "dependents",
     "documents",
     "files",
+    "freeze",
     "hours",
     "identity",
     "imageCrop",
@@ -92,6 +94,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "tour",
     "verticals",
     "visitNotes",
+    "waitlist",
     "website"
   ],
   "platform": [
@@ -145,6 +148,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "app",
     "appearance",
     "auth",
+    "branchMap",
     "clientFields",
     "common",
     "errorPages",
