@@ -169,3 +169,9 @@ export async function saveStructure(body: components["schemas"]["StructureUpdate
     return { error: detail === "locked_agent" || detail === "cycle" ? detail : "generic" };
   }
 }
+
+/** The first-time guide was finished or skipped: it will not open by itself again for this person. */
+export async function markAiTourSeen(): Promise<void> {
+  const { api } = await getTenant();
+  await api.PUT("/me/tours/{key}", { params: { path: { key: "ai_team" } } });
+}
