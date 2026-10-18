@@ -341,7 +341,7 @@ def test_managers_and_owners_are_never_kept_to_branches(
     client: TestClient, auth: AuthHeaders, engine: Engine, studio: dict, branches: dict
 ) -> None:
     # A manager listed against one branch still works across all of them.
-    manager = member_at_north(client, auth, engine, studio, branches)
+    manager = member_at_north(client, auth, engine, studio, branches, role="manager")
     assert client.get(f"/sessions/{branches['south_session']}", headers=manager).status_code == 200
     assert client.get(f"/clients/{branches['south_client']}", headers=manager).status_code == 200
     assert {b["id"] for b in client.get("/locations", headers=manager).json()} == {
