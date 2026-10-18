@@ -197,12 +197,12 @@ with sync_playwright() as p:
         "/account", "/migration",
     ]  # fmt: skip
     for path in pages:
-        owner.goto(f"{h.BASE}{path}"); h.ready(owner); check_a11y(owner, f"he-light {path}")
+        h.visit(owner, f"{h.BASE}{path}"); h.ready(owner); check_a11y(owner, f"he-light {path}")
     en = b.new_context(locale="en-US", color_scheme="dark", viewport={"width": 1280, "height": 900})
     en.add_cookies([{"name": "NEXT_LOCALE", "value": "en", "url": h.BASE}])
     en_page = en.new_page(); login(en_page, owner_email)
     for path in pages:
-        en_page.goto(f"{h.BASE}{path}"); h.ready(en_page); check_a11y(en_page, f"en-dark {path}")
+        h.visit(en_page, f"{h.BASE}{path}"); h.ready(en_page); check_a11y(en_page, f"en-dark {path}")
     check_a11y(member, "app he-light /schedule")
     for path in ("/home", "/bookings", "/profile"):
         member.goto(f"{APP}{path}"); member.wait_for_timeout(1500); check_a11y(member, f"app he-light {path}")
