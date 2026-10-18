@@ -49,7 +49,7 @@ with sync_playwright() as p:
                 problems.append(f"{label}: no <main id=main> found")
             elif kind == "capped" and m["main"] > cap + 1:
                 problems.append(f"{label}: form room is {m['main']:.0f}px, cap is {cap:.0f}px")
-            elif kind == "open" and width >= 1920 and m["main"] <= cap:
+            elif kind == "open" and width >= 1920 and m["main"] <= 1600:
                 problems.append(f"{label}: table page stays at {m['main']:.0f}px on a {width}px screen")
     browser.close()
 
