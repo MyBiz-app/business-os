@@ -12,7 +12,7 @@ import { getTenantFor } from "@/lib/tenant";
 import { deleteFile, deleteFolder, setArchived } from "./actions";
 import { NewFolderForm, UploadForm } from "./forms";
 
-const SYSTEM_KEYS = ["payroll", "employees", "business_docs", "imports", "general"] as const;
+const SYSTEM_KEYS = ["payroll", "employees", "business_docs", "imports", "website", "general"] as const;
 
 /** The business's files (round 6, F1): system folders plus its own, each opened by its own permission. */
 export default async function FilesPage({ searchParams }: PageProps<"/files">) {
