@@ -16,7 +16,7 @@ PUBLIC = [
     "/start", "/getting-started", "/legal/privacy", "/legal/terms", "/login", "/signup", "/forgot-password",
 ]
 CRM = [
-    "/dashboard", "/schedule", "/clients", "/leads", "/plans", "/services", "/team", "/reports",
+    "/dashboard", "/schedule", "/clients", "/leads", "/catalog", "/catalog?tab=plans", "/team", "/reports",
     "/messages", "/content", "/settings", "/ai", "/quotes", "/receipts", "/documents", "/time",
 ]
 # Every violation is also logged to the console. The checks below avoid page.evaluate on purpose:

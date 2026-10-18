@@ -9,6 +9,9 @@ import { formatDay, isDay, todayIn } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
+import { Pill } from "@/components/pill";
+
+import { addMeAsClient } from "./actions";
 import { StatusBadge } from "./status-badge";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -21,6 +24,7 @@ type Status = (typeof STATUSES)[number];
 const PLANS = ["valid", "none"] as const;
 type PlanFilter = (typeof PLANS)[number];
 const ABSENCES = [14, 30, 60] as const;
+const STAFF = ["only", "exclude"] as const;
 
 export default async function ClientsPage({ searchParams }: PageProps<"/clients">) {
   const t = await getTranslations();
@@ -32,6 +36,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
   const status = STATUSES.find((s) => s === params.status) as Status | undefined;
   const plan = PLANS.find((p) => p === params.plan) as PlanFilter | undefined;
   const absent = ABSENCES.find((d) => String(d) === params.absent);
+  const staff = STAFF.find((v) => v === params.staff);
   const page = Math.max(1, Number(params.page) || 1);
   // Date filters that come from the dashboard tiles ("new clients", "no-shows").
   const day = (value: unknown) => (isDay(value) ? value : undefined);
@@ -47,6 +52,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           status,
           plan,
           absent_days: absent,
+          staff,
           joined_from: joined.from,
           joined_to: joined.to,
           no_show_from: noShow.from,
@@ -78,6 +84,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     if (search) query.set("q", search);
     if (status) query.set("status", status);
     if (plan) query.set("plan", plan);
+    if (staff) query.set("staff", staff);
     if (absent) query.set("absent", String(absent));
     for (const [key, value] of Object.entries(dateFilters)) if (value && !keys.includes(key)) query.set(key, value);
     return query.size ? `/clients?${query}` : "/clients";
@@ -87,6 +94,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     if (search) query.set("q", search);
     if (status) query.set("status", status);
     if (plan) query.set("plan", plan);
+    if (staff) query.set("staff", staff);
     if (absent) query.set("absent", String(absent));
     for (const [key, value] of Object.entries(dateFilters)) if (value) query.set(key, value);
     query.set("page", String(target));
@@ -105,6 +113,13 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
               <Link href="/clients/join" className="btn-secondary px-4 py-2.5">
                 {t("join.inviteToApp")}
               </Link>
+            )}
+            {canWriteClients(tenant) && (
+              <form action={addMeAsClient}>
+                <button type="submit" className="btn-secondary px-4 py-2.5">
+                  {t("clients.addMe")}
+                </button>
+              </form>
             )}
             {canWriteClients(tenant) && (
               <Link href="/clients/import" className="btn-secondary px-4 py-2.5">
@@ -169,6 +184,17 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
             ))}
           </select>
         </label>
+        <label className="flex flex-col gap-1.5 text-sm font-medium">
+          {t("clients.staffFilter")}
+          <select name="staff" defaultValue={staff ?? ""} className="control px-3 py-2 font-normal">
+            <option value="">{t("clients.staffAny")}</option>
+            {STAFF.map((value) => (
+              <option key={value} value={value}>
+                {t(`clients.staffOptions.${value}`)}
+              </option>
+            ))}
+          </select>
+        </label>
         <button type="submit" className="btn-secondary px-4 py-2">
           {t("clients.search")}
         </button>
@@ -194,7 +220,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
 
       {result.items.length === 0 ? (
         <EmptyState variant="people">
-          {search || status || plan || absent || dateChips.length > 0 ? term("noResults") : term("noClients")}
+          {search || status || plan || absent || staff || dateChips.length > 0 ? term("noResults") : term("noClients")}
         </EmptyState>
       ) : (
         <ScrollRegion labelledBy="clients-heading" className="rounded-2xl border border-border">
@@ -218,6 +244,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                       <span dir="auto" className="text-primary-ink underline-offset-4 group-hover:underline">
                         {[client.first_name, client.last_name].filter(Boolean).join(" ")}
                       </span>
+                      {client.is_staff && <Pill tone="primary">{t("clients.staffBadge")}</Pill>}
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3" dir="ltr">{client.phone}</td>

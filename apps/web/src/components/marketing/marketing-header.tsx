@@ -15,7 +15,11 @@ import { moveFocus, useDismiss } from "@/components/use-dismiss";
 const LINKS = [
   { href: "/features", key: "features" },
   { href: "/industries/fitness", key: "industries", match: "/industries" },
+<<<<<<< HEAD
   { href: "/ai-team", key: "aiTeam" },
+=======
+  { href: "/websites", key: "websites" },
+>>>>>>> origin/main
   { href: "/pricing", key: "pricing" },
   { href: "/about", key: "about" },
   { href: "/contact", key: "contact" },
@@ -50,7 +54,7 @@ export function MarketingHeader() {
   });
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/80 backdrop-blur-xl" style={{ viewTransitionName: "mk-header" }}>
       <Container className="flex h-16 items-center justify-between gap-4">
         <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
           <BrandMark className="size-8 drop-shadow-md transition-transform duration-300 group-hover:rotate-12" />

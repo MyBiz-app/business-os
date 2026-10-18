@@ -63,6 +63,14 @@ SYSTEM_FOLDERS: tuple[dict, ...] = (
         "sensitive": False,
     },
     {
+        "key": "website",
+        "name": "Website",
+        "read": "business.settings",
+        "write": "business.settings",
+        "retain": False,
+        "sensitive": False,
+    },
+    {
         "key": "general",
         "name": "General",
         "read": "files.read",

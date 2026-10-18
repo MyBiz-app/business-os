@@ -34,7 +34,7 @@ def test_system_folders_and_permissions(
 ) -> None:
     owner = studio["headers"]
     mine = folders(client, owner)
-    assert set(mine) == {"payroll", "employees", "business_docs", "imports", "general"}
+    assert set(mine) == {"payroll", "employees", "business_docs", "imports", "website", "general"}
     assert mine["payroll"]["can_upload"] is False and mine["general"]["can_upload"] is True
 
     # A front desk member opens nothing; a manager opens all but the payslips.
@@ -52,6 +52,7 @@ def test_system_folders_and_permissions(
         "employees",
         "business_docs",
         "imports",
+        "website",
         "general",
     }
 

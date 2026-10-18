@@ -32,6 +32,17 @@ def ready(page) -> None:
     )
 
 
+def skip_tour(page) -> None:
+    """Close the AI team's first-time guide if it opened by itself (it covers the page until skipped)."""
+    dialog = page.get_by_role("dialog", name="הכירו את הצוות שלכם")
+    try:
+        dialog.wait_for(state="visible", timeout=3000)
+    except Exception:  # already seen
+        return
+    page.keyboard.press("Escape")
+    dialog.wait_for(state="detached")
+
+
 def app_ready(page) -> None:
     """The client app's entrance fades run in JavaScript (React Native Animated), not as CSS
     animations; wait until nothing is part-way faded before checking contrast."""
@@ -60,6 +71,18 @@ def confirm_link(email: str) -> str:
     html = _message(email)["HTML"]
     link = re.search(r'href="([^"]+(?:/auth/confirm|/verify)[^"]+)"', html)
     return link.group(1).replace("&amp;", "&")
+
+
+def accept_legal(page) -> None:
+    """The mobile app asks a person to accept the current legal documents when it opens; the
+    dialog covers the screen until they do, so a walk-through accepts it first."""
+    accept = page.get_by_role("button", name="אני מאשר/ת")
+    try:
+        accept.wait_for(state="visible", timeout=10000)
+    except Exception:
+        return
+    accept.click()
+    accept.wait_for(state="hidden")
 
 
 def otp(email: str) -> str:

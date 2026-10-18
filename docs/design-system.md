@@ -92,6 +92,13 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   hover. Errors stay until closed; success and info fade after 5 seconds. Use `action` for
   "Undo" after a delete or archive and "View" after a create. `FormNotice` also turns the form's
   `SubmitButton` into "Saved" for a moment. Field errors stay next to the field.
+- Page transitions (web, view transitions, no library): `components/ui/page-transition.tsx`.
+  `PageTransition` goes in a `template.tsx` (a layout persists, so enter/exit never fire there):
+  the landing site fades in with a 12px slide up (250ms) under a fixed header, the CRM only fades
+  (150ms) inside its fixed side menu and header. `CardTransition name="lead-<id>"` on a list card plus
+  `RouteModal transitionName="lead-<id>"` makes the card grow into its window and shrink back.
+  Names must be unique on the page. The motion rules live at the end of `globals.css` and are off
+  for `prefers-reduced-motion` and the accessibility widget; browsers without support just swap.
 - Skip link: every page has one `<main id="main">`. `Container as="main"` sets the id for you;
   a bare `<main>` needs `id="main"`.
 

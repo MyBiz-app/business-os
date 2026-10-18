@@ -50,7 +50,7 @@ export function AiBubble() {
   const tAssistant = useTranslations("assistant");
   const path = usePathname();
   const label = useScreenLabel();
-  const [team, setTeam] = useState<{ agents: Agent[]; enabled: boolean } | null>(null);
+  const [team, setTeam] = useState<{ agents: Agent[]; enabled: boolean; level: "ok" | "warn" | "over" } | null>(null);
   const [open, setOpen] = useState(false);
   const [fan, setFan] = useState(false);
   const [picked, setPicked] = useState<{ key: string; path: string } | null>(null);
@@ -340,6 +340,13 @@ export function AiBubble() {
         }}
       >
         <Crossfade agent={shown} />
+        {team.level !== "ok" && (
+          <span
+            role="img"
+            aria-label={t(team.level === "over" ? "levelOver" : "levelWarn")}
+            className={`absolute end-0 top-0 size-3.5 rounded-full border-2 border-background ${team.level === "over" ? "bg-danger" : "bg-warning"}`}
+          />
+        )}
       </button>
 
       {fan && !open && fanAgents.length > 0 && (
