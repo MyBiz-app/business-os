@@ -337,6 +337,14 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Filed copies (payslips, signed Form 101, issued documents) go through `files.keep_copy`: the document's own table stays the source of truth, a failed copy never fails the action. Payslips are filed twice, as a draft at approval and as a final set after the accountant check.
 - Pushes about payroll run as jobs (`remind-payroll` daily, `notify-payslips` hourly) because a phone token is readable only by its owner under row level security; each is recorded once in the audit log. No email and no cost.
 
+### AI connectors: actions that wait for approval (2026-10-18, round 7 R37b, migration 0136)
+
+- A connector may only propose, never change. The four proposing tools (`MCP_ACTION_TOOLS`: book, cancel, log time, bill a month) are the assistant's own, so they only create a pending action; publishing and scheduled tasks stay with the built-in assistant. The request is filed with agent key `mcp` and the app's name in its preview, so no table changed.
+- Proposing is a second scope the person ticks on the approval screen (`propose`, on by default); the first scope (`read`) is always granted. Connections made before this release stay read-only until reconnected, so nobody gains a power they did not approve.
+- Only the person the app acts for sees and decides its requests (the existing confirm and reject endpoints already require the requester). Approval re-checks permission, module, payload hash and capacity, and the audit entry carries the app's name.
+- Requests last 24 hours (nobody watches when an app proposes), at most 20 wait per business, and the read-only database transaction stays the default; only a proposing call writes, and only the request row.
+- The console view is a read-only function (`platform_mcp_usage`, usage permission) with per-business apps, calls and proposal outcomes. The settings guide is text only; screenshots wait for a real Claude and ChatGPT session.
+
 ## Open
 
 | # | Question |

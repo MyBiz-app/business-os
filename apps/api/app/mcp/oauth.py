@@ -28,7 +28,7 @@ from app.core import audit
 from app.core.brand import NAME
 from app.core.config import get_settings
 from app.core.db import EngineDep
-from app.mcp.access import anonymous_session
+from app.mcp.access import PROPOSE, anonymous_session
 from app.mcp.tokens import (
     ACCESS_PREFIX,
     CODE_PREFIX,
@@ -200,6 +200,10 @@ class Approval(BaseModel):
     redirect_uri: str
     code_challenge: str = Field(min_length=43, max_length=128)
     state: str = Field(default="", max_length=500)
+    propose: bool = Field(
+        default=False,
+        description="Also let the app propose changes; each one waits for this person's approval",
+    )
 
 
 class ApprovalResult(BaseModel):
@@ -235,9 +239,9 @@ def approve(body: Approval, tenant: TenantDep) -> ApprovalResult:
         text("""
             INSERT INTO app.mcp_connections
                 (tenant_id, user_id, mcp_client, client_name, redirect_uri, code_hash,
-                 code_challenge, code_expires_at)
+                 code_challenge, code_expires_at, scopes)
             VALUES (app.current_tenant_id(), app.current_user_id(), :client, :name, :redirect,
-                    :code_hash, :challenge, now() + make_interval(mins => :minutes))
+                    :code_hash, :challenge, now() + make_interval(mins => :minutes), :scopes)
             RETURNING id
         """),
         {
@@ -247,6 +251,7 @@ def approve(body: Approval, tenant: TenantDep) -> ApprovalResult:
             "code_hash": code_hash,
             "challenge": body.code_challenge,
             "minutes": CODE_MINUTES,
+            "scopes": ["read", PROPOSE] if body.propose else ["read"],
         },
     ).scalar_one()
     audit.record(
@@ -255,6 +260,7 @@ def approve(body: Approval, tenant: TenantDep) -> ApprovalResult:
         entity_type="mcp_connection",
         entity_id=connection_id,
         client=known.client_name,
+        propose=body.propose,
     )
     return ApprovalResult(redirect_to=_with_query(body.redirect_uri, code=code, state=body.state))
 
@@ -351,6 +357,7 @@ class McpConnection(BaseModel):
     created_at: dt.datetime
     last_used_at: dt.datetime | None
     calls: int
+    can_propose: bool = Field(description="May also propose changes, which wait for approval")
 
 
 @router.get("/mcp-connections", operation_id="list_mcp_connections")
@@ -358,7 +365,8 @@ def list_connections(tenant: TenantDep) -> list[McpConnection]:
     """The AI apps the signed-in person connected to this business."""
     rows = tenant.session.execute(
         text("""
-            SELECT id, client_name, created_at, last_used_at, calls
+            SELECT id, client_name, created_at, last_used_at, calls,
+                   'propose' = ANY(scopes) AS can_propose
             FROM app.mcp_connections
             WHERE tenant_id = app.current_tenant_id() AND user_id = app.current_user_id()
               AND access_hash IS NOT NULL AND revoked_at IS NULL

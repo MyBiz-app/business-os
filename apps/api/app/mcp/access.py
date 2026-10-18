@@ -19,6 +19,7 @@ from app.core.permissions import effective_permissions
 from app.mcp.tokens import hash_token
 
 METER = "mcp_calls"
+PROPOSE = "propose"  # a connection scope; "read" is held by every connection
 
 
 class AccessDenied(Exception):
@@ -32,6 +33,11 @@ class Connection:
     user_id: UUID
     client_name: str
     scopes: tuple[str, ...]
+
+    @property
+    def may_propose(self) -> bool:
+        """The person also allowed this app to propose changes (each waits for their approval)."""
+        return PROPOSE in self.scopes
 
 
 @contextmanager
@@ -52,8 +58,11 @@ def authenticate(engine: Engine, token: str) -> Connection | None:
 
 
 @contextmanager
-def tenant_context(engine: Engine, connection: Connection) -> Iterator[TenantContext]:
-    """The connection's person inside its business, in a transaction that cannot write."""
+def tenant_context(
+    engine: Engine, connection: Connection, read_only: bool = True
+) -> Iterator[TenantContext]:
+    """The connection's person inside its business, in a transaction that cannot write (except
+    when a tool proposes a change: that writes the request, never the change itself)."""
     with contextmanager(session_scope)(open_session(engine, connection.user_id)) as session:
         set_tenant(session, connection.tenant_id)
         member = session.execute(
@@ -86,7 +95,8 @@ def tenant_context(engine: Engine, connection: Connection) -> Iterator[TenantCon
         if allowed is not None and not allowed:
             raise AccessDenied("You have no branches in this business.")
         set_branch(session, None, allowed)
-        session.execute(text("SET TRANSACTION READ ONLY"))
+        if read_only:
+            session.execute(text("SET TRANSACTION READ ONLY"))
         yield TenantContext(
             session=session,
             tenant_id=connection.tenant_id,
