@@ -6,8 +6,9 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 \
     && rm -rf /var/lib/apt/lists/*
 
-# setuptools ships with the base image and lags behind its security fixes; upgrade it here.
-RUN pip install --no-cache-dir --upgrade uv==0.11.15 "setuptools>=83"
+# uv installs the dependencies; pip is removed afterwards because it vendors old copies of urllib3,
+# msgpack and setuptools that image scanners flag and that nothing at runtime uses.
+RUN pip install --no-cache-dir uv==0.13.1 && pip uninstall -y pip
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
