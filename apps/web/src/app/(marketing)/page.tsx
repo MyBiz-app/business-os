@@ -15,6 +15,7 @@ import {
   DemoSection,
   FactsStrip,
   PricingTeaser,
+  WebsitesTeaser,
 } from "@/components/marketing/home";
 import { HomePhone } from "@/components/marketing/home-phone";
 import { HeroIntro } from "@/components/marketing/hero-intro";
@@ -215,6 +216,7 @@ export default async function Home() {
       <IndustryCards />
 
       <PricingTeaser />
+      <WebsitesTeaser />
 
       {/* How it works */}
       <Section
