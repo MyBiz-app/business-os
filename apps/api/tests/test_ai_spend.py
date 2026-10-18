@@ -31,7 +31,7 @@ def test_payg_is_off_by_default_and_the_plan_limit_stops_questions(
     spend = client.get("/ai/spend", headers=headers).json()
     assert spend["payg_enabled"] is False and spend["payg_cap_minor"] is None
     assert spend["credits_limit"] == spend["credits_included"] > 0
-    assert spend["price_per_100_minor"] == 600  # ILS
+    assert spend["price_per_100_minor"] == 800  # ILS
 
     spend_credits(engine, spend["credits_included"] + 1)
     response = ask(client, headers, conversation(client, headers), "hi")
@@ -53,8 +53,8 @@ def test_payg_without_a_cap_keeps_working_and_bills_the_extra(
     assert response.status_code == 200, response.text
     spend = client.get("/ai/spend", headers=headers).json()
     assert spend["extra_credits"] >= 250
-    assert spend["extra_minor"] >= 1500  # 250 credits at 6.00 per 100
-    assert client.get("/billing/usage", headers=headers).json()["ai_extra_minor"] >= 1500
+    assert spend["extra_minor"] >= 2000  # 250 credits at 8.00 per 100
+    assert client.get("/billing/usage", headers=headers).json()["ai_extra_minor"] >= 2000
 
 
 def test_payg_cap_stops_questions_when_reached(
@@ -67,9 +67,9 @@ def test_payg_cap_stops_questions_when_reached(
     capped = client.put(
         "/ai/spend", json={"payg_enabled": True, "payg_cap_minor": 1200}, headers=headers
     ).json()
-    assert capped["credits_limit"] == included + 200  # 12.00 buys 200 credits at 6.00 per 100
+    assert capped["credits_limit"] == included + 150  # 12.00 buys 150 credits at 8.00 per 100
 
-    spend_credits(engine, included + 150)
+    spend_credits(engine, included + 100)
     assert ask(client, headers, conversation(client, headers), "hi").status_code == 200
     spend_credits(engine, 100)
     response = ask(client, headers, conversation(client, headers), "hi")

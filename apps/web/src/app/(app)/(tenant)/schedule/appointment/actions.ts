@@ -5,7 +5,12 @@ import { redirect } from "next/navigation";
 import { ApiError } from "@/lib/api";
 import { getTenantFor } from "@/lib/tenant";
 
-export type AppointmentState = { error?: "slot_taken" | "outside_hours" | "address_required" | "invalid" | "generic" };
+export type AppointmentState = {
+  error?: "slot_taken" | "outside_hours" | "address_required" | "invalid" | "generic";
+  saved?: boolean;
+  /** Where a window over the schedule goes once the appointment is booked. */
+  next?: string;
+};
 
 /** Books the chosen client into the chosen free time, then opens the appointment. */
 export async function bookAppointment(serviceId: string, _state: AppointmentState, formData: FormData): Promise<AppointmentState> {
@@ -34,5 +39,8 @@ export async function bookAppointment(serviceId: string, _state: AppointmentStat
             : "generic",
     };
   }
-  redirect(`/schedule/${data.session_id}?booked=1`);
+  const next = `/schedule/${data.session_id}?booked=1`;
+  // In a window over the schedule the form closes itself, shows the confirmation and opens the appointment.
+  if (formData.get("_modal")) return { saved: true, next };
+  redirect(next);
 }

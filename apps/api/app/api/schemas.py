@@ -7,6 +7,7 @@ from zoneinfo import available_timezones
 from pydantic import BaseModel, BeforeValidator, Field, field_validator, model_validator
 
 from app.catalog.verticals import VERTICAL_PACKS
+from app.core.website import normalize_website
 
 LegalEntityType = Literal[
     "company", "licensed_dealer", "exempt_dealer", "nonprofit", "partnership", "other"
@@ -61,6 +62,15 @@ class Me(BaseModel):
     address_line: str | None = None
     city: str | None = None
     postal_code: str | None = None
+    city_code: int | None = Field(default=None, description="Home city, from the official list")
+    street_code: int | None = None
+    house_number: str | None = None
+    address_details: str | None = None
+    street_unlisted: str | None = None
+    street_name: str | None = Field(default=None, description="The home street's name")
+    address_complete: bool = Field(
+        default=False, description="City, street and house number are all filled in"
+    )
     email_roster: bool = Field(
         default=True, description="Email the person when their roster is published"
     )
@@ -168,6 +178,9 @@ class TenantUpdate(BaseModel):
     )
     address_line: str | None = Field(default=None, max_length=200)
     address_city: str | None = Field(default=None, max_length=100)
+    website_url: str | None = Field(
+        default=None, max_length=300, description="The business's website; empty clears it"
+    )
     employer_file_number: str | None = Field(
         default=None, pattern=r"^[0-9A-Za-z/-]{2,20}$", description="Deductions file (תיק ניכויים)"
     )
@@ -187,6 +200,11 @@ class TenantUpdate(BaseModel):
         if isinstance(value, str):
             return value.strip() or None
         return value
+
+    @field_validator("website_url", mode="before")
+    @classmethod
+    def clean_website(cls, value: object) -> object:
+        return normalize_website(value) if isinstance(value, str) else value
 
     @field_validator("business_number", "employer_file_number", mode="before")
     @classmethod
@@ -229,6 +247,9 @@ class Tenant(BaseModel):
     )
     business_number: str | None = Field(
         default=None, description="Shown only to people who manage the business's settings"
+    )
+    website_url: str | None = Field(
+        default=None, description="The business's website (its branches may have their own)"
     )
     address_line: str | None = Field(default=None, description="Settings managers only")
     address_city: str | None = Field(default=None, description="Settings managers only")

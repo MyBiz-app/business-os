@@ -29,6 +29,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "settings"
   ],
   "tenant": [
+    "address",
     "aiBubble",
     "aiTeam",
     "appointments",
@@ -36,6 +37,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "auth",
     "billing",
     "billingRun",
+    "bookings",
     "businessMenu",
     "clientFields",
     "clientImport",
@@ -87,8 +89,10 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "timeClock",
     "timeOff",
     "timeOffQueue",
+    "tour",
     "verticals",
-    "visitNotes"
+    "visitNotes",
+    "website"
   ],
   "platform": [
     "billing",
@@ -109,14 +113,21 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
   "app": [
     "accessibility",
     "account",
+    "address",
+    "aiBubble",
+    "aiTeam",
     "app",
     "appearance",
+    "assistant",
     "auth",
+    "businessMenu",
     "clientFields",
     "common",
+    "content",
     "imageCrop",
     "locales",
     "modules",
+    "nav",
     "onboarding",
     "platform",
     "security",
@@ -130,6 +141,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
   "root": [
     "accessibility",
     "account",
+    "address",
     "app",
     "appearance",
     "auth",
@@ -153,6 +165,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "start",
     "team",
     "terms",
+    "tour",
     "userMenu",
     "verticals"
   ]

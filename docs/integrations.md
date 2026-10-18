@@ -108,6 +108,23 @@ and `/social/callback/google_business` (both in the same Google OAuth client) an
 build up from our own daily reads. These tokens expire within a day, so the sync renews them on
 every run. Publishing is not built for these networks yet.
 
+## Cities, streets and map points (addresses)
+
+Addresses are chosen from the official Israeli lists (data.gov.il, free open data), kept as a
+snapshot in the code (`apps/api/app/geo/data/il_geo.json.gz`) and loaded into the shared, read-only
+tables `geo_cities` and `geo_streets` by migration 0129. Refresh once a year:
+`uv run python scripts/build_geo_snapshot.py` (needs access to data.gov.il), review the printed
+counts, commit the file, then `uv run python -m app.geo.loader` against each database (rows are
+inserted or updated, never deleted: saved addresses point at them).
+
+A branch's point on the map comes from OpenStreetMap's free Nominatim service
+(`app/geo/geocoder.py`): one request when a branch address is saved, never per page view, with
+an identifying `User-Agent` (`API_GEOCODER_USER_AGENT`). `API_GEOCODER=none` turns it off (tests
+and local work). A failure never blocks saving; the branch simply has no point until the next
+save or until the pin is placed by hand. Nominatim's policy allows light use (about one request a
+second); if branch saves ever become frequent, host Nominatim or switch the class behind
+`get_geocoder()` for another service.
+
 ## Switching provider
 
 - **A business**: settings → Integrations → choose another provider and fill its settings.

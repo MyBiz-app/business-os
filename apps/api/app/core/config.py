@@ -27,6 +27,8 @@ class Settings(BaseSettings):
 
     # Local defaults match `supabase start`. Other environments set these explicitly.
     database_url: str = "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
+    # Background jobs switch to this role after connecting; empty runs them as the login itself.
+    jobs_db_role: str = "app_jobs"
     jwks_url: str = "http://127.0.0.1:54321/auth/v1/.well-known/jwks.json"
     jwt_audience: str = "authenticated"
 
@@ -63,6 +65,11 @@ class Settings(BaseSettings):
     sentry_dsn: SecretStr | None = None
     sentry_traces_sample_rate: float = Field(default=0.0, ge=0.0, le=1.0)
     sentry_release: str | None = None  # defaults to the commit Render deployed (RENDER_GIT_COMMIT)
+
+    # Turning a branch's address into a point on the map (R34): "nominatim" (OpenStreetMap, free,
+    # one request per saved address) or "none". Tests and local work run with "none".
+    geocoder: str = "nominatim"
+    geocoder_user_agent: str = f"{BRAND_NAME} business-os geocoder"
 
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
     email_provider: str = "none"  # none | log | resend | gmail | smtp
@@ -144,6 +151,12 @@ class Settings(BaseSettings):
     # Signed-in requests one business may make per minute (staff and clients together); 0 turns
     # the business ceiling off. Counted in the same store as the address limits.
     tenant_rate_limit_per_minute: int = 600
+
+    # AI connectors (MCP): calls per business in a rolling 24 hours, over every connection (R37a);
+    # 0 turns the ceiling off. How long a token lives.
+    mcp_daily_calls_per_business: int = 600
+    mcp_access_token_minutes: int = 60
+    mcp_refresh_token_days: int = 90
 
     @property
     def rate_limits_on(self) -> bool:

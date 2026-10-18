@@ -22,6 +22,7 @@ from app.api.bookings import (
     lock_session,
     place_booking,
 )
+from app.api.clients import join_as_member, member_join_code
 from app.api.closed_days import ClosedDay
 from app.api.common import blank_to_none, not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
@@ -55,6 +56,7 @@ class BusinessProfile(BaseModel):
     primary_color: str | None
     logo_url: str | None
     client_app: bool = Field(description="Whether the business offers the client app")
+    website_url: str | None = Field(default=None, description="The business's website, if any")
     inquiries: bool = Field(
         default=False, description="Whether its public inquiry form is open (CRM module)"
     )
@@ -67,6 +69,7 @@ class ClientBusiness(BaseModel):
     locale: Literal["he", "en"]
     primary_color: str | None
     logo_url: str | None
+    website_url: str | None = Field(default=None, description="The business's website, if any")
     time_zone: str
     currency: str
     cancellation_window_minutes: int
@@ -100,6 +103,9 @@ class ClientLocation(BaseModel):
     contact_email: str | None = Field(
         default=None,
         description="The branch's confirmed main email, else the business's; none if neither set",
+    )
+    website_url: str | None = Field(
+        default=None, description="The branch's website, else the business's; none if neither set"
     )
 
 
@@ -196,7 +202,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
     row = (
         session.execute(
             text(f"""
-                SELECT t.id, t.name, t.locale, t.primary_color, t.client_app,
+                SELECT t.id, t.name, t.locale, t.primary_color, t.client_app, t.website_url,
                        {LOGO_URL.format(t="t")} AS logo_url,
                        app.accepts_inquiries(:code) AS inquiries
                 FROM app.business_by_join_code(:code) t
@@ -213,7 +219,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
-           t.cancellation_window_minutes, t.online_sales, t.resource_payment,
+           t.cancellation_window_minutes, t.online_sales, t.resource_payment, t.website_url,
            {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
@@ -234,6 +240,8 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
     rows = context.session.execute(
         text("""
             SELECT l.id, l.name, l.address, l.kind,
+                   coalesce(l.website_url, (SELECT website_url FROM app.tenants
+                                            WHERE id = l.tenant_id)) AS website_url,
                    coalesce(
                        (SELECT c.email FROM app.contact_emails c
                         WHERE c.tenant_id = l.tenant_id AND c.location_id = l.id
@@ -246,6 +254,15 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
         """)
     ).mappings()
     return [ClientLocation.model_validate(dict(row)) for row in rows]
+
+
+def _joined_business(session: Session, client_id: UUID | None) -> ClientBusiness:
+    row = (
+        session.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": client_id})
+        .mappings()
+        .one()
+    )
+    return _business(row)
 
 
 @router.post("/businesses", status_code=status.HTTP_201_CREATED)
@@ -265,14 +282,31 @@ def join_business(
     ).scalar()
     if client_id is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="unknown_code")
-    row = (
-        session.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": client_id})
-        .mappings()
-        .one()
-    )
+    joined = _joined_business(session, client_id)
     if body.accepted_legal:
-        record_acceptance(session, request, user.id, body.accepted_legal, "client_join", row["id"])
-    return _business(row)
+        record_acceptance(session, request, user.id, body.accepted_legal, "client_join", joined.id)
+    return joined
+
+
+class MemberJoinRequest(BaseModel):
+    tenant_id: UUID
+
+
+@router.post("/businesses/self", status_code=status.HTTP_201_CREATED)
+def join_own_business(
+    body: MemberJoinRequest, user: UserDep, session: SessionDep
+) -> ClientBusiness:
+    """ "Sign up as a client too": a team member joins their own business without a code (R36)."""
+    ensure_profile(session, user.id, user.email)
+    code = member_join_code(session, body.tenant_id)
+    if code is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_a_team_member")
+    offers_app = session.execute(
+        text("SELECT client_app FROM app.business_by_join_code(:code)"), {"code": code}
+    ).scalar()
+    if offers_app is False:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
+    return _joined_business(session, join_as_member(session, body.tenant_id))
 
 
 CLIENT_SESSION_SELECT = """

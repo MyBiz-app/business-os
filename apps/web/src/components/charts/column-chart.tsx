@@ -64,7 +64,8 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
         {title}
       </figcaption>
       <div className="relative" dir="ltr">
-        <svg viewBox={`0 0 ${width} ${HEIGHT + 28}`} className="h-auto w-full max-w-[720px] overflow-visible" role="img" aria-label={title}>
+        <svg viewBox={`0 0 ${width} ${HEIGHT + 28}`} className="h-auto w-full max-w-[720px] overflow-visible" role="group" aria-label={title}>
+          {/* A "group", not an "img": the columns are focusable and an image may not contain interactive children. */}
           <defs>
             <linearGradient id={gradient} x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor="var(--primary)" />

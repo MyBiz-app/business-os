@@ -38,7 +38,7 @@ nothing in production was touched.
 | 4 | Encryption at rest and in transit | ✅ | - | Provider disk and TLS, plus field encryption |
 | 4 | Key rotation | ✅ | #389 | `rotate-secrets` job and procedure |
 | 4 | Secrets management | ✅ | #384 | gitleaks in CI and nightly |
-| 4 | Least privilege | 🟡 | - | The API runs as a limited role without row security bypass. Background jobs still use the owner connection (`app/jobs.py` says so on purpose, they work across businesses). A separate limited jobs role is a code item for after go-live |
+| 4 | Least privilege | 🟢 | - | The API runs as a limited role without row security bypass. Background jobs switch to `app_jobs` (migration 0128): all businesses, rows only, no schema changes, no TRUNCATE, no triggers. `API_JOBS_DB_ROLE=` (empty) turns it off |
 | 4 | Access to production | 🟡 | #396, #407 | Two-step sign-in on Supabase, Render, Vercel, GitHub: owner |
 | 5 | Production server | 🟡 | #396 | Written as code, off. Render Starter and Supabase Pro at go-live: owner approves |
 | 5 | Indexes | ✅ | #403 | Trigram index for client search; index tests |

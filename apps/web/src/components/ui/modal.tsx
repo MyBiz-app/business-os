@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { type ReactNode, useCallback, useEffect, useId, useRef, useState } from "react";
+import { type ReactNode, useCallback, useId, useLayoutEffect, useRef, useState, ViewTransition } from "react";
 
 const CLOSE_MS = 150; // matches `.modal-dialog[data-closing]` in globals.css
 
@@ -10,7 +10,8 @@ const CLOSE_MS = 150; // matches `.modal-dialog[data-closing]` in globals.css
  * behind stays visible and blurred. Esc, the X and a click on the backdrop close it; with `dirty`
  * they first ask "Leave without saving?". Focus moves in and returns to the button that opened it
  * (native `<dialog>`). Put the save and cancel buttons in `footer`: it stays visible without scrolling.
- * Mount it only while it is open, or pass `open`. */
+ * Mount it only while it is open, or pass `open`. With `transitionName` the window grows out of the
+ * card that has the same name (see `CardTransition`) and shrinks back into it. */
 export function Modal({
   open = true,
   onClose,
@@ -20,6 +21,7 @@ export function Modal({
   footer,
   dirty = false,
   size = "lg",
+  transitionName,
 }: {
   open?: boolean;
   onClose: () => void;
@@ -30,6 +32,8 @@ export function Modal({
   /** True while the form holds changes that are not saved yet. */
   dirty?: boolean;
   size?: "sm" | "md" | "lg";
+  /** The name of the card this window grows out of (a view transition shared element). */
+  transitionName?: string;
 }) {
   const t = useTranslations("common");
   const dialog = useRef<HTMLDialogElement>(null);
@@ -39,7 +43,9 @@ export function Modal({
   const [closing, setClosing] = useState(false);
   const [asking, setAsking] = useState(false);
 
-  useEffect(() => {
+  // A layout effect, so the window is on screen in the same commit as the navigation and the
+  // browser can pair it with the card it grows out of.
+  useLayoutEffect(() => {
     const element = dialog.current;
     if (!open || !element) return;
     if (!element.open) element.showModal();
@@ -51,13 +57,18 @@ export function Modal({
 
   const finish = useCallback(() => {
     setAsking(false);
-    setClosing(true);
     window.clearTimeout(timer.current);
+    // The shrink back into the card is the closing animation.
+    if (transitionName) {
+      onClose();
+      return;
+    }
+    setClosing(true);
     timer.current = window.setTimeout(() => {
       setClosing(false);
       onClose();
     }, CLOSE_MS);
-  }, [onClose]);
+  }, [onClose, transitionName]);
 
   const requestClose = useCallback(() => {
     if (dirty) setAsking(true);
@@ -81,7 +92,8 @@ export function Modal({
         if (event.target === event.currentTarget) requestClose();
       }}
     >
-      <div className="modal-panel" data-size={size}>
+      <PanelTransition name={transitionName}>
+      <div className="modal-panel" data-size={size} data-morph={transitionName ? "" : undefined}>
         <header className="flex items-start gap-3 border-b border-border px-5 py-4 sm:px-6">
           <div className="min-w-0 flex-1">
             <h2 id={titleId} className="text-lg font-bold leading-snug">
@@ -124,6 +136,16 @@ export function Modal({
           </div>
         ) : null}
       </div>
+      </PanelTransition>
     </dialog>
+  );
+}
+
+function PanelTransition({ name, children }: { name?: string; children: ReactNode }) {
+  if (!name) return children;
+  return (
+    <ViewTransition name={name} share="card-window" default="none">
+      {children}
+    </ViewTransition>
   );
 }

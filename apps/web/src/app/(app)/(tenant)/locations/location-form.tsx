@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { AddressPicker } from "@/components/address-picker";
 import { CheckboxField, Field, SelectField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -29,7 +30,16 @@ export function LocationForm({ action, location, submitLabel, readOnly = false, 
       <FormFeedback state={state} />
       <fieldset key={location?.updated_at ?? "new"} disabled={readOnly} className="grid gap-4 sm:grid-cols-2">
         <Field label={t("locations.name")} name="name" required maxLength={120} defaultValue={location?.name} />
-        <Field label={t("locations.address")} name="address" maxLength={300} defaultValue={location?.address ?? ""} />
+        <fieldset className="flex flex-col gap-3 sm:col-span-2">
+          <legend className="mb-1 text-sm font-medium">{t("locations.address")}</legend>
+          <AddressPicker
+            required={!location || location.city_code != null}
+            defaults={location ?? {}}
+            legacyText={location?.address}
+            disabled={readOnly}
+          />
+        </fieldset>
+        <Field label={t("locations.website")} hint={t("locations.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="off" placeholder="www.example.com" defaultValue={location?.website_url ?? ""} />
         {location && kindOptions.length > 1 && (
           <SelectField label={t("locations.kind")} name="kind" defaultValue={location.kind ?? ""} options={kindOptions} />
         )}

@@ -27,8 +27,9 @@
 Every run is recorded in app.job_runs (started, finished, ok, result), so a job that stopped
 running or keeps failing is noticed by check-jobs (.github/workflows/check-jobs-staging.yml).
 
-Jobs run with the migration (owner) connection, across all businesses, so they must only do
-system work that needs no user's permission."""
+Jobs connect with the migration (owner) login but switch to the `app_jobs` role (jobs_engine):
+it works across all businesses and can read and write rows, but cannot change the schema or
+truncate a table. They must only do system work that needs no user's permission."""
 
 import argparse
 import json
@@ -37,7 +38,7 @@ from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import Connection, Engine, create_engine, text
+from sqlalchemy import Connection, Engine, create_engine, event, text
 
 from app.commerce.billing import bill_businesses
 from app.commerce.dunning import run_dunning
@@ -733,6 +734,24 @@ MAX_HOURS = {**{job: 27 for job in DAILY}, **{job: 8 for job in HOURLY}}
 OPTIONAL = {"send-emails", "notify-shifts"}
 
 
+JOBS_ROLE = "app_jobs"
+
+
+def jobs_engine(database_url: str, role: str | None = JOBS_ROLE) -> Engine:
+    """An engine whose every connection runs as the least-privilege jobs role."""
+    engine = create_engine(database_url)
+    if role:
+
+        @event.listens_for(engine, "connect")
+        def _use_jobs_role(dbapi_connection, _record) -> None:
+            cursor = dbapi_connection.cursor()
+            cursor.execute(f'SET ROLE "{role}"')
+            cursor.close()
+            dbapi_connection.commit()
+
+    return engine
+
+
 def run_job(engine: Engine, name: str, apply: bool = False) -> object:
     """Runs one job in its own transaction and records the run in app.job_runs, failed runs
     included (the record is written apart from the job, so a rollback doesn't lose it).
@@ -891,7 +910,8 @@ def main() -> None:
         help="Really change data (delete-closed-businesses, rotate-secrets: a report without it)",
     )
     args = parser.parse_args()
-    engine = create_engine(args.database_url or get_settings().database_url)
+    settings = get_settings()
+    engine = jobs_engine(args.database_url or settings.database_url, settings.jobs_db_role)
     if args.job == "check-jobs":
         with engine.connect() as conn:
             late = late_jobs(conn)
