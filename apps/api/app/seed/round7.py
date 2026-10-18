@@ -65,14 +65,11 @@ NO_DEMO: dict[str, str] = {
 # demo rows here (and remove it from this list); the coverage test already fails for its new
 # tenant tables until it is filled or listed in NO_DEMO.
 PENDING_FEATURES = (
-    "R30 waitlist 2.0 (range, day, appointments, resources)",
-    "R31 staff over capacity",
-    "R32 business cancellation policy",
-    "R33 subscription cancellation by the business",
-    "R35 branches map",
-    "R37b MCP connector for ChatGPT",
-    "R28 solo mode (one business without staff)",
-    "R25a / R25b site-only track and the CRM website area",
+    "R23 freeze extras: a freeze request with an attached paper (needs its migration)",
+    "R25b CRM website area (the website order and visits are already filled)",
+    "R33 subscription cancellation by the business (console churn view)",
+    "R28 solo mode: a solo demo business needs no team, so it would be a fourth business "
+    "(the curated account keeps exactly three); the three get a business size instead",
 )
 
 QUOTES = {
@@ -268,7 +265,7 @@ def _documents(conn: Connection, tenant_id: UUID, owner: UUID, clients: list, to
         {"t": tenant_id},
     )
     with _as_tenant(conn, tenant_id, owner) as db:
-        context = SimpleNamespace(session=db)
+        context = SimpleNamespace(session=db, tenant_id=tenant_id)
         first = None
         plan = (
             ("tax_invoice_receipt", "card", "מנוי חודשי", 1, 28_000),
@@ -1107,6 +1104,229 @@ def _people(conn: Connection, tenant_id: UUID, owner: UUID, name: str, clients: 
     return added
 
 
+def _business_size(conn: Connection, tenant_id: UUID, name: str) -> int:
+    """The size each demo business answered at sign-up (a solo business has no team, so none of
+    the three is solo). Only fills an empty answer."""
+    size = {GYM_NETWORK: "network", SALON: "medium", PIZZA: "network"}.get(name)
+    if size is None:
+        return 0
+    return conn.execute(
+        text("UPDATE app.tenants SET business_size = :s WHERE id = :t AND business_size IS NULL"),
+        {"s": size, "t": tenant_id},
+    ).rowcount
+
+
+def _cancellation(conn: Connection, tenant_id: UUID, owner: UUID, currency: str,
+                  clients: list, today: date) -> int:  # fmt: skip
+    """R32: a policy for one service and one for a plan, a plan with visits per week and a client
+    on it, and two late cancellations whose visit was given back (with the client told)."""
+    added = 0
+    layers = conn.execute(
+        text(
+            "SELECT count(*) FROM app.cancellation_policies "
+            "WHERE tenant_id = :t AND scope <> 'business'"
+        ),
+        {"t": tenant_id},
+    ).scalar_one()
+    if layers == 0:
+        service = conn.execute(
+            text(
+                "SELECT id FROM app.services "
+                "WHERE tenant_id = :t AND active ORDER BY created_at LIMIT 1"
+            ),
+            {"t": tenant_id},
+        ).scalar()
+        plan = conn.execute(
+            text("""
+                SELECT id FROM app.plans WHERE tenant_id = :t AND active AND kind = 'membership'
+                ORDER BY created_at LIMIT 1
+            """),
+            {"t": tenant_id},
+        ).scalar()
+        if service:
+            conn.execute(
+                text("""
+                    INSERT INTO app.cancellation_policies
+                        (tenant_id, scope, service_id, free_minutes, late_outcome, no_show_outcome,
+                         confirmed)
+                    VALUES (:t, 'service', :s, 240, 'recorded', 'counts', true)
+                """),
+                {"t": tenant_id, "s": service},
+            )
+            added += 1
+        if plan:
+            conn.execute(
+                text("""
+                    INSERT INTO app.cancellation_policies
+                        (tenant_id, scope, plan_id, free_minutes, late_outcome, no_show_outcome,
+                         no_show_limit, confirmed)
+                    VALUES (:t, 'plan', :p, 720, 'counts', 'fee', 3, true)
+                """),
+                {"t": tenant_id, "p": plan},
+            )
+            added += 1
+    quota_plan = conn.execute(
+        text("SELECT id FROM app.plans WHERE tenant_id = :t AND period_quota IS NOT NULL LIMIT 1"),
+        {"t": tenant_id},
+    ).scalar()
+    if quota_plan is None:
+        quota_plan = conn.execute(
+            text("""
+                INSERT INTO app.plans
+                    (tenant_id, name, kind, price_amount, price_currency, validity_days,
+                     period_quota, period_unit)
+                VALUES (:t, 'מנוי 3 ביקורים בשבוע', 'membership', 24000, :c, 30, 3, 'week')
+                RETURNING id
+            """),
+            {"t": tenant_id, "c": currency},
+        ).scalar_one()
+        conn.execute(
+            text("""
+                INSERT INTO app.entitlements
+                    (tenant_id, client_id, plan_id, name, kind, starts_on, ends_on, price_amount,
+                     price_currency, sold_by, period_quota, period_unit)
+                VALUES (:t, :client, :plan, 'מנוי 3 ביקורים בשבוע', 'membership', :s, :e, 24000,
+                        :c, :owner, 3, 'week')
+            """),
+            {"t": tenant_id, "client": clients[-1][0], "plan": quota_plan,
+             "s": today - timedelta(days=10), "e": today + timedelta(days=20),
+             "c": currency, "owner": owner},
+        )  # fmt: skip
+        added += 2
+    if not conn.execute(
+        text("SELECT 1 FROM app.bookings WHERE tenant_id = :t AND credit_released LIMIT 1"),
+        {"t": tenant_id},
+    ).first():
+        given_back = conn.execute(
+            text("""
+                UPDATE app.bookings SET credit_released = true, waived_by = :owner,
+                       waived_at = now(),
+                       waive_reason = 'תקלה בתחבורה, ויתרנו על הביטול המאוחר'
+                WHERE id IN (
+                    SELECT id FROM app.bookings
+                    WHERE tenant_id = :t AND late_cancel AND status = 'cancelled'
+                    ORDER BY cancelled_at DESC LIMIT 2)
+                RETURNING client_id, session_id
+            """),
+            {"t": tenant_id, "owner": owner},
+        ).all()
+        for client_id, session_id in given_back:
+            conn.execute(
+                text("""
+                    INSERT INTO app.notifications (tenant_id, client_id, kind, payload)
+                    VALUES (:t, :c, 'credit_returned', CAST(:p AS jsonb))
+                """),
+                {"t": tenant_id, "c": client_id, "p": _json({"session_id": str(session_id)})},
+            )
+            added += 2
+    return added
+
+
+def _waitlist(conn: Connection, tenant_id: UUID, clients: list, today: date) -> int:
+    """R30: a client waiting for one slot, one for a time range and one for any time of a day,
+    and two offers for a spot that opened (one claimed already, one taken by someone else)."""
+    if _has(conn, "waitlist_requests", tenant_id) or len(clients) < 6:
+        return 0
+    sessions = conn.execute(
+        text("""
+            SELECT id, service_id, location_id, starts_at FROM app.sessions
+            WHERE tenant_id = :t AND status = 'scheduled' AND starts_at > now() + interval '1 day'
+              AND service_id IS NOT NULL
+            ORDER BY starts_at LIMIT 3
+        """),
+        {"t": tenant_id},
+    ).all()
+    if len(sessions) < 3:
+        return 0
+    slot, window, whole_day = sessions
+    insert = text("""
+        INSERT INTO app.waitlist_requests
+            (tenant_id, client_id, kind, service_id, location_id, day, from_time, to_time,
+             starts_at, status, expires_at)
+        VALUES (:t, :c, :kind, :service, :loc, :day, :from, :to, :at, 'active',
+                now() + interval '5 days')
+        RETURNING id
+    """)
+    requests = []
+    for client, kind, row, span in (
+        (clients[0], "slot", slot, (None, None, slot[3])),
+        (clients[1], "range", window, (time(17), time(20), None)),
+        (clients[2], "day", whole_day, (None, None, None)),
+    ):
+        requests.append(
+            conn.execute(
+                insert,
+                {"t": tenant_id, "c": client[0], "kind": kind, "service": row[1], "loc": row[2],
+                 "day": row[3].date(), "from": span[0], "to": span[1], "at": span[2]},
+            ).scalar_one()
+        )  # fmt: skip
+    for client, request, status in ((clients[3], requests[0], "open"), (clients[4], None, "taken")):
+        conn.execute(
+            text("""
+                INSERT INTO app.waitlist_offers
+                    (tenant_id, session_id, client_id, request_id, status)
+                VALUES (:t, :s, :c, :r, :status)
+            """),
+            {"t": tenant_id, "s": slot[0], "c": client[0], "r": request, "status": status},
+        )
+    return len(requests) + 2
+
+
+def _freeze_requests(conn: Connection, tenant_id: UUID, owner: UUID, clients: list,
+                     today: date) -> int:  # fmt: skip
+    """R23: the freeze rules, and requests that are waiting, approved on their own and rejected.
+    HOOK: a request with an attached paper arrives with its own migration."""
+    if _has(conn, "freeze_requests", tenant_id):
+        return 0
+    conn.execute(
+        text("""
+            INSERT INTO app.tenant_freeze_rules
+                (tenant_id, allow_requests, min_days, max_days, yearly_bank_days, notice_days,
+                 auto_approve_reasons)
+            VALUES (:t, true, 3, 30, 45, 1, ARRAY['illness', 'reserve_duty'])
+            ON CONFLICT (tenant_id) DO NOTHING
+        """),
+        {"t": tenant_id},
+    )
+    entitlements = conn.execute(
+        text("""
+            SELECT DISTINCT ON (e.client_id) e.id, e.client_id FROM app.entitlements e
+            WHERE e.tenant_id = :t AND e.status = 'active'
+              AND e.starts_on <= :today AND e.ends_on >= :today + 10
+              AND NOT EXISTS (SELECT 1 FROM app.entitlement_freezes f WHERE f.entitlement_id = e.id)
+            ORDER BY e.client_id, e.created_at LIMIT 3
+        """),
+        {"t": tenant_id, "today": today},
+    ).all()
+    added = 0
+    for (entitlement, client), (reason, status, auto, offset, days) in zip(
+        entitlements,
+        (("travel", "pending", False, 1, 4), ("reserve_duty", "approved", True, 2, 5),
+         ("other", "rejected", False, 3, 4)),
+        strict=False,
+    ):  # fmt: skip
+        starts = today + timedelta(days=offset)
+        ends = starts + timedelta(days=days - 1)
+        conn.execute(
+            text("""
+                INSERT INTO app.freeze_requests
+                    (tenant_id, client_id, entitlement_id, starts_on, ends_on, reason, note, status,
+                     approved_starts_on, approved_ends_on, auto_approved, decided_by, decided_at,
+                     decision_note)
+                VALUES (:t, :c, :e, :s, :end, :reason, 'נתוני דמו', :status,
+                        CASE WHEN :status = 'approved' THEN CAST(:s AS date) END,
+                        CASE WHEN :status = 'approved' THEN CAST(:end AS date) END, :auto,
+                        CASE WHEN :status = 'rejected' THEN CAST(:by AS uuid) END,
+                        CASE WHEN :status <> 'pending' THEN now() END,
+                        CASE WHEN :status = 'rejected' THEN 'לא ניתן להקפיא בתקופת עומס' END)
+            """),
+            {"t": tenant_id, "c": client, "e": entitlement, "s": starts, "end": ends,
+             "reason": reason, "status": status, "auto": auto, "by": str(owner)},
+        )  # fmt: skip
+        added += 1
+    return added
+
+
 def seed_round7(conn: Connection, tenant_id: UUID, tenant_name: str, today: date) -> dict[str, int]:
     """Adds the round-7 demo data to one business; returns what was added per area."""
     owner = conn.execute(
@@ -1134,5 +1354,9 @@ def seed_round7(conn: Connection, tenant_id: UUID, tenant_name: str, today: date
         "website": _website(conn, tenant_id, owner, tenant_name, currency, today, rng),
         "whatsapp": _whatsapp(conn, tenant_id, clients),
         "people": _people(conn, tenant_id, owner, tenant_name, clients),
+        "size": _business_size(conn, tenant_id, tenant_name),
+        "cancellation": _cancellation(conn, tenant_id, owner, currency, clients, today),
+        "waitlist": _waitlist(conn, tenant_id, clients, today),
+        "freeze_requests": _freeze_requests(conn, tenant_id, owner, clients, today),
     }
     return counts

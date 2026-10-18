@@ -646,6 +646,13 @@ def test_curated_demo_fills_every_tenant_table_or_says_why_not(engine: Engine) -
     ):
         assert filled[table] == 3, table
     assert filled["website_orders"] == 2 and filled["entitlement_freezes"] >= 1
+    for table in ("waitlist_requests", "freeze_requests", "tenant_freeze_rules"):
+        assert filled[table] == 3, table
+    with engine.connect() as connection:
+        sizes = connection.execute(
+            text("SELECT business_size FROM app.tenants WHERE id = ANY(:t)"), {"t": tenants}
+        ).scalars().all()  # fmt: skip
+    assert None not in sizes and "solo" not in sizes
 
 
 def test_the_seed_refuses_the_primary_owner_account(
