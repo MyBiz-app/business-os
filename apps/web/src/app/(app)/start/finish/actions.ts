@@ -6,7 +6,7 @@ import { legalVersion } from "@business-os/i18n/brand";
 
 import { ApiError, getApi, type Tenant, unwrap } from "@/lib/api";
 import { clearResumePath } from "@/lib/resume";
-import { decodePlan } from "@/lib/signup-plan";
+import { businessSize, decodePlan } from "@/lib/signup-plan";
 import { setActiveTenant } from "@/lib/tenant";
 
 export type FinishState = { error?: "invalid" | "generic" };
@@ -25,6 +25,7 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
   const brandField = String(formData.get("brand") ?? "");
   const brand = (BRANDS as readonly string[]).includes(brandField) ? (brandField as (typeof BRANDS)[number]) : "visa";
 
+  const websiteOnly = plan.track === "website_only";
   const api = await getApi();
   let tenant: Tenant;
   try {
@@ -36,7 +37,10 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
           locale,
           time_zone: supported.includes(timeZone) ? timeZone : fallbackZone,
           currency: plan.currency,
-          modules: plan.modules,
+          modules: websiteOnly ? {} : plan.modules,
+          // A website-only business has no system yet; the size is the journey's staff and branches.
+          product_track: websiteOnly ? "website_only" : "full",
+          ...(websiteOnly ? {} : { business_size: businessSize(plan.staff, plan.locations) }),
           accepted_legal: { terms: legalVersion("terms"), privacy: legalVersion("privacy"), dpa: legalVersion("dpa") },
         },
       }),
@@ -49,17 +53,24 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
 
   // The business exists from here on; a hiccup in the steps below must not block the owner.
   const scope = { header: { "X-Tenant-Id": tenant.id } };
-  if (plan.businessNumber || plan.entityType) {
+  if (plan.businessNumber || plan.entityType || plan.websiteUrl) {
     await api
       .PATCH("/tenants/current", {
         params: scope,
-        body: { business_number: plan.businessNumber, legal_entity_type: plan.entityType },
+        body: {
+          business_number: plan.businessNumber,
+          legal_entity_type: plan.entityType,
+          ...(plan.websiteUrl ? { website_url: plan.websiteUrl } : {}),
+        },
       })
       .catch(() => null);
   }
   await api.POST("/billing/payment-method", { params: scope, body: { brand } }).catch(() => null);
-  await api
-    .POST("/tenants/current/welcome-email", { params: scope, body: { expected_active_clients: plan.clients } })
-    .catch(() => null);
-  redirect("/dashboard?welcome=1");
+  if (!websiteOnly) {
+    await api
+      .POST("/tenants/current/welcome-email", { params: scope, body: { expected_active_clients: plan.clients } })
+      .catch(() => null);
+  }
+  // Whoever asked for a website goes straight to the brief, with what is known already filled in.
+  redirect(websiteOnly || plan.site === "build" ? "/website/brief" : "/dashboard?welcome=1");
 }

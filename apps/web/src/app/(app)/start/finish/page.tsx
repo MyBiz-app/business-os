@@ -86,7 +86,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
             <li key={line.key} className="flex items-center justify-between gap-3 text-sm">
               <span className="flex items-center gap-1.5">
                 <Check aria-hidden="true" className="size-4 shrink-0 text-success-ink" />
-                {line.key === "core" ? tModules("core") : tModules(`names.${line.key}`)}
+                {line.key === "core" ? tModules("core") : line.key === "website" ? t("site.cartLine") : tModules(`names.${line.key}`)}
                 {line.quantity > 1 && <span className="text-muted" dir="ltr">× {line.quantity}</span>}
               </span>
               <bdi className="font-semibold">{money(line.amount)}</bdi>

@@ -8,6 +8,7 @@ charged before payments (#46): the order records the prices it was offered."""
 import json
 from datetime import datetime
 from typing import Annotated, Literal
+from urllib.parse import urlparse
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -17,6 +18,11 @@ from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import AnonymousSessionDep, TenantContext, require
+from app.api.modules import set_modules
+from app.catalog.verticals import VERTICAL_PACKS
+from app.commerce.modules import PRESETS
+from app.core import events
+from app.core.audit import record
 from app.core.permissions import Permission
 from app.files import system_folder_id
 from app.websites.brief import Brief, missing_for_submit
@@ -62,6 +68,9 @@ class OrderState(BaseModel):
     with_system: bool = Field(description="The business also uses the system")
     missing: list[str] = Field(description="Answers the brief still needs before it can be sent")
     files_folder_id: UUID = Field(description="Where the wizard's images are uploaded")
+    prefill: Brief = Field(
+        description="What MyBiz already knows about the business, to start the brief with"
+    )
 
 
 class BriefSave(BaseModel):
@@ -79,9 +88,14 @@ class Visit(BaseModel):
 
 
 def _with_system(db: Session) -> bool:
-    """True while every business has the system. R25a adds "website only" businesses, which
-    pay the stand-alone price and cannot book through MyBiz."""
-    return True
+    """A "website only" business (sign-up track, R25a) pays the stand-alone price and cannot
+    book through MyBiz until it adds the system."""
+    return (
+        db.execute(
+            text("SELECT product_track FROM app.tenants WHERE id = app.current_tenant_id()")
+        ).scalar_one()
+        == "full"
+    )
 
 
 def _price(db: Session, currency: str) -> Price:
@@ -117,6 +131,44 @@ def _out(row: dict) -> OrderOut:
     return OrderOut.model_validate({**row, "currency": row["currency"].strip()})
 
 
+def _prefill(db: Session, *, with_system: bool) -> Brief:
+    """The brief with everything MyBiz already knows filled in (name, area, branding, services
+    and booking from the system, the website address), so the wizard only asks what is missing."""
+    business = (
+        db.execute(
+            text("""
+                SELECT locale, primary_color, website_url, address_city,
+                       (SELECT count(*) FROM app.services WHERE active) AS services,
+                       (SELECT count(*) FROM app.locations WHERE active) AS branches
+                FROM app.tenants WHERE id = app.current_tenant_id()
+            """)
+        )
+        .mappings()
+        .one()
+    )
+    sections = ["hero"]
+    if business["services"]:
+        sections.append("services")
+    if business["address_city"] or business["branches"]:
+        sections.append("location")
+    if with_system:
+        sections.append("booking")
+    sections.append("contact")
+    brief = Brief(
+        goals=["bookings", "leads"] if with_system else ["leads"],
+        area=business["address_city"],
+        sections=sections,  # type: ignore[arg-type]
+        colors_from_brand=True,
+        colors=[business["primary_color"]] if business["primary_color"] else [],
+        languages=[business["locale"]],
+    )
+    host = urlparse(business["website_url"] or "").hostname
+    if host:
+        brief.domain = "have"
+        brief.domain_name = host
+    return brief
+
+
 def _state(db: Session, tenant_id: UUID) -> OrderState:
     row = _order(db)
     brief = Brief.model_validate(row["brief"]) if row else Brief()
@@ -127,6 +179,7 @@ def _state(db: Session, tenant_id: UUID) -> OrderState:
         with_system=with_system,
         missing=missing_for_submit(brief, with_system=with_system),
         files_folder_id=system_folder_id(db, tenant_id, "website"),
+        prefill=_prefill(db, with_system=with_system),
     )
 
 
@@ -223,6 +276,32 @@ def submit_order(context: OwnerDep) -> OrderState:
             "monthly": price.monthly,
             "snapshot": json.dumps(_snapshot(db)),
         },
+    )
+    return _state(db, context.tenant_id)
+
+
+@router.post("/add-system")
+def add_system(context: OwnerDep) -> OrderState:
+    """A "website only" business adds the system: it gets the modules its kind of business
+    starts with (no new sign-up) and from then on pays the with-system price."""
+    db = context.session
+    track = db.execute(
+        text("SELECT product_track, vertical FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).one()
+    if track.product_track != "website_only":
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="already_has_system")
+    preset = dict.fromkeys(PRESETS[VERTICAL_PACKS[track.vertical].default_preset], 1)
+    set_modules(db, context.tenant_id, preset)
+    db.execute(
+        text("UPDATE app.tenants SET product_track = 'full' WHERE id = app.current_tenant_id()")
+    )
+    events.record(db, "system_added", track="website_only")
+    record(
+        db,
+        "tenant.updated",
+        entity_type="tenant",
+        entity_id=context.tenant_id,
+        fields=["product_track"],
     )
     return _state(db, context.tenant_id)
 

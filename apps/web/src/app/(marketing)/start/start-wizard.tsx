@@ -29,6 +29,7 @@ import {
   type Offer,
   priceLines,
   type SignupPlan,
+  normalizeWebsiteUrl,
   tierOf,
   tierPrice,
   withLocations,
@@ -38,7 +39,7 @@ import { isolate } from "@/lib/bidi";
 import { industryTexts } from "@/lib/verticals";
 
 import { AddOnRail, Cart, SummaryLines } from "./cart";
-import { AccountStep, BusinessStep, IndustryStep } from "./steps";
+import { AccountStep, BusinessStep, IndustryStep, SiteStep } from "./steps";
 import type { Draft } from "./wizard-types";
 import {
   BoardingPass,
@@ -53,11 +54,11 @@ const SIGNUP_VISIT_KEY = `${BRAND.app.storagePrefix}-signup-visit`;
 
 type Catalog = components["schemas"]["Catalog"];
 
-type Step = "account" | "industry" | "business" | "base" | Offer | "summary";
+type Step = "account" | "industry" | "business" | "base" | Offer | "site" | "summary";
 const GROUPS = [
   { key: "business", steps: ["account", "industry", "business"] },
   { key: "plan", steps: ["base"] },
-  { key: "extras", steps: ["client_app", "ai", "crm", "whatsapp"] },
+  { key: "extras", steps: ["client_app", "ai", "crm", "whatsapp", "site"] },
   { key: "services", steps: ["pack", "support", "setup"] },
   { key: "summary", steps: ["summary"] },
 ] as const;
@@ -101,7 +102,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const { text } = industryTexts(useTranslations());
   const locale = useLocale();
   const router = useRouter();
-  const steps: Step[] = [...(providers.some((button) => button.live) && !signedIn ? (["account"] as const) : []), "industry", "business", "base", ...OFFERS, "summary"];
+  const steps: Step[] = [...(providers.some((button) => button.live) && !signedIn ? (["account"] as const) : []), "industry", "business", "base", ...OFFERS.slice(0, 4), "site", ...OFFERS.slice(4), "summary"];
   const [stepIndex, setStepIndex] = useState(steps[0] === "account" ? 0 : initial.vertical ? 1 : 0);
   // The category whose kinds of business are shown in the industry step (null: all categories).
   const [category, setCategory] = useState<string | null>(findVertical(initial.vertical)?.category ?? null);
@@ -113,6 +114,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const [termsError, setTermsError] = useState(false);
   // Add-ons the person said "no thanks" to, so Continue reads as a choice, not a skip.
   const [declined, setDeclined] = useState<Offer[]>([]);
+  const [siteTouched, setSiteTouched] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   const tierList = useRef<HTMLUListElement>(null);
   const termsBox = useRef<HTMLInputElement>(null);
@@ -140,7 +142,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         sessionStorage.setItem(SIGNUP_VISIT_KEY, visit);
         void reportSignupStep(visit, "signup_started");
       }
-      const group = (OFFERS as readonly string[]).includes(step) ? (["pack", "support", "setup"].includes(step) ? "services" : "extras") : step;
+      const group = step === "site" ? "extras" : (OFFERS as readonly string[]).includes(step) ? (["pack", "support", "setup"].includes(step) ? "services" : "extras") : step;
       void reportSignupStep(visit, "signup_step", group as Parameters<typeof reportSignupStep>[2]);
     } catch {
       // Storage can be blocked; the sign-up works the same without the beacon.
@@ -165,14 +167,21 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const goTo = (target: Step) => go(steps.indexOf(target));
-  const next = () => go(stepIndex + 1);
+  const next = () => {
+    // "I have a website" needs its address before moving on.
+    if (step === "site" && draft.site === "have" && !normalizeWebsiteUrl(draft.websiteUrl ?? "")) {
+      setSiteTouched(true);
+      return;
+    }
+    go(stepIndex + 1);
+  };
   const back = () => go(stepIndex - 1);
 
-  const label = (key: "core" | ModuleKey) => (key === "core" ? tModules("core") : tModules(`names.${key}`));
+  const label = (key: "core" | "website" | ModuleKey) => (key === "core" ? tModules("core") : key === "website" ? t("site.cartLine") : tModules(`names.${key}`));
   const offerName = (offer: Offer) => t(`offers.${offer}.eyebrow`);
   const tierName = (offer: Offer, tier: string) => t(`offers.${offer}.plans.${tier}.name` as "offers.ai.plans.basic.name");
   const announce = (message: "cart.addedNotice" | "cart.removedNotice", name: string, modules: SignupPlan["modules"]) => {
-    const newTotal = priceLines(catalog, { clients: draft.clients, modules }).total;
+    const newTotal = priceLines(catalog, { clients: draft.clients, modules, site: draft.site }).total;
     setNotice(t(message, { name, total: money(newTotal) }));
   };
   const setTier = (offer: Offer, tier: string | null) => {
@@ -182,7 +191,12 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     setDeclined((list) => (tier ? list.filter((item) => item !== offer) : [...new Set([...list, offer])]));
     announce(chosen ? "cart.addedNotice" : "cart.removedNotice", chosen ? `${offerName(offer)} · ${tierName(offer, chosen)}` : offerName(offer), modules);
   };
-  const removeModule = (key: ModuleKey) => {
+  const removeModule = (key: ModuleKey | "website") => {
+    if (key === "website") {
+      setDraft({ ...draft, site: "none" });
+      setNotice(t("cart.removedNotice", { name: label(key), total: money(priceLines(catalog, { clients: draft.clients, modules: draft.modules }).total) }));
+      return;
+    }
     const modules = { ...draft.modules };
     delete modules[key];
     const kept = withoutOrphans(modules, catalog);
@@ -221,17 +235,20 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
       return;
     }
     if (!draft.vertical) return;
-    const plan: SignupPlan = { ...draft, vertical: draft.vertical, name: draft.name.trim() };
+    const websiteUrl = draft.site === "have" ? normalizeWebsiteUrl(draft.websiteUrl ?? "") : null;
+    const plan: SignupPlan = { ...draft, vertical: draft.vertical, name: draft.name.trim(), websiteUrl: websiteUrl ?? undefined };
     const target = `/start/finish?p=${encodePlan(plan)}`;
     router.push(signedIn ? target : `/signup?next=${encodeURIComponent(target)}`);
   };
   const chosenKind = findVertical(draft.vertical);
-  const addOnLabels = lines.filter((line) => line.key !== "core" && line.key !== "extra_location").map((line) => label(line.key));
+  const addOnLabels = lines.filter((line) => line.key !== "core" && line.key !== "extra_location" && line.key !== "website").map((line) => label(line.key));
   const passDetails = [
     ...(draft.entityType ? [{ label: t("summary.passEntity"), value: t(`business.entity.types.${draft.entityType}`) }] : []),
     ...(draft.businessNumber ? [{ label: t("summary.passNumber"), value: draft.businessNumber }] : []),
     ...(chosenKind ? [{ label: t("summary.passCategory"), value: text(chosenKind.category, "name") }] : []),
     { label: t("summary.passSize"), value: t("summary.passSizeValue", { staff: draft.staff, locations: draft.locations }) },
+    ...(draft.site === "build" ? [{ label: t("summary.passWebsite"), value: t("summary.passWebsiteBuild") }] : []),
+    ...(draft.site === "have" && normalizeWebsiteUrl(draft.websiteUrl ?? "") ? [{ label: t("summary.passWebsite"), value: draft.websiteUrl!.trim() }] : []),
     { label: t("summary.passAddons"), value: addOnLabels.length > 0 ? addOnLabels.join(", ") : t("summary.passNoAddons") },
   ];
   const loginHref = draft.vertical
@@ -325,6 +342,8 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         </div>
       </>
     );
+  } else if (step === "site") {
+    content = <SiteStep draft={draft} update={update} touched={siteTouched} headingProps={headingProps} />;
   } else if ((OFFERS as readonly string[]).includes(step)) {
     const offer = step as Offer;
     const tiers = OFFER_TIERS[offer];
@@ -512,7 +531,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
 
   const groupIndex = GROUPS.findIndex((group) => (group.steps as readonly string[]).includes(step));
   const isOffer = (OFFERS as readonly string[]).includes(step);
-  const showContinue = step === "business" || step === "base";
+  const showContinue = step === "business" || step === "base" || step === "site";
 
   const decided = isOffer && (tierOf(step as Offer, draft.modules) !== null || declined.includes(step as Offer) || OFFER_TIERS[step as Offer].some((tier) => tier.modules.length === 0));
   const arrow = <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />;

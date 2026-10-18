@@ -100,6 +100,10 @@ class Me(BaseModel):
     )
 
 
+BusinessSize = Literal["solo", "small", "medium", "network"]
+ProductTrack = Literal["full", "website_only"]
+
+
 class TenantCreate(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     vertical: str
@@ -112,6 +116,14 @@ class TenantCreate(BaseModel):
     accepted_legal: dict[str, str] | None = Field(
         default=None,
         description="Legal documents accepted at sign-up (document -> version)",
+    )
+    product_track: ProductTrack | None = Field(
+        default=None,
+        description="website_only: the business ordered a website and has no system modules yet;"
+        " left out means the full system",
+    )
+    business_size: BusinessSize | None = Field(
+        default=None, description="How big the business said it is at sign-up"
     )
 
     @field_validator("name")
@@ -173,6 +185,7 @@ class TenantUpdate(BaseModel):
     shifts_publish_day: int | None = Field(default=None, ge=1, le=28)
     shifts_publish_time: dt.time | None = None
     legal_entity_type: LegalEntityType | None = None
+    business_size: BusinessSize | None = None
     business_number: str | None = Field(
         default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
     )
@@ -250,6 +263,12 @@ class Tenant(BaseModel):
     )
     website_url: str | None = Field(
         default=None, description="The business's website (its branches may have their own)"
+    )
+    product_track: ProductTrack = Field(
+        default="full", description="website_only: a business that ordered a website only"
+    )
+    business_size: BusinessSize | None = Field(
+        default=None, description="solo, small (2-5), medium (6-20) or network; null if not given"
     )
     address_line: str | None = Field(default=None, description="Settings managers only")
     address_city: str | None = Field(default=None, description="Settings managers only")

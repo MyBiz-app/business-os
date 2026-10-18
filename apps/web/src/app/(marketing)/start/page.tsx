@@ -11,6 +11,7 @@ import { providerButtons } from "@/lib/auth-providers";
 import { createClient } from "@/lib/supabase/server";
 import { CURRENCIES, type Currency, modulesFromParam, trialEndsOn, wholeParam, withLocations, withoutOrphans } from "@/lib/signup-plan";
 
+import { SiteOnlyStart } from "./site-only";
 import { StartWizard } from "./start-wizard";
 
 type Catalog = components["schemas"]["Catalog"];
@@ -29,6 +30,8 @@ async function loadCatalog(currency: Currency): Promise<Catalog | null> {
   }
 }
 
+const asCurrency = (value: unknown): Currency | null => (CURRENCIES as readonly unknown[]).includes(value) ? (value as Currency) : null;
+
 /** "Start free": the sign-up journey. Links can preselect an industry (?vertical=beauty or a sub-category such as barbershop), a
  * recommended plan (?preset=growing) or a currency (?currency=USD). */
 export default async function StartPage({ searchParams }: PageProps<"/start">) {
@@ -36,6 +39,16 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
   const tMarketing = await getTranslations("marketing");
   const locale = await getLocale();
   const query = await searchParams;
+  // "Website only" from the /websites page: its own short sign-up, no price list needed.
+  if (query.track === "site") {
+    const { data: claims } = await (await createClient()).auth.getClaims();
+    const wanted = asCurrency(query.currency);
+    return (
+      <main id="main" className="flex flex-col">
+        <SiteOnlyStart currency={wanted ?? (locale === "he" ? "ILS" : "USD")} signedIn={Boolean(claims?.claims)} />
+      </main>
+    );
+  }
   const catalogs: Partial<Record<Currency, Catalog>> = {};
   for (const [currency, catalog] of await Promise.all(CURRENCIES.map(async (c) => [c, await loadCatalog(c)] as const))) {
     if (catalog) catalogs[currency] = catalog;
@@ -79,6 +92,7 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
           staff: 2,
           locations,
           currency,
+          ...(query.site === "build" ? { site: "build" as const } : {}),
           modules: withLocations(fromCalc ? withoutOrphans(modulesFromParam(query.modules), catalogs[currency] ?? Object.values(catalogs)[0]!) : Object.fromEntries(presetModules.map((key) => [key, 1])), locations),
         }}
         fromCalc={fromCalc}

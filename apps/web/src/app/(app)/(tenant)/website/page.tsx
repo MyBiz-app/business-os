@@ -9,6 +9,7 @@ import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
+import { AddSystemForm } from "./add-system-form";
 import { RespondForm } from "./respond-form";
 
 const STAGES = ["briefing", "received", "building", "review", "live"] as const;
@@ -27,6 +28,14 @@ export default async function WebsitePage() {
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("subtitle")} />
+
+      {!state.with_system && (
+        <section className="card flex flex-col gap-3 p-6" aria-labelledby="site-system">
+          <h2 id="site-system" className="text-lg font-semibold">{t("system.title")}</h2>
+          <p className="text-sm text-muted">{t("system.body")}</p>
+          <AddSystemForm label={t("system.add")} />
+        </section>
+      )}
 
       {!order && (
         <section className="card flex flex-col gap-4 p-6" aria-labelledby="site-offer">

@@ -50,9 +50,9 @@ export default async function WebsitesPage({ searchParams }: PageProps<"/website
   }));
   const steps = t.raw("steps.items") as { title: string; text: string }[];
   const cards = [
-    { key: "siteOnly", setup: alone.setup, monthly: alone.monthly, href: "/start", featured: false },
+    { key: "siteOnly", setup: alone.setup, monthly: alone.monthly, href: `/start?track=site&currency=${currency}`, featured: false },
     { key: "systemOnly", setup: null, monthly: systemFrom ?? null, href: "/pricing", featured: false },
-    { key: "both", setup: withSystem.setup, monthly: withSystem.monthly, href: "/start", featured: true },
+    { key: "both", setup: withSystem.setup, monthly: withSystem.monthly, href: `/start?site=build&currency=${currency}`, featured: true },
   ] as const;
   const saved = alone.setup - withSystem.setup;
 

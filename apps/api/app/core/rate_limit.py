@@ -34,6 +34,8 @@ class Rule:
 
 # A request counts against every rule it matches (a public form post: public-write, public, all).
 RULES: tuple[Rule, ...] = (
+    # "Does this email have an account?" must not become a way to list emails.
+    Rule("account-lookup", "/public/accounts/exists", 6),
     Rule("public-write", "/public/", 20, methods=frozenset({"POST", "PUT", "PATCH", "DELETE"})),
     Rule("public", "/public/", 120),
     # An AI app registers itself once per business owner; nothing needs more than a handful.
