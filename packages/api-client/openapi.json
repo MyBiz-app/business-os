@@ -20435,6 +20435,26 @@
         ]
       }
     },
+    "/me/security/mfa-risk-acknowledgement": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Acknowledge Mfa Risk",
+        "description": "The person read the warning about working without two-step sign-in and understands the\nrisk. Kept with the time and address, and shown in the audit log of their businesses.",
+        "operationId": "acknowledge_mfa_risk",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/me/push-tokens": {
       "put": {
         "tags": [
@@ -72448,19 +72468,25 @@
               }
             ],
             "title": "Mfa Required From",
-            "description": "From this day owners and managers need a code for sensitive actions"
+            "description": "Deprecated: always empty, two-step sign-in is optional for owners and managers"
           },
           "mfa_required_now": {
             "type": "boolean",
             "title": "Mfa Required Now",
-            "description": "Owners and managers need a code already"
+            "description": "Deprecated: always false, see mfa_risk_acknowledged"
+          },
+          "mfa_risk_acknowledged": {
+            "type": "boolean",
+            "title": "Mfa Risk Acknowledged",
+            "description": "The person confirmed they understand the risk of working without a code"
           }
         },
         "type": "object",
         "required": [
           "mfa_enforced",
           "mfa_required_from",
-          "mfa_required_now"
+          "mfa_required_now",
+          "mfa_risk_acknowledged"
         ],
         "title": "SecurityPolicy"
       },

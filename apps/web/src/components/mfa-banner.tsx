@@ -1,12 +1,15 @@
 import { ShieldAlert } from "lucide-react";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { acknowledgeMfaRisk } from "@/app/(app)/account/security-actions";
+import { SubmitButton } from "@/components/form/submit-button";
 import { getApi } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
-/** Reminds owners and managers (and the MyBiz team) without an authenticator to turn on
- * two-step sign-in, with the day it becomes required. Shows nothing for everyone else. */
+/** Warns owners and managers without an authenticator that two-step sign-in is off, and lets them
+ * confirm they understand the risk (it is optional, but the sensitive actions wait for the
+ * confirmation). The MyBiz team is told it is required. Shows nothing for everyone else. */
 export async function MfaBanner({ memberships, platform }: { memberships: string[]; platform: boolean }) {
   const eligible = platform || memberships.some((role) => role === "owner" || role === "manager");
   if (!eligible) return null;
@@ -21,10 +24,8 @@ export async function MfaBanner({ memberships, platform }: { memberships: string
   }
   if (!policy?.mfa_enforced) return null;
   const t = await getTranslations("security");
-  const text =
-    platform || policy.mfa_required_now
-      ? t(platform ? "mfa.requiredTeam" : "mfa.requiredBusiness")
-      : t("mfa.requiredSoon", { date: (await getFormatter()).dateTime(new Date(policy.mfa_required_from ?? ""), { dateStyle: "medium", timeZone: "UTC" }) });
+  const acknowledged = policy.mfa_risk_acknowledged;
+  const text = platform ? t("mfa.requiredTeam") : t(acknowledged ? "mfa.warningAcknowledged" : "mfa.warning");
   return (
     <div role="status" className="flex flex-wrap items-center justify-center gap-3 border-b border-border bg-warning/10 px-4 py-2 text-sm">
       <ShieldAlert aria-hidden="true" className="size-4" />
@@ -32,6 +33,11 @@ export async function MfaBanner({ memberships, platform }: { memberships: string
       <Link href="/account#security" className="font-medium underline underline-offset-4">
         {t("mfa.enable")}
       </Link>
+      {!platform && !acknowledged && (
+        <form action={acknowledgeMfaRisk}>
+          <SubmitButton variant="secondary">{t("mfa.riskConfirm")}</SubmitButton>
+        </form>
+      )}
     </div>
   );
 }

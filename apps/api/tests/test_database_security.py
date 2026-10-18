@@ -15,6 +15,7 @@ GLOBAL_TABLES = {
     "user_tours",
     "login_devices",
     "legal_acceptances",
+    "mfa_risk_acknowledgements",
     "job_runs",
     "announcement_views",
     "email_suppressions",  # bounced addresses; read through SECURITY DEFINER functions

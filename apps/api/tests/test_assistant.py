@@ -497,6 +497,9 @@ def test_per_user_rate_limit_stops_a_burst(
 
     monkeypatch.setenv("API_AI_USER_MESSAGES_PER_MINUTE", "2")
     get_settings.cache_clear()
+    # The limiter counts in fixed one-minute windows: pin the clock mid-window so a minute boundary
+    # between the three questions cannot reset the count.
+    monkeypatch.setattr("app.api.assistant.time.time", lambda: 1_800_000_030.0)
     try:
         use_provider(FakeProvider([says("a"), says("b"), says("c")]))
         headers = studio["headers"]

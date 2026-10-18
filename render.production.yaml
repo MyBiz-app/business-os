@@ -61,9 +61,6 @@ services:
         sync: false
       - key: API_ID_HASH_KEY
         sync: false
-      # Two-step sign-in for owners and managers starts on this date (YYYY-MM-DD).
-      - key: API_MFA_REQUIRED_FROM
-        sync: false
       # Optional until wanted (docs/deploy/go-live-checklist.md).
       - key: API_ANTHROPIC_API_KEY
         sync: false

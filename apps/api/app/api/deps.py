@@ -13,9 +13,9 @@ from app.core.config import get_settings
 from app.core.db import EngineDep, open_session, session_scope, set_tenant
 from app.core.mfa import (
     SENSITIVE_PERMISSIONS,
+    check_sensitive_action,
     mfa_required,
     require_aal2,
-    sensitive_action_needs_mfa,
 )
 from app.core.permissions import Permission, effective_permissions
 
@@ -321,8 +321,8 @@ def require(permission: Permission) -> Callable[[TenantContext], TenantContext]:
     def check(context: TenantDep) -> TenantContext:
         if permission not in context.permissions:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
-        if permission in SENSITIVE_PERMISSIONS and sensitive_action_needs_mfa(context.aal):
-            raise mfa_required()
+        if permission in SENSITIVE_PERMISSIONS:
+            check_sensitive_action(context.session, context.aal)
         return context
 
     return check

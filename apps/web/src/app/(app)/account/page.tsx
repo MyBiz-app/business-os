@@ -40,6 +40,7 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
   const deviceId = (await cookies()).get(DEVICE_COOKIE)?.value;
   const api = await getApi();
   const { data: devices } = await api.GET("/me/devices", { headers: deviceId ? { "X-Device-Id": deviceId } : {} });
+  const { data: policy } = await api.GET("/me/security");
   const { data: auth } = phoneCodes ? await (await createClient()).auth.getUser() : { data: null };
 
   const menu = [
@@ -94,7 +95,9 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
             <SecuritySettings
               factors={(factorList?.totp ?? []).map((f) => ({ id: f.id, createdAt: f.created_at }))}
               devices={(devices ?? []).map((d) => ({ id: d.id, label: d.label, lastSeenAt: d.last_seen_at, current: d.current }))}
-              required={mfa === "required" ? (me.platform_admin ? "team" : "business") : null}
+              required={mfa === "required" ? (me.platform_admin ? "team" : "business") : mfa === "ack" ? "ack" : null}
+              riskOptional={!me.platform_admin && Boolean(policy?.mfa_enforced)}
+              riskAcknowledged={policy?.mfa_risk_acknowledged ?? false}
             />
           </CollapsibleSection>
           <CollapsibleSection id="password" storageKey={key("password")} title={t("account.password")}>
