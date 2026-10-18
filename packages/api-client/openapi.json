@@ -16258,6 +16258,210 @@
         }
       }
     },
+    "/website/insights": {
+      "get": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Get Insights",
+        "description": "Visits per day and source, and the enquiries that came through the contact form.",
+        "operationId": "get_insights",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Insights"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/website/embed": {
+      "get": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Get Embed",
+        "description": "What a business with its own website pastes into it: the contact form and a booking link.",
+        "operationId": "get_embed",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Embed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/website/offer-card": {
+      "get": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Get Offer Card",
+        "description": "The dashboard card \"can your clients find you?\": only for a business without a website\norder, after its first 30 days, until the owner closes it for good.",
+        "operationId": "get_offer_card",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfferCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/website/order/submit": {
       "post": {
         "tags": [
@@ -20287,7 +20491,10 @@
             "in": "path",
             "required": true,
             "schema": {
-              "const": "ai_team",
+              "enum": [
+                "ai_team",
+                "website_offer"
+              ],
               "type": "string",
               "title": "Key"
             }
@@ -20327,7 +20534,10 @@
             "in": "path",
             "required": true,
             "schema": {
-              "const": "ai_team",
+              "enum": [
+                "ai_team",
+                "website_offer"
+              ],
               "type": "string",
               "title": "Key"
             }
@@ -54187,6 +54397,40 @@
         ],
         "title": "DunningSettings"
       },
+      "Embed": {
+        "properties": {
+          "inquiries_enabled": {
+            "type": "boolean",
+            "title": "Inquiries Enabled"
+          },
+          "contact_form_url": {
+            "type": "string",
+            "title": "Contact Form Url"
+          },
+          "contact_form_code": {
+            "type": "string",
+            "title": "Contact Form Code"
+          },
+          "booking_url": {
+            "type": "string",
+            "title": "Booking Url"
+          },
+          "booking_code": {
+            "type": "string",
+            "title": "Booking Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inquiries_enabled",
+          "contact_form_url",
+          "contact_form_code",
+          "booking_url",
+          "booking_code"
+        ],
+        "title": "Embed",
+        "description": "Copy and paste snippets for a business that already has a website of its own."
+      },
       "Employment": {
         "properties": {
           "exists": {
@@ -54477,6 +54721,31 @@
         },
         "type": "object",
         "title": "EmploymentBody"
+      },
+      "Enquiry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "created_at"
+        ],
+        "title": "Enquiry"
       },
       "Entitlement": {
         "properties": {
@@ -57303,6 +57572,53 @@
           "first_name"
         ],
         "title": "InquiryCreate"
+      },
+      "Insights": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/VisitDay"
+            },
+            "type": "array",
+            "title": "Days",
+            "description": "One entry per day, oldest first, zeros included"
+          },
+          "visits_total": {
+            "type": "integer",
+            "title": "Visits Total"
+          },
+          "sources": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Sources",
+            "description": "Visits by source: direct, search, social, other"
+          },
+          "enquiries_total": {
+            "type": "integer",
+            "title": "Enquiries Total",
+            "description": "Leads from the contact form in the same period"
+          },
+          "enquiries": {
+            "items": {
+              "$ref": "#/components/schemas/Enquiry"
+            },
+            "type": "array",
+            "title": "Enquiries",
+            "description": "The latest few"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "visits_total",
+          "sources",
+          "enquiries_total",
+          "enquiries"
+        ],
+        "title": "Insights",
+        "description": "The live site's numbers over the last 30 days (empty until the site counts visits)."
       },
       "Inspiration": {
         "properties": {
@@ -62683,6 +62999,20 @@
           "result"
         ],
         "title": "Offer"
+      },
+      "OfferCard": {
+        "properties": {
+          "show": {
+            "type": "boolean",
+            "title": "Show",
+            "description": "Show the one-time dashboard card about the website service"
+          }
+        },
+        "type": "object",
+        "required": [
+          "show"
+        ],
+        "title": "OfferCard"
       },
       "OpeningHours": {
         "properties": {
@@ -69564,7 +69894,10 @@
           "seen": {
             "items": {
               "type": "string",
-              "const": "ai_team"
+              "enum": [
+                "ai_team",
+                "website_offer"
+              ]
             },
             "type": "array",
             "title": "Seen"
@@ -74784,6 +75117,25 @@
           "key"
         ],
         "title": "Visit"
+      },
+      "VisitDay": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "visits": {
+            "type": "integer",
+            "title": "Visits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "visits"
+        ],
+        "title": "VisitDay"
       },
       "VoidInvoice": {
         "properties": {

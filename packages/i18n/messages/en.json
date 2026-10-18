@@ -9337,7 +9337,13 @@
       "support_view": "MyBiz support viewed a page",
       "platform_change": "MyBiz support changed something",
       "tenant_closed": "Closed the business",
-      "tenant_reopened": "Reopened the business"
+      "tenant_reopened": "Reopened the business",
+      "tenant_modules_changed": "Changed the plan modules",
+      "tenant_subscription_canceled": "Cancelled the subscription",
+      "tenant_subscription_resumed": "Resumed the subscription",
+      "export_receipt_pdf": "Downloaded a receipt",
+      "export_platform_invoice_pdf": "Downloaded a MyBiz invoice",
+      "export_issued_document": "Downloaded a tax document"
     }
   },
   "staffCard": {
@@ -9673,7 +9679,8 @@
       "body": "You answer a few questions and we build a designed, branded landing page, with an inquiry form that lands in your system and a visit counter. You approve the site before it goes live.",
       "price": "One-time setup {setup} and {monthly} a month (hosting, security, upkeep and one small change a month).",
       "nothingCharged": "Nothing is charged until payments are switched on in the system.",
-      "start": "Start the brief"
+      "start": "Start the brief",
+      "locked": "Not ordered yet"
     },
     "status": {
       "title": "Order status",
@@ -9708,6 +9715,52 @@
       "sendChanges": "Send the request",
       "cancel": "Cancel",
       "approved": "You approved the website. We are putting it live."
+    },
+    "preview": {
+      "tagline": "Your business, online and ready to take bookings",
+      "services": "Services",
+      "contact": "Contact"
+    },
+    "embed": {
+      "title": "Already have a website? Put MyBiz in it",
+      "body": "Copy a snippet into your own website. Inquiries arrive in your system as new leads, and clients book through MyBiz. You do not need to order a website from us for this.",
+      "formOff": "The contact form is off. Turn on the CRM module to let people leave their details.",
+      "formTitle": "Contact form",
+      "bookingLabel": "Book now",
+      "copy": "Copy",
+      "copied": "Copied",
+      "form": {
+        "title": "Contact form",
+        "hint": "A form that sends inquiries to your leads. Paste it where you want the form to appear."
+      },
+      "booking": {
+        "title": "Booking button",
+        "hint": "A button that opens your page in MyBiz, where clients sign up and book."
+      }
+    },
+    "insights": {
+      "title": "Your website, last 30 days",
+      "visits": "Visits",
+      "enquiries": "Inquiries from the form",
+      "noVisits": "No visits counted yet. Visits show up here once people open your website.",
+      "perDay": "Visits per day",
+      "showTable": "Show as a table",
+      "day": "Day",
+      "sources": "Where visitors came from",
+      "source": {
+        "direct": "Direct",
+        "search": "Search",
+        "social": "Social",
+        "other": "Other"
+      },
+      "latest": "Latest inquiries",
+      "noEnquiries": "No inquiries from the form yet."
+    },
+    "dashboardCard": {
+      "title": "Can your clients find you online?",
+      "body": "A website built for your business, connected to your system, bringing inquiries and bookings straight in.",
+      "cta": "See how it works",
+      "dismiss": "Close for good"
     }
   },
   "aiConnections": {

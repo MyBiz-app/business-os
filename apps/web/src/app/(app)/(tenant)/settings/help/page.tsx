@@ -15,7 +15,7 @@ export default async function HelpSettingsPage() {
   if (!canManageSettings(context.tenant)) redirect("/dashboard");
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("nav.items.help")} description={t("nav.hints.help")} />
       {context.tenant.role === "owner" && <SupportSection context={context} />}
       <WriteToSupport />

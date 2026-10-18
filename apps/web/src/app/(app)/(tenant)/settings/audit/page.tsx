@@ -56,7 +56,7 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/setting
   const olderHref = page.next_cursor ? `/settings/audit?${new URLSearchParams([...params, ["cursor", page.next_cursor]])}` : null;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle")} />
       <form method="get" className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1.5 text-sm font-medium">

@@ -6,7 +6,7 @@ live. MyBiz works the order from the console board (`/platform/website-orders`).
 charged before payments (#46): the order records the prices it was offered."""
 
 import json
-from datetime import datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Annotated, Literal
 from uuid import UUID
 
@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import AnonymousSessionDep, TenantContext, require
+from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.files import system_folder_id
 from app.websites.brief import Brief, missing_for_submit
@@ -76,6 +77,48 @@ class Response(BaseModel):
 class Visit(BaseModel):
     key: str = Field(min_length=8, max_length=64, pattern=r"^[0-9a-f]+$")
     source: Literal["direct", "search", "social", "other"] = "other"
+
+
+class VisitDay(BaseModel):
+    day: date
+    visits: int
+
+
+class Enquiry(BaseModel):
+    id: UUID
+    name: str
+    created_at: datetime
+
+
+class Insights(BaseModel):
+    """The live site's numbers over the last 30 days (empty until the site counts visits)."""
+
+    days: list[VisitDay] = Field(description="One entry per day, oldest first, zeros included")
+    visits_total: int
+    sources: dict[str, int] = Field(description="Visits by source: direct, search, social, other")
+    enquiries_total: int = Field(description="Leads from the contact form in the same period")
+    enquiries: list[Enquiry] = Field(description="The latest few")
+
+
+class Embed(BaseModel):
+    """Copy and paste snippets for a business that already has a website of its own."""
+
+    inquiries_enabled: bool
+    contact_form_url: str
+    contact_form_code: str
+    booking_url: str
+    booking_code: str
+
+
+class OfferCard(BaseModel):
+    show: bool = Field(description="Show the one-time dashboard card about the website service")
+
+
+# The dashboard card appears once the business has been around this long.
+OFFER_AFTER_DAYS = 30
+OFFER_TOUR_KEY = "website_offer"
+INSIGHT_DAYS = 30
+SOURCES = ("direct", "search", "social", "other")
 
 
 def _with_system(db: Session) -> bool:
@@ -160,6 +203,96 @@ def save_brief(body: BriefSave, context: OwnerDep) -> OrderState:
             {"brief": brief},
         )
     return _state(db, context.tenant_id)
+
+
+@router.get("/insights")
+def get_insights(context: OwnerDep) -> Insights:
+    """Visits per day and source, and the enquiries that came through the contact form."""
+    db = context.session
+    today = datetime.now(UTC).date()  # visits are counted per UTC day
+    first = today - timedelta(days=INSIGHT_DAYS - 1)
+    rows = db.execute(
+        text("""
+            SELECT day, source, visits FROM app.website_visits_daily
+            WHERE day BETWEEN :first AND :today
+        """),
+        {"first": first, "today": today},
+    ).mappings()
+    per_day: dict[date, int] = {}
+    sources = dict.fromkeys(SOURCES, 0)
+    for row in rows:
+        per_day[row["day"]] = per_day.get(row["day"], 0) + row["visits"]
+        sources[row["source"]] += row["visits"]
+    # Both the public inquiry form and the finished site post to the same endpoint.
+    leads = (
+        db.execute(
+            text("""
+            SELECT id, first_name, last_name, created_at, count(*) OVER () AS total
+            FROM app.leads
+            WHERE source IN ('form', 'website') AND created_at >= :since
+            ORDER BY created_at DESC LIMIT 5
+        """),
+            {"since": datetime.combine(first, datetime.min.time(), tzinfo=UTC)},
+        )
+        .mappings()
+        .all()
+    )
+    return Insights(
+        days=[
+            VisitDay(
+                day=first + timedelta(days=i), visits=per_day.get(first + timedelta(days=i), 0)
+            )
+            for i in range(INSIGHT_DAYS)
+        ],
+        visits_total=sum(sources.values()),
+        sources=sources,
+        enquiries_total=leads[0]["total"] if leads else 0,
+        enquiries=[
+            Enquiry(
+                id=row["id"],
+                name=" ".join(part for part in (row["first_name"], row["last_name"]) if part),
+                created_at=row["created_at"],
+            )
+            for row in leads
+        ],
+    )
+
+
+@router.get("/embed")
+def get_embed(context: OwnerDep) -> Embed:
+    """What a business with its own website pastes into it: the contact form and a booking link."""
+    db = context.session
+    code = db.execute(
+        text("SELECT join_code FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    web = get_settings().web_url.rstrip("/")
+    accepts = db.execute(text("SELECT app.accepts_inquiries(:code)"), {"code": code}).scalar_one()
+    return Embed(
+        inquiries_enabled=bool(accepts),
+        contact_form_url=f"{web}/embed/inquiry/{code}",
+        contact_form_code=code,
+        booking_url=f"{web}/join/{code}",
+        booking_code=code,
+    )
+
+
+@router.get("/offer-card")
+def get_offer_card(context: OwnerDep) -> OfferCard:
+    """The dashboard card "can your clients find you?": only for a business without a website
+    order, after its first 30 days, until the owner closes it for good."""
+    db = context.session
+    show = db.execute(
+        text("""
+            SELECT t.created_at < now() - make_interval(days => :days)
+               AND NOT EXISTS (SELECT 1 FROM app.website_orders)
+               AND t.website_url IS NULL
+               AND NOT EXISTS (SELECT 1 FROM app.user_tours
+                               WHERE user_id = app.current_user_id() AND tour_key = :key)
+            FROM app.tenants t WHERE t.id = app.current_tenant_id()
+        """),
+        {"days": OFFER_AFTER_DAYS, "key": OFFER_TOUR_KEY},
+    ).scalar_one()
+    return OfferCard(show=bool(show))
 
 
 def _snapshot(db: Session) -> dict:

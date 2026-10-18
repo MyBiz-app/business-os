@@ -97,7 +97,7 @@ export function SettingsRoom({
             </div>
           ))}
         </nav>
-        <div className={`${isIndex ? "hidden lg:block" : ""} flex min-w-0 flex-col gap-4`}>
+        <div className={`${isIndex ? "hidden lg:block" : ""} @container flex min-w-0 flex-col gap-4`}>
           {!isIndex && (
             <Link href="/settings" className="inline-flex items-center gap-1 text-sm text-primary-ink underline-offset-4 hover:underline print:hidden lg:hidden">
               <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />

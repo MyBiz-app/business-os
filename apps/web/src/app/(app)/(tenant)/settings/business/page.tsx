@@ -20,7 +20,7 @@ export default async function BusinessSettingsPage() {
   const readiness = (await context.api.GET("/tenants/current/readiness", { params: context.scope })).data;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("nav.items.business")} description={t("nav.hints.business")} />
       <CollapsibleSection title={t("details")} description={t("detailsHint")} defaultOpen storageKey="settings-details">
         <DetailsForm tenant={tenant} timeZones={Intl.supportedValuesOf("timeZone")} />
