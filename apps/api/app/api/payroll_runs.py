@@ -127,6 +127,9 @@ class RunSummary(BaseModel):
     people: int
     gross_minor: int
     deductions_minor: int
+    employer_cost_minor: int = Field(
+        description="Gross pay plus what the employer pays on top (pension, severance, insurance)"
+    )
     previous_gross_minor: int | None
     open_errors: int
     open_warnings: int
@@ -567,6 +570,22 @@ def _lines(context: TenantContext, run_id: UUID) -> list[RunLine]:
     return result
 
 
+def _employer_cost(context: TenantContext, row: Any, lines: list[RunLine]) -> int:
+    """What the month costs the employer: the gross of the lines the reader may see plus the
+    employer-side pension, severance, study fund and insurance worked out on them."""
+    from app.api.payslips import _all_nets  # payslips imports this module
+
+    nets = _all_nets(context.session, context.tenant_id, row)
+    visible = {line.user_id for line in lines}
+    extra = sum(
+        item["amount_minor"]
+        for user_id, (net, _frozen) in nets.items()
+        if user_id in visible
+        for item in net["employer"]
+    )
+    return sum(line.gross_minor for line in lines) + extra
+
+
 def _present(context: TenantContext, first: dt.date, notes: list[RunNote] | None = None) -> Run:
     row = _run_row(context.session, first)
     lines = _lines(context, row["id"])
@@ -589,6 +608,7 @@ def _present(context: TenantContext, first: dt.date, notes: list[RunNote] | None
             people=len(lines),
             gross_minor=sum(line.gross_minor for line in lines),
             deductions_minor=sum(line.deductions_minor for line in lines),
+            employer_cost_minor=_employer_cost(context, row, lines),
             previous_gross_minor=int(previous) if previous is not None else None,
             open_errors=sum(w.severity == "error" for line in lines for w in line.warnings),
             open_warnings=sum(

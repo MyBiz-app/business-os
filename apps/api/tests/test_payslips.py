@@ -95,6 +95,11 @@ def test_net_is_frozen_when_the_month_is_approved_and_payslips_open(
     assert person["net_minor"] == person["gross_minor"] - person["total_deductions_minor"]
     assert live["net_minor"] == sum(p["net_minor"] for p in live["people"])
 
+    run = client.get("/payroll/runs/2026-03", headers=headers).json()
+    employer = sum(i["amount_minor"] for p in live["people"] for i in p["employer"])
+    assert run["summary"]["employer_cost_minor"] == run["summary"]["gross_minor"] + employer
+    assert run["summary"]["employer_cost_minor"] > run["summary"]["gross_minor"]
+
     _approve(client, headers, ctx)
     # Every payslip is filed in the payroll folder, and in the person's own documents.
     folders = client.get("/files/folders", headers=headers).json()
