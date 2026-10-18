@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { RedirectType, redirect } from "next/navigation";
 
 import { unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
@@ -52,8 +52,8 @@ export async function createService(_state: FormState, formData: FormData): Prom
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/services");
-  redirect("/services");
+  revalidatePath("/catalog");
+  return { saved: true };
 }
 
 export async function updateService(
@@ -71,33 +71,25 @@ export async function updateService(
         body,
       }),
     );
+    // A court / room service also carries the rooms that serve it (replaces the list).
+    if (formData.get("rooms_listed")) {
+      unwrap(
+        await api.PUT("/services/{service_id}/rooms", {
+          params: { ...scope, path: { service_id: serviceId } },
+          body: formData.getAll("room_id").map(String),
+        }),
+      );
+    }
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/services");
-  return { saved: true };
-}
-
-/** Which courts / rooms serve a resource service (replaces the list). */
-export async function saveServiceRooms(serviceId: string, _state: FormState, formData: FormData): Promise<FormState> {
-  const { api, scope } = await getTenant();
-  try {
-    unwrap(
-      await api.PUT("/services/{service_id}/rooms", {
-        params: { ...scope, path: { service_id: serviceId } },
-        body: formData.getAll("room_id").map(String),
-      }),
-    );
-  } catch (error) {
-    return errorState(error);
-  }
-  revalidatePath(`/services/${serviceId}`);
+  revalidatePath("/catalog");
   return { saved: true };
 }
 
 export async function deleteService(serviceId: string): Promise<void> {
   const { api, scope } = await getTenant();
   const { result } = unwrap(await api.DELETE("/services/{service_id}", { params: { ...scope, path: { service_id: serviceId } } }));
-  revalidatePath("/services");
-  redirect(`/services?removed=${result}`);
+  revalidatePath("/catalog");
+  redirect(`/catalog?tab=services&removed=${result}`, RedirectType.replace);
 }

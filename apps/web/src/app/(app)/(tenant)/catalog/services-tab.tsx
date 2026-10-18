@@ -1,26 +1,25 @@
+import { CalendarDays, Gauge } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-import { CalendarDays, Gauge } from "lucide-react";
-
-import { FormNotice } from "@/components/form/form-message";
+import { EmptyState } from "@/components/empty-state";
+import { SummaryTiles } from "@/components/ui/summary-tiles";
 import { unwrap } from "@/lib/api";
 import { addDays, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canReadReports, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
-import { Container } from "@/components/layout/container";
-import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/empty-state";
 
-export default async function ServicesPage({ searchParams }: PageProps<"/services">) {
-  const { removed } = await searchParams;
+import { catalogHref, type CatalogShow } from "./tabs";
+
+/** The services you offer: tiles that filter, then the cards. Each card opens in a window. */
+export async function ServicesTab({ show }: { show: CatalogShow }) {
   const t = await getTranslations();
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("catalog.read");
   // The last 30 days per service, for those who may see reports.
   const end = addDays(todayIn(tenant.time_zone), -1);
-  const [services, usage] = await Promise.all([
+  const [all, usage] = await Promise.all([
     api.GET("/services", { params: scope }).then(unwrap),
     canReadReports(tenant)
       ? api
@@ -30,34 +29,50 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
           .then(unwrap)
       : Promise.resolve([]),
   ]);
+  const services = all.filter((service) => (show === "all" ? true : show === "active" ? service.active : !service.active));
   // An isolated number, so "%" stays on the right side in Hebrew too.
   const percentFormat = new Intl.NumberFormat(locale, { style: "percent" });
-  const percent = { format: (value: number) => `\u2066${percentFormat.format(value)}\u2069` };
+  const percent = { format: (value: number) => `⁦${percentFormat.format(value)}⁩` };
   const usageOf = new Map(usage.map((row) => [row.key, row]));
+  const sessions = usage.reduce((sum, row) => sum + (row.sessions ?? 0), 0);
+  const tile = (key: CatalogShow, value: number, hint?: string) => ({
+    key,
+    label: t(`catalog.tiles.services.${key}`),
+    value,
+    hint,
+    href: catalogHref("services", key),
+    active: show === key,
+  });
 
   return (
-    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      {(removed === "deleted" || removed === "archived") && <FormNotice message={t(`services.removed.${removed}`)} />}
-      <PageHeader
-        title={t("services.title")}
-        description={t("services.subtitle")}
-        actions={
-          canWriteCatalog(tenant) && (
-            <Link href="/services/new" className="btn-primary px-4 py-2.5">
-              {t("services.add")}
-            </Link>
-          )
-        }
+    <>
+      <SummaryTiles
+        label={t("catalog.tiles.label")}
+        tiles={[
+          tile("all", all.length, canReadReports(tenant) ? t("services.stats.sessions", { count: sessions }) : undefined),
+          tile("active", all.filter((service) => service.active).length),
+          tile("paused", all.filter((service) => !service.active).length),
+        ]}
       />
-
       {services.length === 0 ? (
-        <EmptyState variant="list">{t("services.empty")}</EmptyState>
+        <EmptyState variant="list">
+          <span className="flex max-w-md flex-col items-center gap-3">
+            <span className="font-semibold text-foreground">{t("catalog.servicesEmpty.title")}</span>
+            <span>{t("catalog.servicesEmpty.body")}</span>
+            {all.length === 0 && canWriteCatalog(tenant) && (
+              <Link href="/catalog/services/new" className="btn-primary px-4 py-2.5">
+                {t("catalog.servicesEmpty.cta")}
+              </Link>
+            )}
+          </span>
+        </EmptyState>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {services.map((service) => (
             <li key={service.id}>
               <Link
-                href={`/services/${service.id}`}
+                href={`/catalog/services/${service.id}`}
+                scroll={false}
                 style={{ "--service": service.color ?? "var(--primary)" } as React.CSSProperties}
                 className={`flex h-full flex-col gap-4 card card-hover p-5 ${service.active ? "" : "opacity-60"}`}
               >
@@ -98,6 +113,6 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
           ))}
         </ul>
       )}
-    </Container>
+    </>
   );
 }

@@ -4,22 +4,30 @@ import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 
 import { Field, SelectField } from "@/components/form/field";
-import { FormError, FormNotice } from "@/components/form/form-message";
-import { SubmitButton } from "@/components/form/submit-button";
+import { FormError } from "@/components/form/form-message";
 
-import { createPromoCode, type PromoState } from "./promo-actions";
+import { CatalogFormFrame } from "../form-frame";
+import { createPromoCode, type PromoState } from "./actions";
 
-type Props = { plans: { id: string; name: string }[]; currencySymbol: string };
+type Props = { plans: { id: string; name: string }[]; currencySymbol: string; modal?: boolean };
 
-export function PromoForm({ plans, currencySymbol }: Props) {
+/** A new discount code, as a window over the list or as a page. */
+export function PromoForm({ plans, currencySymbol, modal = false }: Props) {
   const t = useTranslations("promo");
   const [state, action] = useActionState<PromoState, FormData>(createPromoCode, {});
   const [kind, setKind] = useState<"percent" | "amount">("percent");
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <CatalogFormFrame
+      modal={modal}
+      backHref="/catalog?tab=codes"
+      formAction={action}
+      state={{ saved: state.saved }}
+      savedMessage={t("created")}
+      closeOnSave
+      submitLabel={t("create")}
+    >
       <FormError message={state.error && t(`errors.${state.error}`)} />
-      <FormNotice message={state.saved ? t("created") : undefined} />
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Field
           label={t("code")}
           name="code"
@@ -57,9 +65,6 @@ export function PromoForm({ plans, currencySymbol }: Props) {
         <Field label={t("endsOn")} name="ends_on" type="date" />
         <Field label={t("maxUses")} name="max_uses" type="number" min={1} hint={t("maxUsesHint")} />
       </div>
-      <div>
-        <SubmitButton>{t("create")}</SubmitButton>
-      </div>
-    </form>
+    </CatalogFormFrame>
   );
 }

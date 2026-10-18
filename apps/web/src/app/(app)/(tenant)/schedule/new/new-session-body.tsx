@@ -21,7 +21,7 @@ export async function NewSessionBody({ date }: { date?: string | string[] }) {
     return (
       <p className="rounded-2xl border border-dashed border-border p-8 text-center text-muted">
         {t("needService")}{" "}
-        <Link href="/services/new" className="text-primary-ink underline">
+        <Link href="/catalog/services/new" className="text-primary-ink underline">
           →
         </Link>
       </p>

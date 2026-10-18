@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { RedirectType, redirect } from "next/navigation";
 
 import { ApiError, unwrap } from "@/lib/api";
 import { toMinorUnits } from "@/lib/money";
@@ -37,19 +38,25 @@ export async function createPromoCode(_state: PromoState, formData: FormData): P
     if (error instanceof ApiError && error.status === 422) return { error: "invalid" };
     return { error: "generic" };
   }
-  revalidatePath("/plans");
+  revalidatePath("/catalog");
   return { saved: true };
 }
 
 export async function setPromoActive(codeId: string, active: boolean): Promise<void> {
   const { api, scope } = await getTenant();
   unwrap(await api.PATCH("/promo-codes/{code_id}", { params: { ...scope, path: { code_id: codeId } }, body: { active } }));
-  revalidatePath("/plans");
+  revalidatePath("/catalog");
 }
 
 export async function deletePromoCode(codeId: string): Promise<void> {
   const { api, scope } = await getTenant();
   const { response } = await api.DELETE("/promo-codes/{code_id}", { params: { ...scope, path: { code_id: codeId } } });
   if (!response.ok && response.status !== 409) throw new ApiError(response.status, "delete promo failed");
-  revalidatePath("/plans");
+  revalidatePath("/catalog");
+}
+
+/** Deletes a code from its window and returns to the list. */
+export async function removePromoCode(codeId: string): Promise<void> {
+  await deletePromoCode(codeId);
+  redirect("/catalog?tab=codes&removed=code", RedirectType.replace);
 }

@@ -2,15 +2,14 @@
 
 import type { components } from "@business-os/api-client";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { CheckboxField, Field, SelectField, TextAreaField } from "@/components/form/field";
-import { FormFeedback } from "@/components/form/form-feedback";
-import { SubmitButton } from "@/components/form/submit-button";
 import { DEFAULT_BRAND_COLOR } from "@/lib/brand";
 import type { FormState } from "@/lib/form-state";
 import { toMajorUnits } from "@/lib/money";
+
+import { CatalogFormFrame } from "../form-frame";
 
 type Service = components["schemas"]["Service"];
 
@@ -24,17 +23,30 @@ type Props = {
   currency: string;
   submitLabel: string;
   readOnly?: boolean;
+  /** Shown as a window over the list instead of a page. */
+  modal?: boolean;
+  /** The delete button and rooms, under the fields. */
+  aside?: React.ReactNode;
 };
 
-export function ServiceForm({ action, service, currency, submitLabel, readOnly = false }: Props) {
+export function ServiceForm({ action, service, currency, submitLabel, readOnly = false, modal = false, aside }: Props) {
   const t = useTranslations();
   const [state, formAction] = useActionState(action, {});
   const [mode, setMode] = useState<Service["booking_mode"]>(service?.booking_mode ?? "class");
   const [onSite, setOnSite] = useState(service?.on_site ?? false);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
-      <FormFeedback state={state} />
+    <CatalogFormFrame
+      modal={modal}
+      backHref="/catalog?tab=services"
+      formAction={formAction}
+      state={state}
+      savedMessage={service ? t("common.saved") : t("services.created")}
+      closeOnSave={modal || !service}
+      readOnly={readOnly}
+      submitLabel={submitLabel}
+      aside={aside}
+    >
       {/* Remount after a save so fields show the stored values (see ClientForm). */}
       <fieldset key={service?.updated_at ?? "new"} disabled={readOnly} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
@@ -147,14 +159,6 @@ export function ServiceForm({ action, service, currency, submitLabel, readOnly =
         </div>
         <CheckboxField label={t("services.active")} name="active" defaultChecked={service?.active ?? true} />
       </fieldset>
-      {!readOnly && (
-        <div className="flex items-center gap-4">
-          <SubmitButton>{submitLabel}</SubmitButton>
-          <Link href="/services" className="text-sm text-muted underline-offset-4 hover:underline">
-            {t("common.cancel")}
-          </Link>
-        </div>
-      )}
-    </form>
+    </CatalogFormFrame>
   );
 }

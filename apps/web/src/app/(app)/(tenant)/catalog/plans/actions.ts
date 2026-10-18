@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { RedirectType, redirect } from "next/navigation";
 
 import { unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
@@ -37,8 +37,8 @@ export async function createPlan(_state: FormState, formData: FormData): Promise
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/plans");
-  redirect("/plans");
+  revalidatePath("/catalog");
+  return { saved: true };
 }
 
 export async function updatePlan(planId: string, _state: FormState, formData: FormData): Promise<FormState> {
@@ -50,13 +50,13 @@ export async function updatePlan(planId: string, _state: FormState, formData: Fo
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/plans");
+  revalidatePath("/catalog");
   return { saved: true };
 }
 
 export async function deletePlan(planId: string): Promise<void> {
   const { api, scope } = await getTenant();
   const { result } = unwrap(await api.DELETE("/plans/{plan_id}", { params: { ...scope, path: { plan_id: planId } } }));
-  revalidatePath("/plans");
-  redirect(`/plans?removed=${result}`);
+  revalidatePath("/catalog");
+  redirect(`/catalog?tab=plans&removed=${result}`, RedirectType.replace);
 }
