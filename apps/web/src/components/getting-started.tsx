@@ -9,7 +9,7 @@ export type SetupStep = GettingStarted["steps"][number]["key"];
 
 export const SETUP_STEPS: Record<SetupStep, { href: string; Icon: typeof Palette }> = {
   branding: { href: "/settings/branding", Icon: Palette },
-  services: { href: "/services", Icon: Tags },
+  services: { href: "/catalog?tab=services", Icon: Tags },
   schedule: { href: "/schedule", Icon: CalendarDays },
   team: { href: "/team", Icon: UsersRound },
   clients: { href: "/clients", Icon: Users },

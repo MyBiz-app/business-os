@@ -57,7 +57,7 @@ with sync_playwright() as p:
     expect(nav.get_by_role("link", name="הגדרות")).to_have_count(0)
     coach.goto(f"{h.BASE}/plans/new")
     h.ready(coach)
-    expect(coach).to_have_url(re.compile(r".*/plans$"))  # staff cannot edit plans
+    expect(coach).to_have_url(re.compile(r".*/catalog\?tab=plans$"))  # staff cannot edit plans
     print("coach starts as read-only staff: ok")
 
     # Create a role "מנהל תוכניות" that may edit the catalog.
@@ -92,7 +92,7 @@ with sync_playwright() as p:
     coach.goto(f"{h.BASE}/dashboard")
     h.ready(coach)
     nav = coach.get_by_role("navigation", name="ניווט ראשי")
-    expect(nav.get_by_role("link", name="מנויים וכרטיסיות")).to_be_visible()
+    expect(nav.get_by_role("link", name="קטלוג")).to_be_visible()
     expect(nav.get_by_role("link", name="לוח שיעורים")).to_have_count(0)  # only what the role gives
     coach.goto(f"{h.BASE}/schedule")  # a direct link to a page the role can't open
     coach.wait_for_url("**/dashboard")

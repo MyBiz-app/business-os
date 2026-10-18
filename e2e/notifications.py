@@ -35,7 +35,7 @@ with sync_playwright() as p:
     owner.get_by_label("שם").fill("יוגה")
     owner.get_by_label("משך (בדקות)").fill("60")
     owner.get_by_label("משתתפים בכל מפגש").fill("8")
-    owner.get_by_role("button", name="יצירה").click(); owner.wait_for_url("**/services")
+    owner.get_by_role("button", name="יצירה").click(); owner.wait_for_url(re.compile(r".*/catalog\?tab=services"))
     owner.goto(f"{h.BASE}/schedule/new"); h.ready(owner)
     owner.get_by_label("תאריך", exact=True).fill(tomorrow)
     owner.get_by_label("שעת התחלה").fill("18:00")
