@@ -27,7 +27,10 @@ def check_a11y(page, label):
     results = axe.run(page)
     serious = [v for v in results.response["violations"] if v["impact"] in ("serious", "critical")]
     for v in serious:
-        a11y.append(f"{label}: {v['id']} ({v['impact']}) x{len(v['nodes'])}: {v['nodes'][0]['target']}")
+        node = v["nodes"][0]
+        checks = node.get("any", []) + node.get("all", []) + node.get("none", [])
+        why = checks[0]["message"] if checks else ""
+        a11y.append(f"{label}: {v['id']} ({v['impact']}) x{len(v['nodes'])}: {node['target']} {why} {node['html'][:160]}")
 
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
