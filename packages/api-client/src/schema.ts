@@ -1600,6 +1600,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/quotes/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Quotes Summary
+         * @description How many quotes and how much money per status and currency, over every visible quote.
+         */
+        get: operations["quotes_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/quotes/{quote_id}": {
         parameters: {
             query?: never;
@@ -17087,6 +17107,24 @@ export interface components {
              */
             total: number;
         };
+        /** QuoteStatusTotal */
+        QuoteStatusTotal: {
+            /**
+             * Status
+             * @description expired: sent and past its date
+             * @enum {string}
+             */
+            status: "draft" | "sent" | "accepted" | "declined" | "expired";
+            /** Currency */
+            currency: string;
+            /** Count */
+            count: number;
+            /**
+             * Total
+             * @description Minor units
+             */
+            total: number;
+        };
         /** QuoteSummary */
         QuoteSummary: {
             /**
@@ -24807,6 +24845,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quotes_summary: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteStatusTotal"][];
                 };
             };
             /** @description Validation Error */
