@@ -30,6 +30,18 @@ def check_a11y(page, label):
         node = v["nodes"][0]
         checks = node.get("any", []) + node.get("all", []) + node.get("none", [])
         why = checks[0]["message"] if checks else ""
+        if v["id"] == "color-contrast":
+            try:
+                sel = node["target"][-1]
+                chain = page.evaluate("""(sel) => { const out = []; let el = document.querySelector(sel);
+                  const r = el.getBoundingClientRect(); const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                  out.push('top=' + (top && top.tagName + '.' + top.className).slice(0, 80));
+                  while (el && out.length < 9) { const c = getComputedStyle(el);
+                    out.push(el.tagName + '.' + String(el.className).slice(0, 40) + ' bg=' + c.backgroundColor + ' op=' + c.opacity + ' color=' + c.color); el = el.parentElement; }
+                  return out; }""", sel)
+                a11y.append(f"{label}: contrast chain {chain}")
+            except Exception as e:  # diagnostics only
+                a11y.append(f"{label}: contrast chain failed {e}")
         a11y.append(f"{label}: {v['id']} ({v['impact']}) x{len(v['nodes'])}: {node['target']} {why} {node['html'][:160]}")
 
 with sync_playwright() as p:

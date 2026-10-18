@@ -64,7 +64,7 @@ function ToastView({ toast, onDone }: { toast: Toast; onDone: () => void }) {
   }, [progress, reduced, onDone, toast.kind]);
 
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { bottom: insets.bottom + 88 }]}>
+    <View style={[styles.wrap, { pointerEvents: "box-none" }, { bottom: insets.bottom + 88 }]}>
       <Animated.View
         accessibilityRole="alert"
         accessibilityLiveRegion="polite"
