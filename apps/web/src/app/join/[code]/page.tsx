@@ -56,6 +56,11 @@ export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
             {t("openInBrowser")}
           </a>
         )}
+        {business.website_url && (
+          <a href={business.website_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium underline-offset-4 hover:underline">
+            {t("visitSite")}
+          </a>
+        )}
       </main>
     </div>
   );

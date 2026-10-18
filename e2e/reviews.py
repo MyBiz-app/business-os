@@ -52,6 +52,7 @@ with sync_playwright() as p:
     member.get_by_label("הקוד בן 6 הספרות").fill(h.otp(member_email))
     # Filling the last digit signs in on its own.
     member.wait_for_url("**/join**")
+    h.accept_legal(member)
     member.get_by_label("שם פרטי").fill("נועה")
     member.get_by_role("button", name="הצטרפות לסלון רוני").click(); member.wait_for_url("**/home")
 

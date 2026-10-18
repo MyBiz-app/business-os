@@ -48,6 +48,8 @@ export async function createClient(
     return toState(error);
   }
   revalidatePath("/clients");
+  // In a window over the list the form closes itself and shows the confirmation.
+  if (formData.get("_modal")) return { saved: true };
   redirect(`/clients/${id}`);
 }
 

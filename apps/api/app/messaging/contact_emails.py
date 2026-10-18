@@ -92,6 +92,18 @@ def sender_name(db: Db, tenant_id: UUID, location_id: UUID | None = None) -> str
     )
 
 
+def website_of(db: Db, tenant_id: UUID, location_id: UUID | None = None) -> str | None:
+    """The site shown in a message's footer: the branch's own, else the business's."""
+    return db.execute(
+        text("""
+            SELECT coalesce(
+                (SELECT website_url FROM app.locations WHERE id = :l AND tenant_id = :t),
+                (SELECT website_url FROM app.tenants WHERE id = :t))
+        """),
+        {"t": tenant_id, "l": location_id},
+    ).scalar()
+
+
 def confirm_token(tenant_id: UUID, row_id: UUID, email: str) -> str:
     return sign(f"{SUBJECT_PREFIX}:{tenant_id}:{row_id}:{email.lower()}", ttl=CONFIRM_TTL)
 

@@ -108,7 +108,7 @@ export async function runMove(sessionId: string, commit: boolean): Promise<MoveR
       : await api.POST("/migration/sessions/{session_id}/preview", path);
     if (commit && result.data) {
       revalidatePath("/clients");
-      revalidatePath("/services");
+      revalidatePath("/catalog");
       revalidatePath("/team");
     }
     return unwrap(result);

@@ -75,6 +75,7 @@ def test_public_profile_by_join_code(client: TestClient, studio: dict) -> None:
         "logo_url",
         "client_app",
         "inquiries",
+        "website_url",
     }
     assert client.get("/public/businesses/NOPE2345").status_code == 404
 

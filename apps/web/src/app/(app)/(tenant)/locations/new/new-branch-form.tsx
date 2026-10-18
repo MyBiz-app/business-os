@@ -28,6 +28,7 @@ export function NewBranchForm({ action, chargeable, branches, people, kindOption
         <legend className="sr-only">{t("locations.addBranch.details")}</legend>
         <Field label={t("locations.name")} name="name" required maxLength={120} />
         <Field label={t("locations.address")} name="address" maxLength={300} />
+        <Field label={t("locations.website")} hint={t("locations.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="off" placeholder="www.example.com" />
         {kindOptions.length > 1 && (
           <SelectField label={t("locations.kind")} name="kind" defaultValue="" options={kindOptions} />
         )}

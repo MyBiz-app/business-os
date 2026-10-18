@@ -22,7 +22,7 @@ import { ScreenContextProvider } from "./ai-bubble/screen-context";
 import "./crm-shell.css";
 
 /** The CRM frame (side menu, branch switcher, banners, AI bubble) around whatever page it wraps. */
-export async function CrmFrame({ children }: { children: ReactNode }) {
+export async function CrmFrame({ children, modal }: { children: ReactNode; modal?: ReactNode }) {
   const { tenant, me, branch } = await getTenant();
   const t = await getTranslations();
   const logo = apiAssetUrl(tenant.logo_url);
@@ -48,9 +48,8 @@ export async function CrmFrame({ children }: { children: ReactNode }) {
     { href: "/leads", group: g("clients"), label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
     { href: "/messages", group: g("clients"), label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },
     { href: "/content", group: g("clients"), label: t("nav.content"), icon: "content", permission: "social.read", upgrade: "social" },
-    { href: "/services", group: g("catalog"), label: t("nav.services"), icon: "services", permission: "catalog.read" },
-    { href: "/plans", group: g("catalog"), label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
-    { href: "/quotes", group: g("money"), label: t("nav.quotes"), icon: "quotes", permission: "clients.read" },
+    { href: "/catalog", group: g("catalog"), label: t("nav.catalog"), icon: "catalog", permission: "catalog.read" },
+    { href: "/quotes", group: g("money"), label: t(termsOf(tenant.vertical) === "events" ? "nav.quotesEvents" : "nav.quotes"), icon: "quotes", permission: "clients.read" },
     { href: "/invoices", group: g("money"), label: t("nav.invoices"), icon: "invoices", permission: "sales.manage" },
     ...(vertical(tenant.vertical)?.timeBilling
       ? [
@@ -128,6 +127,8 @@ export async function CrmFrame({ children }: { children: ReactNode }) {
       </div>
     </div>
     {aiBubble && <AiBubble />}
+    {/* Forms that open as a window over the page (round 7); the slot is empty otherwise. */}
+    {modal}
     </ScreenContextProvider>
     </ScopedMessages>
   );

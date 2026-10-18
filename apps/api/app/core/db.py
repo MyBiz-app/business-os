@@ -64,9 +64,13 @@ def log_slow_queries(engine: Engine, threshold_ms: int) -> None:
 
 def _apply_context(connection: Connection, user_id: str, tenant_id: str) -> None:
     connection.execute(text("SET LOCAL ROLE app_api"))
+    # JIT is off: the row-level-security functions make every plan look expensive, so Postgres
+    # compiled even small queries (about 0.7 s for a week of the timetable); without it the same
+    # query takes about 10 ms.
     connection.execute(
         text(
-            "SELECT set_config('app.user_id', :uid, true), set_config('app.tenant_id', :tid, true)"
+            "SELECT set_config('app.user_id', :uid, true), set_config('app.tenant_id', :tid, true),"
+            " set_config('jit', 'off', true)"
         ),
         {"uid": user_id, "tid": tenant_id},
     )

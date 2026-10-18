@@ -28,9 +28,12 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}-${tenant.require_mfa_for_staff}-${tenant.resource_payment}-${tenant.booking_horizon_days}-${tenant.weekly_release_weekday}-${tenant.weekly_release_time}`} className="grid gap-4 sm:grid-cols-2">
+      <div key={`${tenant.name}-${tenant.website_url}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}-${tenant.require_mfa_for_staff}-${tenant.resource_payment}-${tenant.booking_horizon_days}-${tenant.weekly_release_weekday}-${tenant.weekly_release_time}`} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
+        </div>
+        <div className="sm:col-span-2">
+          <Field label={t("settings.website")} hint={t("settings.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="url" placeholder="www.example.com" defaultValue={tenant.website_url ?? ""} />
         </div>
         <SelectField
           label={t("onboarding.locale")}

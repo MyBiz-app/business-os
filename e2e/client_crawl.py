@@ -55,6 +55,7 @@ with sync_playwright() as p:
     page.get_by_label("הקוד בן 6 הספרות").fill(h.otp(client_email))
     # Filling the last digit signs in on its own.
     page.wait_for_url("**/join")
+    h.accept_legal(page)
     scan(page, "join")
     page.get_by_label("קוד הצטרפות").fill(code)
     page.get_by_role("button", name="המשך").click()
