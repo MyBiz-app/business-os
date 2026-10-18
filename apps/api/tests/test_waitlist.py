@@ -69,6 +69,18 @@ def test_settings_and_the_pack_defaults(client: TestClient, studio: dict, barber
     assert bad.status_code == 422
 
 
+def test_auto_hours_must_be_between_0_and_72(client: TestClient, studio: dict) -> None:
+    for hours in (-1, 73):
+        refused = client.patch(
+            "/tenants/current", json={"waitlist_auto_hours": hours}, headers=studio["headers"]
+        )
+        assert refused.status_code == 422, hours
+    for hours in (0, 72):
+        set_waitlist(client, studio["headers"], waitlist_auto_hours=hours)
+        current = client.get("/tenants/current", headers=studio["headers"]).json()
+        assert current["waitlist_auto_hours"] == hours
+
+
 def test_auto_mode_promotes_a_class_far_ahead_and_offers_it_close_in(
     client: TestClient, studio: dict, auth: AuthHeaders
 ) -> None:

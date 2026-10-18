@@ -34603,6 +34603,18 @@
             }
           },
           {
+            "name": "exclude_staff",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out clients who are also team members",
+              "default": false,
+              "title": "Exclude Staff"
+            },
+            "description": "Leave out clients who are also team members"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -34685,6 +34697,18 @@
               "default": 14,
               "title": "Days"
             }
+          },
+          {
+            "name": "exclude_staff",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out clients who are also team members",
+              "default": false,
+              "title": "Exclude Staff"
+            },
+            "description": "Leave out clients who are also team members"
           },
           {
             "name": "X-Tenant-Id",
@@ -34832,6 +34856,18 @@
               "title": "Location Id"
             },
             "description": "Only these branches (within the person's own)"
+          },
+          {
+            "name": "exclude_staff",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out clients who are also team members",
+              "default": false,
+              "title": "Exclude Staff"
+            },
+            "description": "Leave out clients who are also team members"
           },
           {
             "name": "X-Tenant-Id",
@@ -49080,13 +49116,19 @@
             ],
             "title": "Staff Cost Minor",
             "description": "The branch's share of the latest payroll month's gross pay (needs payroll access; people who did not clock in are not counted)"
+          },
+          "staff_count": {
+            "type": "integer",
+            "title": "Staff Count",
+            "description": "Team members assigned to the branch or based there"
           }
         },
         "type": "object",
         "required": [
           "location_id",
           "origins",
-          "staff_cost_minor"
+          "staff_cost_minor",
+          "staff_count"
         ],
         "title": "BranchInsight"
       },

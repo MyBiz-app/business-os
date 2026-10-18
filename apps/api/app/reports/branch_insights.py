@@ -13,6 +13,9 @@ from sqlalchemy.orm import Session
 from app.geo.geocoder import get_geocoder
 
 TOP_CITIES = 6
+# A city is shown only when at least this many clients come from it, so no single client can be
+# picked out of the map (privacy, R35).
+MIN_CLIENTS_PER_CITY = 5
 
 
 @dataclass(frozen=True)
@@ -33,7 +36,8 @@ def _city_point(city_name: str) -> tuple[float, float] | None:
 
 def client_origins(db: Session, location_id: str, start: dt.date, end: dt.date) -> list[Origin]:
     """The cities of the clients who booked a session at the branch in [start, end], most first.
-    A client counts once, in the city of their latest saved address."""
+    A client counts once, in the city of their latest saved address. Cities with fewer than
+    MIN_CLIENTS_PER_CITY clients are left out."""
     rows = db.execute(
         text("""
             WITH tz AS (SELECT coalesce(t.time_zone, 'UTC') AS time_zone FROM app.tenants t
@@ -56,10 +60,17 @@ def client_origins(db: Session, location_id: str, start: dt.date, end: dt.date) 
             ) addr
             JOIN app.geo_cities c ON c.code = addr.city_code
             GROUP BY c.code, c.name_he
+            HAVING count(*) >= :min_clients
             ORDER BY count(*) DESC, c.name_he
             LIMIT :limit
         """),
-        {"location": location_id, "start": start, "end": end, "limit": TOP_CITIES},
+        {
+            "location": location_id,
+            "start": start,
+            "end": end,
+            "limit": TOP_CITIES,
+            "min_clients": MIN_CLIENTS_PER_CITY,
+        },
     ).all()
     result = []
     for row in rows:
@@ -105,3 +116,18 @@ def staff_cost_by_branch(db: Session) -> tuple[dt.date | None, dict[str, int]]:
         {"run": run.id, "period": run.period},
     ).all()
     return run.period, {row.location_id: int(row.cost or 0) for row in rows}
+
+
+def staff_count_by_branch(db: Session) -> dict[str, int]:
+    """Team members tied to each branch: assigned to it, or with it as their home branch."""
+    rows = db.execute(
+        text("""
+            SELECT l.id::text AS location_id, count(m.user_id) AS members
+            FROM app.locations l
+            JOIN app.tenant_members m
+              ON m.home_location_id = l.id OR l.id = ANY(m.location_ids)
+            WHERE l.active AND app.in_branch(l.id)
+            GROUP BY l.id
+        """)
+    ).all()
+    return {row.location_id: int(row.members) for row in rows}

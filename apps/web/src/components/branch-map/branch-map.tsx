@@ -33,6 +33,8 @@ export type MapBranch = {
   staffCost: number | null;
   /** The payroll month (YYYY-MM-DD) the cost is from. */
   staffCostMonth: string | null;
+  /** Team members assigned to the branch or based there. */
+  staffCount: number;
 };
 
 type ColorBy = "revenue" | "clients" | "occupancy";
@@ -260,6 +262,7 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
             <Stat label={t("panel.clients")} value={count(open.clients)} />
             <Stat label={t("panel.bookings")} value={count(open.bookings)} />
             <Stat label={t("panel.occupancy")} value={percent(open.occupancy)} />
+            <Stat label={t("panel.staffCount")} value={count(open.staffCount)} />
           </dl>
           {open.staffCost !== null && open.staffCostMonth && (
             <dl className="grid grid-cols-1 gap-3 text-sm">
