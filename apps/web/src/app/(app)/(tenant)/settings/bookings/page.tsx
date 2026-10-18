@@ -21,7 +21,7 @@ export default async function BookingSettingsPage() {
   const cancellation = unwrap(await api.GET("/cancellation-policy", { params: scope }));
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("nav.items.bookings")} description={t("nav.hints.bookings")} />
       <CollapsibleSection title={t("cancellation.title")} description={t("cancellation.subtitle")} defaultOpen storageKey="settings-cancellation">
         <CancellationForm key={JSON.stringify(cancellation.business)} overview={cancellation} />

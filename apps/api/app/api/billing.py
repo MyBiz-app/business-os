@@ -21,6 +21,7 @@ from app.commerce import quotas
 from app.commerce.billing import add_months
 from app.commerce.modules import allowance
 from app.commerce.quotas import QuotaAlert
+from app.core.audit import record
 from app.core.config import get_settings
 from app.core.permissions import Permission
 
@@ -249,6 +250,7 @@ def cancel_subscription(context: OwnerDep) -> Collection:
         # The period that contains today is already running; it ends at the start of the next.
         end = datetime.combine(add_months(anchor, months + 1), datetime.min.time(), tzinfo=zone)
     db.execute(text("SELECT app.set_subscription_cancel(:at)"), {"at": end})
+    record(db, "tenant.subscription_canceled", entity_type="tenant", ends_at=end)
     return _collection(db, _invoices(db), tenant.time_zone)
 
 
@@ -257,6 +259,7 @@ def resume_subscription(context: OwnerDep) -> Collection:
     """Takes a cancellation back, and brings a business back whose subscription had ended."""
     db = context.session
     db.execute(text("SELECT app.set_subscription_cancel(NULL)"))
+    record(db, "tenant.subscription_resumed", entity_type="tenant")
     time_zone = db.execute(
         text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
     ).scalar_one()

@@ -69,5 +69,6 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
   await api
     .POST("/tenants/current/welcome-email", { params: scope, body: { expected_active_clients: plan.clients } })
     .catch(() => null);
-  redirect("/dashboard?welcome=1");
+  // Moving from another system: open the migration hub; starting fresh: the welcome tour.
+  redirect(plan.track === "existing" ? "/migration" : "/dashboard?welcome=1");
 }

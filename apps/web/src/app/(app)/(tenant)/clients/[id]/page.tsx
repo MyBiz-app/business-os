@@ -223,7 +223,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
         </p>
       )}
 
-      <div className="grid items-start gap-6 lg:grid-cols-5">
+      <div className="grid items-start gap-6 lg:grid-cols-5 min-[120rem]:grid-cols-7">
         <div className="flex min-w-0 flex-col gap-6 lg:col-span-3">
           <PlansSection clientId={client.id} context={context} locked={erased} />
 
@@ -283,7 +283,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-6 lg:col-span-2">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-span-2 min-[120rem]:col-span-4 min-[120rem]:grid min-[120rem]:grid-cols-2 min-[120rem]:items-start">
           <section aria-labelledby="details-heading" className="card p-6">
             <h2 id="details-heading" className="mb-4 text-lg font-semibold">
               {t("details")}

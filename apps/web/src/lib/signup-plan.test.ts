@@ -38,6 +38,12 @@ test("a plan survives the round trip through the URL, Hebrew included", () => {
   assert.deepEqual(decodePlan(encoded), plan);
 });
 
+test("the track of a business moving from another system survives the link", () => {
+  const moving: SignupPlan = { ...plan, track: "existing" };
+  assert.equal(decodePlan(encodePlan(moving))?.track, "existing");
+  assert.equal(decodePlan(encodePlan({ ...plan, track: "bogus" as "new" }))?.track, undefined);
+});
+
 test("anything that is not a valid plan is rejected", () => {
   assert.equal(decodePlan(undefined), null);
   assert.equal(decodePlan("not base64 json"), null);

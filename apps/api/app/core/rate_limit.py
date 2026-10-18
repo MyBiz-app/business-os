@@ -11,6 +11,7 @@ here without touching the rules. `RedisStore` is that shared store; it is used o
 import hmac
 import logging
 import math
+import re
 import threading
 import time
 from collections.abc import Callable
@@ -30,7 +31,14 @@ class Rule:
     limit: int  # requests per window per address
     window: int = 60  # seconds
     methods: frozenset[str] | None = None  # None: every method
+    pattern: re.Pattern[str] | None = (
+        None  # None: the prefix alone decides; else the path must match too
+    )
 
+
+# Calls that carry a file or a bulk import: logos, avatars, client documents, migration files,
+# client import. They are heavier than a normal call (storage, scanning, parsing).
+UPLOAD_PATH = re.compile(r"/(files|documents|logo|avatar|import)(/|$)")
 
 # A request counts against every rule it matches (a public form post: public-write, public, all).
 RULES: tuple[Rule, ...] = (
@@ -39,6 +47,7 @@ RULES: tuple[Rule, ...] = (
     # An AI app registers itself once per business owner; nothing needs more than a handful.
     Rule("mcp-register", "/mcp-oauth/register", 10),
     Rule("webhooks", "/webhooks/", 600),
+    Rule("uploads", "/", 30, methods=frozenset({"POST", "PUT"}), pattern=UPLOAD_PATH),
     Rule("all", "/", 1200),
 )
 EXEMPT = ("/health", "/health/ready")
@@ -176,6 +185,8 @@ def limiter(
             if not path.startswith(rule.prefix):
                 continue
             if rule.methods is not None and request.method not in rule.methods:
+                continue
+            if rule.pattern is not None and not rule.pattern.search(path):
                 continue
             count, ends = store.hit(f"{rule.name}:{address}", rule.window, now)
             if count > rule.limit:
