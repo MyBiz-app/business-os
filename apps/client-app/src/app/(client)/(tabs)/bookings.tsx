@@ -35,6 +35,7 @@ export default function Bookings() {
   const t = useTranslations("client.bookings");
   const tWaitlist = useTranslations("client.waitlist");
   const tStatus = useTranslations("bookings");
+  const tClient = useTranslations("client");
   const tPlans = useTranslations("plans");
   const tReceipts = useTranslations("receipts");
   const tFreeze = useTranslations("client.freeze");
@@ -120,6 +121,7 @@ export default function Bookings() {
     </View>
   );
 
+  const whenFormat = new Intl.DateTimeFormat(locale, { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: business.time_zone });
   const dayNumber = new Intl.DateTimeFormat(locale, { day: "numeric", timeZone: business.time_zone });
   const monthShort = new Intl.DateTimeFormat(locale, { month: "short", timeZone: business.time_zone });
   /** An upcoming booking: its date, time and status, with navigate / calendar / cancel. */
@@ -136,6 +138,13 @@ export default function Bookings() {
             {formatTime(booking.starts_at, locale, business.time_zone)}-{formatTime(booking.ends_at, locale, business.time_zone)}
             {booking.dependent_name ? ` · ${booking.dependent_name}` : ""}
           </Text>
+          {booking.free_cancel_until ? (
+            <Text style={[local.meta, { color: palette.muted }]}>
+              {Date.parse(booking.free_cancel_until) > Date.now()
+                ? tClient("freeCancelUntil", { when: whenFormat.format(new Date(booking.free_cancel_until)) })
+                : tClient("cancelLateSoon")}
+            </Text>
+          ) : null}
         </View>
         <Badge label={tStatus(`statuses.${booking.status}`)} tone={TONE[booking.status] ?? "muted"} palette={palette} />
       </View>

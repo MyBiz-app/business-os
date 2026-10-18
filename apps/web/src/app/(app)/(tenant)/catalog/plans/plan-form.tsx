@@ -29,6 +29,7 @@ export function PlanForm({ action, plan, currency, submitLabel, readOnly = false
   const [state, formAction] = useActionState(action, {});
   const [kind, setKind] = useState(plan?.kind ?? "membership");
   const [cycle, setCycle] = useState<string>(plan?.billing_cycle ?? "");
+  const [periodUnit, setPeriodUnit] = useState<string>(plan?.period_unit ?? "");
 
   return (
     <CatalogFormFrame
@@ -112,6 +113,25 @@ export function PlanForm({ action, plan, currency, submitLabel, readOnly = false
           required
           defaultValue={plan?.validity_days ?? (kind === "punch_card" ? 90 : 30)}
         />
+      )}
+      {kind === "membership" && (
+        <>
+          <SelectField
+            label={t("plans.quota")}
+            name="period_unit"
+            value={periodUnit}
+            onChange={(event) => setPeriodUnit(event.target.value)}
+            options={[
+              { value: "", label: t("plans.quotas.none") },
+              ...(["week", "month"] as const).map((value) => ({ value, label: t(`plans.quotas.${value}`) })),
+            ]}
+          />
+          {periodUnit !== "" ? (
+            <Field label={t("plans.quotaVisits")} name="period_quota" type="number" min={1} max={100} required defaultValue={plan?.period_quota ?? 2} />
+          ) : (
+            <p className="self-end pb-2 text-xs text-muted">{t("plans.quotaHint")}</p>
+          )}
+        </>
       )}
       <Field
         label={`${t("plans.price")} (${currency})`}

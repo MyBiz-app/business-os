@@ -18,6 +18,7 @@ from app.api.schemas import (
     Tenant,
     TenantCreate,
 )
+from app.catalog.cancellation import defaults_for
 from app.catalog.verticals import VERTICAL_PACKS
 from app.commerce.modules import PRESETS
 from app.core import events
@@ -138,6 +139,30 @@ def apply_vertical_pack(
             "wl_resources": pack.waitlist.resources,
             "id": tenant_id,
         },
+    )
+    # The cancellation policy the category suggests, in force until the business changes it.
+    defaults = defaults_for(pack.category)
+    session.execute(
+        text("""
+            INSERT INTO app.cancellation_policies
+                (tenant_id, scope, group_minutes, personal_minutes, resource_minutes,
+                 late_outcome, no_show_outcome)
+            VALUES (:id, 'business', :group_minutes, :personal_minutes, :resource_minutes,
+                    :late_outcome, :no_show_outcome)
+            ON CONFLICT (tenant_id) WHERE scope = 'business' DO NOTHING
+        """),
+        {
+            "id": tenant_id,
+            "group_minutes": defaults.group_minutes,
+            "personal_minutes": defaults.personal_minutes,
+            "resource_minutes": defaults.resource_minutes,
+            "late_outcome": defaults.late_outcome,
+            "no_show_outcome": defaults.no_show_outcome,
+        },
+    )
+    session.execute(
+        text("UPDATE app.tenants SET cancellation_window_minutes = :minutes WHERE id = :id"),
+        {"minutes": defaults.group_minutes, "id": tenant_id},
     )
     for service in pack.default_services:
         resource = service.booking_mode == "resource"  # by the hour: prices are per hour
