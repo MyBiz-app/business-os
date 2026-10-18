@@ -1,3 +1,4 @@
+import type { components } from "@business-os/api-client";
 import { FileSignature, Plus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -16,6 +17,9 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { STATUS_TONE } from "./status";
 
+const PAGE_SIZE = 50;
+const MAX_SHOWN = 1000;
+const CHUNK = 200; // the API's largest page
 const FILTERS = ["all", "draft", "sent", "accepted", "declined", "expired"] as const;
 const VIEWS = ["quotes", "events"] as const;
 
@@ -33,21 +37,37 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
   const anchor = isDay(query.date) ? query.date : today;
   const month = monthGrid(anchor);
 
-  // The tiles count every quote; the list below is the same set narrowed to the chosen status.
-  const everything = unwrap(await api.GET("/quotes", { params: scope }));
-  const quotes = filter === "all" ? everything : everything.filter((quote) => quote.status === filter);
-  const rowsOf = (status: "draft" | "sent" | "accepted") => everything.filter((quote) => quote.status === status);
-  const totalOf = (rows: typeof everything) => {
-    const currencies = new Set(rows.map((quote) => quote.currency));
-    return rows.length > 0 && currencies.size === 1 ? formatMoney(rows.reduce((sum, quote) => sum + quote.total, 0), [...currencies][0], locale) : undefined;
+  // The tiles count every quote (a summary query); the list is one status, a page at a time.
+  const summary = unwrap(await api.GET("/quotes/summary", { params: scope }));
+  const total = summary.reduce((sum, row) => sum + row.count, 0);
+  const shown = Math.min(MAX_SHOWN, Math.max(PAGE_SIZE, Number(query.shown) || PAGE_SIZE));
+  // One more than shown tells whether a next page exists.
+  const fetched: components["schemas"]["QuoteSummary"][] = [];
+  while (view === "quotes" && total > 0 && fetched.length <= shown) {
+    const take = Math.min(CHUNK, shown + 1 - fetched.length);
+    const chunk = unwrap(
+      await api.GET("/quotes", {
+        params: { ...scope, query: { status: filter === "all" ? undefined : filter, limit: take, offset: fetched.length } },
+      }),
+    );
+    fetched.push(...chunk);
+    if (chunk.length < take) break;
+  }
+  const hasMore = fetched.length > shown;
+  const quotes = fetched.slice(0, shown);
+  const rowsOf = (...statuses: string[]) => summary.filter((row) => statuses.includes(row.status));
+  const countOf = (rows: typeof summary) => rows.reduce((sum, row) => sum + row.count, 0);
+  const totalOf = (rows: typeof summary) => {
+    const currencies = new Set(rows.map((row) => row.currency));
+    return rows.length > 0 && currencies.size === 1 ? formatMoney(rows.reduce((sum, row) => sum + row.total, 0), [...currencies][0], locale) : undefined;
   };
-  const won = rowsOf("accepted").length;
-  const lost = everything.filter((quote) => quote.status === "declined" || quote.status === "expired").length;
+  const won = countOf(rowsOf("accepted"));
+  const lost = countOf(rowsOf("declined", "expired"));
   const decided = won + lost;
   const tiles = [
-    { key: "draft", label: t("tiles.draft"), value: rowsOf("draft").length, hint: totalOf(rowsOf("draft")), href: "/quotes?status=draft", active: view === "quotes" && filter === "draft" },
-    { key: "sent", label: t("tiles.sent"), value: rowsOf("sent").length, hint: totalOf(rowsOf("sent")), href: "/quotes?status=sent", active: view === "quotes" && filter === "sent" },
-    { key: "accepted", label: t("tiles.accepted"), value: rowsOf("accepted").length, hint: totalOf(rowsOf("accepted")), href: "/quotes?status=accepted", active: view === "quotes" && filter === "accepted" },
+    { key: "draft", label: t("tiles.draft"), value: countOf(rowsOf("draft")), hint: totalOf(rowsOf("draft")), href: "/quotes?status=draft", active: view === "quotes" && filter === "draft" },
+    { key: "sent", label: t("tiles.sent"), value: countOf(rowsOf("sent")), hint: totalOf(rowsOf("sent")), href: "/quotes?status=sent", active: view === "quotes" && filter === "sent" },
+    { key: "accepted", label: t("tiles.accepted"), value: countOf(rowsOf("accepted")), hint: totalOf(rowsOf("accepted")), href: "/quotes?status=accepted", active: view === "quotes" && filter === "accepted" },
     {
       key: "closeRate",
       label: t("tiles.closeRate"),
@@ -157,7 +177,7 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       {header}
       {slicer}
-      {everything.length === 0 ? (
+      {total === 0 ? (
         <section aria-labelledby="first-quote" className="card flex flex-col items-center gap-6 p-8 text-center">
           <h2 id="first-quote" className="text-xl font-semibold">{t("empty.title")}</h2>
           <ol className="grid w-full max-w-4xl gap-4 text-start sm:grid-cols-3">
@@ -212,6 +232,15 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
                 </li>
               ))}
             </ul>
+          )}
+          {hasMore && shown < MAX_SHOWN && (
+            <Link
+              scroll={false}
+              href={`/quotes?${filter === "all" ? "" : `status=${filter}&`}shown=${shown + PAGE_SIZE}`}
+              className="btn-secondary self-center px-4 py-2"
+            >
+              {t("loadMore")}
+            </Link>
           )}
         </>
       )}

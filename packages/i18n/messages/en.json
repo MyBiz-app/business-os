@@ -7134,6 +7134,7 @@
     "new": "New quote",
     "back": "All quotes",
     "none": "No quotes here yet.",
+    "loadMore": "Load more",
     "noneForClient": "No quotes for this client yet.",
     "filter": "Filter by status",
     "filters": {
