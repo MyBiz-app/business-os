@@ -50,6 +50,20 @@ export async function removeFactor(_state: RemoveState, formData: FormData): Pro
   return { done: true };
 }
 
+/** The person read the warning about working without two-step sign-in and understands the risk.
+ * The API keeps who, when and from where; until then it refuses the sensitive actions. */
+export async function acknowledgeMfaRisk(): Promise<void> {
+  const { data } = await (await createClient()).auth.getSession();
+  if (!data.session) redirect("/login");
+  const response = await fetch(`${API_URL}/me/security/mfa-risk-acknowledgement`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${data.session.access_token}` },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("mfa_risk_acknowledgement_failed");
+  revalidatePath("/", "layout");
+}
+
 /** Lets the businesses the person works for see in their audit log that two-step sign-in was
  * turned on or off. Never blocks the page. */
 async function reportSecurityEvent(kind: "mfa_enabled" | "mfa_disabled"): Promise<void> {

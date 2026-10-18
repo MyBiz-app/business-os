@@ -298,8 +298,9 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 
 Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the owner asked for everything free to be built).
 
-- Authenticator-app codes (TOTP, free) are required of the MyBiz team always; of owners and managers for sensitive actions from `API_MFA_REQUIRED_FROM` (14 days after go-live); and of a business's whole team when its owner ticks `require_mfa_for_staff`. Optional for everyone else; never for end clients.
+- Authenticator-app codes (TOTP, free) are required of the MyBiz team always; (of owners and managers it became optional on 2026-10-18, see below); and of a business's whole team when its owner ticks `require_mfa_for_staff`. Optional for everyone else; never for end clients.
 - A second authenticator is the backup: Supabase has no recovery codes for TOTP.
+- **Changed 2026-10-18 (owner): two-step sign-in is optional for owners and managers, with a warning.** Nobody is forced to turn it on, but an owner or manager without a code must read the warning and confirm they understand the risk (and that keeping the account secure is their responsibility) before the sensitive actions (settings, pay, ID numbers, team roles, closing, personal-data export). The confirmation is kept per person and version of the text (`mfa_risk_acknowledgements`: when, address, device) and shown in the audit log. It replaces the `API_MFA_REQUIRED_FROM` date (the setting is no longer read; remove it a release later). The MyBiz team and businesses that tick `require_mfa_for_staff` still need a code. The wording needs the lawyer's review (go-live guide item 17).
 - Passwords: 10 characters, letters and digits, and a recent sign-in to change one.
 - Idle sign-out: 12 hours on the web, 30 days in the apps, done by the apps themselves (Supabase's server-side timeouts are a paid feature).
 - A sign-in from a new device is emailed; only a hash of the device id is stored.

@@ -53,7 +53,6 @@ variables, releases, who can reach what). Files: [`render.production.yaml`](../.
 | `API_WEB_URL`, `API_API_URL` | The public addresses (not localhost) |
 | `API_CORS_ORIGINS` | JSON list of the real web and app origins (not localhost) |
 | `API_TRUST_FORWARDED_FOR` | `true` behind Render's proxy |
-| `API_MFA_REQUIRED_FROM` | A date (`YYYY-MM-DD`) 14 days after go-live: from then owners and managers need an authenticator code for sensitive actions (settings, pay, ID numbers, team roles, closing the business). The MyBiz team always needs one. Without it, required from the start |
 | `API_MFA_ENFORCED` | Leave unset (on everywhere but local development) |
 | `API_RATE_LIMIT_REDIS_URL` | Optional; only when running more than one API instance: a Render Key Value, internal URL (**off**, steps in [staging.md](staging.md)) |
 | `API_TENANT_RATE_LIMIT_PER_MINUTE` | Optional; the most signed-in requests one business may make a minute, default 600 (GL18) |

@@ -9,13 +9,26 @@ import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 import { CODE_LENGTH } from "@/lib/mfa";
 
-import { confirmEnrollment, type EnrollState, type RemoveState, removeFactor, signOutEverywhere, startEnrollment } from "./security-actions";
+import { acknowledgeMfaRisk, confirmEnrollment, type EnrollState, type RemoveState, removeFactor, signOutEverywhere, startEnrollment } from "./security-actions";
 
 export type Factor = { id: string; createdAt: string };
 export type Device = { id: string; label: string; lastSeenAt: string; current: boolean };
 
 /** The person's security: the authenticator app, signing out everywhere and the recent devices. */
-export function SecuritySettings({ factors, devices, required }: { factors: Factor[]; devices: Device[]; required: "team" | "business" | null }) {
+export function SecuritySettings({
+  factors,
+  devices,
+  required,
+  riskOptional,
+  riskAcknowledged,
+}: {
+  factors: Factor[];
+  devices: Device[];
+  required: "team" | "business" | "ack" | null;
+  /** Owners and managers may work without a code once they confirm the warning (not the MyBiz team). */
+  riskOptional: boolean;
+  riskAcknowledged: boolean;
+}) {
   const t = useTranslations("security");
   const locale = useLocale();
   const [enrollment, start] = useActionState<EnrollState>(startEnrollment, {});
@@ -26,7 +39,9 @@ export function SecuritySettings({ factors, devices, required }: { factors: Fact
 
   return (
     <div className="flex flex-col gap-6">
-      {required && factors.length === 0 && <FormError message={t(required === "team" ? "mfa.requiredTeam" : "mfa.requiredBusiness")} />}
+      {required && factors.length === 0 && (
+        <FormError message={t(required === "team" ? "mfa.requiredTeam" : required === "ack" ? "mfa.requiredAck" : "mfa.requiredBusiness")} />
+      )}
       <div className="flex flex-col gap-3">
         <h3 className="flex items-center gap-2 font-medium">
           <ShieldCheck aria-hidden="true" className="size-5 text-primary-ink" />
@@ -73,6 +88,19 @@ export function SecuritySettings({ factors, devices, required }: { factors: Fact
           </form>
         )}
         {factors.length === 1 && <p className="text-xs text-muted">{t("mfa.backupHint")}</p>}
+        {factors.length === 0 && riskOptional && (
+          <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
+            <h4 className="font-medium">{t("mfa.riskTitle")}</h4>
+            <p className="text-sm text-muted">{t("mfa.riskBody")}</p>
+            {riskAcknowledged ? (
+              <FormNotice message={t("mfa.riskDone")} />
+            ) : (
+              <form action={acknowledgeMfaRisk}>
+                <SubmitButton variant="secondary">{t("mfa.riskConfirm")}</SubmitButton>
+              </form>
+            )}
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-3 border-t border-border pt-6">
         <h3 className="font-medium">{t("signOutAll.title")}</h3>

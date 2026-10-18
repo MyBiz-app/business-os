@@ -3897,6 +3897,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/security/mfa-risk-acknowledgement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acknowledge Mfa Risk
+         * @description The person read the warning about working without two-step sign-in and understands the
+         *     risk. Kept with the time and address, and shown in the audit log of their businesses.
+         */
+        post: operations["acknowledge_mfa_risk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/push-tokens": {
         parameters: {
             query?: never;
@@ -19912,14 +19933,19 @@ export interface components {
             mfa_enforced: boolean;
             /**
              * Mfa Required From
-             * @description From this day owners and managers need a code for sensitive actions
+             * @description Deprecated: always empty, two-step sign-in is optional for owners and managers
              */
             mfa_required_from: string | null;
             /**
              * Mfa Required Now
-             * @description Owners and managers need a code already
+             * @description Deprecated: always false, see mfa_risk_acknowledged
              */
             mfa_required_now: boolean;
+            /**
+             * Mfa Risk Acknowledged
+             * @description The person confirmed they understand the risk of working without a code
+             */
+            mfa_risk_acknowledged: boolean;
         };
         /** SeenTours */
         SeenTours: {
@@ -32238,6 +32264,24 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SecurityPolicy"];
                 };
+            };
+        };
+    };
+    acknowledge_mfa_risk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
