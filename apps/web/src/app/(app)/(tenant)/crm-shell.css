@@ -49,3 +49,25 @@
   font-weight: 800;
   letter-spacing: -0.02em;
 }
+
+/* Sections the side menu scrolls to stop below the sticky header, and glow for a moment on arrival. */
+.crm-content [id] {
+  scroll-margin-top: 5.5rem;
+}
+[data-nav-flash] {
+  animation: nav-flash 1.5s ease-out;
+}
+@keyframes nav-flash {
+  0% {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-nav-flash] {
+    animation: none;
+    outline: 2px solid var(--primary);
+  }
+}

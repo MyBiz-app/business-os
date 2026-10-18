@@ -33,9 +33,11 @@ const CURRENT = new Set<Entitlement["state"]>(["active", "upcoming", "frozen"]);
 /** The client's plans, upcoming bookings (soonest first) and history. */
 export default function Bookings() {
   const t = useTranslations("client.bookings");
+  const tWaitlist = useTranslations("client.waitlist");
   const tStatus = useTranslations("bookings");
   const tPlans = useTranslations("plans");
   const tReceipts = useTranslations("receipts");
+  const tFreeze = useTranslations("client.freeze");
   const tReview = useTranslations("client.review");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
@@ -163,6 +165,23 @@ export default function Bookings() {
                 <Text style={[local.meta, { color: palette.muted }]}>
                   {t("validUntil", { date: day.format(new Date(`${entitlement.ends_on}T12:00:00Z`)) })}
                 </Text>
+                {entitlement.next_billing_on && entitlement.next_billing_amount !== null ? (
+                  <Text style={[local.meta, { color: palette.muted }]}>
+                    {tPlans(entitlement.auto_renew ? "renews" : "renewsOff", {
+                      date: day.format(new Date(`${entitlement.next_billing_on}T12:00:00Z`)),
+                      amount: money(entitlement.next_billing_amount, entitlement.price_currency),
+                    })}
+                  </Text>
+                ) : null}
+                {entitlement.freezable || entitlement.state === "frozen" ? (
+                  <Text
+                    accessibilityRole="link"
+                    onPress={() => router.push({ pathname: "/freeze", params: { entitlement: entitlement.id } })}
+                    style={[local.meta, { color: palette.primaryInk, textDecorationLine: "underline" }]}
+                  >
+                    {tFreeze("request")}
+                  </Text>
+                ) : null}
               </View>
               {entitlement.receipt_id && (
                 <Text
@@ -256,6 +275,9 @@ export default function Bookings() {
           <Card palette={palette}>{(allHistory ? data.past : data.past.slice(0, HISTORY_PAGE)).map(row)}</Card>
         </>
       ) : null}
+      {(business.waitlist_class !== "off" || business.waitlist_appointment !== "off" || business.waitlist_resource !== "off") && (
+        <ListRow palette={palette} title={tWaitlist("title")} onPress={() => router.push("/waitlist")} />
+      )}
       <ListRow palette={palette} title={t("receipts")} onPress={() => router.push("/receipts")} />
     </Screen>
   );

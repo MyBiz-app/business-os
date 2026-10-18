@@ -91,7 +91,7 @@ def seed(
     modules = {
         **dict.fromkeys(PRESETS["ai_powered"], 1),
         **dict.fromkeys(
-            ("crm", "whatsapp", "agent_finance", "agent_marketing", "social_studio"), 1
+            ("crm", "whatsapp", "agent_finance", "agent_marketing", "social_studio", "payroll"), 1
         ),
     }
     set_modules(conn, tenant_id, modules)

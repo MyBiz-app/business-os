@@ -6,6 +6,7 @@
   "color": "from-red-500 to-orange-600",
   "terms": "food",
   "schedule_view": "class_blocks",
+  "waitlist": { "enabled": false, "classes": "first_come", "appointments": "first_come", "resources": "first_come" },
   "social": "off",
   "client_term": "guest",
   "booking_modes": [

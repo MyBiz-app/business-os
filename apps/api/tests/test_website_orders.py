@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from app.websites.brief import Brief, missing_for_submit
+from app.websites.pricing import price_for
 from app.websites.prompt import build_prompt
 from tests.conftest import AuthHeaders, add_member, make_staff
 
@@ -321,3 +322,16 @@ def test_the_dashboard_card_waits_30_days_and_closes_for_good(
     client.delete("/me/tours/website_offer", headers=headers)
     client.put("/website/order", json={"brief": FULL}, headers=headers)
     assert client.get("/website/offer-card", headers=headers).json() == {"show": False}
+
+
+def test_the_public_price_list_is_the_orders_price_list(client: TestClient) -> None:
+    for currency in ("ILS", "USD", "EUR"):
+        body = client.get("/public/website-prices", params={"currency": currency}).json()
+        assert body["currency"] == currency
+        for product in ("landing_only", "landing_with_system"):
+            setup, monthly = price_for(product, currency)
+            assert body[product] == {"setup": setup, "monthly": monthly}
+    # An unknown currency falls back to USD, like the orders.
+    assert (
+        client.get("/public/website-prices", params={"currency": "JPY"}).json()["currency"] == "USD"
+    )

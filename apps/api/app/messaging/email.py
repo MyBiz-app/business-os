@@ -200,6 +200,7 @@ def render(
         "note": str(payload.get("note") or ""),
         "plan": str(payload.get("plan_name", "")),
         "date": _day(payload.get("ends_on")),
+        "from": _day(payload.get("starts_on")),
         "friend": str(payload.get("from_name", "")),
     }
     subject = _fill(messages["subject"][kind], values)

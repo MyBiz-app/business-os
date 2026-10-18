@@ -177,6 +177,7 @@ When a decision changes, update the row and note the date - do not delete histor
 | X54 | Incident banners and the legal pack (go-live GL23, 2026-10-17, delegated): a banner is a row in MyBiz's own table `platform_incidents` (migration 0121), opened and resolved in the console with the existing `broadcasts.manage` permission instead of a new one, and read by everybody through the public `GET /public/incidents` (no personal data) so the sign-in page can show it too. It is not a new `announcements` kind: announcements are per person (delivery, dismissal, consent), a banner is for everyone until resolved. The law papers (`docs/legal/`) are drafts for a lawyer that describe what the code does; every legal claim is marked "to confirm", and the officer is the owner until a lawyer says otherwise. | DECIDED (delegated) |
 | X55 | Modular brand (round 7, R21, 2026-10-17, delegated): one brand file, `packages/i18n/brand.json`, holds the name, short name, domain, app address, app scheme (and old schemes kept for links), cookie and storage prefix, emails, social links and company details; copies for the API, Supabase and the Expo config come from `pnpm brand:sync` and CI checks them. Cookies move to the neutral prefix `bos` once, before go-live (everyone signs in again once). The palette value `mybiz` becomes `brand` by expand-first: migration 0125 allows both, the API writes `brand` and reads `mybiz` as `brand`; old rows are rewritten and `mybiz` dropped one release later. The store id (`com.businessos.mybiz`) stays in `packages/brand/app-ids.json` because it can never change. |
 | X56 | AI usage, pace and AI users (round 7, R8, 2026-10-18, delegated; spec decisions 18.3 and 18.4, approved with all defaults): the credit stays one US cent of model cost and the pool stays monthly per business; added a daily pace per person (15% of the pool by default, changeable per person, the owner has none), a personal on/off switch and monthly limit per person (staff card, AI tab), "AI users" per module (3 with AI Basic, 10 with AI Pro) and a paid "extra AI user" add-on (19 ILS a month, adds 150 credits to the pool), and pay-as-you-go at 8 ILS per 100 credits (was 6). The person switch is stored on the member (`tenant_members.ai_access`, null follows the role), so every permission check sees it. Migration 0130. |
+| X57 | Freeze from the app and renewing memberships (round 7, R23, 2026-10-18, delegated; spec section 21, approved with all defaults): one `tenant_freeze_rules` row per business (requests off by default, 1 to 30 days, optional yearly bank, notice, fee, defer or credit, reasons approved automatically); a client's request waits for a manager and is approved whole or in part, or declined with a message. The effect of a freeze is computed once in the database (`freeze_effect`, `apply_freeze`, `end_freeze_early`, migration 0135) so the preview, a manager's decision and an automatic approval agree: prepaid memberships extend their end date; renewing ones move the next charge by the frozen days (default) or are credited pro rata (price times frozen days divided by the real length of the cycle, rounded up in the client's favor, never above the price). A renewing plan's validity follows its cycle (30, 91, 365 days or the custom days). Punch cards cannot be frozen. Attachments to a request and an automatic renewal job are left for later (no payment provider yet). |
 
 ### Apps accessibility preferences (2026-10-12)
 
@@ -304,6 +305,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 
 - **One order per business** (`app.website_orders`), stages `briefing`, `received`, `building`, `review`, `live`. The business edits the brief until MyBiz starts building; the console cannot move an order that is still `briefing`. When an order goes `live` the site address becomes the business's website (R22).
 - **Prices are configuration** (`app/websites/pricing.py`), not catalog modules: with the system 490 setup + 29 a month, website only 790 + 49 (decision 18.12). The order records the prices it was offered. Nothing is charged before #46. They are not in `MODULES` so the public pricing page and the configurator stay as they are; R25a decides how a "website only" business is priced and billed.
+- **One website price list** (2026-10-18): the public `/websites` page and the pricing page read `GET /public/website-prices`, which serves the same list the order records, so there is no second copy in the web app. The page's USD and EUR figures won over the older API figures, because they were what visitors saw.
 - **The build prompt is generated, not stored**: the console builds it from the brief plus a snapshot of the business (name, branches, services, join code) taken when the brief is sent, so it always matches what the owner approved.
 - **Visits** are counted per business, day and source (`direct`, `search`, `social`, `other`) by an anonymous call from the finished site, only while the order is `live`; no cookies, nothing personal.
 ### Cities, streets and branch coordinates (2026-10-18, round 7 R34, migration 0129)
@@ -313,6 +315,15 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - A branch's map point is looked up once per saved address through Nominatim (OpenStreetMap), never blocking the save; the pin can be placed by hand through the API (the draggable-pin screen is part of the branches map slice, R35).
 - Home addresses of people stay visible only to the person (existing row policy); a team member without a full home address sees a reminder line until they fill it in (nobody is locked out).
 
+### Smart waitlist (2026-10-18, round 7 R30, migration 0134)
+
+- Four modes per kind (classes, appointments, courts or rooms): off, auto, first come, manual. A service can override the business mode.
+- **Auto** only means the class's own waitlist: the first person is promoted when a spot opens, but only when the class starts later than the configured hours (default 3, 0 to 72), so nobody is booked at the last minute. Requests for a day or a time range behave as first come, since nobody is on a class list.
+- **First come**: everyone whose request or waitlisted place matches is notified; the first to claim takes it (server decides, the others are told it was taken and stay on the list).
+- **Manual**: nothing is sent automatically; the team admits or notifies from the waitlist screen.
+- Up to 5 active requests per client; a request expires after its day. Courts paid in the app need the client's explicit payment on claim.
+- Appointments and courts have no session to promote, so claiming creates a new one through the normal booking functions.
+- Vertical defaults: fitness and classes auto/first come, sports first come, beauty no waitlist for courts, clinic manual, other categories disabled.
 ### AI connectors: Claude and ChatGPT through MCP (2026-10-18, round 7 R37a, migration 0133)
 
 - MyBiz runs its own small OAuth 2.1 server instead of Supabase's. Supabase's OAuth server for MCP could not be checked from the build environment and would tie sign-in to a beta feature; ours is a few hundred lines, needs no paid plan, and keeps a business's connections in the business's own table with row level security. Apps register themselves (public clients, no secrets, PKCE S256 required); redirect addresses must be https or local http.
@@ -320,6 +331,20 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Connectors read through the assistant's own tools, a fixed list (`MCP_READ_TOOLS`), so permissions, branches and modules behave exactly as in the app. Anything that proposes a change stays out until R37b adds actions that wait for approval in the CRM.
 - Reads run in a READ ONLY transaction and results are wrapped as untrusted data. Usage is the meter `mcp_calls` (one per call); the ceiling is 600 per business per rolling 24 hours, a setting.
 - Tokens: access 60 minutes, refresh 90 days and rotated on use, code 5 minutes; only SHA-256 hashes are stored. Connection lookups by hash are SECURITY DEFINER functions because the token endpoint knows no business yet.
+
+### Payroll gaps from the coverage audit (2026-10-18)
+
+- Payroll is the paid module `payroll` (placeholder ILS 49 / USD 15 / EUR 14); the K2 readiness gate (business number, address, employer file number) is enforced on the server for every change to a run, not only shown on the card. Reading stays open so a lapsed module never hides past payslips.
+- Filed copies (payslips, signed Form 101, issued documents) go through `files.keep_copy`: the document's own table stays the source of truth, a failed copy never fails the action. Payslips are filed twice, as a draft at approval and as a final set after the accountant check.
+- Pushes about payroll run as jobs (`remind-payroll` daily, `notify-payslips` hourly) because a phone token is readable only by its owner under row level security; each is recorded once in the audit log. No email and no cost.
+
+### AI connectors: actions that wait for approval (2026-10-18, round 7 R37b, migration 0136)
+
+- A connector may only propose, never change. The four proposing tools (`MCP_ACTION_TOOLS`: book, cancel, log time, bill a month) are the assistant's own, so they only create a pending action; publishing and scheduled tasks stay with the built-in assistant. The request is filed with agent key `mcp` and the app's name in its preview, so no table changed.
+- Proposing is a second scope the person ticks on the approval screen (`propose`, on by default); the first scope (`read`) is always granted. Connections made before this release stay read-only until reconnected, so nobody gains a power they did not approve.
+- Only the person the app acts for sees and decides its requests (the existing confirm and reject endpoints already require the requester). Approval re-checks permission, module, payload hash and capacity, and the audit entry carries the app's name.
+- Requests last 24 hours (nobody watches when an app proposes), at most 20 wait per business, and the read-only database transaction stays the default; only a proposing call writes, and only the request row.
+- The console view is a read-only function (`platform_mcp_usage`, usage permission) with per-business apps, calls and proposal outcomes. The settings guide is text only; screenshots wait for a real Claude and ChatGPT session.
 
 ## Open
 

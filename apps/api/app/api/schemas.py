@@ -137,6 +137,9 @@ class TenantCreate(BaseModel):
         return value
 
 
+WaitlistModeSetting = Literal["off", "auto", "first_come", "manual"]
+
+
 class TenantUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=120)
     locale: Locale | None = None
@@ -167,6 +170,11 @@ class TenantUpdate(BaseModel):
     )
     network_scope: Literal["network", "branch"] | None = None
     client_id_number: Literal["off", "optional", "required"] | None = None
+    waitlist_enabled: bool | None = None
+    waitlist_class_mode: WaitlistModeSetting | None = None
+    waitlist_appointment_mode: WaitlistModeSetting | None = None
+    waitlist_resource_mode: WaitlistModeSetting | None = None
+    waitlist_auto_hours: int | None = Field(default=None, ge=0, le=72)
     shifts_publish_auto: bool | None = None
     shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
     shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
@@ -286,6 +294,19 @@ class Tenant(BaseModel):
     )
     client_id_number: Literal["off", "optional", "required"] = Field(
         default="off", description="Whether the business asks its clients for an ID number"
+    )
+    waitlist_enabled: bool = Field(default=True, description="The business keeps waitlists")
+    waitlist_class_mode: WaitlistModeSetting = Field(
+        default="auto", description="What happens when a spot in a class opens"
+    )
+    waitlist_appointment_mode: WaitlistModeSetting = Field(
+        default="off", description="What happens when a personal appointment time opens"
+    )
+    waitlist_resource_mode: WaitlistModeSetting = Field(
+        default="off", description="What happens when a court or room time opens"
+    )
+    waitlist_auto_hours: int = Field(
+        default=3, description="Automatic sign-up stops this many hours before a class starts"
     )
     resource_payment: Literal["app", "venue"] = Field(
         default="app",

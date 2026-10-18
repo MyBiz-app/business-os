@@ -2,9 +2,12 @@ import type { components } from "@business-os/api-client";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Banknote, CalendarCheck, CreditCard, Gauge, Luggage, Minus, UserPlus, Users, UserX } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { AttentionPanel } from "./attention-panel";
 import { WebsiteOfferCard } from "./website-offer-card";
+import { BranchMapCard } from "./branch-map-card";
+import { WaitlistHint } from "./waitlist-hint";
 import { usageWarnings } from "@business-os/i18n/usage";
 import { termsOf } from "@business-os/verticals";
 
@@ -19,7 +22,7 @@ import { addDays, formatDay, formatTime, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canManageSettings, canReadReports } from "@/lib/permissions";
 import { resolveRange } from "@/lib/range";
-import { getTenant } from "@/lib/tenant";
+import { getBranches, getTenant } from "@/lib/tenant";
 import { coverSrc } from "@/lib/workspace";
 
 import { isolate } from "@/lib/bidi";
@@ -53,6 +56,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const range = resolveRange(query, today, { presets: PRESETS, fallback: 30 });
   const { start, end } = range;
   const reports = canReadReports(tenant);
+  const branches = reports ? await getBranches() : [];
   // "Without team members": clients who are also on the team don't count in the numbers.
   const excludeStaff = query.staff === "exclude";
 
@@ -242,6 +246,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       )}
 
       <AttentionPanel context={{ api, scope }} />
+      <WaitlistHint context={{ api, scope, tenant }} />
 
       {reports && (
         <PeriodProvider>
@@ -363,6 +368,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </section>
         </PendingArea>
         </PeriodProvider>
+      )}
+
+      {reports && branches.length > 1 && (
+        <Suspense fallback={null}>
+          <BranchMapCard context={{ api, scope, tenant }} />
+        </Suspense>
       )}
 
       {canSeeSchedule && <section aria-labelledby="today-heading" className="card flex flex-col gap-3 p-6">

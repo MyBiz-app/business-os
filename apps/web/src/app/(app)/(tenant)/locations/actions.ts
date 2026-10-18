@@ -7,7 +7,7 @@ import { apiUpload, unwrap } from "@/lib/api";
 import { addressFromForm } from "@/lib/address";
 import { errorState, type FormState } from "@/lib/form-state";
 import type { Block, HoursState } from "@/lib/hours";
-import { getTenant, getTenantFor } from "@/lib/tenant";
+import { getActiveMembership, getTenant, getTenantFor, setActiveBranch } from "@/lib/tenant";
 
 const value = (formData: FormData, name: string) => String(formData.get(name) ?? "");
 const optionalNumber = (formData: FormData, name: string) => {
@@ -49,6 +49,10 @@ export async function updateLocation(
         body: {
           name: value(formData, "name"),
           ...addressFromForm(formData),
+          // Only when the pin was dragged: otherwise a changed address is looked up again.
+          ...(formData.has("latitude") && formData.has("longitude")
+            ? { latitude: optionalNumber(formData, "latitude"), longitude: optionalNumber(formData, "longitude") }
+            : {}),
           website_url: value(formData, "website_url").trim() || null,
           active: formData.get("active") === "on",
           ...(formData.has("kind") ? { kind: value(formData, "kind") || null } : {}),
@@ -61,6 +65,15 @@ export async function updateLocation(
   revalidatePath("/locations");
   revalidatePath(`/locations/${locationId}`);
   return { saved: true };
+}
+
+/** From a branch on the map to its report or its schedule, looking at that branch only. */
+export async function openBranch(formData: FormData): Promise<void> {
+  const { membership } = await getActiveMembership();
+  if (!membership) return;
+  // The API re-checks that the person may see this branch on every request.
+  await setActiveBranch(membership.tenant_id, String(formData.get("branch_id") ?? "") || null);
+  redirect(formData.get("to") === "schedule" ? "/schedule" : "/reports");
 }
 
 export async function addRoom(

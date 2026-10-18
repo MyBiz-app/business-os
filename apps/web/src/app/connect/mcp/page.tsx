@@ -2,7 +2,7 @@ import { Plug } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { AuthHeading, AuthShell } from "@/components/auth/auth-shell";
-import { SelectField } from "@/components/form/field";
+import { CheckboxField, SelectField } from "@/components/form/field";
 import { ScopedMessages } from "@/components/scoped-messages";
 import { getApi } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
@@ -56,6 +56,10 @@ export default async function ConnectMcpPage({ searchParams }: PageProps<"/conne
             defaultValue={membership.tenant_id}
             options={me.memberships.map((m) => ({ value: m.tenant_id, label: m.tenant_name }))}
           />
+          <div className="flex flex-col gap-1">
+            <CheckboxField label={t("propose")} name="propose" defaultChecked />
+            <p className="ps-6 text-sm text-muted">{t("proposeHint")}</p>
+          </div>
           <button type="submit" className="btn-primary px-4 py-2.5">
             {t("approve")}
           </button>

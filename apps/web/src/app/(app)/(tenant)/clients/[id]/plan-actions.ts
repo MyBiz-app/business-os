@@ -6,7 +6,16 @@ import { ApiError, unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
 
 export type PlanFormState = {
-  error?: "invalid" | "generic" | "not_active" | "outside_validity" | "overlapping_freeze";
+  error?:
+    | "invalid"
+    | "generic"
+    | "not_active"
+    | "not_a_membership"
+    | "outside_validity"
+    | "overlapping_freeze"
+    | "request_not_pending"
+    | "not_freezable"
+    | "freeze_over";
   saved?: boolean;
   /** After a sale: the idempotency key for the next one. */
   nextKey?: string;
@@ -15,7 +24,15 @@ export type PlanFormState = {
 function toState(error: unknown): PlanFormState {
   if (error instanceof ApiError) {
     const detail = (error.body as { detail?: unknown } | null)?.detail;
-    if (detail === "not_active" || detail === "outside_validity" || detail === "overlapping_freeze") {
+    if (
+      detail === "not_active" ||
+      detail === "not_a_membership" ||
+      detail === "outside_validity" ||
+      detail === "overlapping_freeze" ||
+      detail === "request_not_pending" ||
+      detail === "not_freezable" ||
+      detail === "freeze_over"
+    ) {
       return { error: detail };
     }
     if (error.status === 422) return { error: "invalid" };
@@ -79,4 +96,59 @@ export async function cancelEntitlement(clientId: string, entitlementId: string)
     }),
   );
   revalidatePath(`/clients/${clientId}`);
+}
+
+/** A manager's decision on a client's freeze request: all of it, or part (`approved_ends_on`). */
+export async function approveFreezeRequest(
+  clientId: string,
+  requestId: string,
+  _state: PlanFormState,
+  formData: FormData,
+): Promise<PlanFormState> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(
+      await api.POST("/freeze-requests/{request_id}/approve", {
+        params: { ...scope, path: { request_id: requestId } },
+        body: { note: value(formData, "note") || null, approved_ends_on: value(formData, "approved_ends_on") || null },
+      }),
+    );
+  } catch (error) {
+    return toState(error);
+  }
+  revalidatePath(`/clients/${clientId}`);
+  return { saved: true };
+}
+
+export async function rejectFreezeRequest(
+  clientId: string,
+  requestId: string,
+  _state: PlanFormState,
+  formData: FormData,
+): Promise<PlanFormState> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(
+      await api.POST("/freeze-requests/{request_id}/reject", {
+        params: { ...scope, path: { request_id: requestId } },
+        body: { note: value(formData, "note") || null },
+      }),
+    );
+  } catch (error) {
+    return toState(error);
+  }
+  revalidatePath(`/clients/${clientId}`);
+  return { saved: true };
+}
+
+/** The client is back: the freeze ends yesterday and the dates and next charge come back. */
+export async function endFreezeEarly(clientId: string, freezeId: string, _state: PlanFormState): Promise<PlanFormState> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(await api.POST("/freezes/{freeze_id}/end-early", { params: { ...scope, path: { freeze_id: freezeId } } }));
+  } catch (error) {
+    return toState(error);
+  }
+  revalidatePath(`/clients/${clientId}`);
+  return { saved: true };
 }

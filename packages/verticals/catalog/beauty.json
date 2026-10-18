@@ -6,6 +6,7 @@
   "color": "from-pink-500 to-rose-500",
   "terms": "beauty",
   "schedule_view": "appointments",
+  "waitlist": { "enabled": true, "classes": "first_come", "appointments": "first_come", "resources": "off" },
   "social": "off",
   "client_term": "client",
   "booking_modes": [

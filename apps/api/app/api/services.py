@@ -20,7 +20,7 @@ DeleteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_DELETE))
 COLUMNS = (
     "id, name, description, duration_minutes, capacity, booking_mode, price_amount, "
     "price_currency, color, active, created_at, updated_at, min_minutes, max_minutes, "
-    "step_minutes, price_per_hour, on_site, travel_minutes"
+    "step_minutes, price_per_hour, on_site, travel_minutes, waitlist_mode"
 )
 COLOR_PATTERN = r"^#[0-9a-fA-F]{6}$"
 # class: scheduled sessions people join; appointment: one-to-one at a free time with a staff member;
@@ -90,6 +90,9 @@ class ServiceUpdate(ServiceFields):
     price_per_hour: int | None = Field(default=None, ge=0)
     on_site: bool | None = None
     travel_minutes: int | None = Field(default=None, ge=0, le=240)
+    waitlist_mode: Literal["off", "auto", "first_come", "manual"] | None = Field(
+        default=None, description="This service's own waitlist mode; null follows the business"
+    )
 
 
 def check_lengths(minimum: int | None, maximum: int | None, step: int | None) -> None:
@@ -119,6 +122,9 @@ class Service(BaseModel):
     price_per_hour: int | None = None
     on_site: bool = False
     travel_minutes: int = 0
+    waitlist_mode: Literal["off", "auto", "first_come", "manual"] | None = Field(
+        default=None, description="Overrides the business's waitlist mode for this service"
+    )
 
 
 @router.get("")
