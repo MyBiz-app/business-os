@@ -116,6 +116,8 @@ with sync_playwright() as p:
             JOIN app.users u ON u.id = m.user_id WHERE u.email = %s
         """, (owner_email,)).fetchone()[0]
     member = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, has_touch=True).new_page()
+    member_console: list[str] = []  # what the app logged: Expo's dev toast appears when it logs an error or warning
+    member.on("console", lambda m: member_console.append(f"{m.type}: {m.text[:300]}") if m.type in ("error", "warning") else None)
     member.goto(APP); member.wait_for_url("**/sign-in", timeout=60000)
     member.get_by_label("אימייל").fill(member_email)
     member.get_by_role("button", name="שליחת קוד").click()
@@ -199,9 +201,12 @@ with sync_playwright() as p:
         "/settings/audit", "/settings/data", "/settings/help",
         "/account", "/migration",
     ]  # fmt: skip
+    # Tall viewport: the side menu scrolls inside its own column when sub-items unfold, and axe works out the
+    # background of text scrolled out of view from the page behind it (a false contrast failure on navy).
+    owner.set_viewport_size({"width": 1280, "height": 2000})
     for path in pages:
         h.visit(owner, f"{h.BASE}{path}"); h.ready(owner); check_a11y(owner, f"he-light {path}")
-    en = b.new_context(locale="en-US", color_scheme="dark", viewport={"width": 1280, "height": 900})
+    en = b.new_context(locale="en-US", color_scheme="dark", viewport={"width": 1280, "height": 2000})
     en.add_cookies([{"name": "NEXT_LOCALE", "value": "en", "url": h.BASE}])
     en_page = en.new_page(); login(en_page, owner_email)
     for path in pages:
@@ -212,5 +217,7 @@ with sync_playwright() as p:
     print("9. accessibility:", "no serious issues" if not a11y else f"{len(a11y)} serious issues")
     for line in a11y:
         print("   ", line)
+    if a11y:
+        print("member app console:", *member_console[-15:], sep="\n    ")
     b.close()
     assert not a11y, f"{len(a11y)} serious accessibility issues (listed above)"
