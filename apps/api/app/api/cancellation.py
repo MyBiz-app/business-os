@@ -314,36 +314,45 @@ def set_policy(body: BusinessPolicy, context: SettingsDep) -> PolicyOverview:
     return _overview(db)
 
 
+def _save_sql(column: str) -> str:
+    return (
+        "INSERT INTO app.cancellation_policies"
+        " (tenant_id, scope, " + column + ", free_minutes, late_outcome, no_show_outcome,"
+        " no_show_limit) VALUES (:tenant_id, :scope, :target, :free_minutes, :late_outcome,"
+        " :no_show_outcome, :no_show_limit)"
+        " ON CONFLICT (tenant_id, " + column + ") WHERE scope = :scope DO UPDATE SET"
+        " free_minutes = EXCLUDED.free_minutes, late_outcome = EXCLUDED.late_outcome,"
+        " no_show_outcome = EXCLUDED.no_show_outcome, no_show_limit = EXCLUDED.no_show_limit,"
+        " updated_at = now()"
+    )
+
+
+# Fixed statements per layer: only these literals ever reach the database as SQL text.
+SAVE = {"service": _save_sql("service_id"), "plan": _save_sql("plan_id")}
+EXISTS = {
+    "service": "SELECT 1 FROM app.services WHERE id = :id",
+    "plan": "SELECT 1 FROM app.plans WHERE id = :id",
+}
+REMOVE = {
+    "service": "DELETE FROM app.cancellation_policies WHERE scope = 'service' AND service_id = :id",
+    "plan": "DELETE FROM app.cancellation_policies WHERE scope = 'plan' AND plan_id = :id",
+}
+
+
 def _save_override(
     db: Session, context: TenantContext, scope: str, target: UUID, body: OverridePolicy
 ) -> None:
-    column = "service_id" if scope == "service" else "plan_id"
-    table = "app.services" if scope == "service" else "app.plans"
-    if db.execute(text(f"SELECT 1 FROM {table} WHERE id = :id"), {"id": target}).first() is None:
+    if db.execute(text(EXISTS[scope]), {"id": target}).first() is None:
         raise not_found()
     db.execute(
-        text(f"""
-            INSERT INTO app.cancellation_policies
-                (tenant_id, scope, {column}, free_minutes, late_outcome, no_show_outcome,
-                 no_show_limit)
-            VALUES (:tenant_id, :scope, :target, :free_minutes, :late_outcome, :no_show_outcome,
-                    :no_show_limit)
-            ON CONFLICT (tenant_id, {column}) WHERE scope = :scope DO UPDATE SET
-                free_minutes = EXCLUDED.free_minutes, late_outcome = EXCLUDED.late_outcome,
-                no_show_outcome = EXCLUDED.no_show_outcome,
-                no_show_limit = EXCLUDED.no_show_limit, updated_at = now()
-        """),
+        text(SAVE[scope]),
         {**body.model_dump(), "tenant_id": context.tenant_id, "scope": scope, "target": target},
     )
     record(db, f"cancellation_policy.{scope}", entity_type=scope, entity_id=target)
 
 
 def _remove_override(db: Session, scope: str, target: UUID) -> None:
-    column = "service_id" if scope == "service" else "plan_id"
-    db.execute(
-        text(f"DELETE FROM app.cancellation_policies WHERE scope = :scope AND {column} = :id"),
-        {"scope": scope, "id": target},
-    )
+    db.execute(text(REMOVE[scope]), {"id": target})
     record(db, f"cancellation_policy.{scope}_removed", entity_type=scope, entity_id=target)
 
 
