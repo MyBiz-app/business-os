@@ -57,7 +57,7 @@ with sync_playwright() as p:
     page.get_by_label("קוד הצטרפות").fill(code)
     page.get_by_role("button", name="המשך").click()
     page.get_by_label("שם פרטי").fill("אורי")
-    page.get_by_role("button", name=f"הצטרפות ל{name}").click(); page.wait_for_url("**/home")
+    page.get_by_role("button", name=f"הצטרפות ל{name}").click(); page.get_by_role("button", name="להמשך", exact=True).click(); page.wait_for_url("**/home")
     print(f"1. joined {name}: ok")
 
     # 2. My addresses: add home.

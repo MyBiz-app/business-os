@@ -89,7 +89,7 @@ with sync_playwright() as p:
     page.get_by_label("קוד הצטרפות").fill(code)
     page.get_by_role("button", name="המשך").click()
     page.get_by_label("שם פרטי").fill("מיכל")
-    page.get_by_role("button", name=f"הצטרפות ל{name}").click(); page.wait_for_url("**/home")
+    page.get_by_role("button", name=f"הצטרפות ל{name}").click(); page.get_by_role("button", name="להמשך", exact=True).click(); page.wait_for_url("**/home")
     with psycopg.connect(h.DATABASE_URL) as conn:
         client_id = conn.execute("""
             SELECT c.id FROM app.clients c JOIN app.users u ON u.id = c.user_id
