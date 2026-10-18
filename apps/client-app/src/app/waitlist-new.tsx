@@ -6,9 +6,11 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Chip } from "@business-os/app-kit/components/chip";
+import { RangeSlider } from "@business-os/app-kit/components/range-slider";
 import { Button, Card, ErrorText, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { useLocations } from "@/lib/use-locations";
 import { useBusiness } from "@/providers/business-provider";
 
 const DAYS = 14;
@@ -31,14 +33,23 @@ export default function WaitlistNew() {
   const [mode, setMode] = useState<Mode>("day");
   const [from, setFrom] = useState(9 * 60);
   const [to, setTo] = useState(12 * 60);
+  const [staffId, setStaffId] = useState<string | null>(null);
+  const [locationId, setLocationId] = useState<string | null>(null);
+  const locations = useLocations();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!business) return null;
-    return api.GET("/client/appointments/services", { params: scope }).then(unwrap);
+    const [list, team] = await Promise.all([
+      api.GET("/client/appointments/services", { params: scope }).then(unwrap),
+      api.GET("/client/appointments/staff", { params: scope }).then(unwrap),
+    ]);
+    return { list, team };
   }, [api, scope, business]);
-  const { data: services } = useLoad(load);
+  const { data } = useLoad(load);
+  const services = data?.list;
+  const team = data?.team ?? [];
 
   if (!business) return null;
 
@@ -46,13 +57,14 @@ export default function WaitlistNew() {
     if (!serviceId) return;
     setBusy(true);
     setError(null);
+    const filters = { ...(staffId ? { staff_user_id: staffId } : {}), ...(locationId ? { location_id: locationId } : {}) };
     const result = await api
       .POST("/client/waitlist", {
         params: scope,
         body:
           mode === "range"
-            ? { service_id: serviceId, kind: "range", day, from_time: clock(from), to_time: clock(to) }
-            : { service_id: serviceId, kind: "day", day },
+            ? { service_id: serviceId, kind: "range", day, from_time: clock(from), to_time: clock(to), ...filters }
+            : { service_id: serviceId, kind: "day", day, ...filters },
       })
       .catch(() => null);
     setBusy(false);
@@ -118,9 +130,51 @@ export default function WaitlistNew() {
       </View>
       {mode === "range" && (
         <Card palette={palette}>
+          <RangeSlider
+            value={{ from, to }}
+            onChange={(next) => {
+              setFrom(next.from);
+              setTo(next.to);
+            }}
+            min={0}
+            max={24 * 60}
+            step={STEP}
+            gap={STEP}
+            palette={palette}
+            labels={{ from: t("from"), to: t("to") }}
+            describe={clock}
+          />
+          <Text style={[local.summary, { color: palette.foreground }]}>{`${clock(from)} - ${clock(to)}`}</Text>
           {stepper(t("from"), from, (next) => setFrom(next), 0, to - STEP)}
           {stepper(t("to"), to, (next) => setTo(next), from + STEP, 24 * 60 - STEP)}
         </Card>
+      )}
+
+      {team.length > 0 && (
+        <>
+          <Heading palette={palette} level={2}>
+            {t("withWhom")}
+          </Heading>
+          <View role="radiogroup" aria-label={t("withWhom")} style={local.chips}>
+            <Chip label={t("anyone")} selected={staffId === null} onPress={() => setStaffId(null)} palette={palette} />
+            {team.map((member) => (
+              <Chip key={member.user_id} label={member.name} selected={staffId === member.user_id} onPress={() => setStaffId(member.user_id)} palette={palette} />
+            ))}
+          </View>
+        </>
+      )}
+      {locations.length > 1 && (
+        <>
+          <Heading palette={palette} level={2}>
+            {t("branch")}
+          </Heading>
+          <View role="radiogroup" aria-label={t("branch")} style={local.chips}>
+            <Chip label={t("anyBranch")} selected={locationId === null} onPress={() => setLocationId(null)} palette={palette} />
+            {locations.map((branch) => (
+              <Chip key={branch.id} label={branch.name} selected={locationId === branch.id} onPress={() => setLocationId(branch.id)} palette={palette} />
+            ))}
+          </View>
+        </>
       )}
 
       <ErrorText message={error} palette={palette} />
@@ -135,5 +189,6 @@ const local = StyleSheet.create({
   stepper: { gap: 6 },
   stepperLabel: { fontSize: 13, fontWeight: "600", textAlign: "left" },
   stepperRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  summary: { fontSize: 15, fontWeight: "700", textAlign: "center", fontVariant: ["tabular-nums"], writingDirection: "ltr" },
   time: { fontSize: 22, fontWeight: "800", fontVariant: ["tabular-nums"] },
 });

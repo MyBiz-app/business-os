@@ -124,7 +124,7 @@ export default function Today() {
                 ? session.appointment_client
                 : [
                     t("spots", { booked: session.booked, capacity: session.capacity }),
-                    session.waitlisted > 0 ? t("waitlist", { count: session.waitlisted }) : null,
+                    session.waitlisted + session.waiting_requests > 0 ? t("waitlist", { count: session.waitlisted + session.waiting_requests }) : null,
                   ]
                     .filter(Boolean)
                     .join(" · ")

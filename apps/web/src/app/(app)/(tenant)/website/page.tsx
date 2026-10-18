@@ -11,6 +11,7 @@ import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 import { termsOf } from "@business-os/verticals";
 
+import { AddSystemForm } from "./add-system-form";
 import { EmbedPanel } from "./embed-panel";
 import { InsightsPanel } from "./insights-panel";
 import { RespondForm } from "./respond-form";
@@ -36,6 +37,14 @@ export default async function WebsitePage() {
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("subtitle")} />
+
+      {!state.with_system && (
+        <section className="card flex flex-col gap-3 p-6" aria-labelledby="site-system">
+          <h2 id="site-system" className="text-lg font-semibold">{t("system.title")}</h2>
+          <p className="text-sm text-muted">{t("system.body")}</p>
+          <AddSystemForm label={t("system.add")} />
+        </section>
+      )}
 
       {!order && (
         <section className="card grid gap-6 p-6 md:grid-cols-2" aria-labelledby="site-offer">

@@ -3144,6 +3144,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/website/add-system": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add System
+         * @description A "website only" business adds the system: it gets the modules its kind of business
+         *     starts with (no new sign-up) and from then on pays the with-system price.
+         */
+        post: operations["add_system"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/website/order/respond": {
         parameters: {
             query?: never;
@@ -6574,6 +6595,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/metrics/branch-insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Branch Insights
+         * @description What the branches map shows beyond the metrics: where each branch's clients come from
+         *     and what its team costs. Only branches the person may see.
+         */
+        get: operations["branch_insights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reviews": {
         parameters: {
             query?: never;
@@ -9138,6 +9180,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/accounts/exists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Account Exists
+         * @description Whether this email already has a MyBiz account, so the sign-up can say "it looks like you
+         *     already have an account, sign in" before opening a second business. It answers yes or no and
+         *     nothing else; the rate limit (6 a minute per visitor) keeps it from listing emails.
+         */
+        post: operations["account_exists"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -9264,6 +9328,16 @@ export interface components {
              * Format: uuid
              */
             tenant_id: string;
+        };
+        /** AccountCheck */
+        AccountCheck: {
+            /** Email */
+            email: string;
+        };
+        /** AccountExists */
+        AccountExists: {
+            /** Exists */
+            exists: boolean;
         };
         /** Acknowledge */
         Acknowledge: {
@@ -10519,6 +10593,31 @@ export interface components {
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
         };
+        /** BranchInsight */
+        BranchInsight: {
+            /** Location Id */
+            location_id: string;
+            /**
+             * Origins
+             * @description Cities of the clients who booked there in the period, most first
+             */
+            origins: components["schemas"]["ClientOriginOut"][];
+            /**
+             * Staff Cost Minor
+             * @description The branch's share of the latest payroll month's gross pay (needs payroll access; people who did not clock in are not counted)
+             */
+            staff_cost_minor: number | null;
+        };
+        /** BranchInsights */
+        BranchInsights: {
+            /**
+             * Staff Cost Period
+             * @description The payroll month the cost is from
+             */
+            staff_cost_period: string | null;
+            /** Branches */
+            branches: components["schemas"]["BranchInsight"][];
+        };
         /** BranchManager */
         BranchManager: {
             /**
@@ -11734,6 +11833,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** ClientOriginOut */
+        ClientOriginOut: {
+            /** City Code */
+            city_code: number;
+            /** City Name */
+            city_name: string;
+            /** Clients */
+            clients: number;
+            /**
+             * Latitude
+             * @description The city's centre, when it could be found
+             */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
         };
         /** ClientPage */
         ClientPage: {
@@ -16563,6 +16678,8 @@ export interface components {
              * @description Where the wizard's images are uploaded
              */
             files_folder_id: string;
+            /** @description What we already know about the business, to start the brief with */
+            prefill: components["schemas"]["Brief"];
         };
         /** OtherIncome */
         OtherIncome: {
@@ -19053,6 +19170,12 @@ export interface components {
             /** Waitlisted */
             waitlisted: number;
             /**
+             * Waiting Requests
+             * @description Clients waiting for a spot like this one (a range, a whole day or this exact time), on top of those on the class's own waitlist
+             * @default 0
+             */
+            waiting_requests: number;
+            /**
              * Series Open Ended
              * @description For a session in a weekly series: whether the series keeps going
              */
@@ -20362,6 +20485,18 @@ export interface components {
              */
             website_url?: string | null;
             /**
+             * Product Track
+             * @description website_only: a business that ordered a website only
+             * @default full
+             * @enum {string}
+             */
+            product_track: "full" | "website_only";
+            /**
+             * Business Size
+             * @description solo, small (2-5), medium (6-20) or network; null if not given
+             */
+            business_size?: ("solo" | "small" | "medium" | "network") | null;
+            /**
              * Address Line
              * @description Settings managers only
              */
@@ -20598,6 +20733,16 @@ export interface components {
             accepted_legal?: {
                 [key: string]: string;
             } | null;
+            /**
+             * Product Track
+             * @description website_only: the business ordered a website and has no system modules yet; left out means the full system
+             */
+            product_track?: ("full" | "website_only") | null;
+            /**
+             * Business Size
+             * @description How big the business said it is at sign-up
+             */
+            business_size?: ("solo" | "small" | "medium" | "network") | null;
         };
         /** TenantModules */
         TenantModules: {
@@ -20681,6 +20826,8 @@ export interface components {
             shifts_publish_time?: string | null;
             /** Legal Entity Type */
             legal_entity_type?: ("company" | "licensed_dealer" | "exempt_dealer" | "nonprofit" | "partnership" | "other") | null;
+            /** Business Size */
+            business_size?: ("solo" | "small" | "medium" | "network") | null;
             /**
              * Business Number
              * @description Registration number (ח.פ., עוסק מורשה...)
@@ -29444,6 +29591,39 @@ export interface operations {
             };
         };
     };
+    add_system: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     respond: {
         parameters: {
             query?: never;
@@ -37468,6 +37648,44 @@ export interface operations {
             };
         };
     };
+    branch_insights: {
+        parameters: {
+            query: {
+                /** @description First local date */
+                start: string;
+                /** @description Last local date (inclusive) */
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchInsights"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     review_summary: {
         parameters: {
             query?: {
@@ -42649,6 +42867,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    account_exists: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountCheck"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountExists"];
+                };
             };
             /** @description Validation Error */
             422: {

@@ -20,7 +20,7 @@ export function SummaryLines({
   lines: PriceLine[];
   label: (key: PriceLine["key"]) => string;
   money: (amount: number) => string;
-  onRemove: (key: ModuleKey) => void;
+  onRemove: (key: ModuleKey | "website") => void;
   removeLabel: string;
 }) {
   return (
@@ -36,7 +36,7 @@ export function SummaryLines({
             {line.key !== "core" && line.key !== "extra_location" && (
               <button
                 type="button"
-                onClick={() => onRemove(line.key as ModuleKey)}
+                onClick={() => onRemove(line.key as ModuleKey | "website")}
                 aria-label={`${removeLabel}: ${label(line.key)}`}
                 className="btn-icon flex size-8 items-center justify-center rounded-lg text-muted hover:bg-foreground/5 hover:text-foreground"
               >
@@ -129,7 +129,7 @@ export function Cart({
   money: (amount: number) => string;
   open: boolean;
   onToggle: () => void;
-  onRemove: (key: ModuleKey) => void;
+  onRemove: (key: ModuleKey | "website") => void;
   t: T;
   /** The steps column shown above the plan on wide screens. */
   steps?: ReactNode;
@@ -140,7 +140,7 @@ export function Cart({
       {items.map((line) => (
         <li key={line.key} className="group flex animate-[pop_360ms_var(--ease-out)_both] items-center justify-between gap-3 text-sm">
           <span className="flex min-w-0 items-center gap-2">
-            {line.key === "core" ? (
+            {line.key === "core" || line.key === "website" ? (
               <span aria-hidden="true" className="icon-tile size-8">
                 <Check className="size-4" />
               </span>
@@ -155,7 +155,7 @@ export function Cart({
             {line.key !== "core" && line.key !== "extra_location" && (
               <button
                 type="button"
-                onClick={() => onRemove(line.key as ModuleKey)}
+                onClick={() => onRemove(line.key as ModuleKey | "website")}
                 aria-label={`${t("offer.remove")}: ${line.label}`}
                 className="btn-icon flex size-7 items-center justify-center rounded-lg text-muted hover:bg-foreground/5 hover:text-foreground"
               >

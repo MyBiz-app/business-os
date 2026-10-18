@@ -16530,6 +16530,74 @@
         }
       }
     },
+    "/website/add-system": {
+      "post": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Add System",
+        "description": "A \"website only\" business adds the system: it gets the modules its kind of business\nstarts with (no new sign-up) and from then on pays the with-system price.",
+        "operationId": "add_system",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/website/order/respond": {
       "post": {
         "tags": [
@@ -34077,6 +34145,98 @@
         }
       }
     },
+    "/metrics/branch-insights": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Branch Insights",
+        "description": "What the branches map shows beyond the metrics: where each branch's clients come from\nand what its team costs. Only branches the person may see.",
+        "operationId": "branch_insights",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date",
+              "title": "Start"
+            },
+            "description": "First local date"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Last local date (inclusive)",
+              "title": "End"
+            },
+            "description": "Last local date (inclusive)"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchInsights"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/reviews": {
       "get": {
         "tags": [
@@ -44110,6 +44270,48 @@
           }
         }
       }
+    },
+    "/public/accounts/exists": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Account Exists",
+        "description": "Whether this email already has a MyBiz account, so the sign-up can say \"it looks like you\nalready have an account, sign in\" before opening a second business. It answers yes or no and\nnothing else; the rate limit (6 a minute per visitor) keeps it from listing emails.",
+        "operationId": "account_exists",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCheck"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountExists"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -44430,6 +44632,35 @@
           "tenant_id"
         ],
         "title": "Accepted"
+      },
+      "AccountCheck": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 3,
+            "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "AccountCheck"
+      },
+      "AccountExists": {
+        "properties": {
+          "exists": {
+            "type": "boolean",
+            "title": "Exists"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exists"
+        ],
+        "title": "AccountExists"
       },
       "Acknowledge": {
         "properties": {
@@ -47770,6 +48001,71 @@
         ],
         "title": "BookingUpdate"
       },
+      "BranchInsight": {
+        "properties": {
+          "location_id": {
+            "type": "string",
+            "title": "Location Id"
+          },
+          "origins": {
+            "items": {
+              "$ref": "#/components/schemas/ClientOriginOut"
+            },
+            "type": "array",
+            "title": "Origins",
+            "description": "Cities of the clients who booked there in the period, most first"
+          },
+          "staff_cost_minor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Cost Minor",
+            "description": "The branch's share of the latest payroll month's gross pay (needs payroll access; people who did not clock in are not counted)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_id",
+          "origins",
+          "staff_cost_minor"
+        ],
+        "title": "BranchInsight"
+      },
+      "BranchInsights": {
+        "properties": {
+          "staff_cost_period": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Cost Period",
+            "description": "The payroll month the cost is from"
+          },
+          "branches": {
+            "items": {
+              "$ref": "#/components/schemas/BranchInsight"
+            },
+            "type": "array",
+            "title": "Branches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_cost_period",
+          "branches"
+        ],
+        "title": "BranchInsights"
+      },
       "BranchManager": {
         "properties": {
           "user_id": {
@@ -50975,6 +51271,54 @@
           "created_at"
         ],
         "title": "ClientNote"
+      },
+      "ClientOriginOut": {
+        "properties": {
+          "city_code": {
+            "type": "integer",
+            "title": "City Code"
+          },
+          "city_name": {
+            "type": "string",
+            "title": "City Name"
+          },
+          "clients": {
+            "type": "integer",
+            "title": "Clients"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "The city's centre, when it could be found"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_code",
+          "city_name",
+          "clients",
+          "latitude",
+          "longitude"
+        ],
+        "title": "ClientOriginOut"
       },
       "ClientPage": {
         "properties": {
@@ -63411,6 +63755,10 @@
             "format": "uuid",
             "title": "Files Folder Id",
             "description": "Where the wizard's images are uploaded"
+          },
+          "prefill": {
+            "$ref": "#/components/schemas/Brief",
+            "description": "What we already know about the business, to start the brief with"
           }
         },
         "type": "object",
@@ -63419,7 +63767,8 @@
           "price",
           "with_system",
           "missing",
-          "files_folder_id"
+          "files_folder_id",
+          "prefill"
         ],
         "title": "OrderState"
       },
@@ -69721,6 +70070,12 @@
             "type": "integer",
             "title": "Waitlisted"
           },
+          "waiting_requests": {
+            "type": "integer",
+            "title": "Waiting Requests",
+            "description": "Clients waiting for a spot like this one (a range, a whole day or this exact time), on top of those on the class's own waitlist",
+            "default": 0
+          },
           "series_open_ended": {
             "anyOf": [
               {
@@ -73287,6 +73642,34 @@
             "title": "Website Url",
             "description": "The business's website (its branches may have their own)"
           },
+          "product_track": {
+            "type": "string",
+            "enum": [
+              "full",
+              "website_only"
+            ],
+            "title": "Product Track",
+            "description": "website_only: a business that ordered a website only",
+            "default": "full"
+          },
+          "business_size": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "solo",
+                  "small",
+                  "medium",
+                  "network"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Size",
+            "description": "solo, small (2-5), medium (6-20) or network; null if not given"
+          },
           "address_line": {
             "anyOf": [
               {
@@ -73721,6 +74104,40 @@
             ],
             "title": "Accepted Legal",
             "description": "Legal documents accepted at sign-up (document -> version)"
+          },
+          "product_track": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "full",
+                  "website_only"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Track",
+            "description": "website_only: the business ordered a website and has no system modules yet; left out means the full system"
+          },
+          "business_size": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "solo",
+                  "small",
+                  "medium",
+                  "network"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Size",
+            "description": "How big the business said it is at sign-up"
           }
         },
         "type": "object",
@@ -74228,6 +74645,23 @@
               }
             ],
             "title": "Legal Entity Type"
+          },
+          "business_size": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "solo",
+                  "small",
+                  "medium",
+                  "network"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Size"
           },
           "business_number": {
             "anyOf": [

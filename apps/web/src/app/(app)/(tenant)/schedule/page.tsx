@@ -104,7 +104,12 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         ? t("cancelled")
         : session.booking_mode === "appointment"
           ? (session.appointment_client ?? null)
-          : t("spotsLabel", { booked: session.booked, capacity: session.capacity }),
+          : [
+              t("spotsLabel", { booked: session.booked, capacity: session.capacity }),
+              session.waitlisted + session.waiting_requests > 0 ? t("waitingLabel", { count: session.waitlisted + session.waiting_requests }) : null,
+            ]
+              .filter(Boolean)
+              .join(" · "),
       color: session.service.color ?? "var(--primary)",
       branch: mergedBranches && location ? { name: nameOf.get(location) ?? "", color: colorOf.get(location) ?? "var(--primary)" } : null,
       cancelled,

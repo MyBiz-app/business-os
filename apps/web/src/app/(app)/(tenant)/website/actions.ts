@@ -71,3 +71,15 @@ export async function respondToSite(_state: FormState, formData: FormData): Prom
   revalidatePath("/website");
   return { saved: true };
 }
+
+/** A website-only business adds the system: its modules open and it keeps its account. */
+export async function addSystem(_state: FormState): Promise<FormState> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(await api.POST("/website/add-system", { params: scope }));
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
