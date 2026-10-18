@@ -1,6 +1,6 @@
 "use client";
 
-import { FlaskConical, GitBranch, MessageCircle, Maximize2, Minimize2, RotateCcw, UserPlus } from "lucide-react";
+import { CircleHelp, FlaskConical, GitBranch, MessageCircle, Maximize2, Minimize2, RotateCcw, UserPlus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -15,6 +15,7 @@ import {
   type Conversation,
   type ConversationSummary,
   decideAction,
+  markAiTourSeen,
   openConversation,
   saveStructure,
   sendMessage,
@@ -25,6 +26,7 @@ import { AgentAvatar } from "./agent-avatar";
 import { AgentEditor } from "./agent-editor";
 import type { RoleOption } from "./agent-fields";
 import { AgentWizard } from "./agent-wizard";
+import { AiTour } from "./ai-tour";
 import { ChatPanel } from "./chat-panel";
 import { type Branch } from "./scope-picker";
 import { StructurePanel } from "./structure-panel";
@@ -46,11 +48,13 @@ type Props = {
   timeZone: string;
   /** The business's own roles, for choosing who may use an agent. */
   roles: RoleOption[];
+  /** This person has already finished or skipped the first-time guide. */
+  tourSeen?: boolean;
   /** An agent to open straight away (the floating bubble links here). */
   initialAgent?: string | null;
 };
 
-export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone, roles, initialAgent = null }: Props) {
+export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone, roles, tourSeen = true, initialAgent = null }: Props) {
   const t = useTranslations("aiTeam");
   const tAssistant = useTranslations("assistant");
   const locale = useLocale();
@@ -61,6 +65,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   const [view, setView] = useState<"map" | "list">("map");
   const [closedAgent, setClosedAgent] = useState<Agent | null>(null);
   const router = useRouter();
+  const [touring, setTouring] = useState(!tourSeen);
   // The map can take the whole width while a chat stays open, shown as a small floating card.
   const [mapWide, setMapWide] = useState(false);
   const [wizard, setWizard] = useState(false);
@@ -97,6 +102,11 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
     }
     setDraft(null);
     router.refresh();
+  }
+
+  function endTour() {
+    setTouring(false);
+    void markAiTourSeen();
   }
 
   const agent = team.agents.find((a) => a.key === selected) ?? null;
@@ -251,17 +261,23 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         title={t("title")}
         description={t("subtitle")}
         actions={
-          team.can_manage && (
-            <button type="button" onClick={() => setWizard(true)} disabled={structuring} className="btn-primary inline-flex h-11 items-center gap-2 px-4 text-sm">
-              <UserPlus aria-hidden="true" className="size-4" />
-              {t("wizard.hire")}
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setTouring(true)} disabled={structuring} className="btn-secondary inline-flex h-11 items-center gap-2 px-4 text-sm">
+              <CircleHelp aria-hidden="true" className="size-4" />
+              {t("tour.help")}
             </button>
-          )
+            {team.can_manage && (
+              <button type="button" onClick={() => setWizard(true)} disabled={structuring} className="btn-primary inline-flex h-11 items-center gap-2 px-4 text-sm">
+                <UserPlus aria-hidden="true" className="size-4" />
+                {t("wizard.hire")}
+              </button>
+            )}
+          </div>
         }
       />
 
       {/* One bar of a fixed height, so nothing jumps when the window changes size or the mode switches. */}
-      <div role="toolbar" aria-label={t("toolbar")} className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl border border-border bg-surface px-4 py-2">
+      <div role="toolbar" data-tour="ai-toolbar" aria-label={t("toolbar")} className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl border border-border bg-surface px-4 py-2">
         {structuring ? (
           <>
             <p className="text-sm font-semibold">{t("structure.title")}</p>
@@ -280,7 +296,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
           </>
         ) : (
           <>
-            <p className="text-sm text-muted">{t("usage", { used: number.format(team.credits_used), included: number.format(team.credits_included) })}</p>
+            <p data-tour="ai-usage" className="text-sm text-muted">{t("usage", { used: number.format(team.credits_used), included: number.format(team.credits_included) })}</p>
             <div className="flex items-center gap-2">
               <div className="hidden md:block">
                 <SegmentedControl label={t("view")} value={view} onChange={setView} options={[{ value: "map", label: t("views.map") }, { value: "list", label: t("views.list") }]} />
@@ -297,7 +313,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
       </div>
 
       <div className="flex items-start gap-4">
-        <div className={`relative min-w-0 motion-reduce:transition-none transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${wide ? "w-full" : chatOpen ? "hidden w-full lg:block lg:w-72 lg:shrink-0 xl:w-80" : "w-full"}`}>
+        <div data-tour="ai-map" className={`relative min-w-0 motion-reduce:transition-none transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${wide ? "w-full" : chatOpen ? "hidden w-full lg:block lg:w-72 lg:shrink-0 xl:w-80" : "w-full"}`}>
           {chatOpen && view === "map" && (
             <button
               type="button"
@@ -389,6 +405,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         </button>
       )}
 
+      {touring && <AiTour agents={team.agents} canManage={team.can_manage} onClose={endTour} />}
       {closedAgent && (
         <AgentDialog
           agent={closedAgent}

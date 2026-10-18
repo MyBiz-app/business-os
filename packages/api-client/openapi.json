@@ -19143,6 +19143,115 @@
         ]
       }
     },
+    "/me/tours": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "List Seen Tours",
+        "description": "The tours this person has finished or skipped.",
+        "operationId": "list_seen_tours",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeenTours"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/me/tours/{key}": {
+      "put": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Mark Tour Seen",
+        "description": "Remember that the tour was seen; safe to call again.",
+        "operationId": "mark_tour_seen",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "const": "ai_team",
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Reset Tour",
+        "description": "Forget that the tour was seen, so it shows again on the next visit.",
+        "operationId": "reset_tour",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "const": "ai_team",
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/broadcasts": {
       "get": {
         "tags": [
@@ -62989,6 +63098,23 @@
           "mfa_required_now"
         ],
         "title": "SecurityPolicy"
+      },
+      "SeenTours": {
+        "properties": {
+          "seen": {
+            "items": {
+              "type": "string",
+              "const": "ai_team"
+            },
+            "type": "array",
+            "title": "Seen"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seen"
+        ],
+        "title": "SeenTours"
       },
       "SelectAccounts": {
         "properties": {

@@ -3533,6 +3533,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/tours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Seen Tours
+         * @description The tours this person has finished or skipped.
+         */
+        get: operations["list_seen_tours"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/tours/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Mark Tour Seen
+         * @description Remember that the tour was seen; safe to call again.
+         */
+        put: operations["mark_tour_seen"];
+        post?: never;
+        /**
+         * Reset Tour
+         * @description Forget that the tour was seen, so it shows again on the next visit.
+         */
+        delete: operations["reset_tour"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/broadcasts": {
         parameters: {
             query?: never;
@@ -16891,6 +16935,11 @@ export interface components {
              */
             mfa_required_now: boolean;
         };
+        /** SeenTours */
+        SeenTours: {
+            /** Seen */
+            seen: "ai_team"[];
+        };
         /** SelectAccounts */
         SelectAccounts: {
             /** External Ids */
@@ -28111,6 +28160,84 @@ export interface operations {
                 "application/json": components["schemas"]["PushTokenBody"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_seen_tours: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeenTours"];
+                };
+            };
+        };
+    };
+    mark_tour_seen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "ai_team";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_tour: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "ai_team";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             204: {

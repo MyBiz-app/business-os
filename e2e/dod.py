@@ -147,6 +147,7 @@ with sync_playwright() as p:
     owner.on("pageerror", lambda e: print("pageerror:", e))
     owner.on("console", lambda m: print("console:", m.text[:300]) if m.type == "error" else None)
     owner.goto(f"{h.BASE}/ai?agent=chief"); h.ready(owner)  # opens the chat with the chief agent
+    h.skip_tour(owner)
     expect(owner.locator("#ai-question")).to_be_visible(timeout=20000)
     h.ready(owner)
     for _ in range(5):  # the chat re-renders when its history arrives and then drops what was typed

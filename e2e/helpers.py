@@ -32,6 +32,17 @@ def ready(page) -> None:
     )
 
 
+def skip_tour(page) -> None:
+    """Close the AI team's first-time guide if it opened by itself (it covers the page until skipped)."""
+    dialog = page.get_by_role("dialog", name="הכירו את הצוות שלכם")
+    try:
+        dialog.wait_for(state="visible", timeout=3000)
+    except Exception:  # already seen
+        return
+    page.keyboard.press("Escape")
+    dialog.wait_for(state="detached")
+
+
 def app_ready(page) -> None:
     """The client app's entrance fades run in JavaScript (React Native Animated), not as CSS
     animations; wait until nothing is part-way faded before checking contrast."""

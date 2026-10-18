@@ -12,6 +12,7 @@ GLOBAL_TABLES = {
     "platform_ai_settings",
     "platform_ai_conversations",
     "push_tokens",
+    "user_tours",
     "login_devices",
     "legal_acceptances",
     "job_runs",
