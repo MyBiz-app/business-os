@@ -3,6 +3,7 @@
  * validates and prices the modules again when the business is created; this is the preview. */
 import { isOpen } from "@business-os/verticals";
 
+
 export const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 /** Active-client sizes offered in the journey (the core plan's tiers; 1500 means 1,000+). */
 export const CLIENT_SIZES = [100, 300, 1000, 1500] as const;
@@ -35,6 +36,42 @@ export type Modules = Partial<Record<ModuleKey, number>>;
 export const ENTITY_TYPES = ["company", "licensed_dealer", "exempt_dealer", "nonprofit", "partnership", "other"] as const;
 export type EntityType = (typeof ENTITY_TYPES)[number];
 
+/** The website step: the business has one (and pastes its address), needs none, or asks MyBiz to
+ * build it. */
+export const SITE_CHOICES = ["have", "none", "build"] as const;
+export type SiteChoice = (typeof SITE_CHOICES)[number];
+
+/** `new` / `existing`: the usual sign-up (from scratch, or moving from another system).
+ * `website_only`: a business that ordered a website and nothing else; it can add the system
+ * later without signing up again. */
+export type Track = "new" | "existing" | "website_only";
+
+/** How big the business said it is, kept with the business (the API's `business_size`). */
+export type BusinessSize = "solo" | "small" | "medium" | "network";
+
+/** The size bucket of the people and branches asked in the journey: alone, 2-5, 6-20, or a
+ * network (more than one branch). */
+export function businessSize(staff: number, locations: number): BusinessSize {
+  if (locations > 1) return "network";
+  if (staff <= 1) return "solo";
+  return staff <= 5 ? "small" : staff <= 20 ? "medium" : "network";
+}
+
+/** A website address typed or pasted by a person ("www.x.co.il", "https://x.co.il/"), as the https
+ * address the API keeps; null if it is not an address. */
+export function normalizeWebsiteUrl(value: string): string | null {
+  const typed = value.trim();
+  if (!typed || /\s/.test(typed)) return null;
+  try {
+    const url = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(typed) ? typed : `https://${typed}`);
+    if ((url.protocol !== "https:" && url.protocol !== "http:") || !url.hostname.includes(".")) return null;
+    const address = url.toString();
+    return address.length <= 300 ? address : null;
+  } catch {
+    return null;
+  }
+}
+
 export type SignupPlan = {
   /** A catalog industry open for sign-up (category or sub-category). */
   vertical: string;
@@ -48,9 +85,14 @@ export type SignupPlan = {
   businessNumber?: string;
   /** Legal form: required in Israel (ILS), where it decides which documents the business issues. */
   entityType?: EntityType;
+  /** The website step: has one, needs none, or wants MyBiz to build it. */
+  site?: SiteChoice;
+  /** The address of the website the business already has (with `site: "have"`). */
+  websiteUrl?: string;
   /** "existing": already runs a business elsewhere and moves to MyBiz (opens the migration hub
-   * after sign-up); absent or "new": starting a business from scratch. */
-  track?: "new" | "existing";
+   * after sign-up); "new" or absent: starting from scratch; "website_only": ordered a website and
+   * nothing else. */
+  track?: Track;
 };
 
 /** The Israeli ID / company number check digit (the same rule as the API): up to 9 digits. */
@@ -127,12 +169,24 @@ type CatalogModuleLike = {
   requires_all?: string[];
 };
 
+/** What a website built by MyBiz costs: once, and a month (minor units). */
+export type SiteFee = { setup: number; monthly: number };
+/** The two website price lists: on its own, and with the system. */
+export type SiteFees = { alone: SiteFee; withSystem: SiteFee };
+
+/** The API's website price list (`/public/website-prices`) as the two fees the cart needs. */
+export function websiteFees(prices: { landing_only: SiteFee; landing_with_system: SiteFee } | null | undefined): SiteFees | undefined {
+  return prices ? { alone: prices.landing_only, withSystem: prices.landing_with_system } : undefined;
+}
+
 type CatalogLike = {
+  /** Where the website fees go; without them a website adds no price lines. */
+  website?: SiteFees;
   core: { up_to_clients?: number | null; price: number }[];
   modules: CatalogModuleLike[];
 };
 
-export type PriceLine = { key: "core" | ModuleKey; quantity: number; amount: number };
+export type PriceLine = { key: "core" | "website" | ModuleKey; quantity: number; amount: number };
 
 const offerModules = (offer: Offer) => new Set(OFFER_TIERS[offer].flatMap((tier) => tier.modules));
 
@@ -225,15 +279,23 @@ export function coreTier<T extends CatalogLike["core"][number]>(catalog: { core:
  * from them the one-time services, charged with the first invoice after the trial. */
 export function priceLines(
   catalog: CatalogLike,
-  plan: Pick<SignupPlan, "clients" | "modules">,
+  plan: Pick<SignupPlan, "clients" | "modules"> & Partial<Pick<SignupPlan, "site" | "track">>,
 ): { lines: PriceLine[]; total: number; once: PriceLine[]; onceTotal: number } {
   const byKey = Object.fromEntries(catalog.modules.map((m) => [m.key, m]));
-  const lines: PriceLine[] = [{ key: "core", quantity: 1, amount: coreTier(catalog, plan.clients).price }];
+  const websiteOnly = plan.track === "website_only";
+  // A website-only business has no system, so no core plan and no modules.
+  const lines: PriceLine[] = websiteOnly ? [] : [{ key: "core", quantity: 1, amount: coreTier(catalog, plan.clients).price }];
   const once: PriceLine[] = [];
-  for (const key of MODULE_KEYS) {
+  for (const key of websiteOnly ? [] : MODULE_KEYS) {
     const quantity = plan.modules[key] ?? 0;
     const entry = byKey[key];
     if (quantity > 0 && entry) (entry.billing === "once" ? once : lines).push({ key, quantity, amount: entry.price * quantity });
+  }
+  // The website MyBiz builds: a monthly fee and a one-time setup (cheaper with the system).
+  const price = catalog.website?.[websiteOnly ? "alone" : "withSystem"];
+  if (price && (plan.site === "build" || websiteOnly)) {
+    lines.push({ key: "website", quantity: 1, amount: price.monthly });
+    once.push({ key: "website", quantity: 1, amount: price.setup });
   }
   const sum = (list: PriceLine[]) => list.reduce((total, line) => total + line.amount, 0);
   return { lines, total: sum(lines), once, onceTotal: sum(once) };
@@ -290,6 +352,9 @@ export function decodePlan(value: unknown): SignupPlan | null {
   }
   const number = typeof raw.businessNumber === "string" ? cleanBusinessNumber(raw.businessNumber) : "";
   const entityType = (ENTITY_TYPES as readonly unknown[]).includes(raw.entityType) ? (raw.entityType as EntityType) : undefined;
+  const site = (SITE_CHOICES as readonly unknown[]).includes(raw.site) ? (raw.site as SiteChoice) : undefined;
+  const websiteUrl = typeof raw.websiteUrl === "string" && site === "have" ? normalizeWebsiteUrl(raw.websiteUrl) : null;
+  const track: Track | undefined = raw.track === "website_only" || raw.track === "existing" ? raw.track : undefined;
   return {
     vertical: raw.vertical,
     name,
@@ -300,7 +365,9 @@ export function decodePlan(value: unknown): SignupPlan | null {
     modules,
     ...(number && number.length <= 20 ? { businessNumber: number } : {}),
     ...(entityType ? { entityType } : {}),
-    ...(raw.track === "existing" ? { track: "existing" as const } : {}),
+    ...(site ? { site } : {}),
+    ...(websiteUrl ? { websiteUrl } : {}),
+    ...(track ? { track } : {}),
   };
 }
 

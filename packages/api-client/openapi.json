@@ -16530,6 +16530,74 @@
         }
       }
     },
+    "/website/add-system": {
+      "post": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Add System",
+        "description": "A \"website only\" business adds the system: it gets the modules its kind of business\nstarts with (no new sign-up) and from then on pays the with-system price.",
+        "operationId": "add_system",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/website/order/respond": {
       "post": {
         "tags": [
@@ -44202,6 +44270,48 @@
           }
         }
       }
+    },
+    "/public/accounts/exists": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Account Exists",
+        "description": "Whether this email already has a MyBiz account, so the sign-up can say \"it looks like you\nalready have an account, sign in\" before opening a second business. It answers yes or no and\nnothing else; the rate limit (6 a minute per visitor) keeps it from listing emails.",
+        "operationId": "account_exists",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCheck"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountExists"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -44522,6 +44632,35 @@
           "tenant_id"
         ],
         "title": "Accepted"
+      },
+      "AccountCheck": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 3,
+            "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "AccountCheck"
+      },
+      "AccountExists": {
+        "properties": {
+          "exists": {
+            "type": "boolean",
+            "title": "Exists"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exists"
+        ],
+        "title": "AccountExists"
       },
       "Acknowledge": {
         "properties": {
@@ -63578,6 +63717,10 @@
             "format": "uuid",
             "title": "Files Folder Id",
             "description": "Where the wizard's images are uploaded"
+          },
+          "prefill": {
+            "$ref": "#/components/schemas/Brief",
+            "description": "What we already know about the business, to start the brief with"
           }
         },
         "type": "object",
@@ -63586,7 +63729,8 @@
           "price",
           "with_system",
           "missing",
-          "files_folder_id"
+          "files_folder_id",
+          "prefill"
         ],
         "title": "OrderState"
       },
@@ -73460,6 +73604,34 @@
             "title": "Website Url",
             "description": "The business's website (its branches may have their own)"
           },
+          "product_track": {
+            "type": "string",
+            "enum": [
+              "full",
+              "website_only"
+            ],
+            "title": "Product Track",
+            "description": "website_only: a business that ordered a website only",
+            "default": "full"
+          },
+          "business_size": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "solo",
+                  "small",
+                  "medium",
+                  "network"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Size",
+            "description": "solo, small (2-5), medium (6-20) or network; null if not given"
+          },
           "address_line": {
             "anyOf": [
               {
@@ -73894,6 +74066,40 @@
             ],
             "title": "Accepted Legal",
             "description": "Legal documents accepted at sign-up (document -> version)"
+          },
+          "product_track": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "full",
+                  "website_only"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Track",
+            "description": "website_only: the business ordered a website and has no system modules yet; left out means the full system"
+          },
+          "business_size": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "solo",
+                  "small",
+                  "medium",
+                  "network"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Size",
+            "description": "How big the business said it is at sign-up"
           }
         },
         "type": "object",
@@ -74401,6 +74607,23 @@
               }
             ],
             "title": "Legal Entity Type"
+          },
+          "business_size": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "solo",
+                  "small",
+                  "medium",
+                  "network"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Size"
           },
           "business_number": {
             "anyOf": [

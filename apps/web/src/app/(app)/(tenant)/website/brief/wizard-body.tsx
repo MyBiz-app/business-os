@@ -12,7 +12,8 @@ export async function WizardBody() {
   const state = unwrap(await api.GET("/website/order", { params: scope }));
   // Once MyBiz builds, the brief no longer changes.
   if (state.order && state.order.stage !== "briefing" && state.order.stage !== "received") redirect("/website");
-  const brief = prefill(normalize(state.order?.brief), tenant);
+  // A first visit starts from what MyBiz already knows (the API), then the settings fill the gaps.
+  const brief = prefill(normalize(state.order ? state.order.brief : state.prefill), tenant);
   // File names for the images already uploaded.
   const ids = new Set([...brief.images.map((image) => image.file_id), ...(brief.logo_file_id ? [brief.logo_file_id] : [])]);
   const fileNames: Record<string, string> = {};

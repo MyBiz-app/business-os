@@ -7,14 +7,15 @@ import { BRAND } from "@business-os/i18n/brand";
 
 import { API_URL } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
-import { decodePlan, encodePlan, priceLines, trialEndsOn } from "@/lib/signup-plan";
+import { loadSitePrices } from "@/lib/pricing";
+import { decodePlan, encodePlan, priceLines, type SiteFees, trialEndsOn, websiteFees } from "@/lib/signup-plan";
 import { industryTexts } from "@/lib/verticals";
 
 import { FinishForm } from "./finish-form";
 import { isolate } from "@/lib/bidi";
 import { Container } from "@/components/layout/container";
 
-type Catalog = components["schemas"]["Catalog"];
+type Catalog = components["schemas"]["Catalog"] & { website?: SiteFees };
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("start.finish");
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 async function loadCatalog(currency: string): Promise<Catalog | null> {
   try {
     const response = await fetch(`${API_URL}/public/pricing?currency=${currency}`, { next: { revalidate: 3600 } });
-    return response.ok ? ((await response.json()) as Catalog) : null;
+    return response.ok ? { ...((await response.json()) as Catalog), website: websiteFees(await loadSitePrices(currency)) } : null;
   } catch {
     return null;
   }
@@ -86,7 +87,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
             <li key={line.key} className="flex items-center justify-between gap-3 text-sm">
               <span className="flex items-center gap-1.5">
                 <Check aria-hidden="true" className="size-4 shrink-0 text-success-ink" />
-                {line.key === "core" ? tModules("core") : tModules(`names.${line.key}`)}
+                {line.key === "core" ? tModules("core") : line.key === "website" ? t("site.cartLine") : tModules(`names.${line.key}`)}
                 {line.quantity > 1 && <span className="text-muted" dir="ltr">× {line.quantity}</span>}
               </span>
               <bdi className="font-semibold">{money(line.amount)}</bdi>

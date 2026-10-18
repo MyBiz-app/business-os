@@ -5962,7 +5962,9 @@
       "passSizeValue": "{staff, plural, one {# employee} other {# employees}} · {locations, plural, one {# location} other {# locations}}",
       "passAddons": "Add-ons",
       "passNoAddons": "Core only",
-      "passEntity": "Business type"
+      "passEntity": "Business type",
+      "passWebsite": "Website",
+      "passWebsiteBuild": "MyBiz builds it"
     },
     "finish": {
       "title": "Last step: payment details",
@@ -6009,6 +6011,61 @@
       "bestValue": "Best value",
       "noThanks": "No thanks, skip {name}",
       "needsAi": "Includes AI Basic (+{price} a month), since you haven't chosen AI yet"
+    },
+    "site": {
+      "eyebrow": "Website",
+      "title": "Does your business have a website?",
+      "text": "Tell us and we will set things up around it. You can change this any time.",
+      "choices": {
+        "have": {
+          "name": "I have a website",
+          "text": "Paste the address and we will show it to your clients."
+        },
+        "none": {
+          "name": "I do not have one and do not need one",
+          "text": "Nothing to add. You can order a website later."
+        },
+        "build": {
+          "name": "Build me a website",
+          "text": "A branded landing page built for you, using what you already told us."
+        }
+      },
+      "price": "{setup} setup, then {monthly} a month",
+      "address": "Website address",
+      "addressPlaceholder": "www.example.com",
+      "addressInvalid": "That does not look like a web address.",
+      "buildNote": "After you sign up we open a short questionnaire with everything we already know filled in. Nothing is charged before payments open.",
+      "cartLine": "Website built by MyBiz"
+    },
+    "siteOnly": {
+      "eyebrow": "Website only",
+      "title": "A website for your business",
+      "subtitle": "A branded landing page that MyBiz builds for you. You can add the full system at any time, with no new sign-up.",
+      "price": "{setup} setup and {monthly} a month. Nothing is charged before payments open.",
+      "account": {
+        "question": "Do you already have a MyBiz account?",
+        "yes": "Yes, sign in",
+        "yesSignedIn": "Order for my business",
+        "yesText": "You order from inside your CRM, so we do not open a second business.",
+        "no": "No, I am new",
+        "noSignedIn": "Open a new business",
+        "noText": "A short sign-up: business name, email and kind of business."
+      },
+      "form": {
+        "title": "Tell us about your business",
+        "name": "Business name",
+        "kind": "Kind of business",
+        "kindPlaceholder": "Choose...",
+        "email": "Email",
+        "incomplete": "Please fill in every field.",
+        "submit": "Continue",
+        "back": "Back",
+        "note": "Next you create your password, then answer a short questionnaire about the website."
+      },
+      "existing": {
+        "text": "It looks like you already have an account.",
+        "cta": "Sign in to order from your CRM"
+      }
     }
   },
   "gettingStarted": {
@@ -9744,6 +9801,11 @@
       "sendChanges": "Send the request",
       "cancel": "Cancel",
       "approved": "You approved the website. We are putting it live."
+    },
+    "system": {
+      "title": "Add the system",
+      "body": "Your business is on the website-only track. Add the system (clients, schedule, payments and more) without signing up again. The website price changes to the with-system price.",
+      "add": "Add the system"
     },
     "preview": {
       "tagline": "Your business, online and ready to take bookings",

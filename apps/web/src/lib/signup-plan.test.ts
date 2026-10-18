@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { businessNumberOk, calcPlanQuery, clientsTier, companyPrefixWarning, modulesFromParam, wholeParam, chooseTier, decodePlan, encodePlan, priceLines, type SignupPlan, tierOf, withLocations, withoutOrphans } from "./signup-plan.ts";
+import { businessNumberOk, businessSize, calcPlanQuery, normalizeWebsiteUrl, clientsTier, companyPrefixWarning, modulesFromParam, wholeParam, chooseTier, decodePlan, encodePlan, priceLines, type SignupPlan, tierOf, withLocations, withoutOrphans } from "./signup-plan.ts";
 
 const catalog = {
   core: [
@@ -21,6 +21,8 @@ const catalog = {
     { key: "setup_full", price: 69000, billing: "once" as const },
   ],
 };
+
+const ilsFees = { alone: { setup: 79000, monthly: 4900 }, withSystem: { setup: 49000, monthly: 2900 } };
 
 const plan: SignupPlan = {
   vertical: "beauty",
@@ -134,4 +136,53 @@ test("the calculator plan round-trips through the /start link", () => {
 test("the price at 240 clients, 2 locations and the app", () => {
   const { total } = priceLines(catalog, { clients: 240, modules: withLocations({ client_app: 1 }, 2) });
   assert.equal(total, 14900 + 4900 + 2900);
+});
+
+test("business size: alone, 2-5, 6-20, or a network of branches", () => {
+  assert.equal(businessSize(1, 1), "solo");
+  assert.equal(businessSize(2, 1), "small");
+  assert.equal(businessSize(5, 1), "small");
+  assert.equal(businessSize(6, 1), "medium");
+  assert.equal(businessSize(20, 1), "medium");
+  assert.equal(businessSize(21, 1), "network");
+  assert.equal(businessSize(1, 2), "network");
+});
+
+test("a website address is accepted with or without the scheme, anything else is not", () => {
+  assert.equal(normalizeWebsiteUrl("www.example.co.il"), "https://www.example.co.il/");
+  assert.equal(normalizeWebsiteUrl(" https://example.com/page "), "https://example.com/page");
+  assert.equal(normalizeWebsiteUrl("http://example.com"), "http://example.com/");
+  assert.equal(normalizeWebsiteUrl(""), null);
+  assert.equal(normalizeWebsiteUrl("not a site"), null);
+  assert.equal(normalizeWebsiteUrl("localhost"), null);
+  assert.equal(normalizeWebsiteUrl("javascript://example.com/%0Aalert(1)"), null);
+});
+
+test("the website step survives the URL: kept for 'have', ignored otherwise", () => {
+  const have = decodePlan(encodePlan({ ...plan, site: "have", websiteUrl: "www.shira.co.il" }));
+  assert.equal(have?.site, "have");
+  assert.equal(have?.websiteUrl, "https://www.shira.co.il/");
+  const build = decodePlan(encodePlan({ ...plan, site: "build", websiteUrl: "www.shira.co.il" }));
+  assert.equal(build?.site, "build");
+  assert.equal(build?.websiteUrl, undefined);
+  assert.equal(decodePlan(encodePlan({ ...plan, site: "huh" as never }))?.site, undefined);
+});
+
+test("a website built for a business with the system is a monthly line and a setup line", () => {
+  const withSite = { ...catalog, website: ilsFees };
+  const { lines, total, once, onceTotal } = priceLines(withSite, { ...plan, site: "build" });
+  assert.deepEqual(lines.at(-1), { key: "website", quantity: 1, amount: 2900 });
+  assert.equal(total, 25600 + 2900);
+  assert.deepEqual(once, [{ key: "website", quantity: 1, amount: 49000 }]);
+  assert.equal(onceTotal, 49000);
+  assert.equal(priceLines(withSite, { ...plan, site: "have" }).total, 25600);
+});
+
+test("a website-only plan pays the stand-alone price and has no core plan or modules", () => {
+  const { lines, once } = priceLines({ ...catalog, website: ilsFees }, { clients: 0, modules: { client_app: 1 }, track: "website_only" });
+  assert.deepEqual(lines, [{ key: "website", quantity: 1, amount: 4900 }]);
+  assert.deepEqual(once, [{ key: "website", quantity: 1, amount: 79000 }]);
+  const decoded = decodePlan(encodePlan({ ...plan, modules: {}, track: "website_only" }));
+  assert.equal(decoded?.track, "website_only");
+  assert.equal(decodePlan(encodePlan(plan))?.track, undefined);
 });

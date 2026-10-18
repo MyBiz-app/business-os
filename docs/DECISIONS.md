@@ -346,6 +346,13 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Only the person the app acts for sees and decides its requests (the existing confirm and reject endpoints already require the requester). Approval re-checks permission, module, payload hash and capacity, and the audit entry carries the app's name.
 - Requests last 24 hours (nobody watches when an app proposes), at most 20 wait per business, and the read-only database transaction stays the default; only a proposing call writes, and only the request row.
 - The console view is a read-only function (`platform_mcp_usage`, usage permission) with per-business apps, calls and proposal outcomes. The settings guide is text only; screenshots wait for a real Claude and ChatGPT session.
+### Sign-up tracks and business size (2026-10-18, round 7 R25a, migration 0137)
+
+- **Two columns on the business**: `product_track` (`full`, the default, or `website_only`) and `business_size` (`solo`, `small` 2-5, `medium` 6-20, `network`). A website-only business is a normal business with no modules; adding the system (`POST /website/add-system`) gives it its kind of business's starting modules and flips the track to `full`, with no new sign-up. Its website price is the stand-alone one until then (the hook R24 left in `website_orders._with_system`).
+- **Business size is derived, not asked twice**: the journey already asks staff and branches, so the size is `network` for more than one branch, otherwise `solo` for one person, `small` up to 5, `medium` up to 20, `network` above. It was asked and thrown away before; now it is kept, and the "I grew" and independent-mode slice (R28) reads it.
+- **"Does this email already have an account?"** is a public yes-or-no lookup (`POST /public/accounts/exists`) because the spec asks for it. It is limited to 6 requests a minute per visitor so it cannot be used to list emails, and it only looks at people who have signed in to the API at least once; the sign-in provider still refuses a duplicate email. The password-reset flow keeps its same-message-either-way behavior.
+- **The website step** sits after the four product add-ons. "Build me a website" puts the with-system price in the cart (not charged before #46) and sends the new owner to the website brief right after sign-up, with what MyBiz already knows filled in (area, services, branches, colors, language, website address).
+- The web copy of the website price list now equals the API's (USD and EUR with-system prices differed).
 
 ## Open
 
