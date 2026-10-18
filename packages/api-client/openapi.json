@@ -67501,15 +67501,94 @@
       "PromoCodeUpdate": {
         "properties": {
           "active": {
-            "type": "boolean",
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Active"
+          },
+          "percent_off": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent Off"
+          },
+          "amount_off": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Off",
+            "description": "Minor units"
+          },
+          "plan_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Id"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "ends_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends On"
+          },
+          "max_uses": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Uses"
           }
         },
         "type": "object",
-        "required": [
-          "active"
-        ],
-        "title": "PromoCodeUpdate"
+        "title": "PromoCodeUpdate",
+        "description": "Only the fields that are sent change; null clears plan, dates and limit.\n\nThe code itself never changes. The discount amount changes only before the first use,\nso paid checkouts keep the meaning they were paid with."
       },
       "ProviderField": {
         "properties": {
@@ -68657,6 +68736,18 @@
             "type": "integer",
             "title": "Total",
             "description": "Minor units"
+          },
+          "month_count": {
+            "type": "integer",
+            "title": "Month Count",
+            "description": "Of these, accepted in the current month (business time zone)",
+            "default": 0
+          },
+          "month_total": {
+            "type": "integer",
+            "title": "Month Total",
+            "description": "Minor units, accepted this month",
+            "default": 0
           }
         },
         "type": "object",

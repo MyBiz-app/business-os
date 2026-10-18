@@ -231,6 +231,13 @@ tens of thousands of shekels). Give the tester a staging copy with demo data, th
 [ASVS self-check](../reviews/go-live-asvs-self-check-2026-10.md) and the scope (website, API,
 apps). Track every finding as a GitHub issue; fix the high ones before the next release.
 
+## Decisions waiting for you (round 7 leftovers)
+
+1. **Lawyer for the cancellation text (R33).** The MyBiz subscription cancellation wording and policy page are drafts. Have a lawyer review them before go-live.
+2. **The 129 "solo" bundle price.** Decide how a bundle discount appears on the invoice; until then the price is not offered.
+3. **OpenAI and Gemini prices.** Confirm them on the vendors' pricing pages before switching either provider on (see "Switching on a live AI provider").
+4. **A monthly summary email** does not exist yet; decide if you want one (it would also carry the "My website" line).
+
 ## Still the owner's
 
 Rotate `API_INTERNAL_TOKEN` (Render and Vercel), change the demo passwords, decide the AI credit
