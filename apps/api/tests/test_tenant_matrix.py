@@ -27,7 +27,8 @@ PLATFORM_TABLES = {
 # Tenant tables neither the demo data nor `_synthetic_row` can fill (a CHECK constraint needs a
 # real value). Add a row for them in the seed (preferred) or list them here.
 # time_clock_approvals needs a real member and a first-of-month date; the demo data (D1) fills it.
-UNSEEDED: set[str] = {"time_clock_approvals"}
+# subscription_cancellations is written only when an owner cancels or pauses (R33).
+UNSEEDED: set[str] = {"time_clock_approvals", "subscription_cancellations"}
 # Values for columns a CHECK constraint pins down (a synthetic row can't guess them).
 OVERRIDES = {
     "ai_agents": {"builtin_key": "'x'"},

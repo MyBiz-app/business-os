@@ -66,6 +66,8 @@ BOUNDED = {
     "/mcp-connections": "capped",
     # the console's unpaid-invoice list: the function returns at most 500 businesses
     "/platform/billing/overdue": "capped",
+    "/platform/billing/cancellations": "capped: the last 12 months, at most 500 rows",
+    "/platform/billing/churn": "twelve months",
     # the SQL function returns at most 5 open banners, or the latest 50
     "/public/incidents": "limit in SQL",
     "/platform/incidents": "limit in SQL",
