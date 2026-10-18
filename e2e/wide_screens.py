@@ -23,6 +23,8 @@ faulthandler.dump_traceback_later(1200, exit=True)  # a hang shows where it stoo
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=h.chromium())
     page = browser.new_context(locale="he-IL", viewport={"width": 1440, "height": 900}).new_page()
+    page.set_default_timeout(120000)  # the first visit of each console page is compiled on demand
+    page.set_default_navigation_timeout(180000)
     print("signing in", flush=True)
     h.login(page, OWNER)
     print("signed in", flush=True)
