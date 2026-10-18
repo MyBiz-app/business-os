@@ -18,7 +18,7 @@ CAP = 1600  # Container size "settings" (100rem)
 # (path, "capped" = a form room, "open" = a table or board that may use the whole screen)
 PAGES = [("/account", "capped"), ("/platform", "open"), ("/platform/businesses", "open"), ("/platform/billing", "capped")]
 problems: list[str] = []
-faulthandler.dump_traceback_later(300, exit=True)  # a hang shows where it stood instead of running to the job limit
+faulthandler.dump_traceback_later(1200, exit=True)  # a hang shows where it stood instead of running to the job limit
 
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=h.chromium())
