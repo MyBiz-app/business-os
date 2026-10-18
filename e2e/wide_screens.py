@@ -5,6 +5,7 @@ its 1600px cap, and a table page uses the room it is given.
     uv run --with playwright --with "psycopg[binary]" python e2e/wide_screens.py <console owner email>
 """
 
+import faulthandler
 import sys
 
 from playwright.sync_api import sync_playwright
@@ -17,6 +18,7 @@ CAP = 1600  # Container size "settings" (100rem)
 # (path, "capped" = a form room, "open" = a table or board that may use the whole screen)
 PAGES = [("/account", "capped"), ("/platform", "open"), ("/platform/businesses", "open"), ("/platform/billing", "capped")]
 problems: list[str] = []
+faulthandler.dump_traceback_later(300, exit=True)  # a hang shows where it stood instead of running to the job limit
 
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=h.chromium())
@@ -34,6 +36,7 @@ with sync_playwright() as p:
                 })"""
             )
             label = f"{path} at {width}"
+            print(label, m, flush=True)
             if m["scroll"] > 0:
                 problems.append(f"{label}: scrolls sideways by {m['scroll']}px")
             if m["main"] == 0:
