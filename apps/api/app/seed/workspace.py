@@ -68,6 +68,8 @@ def seed_workspace(
         text("""
             UPDATE app.tenants
             SET legal_entity_type = 'company', business_number = :number,
+                address_line = 'הרצל 12', address_city = 'תל אביב',
+                employer_file_number = '940000000',
                 cover = :cover, cover_content_type = 'image/png', cover_updated_at = now()
             WHERE id = :t
         """),

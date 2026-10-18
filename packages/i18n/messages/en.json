@@ -2611,7 +2611,8 @@
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
       "noPack": "Included amount",
-      "social_studio": "Content studio"
+      "social_studio": "Content studio",
+      "payroll": "Payroll"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -2635,7 +2636,8 @@
       "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
       "noSupport": "Email and help center, an answer by the next business day.",
       "noPack": "2 GB for files and 200 messages a month.",
-      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post."
+      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post.",
+      "payroll": "Monthly payroll runs, payslips, Form 101 and the bank transfer file, for up to 10 staff."
     },
     "followsBranches": "Follows your active branches",
     "supportTier": "Support",
@@ -3558,6 +3560,14 @@
     "leadFollowUp": {
       "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
       "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
+    },
+    "payrollReminder": {
+      "title": "Payroll for {month} is waiting",
+      "body": "{business}: the payroll run for {month} is not approved yet. Open payroll to finish it."
+    },
+    "payslipReady": {
+      "title": "Your payslip is ready",
+      "body": "{business}: your payslip for {month} is in your documents."
     },
     "roster": {
       "subject": "Your new shifts at {business}",
