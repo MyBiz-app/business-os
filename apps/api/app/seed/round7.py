@@ -24,6 +24,7 @@ from types import SimpleNamespace
 from uuid import UUID, uuid4
 
 from sqlalchemy import Connection, text
+from weasyprint import HTML
 
 from app.api.issued_documents import IssueRequest, LineIn, issue
 from app.seed.round6 import _as_tenant, _month, _team
@@ -38,7 +39,6 @@ PIZZA = "Urban Slice"
 NO_DEMO: dict[str, str] = {
     "ai_agent_avatars": "uploaded images of custom agents; the demo agents use presets",
     "checkouts": "payment-provider sessions; paid providers stay off until go-live",
-    "client_documents": "files a client uploads; the demo has no real documents to show",
     "client_locations": "a client's saved places in the client app; added by the person",
     "client_social": "a client's own social links, entered by the client",
     "contact_requests": "leads from the public marketing site; they belong to the platform demo",
@@ -65,7 +65,6 @@ NO_DEMO: dict[str, str] = {
 # demo rows here (and remove it from this list); the coverage test already fails for its new
 # tenant tables until it is filled or listed in NO_DEMO.
 PENDING_FEATURES = (
-    "R23 freeze extras: a freeze request with an attached paper (needs its migration)",
     "R25b CRM website area (the website order and visits are already filled)",
     "R33 subscription cancellation by the business (console churn view)",
     "R28 solo mode: a solo demo business needs no team, so it would be a fourth business "
@@ -140,6 +139,10 @@ MORE_CHATS = (
         "ההכנסות החודש גבוהות מהחודש שעבר. פירוט לפי שירות בדוח המספרים.",
     ),
 )
+
+
+def _paper() -> bytes:
+    return HTML(string="<p>Sample paper for a freeze request (demo data).</p>").write_pdf()
 
 
 def _json(value: object) -> str:
@@ -1275,7 +1278,7 @@ def _waitlist(conn: Connection, tenant_id: UUID, clients: list, today: date) -> 
 def _freeze_requests(conn: Connection, tenant_id: UUID, owner: UUID, clients: list,
                      today: date) -> int:  # fmt: skip
     """R23: the freeze rules, and requests that are waiting, approved on their own and rejected.
-    HOOK: a request with an attached paper arrives with its own migration."""
+    The approved one carries a paper the client attached (a sample call-up paper)."""
     if _has(conn, "freeze_requests", tenant_id):
         return 0
     conn.execute(
@@ -1307,7 +1310,7 @@ def _freeze_requests(conn: Connection, tenant_id: UUID, owner: UUID, clients: li
     ):  # fmt: skip
         starts = today + timedelta(days=offset)
         ends = starts + timedelta(days=days - 1)
-        conn.execute(
+        request_id = conn.execute(
             text("""
                 INSERT INTO app.freeze_requests
                     (tenant_id, client_id, entitlement_id, starts_on, ends_on, reason, note, status,
@@ -1319,11 +1322,30 @@ def _freeze_requests(conn: Connection, tenant_id: UUID, owner: UUID, clients: li
                         CASE WHEN :status = 'rejected' THEN CAST(:by AS uuid) END,
                         CASE WHEN :status <> 'pending' THEN now() END,
                         CASE WHEN :status = 'rejected' THEN 'לא ניתן להקפיא בתקופת עומס' END)
+                RETURNING id
             """),
             {"t": tenant_id, "c": client, "e": entitlement, "s": starts, "end": ends,
              "reason": reason, "status": status, "auto": auto, "by": str(owner)},
-        )  # fmt: skip
+        ).scalar_one()  # fmt: skip
         added += 1
+        if reason == "reserve_duty":
+            paper = _paper()
+            document_id = conn.execute(
+                text("""
+                    INSERT INTO app.client_documents
+                        (tenant_id, client_id, name, kind, content_type, size, content,
+                         uploaded_by_client)
+                    VALUES (:t, :c, 'צו-קריאה-דוגמה.pdf', 'client_file', 'application/pdf', :size,
+                            :content, true)
+                    RETURNING id
+                """),
+                {"t": tenant_id, "c": client, "size": len(paper), "content": paper},
+            ).scalar_one()
+            conn.execute(
+                text("UPDATE app.freeze_requests SET document_id = :d WHERE id = :r"),
+                {"d": document_id, "r": request_id},
+            )
+            added += 1
     return added
 
 
