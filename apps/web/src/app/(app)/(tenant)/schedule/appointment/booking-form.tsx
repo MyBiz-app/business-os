@@ -3,8 +3,9 @@
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
-import { FormError } from "@/components/form/form-message";
+import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { ModalMarker } from "@/components/ui/route-modal";
 
 import { type AppointmentState, bookAppointment } from "./actions";
 
@@ -14,10 +15,13 @@ type Client = { id: string; name: string; detail: string };
 /** Pick a free time and a client, then book. */
 export function BookingForm({ serviceId, slots, clients }: { serviceId: string; slots: Slot[]; clients: Client[] }) {
   const t = useTranslations("appointments");
+  const tCommon = useTranslations("common");
   const [state, action] = useActionState<AppointmentState, FormData>(bookAppointment.bind(null, serviceId), {});
   return (
     <form action={action} className="flex flex-col gap-5">
       <FormError message={state.error && t(`errors.${state.error}`)} />
+      <FormNotice message={state.saved ? tCommon("saved") : undefined} />
+      <ModalMarker saved={state.saved} next={state.next} />
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-2 font-semibold">{t("chooseSlot")}</legend>
         <div className="enter-items grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-6">
@@ -53,7 +57,7 @@ export function BookingForm({ serviceId, slots, clients }: { serviceId: string; 
           ))}
         </ul>
       </fieldset>
-      <div>
+      <div className="form-actions">
         <SubmitButton>{t("book")}</SubmitButton>
       </div>
     </form>

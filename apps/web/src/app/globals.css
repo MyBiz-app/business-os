@@ -1667,6 +1667,23 @@ h1[tabindex="-1"]:focus {
 .modal-dialog[data-closing] .modal-panel {
   animation: modal-out 150ms ease-in both;
 }
+/* A form's save row inside a window stays at the bottom of the visible area while the fields scroll. */
+.modal-panel .form-actions {
+  position: sticky;
+  bottom: -1.25rem;
+  z-index: 1;
+  margin-inline: -1.25rem;
+  margin-block-end: -1.25rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+@media (min-width: 40rem) {
+  .modal-panel .form-actions {
+    margin-inline: -1.5rem;
+    padding-inline: 1.5rem;
+  }
+}
 .modal-ask {
   position: absolute;
   inset: 0;
@@ -1845,4 +1862,24 @@ h1[tabindex="-1"]:focus {
   inset-block-start: 1.5rem;
   inset-inline-start: 50%;
   translate: -50% 0;
+}
+
+/* ---- Guided tour (components/tour): the dimmed page with a clear window around one element ---- */
+
+.tour-hole {
+  position: fixed;
+  border-radius: 1rem;
+  pointer-events: none;
+  outline: 2px solid var(--primary);
+  box-shadow: 0 0 0 100vmax color-mix(in oklab, var(--foreground) 45%, transparent);
+  transition:
+    top 250ms var(--ease-out),
+    left 250ms var(--ease-out),
+    width 250ms var(--ease-out),
+    height 250ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-hole {
+    transition: none;
+  }
 }

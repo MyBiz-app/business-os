@@ -53,6 +53,9 @@ def get_metrics(
     start: Annotated[dt.date, Query(description="First local date")],
     end: Annotated[dt.date, Query(description="Last local date (inclusive)")],
     keys: Annotated[list[MetricKey] | None, Query()] = None,
+    exclude_staff: Annotated[
+        bool, Query(description="Leave out clients who are also team members")
+    ] = False,
 ) -> list[MetricValue]:
     """Each metric for the period and for the period of the same length just before it."""
     _check_period(start, end)
@@ -61,8 +64,8 @@ def get_metrics(
         MetricValue(
             key=key,
             unit=METRICS[key].unit,
-            value=compute(context.session, key, start, end),
-            previous=compute(context.session, key, before_start, before_end),
+            value=compute(context.session, key, start, end, exclude_staff),
+            previous=compute(context.session, key, before_start, before_end, exclude_staff),
             higher_is_better=METRICS[key].higher_is_better,
         )
         for key in keys or list(METRICS)
@@ -76,13 +79,16 @@ def get_series(
     start: Annotated[dt.date, Query()],
     end: Annotated[dt.date, Query()],
     grain: Annotated[Grain, Query()] = "week",
+    exclude_staff: Annotated[
+        bool, Query(description="Leave out clients who are also team members")
+    ] = False,
 ) -> list[Point]:
     _check_period(start, end)
     if METRICS[key].bucket_sql is None:
         raise HTTPException(status_code=422, detail="no_series")
     return [
         Point(bucket=bucket, value=value)
-        for bucket, value in series(context.session, key, start, end, grain)
+        for bucket, value in series(context.session, key, start, end, grain, exclude_staff)
     ]
 
 

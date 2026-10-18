@@ -3,7 +3,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -14,6 +14,8 @@ from app.catalog.verticals import CATALOG, VerticalPack
 from app.commerce.modules import MODULES
 from app.core.permissions import Permission
 from app.core.website import normalize_website
+from app.geo.addresses import AddressFields
+from app.geo.branch import CLEARED, branch_address_columns
 from app.schedule.branch_managers import appoint, step_down
 
 router = APIRouter(tags=["locations"])
@@ -27,6 +29,11 @@ LOCATION_COLUMNS = """
     l.id, l.name, l.address, l.active, l.created_at, l.updated_at,
     l.kind, l.manager_user_id, t.vertical AS tenant_vertical,
     l.primary_color, l.website_url,
+    l.city_code, l.street_code, l.house_number, l.address_details, l.street_unlisted,
+    l.latitude, l.longitude,
+    (SELECT c.name_he FROM app.geo_cities c WHERE c.code = l.city_code) AS city_name,
+    (SELECT st.name_he FROM app.geo_streets st
+      WHERE st.city_code = l.city_code AND st.code = l.street_code) AS street_name,
     coalesce(l.website_url, t.website_url) AS effective_website_url,
     CASE WHEN l.logo IS NULL THEN NULL
          ELSE '/public/locations/' || l.id || '/logo?v='
@@ -48,7 +55,7 @@ def _strip_required(value: str) -> str:
     return value.strip()
 
 
-class LocationCreate(BaseModel):
+class LocationCreate(AddressFields):
     name: str = Field(min_length=1, max_length=120)
     address: str | None = Field(default=None, max_length=300)
     kind: str | None = Field(
@@ -77,7 +84,7 @@ class LocationCreate(BaseModel):
         return normalize_website(value) if isinstance(value, str) else value
 
 
-class LocationUpdate(BaseModel):
+class LocationUpdate(AddressFields):
     name: str | None = Field(default=None, min_length=1, max_length=120)
     address: str | None = Field(default=None, max_length=300)
     active: bool | None = None
@@ -91,6 +98,16 @@ class LocationUpdate(BaseModel):
         pattern=r"^#[0-9a-fA-F]{6}$",
         description="The branch's own accent color; null falls back to the network's",
     )
+    latitude: float | None = Field(
+        default=None, ge=-90, le=90, description="The pin, moved by hand (with longitude)"
+    )
+    longitude: float | None = Field(default=None, ge=-180, le=180)
+
+    @model_validator(mode="after")
+    def point_is_whole(self) -> "LocationUpdate":
+        if (self.latitude is None) != (self.longitude is None):
+            raise ValueError("a point needs both latitude and longitude")
+        return self
 
     website_url: str | None = Field(
         default=None, max_length=300, description="The branch's own website; null: the business's"
@@ -140,6 +157,15 @@ class Location(BaseModel):
     id: UUID
     name: str
     address: str | None
+    city_code: int | None = Field(description="The branch's city, from the official list")
+    street_code: int | None
+    house_number: str | None
+    address_details: str | None
+    street_unlisted: str | None = Field(description="A street typed because it is not on the list")
+    city_name: str | None
+    street_name: str | None
+    latitude: float | None = Field(description="The branch's point on the map, if known")
+    longitude: float | None
     active: bool
     created_at: datetime
     updated_at: datetime
@@ -242,13 +268,7 @@ def create_location(body: LocationCreate, context: WriteDep) -> Location:
     if context.branches is not None:  # new branches are for people who reach every branch
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
     ensure_branch_kind(context.session, body.kind)
-    location_id = context.session.execute(
-        text("""
-            INSERT INTO app.locations (tenant_id, name, address, kind, website_url)
-            VALUES (:tenant_id, :name, :address, :kind, :website_url) RETURNING id
-        """),
-        {**body.model_dump(), "tenant_id": context.tenant_id},
-    ).scalar_one()
+    location_id = _insert_location(context, body)
     return _one_location(context.session, location_id)
 
 
@@ -275,6 +295,25 @@ class BranchSetup(LocationCreate):
     accept_extra_charge: bool = Field(
         default=False, description="Required when the new branch adds a monthly charge"
     )
+
+
+def _insert_location(context: TenantContext, body: LocationCreate) -> UUID:
+    """The branch row. A structured address (city, street, house number) is checked against the
+    official lists and its point looked up; a plain `address` text is still accepted."""
+    values = {"name": body.name, "kind": body.kind, "website_url": body.website_url}
+    if body.address_given():
+        values |= branch_address_columns(context.session, body.model_dump(exclude_unset=True))
+    else:
+        values["address"] = body.address
+    columns = ", ".join(values)
+    placeholders = ", ".join(f":{key}" for key in values)
+    return context.session.execute(
+        text(
+            f"INSERT INTO app.locations (tenant_id, {columns}) "
+            f"VALUES (:tenant_id, {placeholders}) RETURNING id"
+        ),
+        {**values, "tenant_id": context.tenant_id},
+    ).scalar_one()
 
 
 def _new_branch_preview(session: Session) -> NewBranchPreview:
@@ -310,6 +349,8 @@ def add_branch(body: BranchSetup, context: SettingsDep) -> Location:
     have accepted it; nothing is billed here (the extra-branch module follows the branches)."""
     session = context.session
     ensure_branch_kind(session, body.kind)
+    if not (body.city_code and (body.street_code or body.street_unlisted) and body.house_number):
+        raise HTTPException(status_code=422, detail="address_incomplete")  # a branch needs one
     if _new_branch_preview(session).chargeable and not body.accept_extra_charge:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="charge_not_accepted")
     if (
@@ -330,19 +371,7 @@ def add_branch(body: BranchSetup, context: SettingsDep) -> Location:
     ).scalar_one()
     if known != len(staff):
         raise HTTPException(status_code=422, detail="unknown_member")
-    location_id = session.execute(
-        text("""
-            INSERT INTO app.locations (tenant_id, name, address, kind, website_url)
-            VALUES (:tenant_id, :name, :address, :kind, :website_url) RETURNING id
-        """),
-        {
-            "tenant_id": context.tenant_id,
-            "name": body.name,
-            "address": body.address,
-            "kind": body.kind,
-            "website_url": body.website_url,
-        },
-    ).scalar_one()
+    location_id = _insert_location(context, body)
     if body.copy_hours_from is not None:
         session.execute(
             text("""
@@ -379,6 +408,27 @@ def update_location(location_id: UUID, body: LocationUpdate, context: WriteDep) 
         if not (key in {"name", "active"} and value is None)
     }
     ensure_branch_kind(context.session, changes.get("kind"))
+    if body.address_given() or "latitude" in changes:
+        current = (
+            context.session.execute(
+                text("""
+                    SELECT address, city_code, street_code, house_number, address_details,
+                           street_unlisted
+                    FROM app.locations WHERE id = :id
+                """),
+                {"id": location_id},
+            )
+            .mappings()
+            .first()
+        )
+        if current is None:
+            raise not_found()
+        if body.address_given():
+            changes |= branch_address_columns(context.session, changes, dict(current))
+        else:  # only the pin moved
+            changes |= {"geocoded_at": None}
+    elif "address" in changes:  # plain text replaces a structured address and its point
+        changes |= {**CLEARED, "address": changes["address"]}
     if changes.get("active") is False:
         # A business always keeps at least one active branch.
         others = context.session.execute(
@@ -389,7 +439,7 @@ def update_location(location_id: UUID, body: LocationUpdate, context: WriteDep) 
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="last_branch")
     if "primary_color" in changes and Permission.BUSINESS_SETTINGS not in context.permissions:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
-    assignments = set_clause(changes, LocationUpdate.model_fields)
+    assignments = set_clause(changes, {*LocationUpdate.model_fields, "geocoded_at"})
     updated = context.session.execute(
         text(f"UPDATE app.locations SET {assignments} WHERE id = :id RETURNING id"),
         {**changes, "id": location_id},

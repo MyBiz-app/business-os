@@ -31,5 +31,7 @@ export async function issueDocument(_state: IssueState, formData: FormData): Pro
     return { error: "generic" };
   }
   revalidatePath("/invoices");
+  // In a window over the list the form closes itself, shows the confirmation and opens the document.
+  if (formData.get("_modal")) return { saved: true, next: `/invoices/${id}` };
   redirect(`/invoices/${id}`);
 }

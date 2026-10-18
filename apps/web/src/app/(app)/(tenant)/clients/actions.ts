@@ -48,6 +48,16 @@ export async function createClient(
     return toState(error);
   }
   revalidatePath("/clients");
+  // In a window over the list the form closes itself and shows the confirmation.
+  if (formData.get("_modal")) return { saved: true };
+  redirect(`/clients/${id}`);
+}
+
+/** "Add me": the signed-in team member becomes a client of this business, then opens the card. */
+export async function addMeAsClient(): Promise<void> {
+  const { api, scope } = await getTenant();
+  const id = unwrap(await api.POST("/clients/me", { params: scope })).id;
+  revalidatePath("/clients");
   redirect(`/clients/${id}`);
 }
 

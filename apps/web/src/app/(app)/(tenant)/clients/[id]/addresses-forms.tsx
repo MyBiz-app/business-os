@@ -4,6 +4,7 @@ import type { components } from "@business-os/api-client";
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
+import { AddressPicker } from "@/components/address-picker";
 import { Field } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -23,8 +24,19 @@ export function AddressForm({ clientId, address }: { clientId: string; address?:
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t("street")} name="street" required maxLength={200} dir="auto" autoComplete="street-address" defaultValue={address?.street ?? ""} />
-        <Field label={t("city")} name="city" required maxLength={80} dir="auto" autoComplete="address-level2" defaultValue={address?.city ?? ""} />
+        <div className="sm:col-span-2">
+          <AddressPicker
+            required={!address || address.city_code != null}
+            defaults={{ ...address, city_name: address?.city_code ? address.city : null }}
+            legacyText={address ? `${address.street}, ${address.city}` : null}
+          />
+        </div>
+        {address && address.city_code == null && (
+          <>
+            <input type="hidden" name="street" value={address.street} />
+            <input type="hidden" name="city" value={address.city} />
+          </>
+        )}
         <Field label={t("details")} name="details" maxLength={200} dir="auto" defaultValue={address?.details ?? ""} />
         <Field label={t("label")} hint={t("labelHint")} name="label" maxLength={40} dir="auto" defaultValue={address?.label ?? ""} />
         <div className="sm:col-span-2">

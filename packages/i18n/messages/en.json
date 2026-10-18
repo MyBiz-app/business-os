@@ -455,6 +455,7 @@
     "business": "Business",
     "openDetails": "Open the details",
     "kpis": "Key numbers",
+    "withoutStaff": "Without team members",
     "period": "Period",
     "lastDays": "Last {count} days",
     "vsPrevious": "vs. the previous period",
@@ -541,7 +542,10 @@
     "migration": "Move to MyBiz",
     "invoices": "Invoices",
     "sidebarLight": "Use a light sidebar",
-    "sidebarDark": "Use a dark sidebar"
+    "sidebarDark": "Use a dark sidebar",
+    "quotesEvents": "Quotes and events",
+    "catalog": "Catalog",
+    "website": "My website"
   },
   "terms": {
     "fitness": {
@@ -809,6 +813,14 @@
     },
     "absentFilter": "Last visit",
     "absentAny": "Any time",
+    "staffFilter": "Team members",
+    "staffAny": "Everyone",
+    "staffOptions": {
+      "only": "Team members only",
+      "exclude": "Without team members"
+    },
+    "staffBadge": "Team",
+    "addMe": "Add me",
     "absentDays": "Not in {days} days",
     "homeBranch": "Home branch",
     "allBranches": "All branches",
@@ -891,7 +903,8 @@
     "loading": "Loading…",
     "chooseFile": "Choose a file",
     "noFile": "No file chosen",
-    "edit": "Edit"
+    "edit": "Edit",
+    "close": "Close"
   },
   "services": {
     "title": "Services",
@@ -926,6 +939,29 @@
     "stats": {
       "sessions": "{count, plural, =0 {No sessions in 30 days} one {One session in 30 days} other {# sessions in 30 days}}",
       "occupancy": "{value} full"
+    },
+    "created": "Service created."
+  },
+  "address": {
+    "city": "City",
+    "cityPlaceholder": "Start typing a city",
+    "street": "Street",
+    "streetPlaceholder": "Start typing a street",
+    "streetNeedsCity": "Choose a city first",
+    "houseNumber": "House number",
+    "details": "Apartment, floor, entrance",
+    "optional": "optional",
+    "unlisted": "My street is not on the list",
+    "unlistedStreet": "Street name",
+    "unlistedNote": "The street will be flagged for review and added to the list.",
+    "current": "Saved address: {address}. Choosing from the list replaces it.",
+    "backToList": "Choose from the list",
+    "noResults": "No results",
+    "chooseCity": "Choose a city from the list",
+    "chooseStreet": "Choose a street from the list",
+    "reminder": {
+      "text": "Complete your home address: city, street and house number.",
+      "action": "Fill in the address"
     }
   },
   "locations": {
@@ -1724,7 +1760,8 @@
     "stats": {
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
       "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
-    }
+    },
+    "created": "Plan created."
   },
   "metrics": {
     "revenue": "Revenue",
@@ -1776,6 +1813,8 @@
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
+      "ai_user_limit_reached": "You've reached your personal AI limit for this month.",
+      "ai_daily_pace_reached": "You've used your share of the AI for today. It opens again tomorrow.",
       "ai_rate_limited": "You're sending questions too fast. Wait a minute and try again.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
@@ -1788,7 +1827,61 @@
     "firstRun": "First run: {when}",
     "upTo": "Up to {credits} credits per run, read-only; anything it proposes waits for your approval."
   },
+  "tour": {
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip the guide",
+    "done": "Done",
+    "progress": "Step {current} of {total}"
+  },
   "aiTeam": {
+    "tour": {
+      "help": "Guide",
+      "team": {
+        "title": "Meet your team",
+        "body": "Every agent has a job of its own. The chief knows who to send you to, so you can always start with it."
+      },
+      "talk": {
+        "title": "How to talk to them",
+        "body": "Click an agent on the map to open a chat. On every other screen a round button sits in the corner: click it to talk to the agent that fits the screen, or press and hold to see the whole team. Ask in plain words, for example \"Who didn't show up this week?\".",
+        "appBody": "In the app, open the AI team from the menu and tap an agent to talk. Ask in plain words, for example \"Who didn't show up this week?\"."
+      },
+      "approvals": {
+        "title": "What they do alone, and what waits for you",
+        "body": "Reading, searching and summing up they do on their own. Anything sensitive, like messaging your clients or changing something in the system, waits for your approval on a card, and the system checks it again before it happens. Try it on this example:"
+      },
+      "usage": {
+        "title": "How much AI was used",
+        "body": "Every chat uses credits from your monthly plan. The bar above the map shows how much of what is included has been used so far."
+      },
+      "hire": {
+        "title": "Hire an agent of your own",
+        "body": "Use \"Hire an agent\" to set up a new one: a name, a job, a way of speaking, the branches it knows and who may use it.",
+        "bodyMember": "Owners and managers can hire an agent of their own: a name, a job, a way of speaking, the branches it knows and who may use it."
+      },
+      "spots": {
+        "map": {
+          "title": "The map",
+          "body": "Click an agent to talk to it. On a wide screen you can also switch to a list."
+        },
+        "toolbar": {
+          "title": "The toolbar",
+          "body": "Switch between the map and the list here. Whoever may edit the team also changes its structure from here."
+        },
+        "meter": {
+          "title": "The usage meter",
+          "body": "This is how many of this month's credits have been used."
+        }
+      },
+      "simulation": {
+        "label": "Example chat, nothing is sent",
+        "question": "Who didn't show up this week?",
+        "answer": "{name}: three clients booked and didn't come this week: Dana Cohen, Yossi Levi and Michal Barak. Want me to send them a reminder with a link to book a new class?",
+        "card": "Send a reminder to 3 clients",
+        "confirmed": "In this example nothing was sent. In a real chat the message goes out only after you confirm.",
+        "rejected": "In this example nothing was sent. In a real chat the request would simply be dropped."
+      }
+    },
     "title": "AI team",
     "subtitle": "Your agents, each with a job. Pick one to talk, or ask the chief and it will point you to the right one.",
     "mapLabel": "The AI team",
@@ -1799,7 +1892,34 @@
       "map": "Map",
       "list": "List"
     },
-    "usage": "{used} of {included} AI credits used this month",
+    "meter": {
+      "business": "{percent}% of this month's AI used",
+      "person": "{percent}% of your daily AI allowance used",
+      "reach": "At this pace the month's AI runs out on {date}",
+      "left": "About {count, plural, one {# question} other {# questions}} left this month",
+      "leftToday": "About {count, plural, one {# question} other {# questions}} left for you today",
+      "noPace": "No daily limit for you",
+      "paceMark": "Where an even pace would be today",
+      "openWindow": "Open the AI usage window",
+      "windowTitle": "AI usage",
+      "windowSubtitle": "{used} of {included} credits used this month",
+      "byDay": "Credits per day",
+      "byPerson": "By person",
+      "byAgent": "By agent",
+      "byKind": "Questions and tasks",
+      "kind": {
+        "asked": "Questions people asked",
+        "scheduled": "Tasks that ran by themselves"
+      },
+      "none": "Nothing used yet this month.",
+      "unknownPerson": "Someone who left or is unknown",
+      "aiUsers": "{count} of {allowed} people have access to the AI team",
+      "alertWarn": "The month's AI is almost used up. You can turn on pay-as-you-go or move to AI Pro.",
+      "alertOver": "The month's AI is used up. New questions wait until next month unless you turn on pay-as-you-go or move to AI Pro.",
+      "enablePayg": "Turn on pay-as-you-go",
+      "upgrade": "Upgrade to AI Pro",
+      "limitPerson": "Limit a person"
+    },
     "state": {
       "active": "Available",
       "locked": "Locked: not in your plan",
@@ -1967,7 +2087,8 @@
         "agent_unavailable": "The agent is not available",
         "business_closed": "The business is closed",
         "generic": "Something went wrong",
-        "ai_user_limit_reached": "The AI limit set for this person was reached"
+        "ai_user_limit_reached": "The AI limit set for this person was reached",
+        "ai_daily_pace_reached": "The person reached their daily AI pace"
       },
       "credits": "{credits} credits",
       "frequency": {
@@ -2223,6 +2344,8 @@
     }
   },
   "aiBubble": {
+    "levelWarn": "The month's AI is almost used up",
+    "levelOver": "The month's AI is used up",
     "open": "Ask {name} or the AI team",
     "close": "Close the chat",
     "openFull": "Open in the full team",
@@ -2349,7 +2472,8 @@
       "ai": "AI",
       "health": "System health",
       "incidents": "Incident banners",
-      "growth": "Growth"
+      "growth": "Growth",
+      "websiteOrders": "Website orders"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -2893,6 +3017,29 @@
       "save": "Save",
       "saved": "Saved",
       "invalid": "Check the numbers: suspension must come after read-only."
+    },
+    "websites": {
+      "title": "Website orders",
+      "hint": "Landing page orders by stage, from the brief to live. Every order has a ready-made prompt for Claude Code.",
+      "empty": "There are no website orders yet.",
+      "changesAsked": "Changes asked",
+      "prompt": "Claude Code prompt and files",
+      "copy": "Copy the prompt",
+      "copied": "Copied",
+      "files": "Download the files (ZIP)",
+      "stage": "Stage",
+      "siteUrl": "Site address",
+      "message": "Message to the customer",
+      "notes": "Internal notes",
+      "save": "Save",
+      "writing": "The business is still writing the brief.",
+      "stages": {
+        "briefing": "Brief in progress",
+        "received": "Received",
+        "building": "Building",
+        "review": "With the customer for approval",
+        "live": "Live"
+      }
     }
   },
   "permissions": {
@@ -4915,7 +5062,14 @@
       "invalid": "Some details aren't valid.",
       "code_taken": "That code already exists.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "new": "New discount code",
+    "removed": "The code was deleted.",
+    "deleteConfirm": "Delete the code {code}?",
+    "usesLabel": "Uses",
+    "givenLabel": "Discount given",
+    "statusLabel": "Status",
+    "activeNow": "Working"
   },
   "start": {
     "meta": {
@@ -5726,6 +5880,11 @@
       "allBranches": "All branches",
       "rosterEmails": "Email me about my shifts",
       "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
+      "signUpClientTitle": "Join as a client too",
+      "signUpClientHint": "Get your own client card in this business, so you can book and pay like any client. You switch between the two areas below.",
+      "signUpClientButton": "Sign me up as a client",
+      "signUpClientDone": "Done. Switch to the client area below.",
+      "signUpClientError": "Could not sign you up. Try again.",
       "colors": "My colors",
       "colorsHint": "Pick your brand color. It colors your clients' app, your web app and this app.",
       "colorHex": "Color code (#rrggbb)",
@@ -6733,7 +6892,7 @@
       "inactive": "Not in use",
       "retire": "Stop using",
       "restore": "Use again",
-      "required": "Enter the street and the city.",
+      "required": "Choose the city and street from the list and enter the house number.",
       "saveFailed": "Couldn't save. Try again."
     },
     "myDay": "My jobs",
@@ -6891,7 +7050,41 @@
       "draft": "Drafts",
       "sent": "Waiting for an answer",
       "accepted": "Accepted",
-      "declined": "Declined or expired"
+      "declined": "Declined or expired",
+      "closeRate": "Close rate",
+      "closeRateHint": "{won} of {decided} decided"
+    },
+    "titleEvents": "Quotes and events",
+    "subtitleEvents": "Send a quote, the client accepts it with one tap and pays the deposit. Accepted quotes with a date become events.",
+    "views": {
+      "label": "View",
+      "quotes": "Quotes",
+      "events": "Events"
+    },
+    "eventsMonth": "Events in {month}",
+    "monthPrev": "Previous month",
+    "monthNext": "Next month",
+    "calendar": {
+      "closed": "Closed",
+      "more": "+{count} more",
+      "empty": "No events this month."
+    },
+    "empty": {
+      "title": "Your first quote in three steps",
+      "step1": "Create a quote",
+      "step1Body": "Pick a client, list what is included and the price.",
+      "step2": "Send it by link",
+      "step2Body": "The client opens a private page, no sign-in needed.",
+      "step3": "They accept and pay the deposit",
+      "step3Body": "You see the answer here and the event lands in the calendar.",
+      "first": "Create the first quote",
+      "example": "Try with an example"
+    },
+    "example": {
+      "title": "Example: full-day service",
+      "line1": "Full-day service",
+      "line2": "Travel and set-up",
+      "notes": "This is an example: change the items, prices and terms before you send it."
     }
   },
   "bills": {
@@ -7752,7 +7945,8 @@
       "employees": "Employees",
       "business_docs": "Business documents",
       "imports": "Imports",
-      "general": "General"
+      "general": "General",
+      "website": "Website"
     },
     "count": "{count, plural, =0 {No files} one {# file} other {# files}}",
     "sealed": "Sealed",
@@ -8211,6 +8405,7 @@
       "ai_not_configured": "The AI is not available right now.",
       "ai_limit_reached": "The monthly AI allowance is used up. You can still map the columns by hand.",
       "ai_user_limit_reached": "Your personal AI limit for this month is used up.",
+      "ai_daily_pace_reached": "You used your share of the AI for today. Map the rest by hand or try tomorrow.",
       "ai_busy": "The AI is busy. Try again in a moment.",
       "ai_unavailable": "The AI could not be reached. Try again later.",
       "ai_map_limit": "You used the AI mapping many times in this move. Map the rest by hand.",
@@ -8707,10 +8902,27 @@
     "noClasses": "Nothing to teach in the next {days} days.",
     "openPayRun": "Open the pay run",
     "aiTitle": "AI team",
-    "aiAllowed": "Can use the AI team",
-    "aiNotAllowed": "No access to the AI team",
-    "aiUsedThisMonth": "credits this month (the whole business: {used} of {included})",
-    "aiHint": "Access follows the role. Change it under Permissions.",
+    "aiNotAllowed": "The AI settings could not be loaded.",
+    "aiHint": "Without a personal switch, access follows the role. The owner is not limited.",
+    "ai": {
+      "usedMonth": "Credits this month",
+      "usedToday": "Credits today (pace: {limit})",
+      "access": "Can use the AI team",
+      "accessHint": "{count} of {allowed} people have access under the plan. An extra AI user costs a little more each month.",
+      "monthly": "Personal monthly limit (credits)",
+      "monthlyPlaceholder": "As the business",
+      "daily": "Daily pace (% of the month's AI, usually {default})",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "owner": "The owner always has access to the AI team and no daily pace.",
+      "errors": {
+        "ai_users_full": "The plan's AI users are all taken. Add an extra AI user first.",
+        "owner_always_has_ai": "The owner always has access.",
+        "invalid": "Check the numbers and try again.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
     "openAi": "Open the AI team",
     "permissionsTitle": "Role and permissions",
     "roleIs": "Role: {role}",
@@ -8722,6 +8934,317 @@
       "documents": "Documents",
       "ai": "AI",
       "permissions": "Permissions"
+    }
+  },
+  "catalog": {
+    "title": "Catalog",
+    "subtitle": "What you sell: services, memberships and punch cards, and discount codes.",
+    "tabs": {
+      "label": "Catalog sections",
+      "services": "Services",
+      "plans": "Memberships and punch cards",
+      "codes": "Discount codes"
+    },
+    "add": {
+      "services": "Add service",
+      "plans": "Add plan",
+      "codes": "Add code"
+    },
+    "tiles": {
+      "label": "Catalog numbers",
+      "services": {
+        "all": "All services",
+        "active": "Open for booking",
+        "paused": "Hidden"
+      },
+      "plans": {
+        "all": "All plans",
+        "active": "On sale",
+        "paused": "Not on sale"
+      },
+      "codes": {
+        "all": "All codes",
+        "active": "Working now",
+        "paused": "Paused"
+      }
+    },
+    "soldLast30": "{count, plural, =0 {None sold in 30 days} one {One sold in 30 days} other {# sold in 30 days}}",
+    "servicesEmpty": {
+      "title": "No services yet",
+      "body": "A service is what clients book: a class, a personal appointment or a court by the hour. Add your first one and it shows on the schedule and in the client app.",
+      "cta": "Create your first service"
+    },
+    "plansEmpty": {
+      "title": "Nothing here yet",
+      "body": "Memberships and punch cards let clients pay once and come again and again. They are optional: businesses that charge per visit can skip them.",
+      "cta": "Create your first plan"
+    },
+    "codesEmpty": {
+      "title": "No discount codes yet",
+      "body": "A code gives a percent or a fixed amount off a plan. Share it in a message or a post and clients enter it when they buy.",
+      "cta": "Create your first code"
+    }
+  },
+  "mcpConnect": {
+    "title": "Connect an AI app",
+    "body": "{app} asks to read the data of the business you choose, as you and with your permissions.",
+    "reads": [
+      "Clients and their profiles",
+      "The schedule and bookings",
+      "Plans, punch cards and open balances",
+      "Metrics and reports"
+    ],
+    "returns": "The app can only read; it cannot change anything. You can disconnect it at any time. After you approve you return to {host}.",
+    "business": "Business",
+    "approve": "Approve the connection",
+    "deny": "Cancel",
+    "invalid": "This connection link is not valid. Start again from the app.",
+    "noBusiness": "You have no business in MyBiz yet. Create one and try again."
+  },
+  "website": {
+    "title": "My website",
+    "subtitle": "A branded landing page for your business, built by the MyBiz team and connected to your system.",
+    "wizardTitle": "Tell us about your website",
+    "wizardHint": "Eight short steps. Every step is saved, so you can leave and come back any time.",
+    "stepOf": "Step {current} of {total}",
+    "summaryStep": "Summary and send",
+    "back": "Back",
+    "next": "Next",
+    "toSummary": "To the summary",
+    "send": "Send to MyBiz",
+    "autosave": "Saved automatically",
+    "sent": "Your brief was sent. We will start building your website.",
+    "errors": {
+      "locked": "Building has started, so the brief can no longer change. Tell us what to change.",
+      "invalid": "One of the answers is not valid. Check it and try again.",
+      "generic": "Something went wrong. Try again in a moment.",
+      "storage_full": "There is not enough file space in the business."
+    },
+    "steps": {
+      "goal": {
+        "title": "What is the website for?",
+        "hint": "Pick everything that applies, then the single most important action.",
+        "goals": "The website is meant to",
+        "mainAction": "The most important action on the page",
+        "mainActionHint": "For example: book a free trial class"
+      },
+      "business": {
+        "title": "About the business",
+        "hint": "In your own words. A few short sentences are enough.",
+        "unique": "What makes you special? (three sentences)",
+        "audience": "Who is your audience?",
+        "area": "Which area do you serve?"
+      },
+      "sections": {
+        "title": "What goes on the page?",
+        "hint": "Pick the sections. We will arrange them well.",
+        "legend": "Sections"
+      },
+      "branding": {
+        "title": "Branding",
+        "hint": "Logo, colors and style. What is already set in the system is taken from there.",
+        "logo": "Logo",
+        "uploadLogo": "Upload a logo",
+        "replaceLogo": "Replace the logo",
+        "noLogo": "I do not have a logo",
+        "fromBrand": "Use the business color from the system",
+        "color": "Color {number}",
+        "addColor": "Add a color",
+        "style": "Style",
+        "font": "Font (optional)",
+        "fontHint": "If you have none, we pick one that fits the style"
+      },
+      "motion": {
+        "title": "Motion",
+        "hint": "How much life the page should have.",
+        "legend": "Level of motion"
+      },
+      "images": {
+        "title": "Images",
+        "hint": "Your own photos are the best thing for a website. They are kept in the \"Website\" folder of your files.",
+        "upload": "Upload images",
+        "uploading": "Uploading...",
+        "note": "Note for the image (optional)",
+        "remove": "Remove the image",
+        "noGood": "I do not have good photos",
+        "noGoodHint": "We will add fitting stock photos"
+      },
+      "inspiration": {
+        "title": "Inspiration and texts",
+        "hint": "Sites you like, and who writes the texts.",
+        "sites": "Up to three sites you like",
+        "url": "Site address {number}",
+        "likes": "What do you like about it?",
+        "copy": "The texts"
+      },
+      "domain": {
+        "title": "Domain and languages",
+        "hint": "Where the site lives, in which languages, and when it should be ready.",
+        "legend": "Domain",
+        "name": "Your domain name",
+        "languages": "Website languages",
+        "dueDate": "Target date (optional)"
+      }
+    },
+    "goals": {
+      "leads": "Bring in inquiries",
+      "bookings": "Bring in bookings",
+      "showcase": "Present the business",
+      "sell": "Sell"
+    },
+    "sections": {
+      "hero": {
+        "title": "Hero",
+        "hint": "The main line and the main button"
+      },
+      "services": {
+        "title": "Services and prices",
+        "hint": "Pulled from your catalog"
+      },
+      "gallery": {
+        "title": "Gallery",
+        "hint": "Photos of the business"
+      },
+      "team": {
+        "title": "Team",
+        "hint": "Who we are"
+      },
+      "testimonials": {
+        "title": "Testimonials",
+        "hint": "Pulled from your reviews"
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "hint": "Answers to the questions that come back"
+      },
+      "location": {
+        "title": "Location and hours",
+        "hint": "Address, map and opening hours"
+      },
+      "contact": {
+        "title": "Contact",
+        "hint": "An inquiry form that lands in the system"
+      },
+      "booking": {
+        "title": "Book an appointment or class",
+        "hint": "Directly through MyBiz",
+        "needsSystem": "Only for a business that uses the system"
+      },
+      "whatsapp": {
+        "title": "WhatsApp button",
+        "hint": "A chat in one tap"
+      }
+    },
+    "styles": {
+      "clean": {
+        "title": "Modern and clean",
+        "hint": "Lots of air, sharp lines"
+      },
+      "luxury": {
+        "title": "Luxurious",
+        "hint": "Restrained, elegant, careful"
+      },
+      "warm": {
+        "title": "Warm and family-friendly",
+        "hint": "Soft colors and rounded corners"
+      },
+      "vibrant": {
+        "title": "Young and vibrant",
+        "hint": "Strong colors and energy"
+      }
+    },
+    "motions": {
+      "none": {
+        "title": "No motion",
+        "hint": "A quiet, fast page"
+      },
+      "subtle": {
+        "title": "Subtle",
+        "hint": "Soft fades and hover accents"
+      },
+      "rich": {
+        "title": "Rich",
+        "hint": "Scroll animations and transitions between sections"
+      }
+    },
+    "domains": {
+      "have": {
+        "title": "I have a domain",
+        "hint": "We will connect it to the site"
+      },
+      "buy": {
+        "title": "I want to buy one",
+        "hint": "We buy it for you at cost plus 20 shekels a year"
+      },
+      "temporary": {
+        "title": "A temporary address",
+        "hint": "A subdomain until you decide"
+      }
+    },
+    "languages": {
+      "he": "Hebrew",
+      "en": "English"
+    },
+    "copyBy": {
+      "me": "I write them",
+      "you": "Write them for me"
+    },
+    "summary": {
+      "title": "All set?",
+      "hint": "Check your answers and send. You can change them until we start building.",
+      "missing": "To send, you still need:"
+    },
+    "missing": {
+      "goals": "The website's goal",
+      "sections": "Sections on the page",
+      "booking_needs_system": "Booking is only available with the system",
+      "style": "Style",
+      "motion": "Level of motion",
+      "copy_by": "Who writes the texts",
+      "domain": "Domain",
+      "domain_name": "The domain name",
+      "languages": "Languages"
+    },
+    "offer": {
+      "title": "A website for your business, without the headache",
+      "body": "You answer a few questions and we build a designed, branded landing page, with an inquiry form that lands in your system and a visit counter. You approve the site before it goes live.",
+      "price": "One-time setup {setup} and {monthly} a month (hosting, security, upkeep and one small change a month).",
+      "nothingCharged": "Nothing is charged until payments are switched on in the system.",
+      "start": "Start the brief"
+    },
+    "status": {
+      "title": "Order status",
+      "submitted": "Sent on {date}",
+      "prices": "Price offered: setup {setup} and {monthly} a month",
+      "message": "A message from the MyBiz team",
+      "yourRequest": "What you asked to change",
+      "open": "Open the website",
+      "continue": "Continue the brief",
+      "edit": "Edit the brief"
+    },
+    "stages": {
+      "briefing": "Brief",
+      "received": "Received",
+      "building": "Building",
+      "review": "Your approval",
+      "live": "Live"
+    },
+    "stageHint": {
+      "briefing": "The brief was not sent yet. Continue where you stopped.",
+      "received": "We received your brief. You can edit it until we start building.",
+      "building": "The website is being built. We will update you here when it is ready to view.",
+      "review": "The website is ready to view. Approve it or ask for changes.",
+      "live": "The website is live."
+    },
+    "review": {
+      "title": "The website is ready to view",
+      "body": "Open the link in the message, then approve or ask for changes.",
+      "approve": "Approve the website",
+      "askChanges": "Ask for changes",
+      "changesLabel": "What should change?",
+      "sendChanges": "Send the request",
+      "cancel": "Cancel",
+      "approved": "You approved the website. We are putting it live."
     }
   }
 }

@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import { Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
+import { ModalMarker } from "@/components/ui/route-modal";
 import type { FormState } from "@/lib/form-state";
 
 type Line = { key: number; description: string; quantity: string; price: string };
@@ -48,6 +49,7 @@ export function QuoteForm({ action, defaults, currency, clients, clientId, submi
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <FormFeedback state={state} />
+      <ModalMarker saved={state.saved} next={state.next} />
       {clients && (
         <SelectField
           label={t("client")}
@@ -131,7 +133,7 @@ export function QuoteForm({ action, defaults, currency, clients, clientId, submi
           <TextAreaField label={t("notes")} placeholder={t("notesHint")} name="notes" rows={4} maxLength={4000} defaultValue={defaults.notes} />
         </div>
       </div>
-      <div>
+      <div className="form-actions">
         <SubmitButton>{submitLabel}</SubmitButton>
       </div>
     </form>

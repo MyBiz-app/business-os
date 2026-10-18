@@ -125,7 +125,25 @@ AI_CREDITS_INCLUDED: dict[str, int] = {"ai_basic": 400, "ai_pro": 1200}
 # and the extra use is billed at the end of the month at this price per 100 credits (minor units;
 # our cost is about $1 per 100). Off by default; while payments (#46) are disabled it is only a
 # line on the account.
-AI_EXTRA_PRICE_PER_100: dict[str, int] = {"ILS": 600, "USD": 170, "EUR": 160}
+AI_EXTRA_PRICE_PER_100: dict[str, int] = {"ILS": 800, "USD": 230, "EUR": 210}
+
+
+# People with access to the AI team: what each AI module includes. More people can join as "extra
+# AI users": each costs this per month (minor units) and adds credits to the business's pool.
+AI_USERS_INCLUDED: dict[str, int] = {"ai_basic": 3, "ai_pro": 10}
+AI_EXTRA_USER_PRICE: dict[str, int] = {"ILS": 1900, "USD": 500, "EUR": 470}
+AI_EXTRA_USER_CREDITS = 150
+
+# One person's most for a day, in percent of the business's monthly credits (the owner is exempt).
+AI_DAILY_PACE_PERCENT = 15
+
+
+def ai_users_included(modules: "dict[str, int] | list[str]") -> int:
+    return max((AI_USERS_INCLUDED[key] for key in AI_USERS_INCLUDED if key in modules), default=0)
+
+
+def ai_extra_user_price(currency: str) -> int:
+    return AI_EXTRA_USER_PRICE.get(currency, AI_EXTRA_USER_PRICE["USD"])
 
 
 def ai_extra_price(currency: str) -> int:

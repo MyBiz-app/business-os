@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { apiUpload, unwrap } from "@/lib/api";
+import { addressFromForm } from "@/lib/address";
 import { errorState, type FormState } from "@/lib/form-state";
 import type { Block, HoursState } from "@/lib/hours";
 import { getTenant, getTenantFor } from "@/lib/tenant";
@@ -23,7 +24,7 @@ export async function createLocation(_state: FormState, formData: FormData): Pro
         params: scope,
         body: {
           name: value(formData, "name"),
-          address: value(formData, "address"),
+          ...addressFromForm(formData),
           website_url: value(formData, "website_url").trim() || null,
         },
       }),
@@ -47,7 +48,7 @@ export async function updateLocation(
         params: { ...scope, path: { location_id: locationId } },
         body: {
           name: value(formData, "name"),
-          address: value(formData, "address"),
+          ...addressFromForm(formData),
           website_url: value(formData, "website_url").trim() || null,
           active: formData.get("active") === "on",
           ...(formData.has("kind") ? { kind: value(formData, "kind") || null } : {}),
@@ -157,7 +158,7 @@ export async function addBranch(_state: FormState, formData: FormData): Promise<
         params: scope,
         body: {
           name: value(formData, "name"),
-          address: value(formData, "address"),
+          ...addressFromForm(formData),
           website_url: value(formData, "website_url").trim() || null,
           kind: value(formData, "kind") || null,
           copy_hours_from: copyFrom === "" ? null : copyFrom,
