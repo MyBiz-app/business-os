@@ -541,7 +541,8 @@
     "migration": "Move to MyBiz",
     "invoices": "Invoices",
     "sidebarLight": "Use a light sidebar",
-    "sidebarDark": "Use a dark sidebar"
+    "sidebarDark": "Use a dark sidebar",
+    "quotesEvents": "Quotes and events"
   },
   "terms": {
     "fitness": {
@@ -6739,7 +6740,41 @@
       "draft": "Drafts",
       "sent": "Waiting for an answer",
       "accepted": "Accepted",
-      "declined": "Declined or expired"
+      "declined": "Declined or expired",
+      "closeRate": "Close rate",
+      "closeRateHint": "{won} of {decided} decided"
+    },
+    "titleEvents": "Quotes and events",
+    "subtitleEvents": "Send a quote, the client accepts it with one tap and pays the deposit. Accepted quotes with a date become events.",
+    "views": {
+      "label": "View",
+      "quotes": "Quotes",
+      "events": "Events"
+    },
+    "eventsMonth": "Events in {month}",
+    "monthPrev": "Previous month",
+    "monthNext": "Next month",
+    "calendar": {
+      "closed": "Closed",
+      "more": "+{count} more",
+      "empty": "No events this month."
+    },
+    "empty": {
+      "title": "Your first quote in three steps",
+      "step1": "Create a quote",
+      "step1Body": "Pick a client, list what is included and the price.",
+      "step2": "Send it by link",
+      "step2Body": "The client opens a private page, no sign-in needed.",
+      "step3": "They accept and pay the deposit",
+      "step3Body": "You see the answer here and the event lands in the calendar.",
+      "first": "Create the first quote",
+      "example": "Try with an example"
+    },
+    "example": {
+      "title": "Example: full-day service",
+      "line1": "Full-day service",
+      "line2": "Travel and set-up",
+      "notes": "This is an example: change the items, prices and terms before you send it."
     }
   },
   "bills": {
