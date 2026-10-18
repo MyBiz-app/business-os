@@ -19,7 +19,7 @@ export default async function BookingSettingsPage() {
   const services = unwrap(await api.GET("/services", { params: { ...scope, query: { active: true } } }));
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("nav.items.bookings")} description={t("nav.hints.bookings")} />
       <CollapsibleSection title={t("waitlist.title")} description={t("waitlist.subtitle")} defaultOpen storageKey="settings-waitlist">
         <WaitlistForm tenant={tenant} />

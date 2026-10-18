@@ -11,7 +11,7 @@ from app.api.deps import SessionDep, UserDep
 router = APIRouter(prefix="/me/tours", tags=["account"])
 
 # The tours the product has. A new tour is added here together with its screens.
-TourKey = Literal["ai_team"]
+TourKey = Literal["ai_team", "website_offer"]
 
 
 class SeenTours(BaseModel):

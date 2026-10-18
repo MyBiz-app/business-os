@@ -41,3 +41,9 @@ test("the store texts exist and the data-safety answers cover the sensitive staf
     assert.ok(read(`../../../docs/store/${file}`).length > 200, file);
   }
 });
+
+test("the Expo web build stays out of search results", () => {
+  const vercel = JSON.parse(read("../vercel.json"));
+  const rule = vercel.headers.find((h) => h.source === "/(.*)");
+  assert.ok(rule.headers.some((h) => h.key === "X-Robots-Tag" && /noindex/.test(h.value)));
+});

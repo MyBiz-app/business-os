@@ -3063,6 +3063,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/website/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Insights
+         * @description Visits per day and source, and the enquiries that came through the contact form.
+         */
+        get: operations["get_insights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/website/embed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Embed
+         * @description What a business with its own website pastes into it: the contact form and a booking link.
+         */
+        get: operations["get_embed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/website/offer-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Offer Card
+         * @description The dashboard card "can your clients find you?": only for a business without a website
+         *     order, after its first 30 days, until the owner closes it for good.
+         */
+        get: operations["get_offer_card"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/website/order/submit": {
         parameters: {
             query?: never;
@@ -13103,6 +13164,22 @@ export interface components {
             /** Suspend After Days */
             suspend_after_days: number;
         };
+        /**
+         * Embed
+         * @description Copy and paste snippets for a business that already has a website of its own.
+         */
+        Embed: {
+            /** Inquiries Enabled */
+            inquiries_enabled: boolean;
+            /** Contact Form Url */
+            contact_form_url: string;
+            /** Contact Form Code */
+            contact_form_code: string;
+            /** Booking Url */
+            booking_url: string;
+            /** Booking Code */
+            booking_code: string;
+        };
         /** Employment */
         Employment: {
             /** Exists */
@@ -13189,6 +13266,21 @@ export interface components {
             employment_notice_date?: string | null;
             /** @description Replaces the stored account; leave out to keep it */
             bank?: components["schemas"]["BankAccount"] | null;
+        };
+        /** Enquiry */
+        Enquiry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** Entitlement */
         Entitlement: {
@@ -14282,6 +14374,36 @@ export interface components {
             interest?: string | null;
             /** Website */
             website?: string | null;
+        };
+        /**
+         * Insights
+         * @description The live site's numbers over the last 30 days (empty until the site counts visits).
+         */
+        Insights: {
+            /**
+             * Days
+             * @description One entry per day, oldest first, zeros included
+             */
+            days: components["schemas"]["VisitDay"][];
+            /** Visits Total */
+            visits_total: number;
+            /**
+             * Sources
+             * @description Visits by source: direct, search, social, other
+             */
+            sources: {
+                [key: string]: number;
+            };
+            /**
+             * Enquiries Total
+             * @description Leads from the contact form in the same period
+             */
+            enquiries_total: number;
+            /**
+             * Enquiries
+             * @description The latest few
+             */
+            enquiries: components["schemas"]["Enquiry"][];
         };
         /** Inspiration */
         Inspiration: {
@@ -16314,6 +16436,14 @@ export interface components {
             result: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** OfferCard */
+        OfferCard: {
+            /**
+             * Show
+             * @description Show the one-time dashboard card about the website service
+             */
+            show: boolean;
         };
         /**
          * OpeningHours
@@ -19045,7 +19175,7 @@ export interface components {
         /** SeenTours */
         SeenTours: {
             /** Seen */
-            seen: "ai_team"[];
+            seen: ("ai_team" | "website_offer")[];
         };
         /** SelectAccounts */
         SelectAccounts: {
@@ -21001,6 +21131,16 @@ export interface components {
              * @enum {string}
              */
             source: "direct" | "search" | "social" | "other";
+        };
+        /** VisitDay */
+        VisitDay: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Visits */
+            visits: number;
         };
         /** VoidInvoice */
         VoidInvoice: {
@@ -29233,6 +29373,105 @@ export interface operations {
             };
         };
     };
+    get_insights: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Insights"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_embed: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Embed"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_offer_card: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     submit_order: {
         parameters: {
             query?: never;
@@ -31279,7 +31518,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                key: "ai_team";
+                key: "ai_team" | "website_offer";
             };
             cookie?: never;
         };
@@ -31308,7 +31547,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                key: "ai_team";
+                key: "ai_team" | "website_offer";
             };
             cookie?: never;
         };

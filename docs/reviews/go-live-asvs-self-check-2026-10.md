@@ -45,7 +45,7 @@ sends `Cache-Control: no-store` unless a route sets its own.
 | 3.3 | Tokens are short lived and rotate on refresh | ✅ | One hour access token, rotating refresh token (Supabase settings) |
 | 3.4 | Session cookies are protected | ✅ | Set by the Supabase server client in `apps/web/src/lib/supabase/proxy.ts` (HttpOnly, Secure over HTTPS, SameSite) |
 | 3.5 | Tokens are not placed in URLs | ✅ | Bearer header only; signed file links carry a separate short lived signature (`app/core/signed_links.py`) |
-| 3.6 | A user can end every session | 🟡 | "Sign out everywhere" is not in the UI; available to the owner in the Supabase dashboard. Not required for level 1; listed as a later improvement |
+| 3.6 | A user can end every session | 🟡 | "Sign out of all devices" is on the web (Account, Account security, `scope: global`); the app has no button yet. Not required for level 1; listed as a later improvement |
 
 ## V4 Access control
 

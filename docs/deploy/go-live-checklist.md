@@ -122,7 +122,7 @@ Nothing was built for the stores, submitted or paid for. What waits for you, in 
 | 5 | Production values in EAS | Free | expo.dev → the project → Environment variables → environment **production**: `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` (the production ones, see [production.md](production.md) section 7) |
 | 6 | First Android build | Free tier, may queue | In `apps/client-app`: `npx eas-cli build --profile production --platform android`. Result: an `.aab` file. Install-test with the `preview` profile first |
 | 7 | First iOS build | Needs step 3 | `npx eas-cli build --profile production --platform ios`; EAS asks to create the signing certificates, answer yes |
-| 8 | Crash reports with readable stack traces | Free Sentry plan | With the Sentry account ([monitoring.md](../monitoring.md)): add `SENTRY_AUTH_TOKEN` as an EAS secret and the Sentry plugin to `app.json` (Claude does this when the account exists) |
+| 8 | Crash reports with readable stack traces | Free Sentry plan | With the Sentry account ([monitoring.md](../monitoring.md)): create an auth token and add `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` as EAS secrets (app) and as Vercel variables (website). The plugin is already wired and switches on by itself when the token exists |
 | 9 | Fill the store forms | Free | Paste from [listing.md](../store/listing.md); Play → Policy → Data safety and Apple → App Privacy from [data-safety.md](../store/data-safety.md); reviewer notes and test login from [review-notes.md](../store/review-notes.md); privacy URL = `<domain>/legal/privacy` |
 | 10 | Screenshots and Play feature graphic | Free | [screenshots.md](../store/screenshots.md) |
 | 11 | Submit to the internal track first | Free | Play → Testing → Internal testing → upload the `.aab`, add your email as a tester. iOS: `npx eas-cli submit --profile production --platform ios` then TestFlight. Only then production review |
@@ -176,6 +176,37 @@ The banner is built and free; the rest is decisions only you can make.
 4. **A backup on-call person** with two-step sign-in on Render, Vercel, Supabase and GitHub, who has read `on-call.md`. Fill the Contacts table.
 5. **Book a lawyer for one session** with `docs/legal/README.md` ("What the lawyer is asked to decide" lists the seven questions). Then replace every `{placeholder}` and the fictitious company details (`packages/i18n/brand.json`).
 6. **Diary dates:** quarterly restore drill and report, yearly procedure review, vendor review and team training (the tables at the end of the legal files are the log).
+
+## Firewall in front of the website and API (WAF)
+
+The API already limits requests per address and per business, but nothing filters traffic before it
+arrives. Pick one (both have a free level, check the current limits before choosing):
+
+1. **Vercel Firewall** (website only): Vercel project, Firewall tab, turn on the managed rules and
+   "Attack Challenge Mode" as the emergency switch. No DNS change.
+2. **Cloudflare in front of the domain** (website and API): add the domain to Cloudflare, move the
+   name servers, set the records to proxied, SSL mode "Full (strict)", turn on Bot Fight Mode and the
+   managed rules. Then add the Cloudflare address ranges to the trusted proxies and re-check
+   `API_TRUST_FORWARDED_FOR` so rate limits still see the visitor's real address (ask Claude).
+
+Check after: `curl -I https://<domain>` still returns the security headers, sign-in works, and a
+test from a second network is not blocked.
+
+## Company, bank account and insurance (A8)
+
+Needed before the first paying customer, not before staging:
+
+1. Register the business (or sole-trader file) and open a business bank account.
+2. Put the real company name, number and VAT number in `packages/i18n/brand.json` (`legal`) and tell
+   Claude, so invoices, the terms and the privacy policy stop using the fictitious ones.
+3. Buy cyber and professional liability insurance; keep the policy number with the legal files.
+
+## Professional penetration test (A12)
+
+Do it after about 20 to 50 businesses or when a large customer asks for it (cost: thousands up to
+tens of thousands of shekels). Give the tester a staging copy with demo data, the
+[ASVS self-check](../reviews/go-live-asvs-self-check-2026-10.md) and the scope (website, API,
+apps). Track every finding as a GitHub issue; fix the high ones before the next release.
 
 ## Still the owner's
 

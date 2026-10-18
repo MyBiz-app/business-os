@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin();
@@ -23,9 +24,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Everything except /embed/: those pages are made to be framed by other sites (the CSP
+        // frame-ancestors in src/proxy.ts decides, and X-Frame-Options would override it).
+        source: "/((?!embed/).*)",
+        headers: [{ key: "X-Frame-Options", value: "DENY" }],
+      },
+      {
         source: "/:path*",
         headers: [
-          { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
@@ -35,4 +41,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+const config = withNextIntl(nextConfig);
+
+// Source maps are uploaded to Sentry (readable stack traces) only in a build that has an auth
+// token; without SENTRY_AUTH_TOKEN the build is exactly as before.
+export default process.env.SENTRY_AUTH_TOKEN
+  ? // The organisation, project and token come from SENTRY_ORG, SENTRY_PROJECT and SENTRY_AUTH_TOKEN.
+    withSentryConfig(config, { sourcemaps: { deleteSourcemapsAfterUpload: true } })
+  : config;

@@ -269,6 +269,61 @@ def test_the_prompt_carries_the_owner_words_and_the_hooks() -> None:
     assert "Pilates: 60 ILS" in prompt and "Herzl 1" in prompt
 
 
+def test_my_site_shows_visits_enquiries_and_the_embed_codes(
+    client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders
+) -> None:
+    headers = studio["headers"]
+    staff = console(client, engine, auth)
+    empty = client.get("/website/insights", headers=headers).json()
+    assert len(empty["days"]) == 30 and empty["visits_total"] == 0 and empty["enquiries"] == []
+
+    embed = client.get("/website/embed", headers=headers).json()
+    code = embed["contact_form_code"]
+    assert embed["contact_form_url"].endswith(f"/embed/inquiry/{code}")
+    assert embed["booking_url"].endswith(f"/join/{code}")
+
+    client.put("/website/order", json={"brief": FULL}, headers=headers)
+    client.post("/website/order/submit", headers=headers)
+    with engine.begin() as connection:
+        key = connection.execute(text("SELECT tracking_key FROM app.website_orders")).scalar_one()
+    oid = client.get("/platform/website-orders", headers=staff).json()[0]["id"]
+    client.patch(
+        f"/platform/website-orders/{oid}",
+        json={"stage": "live", "site_url": "https://studio.example.com"},
+        headers=staff,
+    )
+    for source in ("search", "search", "social"):
+        client.post("/public/website-visits", json={"key": key, "source": source})
+    client.put("/tenants/current/modules", json={"modules": {"crm": 1}}, headers=headers)
+    sent = client.post(
+        f"/public/businesses/{code}/inquiries", json={"first_name": "Dana", "phone": "0501234567"}
+    )
+    assert sent.status_code == 202
+
+    seen = client.get("/website/insights", headers=headers).json()
+    assert seen["visits_total"] == 3 and seen["sources"]["search"] == 2
+    assert seen["days"][-1]["visits"] == 3
+    assert seen["enquiries_total"] == 1 and seen["enquiries"][0]["name"] == "Dana"
+
+
+def test_the_dashboard_card_waits_30_days_and_closes_for_good(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    headers = studio["headers"]
+    assert client.get("/website/offer-card", headers=headers).json() == {"show": False}
+    with engine.begin() as connection:
+        connection.execute(
+            text("UPDATE app.tenants SET created_at = now() - interval '31 days' WHERE id = :t"),
+            {"t": studio["tenant_id"]},
+        )
+    assert client.get("/website/offer-card", headers=headers).json() == {"show": True}
+    assert client.put("/me/tours/website_offer", headers=headers).status_code == 204
+    assert client.get("/website/offer-card", headers=headers).json() == {"show": False}
+    client.delete("/me/tours/website_offer", headers=headers)
+    client.put("/website/order", json={"brief": FULL}, headers=headers)
+    assert client.get("/website/offer-card", headers=headers).json() == {"show": False}
+
+
 def test_the_public_price_list_is_the_orders_price_list(client: TestClient) -> None:
     for currency in ("ILS", "USD", "EUR"):
         body = client.get("/public/website-prices", params={"currency": currency}).json()

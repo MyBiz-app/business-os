@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { Lock } from "lucide-react";
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
@@ -8,9 +9,13 @@ import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
+import { termsOf } from "@business-os/verticals";
 
 import { AddSystemForm } from "./add-system-form";
+import { EmbedPanel } from "./embed-panel";
+import { InsightsPanel } from "./insights-panel";
 import { RespondForm } from "./respond-form";
+import { SitePreview } from "./site-preview";
 
 const STAGES = ["briefing", "received", "building", "review", "live"] as const;
 
@@ -18,8 +23,12 @@ const STAGES = ["briefing", "received", "building", "review", "live"] as const;
 export default async function WebsitePage() {
   const t = await getTranslations("website");
   const locale = await getLocale();
-  const { api, scope } = await getTenantFor("business.settings");
-  const state = unwrap(await api.GET("/website/order", { params: scope }));
+  const { api, scope, tenant } = await getTenantFor("business.settings");
+  const [state, embed] = await Promise.all([
+    api.GET("/website/order", { params: scope }).then(unwrap),
+    api.GET("/website/embed", { params: scope }).then(unwrap),
+  ]);
+  const insights = state.order?.stage === "live" ? await api.GET("/website/insights", { params: scope }).then(unwrap) : undefined;
   const order = state.order;
   const stageIndex = order ? STAGES.indexOf(order.stage) : -1;
   const editable = order?.stage === "briefing" || order?.stage === "received";
@@ -38,14 +47,21 @@ export default async function WebsitePage() {
       )}
 
       {!order && (
-        <section className="card flex flex-col gap-4 p-6" aria-labelledby="site-offer">
-          <h2 id="site-offer" className="text-lg font-semibold">{t("offer.title")}</h2>
-          <p className="text-sm text-muted">{t("offer.body")}</p>
-          <p className="text-sm">
-            {t("offer.price", { setup: price(state.price.setup), monthly: price(state.price.monthly) })}
-          </p>
-          <p className="text-xs text-muted">{t("offer.nothingCharged")}</p>
-          <Link href="/website/brief" className="btn-plain btn-primary w-fit px-4 py-2.5">{t("offer.start")}</Link>
+        <section className="card grid gap-6 p-6 md:grid-cols-2" aria-labelledby="site-offer">
+          <div className="flex flex-col gap-4">
+            <p className="flex items-center gap-2 text-xs font-semibold text-primary-ink">
+              <Lock aria-hidden="true" className="size-4" />
+              {t("offer.locked")}
+            </p>
+            <h2 id="site-offer" className="text-lg font-semibold">{t("offer.title")}</h2>
+            <p className="text-sm text-muted">{t("offer.body")}</p>
+            <p className="text-sm">
+              {t("offer.price", { setup: price(state.price.setup), monthly: price(state.price.monthly) })}
+            </p>
+            <p className="text-xs text-muted">{t("offer.nothingCharged")}</p>
+            <Link href="/website/brief" className="btn-plain btn-primary w-fit px-4 py-2.5">{t("offer.start")}</Link>
+          </div>
+          <SitePreview name={tenant.name} color={tenant.primary_color ?? null} vertical={termsOf(tenant.vertical)} />
         </section>
       )}
 
@@ -101,6 +117,10 @@ export default async function WebsitePage() {
           )}
         </>
       )}
+
+      {insights && <InsightsPanel insights={insights} />}
+
+      <EmbedPanel contactUrl={embed.contact_form_url} bookingUrl={embed.booking_url} inquiriesEnabled={embed.inquiries_enabled} />
     </Container>
   );
 }
