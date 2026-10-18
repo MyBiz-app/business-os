@@ -80,7 +80,7 @@ def load_current_tenant(session: Session) -> Tenant:
                             ELSE '/tenants/current/cover?v='
                                  || extract(epoch FROM t.cover_updated_at)::bigint END AS cover_url,
                        t.legal_entity_type, t.business_number,
-                       t.address_line, t.address_city, t.employer_file_number,
+                       t.address_line, t.address_city, t.employer_file_number, t.website_url,
                        t.business_license_number, t.business_license_expires_on
                 FROM app.tenants t
                 LEFT JOIN app.tenant_members m

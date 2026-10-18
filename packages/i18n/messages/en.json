@@ -88,6 +88,8 @@
     "modulesHint": "Turn features on or off and see the monthly price.",
     "requireHealth": "Clients need a health declaration to book in the app",
     "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book.",
+    "website": "Business website",
+    "websiteHint": "Shown to clients in the app, on the join page, in emails and on invoices. Branches can have their own.",
     "onlineSales": "Clients can buy plans in the app",
     "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged.",
     "billingLink": "MyBiz billing",
@@ -540,6 +542,8 @@
     "invoices": "Invoices",
     "sidebarLight": "Use a light sidebar",
     "sidebarDark": "Use a dark sidebar",
+    "quotesEvents": "Quotes and events",
+    "catalog": "Catalog",
     "expand": "Open {name} menu",
     "collapse": "Close {name} menu",
     "sub": {
@@ -907,7 +911,8 @@
     "loading": "Loading…",
     "chooseFile": "Choose a file",
     "noFile": "No file chosen",
-    "edit": "Edit"
+    "edit": "Edit",
+    "close": "Close"
   },
   "services": {
     "title": "Services",
@@ -942,7 +947,8 @@
     "stats": {
       "sessions": "{count, plural, =0 {No sessions in 30 days} one {One session in 30 days} other {# sessions in 30 days}}",
       "occupancy": "{value} full"
-    }
+    },
+    "created": "Service created."
   },
   "locations": {
     "manager": {
@@ -960,6 +966,8 @@
     "empty": "No locations yet.",
     "name": "Name",
     "address": "Address",
+    "website": "Branch website",
+    "websiteHint": "Leave empty to use the business website.",
     "active": "Open",
     "rooms": "Rooms",
     "kind": "Branch type",
@@ -1322,6 +1330,7 @@
       "preview": "You're joining this business. They'll see your name and email, and you'll be able to book with them.",
       "joinButton": "Join {name}",
       "otherCode": "Use a different code",
+      "visitSite": "Visit the business website",
       "back": "Back",
       "unknownCode": "We couldn't find a business with that code.",
       "generic": "Something went wrong. Try again.",
@@ -1625,6 +1634,7 @@
       "nothingBooked": "Nothing booked yet.",
       "bookNow": "Book now",
       "navigate": "Navigate",
+      "website": "Website",
       "addToCalendar": "Add to calendar",
       "cancelFailed": "The cancellation didn't go through. Try again.",
       "membership": "Your plan",
@@ -1667,7 +1677,8 @@
     "title": "Join {name}",
     "body": "Book appointments and sessions, join waitlists and manage your bookings in the app.",
     "openApp": "Open in the app",
-    "openInBrowser": "Open in the browser, no install"
+    "openInBrowser": "Open in the browser, no install",
+    "visitSite": "Visit the business website"
   },
   "plans": {
     "title": "Plans",
@@ -1735,7 +1746,8 @@
     "stats": {
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
       "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
-    }
+    },
+    "created": "Plan created."
   },
   "metrics": {
     "revenue": "Revenue",
@@ -4776,7 +4788,14 @@
       "invalid": "Some details aren't valid.",
       "code_taken": "That code already exists.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "new": "New discount code",
+    "removed": "The code was deleted.",
+    "deleteConfirm": "Delete the code {code}?",
+    "usesLabel": "Uses",
+    "givenLabel": "Discount given",
+    "statusLabel": "Status",
+    "activeNow": "Working"
   },
   "start": {
     "meta": {
@@ -5378,7 +5397,9 @@
       "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
       "unsupported_image": "Choose a PNG, JPEG or WebP picture."
     },
-    "nav": { "label": "Profile sections" },
+    "nav": {
+      "label": "Profile sections"
+    },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
     "birthDate": "Date of birth",
@@ -6750,7 +6771,41 @@
       "draft": "Drafts",
       "sent": "Waiting for an answer",
       "accepted": "Accepted",
-      "declined": "Declined or expired"
+      "declined": "Declined or expired",
+      "closeRate": "Close rate",
+      "closeRateHint": "{won} of {decided} decided"
+    },
+    "titleEvents": "Quotes and events",
+    "subtitleEvents": "Send a quote, the client accepts it with one tap and pays the deposit. Accepted quotes with a date become events.",
+    "views": {
+      "label": "View",
+      "quotes": "Quotes",
+      "events": "Events"
+    },
+    "eventsMonth": "Events in {month}",
+    "monthPrev": "Previous month",
+    "monthNext": "Next month",
+    "calendar": {
+      "closed": "Closed",
+      "more": "+{count} more",
+      "empty": "No events this month."
+    },
+    "empty": {
+      "title": "Your first quote in three steps",
+      "step1": "Create a quote",
+      "step1Body": "Pick a client, list what is included and the price.",
+      "step2": "Send it by link",
+      "step2Body": "The client opens a private page, no sign-in needed.",
+      "step3": "They accept and pay the deposit",
+      "step3Body": "You see the answer here and the event lands in the calendar.",
+      "first": "Create the first quote",
+      "example": "Try with an example"
+    },
+    "example": {
+      "title": "Example: full-day service",
+      "line1": "Full-day service",
+      "line2": "Travel and set-up",
+      "notes": "This is an example: change the items, prices and terms before you send it."
     }
   },
   "bills": {
@@ -8581,6 +8636,55 @@
       "documents": "Documents",
       "ai": "AI",
       "permissions": "Permissions"
+    }
+  },
+  "catalog": {
+    "title": "Catalog",
+    "subtitle": "What you sell: services, memberships and punch cards, and discount codes.",
+    "tabs": {
+      "label": "Catalog sections",
+      "services": "Services",
+      "plans": "Memberships and punch cards",
+      "codes": "Discount codes"
+    },
+    "add": {
+      "services": "Add service",
+      "plans": "Add plan",
+      "codes": "Add code"
+    },
+    "tiles": {
+      "label": "Catalog numbers",
+      "services": {
+        "all": "All services",
+        "active": "Open for booking",
+        "paused": "Hidden"
+      },
+      "plans": {
+        "all": "All plans",
+        "active": "On sale",
+        "paused": "Not on sale"
+      },
+      "codes": {
+        "all": "All codes",
+        "active": "Working now",
+        "paused": "Paused"
+      }
+    },
+    "soldLast30": "{count, plural, =0 {None sold in 30 days} one {One sold in 30 days} other {# sold in 30 days}}",
+    "servicesEmpty": {
+      "title": "No services yet",
+      "body": "A service is what clients book: a class, a personal appointment or a court by the hour. Add your first one and it shows on the schedule and in the client app.",
+      "cta": "Create your first service"
+    },
+    "plansEmpty": {
+      "title": "Nothing here yet",
+      "body": "Memberships and punch cards let clients pay once and come again and again. They are optional: businesses that charge per visit can skip them.",
+      "cta": "Create your first plan"
+    },
+    "codesEmpty": {
+      "title": "No discount codes yet",
+      "body": "A code gives a percent or a fixed amount off a plan. Share it in a message or a post and clients enter it when they buy.",
+      "cta": "Create your first code"
     }
   }
 }

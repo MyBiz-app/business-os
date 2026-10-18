@@ -1,9 +1,9 @@
 "use client";
 
-import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, ChevronRight, Clock, CreditCard, Dumbbell, FileSignature, FileText, FolderOpen, Inbox, LayoutDashboard, LayoutGrid, Lock, MapPin, Megaphone, Menu, MessageCircle, Plug, Receipt, ScrollText, Settings, Smartphone, Sparkles, Target, Truck, TriangleAlert, Users, UsersRound, Wallet } from "lucide-react";
+import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, ChevronRight, Clock, FileSignature, FileText, FolderOpen, Inbox, LayoutDashboard, LayoutGrid, Lock, MapPin, Megaphone, Menu, MessageCircle, Plug, Receipt, ScrollText, Settings, Smartphone, Sparkles, Tags, Target, Truck, TriangleAlert, Users, UsersRound, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useId, useState, useSyncExternalStore } from "react";
 
 import { useScrollSpy } from "./use-scroll-spy";
@@ -19,8 +19,7 @@ const ICONS = {
   leads: Target,
   messages: MessageCircle,
   content: Sparkles,
-  services: Dumbbell,
-  plans: CreditCard,
+  catalog: Tags,
   sales: Receipt,
   locations: MapPin,
   team: UsersRound,
@@ -98,7 +97,12 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
     .filter((link) => pathname === link.href || pathname.startsWith(`${link.href}/`))
     .sort((a, b) => b.href.length - a.href.length || Number(b.child) - Number(a.child))[0];
   const current = match?.item;
-  const currentChild = match?.child ? match.href : null;
+  // Sub-items that differ by a query (`/catalog?tab=plans`): the one named in the address, else the first.
+  const params = useSearchParams();
+  const queryKids = (current?.children ?? []).filter((c) => c.href.includes("?") && pathOf(c.href.split("?")[0]) === pathname);
+  const tab = params.get("tab");
+  const queryChild = queryKids.length > 0 ? (queryKids.find((c) => new URLSearchParams(c.href.split("?")[1]).get("tab") === tab) ?? queryKids[0]).href : null;
+  const currentChild = queryChild ?? (match?.child ? match.href : null);
   const CurrentIcon = current ? ICONS[current.icon] : Menu;
 
   // Which areas are unfolded: the one you are in, unless you closed it; others stay as you left them.

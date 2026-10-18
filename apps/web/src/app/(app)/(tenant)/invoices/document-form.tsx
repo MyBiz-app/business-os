@@ -8,6 +8,7 @@ import { Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { ModalMarker } from "@/components/ui/route-modal";
 import { PAYMENT_METHODS, type DocumentKind } from "@/lib/issued-documents";
 
 import type { IssueState } from "./actions";
@@ -47,6 +48,7 @@ export function DocumentForm({ action, kinds, kind: initialKind, currency, clien
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <FormFeedback state={state.reason ? { ...state, error: undefined } : state} />
+      <ModalMarker saved={state.saved} next={state.next} />
       <FormError message={state.reason && t(`reasons.${state.reason}`)} />
       {credit ? (
         <>
@@ -159,7 +161,7 @@ export function DocumentForm({ action, kinds, kind: initialKind, currency, clien
         </div>
       </div>
       <p className="text-sm text-muted">{t("issueHint")}</p>
-      <div>
+      <div className="form-actions">
         <SubmitButton>{t("issue")}</SubmitButton>
       </div>
     </form>

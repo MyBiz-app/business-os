@@ -62,6 +62,18 @@ def confirm_link(email: str) -> str:
     return link.group(1).replace("&amp;", "&")
 
 
+def accept_legal(page) -> None:
+    """The mobile app asks a person to accept the current legal documents when it opens; the
+    dialog covers the screen until they do, so a walk-through accepts it first."""
+    accept = page.get_by_role("button", name="אני מאשר/ת")
+    try:
+        accept.wait_for(state="visible", timeout=10000)
+    except Exception:
+        return
+    accept.click()
+    accept.wait_for(state="hidden")
+
+
 def otp(email: str) -> str:
     return re.search(r"\b(\d{6})\b", _message(email)["Text"]).group(1)
 
