@@ -1259,6 +1259,7 @@
     "cancelled": "בוטל",
     "spots": "{booked}/{capacity}",
     "spotsLabel": "{booked} מתוך {capacity} רשומים",
+    "waitingLabel": "{count} בהמתנה",
     "service": "שירות",
     "date": "תאריך",
     "startTime": "שעת התחלה",
@@ -1836,6 +1837,10 @@
       "earlier": "{what}: חצי שעה קודם",
       "later": "{what}: חצי שעה אחר כך",
       "submit": "הוסיפו אותי לרשימה",
+      "withWhom": "עם מי",
+      "anyone": "כל אחד",
+      "branch": "סניף",
+      "anyBranch": "כל סניף",
       "notifyMe": "עדכנו אותי אם יתפנה זמן",
       "errors": {
         "generic": "משהו השתבש. נסו שוב.",
