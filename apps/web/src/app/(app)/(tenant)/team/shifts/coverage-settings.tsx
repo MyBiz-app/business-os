@@ -1,5 +1,6 @@
 "use client";
 
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -19,18 +20,18 @@ const toRows = (rules: CoverageRuleInput[]): Row[] => rules.map((r) => ({ weekda
 export function CoverageSettings({ branches, weekdays }: { branches: Branch[]; weekdays: string[] }) {
   const t = useTranslations("shifts");
   return (
-    <details className="card group p-0">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 font-medium [&::-webkit-details-marker]:hidden">
-        <ShieldCheck aria-hidden="true" className="size-4 text-primary-ink" />
-        {t("coverage.title")}
-        <span className="ms-2 text-sm font-normal text-muted">{t("coverage.hint")}</span>
-      </summary>
-      <ul className="flex flex-col divide-y divide-border border-t border-border">
+    <CollapsibleSection
+      icon={<ShieldCheck aria-hidden="true" className="size-4 text-primary-ink" />}
+      title={t("coverage.title")}
+      description={t("coverage.hint")}
+      storageKey="shifts-coverage"
+    >
+      <ul className="-mx-5 -my-5 flex flex-col divide-y divide-border">
         {branches.map((branch) => (
           <CoverageBranch key={branch.id} branch={branch} weekdays={weekdays} />
         ))}
       </ul>
-    </details>
+    </CollapsibleSection>
   );
 }
 

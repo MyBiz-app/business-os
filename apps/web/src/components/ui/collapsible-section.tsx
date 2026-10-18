@@ -27,6 +27,7 @@ export function CollapsibleSection({
   defaultOpen = false,
   storageKey,
   actions,
+  icon,
   id,
 }: {
   title: string;
@@ -36,6 +37,8 @@ export function CollapsibleSection({
   storageKey?: string;
   /** Buttons shown at the end of the header line (not part of the fold button). */
   actions?: ReactNode;
+  /** A small icon before the title. */
+  icon?: ReactNode;
   /** Anchor of the section: a link to `#id` (or the section menu) opens it and scrolls to it. */
   id?: string;
 }) {
@@ -89,7 +92,10 @@ export function CollapsibleSection({
         >
           <ChevronDown aria-hidden="true" className="section-chevron mt-0.5 size-5 shrink-0 text-muted" data-open={open || undefined} />
           <span className="min-w-0">
-            <span className="block font-semibold">{title}</span>
+            <span className="flex items-center gap-2 font-semibold">
+              {icon}
+              {title}
+            </span>
             {description ? <span className="mt-0.5 block text-sm text-muted">{description}</span> : null}
           </span>
         </button>

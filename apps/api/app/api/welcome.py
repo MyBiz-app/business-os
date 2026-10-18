@@ -108,7 +108,7 @@ def preview_welcome(context: SettingsDep) -> WelcomeEmail:
 
 setup_router = APIRouter(prefix="/tenants/current/getting-started", tags=["tenants"])
 
-SetupStep = Literal["branding", "services", "policy", "schedule", "team", "clients", "card"]
+SetupStep = Literal["branding", "services", "policy", "schedule", "team", "clients", "card", "post"]
 
 
 class SetupItem(BaseModel):
@@ -141,7 +141,10 @@ def getting_started(context: SettingsDep) -> GettingStarted:
                      OR EXISTS (SELECT 1 FROM app.invitations x WHERE x.tenant_id = t.id)) AS team,
                     EXISTS (SELECT 1 FROM app.clients x WHERE x.tenant_id = t.id) AS clients,
                     EXISTS (SELECT 1 FROM app.billing_accounts b
-                            WHERE b.tenant_id = t.id AND b.card_last4 IS NOT NULL) AS card
+                            WHERE b.tenant_id = t.id AND b.card_last4 IS NOT NULL) AS card,
+                    (EXISTS (SELECT 1 FROM app.social_drafts x
+                             WHERE x.tenant_id = t.id AND x.status = 'published')
+                     OR EXISTS (SELECT 1 FROM app.social_posts x WHERE x.tenant_id = t.id)) AS post
                 FROM app.tenants t WHERE t.id = app.current_tenant_id()
             """)
         )

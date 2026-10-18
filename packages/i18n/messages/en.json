@@ -6108,6 +6108,10 @@
       "card": {
         "title": "Add a card for after the trial",
         "text": "Nothing is charged until the trial ends."
+      },
+      "post": {
+        "title": "Publish your first post",
+        "text": "Share an offer or a hello with your followers."
       }
     },
     "page": {

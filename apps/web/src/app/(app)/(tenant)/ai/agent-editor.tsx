@@ -1,10 +1,11 @@
 "use client";
 
-import { Trash2, X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useId, useState } from "react";
 
 import { Field, SelectField, TextAreaField } from "@/components/form/field";
+import { Modal } from "@/components/ui/modal";
 
 import { type AgentChange, type AgentError, type AgentResult, deleteAgent, saveAgent, uploadAgentAvatar } from "./actions";
 import { ColorChoice, DomainChecks, FaceChooser, type Face, RoleChecks, type RoleOption } from "./agent-fields";
@@ -21,9 +22,8 @@ type Props = { agent: Agent; branches: Branch[]; roles: RoleOption[]; onClose: (
 export function AgentEditor({ agent, branches, roles, onClose, onSaved, onDeleted }: Props) {
   const t = useTranslations("aiTeam.wizard");
   const tEdit = useTranslations("aiTeam.edit");
-  const tTeam = useTranslations("aiTeam");
   const locale = useLocale();
-  const dialog = useRef<HTMLDialogElement>(null);
+  const formId = useId();
   const [name, setName] = useState(agent.name);
   const [roleTitle, setRoleTitle] = useState(agent.role_title);
   const [color, setColor] = useState(agent.color);
@@ -41,11 +41,6 @@ export function AgentEditor({ agent, branches, roles, onClose, onSaved, onDelete
   const [error, setError] = useState<AgentError | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
-
-  useEffect(() => {
-    const element = dialog.current;
-    if (element && !element.open) element.showModal();
-  }, []);
 
   async function save(event: React.FormEvent) {
     event.preventDefault();
@@ -108,20 +103,24 @@ export function AgentEditor({ agent, branches, roles, onClose, onSaved, onDelete
   }
 
   return (
-    <dialog ref={dialog} onClose={onClose} aria-labelledby="editor-title" className="m-auto max-h-[calc(100dvh-2rem)] w-[min(40rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-border bg-background p-0 text-foreground backdrop:bg-black/50 backdrop:backdrop-blur-sm">
-      <form onSubmit={save} className="flex max-h-[calc(100dvh-2rem)] flex-col">
-        <header className="flex items-center gap-3 border-b border-border p-4">
-          <div className="min-w-0 flex-1">
-            <h2 id="editor-title" className="truncate font-semibold" dir="auto">
-              {tEdit("title", { name: agent.name })}
-            </h2>
-            <p className="text-sm text-muted">{tEdit("usage", { used: number.format(agent.credits_used_month ?? 0) })}</p>
-          </div>
-          <button type="button" onClick={() => dialog.current?.close()} className="btn-plain rounded-full p-2 hover:bg-surface" aria-label={tTeam("close")}>
-            <X aria-hidden="true" className="size-5" />
+    <Modal
+      title={tEdit("title", { name: agent.name })}
+      description={tEdit("usage", { used: number.format(agent.credits_used_month ?? 0) })}
+      size="md"
+      onClose={onClose}
+      footer={
+        <>
+          <button type="button" onClick={onClose} className="btn-secondary px-4 py-2 text-sm">
+            {tEdit("cancel")}
           </button>
-        </header>
-        <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-4 sm:p-6">
+          <button type="submit" form={formId} disabled={busy} className="btn-primary px-4 py-2 text-sm">
+            {tEdit("save")}
+          </button>
+        </>
+      }
+    >
+      <form id={formId} onSubmit={save}>
+        <div className="flex flex-col gap-5">
           <label className="flex cursor-pointer items-center gap-3 rounded-xl bg-surface p-3">
             <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="size-4 accent-[var(--primary)]" />
             <span className="text-sm font-medium">{tEdit("enabled")}</span>
@@ -175,15 +174,7 @@ export function AgentEditor({ agent, branches, roles, onClose, onSaved, onDelete
             </p>
           )}
         </div>
-        <footer className="flex justify-end gap-2 border-t border-border p-4">
-          <button type="button" onClick={() => dialog.current?.close()} className="btn-secondary px-4 py-2 text-sm">
-            {tEdit("cancel")}
-          </button>
-          <button type="submit" disabled={busy} className="btn-primary px-4 py-2 text-sm">
-            {tEdit("save")}
-          </button>
-        </footer>
       </form>
-    </dialog>
+    </Modal>
   );
 }

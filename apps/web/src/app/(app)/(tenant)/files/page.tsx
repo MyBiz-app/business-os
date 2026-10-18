@@ -11,6 +11,7 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { deleteFile, deleteFolder, setArchived } from "./actions";
 import { NewFolderForm, UploadForm } from "./forms";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 const SYSTEM_KEYS = ["payroll", "employees", "business_docs", "imports", "website", "general"] as const;
 
@@ -138,22 +139,14 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
             )}
 
             {open.can_upload && (
-              <details className="rounded-xl bg-foreground/[0.03] p-3">
-                <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("add")}</summary>
-                <div className="pt-3">
-                  <UploadForm folderId={open.id} />
-                </div>
-              </details>
+              <CollapsibleSection title={t("add")}>
+                <UploadForm folderId={open.id} />
+              </CollapsibleSection>
             )}
             {canManage && open.can_upload && (
-              <details className="rounded-xl bg-foreground/[0.03] p-3">
-                <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary-ink">
-                  <FolderPlus aria-hidden="true" className="size-4" /> {t("newFolder")}
-                </summary>
-                <div className="pt-3">
-                  <NewFolderForm parentId={open.id} />
-                </div>
-              </details>
+              <CollapsibleSection icon={<FolderPlus aria-hidden="true" className="size-4" />} title={t("newFolder")}>
+                <NewFolderForm parentId={open.id} />
+              </CollapsibleSection>
             )}
             {canManage && !open.system_key && open.file_count === 0 && children.length === 0 && (
               <form action={deleteFolder.bind(null, open.id, open.parent_id)}>

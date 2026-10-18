@@ -1,6 +1,7 @@
-"""Adapters for other model vendors (OpenAI, Gemini), disabled until a vendor is enabled in
-app/ai/models.py (paid-provider policy). Each translates the canonical Messages-API blocks to
-the vendor's wire format and back, so conversations stay vendor-neutral in the database."""
+"""Adapters for other model vendors (OpenAI, Gemini), disabled until a vendor is named in
+API_AI_ENABLED_VENDORS (paid-provider policy). Each translates the canonical Messages-API
+blocks to the vendor's wire format and back, so conversations stay vendor-neutral in the
+database."""
 
 import json
 from typing import Any
@@ -43,7 +44,7 @@ def _blocks(content: Any) -> list[dict[str, Any]]:
 
 
 class OpenAIProvider:
-    """OpenAI chat completions. Disabled until "openai" is in ENABLED_VENDORS."""
+    """OpenAI chat completions. Disabled until "openai" is in API_AI_ENABLED_VENDORS."""
 
     URL = "https://api.openai.com/v1/chat/completions"
 
@@ -158,7 +159,7 @@ class OpenAIProvider:
 
 
 class GeminiProvider:
-    """Google Gemini generateContent. Disabled until "gemini" is in ENABLED_VENDORS."""
+    """Google Gemini generateContent. Disabled until "gemini" is in API_AI_ENABLED_VENDORS."""
 
     URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 

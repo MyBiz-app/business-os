@@ -19845,7 +19845,7 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "branding" | "services" | "policy" | "schedule" | "team" | "clients" | "card";
+            key: "branding" | "services" | "policy" | "schedule" | "team" | "clients" | "card" | "post";
             /** Done */
             done: boolean;
         };
