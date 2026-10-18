@@ -26,6 +26,8 @@ export default function Me() {
   const tForm = useTranslations("business.form101");
   const tDocuments = useTranslations("business.myDocuments");
   const { palette, tenant, api, refresh, branches, branch, selectBranch, can } = useStaff();
+  // Solo mode: a one-person business doesn't see shifts, the time clock or employee paperwork.
+  const solo = tenant?.business_size === "solo";
   const { session } = useSession();
   const { businesses, joinOwn } = useBusiness();
   const [signedUp, setSignedUp] = useState<"idle" | "busy" | "done" | "error">("idle");
@@ -110,7 +112,7 @@ export default function Me() {
         )}
       </Card>
 
-      {can("schedule.read") && (
+      {can("schedule.read") && !solo && (
         <Button
           label={tSchedule("open")}
           variant="secondary"
@@ -118,7 +120,7 @@ export default function Me() {
           onPress={() => router.push("/staff-schedule")}
         />
       )}
-      {can("schedule.read") && (
+      {can("schedule.read") && !solo && (
         <Button label={tClock("open")} variant="secondary" palette={palette} onPress={() => router.push("/time-clock")} />
       )}
       {can("schedule.read") && (
@@ -129,14 +131,16 @@ export default function Me() {
           onPress={() => router.push("/availability")}
         />
       )}
-      <Button label={tDocuments("open")} variant="secondary" palette={palette} onPress={() => router.push("/my-documents")} />
+      {!solo && <Button label={tDocuments("open")} variant="secondary" palette={palette} onPress={() => router.push("/my-documents")} />}
 
-      <Button
-        label={tForm("open")}
-        variant="secondary"
-        palette={palette}
-        onPress={() => router.push("/form101")}
-      />
+      {!solo && (
+        <Button
+          label={tForm("open")}
+          variant="secondary"
+          palette={palette}
+          onPress={() => router.push("/form101")}
+        />
+      )}
 
       <Card palette={palette}>
         <Field

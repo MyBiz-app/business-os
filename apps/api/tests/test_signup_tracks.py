@@ -86,3 +86,24 @@ def test_account_check_says_yes_or_no_and_is_rate_limited(
     assert ask("dana@example.com").json() == {"exists": True}
     assert ask("nobody@example.com").json() == {"exists": False}
     assert ask("not an email").status_code == 422
+
+
+def test_solo_grows_with_the_first_employee_or_second_branch(
+    client: TestClient, auth: AuthHeaders
+) -> None:
+    _, headers = create(client, auth, business_size="solo")
+    size = lambda: client.get("/tenants/current", headers=headers).json()["business_size"]  # noqa: E731
+    assert size() == "solo"
+    invited = client.post(
+        "/staff/invitations", json={"email": "first@example.com", "role": "staff"}, headers=headers
+    )
+    assert invited.status_code == 201 and size() == "small"
+
+    _, other = create(client, auth, business_size="solo")
+    branch = client.post("/locations", json={"name": "Second"}, headers=other)
+    assert branch.status_code == 201
+    assert client.get("/tenants/current", headers=other).json()["business_size"] == "small"
+    # A medium business answered the question itself and stays as it is.
+    _, mid = create(client, auth, business_size="medium")
+    client.post("/locations", json={"name": "Another"}, headers=mid)
+    assert client.get("/tenants/current", headers=mid).json()["business_size"] == "medium"

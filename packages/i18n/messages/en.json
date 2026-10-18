@@ -51,6 +51,14 @@
     }
   },
   "settings": {
+    "solo": {
+      "title": "Growing?",
+      "subtitle": "The menu is simple for now: no team, shifts, payroll or branches. They open by themselves when you add a first employee or a second branch, or with one click here.",
+      "firstEmployee": "Add a first employee",
+      "secondBranch": "Add a second branch",
+      "showAll": "I grew, show everything",
+      "done": "Everything is open"
+    },
     "language": "Language",
     "theme": "Theme",
     "themeLight": "Light",

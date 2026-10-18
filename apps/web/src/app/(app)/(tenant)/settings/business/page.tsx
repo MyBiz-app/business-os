@@ -3,11 +3,13 @@ import { redirect } from "next/navigation";
 
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { canManageSettings } from "@/lib/permissions";
+import { isSolo } from "@/lib/solo";
 import { getTenant } from "@/lib/tenant";
 
 import { ContactEmails } from "../contact-emails";
 import { LegalReadiness } from "../legal-readiness";
 import { DetailsForm, IdentityForm } from "../settings-forms";
+import { SoloCard } from "../solo-card";
 import { TopicHeader } from "../topic-header";
 
 /** Settings → Business: details, legal identity, legal readiness and the business's emails. */
@@ -22,6 +24,7 @@ export default async function BusinessSettingsPage() {
   return (
     <div className="form-columns">
       <TopicHeader title={t("nav.items.business")} description={t("nav.hints.business")} />
+      {isSolo(tenant) && <SoloCard />}
       <CollapsibleSection title={t("details")} description={t("detailsHint")} defaultOpen storageKey="settings-details">
         <DetailsForm tenant={tenant} timeZones={Intl.supportedValuesOf("timeZone")} />
       </CollapsibleSection>

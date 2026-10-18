@@ -354,6 +354,13 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **The website step** sits after the four product add-ons. "Build me a website" puts the with-system price in the cart (not charged before #46) and sends the new owner to the website brief right after sign-up, with what MyBiz already knows filled in (area, services, branches, colors, language, website address).
 - The web copy of the website price list now equals the API's (USD and EUR with-system prices differed).
 
+### Solo mode (2026-10-18, round 7 R28, no migration)
+
+- **Solo is `business_size = solo`**, the value R25a already stores; there is no separate mode switch. The menu, dashboard and business app read it (`apps/web/src/lib/solo.ts`).
+- **Hidden, not locked**: team, branches, the action log and, in the business app, shifts, time clock and employee paperwork. Locked "upgrade" items are capped at two. The pages still open by address, so nothing breaks for a business that is mid-way.
+- **"I grew" is automatic**: inviting the first employee or adding a second branch moves `solo` to `small` on the server (`app/core/business_size.py`); other sizes are the owner's own answer and never change by themselves. Settings → Business also has a button that opens everything at once.
+- **The 129 solo price is not built**: billing sums module prices and has no bundle discount, so showing 129 would promise a charge the system does not make. It needs its own decision on how a bundle discount appears on the invoice.
+
 ## Open
 
 | # | Question |

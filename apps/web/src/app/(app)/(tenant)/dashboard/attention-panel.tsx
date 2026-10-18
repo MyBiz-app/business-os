@@ -20,9 +20,9 @@ const KINDS: Record<Kind, { Icon: typeof UserMinus; item: (id: string) => string
 
 /** What needs attention today (GET /attention): only the lists this person may see and that
  * have something in them; nothing at all when everything is in order. */
-export async function AttentionPanel({ context }: { context: Pick<Awaited<ReturnType<typeof getTenant>>, "api" | "scope"> }) {
+export async function AttentionPanel({ context, only }: { context: Pick<Awaited<ReturnType<typeof getTenant>>, "api" | "scope">; only?: readonly Kind[] }) {
   const { api, scope } = context;
-  const lists = unwrap(await api.GET("/attention", { params: scope }));
+  const lists = unwrap(await api.GET("/attention", { params: scope })).filter((list) => !only || only.includes(list.kind));
   if (lists.length === 0) return null;
   const t = await getTranslations("dashboard.attention");
   const locale = await getLocale();

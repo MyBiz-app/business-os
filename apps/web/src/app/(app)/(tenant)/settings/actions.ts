@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { apiUpload, unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
@@ -172,4 +173,12 @@ export async function saveBranding(_state: BrandingState, formData: FormData): P
 
   revalidatePath("/", "layout");
   return { saved: true };
+}
+
+/** "I grew": ends solo mode, so the team, shifts, payroll and branch areas show up. */
+export async function leaveSoloMode(): Promise<void> {
+  const { api, scope } = await getTenant();
+  unwrap(await api.PATCH("/tenants/current", { params: scope, body: { business_size: "small" } }));
+  revalidatePath("/", "layout");
+  redirect("/dashboard");
 }
