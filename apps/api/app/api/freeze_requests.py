@@ -4,7 +4,7 @@ decision, and ending a freeze early.
 A freeze pauses a membership for a range of days. For one that is paid in advance the end date
 moves by the same number of days. For a renewing one the next charge moves too (or, if the
 business chose so, the next charge is credited by the frozen days). The arithmetic lives in the
-database (migration 0131: `freeze_effect`, `apply_freeze`, `end_freeze_early`) so a preview, a
+database (migration 0132: `freeze_effect`, `apply_freeze`, `end_freeze_early`) so a preview, a
 manager's decision and an automatic approval can never disagree."""
 
 import datetime as dt
