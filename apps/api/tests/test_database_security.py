@@ -162,6 +162,7 @@ UNINDEXED_USER_KEYS = {
     ("payments", "created_by"),
     ("pending_actions", "decided_by"),
     ("pending_actions", "requested_by"),
+    ("freeze_requests", "decided_by"),
     ("quotes", "created_by"),
     ("reviews", "staff_user_id"),
     ("shifts", "created_by"),

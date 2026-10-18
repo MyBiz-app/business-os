@@ -19,7 +19,9 @@
       "session_reminder": "היום: {service} ב-{when}",
       "plan_ending": "המנוי שלך מסתיים ב-{date}",
       "friend_request": "{friend} רוצה להיות חבר שלך",
-      "class_invite": "{friend} הזמין אותך: {service} ב-{when}"
+      "class_invite": "{friend} הזמין אותך: {service} ב-{when}",
+      "freeze_approved": "ההקפאה אושרה: {from} עד {date}",
+      "freeze_rejected": "לגבי בקשת ההקפאה שלך"
     },
     "body": {
       "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
@@ -33,7 +35,9 @@
       "session_reminder": "תזכורת: נרשמת ל{service} היום ({when}). לא יתאפשר לך להגיע? כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לקבל את המקום.",
       "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם.",
       "friend_request": "{friend} שלח לך בקשת חברות ב{business}. אפשר לאשר באפליקציה.",
-      "class_invite": "{friend} שמר לך מקום ב{service} ב-{when} ב{business}. אפשר להצטרף באפליקציה; המקום שמור לזמן קצר."
+      "class_invite": "{friend} שמר לך מקום ב{service} ב-{when} ב{business}. אפשר להצטרף באפליקציה; המקום שמור לזמן קצר.",
+      "freeze_approved": "{business} אישר להקפיא את ה{plan} שלך מ-{from} עד {date}. תאריך הסיום זז באותו מספר ימים.",
+      "freeze_rejected": "{business} לא יכול היה לאשר הקפאה של ה{plan} שלך מ-{from} עד {date}."
     },
     "welcome": {
       "subject": "ברוכים הבאים ל-MyBiz, {business}! 🎉",

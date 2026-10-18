@@ -5671,6 +5671,234 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/freeze-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Freeze Rules */
+        get: operations["get_freeze_rules"];
+        /** Set Freeze Rules */
+        put: operations["set_freeze_rules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/entitlements/{entitlement_id}/freeze-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview Freeze
+         * @description What freezing these days would do. A manager may freeze for any reason, so `problems`
+         *     lists what a client's request would run into.
+         */
+        get: operations["preview_freeze"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/freeze-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Freeze Requests
+         * @description Waiting requests first, then the latest decided ones.
+         */
+        get: operations["list_freeze_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/freeze-requests/{request_id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve Freeze Request
+         * @description Approves the whole request, or only part of it (`approved_ends_on`).
+         */
+        post: operations["approve_freeze_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/freeze-requests/{request_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject Freeze Request */
+        post: operations["reject_freeze_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/freezes/{freeze_id}/end-early": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End Freeze Early
+         * @description The client is back: the freeze ends yesterday (or disappears if it has not begun).
+         */
+        post: operations["end_freeze_early"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/freeze-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Freeze Rules */
+        get: operations["my_freeze_rules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/entitlements/{entitlement_id}/freeze-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Freeze Preview
+         * @description Exactly what will happen, shown before the client sends the request.
+         */
+        get: operations["my_freeze_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/freeze-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Freeze Requests */
+        get: operations["my_freeze_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/entitlements/{entitlement_id}/freeze-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask For Freeze
+         * @description Sends the request to the client's branch managers; a reason the business approves
+         *     automatically takes effect at once.
+         */
+        post: operations["ask_for_freeze"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/freeze-requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Withdraw Freeze Request */
+        delete: operations["withdraw_freeze_request"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/freezes/{freeze_id}/end-early": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * My End Freeze Early
+         * @description "I'm back early": the freeze ends yesterday, and the dates and the charge come back.
+         */
+        post: operations["my_end_freeze_early"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/promo-codes": {
         parameters: {
             query?: never;
@@ -9050,7 +9278,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "inactive" | "plan_ending" | "leads_due" | "health_review" | "license_expiring";
+            kind: "inactive" | "plan_ending" | "leads_due" | "health_review" | "freeze_requests" | "license_expiring";
             /** Count */
             count: number;
             /** Items */
@@ -10520,6 +10748,11 @@ export interface components {
             options: string[];
             /** Max Length */
             max_length: number;
+        };
+        /** ClientFreezeRules */
+        ClientFreezeRules: {
+            rules: components["schemas"]["FreezeRules"];
+            bank: components["schemas"]["FreezeBank"];
         };
         /** ClientHealth */
         ClientHealth: {
@@ -12169,6 +12402,27 @@ export interface components {
             receipt_id: string | null;
             /** Receipt Number */
             receipt_number: number | null;
+            /** Billing Cycle */
+            billing_cycle: ("monthly" | "quarterly" | "yearly" | "custom") | null;
+            /** Billing Cycle Days */
+            billing_cycle_days: number | null;
+            /** Auto Renew */
+            auto_renew: boolean;
+            /**
+             * Next Billing On
+             * @description Renewing memberships: the next charge
+             */
+            next_billing_on: string | null;
+            /**
+             * Next Billing Amount
+             * @description What the next charge will be after freeze credits and fees (minor units)
+             */
+            next_billing_amount: number | null;
+            /**
+             * Freezable
+             * @description A membership that is not over, cancelled or used up
+             */
+            freezable: boolean;
         };
         /** Entry */
         Entry: {
@@ -12573,6 +12827,46 @@ export interface components {
             ends_on: string;
             /** Reason */
             reason: string | null;
+            /**
+             * Request Id
+             * @description The client's request, if it came from one
+             */
+            request_id: string | null;
+            /**
+             * Billing Mode
+             * @description What it did to the billing: deferred the next charge, credited it, or neither
+             * @enum {string}
+             */
+            billing_mode: "none" | "defer" | "credit";
+            /**
+             * Billing Shift Days
+             * @description Days the next charge moved
+             */
+            billing_shift_days: number;
+            /**
+             * Credit Amount
+             * @description Credit for the next charge, in minor units
+             */
+            credit_amount: number;
+            /**
+             * Fee Amount
+             * @description Freeze fee for the next charge, in minor units
+             */
+            fee_amount: number;
+        };
+        /** FreezeBank */
+        FreezeBank: {
+            /** Year */
+            year: number;
+            /** Yearly Bank Days */
+            yearly_bank_days: number | null;
+            /**
+             * Used Days
+             * @description Freeze days this year, including requests waiting
+             */
+            used_days: number;
+            /** Remaining Days */
+            remaining_days: number | null;
         };
         /** FreezeCreate */
         FreezeCreate: {
@@ -12588,6 +12882,173 @@ export interface components {
             ends_on: string;
             /** Reason */
             reason?: string | null;
+        };
+        /** FreezePreview */
+        FreezePreview: {
+            /** Days */
+            days: number;
+            /**
+             * New Ends On
+             * Format: date
+             * @description The membership's end date once frozen
+             */
+            new_ends_on: string;
+            /**
+             * Billing Mode
+             * @enum {string}
+             */
+            billing_mode: "none" | "defer" | "credit";
+            /** Next Billing From */
+            next_billing_from: string | null;
+            /** Next Billing To */
+            next_billing_to: string | null;
+            /** Credit Amount */
+            credit_amount: number;
+            /** Fee Amount */
+            fee_amount: number;
+            /**
+             * Next Billing Amount After
+             * @description The next charge after this freeze (renewing memberships)
+             */
+            next_billing_amount_after: number | null;
+            /**
+             * Problems
+             * @description Why a request would be refused now: freeze_requests_off, not_freezable, too_short, too_long, notice_required, outside_validity, overlapping_freeze, overlapping_request, bank_exceeded
+             */
+            problems: string[];
+            /**
+             * Auto Approved
+             * @description Whether it would be approved without a manager
+             */
+            auto_approved: boolean;
+        };
+        /** FreezeRequest */
+        FreezeRequest: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Entitlement Id
+             * Format: uuid
+             */
+            entitlement_id: string;
+            /** Entitlement Name */
+            entitlement_name: string;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "travel" | "reserve_duty" | "illness" | "pregnancy" | "other";
+            /** Note */
+            note: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "approved" | "rejected" | "cancelled";
+            /** Approved Starts On */
+            approved_starts_on: string | null;
+            /** Approved Ends On */
+            approved_ends_on: string | null;
+            /** Auto Approved */
+            auto_approved: boolean;
+            /** Decided By Name */
+            decided_by_name: string | null;
+            /** Decided At */
+            decided_at: string | null;
+            /** Decision Note */
+            decision_note: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Days */
+            days: number;
+        };
+        /** FreezeRequestCreate */
+        FreezeRequestCreate: {
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "travel" | "reserve_duty" | "illness" | "pregnancy" | "other";
+            /** Note */
+            note?: string | null;
+        };
+        /** FreezeRules */
+        FreezeRules: {
+            /**
+             * Allow Requests
+             * @description Clients may ask from the app
+             * @default false
+             */
+            allow_requests: boolean;
+            /**
+             * Min Days
+             * @default 1
+             */
+            min_days: number;
+            /**
+             * Max Days
+             * @default 30
+             */
+            max_days: number;
+            /**
+             * Yearly Bank Days
+             * @description Most freeze days per client in a year; empty: no limit
+             */
+            yearly_bank_days?: number | null;
+            /**
+             * Notice Days
+             * @description Days ahead a request must be sent
+             * @default 0
+             */
+            notice_days: number;
+            /**
+             * Fee Amount
+             * @description Freeze fee in minor units
+             * @default 0
+             */
+            fee_amount: number;
+            /**
+             * Billing Mode
+             * @description Renewing memberships: defer the next charge, or credit it
+             * @default defer
+             * @enum {string}
+             */
+            billing_mode: "defer" | "credit";
+            /** Auto Approve Reasons */
+            auto_approve_reasons?: ("travel" | "reserve_duty" | "illness" | "pregnancy" | "other")[];
         };
         /** FriendRequestCreate */
         FriendRequestCreate: {
@@ -14828,10 +15289,10 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending" | "friend_request" | "class_invite";
+            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending" | "friend_request" | "class_invite" | "freeze_approved" | "freeze_rejected";
             /**
              * Payload
-             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at
+             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at; freeze_approved, freeze_rejected: plan_name, starts_on, ends_on, note
              */
             payload: {
                 [key: string]: unknown;
@@ -15518,6 +15979,12 @@ export interface components {
             credits: number | null;
             /** Active */
             active: boolean;
+            /** Billing Cycle */
+            billing_cycle: ("monthly" | "quarterly" | "yearly" | "custom") | null;
+            /** Billing Cycle Days */
+            billing_cycle_days: number | null;
+            /** Auto Renew */
+            auto_renew: boolean;
             /**
              * Created At
              * Format: date-time
@@ -15562,6 +16029,22 @@ export interface components {
              * @default true
              */
             active: boolean;
+            /**
+             * Billing Cycle
+             * @description Memberships only: how often it is billed. With a cycle, validity_days follows it (30, 91, 365 or billing_cycle_days)
+             */
+            billing_cycle?: ("monthly" | "quarterly" | "yearly" | "custom") | null;
+            /**
+             * Billing Cycle Days
+             * @description Only for the custom cycle
+             */
+            billing_cycle_days?: number | null;
+            /**
+             * Auto Renew
+             * @description Needs a billing cycle
+             * @default false
+             */
+            auto_renew: boolean;
         };
         /**
          * PlanListItem
@@ -15592,6 +16075,12 @@ export interface components {
             credits: number | null;
             /** Active */
             active: boolean;
+            /** Billing Cycle */
+            billing_cycle: ("monthly" | "quarterly" | "yearly" | "custom") | null;
+            /** Billing Cycle Days */
+            billing_cycle_days: number | null;
+            /** Auto Renew */
+            auto_renew: boolean;
             /**
              * Created At
              * Format: date-time
@@ -15625,6 +16114,11 @@ export interface components {
             validity_days?: number | null;
             /** Active */
             active?: boolean | null;
+            /**
+             * Auto Renew
+             * @description Needs a billing cycle
+             */
+            auto_renew?: boolean | null;
         };
         /** PlannedShift */
         PlannedShift: {
@@ -19602,6 +20096,19 @@ export interface components {
             last_name?: string | null;
             /** Phone */
             phone?: string | null;
+        };
+        /** Decision */
+        app__api__freeze_requests__Decision: {
+            /**
+             * Note
+             * @description Shown to the client
+             */
+            note?: string | null;
+            /**
+             * Approved Ends On
+             * @description Approve only part of it: the last day to freeze
+             */
+            approved_ends_on?: string | null;
         };
         /** Decision */
         app__api__pay_components__Decision: {
@@ -33648,6 +34155,463 @@ export interface operations {
             };
             path: {
                 entitlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entitlement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_freeze_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezeRules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_freeze_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FreezeRules"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezeRules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_freeze: {
+        parameters: {
+            query: {
+                starts_on: string;
+                ends_on: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                entitlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezePreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_freeze_requests: {
+        parameters: {
+            query?: {
+                status?: ("pending" | "approved" | "rejected" | "cancelled") | null;
+                client_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezeRequest"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_freeze_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__api__freeze_requests__Decision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezeRequest"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_freeze_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__api__freeze_requests__Decision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezeRequest"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_freeze_early: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                freeze_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entitlement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_freeze_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientFreezeRules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_freeze_preview: {
+        parameters: {
+            query: {
+                starts_on: string;
+                ends_on: string;
+                reason?: ("travel" | "reserve_duty" | "illness" | "pregnancy" | "other") | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                entitlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezePreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_freeze_requests: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezeRequest"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ask_for_freeze: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                entitlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FreezeRequestCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreezeRequest"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    withdraw_freeze_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_end_freeze_early: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                freeze_id: string;
             };
             cookie?: never;
         };

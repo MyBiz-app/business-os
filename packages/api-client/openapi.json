@@ -30253,6 +30253,991 @@
         }
       }
     },
+    "/freeze-rules": {
+      "get": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Get Freeze Rules",
+        "operationId": "get_freeze_rules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Set Freeze Rules",
+        "operationId": "set_freeze_rules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FreezeRules"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entitlements/{entitlement_id}/freeze-preview": {
+      "get": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Preview Freeze",
+        "description": "What freezing these days would do. A manager may freeze for any reason, so `problems`\nlists what a client's request would run into.",
+        "operationId": "preview_freeze",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entitlement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entitlement Id"
+            }
+          },
+          {
+            "name": "starts_on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Starts On"
+            }
+          },
+          {
+            "name": "ends_on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Ends On"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezePreview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freeze-requests": {
+      "get": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "List Freeze Requests",
+        "description": "Waiting requests first, then the latest decided ones.",
+        "operationId": "list_freeze_requests",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected",
+                    "cancelled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FreezeRequest"
+                  },
+                  "title": "Response List Freeze Requests"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freeze-requests/{request_id}/approve": {
+      "post": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Approve Freeze Request",
+        "description": "Approves the whole request, or only part of it (`approved_ends_on`).",
+        "operationId": "approve_freeze_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__api__freeze_requests__Decision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freeze-requests/{request_id}/reject": {
+      "post": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Reject Freeze Request",
+        "operationId": "reject_freeze_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__api__freeze_requests__Decision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freezes/{freeze_id}/end-early": {
+      "post": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "End Freeze Early",
+        "description": "The client is back: the freeze ends yesterday (or disappears if it has not begun).",
+        "operationId": "end_freeze_early",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "freeze_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Freeze Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entitlement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/freeze-rules": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Freeze Rules",
+        "operationId": "my_freeze_rules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientFreezeRules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/entitlements/{entitlement_id}/freeze-preview": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Freeze Preview",
+        "description": "Exactly what will happen, shown before the client sends the request.",
+        "operationId": "my_freeze_preview",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entitlement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entitlement Id"
+            }
+          },
+          {
+            "name": "starts_on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Starts On"
+            }
+          },
+          {
+            "name": "ends_on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Ends On"
+            }
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "travel",
+                    "reserve_duty",
+                    "illness",
+                    "pregnancy",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Reason"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezePreview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/freeze-requests": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Freeze Requests",
+        "operationId": "my_freeze_requests",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FreezeRequest"
+                  },
+                  "title": "Response My Freeze Requests"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/entitlements/{entitlement_id}/freeze-requests": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Ask For Freeze",
+        "description": "Sends the request to the client's branch managers; a reason the business approves\nautomatically takes effect at once.",
+        "operationId": "ask_for_freeze",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entitlement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entitlement Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FreezeRequestCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/freeze-requests/{request_id}": {
+      "delete": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Withdraw Freeze Request",
+        "operationId": "withdraw_freeze_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/freezes/{freeze_id}/end-early": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My End Freeze Early",
+        "description": "\"I'm back early\": the freeze ends yesterday, and the dates and the charge come back.",
+        "operationId": "my_end_freeze_early",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "freeze_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Freeze Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entitlement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/promo-codes": {
       "get": {
         "tags": [
@@ -43162,6 +44147,7 @@
               "plan_ending",
               "leads_due",
               "health_review",
+              "freeze_requests",
               "license_expiring"
             ],
             "title": "Kind"
@@ -46845,6 +47831,22 @@
           "max_length"
         ],
         "title": "ClientFieldDefinition"
+      },
+      "ClientFreezeRules": {
+        "properties": {
+          "rules": {
+            "$ref": "#/components/schemas/FreezeRules"
+          },
+          "bank": {
+            "$ref": "#/components/schemas/FreezeBank"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rules",
+          "bank"
+        ],
+        "title": "ClientFreezeRules"
       },
       "ClientHealth": {
         "properties": {
@@ -51077,6 +52079,68 @@
               }
             ],
             "title": "Receipt Number"
+          },
+          "billing_cycle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "yearly",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle"
+          },
+          "billing_cycle_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle Days"
+          },
+          "auto_renew": {
+            "type": "boolean",
+            "title": "Auto Renew"
+          },
+          "next_billing_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing On",
+            "description": "Renewing memberships: the next charge"
+          },
+          "next_billing_amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing Amount",
+            "description": "What the next charge will be after freeze credits and fees (minor units)"
+          },
+          "freezable": {
+            "type": "boolean",
+            "title": "Freezable",
+            "description": "A membership that is not over, cancelled or used up"
           }
         },
         "type": "object",
@@ -51097,7 +52161,13 @@
           "freezes",
           "created_at",
           "receipt_id",
-          "receipt_number"
+          "receipt_number",
+          "billing_cycle",
+          "billing_cycle_days",
+          "auto_renew",
+          "next_billing_on",
+          "next_billing_amount",
+          "freezable"
         ],
         "title": "Entitlement"
       },
@@ -52194,6 +53264,44 @@
               }
             ],
             "title": "Reason"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id",
+            "description": "The client's request, if it came from one"
+          },
+          "billing_mode": {
+            "type": "string",
+            "enum": [
+              "none",
+              "defer",
+              "credit"
+            ],
+            "title": "Billing Mode",
+            "description": "What it did to the billing: deferred the next charge, credited it, or neither"
+          },
+          "billing_shift_days": {
+            "type": "integer",
+            "title": "Billing Shift Days",
+            "description": "Days the next charge moved"
+          },
+          "credit_amount": {
+            "type": "integer",
+            "title": "Credit Amount",
+            "description": "Credit for the next charge, in minor units"
+          },
+          "fee_amount": {
+            "type": "integer",
+            "title": "Fee Amount",
+            "description": "Freeze fee for the next charge, in minor units"
           }
         },
         "type": "object",
@@ -52201,9 +53309,57 @@
           "id",
           "starts_on",
           "ends_on",
-          "reason"
+          "reason",
+          "request_id",
+          "billing_mode",
+          "billing_shift_days",
+          "credit_amount",
+          "fee_amount"
         ],
         "title": "Freeze"
+      },
+      "FreezeBank": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "yearly_bank_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yearly Bank Days"
+          },
+          "used_days": {
+            "type": "integer",
+            "title": "Used Days",
+            "description": "Freeze days this year, including requests waiting"
+          },
+          "remaining_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remaining Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "yearly_bank_days",
+          "used_days",
+          "remaining_days"
+        ],
+        "title": "FreezeBank"
       },
       "FreezeCreate": {
         "properties": {
@@ -52236,6 +53392,385 @@
           "ends_on"
         ],
         "title": "FreezeCreate"
+      },
+      "FreezePreview": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "new_ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "New Ends On",
+            "description": "The membership's end date once frozen"
+          },
+          "billing_mode": {
+            "type": "string",
+            "enum": [
+              "none",
+              "defer",
+              "credit"
+            ],
+            "title": "Billing Mode"
+          },
+          "next_billing_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing From"
+          },
+          "next_billing_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing To"
+          },
+          "credit_amount": {
+            "type": "integer",
+            "title": "Credit Amount"
+          },
+          "fee_amount": {
+            "type": "integer",
+            "title": "Fee Amount"
+          },
+          "next_billing_amount_after": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Billing Amount After",
+            "description": "The next charge after this freeze (renewing memberships)"
+          },
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Problems",
+            "description": "Why a request would be refused now: freeze_requests_off, not_freezable, too_short, too_long, notice_required, outside_validity, overlapping_freeze, overlapping_request, bank_exceeded"
+          },
+          "auto_approved": {
+            "type": "boolean",
+            "title": "Auto Approved",
+            "description": "Whether it would be approved without a manager"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "new_ends_on",
+          "billing_mode",
+          "next_billing_from",
+          "next_billing_to",
+          "credit_amount",
+          "fee_amount",
+          "next_billing_amount_after",
+          "problems",
+          "auto_approved"
+        ],
+        "title": "FreezePreview"
+      },
+      "FreezeRequest": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "entitlement_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Entitlement Id"
+          },
+          "entitlement_name": {
+            "type": "string",
+            "title": "Entitlement Name"
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Starts On"
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Ends On"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "travel",
+              "reserve_duty",
+              "illness",
+              "pregnancy",
+              "other"
+            ],
+            "title": "Reason"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "approved_starts_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved Starts On"
+          },
+          "approved_ends_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved Ends On"
+          },
+          "auto_approved": {
+            "type": "boolean",
+            "title": "Auto Approved"
+          },
+          "decided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Name"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Note"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "client_id",
+          "client_name",
+          "entitlement_id",
+          "entitlement_name",
+          "starts_on",
+          "ends_on",
+          "reason",
+          "note",
+          "status",
+          "approved_starts_on",
+          "approved_ends_on",
+          "auto_approved",
+          "decided_by_name",
+          "decided_at",
+          "decision_note",
+          "created_at",
+          "days"
+        ],
+        "title": "FreezeRequest"
+      },
+      "FreezeRequestCreate": {
+        "properties": {
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Starts On"
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Ends On"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "travel",
+              "reserve_duty",
+              "illness",
+              "pregnancy",
+              "other"
+            ],
+            "title": "Reason"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_on",
+          "ends_on",
+          "reason"
+        ],
+        "title": "FreezeRequestCreate"
+      },
+      "FreezeRules": {
+        "properties": {
+          "allow_requests": {
+            "type": "boolean",
+            "title": "Allow Requests",
+            "description": "Clients may ask from the app",
+            "default": false
+          },
+          "min_days": {
+            "type": "integer",
+            "maximum": 90.0,
+            "minimum": 1.0,
+            "title": "Min Days",
+            "default": 1
+          },
+          "max_days": {
+            "type": "integer",
+            "maximum": 90.0,
+            "minimum": 1.0,
+            "title": "Max Days",
+            "default": 30
+          },
+          "yearly_bank_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 366.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yearly Bank Days",
+            "description": "Most freeze days per client in a year; empty: no limit"
+          },
+          "notice_days": {
+            "type": "integer",
+            "maximum": 60.0,
+            "minimum": 0.0,
+            "title": "Notice Days",
+            "description": "Days ahead a request must be sent",
+            "default": 0
+          },
+          "fee_amount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Fee Amount",
+            "description": "Freeze fee in minor units",
+            "default": 0
+          },
+          "billing_mode": {
+            "type": "string",
+            "enum": [
+              "defer",
+              "credit"
+            ],
+            "title": "Billing Mode",
+            "description": "Renewing memberships: defer the next charge, or credit it",
+            "default": "defer"
+          },
+          "auto_approve_reasons": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "travel",
+                "reserve_duty",
+                "illness",
+                "pregnancy",
+                "other"
+              ]
+            },
+            "type": "array",
+            "title": "Auto Approve Reasons"
+          }
+        },
+        "type": "object",
+        "title": "FreezeRules"
       },
       "FriendRequestCreate": {
         "properties": {
@@ -58205,7 +59740,9 @@
               "session_reminder",
               "plan_ending",
               "friend_request",
-              "class_invite"
+              "class_invite",
+              "freeze_approved",
+              "freeze_rejected"
             ],
             "title": "Kind"
           },
@@ -58213,7 +59750,7 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Payload",
-            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at"
+            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at; freeze_approved, freeze_rejected: plan_name, starts_on, ends_on, note"
           },
           "created_at": {
             "type": "string",
@@ -59765,6 +61302,38 @@
             "type": "boolean",
             "title": "Active"
           },
+          "billing_cycle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "yearly",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle"
+          },
+          "billing_cycle_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle Days"
+          },
+          "auto_renew": {
+            "type": "boolean",
+            "title": "Auto Renew"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -59787,6 +61356,9 @@
           "validity_days",
           "credits",
           "active",
+          "billing_cycle",
+          "billing_cycle_days",
+          "auto_renew",
           "created_at",
           "updated_at"
         ],
@@ -59863,6 +61435,44 @@
             "type": "boolean",
             "title": "Active",
             "default": true
+          },
+          "billing_cycle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "yearly",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle",
+            "description": "Memberships only: how often it is billed. With a cycle, validity_days follows it (30, 91, 365 or billing_cycle_days)"
+          },
+          "billing_cycle_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1095.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle Days",
+            "description": "Only for the custom cycle"
+          },
+          "auto_renew": {
+            "type": "boolean",
+            "title": "Auto Renew",
+            "description": "Needs a billing cycle",
+            "default": false
           }
         },
         "type": "object",
@@ -59931,6 +61541,38 @@
             "type": "boolean",
             "title": "Active"
           },
+          "billing_cycle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "yearly",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle"
+          },
+          "billing_cycle_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Cycle Days"
+          },
+          "auto_renew": {
+            "type": "boolean",
+            "title": "Auto Renew"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -59962,6 +61604,9 @@
           "validity_days",
           "credits",
           "active",
+          "billing_cycle",
+          "billing_cycle_days",
+          "auto_renew",
           "created_at",
           "updated_at",
           "holders",
@@ -60032,6 +61677,18 @@
               }
             ],
             "title": "Active"
+          },
+          "auto_renew": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auto Renew",
+            "description": "Needs a billing cycle"
           }
         },
         "type": "object",
@@ -70374,6 +72031,38 @@
           "first_name"
         ],
         "title": "ProfileUpdate"
+      },
+      "app__api__freeze_requests__Decision": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note",
+            "description": "Shown to the client"
+          },
+          "approved_ends_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved Ends On",
+            "description": "Approve only part of it: the last day to freeze"
+          }
+        },
+        "type": "object",
+        "title": "Decision"
       },
       "app__api__pay_components__Decision": {
         "properties": {

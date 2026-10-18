@@ -11,6 +11,7 @@ import {
   Palette,
   Plug,
   Puzzle,
+  Snowflake,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -24,6 +25,7 @@ import type { TopicGroup, TopicKey } from "./topics";
 
 const ICONS: Record<TopicKey, LucideIcon> = {
   business: Building2,
+  memberships: Snowflake,
   branding: Palette,
   modules: Puzzle,
   billing: CreditCard,
