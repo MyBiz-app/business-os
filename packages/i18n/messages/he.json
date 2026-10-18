@@ -1946,6 +1946,14 @@
       "backEarlyTitle": "לסיים את ההקפאה עכשיו?",
       "backEarlyMessage": "המנוי נפתח שוב היום, והתאריכים והחיוב הבא חוזרים אחורה בימים שלא נוצלו.",
       "backEarlyDone": "ברוכים השבים! המנוי פעיל שוב.",
+      "paper": "מסמך (לא חובה)",
+      "paperHint": "אישור רפואי או צו, כתמונה. רק העסק רואה אותו.",
+      "paperGallery": "בחירת תמונה",
+      "paperCamera": "צילום",
+      "paperRemove": "הסרה",
+      "paperFailed": "לא הצלחנו להעלות את התמונה. נסו שוב.",
+      "paperPermission": "יש לאשר גישה לתמונות או למצלמה כדי לצרף מסמך.",
+      "paperAttached": "מצורף מסמך",
       "frozenRange": "מוקפא {from} - {to}",
       "keep": "להשאיר מוקפא"
     },
@@ -2070,6 +2078,7 @@
     "decisionNote": "הודעה ללקוח (לא חובה)",
     "decided": "בוצע.",
     "requestsRequestedBy": "הלקוח ביקש באפליקציה",
+    "requestPaper": "פתיחת המסמך המצורף",
     "autoApproved": "אושר אוטומטית",
     "quota": "הגבלת ביקורים",
     "quotas": {

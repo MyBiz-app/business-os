@@ -230,7 +230,12 @@ def test_custom_agents(client: TestClient, studio: dict, use_provider) -> None:
     use_provider(provider)
     ask(client, owner, chat(client, owner, card["key"]), "hi")
     # Only the clients domain: no schedule, no metrics, no hand-over tool.
-    assert tool_names(provider) == {"find_clients", "get_client", "inactive_members"}
+    assert tool_names(provider) == {
+        "find_clients",
+        "get_client",
+        "inactive_members",
+        "suggest_freeze",
+    }
 
     no_domain = client.post("/ai/agents", json={"name": "Empty", "tool_domains": []}, headers=owner)
     assert no_domain.status_code == 422

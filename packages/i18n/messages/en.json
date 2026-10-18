@@ -1946,6 +1946,14 @@
       "backEarlyTitle": "End the freeze now?",
       "backEarlyMessage": "Your plan opens again today, and the dates and next charge go back by the unused days.",
       "backEarlyDone": "Welcome back! Your plan is active again.",
+      "paper": "A paper (optional)",
+      "paperHint": "A medical note or a call-up paper, as a photo. Only the business sees it.",
+      "paperGallery": "Choose a photo",
+      "paperCamera": "Take a photo",
+      "paperRemove": "Remove",
+      "paperFailed": "We couldn't upload the photo. Try again.",
+      "paperPermission": "Allow access to your photos or camera to attach a paper.",
+      "paperAttached": "paper attached",
       "frozenRange": "Frozen {from} - {to}",
       "keep": "Keep frozen"
     },
@@ -2070,6 +2078,7 @@
     "decisionNote": "Message to the client (optional)",
     "decided": "Done.",
     "requestsRequestedBy": "Requested by the client in the app",
+    "requestPaper": "Open the attached paper",
     "autoApproved": "Approved automatically",
     "quota": "Visits limit",
     "quotas": {

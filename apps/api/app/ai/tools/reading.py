@@ -16,6 +16,7 @@ from app.ai.tools.base import (
     _uuid,
 )
 from app.api import bookings as bookings_api
+from app.api import freeze_requests as freeze_api
 from app.api import plans as plans_api
 from app.api import resources as resources_api
 from app.api import schedule as schedule_api
@@ -274,6 +275,54 @@ def inactive_members(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
             }
             for m in members
         ],
+    }
+
+
+def suggest_freeze(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    """What a freeze of these days would do to each of the client's memberships. Only reads: the
+    client asks for the freeze in the app, and a manager decides (round 7, R23)."""
+    client_id = _uuid(args["client_id"], "client_id")
+    starts_on, ends_on = (
+        _date(args["start_date"], "start_date"),
+        _date(args["end_date"], "end_date"),
+    )
+    if ends_on < starts_on or (ends_on - starts_on).days > 90:
+        raise ToolError("the freeze must be 1 to 91 days, ending after it starts")
+    db = ctx.tenant.session
+    if not visible_clients(db, [client_id]):
+        raise ToolError("no client with that id")
+    rules = freeze_api.load_rules(db)
+    today = freeze_api.local_today(db)
+    options = []
+    for e in plans_api.list_entitlements(db, client_id):
+        if not e.freezable or e.state not in ("active", "upcoming"):
+            continue
+        preview = freeze_api.preview_for(db, e, rules, starts_on, ends_on)
+        options.append(
+            {
+                "plan": e.name,
+                "entitlement_id": str(e.id),
+                "valid_until": e.ends_on.isoformat(),
+                "would_end_on": preview.new_ends_on.isoformat(),
+                "next_charge_moves": (
+                    f"{preview.next_billing_from} to {preview.next_billing_to}"
+                    if preview.next_billing_from
+                    else None
+                ),
+                "credit_minor_units": preview.credit_amount,
+                "fee_minor_units": preview.fee_amount,
+                "would_be_refused_because": preview.problems,
+            }
+        )
+    bank = freeze_api.bank_for(db, client_id, rules, starts_on.year)
+    return {
+        "note": "A suggestion only: nothing is frozen. The client asks for it in the app "
+        "(Bookings, Freeze under the plan) and a manager decides. Never say it is done.",
+        "today": today.isoformat(),
+        "business_accepts_requests": rules.allow_requests,
+        "days": (ends_on - starts_on).days + 1,
+        "freeze_days_left_this_year": bank.remaining_days,
+        "memberships": options,
     }
 
 

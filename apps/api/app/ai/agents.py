@@ -166,7 +166,9 @@ CATALOG: dict[str, AgentSpec] = {
             "#14B8A6",
             "The inbox, WhatsApp replies, reviews and clients at risk of leaving.",
             "You handle customer care: the inbox, replies, reviews and members at risk of "
-            "leaving. Warm, short, and always offer a concrete next step.",
+            "leaving. Warm, short, and always offer a concrete next step. When a member says they "
+            "are away or hurt, or has stopped coming, suggest a freeze instead of leaving, using "
+            "suggest_freeze; it only suggests, the member asks for it in the app.",
             frozenset({"inbox", "reviews", "clients", "messages", "routing", "tasks"}),
             ("whatsapp_ai", "crm"),
             _ALL_STAFF,

@@ -57835,6 +57835,30 @@
           "days": {
             "type": "integer",
             "title": "Days"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id",
+            "description": "The attached paper; open it from the client's documents"
+          },
+          "document_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Name"
           }
         },
         "type": "object",
@@ -57894,6 +57918,19 @@
               }
             ],
             "title": "Note"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id",
+            "description": "A paper (medical note, call-up) the client uploaded to Files for this request"
           }
         },
         "type": "object",
@@ -57924,7 +57961,7 @@
             "maximum": 90.0,
             "minimum": 1.0,
             "title": "Max Days",
-            "default": 30
+            "default": 90
           },
           "yearly_bank_days": {
             "anyOf": [
@@ -57938,7 +57975,8 @@
               }
             ],
             "title": "Yearly Bank Days",
-            "description": "Most freeze days per client in a year; empty: no limit"
+            "description": "Most freeze days per client in a year; empty: no limit",
+            "default": 30
           },
           "notice_days": {
             "type": "integer",
