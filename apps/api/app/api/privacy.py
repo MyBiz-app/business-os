@@ -261,6 +261,20 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             "SELECT friend_code, visible, created_at FROM app.client_social WHERE client_id = :id",
             client_id,
         ),
+        "waitlist_requests": _rows(
+            db,
+            """
+            SELECT kind, day, from_time, to_time, starts_at, status, created_at
+            FROM app.waitlist_requests WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
+        "waitlist_offers": _rows(
+            db,
+            "SELECT status, offered_at FROM app.waitlist_offers WHERE client_id = :id"
+            " ORDER BY offered_at",
+            client_id,
+        ),
         "identity_documents": _rows(
             db,
             """
@@ -350,6 +364,8 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         text("DELETE FROM app.health_declarations WHERE client_id = :id"), {"id": client_id}
     ).rowcount
     db.execute(text("DELETE FROM app.notifications WHERE client_id = :id"), {"id": client_id})
+    db.execute(text("DELETE FROM app.waitlist_offers WHERE client_id = :id"), {"id": client_id})
+    db.execute(text("DELETE FROM app.waitlist_requests WHERE client_id = :id"), {"id": client_id})
     # Announcement delivery logs, the friends profile, WhatsApp offers and their chats with the
     # in-app AI assistant (a database function: the API role can't delete in those tables).
     db.execute(text("SELECT app.erase_client_traces(:id)"), {"id": client_id})

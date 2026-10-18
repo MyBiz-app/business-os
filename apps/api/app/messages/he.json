@@ -20,6 +20,8 @@
       "plan_ending": "המנוי שלך מסתיים ב-{date}",
       "friend_request": "{friend} רוצה להיות חבר שלך",
       "class_invite": "{friend} הזמין אותך: {service} ב-{when}",
+      "waitlist_spot_open": "התפנה מקום: {service} ב-{when}",
+      "waitlist_spot_taken": "מישהו הקדים אותך: {service} ב-{when}",
       "freeze_approved": "ההקפאה אושרה: {from} עד {date}",
       "freeze_rejected": "לגבי בקשת ההקפאה שלך"
     },
@@ -36,6 +38,8 @@
       "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם.",
       "friend_request": "{friend} שלח לך בקשת חברות ב{business}. אפשר לאשר באפליקציה.",
       "class_invite": "{friend} שמר לך מקום ב{service} ב-{when} ב{business}. אפשר להצטרף באפליקציה; המקום שמור לזמן קצר.",
+      "waitlist_spot_open": "התפנה מקום ל{service} ב-{when}, ומי שתופס ראשון לוקח. אפשר לתפוס באפליקציה.",
+      "waitlist_spot_taken": "מישהו תפס את המקום ב{service} ב-{when} רגע לפניך. אתה עדיין ברשימת ההמתנה, ונעדכן אם יתפנה מקום נוסף.",
       "freeze_approved": "{business} אישר להקפיא את ה{plan} שלך מ-{from} עד {date}. תאריך הסיום זז באותו מספר ימים.",
       "freeze_rejected": "{business} לא יכול היה לאשר הקפאה של ה{plan} שלך מ-{from} עד {date}."
     },

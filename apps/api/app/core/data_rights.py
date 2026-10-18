@@ -48,6 +48,8 @@ CLIENT_TABLES: dict[str, ClientTable] = {
     "freeze_requests": ClientTable("freeze_requests", "kept", "membership history"),
     "reviews": ClientTable("reviews", "cleared", "the rating stays, the comment goes"),
     "time_entries": ClientTable("time_entries", "kept", "billing records"),
+    "waitlist_offers": ClientTable("waitlist_offers", "deleted"),
+    "waitlist_requests": ClientTable("waitlist_requests", "deleted"),
     "whatsapp_conversations": ClientTable("whatsapp_ai_conversations", "deleted"),
     "whatsapp_offers": ClientTable("whatsapp_offers", "deleted"),
 }

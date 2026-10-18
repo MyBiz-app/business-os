@@ -11,8 +11,8 @@ for a client whose request is approved automatically.
 Nothing existing changes: a plan with no cycle behaves as before, a business with no rules row
 does not accept requests, and the previous release never selects the new columns.
 
-Revision ID: 0134
-Revises: 0133
+Revision ID: 0135
+Revises: 0134
 Create Date: 2026-10-18
 """
 
@@ -20,8 +20,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0134"
-down_revision: str | None = "0133"
+revision: str = "0135"
+down_revision: str | None = "0134"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -37,6 +37,8 @@ NOTIFICATION_KINDS = (
     "plan_ending",
     "friend_request",
     "class_invite",
+    "waitlist_spot_open",
+    "waitlist_spot_taken",
 )
 NEW_KINDS = ("freeze_approved", "freeze_rejected")
 

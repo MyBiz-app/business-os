@@ -65,6 +65,9 @@ BOUNDED = {
     # waiting requests first, then the latest decided: LIMIT 200 (a business) and 50 (a client)
     "/freeze-requests": "limit in SQL",
     "/client/freeze-requests": "limit in SQL",
+    # the SQL returns at most 200 (staff) or 50 (one client: five requests and a few class places)
+    "/waitlist": "limit in SQL",
+    "/client/waitlist": "limit in SQL",
     # one person's AI connections in one business: at most 20 (the cap when approving)
     "/mcp-connections": "capped",
     # the console's unpaid-invoice list: the function returns at most 500 businesses

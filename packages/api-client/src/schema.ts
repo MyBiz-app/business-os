@@ -5582,6 +5582,192 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Waitlist
+         * @description Everyone waiting for a spot, by day: requests and places on classes' own lists.
+         */
+        get: operations["list_waitlist"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/waitlist/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Waitlist Summary
+         * @description How many people wait, and for what (the dashboard's hint to open another class).
+         */
+        get: operations["waitlist_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/waitlist/requests/{request_id}/admit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admit Request
+         * @description The team lets a waiting client in (the manual mode's "let in"): books them into the spot
+         *     that opened and tells them.
+         */
+        post: operations["admit_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/waitlist/bookings/{booking_id}/admit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admit Booking
+         * @description The team moves someone from a class's own list into a spot that is free.
+         */
+        post: operations["admit_booking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/waitlist/requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove Request
+         * @description The team takes a request off the list.
+         */
+        delete: operations["remove_request"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/waitlist/requests/{request_id}/notify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Notify Request
+         * @description The team tells a waiting client about the spot that is free for them now.
+         */
+        post: operations["notify_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Waitlist
+         * @description What the signed-in client waits for: their requests and their places on classes' lists.
+         */
+        get: operations["my_waitlist"];
+        put?: never;
+        /**
+         * Join Waitlist
+         * @description "Tell me if something opens": a given time, a range of hours or a whole day.
+         */
+        post: operations["join_waitlist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/waitlist/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Leave Waitlist
+         * @description The client stops waiting (a place on a class's own list is cancelled as a booking).
+         */
+        delete: operations["leave_waitlist"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/waitlist/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Claim Spot
+         * @description "First to take it gets it": the client takes the spot they were told about. 409
+         *     `spot_taken` when someone was faster (they stay on the list).
+         */
+        post: operations["claim_spot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/rooms/{room_id}/hours": {
         parameters: {
             query?: never;
@@ -9204,6 +9390,27 @@ export interface components {
             /** Created At */
             created_at: string;
         };
+        /** AdmitRequest */
+        AdmitRequest: {
+            /**
+             * Session Id
+             * @description The free spot to use; default: the first one that matches
+             */
+            session_id?: string | null;
+        };
+        /** Admitted */
+        Admitted: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+        };
         /** AgentCard */
         AgentCard: {
             /** Key */
@@ -10824,6 +11031,36 @@ export interface components {
             /** Region Name */
             region_name: string | null;
         };
+        /** ClaimBody */
+        ClaimBody: {
+            /**
+             * Session Id
+             * Format: uuid
+             * @description The spot the client was told about
+             */
+            session_id: string;
+            /**
+             * Pay
+             * @description Courts paid in the app: the client agreed to pay
+             * @default false
+             */
+            pay: boolean;
+            /** Idempotency Key */
+            idempotency_key?: string | null;
+        };
+        /** Claimed */
+        Claimed: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+        };
         /** Client */
         Client: {
             /**
@@ -11036,6 +11273,27 @@ export interface components {
              * @enum {string}
              */
             resource_payment: "app" | "venue";
+            /**
+             * Waitlist Class
+             * @description The business's waitlist for classes (off: none)
+             * @default off
+             * @enum {string}
+             */
+            waitlist_class: "off" | "auto" | "first_come" | "manual";
+            /**
+             * Waitlist Appointment
+             * @description The business's waitlist for personal appointments
+             * @default off
+             * @enum {string}
+             */
+            waitlist_appointment: "off" | "auto" | "first_come" | "manual";
+            /**
+             * Waitlist Resource
+             * @description The business's waitlist for courts and rooms
+             * @default off
+             * @enum {string}
+             */
+            waitlist_resource: "off" | "auto" | "first_come" | "manual";
             /**
              * Dependents
              * @description The industry keeps the client's pets / children (#43)
@@ -15583,6 +15841,60 @@ export interface components {
              */
             created_at: string;
         };
+        /** MyWaitlistEntry */
+        MyWaitlistEntry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "request" | "booking";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "session" | "slot" | "range" | "day";
+            /** Session Id */
+            session_id?: string | null;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** From Time */
+            from_time?: string | null;
+            /** To Time */
+            to_time?: string | null;
+            /** Starts At */
+            starts_at?: string | null;
+            /** Staff Name */
+            staff_name?: string | null;
+            /** Position */
+            position?: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Offer Session Id
+             * @description A spot is free and the client can take it now
+             */
+            offer_session_id?: string | null;
+            /** Offer Starts At */
+            offer_starts_at?: string | null;
+        };
         /** NetLine */
         NetLine: {
             /** Code */
@@ -15709,10 +16021,10 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending" | "friend_request" | "class_invite" | "freeze_approved" | "freeze_rejected";
+            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending" | "friend_request" | "class_invite" | "freeze_approved" | "freeze_rejected" | "waitlist_spot_open" | "waitlist_spot_taken";
             /**
              * Payload
-             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at; freeze_approved, freeze_rejected: plan_name, starts_on, ends_on, note
+             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at; freeze_approved, freeze_rejected: plan_name, starts_on, ends_on, note; waitlist_spot_open: session_id, service_name, starts_at, ends_at
              */
             payload: {
                 [key: string]: unknown;
@@ -18602,6 +18914,11 @@ export interface components {
              * @default 0
              */
             travel_minutes: number;
+            /**
+             * Waitlist Mode
+             * @description Overrides the business's waitlist mode for this service
+             */
+            waitlist_mode?: ("off" | "auto" | "first_come" | "manual") | null;
         };
         /** ServiceCreate */
         ServiceCreate: {
@@ -18729,6 +19046,11 @@ export interface components {
             on_site?: boolean | null;
             /** Travel Minutes */
             travel_minutes?: number | null;
+            /**
+             * Waitlist Mode
+             * @description This service's own waitlist mode; null follows the business
+             */
+            waitlist_mode?: ("off" | "auto" | "first_come" | "manual") | null;
         };
         /** SessionCreate */
         SessionCreate: {
@@ -19765,6 +20087,39 @@ export interface components {
              */
             client_id_number: "off" | "optional" | "required";
             /**
+             * Waitlist Enabled
+             * @description The business keeps waitlists
+             * @default true
+             */
+            waitlist_enabled: boolean;
+            /**
+             * Waitlist Class Mode
+             * @description What happens when a spot in a class opens
+             * @default auto
+             * @enum {string}
+             */
+            waitlist_class_mode: "off" | "auto" | "first_come" | "manual";
+            /**
+             * Waitlist Appointment Mode
+             * @description What happens when a personal appointment time opens
+             * @default off
+             * @enum {string}
+             */
+            waitlist_appointment_mode: "off" | "auto" | "first_come" | "manual";
+            /**
+             * Waitlist Resource Mode
+             * @description What happens when a court or room time opens
+             * @default off
+             * @enum {string}
+             */
+            waitlist_resource_mode: "off" | "auto" | "first_come" | "manual";
+            /**
+             * Waitlist Auto Hours
+             * @description Automatic sign-up stops this many hours before a class starts
+             * @default 3
+             */
+            waitlist_auto_hours: number;
+            /**
              * Resource Payment
              * @description Reservations of courts and rooms: paid in the app or at the venue
              * @default app
@@ -19944,6 +20299,16 @@ export interface components {
             network_scope?: ("network" | "branch") | null;
             /** Client Id Number */
             client_id_number?: ("off" | "optional" | "required") | null;
+            /** Waitlist Enabled */
+            waitlist_enabled?: boolean | null;
+            /** Waitlist Class Mode */
+            waitlist_class_mode?: ("off" | "auto" | "first_come" | "manual") | null;
+            /** Waitlist Appointment Mode */
+            waitlist_appointment_mode?: ("off" | "auto" | "first_come" | "manual") | null;
+            /** Waitlist Resource Mode */
+            waitlist_resource_mode?: ("off" | "auto" | "first_come" | "manual") | null;
+            /** Waitlist Auto Hours */
+            waitlist_auto_hours?: number | null;
             /** Shifts Publish Auto */
             shifts_publish_auto?: boolean | null;
             /** Shifts Publish Cadence */
@@ -20350,6 +20715,156 @@ export interface components {
         VoidInvoice: {
             /** Reason */
             reason: string;
+        };
+        /** WaitlistEntry */
+        WaitlistEntry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Source
+             * @description request: a time range, day or exact time; booking: a place on a class's list
+             * @enum {string}
+             */
+            source: "request" | "booking";
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "session" | "slot" | "range" | "day";
+            /**
+             * Session Id
+             * @description The class, for a booking entry
+             */
+            session_id?: string | null;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** From Time */
+            from_time?: string | null;
+            /** To Time */
+            to_time?: string | null;
+            /** Starts At */
+            starts_at?: string | null;
+            /** Location Id */
+            location_id?: string | null;
+            /** Location Name */
+            location_name?: string | null;
+            /** Staff User Id */
+            staff_user_id?: string | null;
+            /** Staff Name */
+            staff_name?: string | null;
+            /**
+             * Position
+             * @description Place in the queue for this service and day
+             */
+            position: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "off" | "auto" | "first_come" | "manual";
+            /**
+             * Status
+             * @description offered: the client was told about a free spot
+             * @enum {string}
+             */
+            status: "waiting" | "offered";
+            /**
+             * Open Session Id
+             * @description A spot that is free right now for this client
+             */
+            open_session_id?: string | null;
+            /** Open Starts At */
+            open_starts_at?: string | null;
+        };
+        /** WaitlistRequestCreate */
+        WaitlistRequestCreate: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "slot" | "range" | "day";
+            /**
+             * Day
+             * @description The local day (a slot's own day)
+             */
+            day?: string | null;
+            /**
+             * From Time
+             * @description Range: from (local time)
+             */
+            from_time?: string | null;
+            /**
+             * To Time
+             * @description Range: to (local time)
+             */
+            to_time?: string | null;
+            /**
+             * Starts At
+             * @description Slot: the exact start
+             */
+            starts_at?: string | null;
+            /**
+             * Staff User Id
+             * @description Only with this person
+             */
+            staff_user_id?: string | null;
+            /**
+             * Location Id
+             * @description Only at this branch
+             */
+            location_id?: string | null;
+        };
+        /** WaitlistServiceCount */
+        WaitlistServiceCount: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Name */
+            name: string;
+            /** Waiting */
+            waiting: number;
+        };
+        /** WaitlistSummary */
+        WaitlistSummary: {
+            /** Waiting */
+            waiting: number;
+            /**
+             * Services
+             * @description The most wanted services
+             */
+            services: components["schemas"]["WaitlistServiceCount"][];
         };
         /** WebsiteOrder */
         WebsiteOrder: {
@@ -34459,6 +34974,349 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AppointmentService"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_waitlist: {
+        parameters: {
+            query?: {
+                day?: string | null;
+                location_id?: string | null;
+                service_id?: string | null;
+                mode?: ("auto" | "first_come" | "manual") | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitlistEntry"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    waitlist_summary: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitlistSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admit_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdmitRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Admitted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admit_booking: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Admitted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    notify_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_waitlist: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyWaitlistEntry"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    join_waitlist: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WaitlistRequestCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyWaitlistEntry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    leave_waitlist: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    claim_spot: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClaimBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Claimed"];
                 };
             };
             /** @description Validation Error */

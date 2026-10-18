@@ -27,7 +27,8 @@ PLATFORM_TABLES = {
 # Tenant tables neither the demo data nor `_synthetic_row` can fill (a CHECK constraint needs a
 # real value). Add a row for them in the seed (preferred) or list them here.
 # time_clock_approvals needs a real member and a first-of-month date; the demo data (D1) fills it.
-UNSEEDED: set[str] = {"time_clock_approvals"}
+# waitlist_requests needs a kind that matches its time columns and a future day.
+UNSEEDED: set[str] = {"time_clock_approvals", "waitlist_requests"}
 # Values for columns a CHECK constraint pins down (a synthetic row can't guess them).
 OVERRIDES = {
     "ai_agents": {"builtin_key": "'x'"},

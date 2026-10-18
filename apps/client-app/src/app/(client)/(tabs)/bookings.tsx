@@ -33,6 +33,7 @@ const CURRENT = new Set<Entitlement["state"]>(["active", "upcoming", "frozen"]);
 /** The client's plans, upcoming bookings (soonest first) and history. */
 export default function Bookings() {
   const t = useTranslations("client.bookings");
+  const tWaitlist = useTranslations("client.waitlist");
   const tStatus = useTranslations("bookings");
   const tPlans = useTranslations("plans");
   const tReceipts = useTranslations("receipts");
@@ -274,6 +275,9 @@ export default function Bookings() {
           <Card palette={palette}>{(allHistory ? data.past : data.past.slice(0, HISTORY_PAGE)).map(row)}</Card>
         </>
       ) : null}
+      {(business.waitlist_class !== "off" || business.waitlist_appointment !== "off" || business.waitlist_resource !== "off") && (
+        <ListRow palette={palette} title={tWaitlist("title")} onPress={() => router.push("/waitlist")} />
+      )}
       <ListRow palette={palette} title={t("receipts")} onPress={() => router.push("/receipts")} />
     </Screen>
   );
