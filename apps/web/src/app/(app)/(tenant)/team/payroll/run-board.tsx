@@ -116,7 +116,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
       <Stepper stage={stage} />
       <p className="text-sm text-muted">{t(`stageHint.${stage}`)}</p>
 
-      <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="card p-4">
           <dt className="text-sm text-muted">{t("summary.gross")}</dt>
           <dd className="text-2xl font-semibold tabular-nums">
@@ -133,6 +133,13 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
           <dd className="text-2xl font-semibold tabular-nums">
             <bdi>{money(summary.deductions_minor)}</bdi>
           </dd>
+        </div>
+        <div className="card p-4">
+          <dt className="text-sm text-muted">{t("summary.employerCost")}</dt>
+          <dd className="text-2xl font-semibold tabular-nums">
+            <bdi>{money(summary.employer_cost_minor)}</bdi>
+          </dd>
+          <dd className="text-xs text-muted">{t("summary.employerCostNote")}</dd>
         </div>
         <div className="card p-4">
           <dt className="text-sm text-muted">{t("summary.people")}</dt>

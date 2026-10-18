@@ -27,6 +27,11 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
   const brand = (BRANDS as readonly string[]).includes(brandField) ? (brandField as (typeof BRANDS)[number]) : "visa";
 
   const api = await getApi();
+  // "Show me a sample too": a separate sample business of the same industry, made first (the
+  // endpoint is only for people with no business yet). A hiccup must not block the sign-up.
+  if (plan.track !== "existing" && formData.get("sample_data") === "on") {
+    await api.POST("/tenants/sample", { body: { vertical: plan.vertical } }).catch(() => null);
+  }
   let tenant: Tenant;
   try {
     tenant = unwrap(
