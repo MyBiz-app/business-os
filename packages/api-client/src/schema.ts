@@ -14741,7 +14741,7 @@ export interface components {
             site_url: string | null;
             /**
              * Customer Message
-             * @description MyBiz's note to the business
+             * @description The platform team's note to the business
              */
             customer_message: string | null;
             /**
@@ -14785,7 +14785,7 @@ export interface components {
             price: components["schemas"]["Price"];
             /**
              * With System
-             * @description The business also uses the MyBiz system
+             * @description The business also uses the system
              */
             with_system: boolean;
             /**

@@ -57792,7 +57792,7 @@
               }
             ],
             "title": "Customer Message",
-            "description": "MyBiz's note to the business"
+            "description": "The platform team's note to the business"
           },
           "change_request": {
             "anyOf": [
@@ -57944,7 +57944,7 @@
           "with_system": {
             "type": "boolean",
             "title": "With System",
-            "description": "The business also uses the MyBiz system"
+            "description": "The business also uses the system"
           },
           "missing": {
             "items": {
