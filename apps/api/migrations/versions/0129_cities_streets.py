@@ -14,7 +14,7 @@ Expand step only:
 Existing rows keep their text and stay valid; the previous release never reads the new columns.
 
 Revision ID: 0129
-Revises: 0127
+Revises: 0128
 Create Date: 2026-10-18
 """
 
@@ -25,7 +25,7 @@ from alembic import op
 from app.geo.loader import load_snapshot
 
 revision: str = "0129"
-down_revision: str | None = "0127"
+down_revision: str | None = "0128"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
