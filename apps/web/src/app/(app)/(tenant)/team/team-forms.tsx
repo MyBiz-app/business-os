@@ -2,12 +2,13 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useActionState, useMemo, useState } from "react";
+import { type ReactNode, useActionState, useMemo, useState } from "react";
 
 import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { IdentityEditor } from "@/components/identity-editor";
+import { Modal } from "@/components/ui/modal";
 import { PermissionList } from "@/components/permission-list";
 import { SubmitButton } from "@/components/form/submit-button";
 
@@ -167,17 +168,48 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
 type MemberBranchesProps = { userId: string; email: string; branches: { id: string; name: string }[]; selected: string[]; home: string | null };
 
 /** Where a member works: some branches, or (none checked) all of them. */
+/** A small button that opens its content in a window (replaces the bare `<details>` popovers). */
+function WindowButton({
+  trigger,
+  title,
+  description,
+  children,
+}: {
+  trigger: ReactNode;
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" className="control px-2 py-1.5 text-sm" onClick={() => setOpen(true)}>
+        {trigger}
+      </button>
+      {open ? (
+        <Modal size="sm" title={title} description={description} onClose={() => setOpen(false)}>
+          {children}
+        </Modal>
+      ) : null}
+    </>
+  );
+}
+
 function MemberBranches({ userId, email, branches, selected, home }: MemberBranchesProps) {
   const t = useTranslations("team");
   const [state, action] = useActionState<TeamState, FormData>(setBranches.bind(null, userId), {});
   const names = branches.filter((b) => selected.includes(b.id)).map((b) => b.name);
   return (
-    <details className="group relative">
-      <summary className="control cursor-pointer list-none px-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden">
-        <span className="sr-only">{t("branchesOf", { email })}: </span>
-        {names.length === 0 ? t("allBranches") : names.length === 1 ? names[0] : t("someBranches", { count: names.length })}
-      </summary>
-      <form action={action} className="absolute end-0 top-full z-20 mt-1 flex w-56 flex-col gap-2 rounded-2xl bg-surface p-3 shadow-xl ring-1 ring-border">
+    <WindowButton
+      title={t("branchesOf", { email })}
+      trigger={
+        <>
+          <span className="sr-only">{t("branchesOf", { email })}: </span>
+          {names.length === 0 ? t("allBranches") : names.length === 1 ? names[0] : t("someBranches", { count: names.length })}
+        </>
+      }
+    >
+      <form action={action} className="flex flex-col gap-3">
         <TeamError state={state} />
         <fieldset className="flex flex-col gap-1.5">
           <legend className="mb-1 text-xs text-muted">{t("branchesHint")}</legend>
@@ -203,7 +235,7 @@ function MemberBranches({ userId, email, branches, selected, home }: MemberBranc
           {t("saveBranches")}
         </button>
       </form>
-    </details>
+    </WindowButton>
   );
 }
 
@@ -211,19 +243,15 @@ function MemberBranches({ userId, email, branches, selected, home }: MemberBranc
 function MemberPermissions({ email, all, allowed }: { email: string; all: string[]; allowed: string[] }) {
   const t = useTranslations("team");
   return (
-    <details className="group relative">
-      <summary className="control cursor-pointer list-none px-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden">{t("viewPermissions")}</summary>
-      <div className="absolute end-0 top-full z-20 mt-1 flex w-72 max-w-[85vw] flex-col gap-3 rounded-2xl bg-surface p-4 shadow-xl ring-1 ring-border">
-        <p className="text-sm font-medium" dir="auto">
-          {t("permissionsOf", { email })}
-        </p>
+    <WindowButton title={t("permissionsOf", { email })} trigger={t("viewPermissions")}>
+      <div className="flex flex-col gap-3">
         <PermissionList all={all} allowed={allowed} />
         <p className="text-xs text-muted">{t("permissionsHint")}</p>
         <Link href="/team/roles" className="text-sm text-primary-ink underline-offset-4 hover:underline">
           {t("manageRoles")}
         </Link>
       </div>
-    </details>
+    </WindowButton>
   );
 }
 
@@ -231,17 +259,11 @@ function MemberPermissions({ email, all, allowed }: { email: string; all: string
  * only when the popover opens. */
 function MemberIdentity({ userId, name }: { userId: string; name: string }) {
   const t = useTranslations("identity");
-  const [open, setOpen] = useState(false);
   const subject = useMemo(() => ({ kind: "member" as const, id: userId }), [userId]);
+  // The window mounts its content only while open, so the number loads only when it is asked for.
   return (
-    <details className="group relative" onToggle={(event) => setOpen(event.currentTarget.open)}>
-      <summary className="control cursor-pointer list-none px-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden">{t("title")}</summary>
-      <div className="absolute end-0 top-full z-20 mt-1 flex w-72 max-w-[85vw] flex-col gap-3 rounded-2xl bg-surface p-4 shadow-xl ring-1 ring-border">
-        <p className="text-sm font-medium" dir="auto">
-          {t("memberIntro", { name })}
-        </p>
-        {open && <IdentityEditor subject={subject} />}
-      </div>
-    </details>
+    <WindowButton title={t("title")} description={t("memberIntro", { name })} trigger={t("title")}>
+      <IdentityEditor subject={subject} />
+    </WindowButton>
   );
 }

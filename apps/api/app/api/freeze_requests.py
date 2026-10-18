@@ -39,15 +39,18 @@ SettingsDep = Annotated[TenantContext, Depends(require(Permission.BUSINESS_SETTI
 Reason = Literal["travel", "reserve_duty", "illness", "pregnancy", "other"]
 RequestStatus = Literal["pending", "approved", "rejected", "cancelled"]
 BillingMode = Literal["defer", "credit"]
+# Defaults of decision 18.11: a bank of 30 freeze days a year, at most 90 days in one request.
+DEFAULT_YEARLY_BANK_DAYS = 30
+DEFAULT_MAX_DAYS = 90
 REASONS: tuple[str, ...] = ("travel", "reserve_duty", "illness", "pregnancy", "other")
 
 
 class FreezeRules(BaseModel):
     allow_requests: bool = Field(default=False, description="Clients may ask from the app")
     min_days: int = Field(default=1, ge=1, le=90)
-    max_days: int = Field(default=30, ge=1, le=90)
+    max_days: int = Field(default=DEFAULT_MAX_DAYS, ge=1, le=90)
     yearly_bank_days: int | None = Field(
-        default=None,
+        default=DEFAULT_YEARLY_BANK_DAYS,
         ge=1,
         le=366,
         description="Most freeze days per client in a year; empty: no limit",
@@ -85,6 +88,10 @@ class FreezeRequestCreate(BaseModel):
     ends_on: dt.date
     reason: Reason
     note: str | None = Field(default=None, max_length=500)
+    document_id: UUID | None = Field(
+        default=None,
+        description="A paper (medical note, call-up) the client uploaded to Files for this request",
+    )
 
     @field_validator("note", mode="before")
     @classmethod
@@ -138,6 +145,10 @@ class FreezeRequest(BaseModel):
     decision_note: str | None
     created_at: dt.datetime
     days: int
+    document_id: UUID | None = Field(
+        default=None, description="The attached paper; open it from the client's documents"
+    )
+    document_name: str | None = None
 
 
 class Decision(BaseModel):
@@ -157,11 +168,13 @@ REQUEST_SELECT = """
            r.entitlement_id, e.name AS entitlement_name, r.starts_on, r.ends_on, r.reason, r.note,
            r.status, r.approved_starts_on, r.approved_ends_on, r.auto_approved,
            coalesce(d.full_name, d.email) AS decided_by_name, r.decided_at, r.decision_note,
-           r.created_at, (r.ends_on - r.starts_on + 1) AS days
+           r.created_at, (r.ends_on - r.starts_on + 1) AS days,
+           r.document_id, doc.name AS document_name
     FROM app.freeze_requests r
     JOIN app.clients c ON c.id = r.client_id
     JOIN app.entitlements e ON e.id = r.entitlement_id
     LEFT JOIN app.users d ON d.id = r.decided_by
+    LEFT JOIN app.client_documents doc ON doc.id = r.document_id
 """
 
 
@@ -555,12 +568,26 @@ def ask_for_freeze(
     problems = problems_with(db, entitlement, rules, body.starts_on, body.ends_on, local_today(db))
     if problems:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=problems[0])
+    if body.document_id is not None:
+        # Only a paper the client uploaded themselves can be attached (RLS hides other rows).
+        own = db.execute(
+            text("""
+                SELECT 1 FROM app.client_documents
+                WHERE id = :id AND client_id = app.current_client_id() AND uploaded_by_client
+            """),
+            {"id": body.document_id},
+        ).first()
+        if own is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="bad_document"
+            )
     request_id = db.execute(
         text("""
             INSERT INTO app.freeze_requests
-                (tenant_id, client_id, entitlement_id, starts_on, ends_on, reason, note)
+                (tenant_id, client_id, entitlement_id, starts_on, ends_on, reason, note,
+                 document_id)
             VALUES (app.acting_tenant_id(), app.current_client_id(), :e, :starts_on, :ends_on,
-                    :reason, :note)
+                    :reason, :note, :document_id)
             RETURNING id
         """),
         {"e": entitlement_id, **body.model_dump()},

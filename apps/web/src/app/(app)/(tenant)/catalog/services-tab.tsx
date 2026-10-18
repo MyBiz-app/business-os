@@ -11,6 +11,7 @@ import { canReadReports, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
 import { catalogHref, type CatalogShow } from "./tabs";
+import { CardTransition } from "@/components/ui/page-transition";
 
 /** The services you offer: tiles that filter, then the cards. Each card opens in a window. */
 export async function ServicesTab({ show }: { show: CatalogShow }) {
@@ -70,6 +71,7 @@ export async function ServicesTab({ show }: { show: CatalogShow }) {
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {services.map((service) => (
             <li key={service.id}>
+              <CardTransition name={`service-${service.id}`}>
               <Link
                 href={`/catalog/services/${service.id}`}
                 scroll={false}
@@ -109,6 +111,7 @@ export async function ServicesTab({ show }: { show: CatalogShow }) {
                   </span>
                 )}
               </Link>
+              </CardTransition>
             </li>
           ))}
         </ul>

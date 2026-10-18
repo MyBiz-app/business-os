@@ -249,3 +249,22 @@ def test_quotes_summary_counts_every_quote_and_list_pages(client: TestClient, st
     assert [row["number"] for row in page] == [1002, 1001]
     drafts = client.get("/quotes?status=draft", headers=headers).json()
     assert len(drafts) == 2
+
+
+def test_summary_counts_quotes_accepted_this_month(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    dana = new_client(client, headers, "Dana")
+    quotes = [new_quote(client, headers, dana, title=f"Q{i}") for i in range(2)]
+    for quote in quotes:
+        client.post(f"/quotes/{quote['id']}/send", headers=headers)
+        done = client.post(
+            f"/public/quotes/{quote['token']}/answer", json={"accept": True, "name": "Dana Levi"}
+        )
+        assert done.status_code == 200, done.text
+    row = next(
+        r
+        for r in client.get("/quotes/summary", headers=headers).json()
+        if r["status"] == "accepted"
+    )
+    assert row["count"] == 2 and row["month_count"] == 2
+    assert row["month_total"] == row["total"] == 2_100_000

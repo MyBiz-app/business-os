@@ -76,7 +76,7 @@ export async function PromoEditor({ id, modal }: { id: string; modal: boolean })
   const title = <span dir="ltr" className="font-mono">{code.code}</span>;
   if (modal) {
     return (
-      <RouteModal title={code.code} size="sm">
+      <RouteModal title={code.code} size="sm" transitionName={`promo-${code.id}`}>
         <div className="flex flex-col gap-5">
           {body}
           {actions}

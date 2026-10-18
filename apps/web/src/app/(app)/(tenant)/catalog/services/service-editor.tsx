@@ -60,5 +60,5 @@ export async function ServiceEditor({ id, modal }: { id: string; modal: boolean 
       }
     />
   );
-  return modal ? <RouteModal title={service.name}>{form}</RouteModal> : <CatalogPage title={<bdi dir="auto">{service.name}</bdi>} backHref={BACK}>{form}</CatalogPage>;
+  return modal ? <RouteModal title={service.name} transitionName={`service-${id}`}>{form}</RouteModal> : <CatalogPage title={<bdi dir="auto">{service.name}</bdi>} backHref={BACK}>{form}</CatalogPage>;
 }

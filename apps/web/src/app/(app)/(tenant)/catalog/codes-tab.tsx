@@ -12,6 +12,7 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { deletePromoCode, setPromoActive } from "./promos/actions";
 import { catalogHref, type CatalogShow } from "./tabs";
+import { CardTransition } from "@/components/ui/page-transition";
 
 /** Discount codes: tiles that filter, then a list. A row opens the code in a window; pause,
  * resume and delete are also one click away in the row. */
@@ -59,6 +60,7 @@ export async function CodesTab({ show }: { show: CatalogShow }) {
         <ul className="card flex flex-col divide-y divide-border">
           {codes.map((code) => (
             <li key={code.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+              <CardTransition name={`promo-${code.id}`}>
               <Link href={`/catalog/promos/${code.id}`} scroll={false} className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-2">
                   <TicketPercent aria-hidden="true" className="size-4 text-primary-ink" />
@@ -80,6 +82,7 @@ export async function CodesTab({ show }: { show: CatalogShow }) {
                   {code.discount_given > 0 && ` · ${t("promo.given", { amount: formatMoney(code.discount_given, tenant.currency, locale) })}`}
                 </span>
               </Link>
+              </CardTransition>
               {writable && (
                 <span className="flex items-center gap-3 text-sm">
                   <form action={setPromoActive.bind(null, code.id, !code.active)}>
