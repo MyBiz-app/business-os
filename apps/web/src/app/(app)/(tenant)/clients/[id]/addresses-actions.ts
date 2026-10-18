@@ -2,16 +2,18 @@
 
 import { revalidatePath } from "next/cache";
 
+import { addressFromForm } from "@/lib/address";
 import { unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
 import { getTenant } from "@/lib/tenant";
 
 function read(formData: FormData) {
   const value = (name: string) => String(formData.get(name) ?? "").trim() || null;
+  const chosen = addressFromForm(formData);
   return {
     label: value("label"),
-    street: value("street") ?? "",
-    city: value("city") ?? "",
+    // An address kept from before the lists existed keeps its text until a new one is chosen.
+    ...("city_code" in chosen ? chosen : { street: value("street"), city: value("city") }),
     details: value("details"),
     notes: value("notes"),
   };

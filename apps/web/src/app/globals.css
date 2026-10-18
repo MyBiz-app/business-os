@@ -1863,3 +1863,23 @@ h1[tabindex="-1"]:focus {
   inset-inline-start: 50%;
   translate: -50% 0;
 }
+
+/* ---- Guided tour (components/tour): the dimmed page with a clear window around one element ---- */
+
+.tour-hole {
+  position: fixed;
+  border-radius: 1rem;
+  pointer-events: none;
+  outline: 2px solid var(--primary);
+  box-shadow: 0 0 0 100vmax color-mix(in oklab, var(--foreground) 45%, transparent);
+  transition:
+    top 250ms var(--ease-out),
+    left 250ms var(--ease-out),
+    width 250ms var(--ease-out),
+    height 250ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-hole {
+    transition: none;
+  }
+}

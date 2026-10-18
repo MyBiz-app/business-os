@@ -13,8 +13,8 @@ Expand step, all new objects:
 - Console functions (`businesses.act`): the board, one order's update and the order's files.
   Going `live` copies the site address to the business (`tenants.website_url`).
 
-Revision ID: 0129
-Revises: 0128
+Revision ID: 0132
+Revises: 0131
 Create Date: 2026-10-18
 """
 
@@ -22,8 +22,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0129"
-down_revision: str | None = "0128"
+revision: str = "0132"
+down_revision: str | None = "0131"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

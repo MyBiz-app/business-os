@@ -3297,6 +3297,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/geo/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Cities
+         * @description Cities and towns whose name contains the letters, names starting with them first.
+         */
+        get: operations["list_cities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/geo/cities/{city_code}/streets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Streets
+         * @description Streets of one city whose name (or an alternative spelling) contains the letters.
+         */
+        get: operations["list_streets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff": {
         parameters: {
             query?: never;
@@ -3634,6 +3674,50 @@ export interface paths {
          * @description Forget a device's token, e.g. when the person signs out of it.
          */
         delete: operations["unregister_push_token"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/tours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Seen Tours
+         * @description The tours this person has finished or skipped.
+         */
+        get: operations["list_seen_tours"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/tours/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Mark Tour Seen
+         * @description Remember that the tour was seen; safe to call again.
+         */
+        put: operations["mark_tour_seen"];
+        post?: never;
+        /**
+         * Reset Tour
+         * @description Forget that the tour was seen, so it shows again on the next visit.
+         */
+        delete: operations["reset_tour"];
         options?: never;
         head?: never;
         patch?: never;
@@ -6221,6 +6305,90 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/meter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Meter
+         * @description The month's AI meter: where the business is against its pool and against the calendar
+         *     (managers), and the person's own allowance for today and the month.
+         */
+        get: operations["ai_meter"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/usage/breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Usage Breakdown
+         * @description What the usage window adds to /ai/usage: questions people asked against tasks that ran by
+         *     themselves, and how many people have AI access against what the module includes.
+         */
+        get: operations["ai_usage_breakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/extra-users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Extra Ai Users
+         * @description The paid "extra AI user" add-ons: each lets one more person use the AI team and adds 150
+         *     credits to the month's pool. Cannot go below the people who already have access.
+         */
+        put: operations["set_extra_ai_users"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Member Ai
+         * @description One team member's AI settings and use, for the AI tab of the staff card.
+         */
+        get: operations["get_member_ai"];
+        /** Update Member Ai */
+        put: operations["update_member_ai"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/modules/catalog": {
         parameters: {
             query?: never;
@@ -8565,15 +8733,55 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * City Code
+             * @description From the official city list, when chosen there
+             */
+            city_code: number | null;
+            /** Street Code */
+            street_code: number | null;
+            /** House Number */
+            house_number: string | null;
+            /** Address Details */
+            address_details: string | null;
+            /** Street Unlisted */
+            street_unlisted: string | null;
+            /**
+             * Street Name
+             * @description The chosen street's own name
+             */
+            street_name?: string | null;
         };
         /** AddressCreate */
         AddressCreate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Label */
             label?: string | null;
             /** Street */
-            street: string;
+            street?: string | null;
             /** City */
-            city: string;
+            city?: string | null;
             /** Details */
             details?: string | null;
             /** Notes */
@@ -8581,6 +8789,28 @@ export interface components {
         };
         /** AddressUpdate */
         AddressUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Label */
             label?: string | null;
             /** Street */
@@ -9640,6 +9870,28 @@ export interface components {
         };
         /** BranchSetup */
         BranchSetup: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name: string;
             /** Address */
@@ -9826,6 +10078,38 @@ export interface components {
              * Format: date-time
              */
             issued_at: string;
+        };
+        /** BusinessMeter */
+        BusinessMeter: {
+            /** Used */
+            used: number;
+            /** Included */
+            included: number;
+            /**
+             * Limit
+             * @description Where questions stop; null: no limit
+             */
+            limit: number | null;
+            /**
+             * Percent
+             * @description Used / included, in percent
+             */
+            percent: number;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
+            /**
+             * Reach Date
+             * @description When the month's pool runs out at this pace; null if it will not
+             */
+            reach_date: string | null;
+            /**
+             * Questions Left
+             * @description About, at one credit per question
+             */
+            questions_left: number | null;
         };
         /**
          * BusinessProfile
@@ -10177,6 +10461,17 @@ export interface components {
              * @default true
              */
             lives_with_me: boolean;
+        };
+        /** City */
+        City: {
+            /** Code */
+            code: number;
+            /** Name He */
+            name_he: string;
+            /** Name En */
+            name_en: string | null;
+            /** Region Name */
+            region_name: string | null;
         };
         /** Client */
         Client: {
@@ -12223,6 +12518,11 @@ export interface components {
              */
             url: string;
         };
+        /** ExtraUsers */
+        ExtraUsers: {
+            /** Extra Ai Users */
+            extra_ai_users: number;
+        };
         /** FileLink */
         FileLink: {
             /**
@@ -13471,6 +13771,16 @@ export interface components {
             /** Engagements */
             engagements: number;
         };
+        /** KindRow */
+        KindRow: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "asked" | "scheduled";
+            /** Credits */
+            credits: number;
+        };
         /** Kpi */
         Kpi: {
             /** Value */
@@ -13710,6 +14020,33 @@ export interface components {
             name: string;
             /** Address */
             address: string | null;
+            /**
+             * City Code
+             * @description The branch's city, from the official list
+             */
+            city_code: number | null;
+            /** Street Code */
+            street_code: number | null;
+            /** House Number */
+            house_number: string | null;
+            /** Address Details */
+            address_details: string | null;
+            /**
+             * Street Unlisted
+             * @description A street typed because it is not on the list
+             */
+            street_unlisted: string | null;
+            /** City Name */
+            city_name: string | null;
+            /** Street Name */
+            street_name: string | null;
+            /**
+             * Latitude
+             * @description The branch's point on the map, if known
+             */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
             /** Active */
             active: boolean;
             /**
@@ -13782,6 +14119,28 @@ export interface components {
         };
         /** LocationCreate */
         LocationCreate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name: string;
             /** Address */
@@ -13814,6 +14173,28 @@ export interface components {
         };
         /** LocationUpdate */
         LocationUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name?: string | null;
             /** Address */
@@ -13830,6 +14211,13 @@ export interface components {
              * @description The branch's own accent color; null falls back to the network's
              */
             primary_color?: string | null;
+            /**
+             * Latitude
+             * @description The pin, moved by hand (with longitude)
+             */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
             /**
              * Website Url
              * @description The branch's own website; null: the business's
@@ -13897,6 +14285,30 @@ export interface components {
             city?: string | null;
             /** Postal Code */
             postal_code?: string | null;
+            /**
+             * City Code
+             * @description Home city, from the official list
+             */
+            city_code?: number | null;
+            /** Street Code */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /** Address Details */
+            address_details?: string | null;
+            /** Street Unlisted */
+            street_unlisted?: string | null;
+            /**
+             * Street Name
+             * @description The home street's name
+             */
+            street_name?: string | null;
+            /**
+             * Address Complete
+             * @description City, street and house number are all filled in
+             * @default false
+             */
+            address_complete: boolean;
             /**
              * Email Roster
              * @description Email the person when their roster is published
@@ -13993,6 +14405,65 @@ export interface components {
              * @description What they can actually do (their role's switches)
              */
             permissions: string[];
+        };
+        /** MemberAi */
+        MemberAi: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Role Default
+             * @description Whether their role gives AI access without a switch
+             */
+            role_default: boolean;
+            /**
+             * Ai Access
+             * @description Their own switch; null: follow the role
+             */
+            ai_access: boolean | null;
+            /** Has Access */
+            has_access: boolean;
+            /**
+             * Monthly Credits
+             * @description Their own monthly limit; null: the business's
+             */
+            monthly_credits: number | null;
+            /**
+             * Daily Percent
+             * @description Their own daily pace; null: the default
+             */
+            daily_percent: number | null;
+            /**
+             * Default Daily Percent
+             * @default 15
+             */
+            default_daily_percent: number;
+            /** Day Limit */
+            day_limit: number | null;
+            /** Used Month */
+            used_month: number;
+            /** Used Today */
+            used_today: number;
+            /** Ai Users Allowed */
+            ai_users_allowed: number;
+            /** Ai Users Count */
+            ai_users_count: number;
+            /** Is Owner */
+            is_owner: boolean;
+        };
+        /**
+         * MemberAiUpdate
+         * @description Fields left out stay as they are; `null` clears a personal setting back to the default.
+         */
+        MemberAiUpdate: {
+            /** Ai Access */
+            ai_access?: boolean | null;
+            /** Monthly Credits */
+            monthly_credits?: number | null;
+            /** Daily Percent */
+            daily_percent?: number | null;
         };
         /** MemberAtRisk */
         MemberAtRisk: {
@@ -14110,6 +14581,32 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** Meter */
+        Meter: {
+            /**
+             * Month Start
+             * Format: date
+             */
+            month_start: string;
+            /** Day Of Month */
+            day_of_month: number;
+            /** Days In Month */
+            days_in_month: number;
+            /**
+             * Pace Percent
+             * @description How far into the month we are, in percent
+             */
+            pace_percent: number;
+            /** @description Only for those who manage the AI team */
+            business: components["schemas"]["BusinessMeter"] | null;
+            person: components["schemas"]["PersonMeter"];
+            /**
+             * Level
+             * @description The worse of the two: what the small dot shows
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
         };
         /** MethodTotal */
         MethodTotal: {
@@ -15141,6 +15638,33 @@ export interface components {
             };
             /** Entries */
             entries: components["schemas"]["Entry"][];
+        };
+        /** PersonMeter */
+        PersonMeter: {
+            /** Used Month */
+            used_month: number;
+            /**
+             * Month Limit
+             * @description Their own monthly limit, if one is set
+             */
+            month_limit: number | null;
+            /** Used Today */
+            used_today: number;
+            /**
+             * Day Limit
+             * @description Their daily pace; null: none (the owner)
+             */
+            day_limit: number | null;
+            /**
+             * Questions Left Today
+             * @description About, at one credit per question
+             */
+            questions_left_today: number | null;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "ok" | "warn" | "over";
         };
         /** PersonMonth */
         PersonMonth: {
@@ -17275,6 +17799,11 @@ export interface components {
              */
             mfa_required_now: boolean;
         };
+        /** SeenTours */
+        SeenTours: {
+            /** Seen */
+            seen: "ai_team"[];
+        };
         /** SelectAccounts */
         SelectAccounts: {
             /** External Ids */
@@ -18148,6 +18677,15 @@ export interface components {
             modules: string[];
             /** Status */
             status: ("trial" | "active") | null;
+        };
+        /** Street */
+        Street: {
+            /** Code */
+            code: number;
+            /** Name He */
+            name_he: string;
+            /** Aliases */
+            aliases: string[];
         };
         /**
          * StructureUpdate
@@ -19077,6 +19615,21 @@ export interface components {
              */
             amount_minor: number | null;
         };
+        /** UsageBreakdown */
+        UsageBreakdown: {
+            /** By Kind */
+            by_kind: components["schemas"]["KindRow"][];
+            /** Ai Users Allowed */
+            ai_users_allowed: number;
+            /** Ai Users Count */
+            ai_users_count: number;
+            /** Extra Ai Users */
+            extra_ai_users: number;
+            /** Extra User Price Minor */
+            extra_user_price_minor: number;
+            /** Currency */
+            currency: string;
+        };
         /** UsagePoint */
         UsagePoint: {
             /**
@@ -19567,6 +20120,28 @@ export interface components {
         };
         /** ProfileUpdate */
         app__api__routes__ProfileUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Full Name */
             full_name?: string | null;
             /** Phone */
@@ -28035,6 +28610,74 @@ export interface operations {
             };
         };
     };
+    list_cities: {
+        parameters: {
+            query?: {
+                /** @description Letters from the name; empty: all */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["City"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_streets: {
+        parameters: {
+            query?: {
+                /** @description Letters from the name; empty: all */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                city_code: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Street"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_team: {
         parameters: {
             query?: never;
@@ -28803,6 +29446,84 @@ export interface operations {
                 "application/json": components["schemas"]["PushTokenBody"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_seen_tours: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeenTours"];
+                };
+            };
+        };
+    };
+    mark_tour_seen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "ai_team";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_tour: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "ai_team";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             204: {
@@ -34863,6 +35584,183 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AiSpend"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_meter: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Meter"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_usage_breakdown: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageBreakdown"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_extra_ai_users: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtraUsers"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageBreakdown"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_member_ai: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAi"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_member_ai: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberAiUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAi"];
                 };
             };
             /** @description Validation Error */
