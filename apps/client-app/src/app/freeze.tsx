@@ -1,6 +1,7 @@
 import type { components } from "@business-os/api-client";
 import { addDays, addMonths, formatDay, todayIn } from "@business-os/i18n/dates";
 import { formatMoney } from "@business-os/app-kit/lib/money";
+import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -40,6 +41,7 @@ export default function FreezeScreen() {
   const [note, setNote] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
   const [busy, setBusy] = useState(false);
+  const [paper, setPaper] = useState<{ id: string; name: string } | null>(null);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const load = useCallback(async () => {
@@ -98,6 +100,37 @@ export default function FreezeScreen() {
 
   const problemText = (code: string) => (code in PROBLEMS ? tFreeze(`problems.${PROBLEMS[code]}`) : tFreeze("problems.generic"));
 
+  /** A photo of a medical note or call-up paper goes to my documents first; the request points at it. */
+  const attach = async (result: ImagePicker.ImagePickerResult) => {
+    const asset = result.canceled ? null : result.assets[0];
+    if (!asset) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      const form = new FormData();
+      const name = asset.fileName ?? "freeze-paper.jpg";
+      if (asset.file) form.append("file", asset.file);
+      else form.append("file", { uri: asset.uri, name, type: asset.mimeType ?? "image/jpeg" } as unknown as Blob);
+      const saved = unwrap(await api.POST("/client/documents", { params: scope, body: form as never, bodySerializer: (body) => body }));
+      setPaper({ id: saved.id, name: saved.name });
+    } catch {
+      setMessage({ ok: false, text: t("paperFailed") });
+    } finally {
+      setBusy(false);
+    }
+  };
+  const photoOptions: ImagePicker.ImagePickerOptions = { mediaTypes: ["images"], quality: 0.7 };
+  const paperFromGallery = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return setMessage({ ok: false, text: t("paperPermission") });
+    await attach(await ImagePicker.launchImageLibraryAsync(photoOptions));
+  };
+  const paperFromCamera = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) return setMessage({ ok: false, text: t("paperPermission") });
+    await attach(await ImagePicker.launchCameraAsync(photoOptions));
+  };
+
   const send = async () => {
     if (!entitlementId || !start || !end) return;
     setBusy(true);
@@ -106,13 +139,14 @@ export default function FreezeScreen() {
       const sent = unwrap(
         await api.POST("/client/entitlements/{entitlement_id}/freeze-requests", {
           params: { ...scope, path: { entitlement_id: entitlementId } },
-          body: { starts_on: start, ends_on: end, reason, note: note.trim() || null },
+          body: { starts_on: start, ends_on: end, reason, note: note.trim() || null, document_id: paper?.id ?? null },
         }),
       );
       setMessage({ ok: true, text: sent.status === "approved" ? t("done") : t("sent") });
       setStart(null);
       setEnd(null);
       setNote("");
+      setPaper(null);
       await reload();
     } catch (caught) {
       setMessage({ ok: false, text: problemText(caught instanceof ApiError ? (caught.detail ?? "") : "") });
@@ -196,6 +230,20 @@ export default function FreezeScreen() {
           </View>
           <Field label={t("note")} palette={palette} value={note} onChangeText={setNote} maxLength={500} multiline />
 
+          <SectionTitle title={t("paper")} palette={palette} />
+          <Text style={[local.meta, { color: palette.muted }]}>{t("paperHint")}</Text>
+          {paper ? (
+            <View style={local.row}>
+              <Text style={[local.name, local.info, { color: palette.foreground }]}>{paper.name}</Text>
+              <Button label={t("paperRemove")} variant="secondary" palette={palette} onPress={() => setPaper(null)} />
+            </View>
+          ) : (
+            <View style={local.chips}>
+              <Button label={t("paperGallery")} variant="secondary" palette={palette} busy={busy} onPress={() => void paperFromGallery()} />
+              <Button label={t("paperCamera")} variant="secondary" palette={palette} busy={busy} onPress={() => void paperFromCamera()} />
+            </View>
+          )}
+
           {preview && (
             <Card palette={palette}>
               <Text style={[local.name, { color: palette.foreground }]}>{t("whatHappens")}</Text>
@@ -255,6 +303,7 @@ export default function FreezeScreen() {
                   </Text>
                   <Text style={[local.meta, { color: palette.muted }]}>
                     {request.entitlement_name} · {tFreeze(`reasons.${request.reason}`)}
+                    {request.document_id ? ` · ${t("paperAttached")}` : ""}
                   </Text>
                   {request.decision_note ? <Text style={[local.meta, { color: palette.muted }]}>{request.decision_note}</Text> : null}
                 </View>

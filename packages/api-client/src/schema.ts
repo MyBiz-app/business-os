@@ -13874,6 +13874,13 @@ export interface components {
             created_at: string;
             /** Days */
             days: number;
+            /**
+             * Document Id
+             * @description The attached paper; open it from the client's documents
+             */
+            document_id?: string | null;
+            /** Document Name */
+            document_name?: string | null;
         };
         /** FreezeRequestCreate */
         FreezeRequestCreate: {
@@ -13894,6 +13901,11 @@ export interface components {
             reason: "travel" | "reserve_duty" | "illness" | "pregnancy" | "other";
             /** Note */
             note?: string | null;
+            /**
+             * Document Id
+             * @description A paper (medical note, call-up) the client uploaded to Files for this request
+             */
+            document_id?: string | null;
         };
         /** FreezeRules */
         FreezeRules: {
@@ -13910,14 +13922,15 @@ export interface components {
             min_days: number;
             /**
              * Max Days
-             * @default 30
+             * @default 90
              */
             max_days: number;
             /**
              * Yearly Bank Days
              * @description Most freeze days per client in a year; empty: no limit
+             * @default 30
              */
-            yearly_bank_days?: number | null;
+            yearly_bank_days: number | null;
             /**
              * Notice Days
              * @description Days ahead a request must be sent

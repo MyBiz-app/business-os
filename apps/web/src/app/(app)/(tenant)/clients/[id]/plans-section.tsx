@@ -88,6 +88,17 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
                   })}
                   {request.note && ` · ${request.note}`}
                 </p>
+                {request.document_id && (
+                  <a
+                    href={`/documents/${request.document_id}/file`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm font-medium text-primary-ink underline-offset-4 hover:underline"
+                  >
+                    {t("requestPaper")}
+                    {request.document_name ? ` (${request.document_name})` : ""}
+                  </a>
+                )}
                 <RequestDecision
                   request={request}
                   approve={approveFreezeRequest.bind(null, clientId, request.id)}
