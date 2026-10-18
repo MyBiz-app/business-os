@@ -67,8 +67,7 @@ def load_current_tenant(session: Session) -> Tenant:
                        t.shifts_publish_auto, t.shifts_publish_cadence, t.shifts_publish_weekday,
                        t.shifts_publish_day, t.shifts_publish_time,
                        t.join_code,
-                       CASE WHEN t.cancel_at <= now() THEN 'suspended'
-                            ELSE t.billing_state END AS billing_state,
+                       app.effective_billing_state(t) AS billing_state,
                        coalesce(m.role,
                                 CASE WHEN app.support_tenant_id() IS NOT NULL THEN 'support'
                                      ELSE 'platform' END) AS role,

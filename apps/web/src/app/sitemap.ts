@@ -17,6 +17,7 @@ const PAGES = [
   "/contact",
   "/legal/terms",
   "/legal/privacy",
+  "/legal/cancellation",
   "/legal/dpa",
   "/legal/subprocessors",
   "/legal/accessibility",

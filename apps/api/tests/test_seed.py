@@ -1,6 +1,7 @@
 import random
 from uuid import uuid4
 
+import pytest
 from sqlalchemy import Engine, text
 
 from app.api.settings import israeli_number_valid
@@ -570,3 +571,109 @@ def test_curated_demo_has_round_6_pay_hours_run_and_move_without_repeating(
         assert profiles == approvals and profiles > 0
         assert runs == 1 and paid_lines == profiles
         assert move_files == (1 if name == "Adir fitness" else 0)
+
+
+def test_curated_demo_fills_every_tenant_table_or_says_why_not(engine: Engine) -> None:
+    from app.seed.round7 import NO_DEMO
+
+    owner = uuid4()
+    email = f"r7-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+    with engine.begin() as connection:
+        curate(connection, email, 1, random.Random(4))
+    with engine.begin() as connection:
+        again = enrich_profiles(connection, email)
+    assert again["round7"] == 0  # safe to run again
+
+    with engine.connect() as connection:
+        tables = (
+            connection.execute(
+                text("""
+                    SELECT c.table_name FROM information_schema.columns c
+                    JOIN information_schema.tables t
+                      ON t.table_schema = c.table_schema AND t.table_name = c.table_name
+                    WHERE c.table_schema = 'app' AND c.column_name = 'tenant_id'
+                      AND t.table_type = 'BASE TABLE'
+                    ORDER BY 1
+                """)
+            )
+            .scalars()
+            .all()
+        )
+        tenants = connection.execute(
+            text("""
+                SELECT t.id FROM app.tenants t
+                JOIN app.tenant_members m ON m.tenant_id = t.id AND m.role = 'owner'
+                WHERE m.user_id = :owner
+            """),
+            {"owner": owner},
+        ).scalars().all()  # fmt: skip
+        assert len(tenants) == 3
+        filled = {
+            table: connection.execute(
+                text(
+                    f"SELECT count(DISTINCT tenant_id) FROM app.{table} WHERE tenant_id = ANY(:t)"
+                ),
+                {"t": tenants},
+            ).scalar_one()
+            for table in tables
+        }
+    # Platform-wide data (no per-business rows by design) is not a business table.
+    missing = sorted(t for t, n in filled.items() if n == 0 and t not in NO_DEMO)
+    assert not missing, f"tables with no demo rows and no reason in NO_DEMO: {missing}"
+    stale = sorted(t for t in NO_DEMO if t not in filled)
+    assert not stale, f"NO_DEMO names tables that do not exist: {stale}"
+    wrong = sorted(t for t in NO_DEMO if filled.get(t))
+    assert not wrong, f"NO_DEMO lists tables that now have demo rows: {wrong}"
+    # The features of round 7 are open in all three businesses.
+    for table in (
+        "quotes",
+        "issued_documents",
+        "ai_conversations",
+        "pending_actions",
+        "announcements",
+        "consent_events",
+        "shift_templates",
+        "time_off_requests",
+        "promo_codes",
+        "whatsapp_conversations",
+        "client_addresses",
+        "audit_log",
+    ):
+        assert filled[table] == 3, table
+    assert filled["subscription_cancellations"] == 1
+    assert filled["website_orders"] == 2 and filled["entitlement_freezes"] >= 1
+    for table in (
+        "waitlist_requests",
+        "freeze_requests",
+        "tenant_freeze_rules",
+        "client_documents",
+    ):
+        assert filled[table] == 3, table
+    with engine.connect() as connection:
+        sizes = connection.execute(
+            text("SELECT business_size FROM app.tenants WHERE id = ANY(:t)"), {"t": tenants}
+        ).scalars().all()  # fmt: skip
+    assert None not in sizes and "solo" not in sizes
+
+
+def test_the_seed_refuses_the_primary_owner_account(
+    engine: Engine, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.seed.guard import refuse_blocked_owner
+
+    for call in (
+        lambda c: curate(c, "Adire7399@gmail.com", 1, random.Random(1)),
+        lambda c: enrich_profiles(c, "adire7399@gmail.com"),
+        lambda c: seed_demo(c, "adire7399@gmail.com", "studio", 1, random.Random(1)),
+    ):
+        with engine.begin() as connection, pytest.raises(SystemExit, match="primary owner"):
+            call(connection)
+    monkeypatch.setenv("API_SEED_BLOCKED_EMAILS", " Someone@Example.com ,other@example.com")
+    with pytest.raises(SystemExit):
+        refuse_blocked_owner("someone@example.com")
+    refuse_blocked_owner("fine@example.com")  # anyone else is allowed
