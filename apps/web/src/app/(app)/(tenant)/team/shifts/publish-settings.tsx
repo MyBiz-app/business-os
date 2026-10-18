@@ -1,5 +1,6 @@
 "use client";
 
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
@@ -22,13 +23,13 @@ export function PublishSettings({ auto, cadence: initial, weekday, day, time, we
   const order = [6, 0, 1, 2, 3, 4, 5];
 
   return (
-    <details className="card group p-0">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 font-medium [&::-webkit-details-marker]:hidden">
-        <Send aria-hidden="true" className="size-4 text-primary-ink rtl:-scale-x-100" />
-        {t("title")}
-        <span className="ms-2 text-sm font-normal text-muted">{t("hint")}</span>
-      </summary>
-      <form action={action} className="flex flex-wrap items-center gap-3 border-t border-border px-5 py-3">
+    <CollapsibleSection
+      icon={<Send aria-hidden="true" className="size-4 text-primary-ink rtl:-scale-x-100" />}
+      title={t("title")}
+      description={t("hint")}
+      storageKey="shifts-publish"
+    >
+      <form action={action} className="flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="auto" checked={on} onChange={(e) => setOn(e.target.checked)} className="size-4" />
           {t("auto")}
@@ -82,7 +83,7 @@ export function PublishSettings({ auto, cadence: initial, weekday, day, time, we
         <FormNotice message={state.saved ? t("saved") : undefined} />
         <FormError toastOnly message={state.error ? t("saveError") : undefined} />
       </form>
-      <p className="border-t border-border px-5 py-2 text-xs text-muted">{t("explain")}</p>
-    </details>
+      <p className="mt-3 text-xs text-muted">{t("explain")}</p>
+    </CollapsibleSection>
   );
 }

@@ -35,7 +35,7 @@ with sync_playwright() as p:
     page.get_by_label("משך (בדקות)").fill("60")
     page.get_by_label("משתתפים בכל מפגש").fill("10")
     page.get_by_role("button", name="יצירה").click()
-    page.wait_for_url("**/services")
+    page.wait_for_url(re.compile(r".*/catalog\?tab=services"))
 
     page.goto(f"{h.BASE}/schedule/new")
     h.ready(page)

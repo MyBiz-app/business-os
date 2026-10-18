@@ -15,8 +15,9 @@ Tier = Literal["fast", "standard", "strong"]
 TIERS: tuple[Tier, ...] = ("fast", "standard", "strong")
 
 # Vendors that may be called. The adapters for the others exist and are tested, but they are
-# not reachable until a vendor is added here (a deliberate, reviewed change).
+# not reachable until the vendor is named in API_AI_ENABLED_VENDORS (a deliberate switch-on).
 ENABLED_VENDORS: frozenset[str] = frozenset({"anthropic", "demo"})
+KNOWN_VENDORS: tuple[str, ...] = ("anthropic", "openai", "gemini")
 
 
 @dataclass(frozen=True)
@@ -31,7 +32,11 @@ class ModelInfo:
 
 
 # Anthropic prices are the platform's real ones. OpenAI and Gemini rows are placeholders for
-# the disabled adapters: check them against the vendor's price list before enabling.
+# the disabled adapters. Checked 2026-10-18 against third-party price tables only (the vendors'
+# own pages were not reachable): base input/output rates match; Gemini Pro cache read is the
+# 0.125 figure most sources give. Gemini Pro above 200K tokens costs more (2.50 / 15.00), and
+# OpenAI now also sells newer models (GPT-5.5, GPT-5.4 mini). Confirm on the vendor's page
+# before enabling; unknown models are priced as the dearest one in the meantime.
 MODELS: dict[str, ModelInfo] = {
     m.id: m
     for m in (
@@ -41,7 +46,7 @@ MODELS: dict[str, ModelInfo] = {
         ModelInfo("gpt-5-mini", "openai", "fast", (0.25, 2.0, 0.025, 0.25), 400_000),
         ModelInfo("gpt-5", "openai", "standard", (1.25, 10.0, 0.125, 1.25), 400_000),
         ModelInfo("gemini-2.5-flash", "gemini", "fast", (0.30, 2.5, 0.03, 0.30), 1_000_000),
-        ModelInfo("gemini-2.5-pro", "gemini", "standard", (1.25, 10.0, 0.31, 1.25), 1_000_000),
+        ModelInfo("gemini-2.5-pro", "gemini", "standard", (1.25, 10.0, 0.125, 1.25), 1_000_000),
         ModelInfo("demo", "demo", "fast", (0.0, 0.0, 0.0, 0.0), 0, supports_tools=False),
     )
 }
@@ -58,7 +63,7 @@ OVERRIDES: dict[Tier, str] = {}
 def set_overrides(fast: str | None, standard: str | None, strong: str | None) -> None:
     OVERRIDES.clear()
     for tier, model in (("fast", fast), ("standard", standard), ("strong", strong)):
-        if model in MODELS and MODELS[model].vendor in ENABLED_VENDORS:
+        if model in MODELS and MODELS[model].vendor in enabled_vendors():
             OVERRIDES[tier] = model  # type: ignore[index]
 
 
@@ -92,8 +97,14 @@ def model_for_tier(tier: Tier, vendor: str = "anthropic") -> str:
     raise LookupError(f"no {vendor} model for tier {tier}")
 
 
+def enabled_vendors() -> frozenset[str]:
+    """The built-in vendors plus any switched on in settings (API_AI_ENABLED_VENDORS)."""
+    extra = {v.strip() for v in get_settings().ai_enabled_vendors.split(",") if v.strip()}
+    return ENABLED_VENDORS | (extra & set(KNOWN_VENDORS))
+
+
 def vendor_enabled(vendor: str) -> bool:
-    return vendor in ENABLED_VENDORS
+    return vendor in enabled_vendors()
 
 
 _DASHES = re.compile(r"\s*[\u2013\u2014]\s*")

@@ -3,6 +3,8 @@
     uv run python -m app.jobs extend-series [--database-url URL]
     uv run python -m app.jobs remind-sessions
     uv run python -m app.jobs remind-plans
+    uv run python -m app.jobs remind-payroll  (daily: owners are reminded on the 1st and 5th)
+    uv run python -m app.jobs notify-payslips (hourly: "your payslip is ready" after an approval)
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/messaging/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
     uv run python -m app.jobs bill-businesses (simulated platform billing; app/commerce/billing.py)
@@ -27,8 +29,9 @@
 Every run is recorded in app.job_runs (started, finished, ok, result), so a job that stopped
 running or keeps failing is noticed by check-jobs (.github/workflows/check-jobs-staging.yml).
 
-Jobs run with the migration (owner) connection, across all businesses, so they must only do
-system work that needs no user's permission.
+Jobs connect with the migration (owner) login but switch to the `app_jobs` role (jobs_engine):
+it works across all businesses and can read and write rows, but cannot change the schema or
+truncate a table. They must only do system work that needs no user's permission.
 
 Where the code lives: `schedule.py`, `retention.py`, `outbound.py` (the jobs) and `runner.py`
 (registry, locking, run records, alerts and the command line)."""
@@ -38,8 +41,10 @@ from app.jobs.base import LOCK_PREFIX as LOCK_PREFIX
 from app.jobs.outbound import _publish_moment as _publish_moment
 from app.jobs.outbound import issue_documents as issue_documents
 from app.jobs.outbound import move_files as move_files
+from app.jobs.outbound import notify_payslips as notify_payslips
 from app.jobs.outbound import notify_shifts as notify_shifts
 from app.jobs.outbound import publish_shifts as publish_shifts
+from app.jobs.outbound import remind_payroll_job as remind_payroll_job
 from app.jobs.outbound import run_ai_tasks as run_ai_tasks
 from app.jobs.outbound import send_announcements as send_announcements
 from app.jobs.outbound import send_messages as send_messages
@@ -52,8 +57,10 @@ from app.jobs.runner import APPLY_JOBS as APPLY_JOBS
 from app.jobs.runner import DAILY as DAILY
 from app.jobs.runner import HOURLY as HOURLY
 from app.jobs.runner import JOBS as JOBS
+from app.jobs.runner import JOBS_ROLE as JOBS_ROLE
 from app.jobs.runner import MAX_HOURS as MAX_HOURS
 from app.jobs.runner import OPTIONAL as OPTIONAL
+from app.jobs.runner import jobs_engine as jobs_engine
 from app.jobs.runner import late_jobs as late_jobs
 from app.jobs.runner import main as main
 from app.jobs.runner import notify_team as notify_team

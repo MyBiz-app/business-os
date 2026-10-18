@@ -8,6 +8,7 @@ import { useActionState } from "react";
 import { Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { ModalMarker } from "@/components/ui/route-modal";
 
 import type { ClientFormState } from "./actions";
 
@@ -42,6 +43,7 @@ export function ClientForm({ action, client, submitLabel, readOnly = false, bran
     <form action={formAction} className="flex flex-col gap-4">
       <FormError message={errorMessage} />
       <FormNotice message={state.saved ? t("saved") : undefined} />
+      <ModalMarker saved={state.saved} />
       {/* Keyed by the saved version: after a save the fields remount with the stored values
           instead of React's form reset restoring the values the page first loaded with. */}
       <ClientFields
@@ -52,7 +54,7 @@ export function ClientForm({ action, client, submitLabel, readOnly = false, bran
         homeBranch={client ? client.home_location_id : defaultBranch}
       />
       {!readOnly && (
-        <div className="flex items-center gap-4">
+        <div className="form-actions flex items-center gap-4">
           <SubmitButton>{submitLabel}</SubmitButton>
           <Link href="/clients" className="text-sm text-muted underline-offset-4 hover:underline">
             {t("cancel")}

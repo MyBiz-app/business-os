@@ -14,7 +14,7 @@ export default async function DataSettingsPage() {
   if (context.tenant.role !== "owner") redirect("/settings/business");
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("nav.items.data")} description={t("nav.hints.data")} />
       <ExportSection context={context} />
       <CloseSection name={context.tenant.name} />

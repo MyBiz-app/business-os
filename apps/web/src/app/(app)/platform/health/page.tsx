@@ -34,6 +34,7 @@ export default async function PlatformHealthPage() {
     { label: t("messagesFailed"), value: number.format(health.messages_failed_24h), alarm: health.messages_failed_24h > 0 },
     { label: t("emailsWaiting"), value: number.format(health.emails_waiting) },
     { label: t("database"), value: megabytes },
+    { label: t("files"), value: `${number.format(health.files_bytes / (1024 * 1024))} MB` },
     {
       label: t("aiToday"),
       value: `${number.format(health.ai_credits_today)} ${t("aiLimit", { limit: number.format(health.ai_alert_at) })}`,
@@ -43,7 +44,7 @@ export default async function PlatformHealthPage() {
   ];
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <PageHeader titleId="health-heading" title={t("title")} description={t("subtitle")} />
 
       <section aria-labelledby="health-queues" className="flex flex-col gap-4">

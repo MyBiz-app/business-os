@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import TenantContext, TenantDep, UserDep, require
 from app.commerce.modules import (
+    AI_CREDITS_INCLUDED,
+    AI_USERS_INCLUDED,
     CORE_TIERS,
     MODULES,
     PRESETS,
@@ -16,11 +18,13 @@ from app.commerce.modules import (
     ModuleKey,
     PresetKey,
     Questionnaire,
+    ai_extra_user_price,
     quote,
     recommend,
     validate,
 )
 from app.core import events
+from app.core.audit import record
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["modules"])
@@ -39,6 +43,8 @@ class CatalogModule(BaseModel):
     requires_all: list[ModuleKey]
     group: str | None = Field(description="Tiers of one thing: at most one per group")
     billing: Billing = Field(description='"once": charged with the first invoice only')
+    ai_users_included: int = Field(default=0, description="People with AI access it includes")
+    ai_credits_included: int = Field(default=0, description="Monthly AI credits it includes")
 
 
 class CoreTier(BaseModel):
@@ -51,6 +57,7 @@ class Catalog(BaseModel):
     core: list[CoreTier]
     modules: list[CatalogModule]
     presets: dict[PresetKey, list[ModuleKey]]
+    ai_extra_user_price: int = Field(description="One more AI user a month, minor units")
 
 
 class QuestionnaireIn(BaseModel):
@@ -113,10 +120,13 @@ def build_catalog(currency: str) -> Catalog:
                 requires_all=list(m.requires_all),
                 group=m.group,
                 billing=m.billing,
+                ai_users_included=AI_USERS_INCLUDED.get(m.key, 0),
+                ai_credits_included=AI_CREDITS_INCLUDED.get(m.key, 0),
             )
             for m in MODULES.values()
         ],
         presets={key: list(modules) for key, modules in PRESETS.items()},  # type: ignore[misc]
+        ai_extra_user_price=ai_extra_user_price(currency),
     )
 
 
@@ -187,9 +197,18 @@ def set_modules(db: Session | Connection, tenant_id: object, selection: dict[str
 
 
 def _record_added(db: Session, before: dict[str, int], after: dict[str, int]) -> None:
-    """A product event for each module the business just switched on."""
+    """A product event for each module the business just switched on, and one audit entry for the
+    change (who changed the plan)."""
     for key in after.keys() - before.keys():
         events.record(db, "module_enabled", key)
+    if before != after:
+        record(
+            db,
+            "tenant.modules_changed",
+            entity_type="tenant",
+            added=sorted(after.keys() - before.keys()),
+            removed=sorted(before.keys() - after.keys()),
+        )
 
 
 def _tenant_modules(db: Session) -> TenantModules:

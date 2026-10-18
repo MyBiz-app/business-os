@@ -12,8 +12,9 @@ import { formatMoney } from "@/lib/money";
 import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
-import { addTestCard, cancelSubscription, payInvoice, removeCard, resumeSubscription } from "./actions";
+import { addTestCard, endPause, payInvoice, removeCard, resumeSubscription } from "./actions";
 import { AiSpend } from "./ai-spend";
+import { AiUsers } from "./ai-users";
 import { DetailsForm } from "./details-form";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { TopicHeader } from "../topic-header";
@@ -23,7 +24,8 @@ import { ScrollRegion } from "@/components/scroll-region";
 const TRIAL_DAYS = 14;
 const BRANDS = ["visa", "mastercard", "amex"] as const;
 
-export default async function BillingPage() {
+export default async function BillingPage({ searchParams }: PageProps<"/settings/billing">) {
+  const cancelled = (await searchParams).cancelled === "1";
   const t = await getTranslations("billing");
   const tModules = await getTranslations("modules");
   const locale = await getLocale();
@@ -32,6 +34,7 @@ export default async function BillingPage() {
   const billing = unwrap(await api.GET("/billing", { params: scope }));
   // Only people who manage the AI team see the spend controls (403 for the rest).
   const aiSpend = (await api.GET("/ai/spend", { params: scope })).data;
+  const aiUsers = aiSpend ? (await api.GET("/ai/usage/breakdown", { params: scope })).data : undefined;
   const money = (amount: number, currency = billing.estimate.currency) => formatMoney(amount, currency, locale);
   const day = (value: string) => formatDay(value, locale, { day: "numeric", month: "long", year: "numeric" });
   const method = billing.payment_method;
@@ -52,7 +55,7 @@ export default async function BillingPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle")} />
 
       <p role="note" className="flex items-center gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
@@ -170,6 +173,7 @@ export default async function BillingPage() {
       </CollapsibleSection>
 
       {aiSpend && <AiSpend spend={aiSpend} />}
+      {aiUsers && <AiUsers breakdown={aiUsers} />}
 
       <div className="grid items-start gap-6 xl:grid-cols-2">
         <CollapsibleSection
@@ -245,25 +249,38 @@ export default async function BillingPage() {
 
       <CollapsibleSection title={t("subscription.title")} storageKey="billing-subscription">
         <div className="flex flex-col gap-4">
+        {cancelled ? <p className="text-sm font-medium text-success-ink" role="status">{t("cancelFlow.done", { date: collection.cancel_at ? day(collection.cancel_at) : "" })}</p> : null}
         {collection.cancel_at ? (
           <>
             <p className="text-sm">{t("subscription.cancelling", { date: day(collection.cancel_at) })}</p>
+            {collection.refund_minor ? (
+              <p className="text-sm text-muted">{t("subscription.refund", { amount: money(collection.refund_minor, collection.currency ?? undefined) })}</p>
+            ) : null}
             <form action={resumeSubscription}>
               <SubmitButton>{t("subscription.resume")}</SubmitButton>
             </form>
           </>
         ) : (
           <>
+            {collection.paused_until ? (
+              <>
+                <p className="text-sm">{t("subscription.paused", { date: day(collection.paused_until) })}</p>
+                <form action={endPause}>
+                  <SubmitButton>{t("subscription.endPause")}</SubmitButton>
+                </form>
+              </>
+            ) : null}
             <p className="text-sm text-muted">{t("subscription.hint")}</p>
-            {/* No script needed: the confirmation is a native disclosure. */}
-            <details className="text-sm">
-              <summary className="btn-link cursor-pointer font-medium text-danger underline-offset-4 hover:underline">
-                {t("subscription.cancel")}
-              </summary>
-              <form action={cancelSubscription} className="mt-3">
-                <SubmitButton>{t("subscription.cancelConfirm")}</SubmitButton>
-              </form>
-            </details>
+            {tenant.role === "owner" ? (
+              <div>
+                <Link href="/settings/billing/cancel" className="btn-link font-medium text-danger underline-offset-4 hover:underline">
+                  {t("subscription.cancelStart")}
+                </Link>
+              </div>
+            ) : null}
+            <Link href="/legal/cancellation" target="_blank" className="text-sm text-primary-ink underline underline-offset-4">
+              {t("subscription.policy")}
+            </Link>
           </>
         )}
         </div>

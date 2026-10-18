@@ -219,7 +219,7 @@ def get_tenant_context(
     set_tenant(session, tenant_id)
     member = session.execute(
         text("""
-            SELECT m.role, r.permissions AS custom_permissions, m.location_ids
+            SELECT m.role, r.permissions AS custom_permissions, m.location_ids, m.ai_access
             FROM app.tenant_members m
             LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
             WHERE m.tenant_id = app.current_tenant_id() AND m.user_id = app.current_user_id()
@@ -251,7 +251,7 @@ def get_tenant_context(
         closed, billing_state = session.execute(
             text("""
                 SELECT closed_at IS NOT NULL,
-                       CASE WHEN cancel_at <= now() THEN 'suspended' ELSE billing_state END
+                       app.effective_billing_state(tenants)
                 FROM app.tenants WHERE id = app.current_tenant_id()
             """)
         ).one()
@@ -272,7 +272,7 @@ def get_tenant_context(
         session=session,
         tenant_id=tenant_id,
         role=member.role,
-        permissions=effective_permissions(member.role, member.custom_permissions),
+        permissions=effective_permissions(member.role, member.custom_permissions, member.ai_access),
         branches=allowed,
         aal=user.aal,
     )
@@ -348,7 +348,7 @@ def get_client_context(
     closed, billing_state = session.execute(
         text("""
             SELECT closed_at IS NOT NULL,
-                   CASE WHEN cancel_at <= now() THEN 'suspended' ELSE billing_state END
+                   app.effective_billing_state(tenants)
             FROM app.tenants WHERE id = :id
         """),
         {"id": tenant_id},

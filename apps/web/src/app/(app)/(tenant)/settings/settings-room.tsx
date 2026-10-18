@@ -2,6 +2,7 @@
 
 import {
   Building2,
+  CalendarClock,
   ChevronLeft,
   CreditCard,
   Database,
@@ -11,6 +12,8 @@ import {
   Palette,
   Plug,
   Puzzle,
+  Snowflake,
+  Sparkles,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -24,10 +27,13 @@ import type { TopicGroup, TopicKey } from "./topics";
 
 const ICONS: Record<TopicKey, LucideIcon> = {
   business: Building2,
+  memberships: Snowflake,
+  bookings: CalendarClock,
   branding: Palette,
   modules: Puzzle,
   billing: CreditCard,
   integrations: Plug,
+  aiConnections: Sparkles,
   audit: History,
   data: Database,
   help: LifeBuoy,
@@ -77,7 +83,7 @@ export function SettingsRoom({
                           href={item.href}
                           aria-current={active ? "page" : undefined}
                           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
-                            active ? "bg-primary/10 font-semibold text-primary-ink" : "text-foreground hover:bg-foreground/5"
+                            active ? "bg-primary/10 font-semibold text-foreground" : "text-foreground hover:bg-foreground/5"
                           }`}
                         >
                           <Icon aria-hidden="true" className="size-4 shrink-0" />
@@ -91,7 +97,7 @@ export function SettingsRoom({
             </div>
           ))}
         </nav>
-        <div className={`${isIndex ? "hidden lg:block" : ""} flex min-w-0 flex-col gap-4`}>
+        <div className={`${isIndex ? "hidden lg:block" : ""} @container flex min-w-0 flex-col gap-4`}>
           {!isIndex && (
             <Link href="/settings" className="inline-flex items-center gap-1 text-sm text-primary-ink underline-offset-4 hover:underline print:hidden lg:hidden">
               <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />

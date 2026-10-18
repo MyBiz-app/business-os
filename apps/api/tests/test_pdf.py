@@ -42,6 +42,8 @@ def test_a_receipt_downloads_as_pdf(client: TestClient, studio: dict) -> None:
     assert response.headers["content-type"] == "application/pdf"
     assert "receipt-1001.pdf" in response.headers["content-disposition"]
     assert response.content.startswith(b"%PDF")
+    exports = client.get("/audit-log", params={"category": "export"}, headers=studio["headers"])
+    assert [e["action"] for e in exports.json()["entries"]] == ["export.receipt_pdf"]
 
 
 def test_a_client_downloads_only_their_own_receipt(

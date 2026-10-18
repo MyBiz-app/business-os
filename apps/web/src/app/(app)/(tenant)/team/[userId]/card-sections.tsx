@@ -12,6 +12,9 @@ import { hm } from "@/lib/time-clock";
 import { getBranches, getTenant } from "@/lib/tenant";
 import { canManagePayroll } from "@/lib/permissions";
 
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
+
+import { AiMemberForm } from "./ai-member-form";
 import { PayrollFile } from "./payroll/payroll-file";
 import { saveAvailability } from "./availability/actions";
 import { removeTimeOff, saveHours } from "./hours/actions";
@@ -22,12 +25,12 @@ type Member = { user_id: string; email: string; full_name: string | null; role: 
 
 const UPCOMING_DAYS = 14;
 
-function Block({ title, children }: { title: string; children: React.ReactNode }) {
+/** A section of the card that folds; the choice is remembered per browser (`storageKey`). */
+function Block({ title, id, children }: { title: string; id: string; children: React.ReactNode }) {
   return (
-    <section className="card flex flex-col gap-3 p-6">
-      <h2 className="text-lg font-semibold">{title}</h2>
-      {children}
-    </section>
+    <CollapsibleSection title={title} defaultOpen storageKey={`staff-card-${id}`}>
+      <div className="flex flex-col gap-3">{children}</div>
+    </CollapsibleSection>
   );
 }
 
@@ -63,8 +66,8 @@ export async function OverviewTab({ member, context }: { member: Member; context
   ];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Block title={t("details")}>
+    <div className="grid items-start gap-6 lg:grid-cols-2 min-[120rem]:grid-cols-3">
+      <Block id="details" title={t("details")}>
         <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
           {facts.map(([label, value]) => (
             <div key={label} className="contents">
@@ -74,7 +77,7 @@ export async function OverviewTab({ member, context }: { member: Member; context
           ))}
         </dl>
       </Block>
-      <Block title={t("hoursThisMonth")}>
+      <Block id="hours" title={t("hoursThisMonth")}>
         {clock ? (
           <>
             <p className="text-3xl font-bold tabular-nums">{hm(clock.worked.total)}</p>
@@ -87,7 +90,7 @@ export async function OverviewTab({ member, context }: { member: Member; context
           <p className="text-sm text-muted">{t("noClockAccess")}</p>
         )}
       </Block>
-      <Block title={t("upcomingShifts")}>
+      <Block id="shifts" title={t("upcomingShifts")}>
         {shifts.length === 0 ? (
           <p className="text-sm text-muted">{t("noShifts", { days: UPCOMING_DAYS })}</p>
         ) : (
@@ -105,7 +108,7 @@ export async function OverviewTab({ member, context }: { member: Member; context
           {t("openShifts")}
         </Link>
       </Block>
-      <Block title={t("classesTaught")}>
+      <Block id="classes" title={t("classesTaught")}>
         {taught.length === 0 ? (
           <p className="text-sm text-muted">{t("noClasses", { days: UPCOMING_DAYS })}</p>
         ) : (
@@ -166,9 +169,7 @@ export async function AvailabilityTab({ member, context }: { member: Member; con
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="card flex flex-col gap-4 p-6">
-        <h2 className="text-lg font-semibold">{t("availability.title")}</h2>
-        <p className="text-sm text-muted">{t("availability.hint")}</p>
+      <CollapsibleSection title={t("availability.title")} description={t("availability.hint")} defaultOpen storageKey="staff-card-availability">
         <HoursForm
           save={saveAvailability.bind(null, member.user_id)}
           weekStartsOn={weekStartsOn}
@@ -176,20 +177,15 @@ export async function AvailabilityTab({ member, context }: { member: Member; con
           emptyLabel={t("availability.none")}
           savedLabel={t("availability.saved")}
         />
-      </section>
+      </CollapsibleSection>
       {hours && (
-        <section className="card flex flex-col gap-4 p-6">
-          <h2 className="text-lg font-semibold">{t("hours.title")}</h2>
-          <p className="text-sm text-muted">{t("hours.subtitle", { name: isolate(member.full_name ?? member.email) })}</p>
+        <CollapsibleSection title={t("hours.title")} description={t("hours.subtitle", { name: isolate(member.full_name ?? member.email) })} defaultOpen storageKey="staff-card-hours">
           <HoursForm save={saveHours.bind(null, member.user_id)} weekStartsOn={weekStartsOn} initial={toBlocks(hours.blocks)} />
-        </section>
+        </CollapsibleSection>
       )}
       {canHours && (
-        <section aria-labelledby="time-off-heading" className="card flex flex-col gap-4 p-6">
-          <div className="flex flex-col gap-1">
-            <h2 id="time-off-heading" className="text-lg font-semibold">{t("timeOff.title")}</h2>
-            <p className="text-sm text-muted">{t("timeOff.hint")}</p>
-          </div>
+        <CollapsibleSection title={t("timeOff.title")} description={t("timeOff.hint")} defaultOpen storageKey="staff-card-time-off">
+          <div className="flex flex-col gap-4">
           {timeOff.length > 0 && (
             <ul className="flex flex-col divide-y divide-border">
               {timeOff.map((entry) => (
@@ -210,76 +206,153 @@ export async function AvailabilityTab({ member, context }: { member: Member; con
             </ul>
           )}
           <TimeOffForm userId={member.user_id} today={todayIn(tenant.time_zone)} />
-        </section>
+          </div>
+        </CollapsibleSection>
       )}
     </div>
   );
 }
 
-/** Form 101 per year and the employment notice. Payslips are issued from the pay run. */
+/** Form 101 per year, the employment notice, the payslips and the contract. Payslips are issued from
+ * the pay run and filed in the business's files; a person only sees here the folders they may open. */
 export async function DocumentsTab({ member, context }: { member: Member; context: Context }) {
   const t = await getTranslations("payroll");
   const tc = await getTranslations("staffCard");
-  const { api, scope } = context;
+  const locale = await getLocale();
+  const { api, scope, tenant } = context;
   const path = { ...scope, path: { user_id: member.user_id } };
-  const [employment, forms] = await Promise.all([
+  const [employment, forms, folders] = await Promise.all([
     api.GET("/staff/{user_id}/employment", { params: path }).then(unwrap),
     api.GET("/staff/{user_id}/form101", { params: path }).then(unwrap),
+    api.GET("/files/folders", { params: scope }).then((r) => r.data ?? []),
   ]);
   const signed = forms.filter((form) => form.status === "submitted");
-  return (
-    <Block title={t("documents.title")}>
+  const filed = async (systemKey: string) => {
+    const folder = folders.find((f) => f.system_key === systemKey);
+    if (!folder) return null;
+    const files = await api.GET("/files", { params: { ...scope, query: { folder_id: folder.id, archived: false } } }).then((r) => r.data ?? []);
+    return files.filter((file) => file.owner_user_id === member.user_id);
+  };
+  const [payslips, contract] = await Promise.all([filed("payroll"), filed("employees")]);
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone });
+  const fileList = (files: NonNullable<typeof payslips>, empty: string) =>
+    files.length === 0 ? (
+      <p className="text-sm text-muted">{empty}</p>
+    ) : (
       <ul className="flex flex-col divide-y divide-border text-sm">
-        {signed.map((form) => (
-          <li key={form.tax_year} className="flex items-center justify-between gap-3 py-2.5">
-            <span>{t("form101.year", { year: form.tax_year })}</span>
-            <a className="text-primary-ink underline-offset-4 hover:underline" href={`/team/${member.user_id}/payroll/form101/${form.tax_year}/pdf`} download>
-              {t("form101.pdf")}
+        {files.map((file) => (
+          <li key={file.id} className="flex items-center justify-between gap-3 py-2.5">
+            <span className="min-w-0">
+              <span className="block truncate" dir="auto">{file.name}</span>
+              <span className="text-xs text-muted">{date.format(new Date(file.created_at))}</span>
+            </span>
+            <a className="shrink-0 text-primary-ink underline-offset-4 hover:underline" href={`/files/${file.id}/file`} download>
+              {tc("download")}
             </a>
           </li>
         ))}
-        <li className="flex items-center justify-between gap-3 py-2.5">
-          <span>{t("documents.notice")}</span>
-          <span className="text-muted">{employment.employment_notice_date ?? t("documents.notSent")}</span>
-        </li>
       </ul>
-      {signed.length === 0 && <p className="text-sm text-muted">{t("documents.none")}</p>}
-      <Link href="/team/payroll" className="w-fit text-sm text-primary-ink underline-offset-4 hover:underline">
-        {tc("openPayRun")}
-      </Link>
-    </Block>
+    );
+  return (
+    <div className="flex flex-col gap-6">
+      <Block id="documents" title={t("documents.title")}>
+        <ul className="flex flex-col divide-y divide-border text-sm">
+          {signed.map((form) => (
+            <li key={form.tax_year} className="flex items-center justify-between gap-3 py-2.5">
+              <span>{t("form101.year", { year: form.tax_year })}</span>
+              <a className="text-primary-ink underline-offset-4 hover:underline" href={`/team/${member.user_id}/payroll/form101/${form.tax_year}/pdf`} download>
+                {t("form101.pdf")}
+              </a>
+            </li>
+          ))}
+          <li className="flex items-center justify-between gap-3 py-2.5">
+            <span>{t("documents.notice")}</span>
+            <span className="text-muted">{employment.employment_notice_date ?? t("documents.notSent")}</span>
+          </li>
+        </ul>
+        {signed.length === 0 && <p className="text-sm text-muted">{t("documents.none")}</p>}
+        <Link href="/team/payroll" className="w-fit text-sm text-primary-ink underline-offset-4 hover:underline">
+          {tc("openPayRun")}
+        </Link>
+      </Block>
+      {payslips && (
+        <Block id="payslips" title={tc("payslipsTitle")}>
+          {fileList(payslips, tc("noPayslips"))}
+        </Block>
+      )}
+      {contract && (
+        <Block id="contract" title={tc("contractTitle")}>
+          {fileList(contract, tc("noContract"))}
+          <Link href={`/files?folder=${folders.find((f) => f.system_key === "employees")?.id}`} className="w-fit text-sm text-primary-ink underline-offset-4 hover:underline">
+            {tc("openFiles")}
+          </Link>
+        </Block>
+      )}
+    </div>
   );
 }
 
-/** Whether the person may use the AI team and how many credits they used this month. Their own
- * quota and pace arrive with the AI usage rules; until then everyone shares the business budget. */
+/** Whether the person may use the AI team, their own monthly limit and daily pace, and what they used. */
 export async function AiTab({ member, context }: { member: Member; context: Context }) {
   const t = await getTranslations("staffCard");
   const locale = await getLocale();
   const { api, scope } = context;
-  const usage = await api.GET("/ai/usage", { params: scope }).then((r) => r.data ?? null);
-  const allowed = member.permissions.includes("ai.use");
+  const [ai, team] = await Promise.all([
+    api.GET("/ai/members/{user_id}", { params: { ...scope, path: { user_id: member.user_id } } }).then((r) => r.data ?? null),
+    api.GET("/ai/team", { params: scope }).then((r) => r.data ?? null),
+  ]);
+  // Open to this person by their role; "locked" ones need a module the business does not have.
+  const agents = (team?.agents ?? []).filter((agent) => agent.state !== "disabled" && (agent.allowed_roles ?? []).includes(member.role));
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
-  const mine = usage?.by_user.find((row) => row.key === member.user_id)?.credits ?? 0;
   return (
-    <Block title={t("aiTitle")}>
-      <p className="flex items-center gap-2 text-sm">
-        <span aria-hidden="true" className={`size-2 rounded-full ${allowed ? "bg-success" : "bg-muted"}`} />
-        {allowed ? t("aiAllowed") : t("aiNotAllowed")}
-      </p>
-      {usage && (
+    <div className="flex flex-col gap-6">
+    <Block id="ai" title={t("aiTitle")}>
+      {ai ? (
         <>
-          <p className="text-3xl font-bold tabular-nums">{number.format(mine)}</p>
-          <p className="text-sm text-muted">
-            {t("aiUsedThisMonth", { used: number.format(usage.credits_used), included: number.format(usage.credits_included) })}
-          </p>
+          <dl className="grid grid-cols-2 gap-4 sm:max-w-md">
+            <div>
+              <dt className="text-sm text-muted">{t("ai.usedMonth")}</dt>
+              <dd className="text-3xl font-bold tabular-nums">{number.format(ai.used_month)}</dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted">{t("ai.usedToday", { limit: ai.day_limit === null ? "∞" : number.format(ai.day_limit) })}</dt>
+              <dd className="text-3xl font-bold tabular-nums">{number.format(ai.used_today)}</dd>
+            </div>
+          </dl>
+          <AiMemberForm ai={ai} />
         </>
+      ) : (
+        <p className="text-sm text-muted">{t("aiNotAllowed")}</p>
       )}
       <p className="text-sm text-muted">{t("aiHint")}</p>
       <Link href="/ai" className="w-fit text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("openAi")}
       </Link>
     </Block>
+    <Block id="agents" title={t("agentsTitle")}>
+      <p className="text-sm text-muted">{t("agentsHint")}</p>
+      {agents.length === 0 ? (
+        <p className="text-sm">{t("noAgents")}</p>
+      ) : (
+        <ul className="grid gap-2 sm:grid-cols-2 min-[120rem]:grid-cols-3">
+          {agents.map((agent) => (
+            <li key={agent.key} className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-sm">
+              <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: agent.color }} />
+              <span className="min-w-0">
+                <span className="block truncate font-medium" dir="auto">{agent.name}</span>
+                <span className="block truncate text-xs text-muted" dir="auto">
+                  {agent.state === "locked" ? t("agentLocked") : agent.role_title}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Link href="/ai" className="w-fit text-sm text-primary-ink underline-offset-4 hover:underline">
+        {t("openAgents")}
+      </Link>
+    </Block>
+    </div>
   );
 }
 
@@ -289,7 +362,7 @@ export async function PermissionsTab({ member, context }: { member: Member; cont
   const tAll = await getTranslations();
   const roles = await context.api.GET("/roles", { params: context.scope }).then(unwrap);
   return (
-    <Block title={t("permissionsTitle")}>
+    <Block id="permissions" title={t("permissionsTitle")}>
       <p className="text-sm">
         {t("roleIs", { role: member.custom_role_name ?? tAll(`roles.${member.role}` as "roles.staff") })}
       </p>

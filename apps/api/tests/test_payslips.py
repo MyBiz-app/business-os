@@ -95,7 +95,25 @@ def test_net_is_frozen_when_the_month_is_approved_and_payslips_open(
     assert person["net_minor"] == person["gross_minor"] - person["total_deductions_minor"]
     assert live["net_minor"] == sum(p["net_minor"] for p in live["people"])
 
+    run = client.get("/payroll/runs/2026-03", headers=headers).json()
+    employer = sum(i["amount_minor"] for p in live["people"] for i in p["employer"])
+    assert run["summary"]["employer_cost_minor"] == run["summary"]["gross_minor"] + employer
+    assert run["summary"]["employer_cost_minor"] > run["summary"]["gross_minor"]
+
     _approve(client, headers, ctx)
+    # Every payslip is filed in the payroll folder, and in the person's own documents.
+    folders = client.get("/files/folders", headers=headers).json()
+    payroll = next(f for f in folders if f["system_key"] == "payroll")
+    names = [
+        f["name"]
+        for f in client.get("/files", params={"folder_id": payroll["id"]}, headers=headers).json()
+    ]
+    assert sum(n.startswith("payslip-2026-03-") and n.endswith(".pdf") for n in names) == 2
+    assert not any(n.endswith("-final.pdf") for n in names)
+    assert any(
+        f["name"].startswith("payslip-2026-03-")
+        for f in client.get("/files/mine", headers=headers).json()
+    )
     frozen = client.get("/payroll/runs/2026-03/net", headers=headers).json()
     assert all(p["frozen"] for p in frozen["people"])
     # A later rates row changes nothing for the approved month.
@@ -119,6 +137,13 @@ def test_net_is_frozen_when_the_month_is_approved_and_payslips_open(
     assert mine and mine[0]["period"] == "2026-03-01" and mine[0]["draft"] is True
     assert client.get("/me/payslips/2026-03/pdf", headers=headers).status_code == 200
     assert client.get("/me/payslips/2026-04/pdf", headers=headers).status_code == 404
+    checked = client.post("/payroll/runs/2026-03/accountant-check", headers=headers)
+    assert checked.status_code == 204
+    names = [
+        f["name"]
+        for f in client.get("/files", params={"folder_id": payroll["id"]}, headers=headers).json()
+    ]
+    assert sum(n.endswith("-final.pdf") for n in names) == 2
 
 
 def test_the_bank_file_needs_an_approved_month_and_complete_payees(

@@ -21,6 +21,7 @@ from app.api.common import not_found
 from app.api.deps import UserDep
 from app.api.platform import BillingDep, StaffDep, UsageDep, run_rule
 from app.commerce.modules import MODULES
+from app.core.config import get_settings
 
 router = APIRouter(prefix="/platform/ai", tags=["platform"])
 
@@ -96,6 +97,37 @@ def ai_costs(db: UsageDep, days: Annotated[int, Query(ge=1, le=90)] = 30) -> AIC
     )
 
 
+class ConnectorUse(BaseModel):
+    tenant_id: UUID
+    name: str
+    connections: int = Field(description="AI apps connected now")
+    apps: list[str]
+    calls: int = Field(description="Calls in the window")
+    last_call: dt.datetime | None
+    proposed: int = Field(description="Changes the apps proposed in the window")
+    executed: int
+    rejected: int
+    waiting: int = Field(description="Proposals waiting for approval now")
+
+
+class ConnectorBoard(BaseModel):
+    days: int
+    daily_limit: int = Field(description="Calls per business per rolling 24 hours")
+    businesses: list[ConnectorUse]
+
+
+@router.get("/connectors")
+def ai_connectors(db: UsageDep, days: Annotated[int, Query(ge=1, le=90)] = 30) -> ConnectorBoard:
+    """Who uses the AI connectors (Claude, ChatGPT): per business, the apps, the calls and what
+    became of the changes they proposed."""
+    rows = db.execute(text("SELECT * FROM app.platform_mcp_usage(:d)"), {"d": days}).mappings()
+    return ConnectorBoard(
+        days=days,
+        daily_limit=get_settings().mcp_daily_calls_per_business,
+        businesses=[ConnectorUse.model_validate(dict(r)) for r in rows],
+    )
+
+
 class ModelChoice(BaseModel):
     id: str
     tier: ai_models.Tier
@@ -146,7 +178,10 @@ def _settings(db: Session) -> AISettings:
         defaults=defaults,
         choices=[
             ModelChoice(
-                id=m.id, tier=m.tier, vendor=m.vendor, enabled=m.vendor in ai_models.ENABLED_VENDORS
+                id=m.id,
+                tier=m.tier,
+                vendor=m.vendor,
+                enabled=m.vendor in ai_models.enabled_vendors(),
             )
             for m in ai_models.MODELS.values()
             if m.vendor != "demo"
@@ -174,7 +209,7 @@ def change_ai_settings(body: AISettingsChange, db: BillingDep) -> AISettings:
         if model is None:
             continue
         info = ai_models.MODELS.get(model)
-        if info is None or info.vendor not in ai_models.ENABLED_VENDORS or info.vendor == "demo":
+        if info is None or info.vendor not in ai_models.enabled_vendors() or info.vendor == "demo":
             raise HTTPException(status_code=422, detail="model_not_available")
         if info.tier != tier:
             raise HTTPException(status_code=422, detail="model_wrong_tier")

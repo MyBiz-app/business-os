@@ -50,7 +50,7 @@ export function AiBubble() {
   const tAssistant = useTranslations("assistant");
   const path = usePathname();
   const label = useScreenLabel();
-  const [team, setTeam] = useState<{ agents: Agent[]; enabled: boolean } | null>(null);
+  const [team, setTeam] = useState<{ agents: Agent[]; enabled: boolean; level: "ok" | "warn" | "over" } | null>(null);
   const [open, setOpen] = useState(false);
   const [fan, setFan] = useState(false);
   const [picked, setPicked] = useState<{ key: string; path: string } | null>(null);
@@ -80,7 +80,7 @@ export function AiBubble() {
 
   const available = (team?.agents ?? []).filter((a) => a.state === "active");
   const keys = available.map((a) => a.key);
-  const routeKey = agentForPath(path);
+  const routeKey = agentForPath(path, available);
   const defaultKey = keys.includes(routeKey) ? routeKey : "chief";
   // A pick holds on one screen; on another screen the bubble follows that screen again.
   const pickedKey = picked?.path === path ? picked.key : null;
@@ -108,7 +108,7 @@ export function AiBubble() {
 
   if (!team || !shown || bubbleHidden(path)) return null;
 
-  const fanAgents = fanFor(path, keys).flatMap((key) => available.find((a) => a.key === key) ?? []);
+  const fanAgents = fanFor(path, available, shown.key).flatMap((key) => available.find((a) => a.key === key) ?? []);
 
   function choose(agent: Agent) {
     setPicked({ key: agent.key, path });
@@ -340,21 +340,34 @@ export function AiBubble() {
         }}
       >
         <Crossfade agent={shown} />
+        {team.level !== "ok" && (
+          <span
+            role="img"
+            aria-label={t(team.level === "over" ? "levelOver" : "levelWarn")}
+            className={`absolute end-0 top-0 size-3.5 rounded-full border-2 border-background ${team.level === "over" ? "bg-danger" : "bg-warning"}`}
+          />
+        )}
       </button>
 
-      {fan && !open && (
-        <ul aria-label={t("fan")} className="absolute bottom-full end-0 mb-3 flex flex-col-reverse items-center gap-2">
+      {fan && !open && fanAgents.length > 0 && (
+        <ul aria-label={t("fan")} className="absolute bottom-full end-0 mb-3 flex flex-col-reverse items-end gap-2">
           {fanAgents.map((agent, index) => (
             <li key={agent.key} className="ai-fan-in" style={{ animationDelay: `${index * 40}ms` }}>
               <button
                 type="button"
                 onClick={() => choose(agent)}
                 aria-label={`${agent.name}, ${agent.role_title}`}
-                title={`${agent.name} · ${agent.role_title}`}
-                className="btn-plain block size-11 rounded-full shadow-md ring-2 ring-offset-2 ring-offset-background transition-transform hover:scale-110"
-                style={{ ["--tw-ring-color" as string]: agent.color }}
+                className="btn-plain flex max-w-[16rem] items-center gap-2.5 rounded-full border border-border bg-surface py-1 ps-1 pe-4 text-start shadow-md transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2"
               >
-                <AgentAvatar agent={agent} className="size-full" />
+                <AgentAvatar agent={agent} className="size-10 shrink-0 rounded-full ring-2" />
+                <span className="flex min-w-0 flex-col leading-tight">
+                  <span className="truncate text-sm font-semibold" dir="auto">
+                    {agent.name}
+                  </span>
+                  <span className="truncate text-xs text-muted" dir="auto">
+                    {agent.role_title}
+                  </span>
+                </span>
               </button>
             </li>
           ))}

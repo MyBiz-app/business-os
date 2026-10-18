@@ -19,6 +19,7 @@ type ShowToast = (kind: ToastKind, message: string, options?: { action?: ToastAc
 const ToastContext = createContext<ShowToast | null>(null);
 
 const SHOW_MS = 4000;
+const MAX_VISIBLE = 3;
 // The card is dark in both themes, like the web app's.
 const CARD = fixedColors.toast;
 const CARD_INK = fixedColors.toastInk;
@@ -31,79 +32,95 @@ export function useToast(): ShowToast {
   return show;
 }
 
-/** Shows one toast at a time at the bottom of the screen; a new one replaces the old. Errors stay until closed. */
+/** Shows up to three toasts at once at the bottom of the screen, the newest at the bottom; the same
+ * message again replaces the old one. Errors stay until closed. */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toast, setToast] = useState<Toast | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
   const counter = useRef(0);
   const show = useCallback<ShowToast>((kind, message, options) => {
     counter.current += 1;
-    setToast({ id: counter.current, kind, message, action: options?.action });
+    const toast: Toast = { id: counter.current, kind, message, action: options?.action };
+    setToasts((all) => [...all.filter((item) => !(item.kind === kind && item.message === message)), toast].slice(-MAX_VISIBLE));
   }, []);
+  const dismiss = useCallback((id: number) => setToasts((all) => all.filter((item) => item.id !== id)), []);
   const value = useMemo(() => show, [show]);
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {toast ? <ToastView key={toast.id} toast={toast} onDone={() => setToast((current) => (current?.id === toast.id ? null : current))} /> : null}
+      {toasts.length > 0 ? <ToastStack toasts={toasts} onDone={dismiss} /> : null}
     </ToastContext.Provider>
+  );
+}
+
+function ToastStack({ toasts, onDone }: { toasts: Toast[]; onDone: (id: number) => void }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View pointerEvents="box-none" style={[styles.wrap, { bottom: insets.bottom + 88 }]}>
+      {toasts.map((toast) => (
+        <ToastView key={toast.id} toast={toast} onDone={() => onDone(toast.id)} />
+      ))}
+    </View>
   );
 }
 
 function ToastView({ toast, onDone }: { toast: Toast; onDone: () => void }) {
   const t = useTranslations("common");
   const { palette } = useTheme();
-  const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
+  // A new toast re-renders the stack with fresh callbacks; the timer must not restart each time.
+  const done = useRef(onDone);
+  useEffect(() => {
+    done.current = onDone;
+  });
   const progress = useRef(new Animated.Value(0)).current;
   const color = toast.kind === "success" ? palette.success : toast.kind === "info" ? palette.primary : palette.danger;
 
   useEffect(() => {
     Animated.timing(progress, { toValue: 1, duration: reduced ? 0 : 220, useNativeDriver: Platform.OS !== "web" }).start();
     if (toast.kind === "error") return;
-    const timer = setTimeout(onDone, SHOW_MS);
+    const timer = setTimeout(() => done.current(), SHOW_MS);
     return () => clearTimeout(timer);
-  }, [progress, reduced, onDone, toast.kind]);
+  }, [progress, reduced, toast.kind]);
 
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { bottom: insets.bottom + 88 }]}>
-      <Animated.View
-        accessibilityRole="alert"
-        accessibilityLiveRegion="polite"
-        style={[
-          styles.toast,
-          {
-            backgroundColor: CARD,
-            borderColor: tint(CARD_INK, 0.12),
-            opacity: progress,
-            transform: [{ translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
-          },
-        ]}
-      >
-        <View style={[styles.icon, { backgroundColor: color }]}>
-          <Ionicons name={toast.kind === "success" ? "checkmark" : toast.kind === "info" ? "information" : "alert"} size={14} color={fixedColors.white} />
-        </View>
-        <Text style={[styles.message, { color: CARD_INK }]}>{toast.message}</Text>
-        {toast.action ? (
-          <PressableScale
-            accessibilityRole="button"
-            onPress={() => {
-              toast.action?.onPress();
-              onDone();
-            }}
-            style={[styles.action, { backgroundColor: tint(CARD_INK, 0.14) }]}
-          >
-            <Text style={[styles.actionLabel, { color: CARD_INK }]}>{toast.action.label}</Text>
-          </PressableScale>
-        ) : null}
-        <PressableScale accessibilityRole="button" accessibilityLabel={t("dismiss")} onPress={onDone} style={styles.close}>
-          <Ionicons name="close" size={18} color={CARD_MUTED} />
+    <Animated.View
+      accessibilityRole="alert"
+      accessibilityLiveRegion="polite"
+      style={[
+        styles.toast,
+        {
+          backgroundColor: CARD,
+          borderColor: tint(CARD_INK, 0.12),
+          opacity: progress,
+          transform: [{ translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
+        },
+      ]}
+    >
+      <View style={[styles.icon, { backgroundColor: color }]}>
+        <Ionicons name={toast.kind === "success" ? "checkmark" : toast.kind === "info" ? "information" : "alert"} size={14} color={fixedColors.white} />
+      </View>
+      <Text style={[styles.message, { color: CARD_INK }]}>{toast.message}</Text>
+      {toast.action ? (
+        <PressableScale
+          accessibilityRole="button"
+          onPress={() => {
+            toast.action?.onPress();
+            onDone();
+          }}
+          style={[styles.action, { backgroundColor: tint(CARD_INK, 0.14) }]}
+        >
+          <Text style={[styles.actionLabel, { color: CARD_INK }]}>{toast.action.label}</Text>
         </PressableScale>
-      </Animated.View>
-    </View>
+      ) : null}
+      <PressableScale accessibilityRole="button" accessibilityLabel={t("dismiss")} onPress={onDone} style={styles.close}>
+        <Ionicons name="close" size={18} color={CARD_MUTED} />
+      </PressableScale>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { position: "absolute", start: 16, end: 16, alignItems: "center" },
+  wrap: { position: "absolute", start: 16, end: 16, alignItems: "center", gap: 8 },
   toast: {
     flexDirection: "row",
     alignItems: "center",

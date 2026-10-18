@@ -54,6 +54,22 @@ def manager_headers(
 # --- the catalog and the tools ---------------------------------------------------------------
 
 
+def test_each_screen_route_belongs_to_one_agent() -> None:
+    """The bubble in the web app reads this map, so a route must not be claimed twice."""
+    seen: dict[str, str] = {}
+    for spec in agent_catalog.CATALOG.values():
+        for route in spec.routes:
+            assert route.startswith("/") and not route.endswith("/")
+            assert route not in seen, f"{route} is listed for {seen[route]} and {spec.key}"
+            seen[route] = spec.key
+    # Screens added in round 7 are covered too.
+    assert {"/files", "/migration", "/settings", "/quotes", "/time"} <= set(seen)
+
+
+def test_customer_care_agent_is_leo() -> None:
+    assert agent_catalog.CATALOG["care"].name == {"he": "ליאו", "en": "Leo"}
+
+
 def test_every_tool_belongs_to_a_domain_and_agents_use_known_domains() -> None:
     assert set(TOOL_DOMAINS) == set(TOOLS)
     assert set(TOOL_DOMAINS.values()) <= set(agent_catalog.DOMAINS)
@@ -214,7 +230,12 @@ def test_custom_agents(client: TestClient, studio: dict, use_provider) -> None:
     use_provider(provider)
     ask(client, owner, chat(client, owner, card["key"]), "hi")
     # Only the clients domain: no schedule, no metrics, no hand-over tool.
-    assert tool_names(provider) == {"find_clients", "get_client", "inactive_members"}
+    assert tool_names(provider) == {
+        "find_clients",
+        "get_client",
+        "inactive_members",
+        "suggest_freeze",
+    }
 
     no_domain = client.post("/ai/agents", json={"name": "Empty", "tool_domains": []}, headers=owner)
     assert no_domain.status_code == 422

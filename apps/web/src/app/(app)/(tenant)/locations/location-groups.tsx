@@ -8,6 +8,7 @@ import { Field } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
 import type { FormState } from "@/lib/form-state";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Action = (state: FormState, formData: FormData) => Promise<FormState>;
 
@@ -71,12 +72,9 @@ export function LocationGroups({ branches, groups, saveGroup, removeGroup }: Pro
           }}
         />
       ))}
-      <details className="rounded-xl">
-        <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("new")}</summary>
-        <div className="mt-3">
-          <GroupForm branches={branches} group={null} action={saveGroup.bind(null, null)} />
-        </div>
-      </details>
+      <CollapsibleSection title={t("new")} storageKey="location-groups-new">
+        <GroupForm branches={branches} group={null} action={saveGroup.bind(null, null)} />
+      </CollapsibleSection>
     </section>
   );
 }

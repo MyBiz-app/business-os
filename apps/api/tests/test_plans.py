@@ -128,9 +128,10 @@ def test_freeze_blocks_its_days_and_extends_the_end(client: TestClient, studio: 
     headers = studio["headers"]
     dana = new_client(client, headers, "Dana")
     today = local_today()
-    entitlement = sell(
-        client, headers, dana, card(client, headers, credits=5, validity_days=30)["id"]
+    membership = next(
+        p for p in client.get("/plans", headers=headers).json() if p["kind"] == "membership"
     )
+    entitlement = sell(client, headers, dana, membership["id"])
     frozen_from, frozen_to = today + timedelta(days=5), today + timedelta(days=9)
 
     frozen = client.post(
@@ -140,19 +141,38 @@ def test_freeze_blocks_its_days_and_extends_the_end(client: TestClient, studio: 
     )
 
     assert frozen.status_code == 201
-    assert frozen.json()["ends_on"] == (today + timedelta(days=29 + 5)).isoformat()
+    assert (
+        frozen.json()["ends_on"]
+        == (today + timedelta(days=membership["validity_days"] - 1 + 5)).isoformat()
+    )
     during = book(client, headers, new_session(client, studio, on=frozen_from), dana).json()
     after = book(
         client, headers, new_session(client, studio, on=frozen_to + timedelta(days=1)), dana
     ).json()
     assert during["plan_name"] is None
-    assert after["plan_name"] == "5-class card"
+    assert after["plan_name"] == membership["name"]
     overlap = client.post(
         f"/entitlements/{entitlement['id']}/freezes",
         json={"starts_on": frozen_to.isoformat(), "ends_on": frozen_to.isoformat()},
         headers=headers,
     )
     assert overlap.status_code == 409
+
+
+def test_punch_cards_cannot_be_frozen(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    dana = new_client(client, headers, "Dana")
+    entitlement = sell(client, headers, dana, card(client, headers)["id"])
+    today = local_today()
+
+    frozen = client.post(
+        f"/entitlements/{entitlement['id']}/freezes",
+        json={"starts_on": today.isoformat(), "ends_on": (today + timedelta(days=3)).isoformat()},
+        headers=headers,
+    )
+
+    assert frozen.status_code == 409 and frozen.json()["detail"] == "not_a_membership"
+    assert entitlement["freezable"] is False
 
 
 def test_cancelled_entitlement_is_not_used(client: TestClient, studio: dict) -> None:

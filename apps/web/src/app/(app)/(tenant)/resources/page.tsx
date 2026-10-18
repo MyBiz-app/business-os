@@ -194,7 +194,7 @@ export default async function ResourcesPage({ searchParams }: PageProps<"/resour
           {!service ? (
             <p className="text-muted">
               {t("resources.noServices")}{" "}
-              <Link href="/services/new" className="text-primary-ink underline underline-offset-4 hover:no-underline">
+              <Link href="/catalog/services/new" className="text-primary-ink underline underline-offset-4 hover:no-underline">
                 {t("resources.addService")}
               </Link>
             </p>

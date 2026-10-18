@@ -23,7 +23,7 @@ import helpers as h
 
 BASE = os.environ.get("SWEEP_BASE", h.BASE)
 PUBLIC_PAGES = [
-    "/", "/features", "/industries", "/industries/fitness", "/pricing", "/about", "/contact",
+    "/", "/features", "/ai-team", "/industries", "/industries/fitness", "/pricing", "/websites", "/about", "/contact",
     "/getting-started", "/legal/terms", "/legal/privacy", "/legal/accessibility",
     "/login", "/signup", "/forgot-password", "/start",
 ]  # fmt: skip

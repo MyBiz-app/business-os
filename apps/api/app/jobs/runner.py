@@ -4,7 +4,7 @@ import argparse
 import sys
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import Connection, Engine, create_engine, text
+from sqlalchemy import Connection, Engine, create_engine, event, text
 
 from app.commerce.billing import bill_businesses
 from app.commerce.dunning import run_dunning
@@ -15,8 +15,10 @@ from app.jobs.base import LOCK_PREFIX
 from app.jobs.outbound import (
     issue_documents,
     move_files,
+    notify_payslips,
     notify_shifts,
     publish_shifts,
+    remind_payroll_job,
     run_ai_tasks,
     send_announcements,
     send_messages,
@@ -45,6 +47,8 @@ JOBS = {
     "remind-plans": remind_plans,
     "send-emails": send_notification_emails,
     "notify-shifts": notify_shifts,
+    "remind-payroll": remind_payroll_job,
+    "notify-payslips": notify_payslips,
     "message-reminders": message_reminders,
     "follow-up-leads": follow_up_leads,
     "purge-expired": purge_expired,
@@ -71,6 +75,7 @@ DAILY = [
     "extend-series",
     "remind-sessions",
     "remind-plans",
+    "remind-payroll",
     "bill-businesses",
     "dunning",
     "message-reminders",
@@ -81,13 +86,37 @@ DAILY = [
     "issue-documents",
     "sync-social",
 ]
-HOURLY = ["publish-shifts", "send-emails", "notify-shifts", "send-announcements"]
+HOURLY = [
+    "publish-shifts",
+    "send-emails",
+    "notify-shifts",
+    "send-announcements",
+    "notify-payslips",
+]
 # GitHub's free scheduler throttles "hourly" crons on staging to a run every 1-6 hours (observed
 # gaps up to ~6h), so an hourly job is late only after 8 hours without a success.
 MAX_HOURS = {**{job: 27 for job in DAILY}, **{job: 8 for job in HOURLY}}
 # Jobs whose staging workflow runs only once an email provider is set: they count as late only
 # after they have run at least once.
 OPTIONAL = {"send-emails", "notify-shifts"}
+
+
+JOBS_ROLE = "app_jobs"
+
+
+def jobs_engine(database_url: str, role: str | None = JOBS_ROLE) -> Engine:
+    """An engine whose every connection runs as the least-privilege jobs role."""
+    engine = create_engine(database_url)
+    if role:
+
+        @event.listens_for(engine, "connect")
+        def _use_jobs_role(dbapi_connection, _record) -> None:
+            cursor = dbapi_connection.cursor()
+            cursor.execute(f'SET ROLE "{role}"')
+            cursor.close()
+            dbapi_connection.commit()
+
+    return engine
 
 
 def run_job(engine: Engine, name: str, apply: bool = False) -> object:
@@ -248,7 +277,8 @@ def main() -> None:
         help="Really change data (delete-closed-businesses, rotate-secrets: a report without it)",
     )
     args = parser.parse_args()
-    engine = create_engine(args.database_url or get_settings().database_url)
+    settings = get_settings()
+    engine = jobs_engine(args.database_url or settings.database_url, settings.jobs_db_role)
     if args.job == "check-jobs":
         with engine.connect() as conn:
             late = late_jobs(conn)

@@ -128,8 +128,21 @@ SUPPORT_PERMISSIONS: frozenset[Permission] = frozenset(
 PLATFORM_ACT_PERMISSIONS: frozenset[Permission] = ROLE_PERMISSIONS["manager"]
 
 
-def effective_permissions(role: str, custom: list[str] | None) -> frozenset[str]:
-    """The permissions a member actually has. Owners always have everything."""
+def effective_permissions(
+    role: str, custom: list[str] | None, ai_access: bool | None = None
+) -> frozenset[str]:
+    """The permissions a member actually has. Owners always have everything. `ai_access` is the
+    person's own switch for the AI team (null: whatever their role gives); it never touches the
+    owner."""
+    base = _role_permissions(role, custom)
+    if ai_access is None or role == "owner":
+        return base
+    if ai_access:
+        return base | {Permission.AI_USE.value}
+    return base - {Permission.AI_USE.value}
+
+
+def _role_permissions(role: str, custom: list[str] | None) -> frozenset[str]:
     if role == "support":
         return frozenset(p.value for p in SUPPORT_PERMISSIONS)
     if role == "platform":

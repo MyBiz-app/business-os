@@ -17,17 +17,22 @@ from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, ensure_branch_visible, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, WidePageDep, encode_cursor
-from app.api.plans import usable_entitlement
+from app.api.plans import quota_reached, usable_entitlement
 from app.catalog.verticals import CATALOG, VerticalPack
 from app.core import events
 from app.core.permissions import Permission
 from app.messaging.notifications import notify_booking
+from app.schedule.waitlist import mode_for, spot_opened, spot_taken
 
 router = APIRouter(tags=["bookings"])
 
 ScheduleReadDep = Annotated[TenantContext, Depends(require(Permission.SCHEDULE_READ))]
 ClientsReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 ManageDep = Annotated[TenantContext, Depends(require(Permission.BOOKINGS_MANAGE))]
+
+# Who may add a client to a full class: owners, managers and branch managers (not front desk or
+# instructors). Clients never can.
+OVER_CAPACITY_ROLES = frozenset({"owner", "manager", "branch_manager"})
 
 BookingStatus = Literal["booked", "waitlisted", "checked_in", "no_show", "cancelled"]
 
@@ -46,6 +51,11 @@ class BookingCreate(BaseModel):
     dependent_id: UUID | None = Field(
         default=None, description="Which of the client's pets / children comes (#43)"
     )
+    over_capacity: bool = Field(
+        default=False,
+        description="Book the client even though the class is full (owners and managers only); "
+        "ignored while a spot is free",
+    )
 
 
 class BookingUpdate(BaseModel):
@@ -62,7 +72,14 @@ class Booking(BaseModel):
     plan_name: str | None = Field(description="The client's plan this booking uses, if any")
     status: BookingStatus
     waitlist_position: int | None
+    over_capacity: bool = Field(description="Added beyond the class's capacity by a manager")
+    over_capacity_at: datetime | None = None
     late_cancel: bool
+    credit_released: bool = Field(
+        description="The visit is not used up: the policy only records the late cancellation or "
+        "no-show, or a manager gave it back"
+    )
+    waived_at: datetime | None = Field(description="When a manager gave the visit back")
     checked_in_at: datetime | None
     cancelled_at: datetime | None
     created_at: datetime
@@ -80,6 +97,9 @@ class ClientBooking(BaseModel):
     late_cancel: bool
     dependent_name: str | None = None
     rating: int | None = Field(default=None, description="The client's review of the visit")
+    free_cancel_until: datetime | None = Field(
+        default=None, description="Upcoming bookings: cancelling before this moment is free"
+    )
 
 
 NO_DEPENDENT = "'00000000-0000-0000-0000-000000000000'::uuid"
@@ -89,7 +109,9 @@ BOOKING_SELECT = f"""
            trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client_name,
            b.dependent_id, d.name AS dependent_name,
            e.name AS plan_name,
-           b.status, b.late_cancel, b.checked_in_at, b.cancelled_at, b.created_at,
+           b.status, b.over_capacity, b.over_capacity_at, b.late_cancel, b.credit_released,
+           b.waived_at, b.checked_in_at,
+           b.cancelled_at, b.created_at,
            app.waitlist_position(b.id) AS waitlist_position,
            {HEALTH_STATE_SQL} AS health_state
     FROM app.bookings b
@@ -154,6 +176,7 @@ def promote_waitlist(db: Session, session_id: UUID) -> None:
     """Moves the earliest waitlisted clients into free spots of an upcoming session.
     The caller must hold the session lock (`lock_session`)."""
     db.execute(text("SELECT app.promote_waitlist(:id)"), {"id": session_id})
+    spot_opened(db, session_id)  # whoever is still waiting hears about a spot that stays free
 
 
 def place_booking(
@@ -164,8 +187,10 @@ def place_booking(
     *,
     requires_plan: bool,
     dependent_id: UUID | None = None,
+    over_capacity: bool = False,
 ) -> UUID:
-    """Books the client if a spot is free, otherwise adds them to the waitlist. The booking
+    """Books the client if a spot is free, otherwise adds them to the waitlist (or, with
+    `over_capacity`, books them beyond the capacity and marks the booking). The booking
     uses one of the client's plans when one is valid; with `requires_plan`, it must. A booking
     can be for one of the client's dependents (a pet, a child); a client can then hold one
     booking per session and dependent."""
@@ -187,18 +212,29 @@ def place_booking(
 
     entitlement_id = usable_entitlement(db, client_id, session_id)
     if entitlement_id is None and requires_plan:
-        raise _conflict("no_valid_plan")
+        raise _conflict(
+            "period_quota_reached" if quota_reached(db, client_id, session_id) else "no_valid_plan"
+        )
 
     booked, _ = session_counts(db, session_id)
     full = booked >= session["capacity"]
+    over = full and over_capacity
+    if full and not over:
+        service_id = db.execute(
+            text("SELECT service_id FROM app.sessions WHERE id = :id"), {"id": session_id}
+        ).scalar_one()
+        if mode_for(db, service_id) == "off":
+            raise _conflict("session_full")  # the business does not keep a waitlist
     try:
         booking_id = db.execute(
             text("""
                 INSERT INTO app.bookings
                     (tenant_id, session_id, client_id, dependent_id, entitlement_id, status,
-                     waitlisted_at, created_by)
+                     waitlisted_at, created_by, over_capacity, over_capacity_by, over_capacity_at)
                 VALUES (:tenant_id, :session_id, :client_id, :dependent_id, :entitlement_id,
-                        :status, CASE WHEN :full THEN now() END, app.current_user_id())
+                        :status, CASE WHEN :waitlist THEN now() END, app.current_user_id(),
+                        :over, CASE WHEN :over THEN app.current_user_id() END,
+                        CASE WHEN :over THEN now() END)
                 RETURNING id
             """),
             {
@@ -207,12 +243,15 @@ def place_booking(
                 "client_id": client_id,
                 "dependent_id": dependent_id,
                 "entitlement_id": entitlement_id,
-                "status": "waitlisted" if full else "booked",
-                "full": full,
+                "status": "waitlisted" if full and not over else "booked",
+                "waitlist": full and not over,
+                "over": over,
             },
         ).scalar_one()
     except IntegrityError as error:
         raise HTTPException(status_code=422, detail="invalid_reference") from error
+    if not (full and not over):
+        spot_taken(db, session_id, client_id)
     events.record(db, "first_booking", once=True)
     return booking_id
 
@@ -244,20 +283,61 @@ def tenant_pack(db: Session, tenant_id: UUID) -> VerticalPack:
     return CATALOG[vertical]
 
 
+WAITLIST_GRACE_MINUTES = 30  # a client signed in from the waitlist may still cancel for free
+
+
 def cancel_booking(db: Session, booking_id: UUID, session_id: UUID) -> None:
-    """Cancels a booking (late if inside the business's window) and fills the freed spot."""
+    """Cancels a booking and fills the freed spot. Inside the policy's window it is a late
+    cancellation, which the policy may count as a used visit or only record.
+
+    A client who was signed in automatically from the waitlist (the booking carries its
+    `waitlisted_at` and was last changed when the spot opened) cancels without penalty in the
+    first `WAITLIST_GRACE_MINUTES`, since they did not choose the time themselves."""
+    db.execute(
+        text("""
+            WITH terms AS (
+                SELECT b.id, ct.late_outcome,
+                       b.status <> 'waitlisted'
+                           AND now() > s.starts_at - make_interval(mins => ct.free_minutes)
+                           AND NOT (b.status = 'booked' AND b.waitlisted_at IS NOT NULL
+                                    AND b.updated_at > now() - make_interval(mins => :grace))
+                       AS late
+                FROM app.bookings b
+                JOIN app.sessions s ON s.id = b.session_id
+                CROSS JOIN LATERAL app.cancellation_terms(b.session_id, b.entitlement_id) ct
+                WHERE b.id = :id
+            )
+            UPDATE app.bookings b
+            SET status = 'cancelled', cancelled_at = now(), updated_at = now(),
+                late_cancel = terms.late,
+                credit_released = terms.late AND terms.late_outcome <> 'counts'
+            FROM terms
+            WHERE b.id = terms.id
+        """),
+        {"id": booking_id, "grace": WAITLIST_GRACE_MINUTES},
+    )
+    promote_waitlist(db, session_id)
+
+
+def settle_no_show(db: Session, booking_id: UUID, no_show: bool) -> None:
+    """A client marked as not having come uses the visit up or not, as the policy says; moving
+    the booking out of no-show undoes that (a give-back by a manager is kept only for the
+    no-show it was given for)."""
     db.execute(
         text("""
             UPDATE app.bookings b
-            SET status = 'cancelled', cancelled_at = now(), updated_at = now(),
-                late_cancel = b.status <> 'waitlisted' AND now() > s.starts_at
-                    - make_interval(mins => t.cancellation_window_minutes)
-            FROM app.sessions s, app.tenants t
-            WHERE b.id = :id AND s.id = b.session_id AND t.id = b.tenant_id
+            SET credit_released = CASE WHEN :no_show THEN ct.no_show_outcome <> 'counts'
+                                       ELSE false END,
+                waived_by = CASE WHEN :no_show THEN b.waived_by END,
+                waived_at = CASE WHEN :no_show THEN b.waived_at END,
+                waive_reason = CASE WHEN :no_show THEN b.waive_reason END
+            FROM app.bookings x
+            CROSS JOIN LATERAL app.cancellation_terms(x.session_id, x.entitlement_id) ct
+            WHERE b.id = :id AND x.id = b.id
+              AND NOT (:no_show AND b.waived_at IS NOT NULL)
         """),
-        {"id": booking_id},
+        {"id": booking_id, "no_show": no_show},
     )
-    promote_waitlist(db, session_id)
 
 
 @router.get("/sessions/{session_id}/bookings")
@@ -281,6 +361,8 @@ def list_bookings(session_id: UUID, context: ScheduleReadDep, page: WidePageDep)
 def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) -> Booking:
     """Books the client if a spot is free, otherwise adds them to the waitlist."""
     _check_session_branch(context, session_id)
+    if body.over_capacity and context.role not in OVER_CAPACITY_ROLES:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
     # Staff may book without a plan (walk-ins pay at the desk); the roster shows it.
     booking_id = place_booking(
         context.session,
@@ -289,6 +371,7 @@ def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) ->
         body.client_id,
         requires_plan=False,
         dependent_id=body.dependent_id,
+        over_capacity=body.over_capacity,
     )
     notify_booking(context.session, booking_id, "booked_by_studio")
     return _load(context.session, booking_id)
@@ -319,6 +402,8 @@ def update_booking(booking_id: UUID, body: BookingUpdate, context: ManageDep) ->
             """),
             {"id": booking_id, "status": body.status},
         )
+        if body.status == "no_show" or current.status == "no_show":
+            settle_no_show(db, booking_id, body.status == "no_show")
     return _load(db, booking_id)
 
 

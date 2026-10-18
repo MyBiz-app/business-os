@@ -1,24 +1,11 @@
-// Which AI agent the floating bubble shows on which screen. One file, so a new screen is one line.
+// Which AI agent the floating bubble shows on which screen. The screen map lives on the server
+// (each agent card carries its `routes`), so there is one source for the bubble and the API.
 
-const ROUTE_AGENTS: readonly (readonly [prefix: string, agent: string])[] = [
-  ["/leads", "marketing"],
-  ["/messages", "marketing"],
-  ["/schedule", "secretary"],
-  ["/events", "secretary"],
-  ["/sales", "sales"],
-  ["/quotes", "sales"],
-  ["/bills", "finance"],
-  ["/receipts", "finance"],
-  ["/team", "team"],
-  ["/reports", "analyst"],
-  ["/dashboard", "analyst"],
-];
+type Routed = { key: string; routes?: readonly string[] };
 
 /** Screens that already are the AI team (or hand over to it): the bubble stays out of the way. */
 const HIDDEN = ["/ai", "/assistant", "/upgrade"];
 
-/** The fan fills up with these after the chief and the agent of the screen. */
-const FILL = ["secretary", "marketing", "sales", "finance"];
 const FAN_SIZE = 5;
 
 const under = (path: string, prefix: string) => path === prefix || path.startsWith(`${prefix}/`);
@@ -27,15 +14,23 @@ export function bubbleHidden(path: string): boolean {
   return HIDDEN.some((prefix) => under(path, prefix));
 }
 
-/** The agent that suits a screen; the chief everywhere else. */
-export function agentForPath(path: string): string {
-  return ROUTE_AGENTS.find(([prefix]) => under(path, prefix))?.[1] ?? "chief";
+/** The agent that suits a screen (the longest matching route wins); the chief everywhere else. */
+export function agentForPath(path: string, agents: readonly Routed[]): string {
+  let best: { key: string; length: number } | null = null;
+  for (const agent of agents)
+    for (const route of agent.routes ?? [])
+      if (under(path, route) && (!best || route.length > best.length)) best = { key: agent.key, length: route.length };
+  return best?.key ?? "chief";
 }
 
-/** The agents offered in the fan: the chief, the one for this screen, then others, only those that can be talked to. */
-export function fanFor(path: string, available: readonly string[]): string[] {
-  const wanted = ["chief", agentForPath(path), ...FILL];
+/**
+ * The agents offered in the fan. The agent already on the round button is never offered again;
+ * the rest follow by relevance: the screen's agent, the chief, then the others in team order.
+ */
+export function fanFor(path: string, agents: readonly Routed[], shownKey: string): string[] {
+  const keys = agents.map((a) => a.key);
+  const wanted = [agentForPath(path, agents), "chief", ...keys];
   const picked: string[] = [];
-  for (const key of wanted) if (available.includes(key) && !picked.includes(key)) picked.push(key);
+  for (const key of wanted) if (key !== shownKey && keys.includes(key) && !picked.includes(key)) picked.push(key);
   return picked.slice(0, FAN_SIZE);
 }

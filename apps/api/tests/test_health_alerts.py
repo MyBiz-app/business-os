@@ -95,6 +95,7 @@ def test_health_page_data(client: TestClient, engine: Engine, auth: AuthHeaders)
         by_job["purge-expired"]["last_ok"] is False and by_job["purge-expired"]["failures_24h"] == 1
     )
     assert body["database_bytes"] > 0
+    assert body["files_bytes"] >= 0
     assert any(route["route"] == "GET /platform/me" for route in body["routes"])
 
 

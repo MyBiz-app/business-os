@@ -82,18 +82,57 @@ export async function CardsPageSkeleton({ size = "full" }: { size?: ContainerSiz
   );
 }
 
-/** A folder column beside a list: files. */
+/** A row of folders (a sliding pill) over a list: files. */
 export async function SplitPageSkeleton({ size = "full" }: { size?: ContainerSize }) {
   return (
     <Shell size={size}>
-      <div aria-hidden="true" className="grid gap-6 lg:grid-cols-[18rem_1fr]">
-        <div className="card flex flex-col gap-2 p-3">
-          {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="skeleton h-9 w-full" />
-          ))}
-        </div>
-        <Rows count={7} />
+      <div aria-hidden="true" className="flex flex-wrap gap-2">
+        <div className="skeleton h-10 w-[28rem] max-w-full" />
       </div>
+      <Rows count={7} />
+    </Shell>
+  );
+}
+
+/** Six number tiles over two charts: the dashboard (six in a row from 1920px, like the page). */
+export async function DashboardPageSkeleton({ size = "full" }: { size?: ContainerSize }) {
+  return (
+    <Shell size={size}>
+      <div aria-hidden="true" className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6">
+        {Array.from({ length: 6 }, (_, i) => (
+          <div key={i} className="card flex flex-col gap-3 p-5">
+            <div className="skeleton h-4 w-20" />
+            <div className="skeleton h-8 w-24" />
+          </div>
+        ))}
+      </div>
+      <div aria-hidden="true" className="grid gap-4 lg:grid-cols-2">
+        <div className="skeleton h-64 w-full" />
+        <div className="skeleton h-64 w-full" />
+      </div>
+      <Rows count={4} />
+    </Shell>
+  );
+}
+
+/** A period switch, number cards and a chart: the reports. */
+export async function ReportsPageSkeleton({ size = "full" }: { size?: ContainerSize }) {
+  return (
+    <Shell size={size}>
+      <div aria-hidden="true" className="flex flex-wrap items-center gap-2">
+        <div className="skeleton h-10 w-56" />
+        <div className="skeleton h-10 w-40 ms-auto" />
+      </div>
+      <div aria-hidden="true" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="card flex flex-col gap-3 p-5">
+            <div className="skeleton h-4 w-24" />
+            <div className="skeleton h-8 w-32" />
+          </div>
+        ))}
+      </div>
+      <div aria-hidden="true" className="skeleton h-72 w-full" />
+      <Rows count={4} />
     </Shell>
   );
 }

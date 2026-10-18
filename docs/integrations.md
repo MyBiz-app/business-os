@@ -13,7 +13,7 @@ it is a new provider class, or a different choice in settings.
 | Messaging | `messaging.py`: `MessageProvider` - `send`; a WhatsApp provider also implements `parse_inbound` (verify the notification, return `IncomingMessage`s) to feed the AI replies via `/webhooks/whatsapp/{provider}/{tenant_id}` | `simulated` | each business, else `API_MESSAGING_PROVIDER` |
 | Email | `email.py` (senders in `app/messaging/email.py`) | `log` | the platform: `API_EMAIL_PROVIDER` |
 | Push notifications | `app/messaging/push.py` (Expo push; phones register via `PUT /me/push-tokens`) | `expo` | the platform: `API_PUSH_PROVIDER` (`expo` / `log` / `off`), optional `API_EXPO_ACCESS_TOKEN` |
-| AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_ANTHROPIC_API_KEY` |
+| AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_AI_PROVIDER` (`anthropic` / `openai` / `gemini`), the vendor's key, and `API_AI_ENABLED_VENDORS` for non-Anthropic vendors |
 | Storage | `storage.py`: `StorageProvider` - `put`, `get`, `delete`, `signed_url` | `database` (also `supabase`: Supabase Storage, T80) | the platform: `API_STORAGE_PROVIDER` |
 
 - `registry.py`: `@register(capability, name, label, fields=…)` and `SettingField`.
@@ -108,6 +108,23 @@ and `/social/callback/google_business` (both in the same Google OAuth client) an
 build up from our own daily reads. These tokens expire within a day, so the sync renews them on
 every run. Publishing is not built for these networks yet.
 
+## Cities, streets and map points (addresses)
+
+Addresses are chosen from the official Israeli lists (data.gov.il, free open data), kept as a
+snapshot in the code (`apps/api/app/geo/data/il_geo.json.gz`) and loaded into the shared, read-only
+tables `geo_cities` and `geo_streets` by migration 0129. Refresh once a year:
+`uv run python scripts/build_geo_snapshot.py` (needs access to data.gov.il), review the printed
+counts, commit the file, then `uv run python -m app.geo.loader` against each database (rows are
+inserted or updated, never deleted: saved addresses point at them).
+
+A branch's point on the map comes from OpenStreetMap's free Nominatim service
+(`app/geo/geocoder.py`): one request when a branch address is saved, never per page view, with
+an identifying `User-Agent` (`API_GEOCODER_USER_AGENT`). `API_GEOCODER=none` turns it off (tests
+and local work). A failure never blocks saving; the branch simply has no point until the next
+save or until the pin is placed by hand. Nominatim's policy allows light use (about one request a
+second); if branch saves ever become frequent, host Nominatim or switch the class behind
+`get_geocoder()` for another service.
+
 ## Switching provider
 
 - **A business**: settings → Integrations → choose another provider and fill its settings.
@@ -115,3 +132,13 @@ every run. Publishing is not built for these networks yet.
   (each payment, receipt and message keeps the provider that handled it).
 - **The platform default**: change `API_<CAPABILITY>_PROVIDER` (and `API_<CAPABILITY>_SETTINGS`,
   a JSON object of its settings) in the environment and restart the API.
+
+## Branches map (OpenFreeMap)
+
+The branches map and the branch pin use MapLibre with free OpenFreeMap vector tiles
+(`tiles.openfreemap.org`, OpenStreetMap data, no key, no sign-up, credit shown on the map). The
+library loads only on the map page, the dashboard map card and the branch editor. The browser
+fetches tiles itself, so `connect-src` and `img-src` in `apps/web/src/lib/csp.ts` list that host
+(`MAP_ORIGIN`) and `worker-src` allows blobs. To switch provider (for example MapTiler, free up
+to 100,000 loads a month), change the two style URLs in `components/branch-map/map-core.ts` and
+`MAP_ORIGIN`.

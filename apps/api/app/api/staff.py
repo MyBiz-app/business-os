@@ -14,6 +14,7 @@ from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import SessionDep, TenantContext, UserDep, require
 from app.api.routes import ensure_profile
 from app.core.audit import record
+from app.core.business_size import grow_from_solo
 from app.core.permissions import ROLE_PERMISSIONS, Permission, effective_permissions
 from app.schedule.branch_managers import (
     TEAM_ROLES,
@@ -110,7 +111,7 @@ class Member(BaseModel):
             data = {**data}
             custom = data.pop("custom_permissions", None)
             order = [p.value for p in Permission]
-            effective = effective_permissions(data["role"], custom)
+            effective = effective_permissions(data["role"], custom, data.pop("ai_access", None))
             data["permissions"] = [p for p in order if p in effective]
         return data
 
@@ -217,7 +218,7 @@ class Accepted(BaseModel):
 
 MEMBER_SELECT = """
     SELECT m.user_id, u.email, u.full_name, m.role, m.custom_role_id,
-           r.name AS custom_role_name, r.permissions AS custom_permissions,
+           r.name AS custom_role_name, r.permissions AS custom_permissions, m.ai_access,
            m.location_ids, m.created_at AS joined_at,
            m.job_title, m.reports_to, m.home_location_id, u.phone,
            CASE WHEN u.avatar_updated_at IS NULL THEN NULL
@@ -337,6 +338,7 @@ def create_invitation(
         email=body.email,
         role=body.role,
     )
+    grow_from_solo(context.session, context.tenant_id)  # the first employee ends solo mode
     return CreatedInvitation(**row, token=token)
 
 

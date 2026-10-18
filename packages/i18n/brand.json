@@ -13,8 +13,8 @@
   "emails": {
     "support": "support@mybizapp.click",
     "billing": "billing@mybizapp.click",
-    "sender": "no-reply@example.com",
-    "noReply": "no-reply@example.com"
+    "sender": "no-reply@mybizapp.click",
+    "noReply": "no-reply@mybizapp.click"
   },
   "social": {
     "linkedin": "https://www.linkedin.com/company/mybiz",
@@ -57,6 +57,10 @@
       "accessibility": {
         "version": "2026-10-17",
         "date": "2026-10-17"
+      },
+      "cancellation": {
+        "version": "2026-10-18",
+        "date": "2026-10-18"
       }
     },
     "accessibilityCoordinator": {
@@ -64,7 +68,8 @@
         "he": "רכז הנגישות של מייביז",
         "en": "MyBiz accessibility coordinator"
       },
-      "email": "accessibility@mybizapp.click"
+      "email": "accessibility@mybizapp.click",
+      "phone": ""
     }
   }
 }

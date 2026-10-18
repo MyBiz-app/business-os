@@ -6,6 +6,7 @@
   "color": "from-sky-500 to-blue-600",
   "terms": "classes",
   "schedule_view": "class_blocks",
+  "waitlist": { "enabled": true, "classes": "auto", "appointments": "first_come", "resources": "first_come" },
   "social": "on",
   "client_term": "student",
   "booking_modes": [

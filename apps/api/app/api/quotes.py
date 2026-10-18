@@ -78,6 +78,17 @@ class QuoteCreate(QuoteFields):
     client_id: UUID
 
 
+class QuoteStatusTotal(BaseModel):
+    status: QuoteStatus = Field(description="expired: sent and past its date")
+    currency: str
+    count: int
+    total: int = Field(description="Minor units")
+    month_count: int = Field(
+        default=0, description="Of these, accepted in the current month (business time zone)"
+    )
+    month_total: int = Field(default=0, description="Minor units, accepted this month")
+
+
 class QuoteSummary(BaseModel):
     id: UUID
     number: int
@@ -276,6 +287,31 @@ def list_quotes(
         },
     ).mappings()
     return [QuoteSummary.model_validate(dict(row)) for row in rows]
+
+
+@router.get("/quotes/summary")
+def quotes_summary(context: ReadDep) -> list[QuoteStatusTotal]:
+    """How many quotes and how much money per status and currency, over every visible quote."""
+    visible, visible_params = client_branch_filter(context, "c.home_location_id")
+    rows = context.session.execute(
+        text(f"""
+            SELECT q.status, q.currency, count(*)::integer AS count,
+                   coalesce(sum(q.total), 0)::bigint AS total,
+                   (count(*) FILTER (WHERE q.in_month))::integer AS month_count,
+                   coalesce(sum(q.total) FILTER (WHERE q.in_month), 0)::bigint AS month_total
+            FROM (
+                {SUMMARY},
+                       coalesce(date_trunc('month', q.accepted_at AT TIME ZONE t.time_zone)
+                                = date_trunc('month', now() AT TIME ZONE t.time_zone), false)
+                           AS in_month
+                {FROM} WHERE {visible}
+            ) q
+            GROUP BY q.status, q.currency
+            ORDER BY q.status, q.currency
+        """),
+        visible_params,
+    ).mappings()
+    return [QuoteStatusTotal.model_validate(dict(row)) for row in rows]
 
 
 @router.post("/quotes", status_code=status.HTTP_201_CREATED)

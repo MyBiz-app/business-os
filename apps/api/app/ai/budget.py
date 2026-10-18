@@ -13,7 +13,14 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.ai import models
-from app.commerce.modules import ai_credits_allowed, ai_extra_price
+from app.commerce.modules import (
+    AI_DAILY_PACE_PERCENT,
+    AI_EXTRA_USER_CREDITS,
+    ai_credits_allowed,
+    ai_extra_price,
+    ai_users_included,
+)
+from app.core.permissions import Permission, effective_permissions
 
 # Used / included, in percent: each is raised once a month as an alert in the CRM.
 ALERT_THRESHOLDS = (80, 100, 150, 200)
@@ -33,9 +40,46 @@ def credits_used(db: Session, month_start: dt.date) -> float:
     )
 
 
+def _modules(db: Session) -> list[str]:
+    return list(db.execute(text("SELECT module_key FROM app.tenant_modules")).scalars().all())
+
+
+def extra_ai_users(db: Session) -> int:
+    return int(
+        db.execute(
+            text("""
+                SELECT coalesce((SELECT extra_ai_users FROM app.tenant_ai_settings
+                                 WHERE tenant_id = app.current_tenant_id()), 0)
+            """)
+        ).scalar_one()
+    )
+
+
 def credits_included(db: Session) -> int:
-    modules = db.execute(text("SELECT module_key FROM app.tenant_modules")).scalars().all()
-    return ai_credits_allowed(list(modules))
+    """The month's pool: what the AI module includes, plus 150 for each extra AI user."""
+    base = ai_credits_allowed(_modules(db))
+    return base + extra_ai_users(db) * AI_EXTRA_USER_CREDITS if base else 0
+
+
+def ai_users_allowed(db: Session) -> int:
+    """How many people may have access to the AI team (0: no AI module)."""
+    base = ai_users_included(_modules(db))
+    return base + extra_ai_users(db) if base else 0
+
+
+def ai_users_count(db: Session) -> int:
+    """People with access now. The owner is always in and not counted."""
+    rows = db.execute(
+        text("""
+            SELECT m.role, r.permissions AS custom_permissions, m.ai_access
+            FROM app.tenant_members m LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
+            WHERE m.role <> 'owner'
+        """)
+    )
+    return sum(
+        Permission.AI_USE.value in effective_permissions(r.role, r.custom_permissions, r.ai_access)
+        for r in rows
+    )
 
 
 @dataclass(frozen=True)
@@ -122,6 +166,42 @@ def over_person_limit(
 ) -> bool:
     limit = person_limit(db, user_id, role_keys)
     return limit is not None and person_used(db, user_id, month_start) >= limit
+
+
+def day_limit(db: Session, user_id: UUID, role: str) -> int | None:
+    """Most credits the person may use in a day: their own percent (default 15) of the month's
+    pool. The owner has none (None)."""
+    if role == "owner":
+        return None
+    included = credits_included(db)
+    if included == 0:
+        return None
+    percent = db.execute(
+        text("SELECT ai_daily_percent FROM app.tenant_members WHERE user_id = :user"),
+        {"user": user_id},
+    ).scalar()
+    return max(1, round(included * (percent or AI_DAILY_PACE_PERCENT) / 100))
+
+
+def person_used_today(db: Session, user_id: UUID) -> float:
+    return float(
+        db.execute(
+            text("""
+                SELECT coalesce(sum(u.quantity), 0) FROM app.usage_events u
+                JOIN app.tenants t ON t.id = u.tenant_id
+                WHERE u.meter = 'ai_credits' AND t.id = app.current_tenant_id()
+                  AND u.details ->> 'user_id' = :user
+                  AND u.occurred_at >=
+                      ((now() AT TIME ZONE t.time_zone)::date::timestamp AT TIME ZONE t.time_zone)
+            """),
+            {"user": str(user_id)},
+        ).scalar_one()
+    )
+
+
+def over_day_pace(db: Session, user_id: UUID, role: str) -> bool:
+    limit = day_limit(db, user_id, role)
+    return limit is not None and person_used_today(db, user_id) >= limit
 
 
 def raise_alerts(db: Session, month_start: dt.date) -> list[int]:

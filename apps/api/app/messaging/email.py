@@ -42,6 +42,7 @@ class Email:
     reply_to: str | None = None  # where replies go (the business's or branch's own address)
     from_name: str | None = None  # the business or branch shown as the sender's name
     list_unsubscribe: str | None = None  # the opt-out link of an ad (List-Unsubscribe header)
+    website: str | None = None  # the business's or branch's site, shown in the footer
 
 
 def _unsubscribe_headers(link: str) -> dict[str, str]:
@@ -69,7 +70,7 @@ def _html(email: Email) -> str:
         subject=email.subject,
         preheader=greeting.split("\n")[0],
         brand=layout.BRAND,
-        footer=[(lang, f"{layout.BRAND} · {footer}")],
+        footer=[(lang, " · ".join(p for p in (layout.BRAND, footer, email.website) if p))],
         kind=email.kind,
     )
 
@@ -199,6 +200,7 @@ def render(
         "note": str(payload.get("note") or ""),
         "plan": str(payload.get("plan_name", "")),
         "date": _day(payload.get("ends_on")),
+        "from": _day(payload.get("starts_on")),
         "friend": str(payload.get("from_name", "")),
     }
     subject = _fill(messages["subject"][kind], values)
@@ -254,7 +256,7 @@ def send_emails(
         conn.execute(
             text("""
                 SELECT n.id, n.tenant_id, n.kind, n.payload, c.email, c.first_name, c.user_id,
-                       t.name AS business,
+                       t.name AS business, t.website_url,
                        t.locale, t.time_zone
                 FROM app.notifications n
                 JOIN app.clients c ON c.id = n.client_id
@@ -309,6 +311,7 @@ def send_emails(
                     kind=row["kind"],
                     reply_to=_reply_to(conn, row["tenant_id"], reply_cache),
                     from_name=row["business"],
+                    website=row["website_url"],
                 )
             )
         except Exception as error:  # a provider error must not stop the batch

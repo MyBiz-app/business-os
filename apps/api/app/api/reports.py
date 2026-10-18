@@ -9,6 +9,11 @@ from sqlalchemy import text
 
 from app.api.deps import TenantContext, require
 from app.core.permissions import Permission
+from app.reports.branch_insights import (
+    client_origins,
+    staff_cost_by_branch,
+    staff_count_by_branch,
+)
 from app.reports.metrics import (
     METRICS,
     Dimension,
@@ -53,6 +58,9 @@ def get_metrics(
     start: Annotated[dt.date, Query(description="First local date")],
     end: Annotated[dt.date, Query(description="Last local date (inclusive)")],
     keys: Annotated[list[MetricKey] | None, Query()] = None,
+    exclude_staff: Annotated[
+        bool, Query(description="Leave out clients who are also team members")
+    ] = False,
 ) -> list[MetricValue]:
     """Each metric for the period and for the period of the same length just before it."""
     _check_period(start, end)
@@ -61,8 +69,8 @@ def get_metrics(
         MetricValue(
             key=key,
             unit=METRICS[key].unit,
-            value=compute(context.session, key, start, end),
-            previous=compute(context.session, key, before_start, before_end),
+            value=compute(context.session, key, start, end, exclude_staff),
+            previous=compute(context.session, key, before_start, before_end, exclude_staff),
             higher_is_better=METRICS[key].higher_is_better,
         )
         for key in keys or list(METRICS)
@@ -76,13 +84,16 @@ def get_series(
     start: Annotated[dt.date, Query()],
     end: Annotated[dt.date, Query()],
     grain: Annotated[Grain, Query()] = "week",
+    exclude_staff: Annotated[
+        bool, Query(description="Leave out clients who are also team members")
+    ] = False,
 ) -> list[Point]:
     _check_period(start, end)
     if METRICS[key].bucket_sql is None:
         raise HTTPException(status_code=422, detail="no_series")
     return [
         Point(bucket=bucket, value=value)
-        for bucket, value in series(context.session, key, start, end, grain)
+        for bucket, value in series(context.session, key, start, end, grain, exclude_staff)
     ]
 
 
@@ -101,6 +112,9 @@ def get_breakdown(
     context: ReportsDep,
     start: Annotated[dt.date, Query()],
     end: Annotated[dt.date, Query()],
+    exclude_staff: Annotated[
+        bool, Query(description="Leave out clients who are also team members")
+    ] = False,
 ) -> list[BreakdownItem]:
     """Attendance metrics of sessions that took place, per service, instructor or time slot."""
     _check_period(start, end)
@@ -113,7 +127,7 @@ def get_breakdown(
             occupancy=row.occupancy,
             no_show_rate=row.no_show_rate,
         )
-        for row in breakdown(context.session, dimension, start, end)
+        for row in breakdown(context.session, dimension, start, end, exclude_staff)
     ]
 
 
@@ -127,13 +141,17 @@ class MemberAtRisk(BaseModel):
 
 @router.get("/members-at-risk")
 def get_members_at_risk(
-    context: ReportsDep, days: Annotated[int, Query(ge=7, le=180)] = 14
+    context: ReportsDep,
+    days: Annotated[int, Query(ge=7, le=180)] = 14,
+    exclude_staff: Annotated[
+        bool, Query(description="Leave out clients who are also team members")
+    ] = False,
 ) -> list[MemberAtRisk]:
     """Members with a valid plan who haven't come in `days`, or whose plan ends within `days`
     with no renewal."""
     return [
         MemberAtRisk.model_validate(member.__dict__)
-        for member in members_at_risk(context.session, days)
+        for member in members_at_risk(context.session, days, exclude_staff=exclude_staff)
     ]
 
 
@@ -159,6 +177,9 @@ def compare_branches(
     location_id: Annotated[
         list[str] | None, Query(description="Only these branches (within the person's own)")
     ] = None,
+    exclude_staff: Annotated[
+        bool, Query(description="Leave out clients who are also team members")
+    ] = False,
 ) -> list[BranchMetrics]:
     """The same metrics, branch by branch, for comparing them side by side. Each value uses
     the metric's single definition with that one branch selected, so the numbers add up to
@@ -187,7 +208,7 @@ def compare_branches(
                         BranchMetric(
                             key=key,
                             unit=METRICS[key].unit,
-                            value=compute(db, key, start, end),
+                            value=compute(db, key, start, end, exclude_staff),
                             higher_is_better=METRICS[key].higher_is_better,
                         )
                         for key in keys or list(METRICS)
@@ -197,3 +218,69 @@ def compare_branches(
     finally:
         db.execute(text("SELECT set_config('app.location_id', :id, true)"), {"id": previous or ""})
     return result
+
+
+class ClientOriginOut(BaseModel):
+    city_code: int
+    city_name: str
+    clients: int
+    latitude: float | None = Field(description="The city's centre, when it could be found")
+    longitude: float | None
+
+
+class BranchInsight(BaseModel):
+    location_id: str
+    origins: list[ClientOriginOut] = Field(
+        description="Cities of the clients who booked there in the period, most first"
+    )
+    staff_cost_minor: int | None = Field(
+        description="The branch's share of the latest payroll month's gross pay (needs payroll "
+        "access; people who did not clock in are not counted)"
+    )
+    staff_count: int = Field(description="Team members assigned to the branch or based there")
+
+
+class BranchInsights(BaseModel):
+    staff_cost_period: dt.date | None = Field(description="The payroll month the cost is from")
+    branches: list[BranchInsight]
+
+
+@router.get("/branch-insights")
+def branch_insights(
+    context: ReportsDep,
+    start: Annotated[dt.date, Query(description="First local date")],
+    end: Annotated[dt.date, Query(description="Last local date (inclusive)")],
+) -> BranchInsights:
+    """What the branches map shows beyond the metrics: where each branch's clients come from
+    and what its team costs. Only branches the person may see."""
+    _check_period(start, end)
+    db = context.session
+    ids = [
+        row.id
+        for row in db.execute(
+            text("""
+                SELECT id::text AS id FROM app.locations
+                WHERE active AND app.in_branch(id) ORDER BY created_at, name
+            """)
+        )
+    ]
+    period, costs = (
+        staff_cost_by_branch(db) if Permission.PAYROLL_READ in context.permissions else (None, {})
+    )
+    staff_counts = staff_count_by_branch(db)
+    can_see_cost = Permission.PAYROLL_READ in context.permissions
+    return BranchInsights(
+        staff_cost_period=period,
+        branches=[
+            BranchInsight(
+                location_id=location_id,
+                origins=[
+                    ClientOriginOut(**vars(origin))
+                    for origin in client_origins(db, location_id, start, end)
+                ],
+                staff_cost_minor=costs.get(location_id, 0) if can_see_cost and period else None,
+                staff_count=staff_counts.get(location_id, 0),
+            )
+            for location_id in ids
+        ],
+    )

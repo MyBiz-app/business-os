@@ -39,6 +39,7 @@ const MODULES = {
   agent_finance: { icon: Wallet, gradient: "from-lime-500 to-emerald-600" },
   agent_marketing: { icon: Megaphone, gradient: "from-rose-500 to-orange-500" },
   social_studio: { icon: Share2, gradient: "from-pink-500 to-violet-600" },
+  payroll: { icon: Wallet, gradient: "from-emerald-500 to-green-600" },
   extra_location: { icon: Building2, gradient: "from-slate-500 to-slate-700" },
 } as const;
 

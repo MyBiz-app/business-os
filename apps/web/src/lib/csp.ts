@@ -3,7 +3,8 @@
  * own chunks); violations are reported to /api/csp-report.
  *
  * The browser never calls the API or Supabase directly (every call goes through the Next.js
- * server), so connect-src stays 'self', which is tighter than listing those origins.
+ * server), so connect-src stays 'self' plus the free map tile host (the branches map, R35), which
+ * is the one thing the browser fetches itself.
  * Keep this file free of "@/" imports: the node test runner loads it directly. */
 
 export const CSP_REPORT_PATH = "/api/csp-report";
@@ -18,7 +19,9 @@ export function createNonce(): string {
   return btoa(String.fromCharCode(...bytes));
 }
 
-type Options = { dev: boolean };
+/** `embeddable`: a page other sites may show in a frame (the contact form a business pastes into
+ * its own website). */
+type Options = { dev: boolean; embeddable?: boolean };
 
 /** The host error reports go to (Sentry), from the DSN; nothing when monitoring is off. */
 export function sentryIngestOrigin(dsn: string | undefined = process.env.NEXT_PUBLIC_SENTRY_DSN): string | undefined {
@@ -30,6 +33,9 @@ export function sentryIngestOrigin(dsn: string | undefined = process.env.NEXT_PU
   }
 }
 
+/** The free OpenStreetMap-based tile service behind the branches map (styles, tiles, fonts). */
+export const MAP_ORIGIN = "https://tiles.openfreemap.org";
+
 /** The API's origin: business logos and other public images are served from it. */
 export function apiOrigin(url: string | undefined = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000"): string | undefined {
   try {
@@ -39,20 +45,23 @@ export function apiOrigin(url: string | undefined = process.env.NEXT_PUBLIC_API_
   }
 }
 
-function directives(scriptSrc: string, { dev }: Options): string[] {
+function directives(scriptSrc: string, { dev, embeddable }: Options): string[] {
   return [
     "default-src 'self'",
     `script-src ${scriptSrc}${dev ? " 'unsafe-eval'" : ""}`,
     // React and next/font set inline style attributes; a style nonce cannot cover those.
     "style-src 'self' 'unsafe-inline'",
-    ["img-src 'self' data: blob:", apiOrigin()].filter(Boolean).join(" "),
+    ["img-src 'self' data: blob:", MAP_ORIGIN, apiOrigin()].filter(Boolean).join(" "),
     "font-src 'self' data:",
-    ["connect-src 'self'", sentryIngestOrigin()].filter(Boolean).join(" "),
+    ["connect-src 'self'", MAP_ORIGIN, sentryIngestOrigin()].filter(Boolean).join(" "),
+    // The map draws on a canvas in a worker made from a blob.
+    "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    // The app is never shown inside another site's frame (clickjacking).
-    "frame-ancestors 'none'",
+    // The app is never shown inside another site's frame (clickjacking), except the one public
+    // page built for it.
+    embeddable ? "frame-ancestors *" : "frame-ancestors 'none'",
   ];
 }
 

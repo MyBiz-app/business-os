@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
+import { useToast } from "@business-os/app-kit/components/toast";
 import { confirm } from "@business-os/app-kit/lib/confirm";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -39,6 +40,8 @@ export default function SessionScreen() {
   const t = useTranslations("business.today");
   const tSession = useTranslations("business.session");
   const tBookings = useTranslations("bookings");
+  const tCommon = useTranslations("common");
+  const toast = useToast();
   const tNotes = useTranslations("visitNotes");
   const locale = useLocale();
   const { api, scope, tenant, palette, can } = useStaff();
@@ -76,26 +79,36 @@ export default function SessionScreen() {
     setError(code && BOOKING_ERRORS.includes(code) ? tBookings(`errors.${code}`) : tBookings("errors.generic"));
   };
 
-  const run = async (key: string, action: () => Promise<void>) => {
+  /** Runs an action and reloads; says whether it worked, so a toast follows only a success. */
+  const run = async (key: string, action: () => Promise<void>): Promise<boolean> => {
     setBusy(key);
     setError(null);
     setNotice(null);
     try {
       await action();
       await reload();
+      return true;
     } catch (caught) {
       fail(caught);
+      return false;
     } finally {
       setBusy(null);
     }
   };
 
-  const setStatus = (booking: Booking, status: "checked_in" | "no_show" | "booked") =>
-    run(booking.id, async () => {
+  const setStatus = async (booking: Booking, status: "checked_in" | "no_show" | "booked") => {
+    const done = await run(booking.id, async () => {
       unwrap(
         await api.PATCH("/bookings/{booking_id}", { params: { ...scope, path: { booking_id: booking.id } }, body: { status } }),
       );
     });
+    // Check-in and no-show are easy to tap by mistake: say so, with a way back.
+    if (done && status !== "booked") {
+      toast("success", tSession(status === "checked_in" ? "markedCheckedIn" : "markedNoShow", { name: booking.client_name }), {
+        action: { label: tCommon("undo"), onPress: () => void setStatus(booking, "booked") },
+      });
+    }
+  };
 
   const cancel = async (booking: Booking) => {
     const yes = await confirm(
@@ -124,9 +137,10 @@ export default function SessionScreen() {
       tSession("no"),
     );
     if (!yes) return;
-    await run("session", async () => {
+    const done = await run("session", async () => {
       unwrap(await api.PATCH("/sessions/{session_id}", { params: { ...scope, path: { session_id: id } }, body: { status: "cancelled" } }));
     });
+    if (done) toast("success", tSession("classCancelled"), { action: { label: tCommon("undo"), onPress: () => void restoreSession() } });
   };
 
   const restoreSession = () =>
@@ -164,7 +178,11 @@ export default function SessionScreen() {
       const booking = unwrap(
         await api.POST("/sessions/{session_id}/bookings", {
           params: { ...scope, path: { session_id: id } },
-          body: { client_id: client.id, dependent_id: dependentId && dependentId !== WITHOUT ? dependentId : null },
+          body: {
+            client_id: client.id,
+            dependent_id: dependentId && dependentId !== WITHOUT ? dependentId : null,
+            over_capacity: false,
+          },
         }),
       );
       setPicking(null);
@@ -225,7 +243,7 @@ export default function SessionScreen() {
           ) : (
             <Badge label={t("cancelled")} tone="danger" palette={palette} />
           )}
-          {session.waitlisted > 0 && <Badge label={t("waitlist", { count: session.waitlisted })} palette={palette} />}
+          {session.waitlisted + session.waiting_requests > 0 && <Badge label={t("waitlist", { count: session.waitlisted + session.waiting_requests })} palette={palette} />}
           {session.room_name && <Badge label={session.room_name} palette={palette} />}
           {session.location_name && <Badge label={session.location_name} palette={palette} />}
         </View>

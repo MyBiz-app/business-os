@@ -13,10 +13,16 @@ test("the policy allows scripts only by nonce and reports violations", () => {
   const policy = strictCsp("abc", { dev: false });
   assert.match(policy, /script-src 'self' 'nonce-abc' 'strict-dynamic'(;|$)/);
   assert.doesNotMatch(policy, /script-src[^;]*'unsafe-(inline|eval)'/);
-  assert.match(policy, /connect-src 'self'(;|$)/);
+  assert.match(policy, /connect-src 'self' https:\/\/tiles\.openfreemap\.org(;|$)/);
+  assert.match(policy, /worker-src 'self' blob:/);
   assert.match(policy, /frame-ancestors 'none'/);
   assert.match(policy, /object-src 'none'/);
   assert.match(policy, /report-uri \/api\/csp-report/);
+});
+
+test("only the embeddable contact form may be shown in another site's frame", () => {
+  assert.match(strictCsp("abc", { dev: false, embeddable: true }), /frame-ancestors \*(;|$)/);
+  assert.doesNotMatch(strictCsp("abc", { dev: false }), /frame-ancestors \*/);
 });
 
 test("images may load from the API origin (business logos)", () => {

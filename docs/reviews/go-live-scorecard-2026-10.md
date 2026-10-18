@@ -22,7 +22,7 @@ nothing in production was touched.
 | # | Topic | State | Pull request | What is left, and who |
 |---|---|---|---|---|
 | 1 | HTTPS and HSTS | ✅ | #385 | `includeSubDomains` with the real domain (checklist, GL5) |
-| 1 | WAF / DDoS | 🟡 | #396 | Cloudflare in front of the domain (free) or Vercel Firewall (Pro): owner, at domain set-up |
+| 1 | WAF / DDoS | 🟡 | #396 | Cloudflare in front of the domain (free) or Vercel Firewall (Pro): owner, at domain set-up; steps in [go-live-checklist.md](../deploy/go-live-checklist.md) "Firewall in front of the website and API (WAF)", plus A8 (company, bank, insurance) and A12 (penetration test) |
 | 1 | Rate limiting | ✅ | #405 | Shared limiter store needs Render Key Value before a second API instance (documented in `production.md`) |
 | 1 | SQL injection | ✅ | #384 | Automatic test on every new f-string in SQL; ruff `S` |
 | 1 | XSS and CSP | ✅ | #385 | Nonce policy enforced |
@@ -31,20 +31,20 @@ nothing in production was touched.
 | 2 | Two-step sign-in | 🟡 | #386 | Owner turns it on for their own accounts; staging already requires it |
 | 2 | Password policy | 🟡 | #386 | 10 characters, letters and digits applied; leaked-password check needs Supabase Pro |
 | 2 | Roles and permissions | ✅ | - | Existing, with matrix tests |
-| 2 | Sessions | ✅ | #386 | Idle sign-out; "sign out everywhere" listed as later in the ASVS check |
+| 2 | Sessions | ✅ | #386 | Idle sign-out; "Sign out of all devices" is on the web (Account, Account security); the app has no button yet (ASVS 3.6) |
 | 2 | Break-in attempts | ✅ | #392 | Audit log of sign-ins and sensitive actions |
 | 3 | Row security on every table | ✅ | - | `test_tenant_matrix.py`, `test_database_security.py` |
 | 3 | Branch separation | ✅ | #387 | Client notes, documents, health, dependents, receipts, quotes |
 | 4 | Encryption at rest and in transit | ✅ | - | Provider disk and TLS, plus field encryption |
 | 4 | Key rotation | ✅ | #389 | `rotate-secrets` job and procedure |
 | 4 | Secrets management | ✅ | #384 | gitleaks in CI and nightly |
-| 4 | Least privilege | 🟡 | - | The API runs as a limited role without row security bypass. Background jobs still use the owner connection (`app/jobs.py` says so on purpose, they work across businesses). A separate limited jobs role is a code item for after go-live |
+| 4 | Least privilege | 🟢 | - | The API runs as a limited role without row security bypass. Background jobs switch to `app_jobs` (migration 0128): all businesses, rows only, no schema changes, no TRUNCATE, no triggers. `API_JOBS_DB_ROLE=` (empty) turns it off |
 | 4 | Access to production | 🟡 | #396, #407 | Two-step sign-in on Supabase, Render, Vercel, GitHub: owner |
 | 5 | Production server | 🟡 | #396 | Written as code, off. Render Starter and Supabase Pro at go-live: owner approves |
 | 5 | Indexes | ✅ | #403 | Trigram index for client search; index tests |
-| 5 | Connection pooling | ✅ | #405 | Sized in `production.md` |
+| 5 | Connection pooling | ✅ | #405 | Worst case 60 connections worked out in `production.md` section 1; compare with the Supabase compute limit at go-live |
 | 5 | Load tests | ✅ | #405 | k6 parallel run in CI (50 to 200 users) |
-| 5 | Paging of lists | ✅ | #403 | Keyset paging; known gap: the CRM quotes list shows the first 200 and has no "load more" |
+| 5 | Paging of lists | ✅ | #403 | Keyset paging; the CRM quotes list got "load more" in #431. Open: the Expo lists still page by offset (see GL17 in the coverage audit) |
 | 5 | Autoscaling | 🟡 | #405 | Second instance after the Key Value limiter store (paid, later) |
 | 6 | Health checks | ✅ | #396 | `/health` live, `/health/ready` database; the host checks readiness |
 | 6 | Migrations on release | ✅ | #396 | One pre-deploy step in production |

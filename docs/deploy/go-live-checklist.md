@@ -11,7 +11,7 @@ The order of the day itself, with who does what and how to go back, is in [go-li
 | # | Item | State | To switch on |
 |---|---|---|---|
 | P0-1 | Production environment: Vercel Pro, Render Starter or above, Supabase Pro, backups. About $55-75 a month | Owner approves first | Create the services, then set the variables below |
-| P0-2 | Background jobs as Render cron (GitHub schedules skip runs) | Built, **off** | Stop the staging GitHub schedules for the same database, then Render → New → Blueprint → `render.production.yaml`. Set `API_DATABASE_URL` and `API_SECRETS_KEY` when asked |
+| P0-2 | Background jobs as Render cron (GitHub schedules skip runs) | Built, **off** | Stop the staging GitHub schedules for the same database, then Render → New → Blueprint → `render.production.yaml`. Set `API_DATABASE_URL` and `API_SECRETS_KEY` when asked. The two crons run `run-daily` and `run-hourly`, which already include the payroll jobs (`remind-payroll` daily, `notify-payslips` hourly), so no extra scheduler is needed; the GitHub workflows `jobs-staging.yml` and `jobs-hourly-staging.yml` are staging only |
 | P0-3 | Monitoring: JSON logs and request ids exist; error tracking (Sentry) and an uptime monitor do not | Built (GL13), **off** until accounts exist | Follow [monitoring.md](../monitoring.md): Sentry DSNs, UptimeRobot on `/health/ready` with phone alert, status page and `NEXT_PUBLIC_STATUS_URL` |
 | GL13 | Alerts to the owner's phone for a failed or late job; console "System health" page | Built | **Your manual check:** sign in to the MyBiz app on your phone once, then run the GitHub workflow "Send a test alert (staging)"; the push and email must arrive. Then the real test: in staging, stop one job's workflow for a day and see the `check-jobs` alert |
 | P0-7 | Files in object storage | Built | `API_STORAGE_PROVIDER=supabase` and `API_STORAGE_SETTINGS` (see `docs/STATUS.md`) |
@@ -107,6 +107,17 @@ stays an off adapter. What waits for you, when the business really operates:
 | 4 | Real card payments | Provider fees | Needs the payment provider (#46): create the account, then ask Claude to turn on the adapter. Until then paying a late invoice only works with the test card |
 | 5 | Allocation numbers for MyBiz's own invoices | Free | Israel's tax authority may require an allocation number on invoices above a threshold; ask your accountant, and if needed connect the invoicing provider (#47) |
 
+## Cancelling a MyBiz subscription (R33)
+
+Built: the cancel flow, the pause, the 14 day refund (recorded), the `/legal/cancellation` page and
+the console's Churn view. What waits for you:
+
+| # | Step | Cost | Click by click |
+|---|---|---|---|
+| 1 | Have a lawyer read `/legal/cancellation` | Lawyer's fee | The text is in `packages/i18n/messages/he.json` and `en.json` under `marketing.legal.cancellation`. Tell Claude the changes; the date in `brand.json` (`legal.versions.cancellation`) is raised with them |
+| 2 | Confirm the pause fee | Free | ILS 19 a month (USD and EUR 5) is `PAUSE_FEE` in `apps/api/app/commerce/billing.py`. Tell Claude if you want another amount |
+| 3 | Pay out refunds once card payments are on | Provider fees | Refunds are only recorded today (table `subscription_cancellations`, `refund_minor`). When the payment provider (#46) is switched on, ask Claude to add the job that pays them back |
+
 ## App stores (GL19)
 
 Built and ready: app config, build profiles, listing texts (Hebrew and English), privacy and Data
@@ -122,7 +133,7 @@ Nothing was built for the stores, submitted or paid for. What waits for you, in 
 | 5 | Production values in EAS | Free | expo.dev → the project → Environment variables → environment **production**: `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` (the production ones, see [production.md](production.md) section 7) |
 | 6 | First Android build | Free tier, may queue | In `apps/client-app`: `npx eas-cli build --profile production --platform android`. Result: an `.aab` file. Install-test with the `preview` profile first |
 | 7 | First iOS build | Needs step 3 | `npx eas-cli build --profile production --platform ios`; EAS asks to create the signing certificates, answer yes |
-| 8 | Crash reports with readable stack traces | Free Sentry plan | With the Sentry account ([monitoring.md](../monitoring.md)): add `SENTRY_AUTH_TOKEN` as an EAS secret and the Sentry plugin to `app.json` (Claude does this when the account exists) |
+| 8 | Crash reports with readable stack traces | Free Sentry plan | With the Sentry account ([monitoring.md](../monitoring.md)): create an auth token and add `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` as EAS secrets (app) and as Vercel variables (website). The plugin is already wired and switches on by itself when the token exists |
 | 9 | Fill the store forms | Free | Paste from [listing.md](../store/listing.md); Play → Policy → Data safety and Apple → App Privacy from [data-safety.md](../store/data-safety.md); reviewer notes and test login from [review-notes.md](../store/review-notes.md); privacy URL = `<domain>/legal/privacy` |
 | 10 | Screenshots and Play feature graphic | Free | [screenshots.md](../store/screenshots.md) |
 | 11 | Submit to the internal track first | Free | Play → Testing → Internal testing → upload the `.aab`, add your email as a tester. iOS: `npx eas-cli submit --profile production --platform ios` then TestFlight. Only then production review |
@@ -176,6 +187,67 @@ The banner is built and free; the rest is decisions only you can make.
 4. **A backup on-call person** with two-step sign-in on Render, Vercel, Supabase and GitHub, who has read `on-call.md`. Fill the Contacts table.
 5. **Book a lawyer for one session** with `docs/legal/README.md` ("What the lawyer is asked to decide" lists the seven questions). Then replace every `{placeholder}` and the fictitious company details (`packages/i18n/brand.json`).
 6. **Diary dates:** quarterly restore drill and report, yearly procedure review, vendor review and team training (the tables at the end of the legal files are the log).
+
+## Switching on a live AI provider (and the live simulation, R19)
+
+Built and **off**; nothing here runs or costs money until the owner says "connect". Anthropic stays
+the default (`API_ANTHROPIC_API_KEY` on Render, caps 400/1200 credits unchanged). OpenAI and
+Gemini have tested adapters (`app/ai/vendors.py`) that stay unreachable until all three are set:
+
+1. The vendor's key: `API_OPENAI_API_KEY` or `API_GEMINI_API_KEY` (the owner pastes it, never in chat).
+2. The vendor is named in `API_AI_ENABLED_VENDORS` (for example `openai`). Until then the
+   console model picker shows it as disabled and `get_provider()` falls back to demo.
+3. `API_AI_PROVIDER=openai` (or `gemini`) to make it the platform's assistant. Tiers map to the
+   first registry model of that tier (`app/ai/models.py`); check the placeholder prices there
+   against the vendor's price list first (an unknown model is priced as the dearest).
+
+A business can also connect its own key (settings, Integrations, AI). Another vendor is one adapter
+in `vendors.py`, one row per model in `MODELS`, and one `@register("ai", ...)` entry in
+`app/providers/ai.py`. Switching back is removing `API_AI_PROVIDER`.
+
+**Live simulation (R19).** Only after the owner confirms the API account has a balance of $5-10:
+`AI_LIVE_SIM_APPROVED=yes uv run python -m app.ai.live_sim --approved --max-usd 2 --out report.md`
+in `apps/api` with the provider's key set. It asks about 60 questions of three weights, stops at
+the cap, needs no passwords, and prints credits, seconds and errors per kind. Without both guards
+it refuses; on the demo provider it is a free dry run.
+
+## Firewall in front of the website and API (WAF)
+
+The API already limits requests per address and per business, but nothing filters traffic before it
+arrives. Pick one (both have a free level, check the current limits before choosing):
+
+1. **Vercel Firewall** (website only): Vercel project, Firewall tab, turn on the managed rules and
+   "Attack Challenge Mode" as the emergency switch. No DNS change.
+2. **Cloudflare in front of the domain** (website and API): add the domain to Cloudflare, move the
+   name servers, set the records to proxied, SSL mode "Full (strict)", turn on Bot Fight Mode and the
+   managed rules. Then add the Cloudflare address ranges to the trusted proxies and re-check
+   `API_TRUST_FORWARDED_FOR` so rate limits still see the visitor's real address (ask Claude).
+
+Check after: `curl -I https://<domain>` still returns the security headers, sign-in works, and a
+test from a second network is not blocked.
+
+## Company, bank account and insurance (A8)
+
+Needed before the first paying customer, not before staging:
+
+1. Register the business (or sole-trader file) and open a business bank account.
+2. Put the real company name, number and VAT number in `packages/i18n/brand.json` (`legal`) and tell
+   Claude, so invoices, the terms and the privacy policy stop using the fictitious ones.
+3. Buy cyber and professional liability insurance; keep the policy number with the legal files.
+
+## Professional penetration test (A12)
+
+Do it after about 20 to 50 businesses or when a large customer asks for it (cost: thousands up to
+tens of thousands of shekels). Give the tester a staging copy with demo data, the
+[ASVS self-check](../reviews/go-live-asvs-self-check-2026-10.md) and the scope (website, API,
+apps). Track every finding as a GitHub issue; fix the high ones before the next release.
+
+## Decisions waiting for you (round 7 leftovers)
+
+1. **Lawyer for the cancellation text (R33).** The MyBiz subscription cancellation wording and policy page are drafts. Have a lawyer review them before go-live.
+2. **The 129 "solo" bundle price.** Decide how a bundle discount appears on the invoice; until then the price is not offered.
+3. **OpenAI and Gemini prices.** Confirm them on the vendors' pricing pages before switching either provider on (see "Switching on a live AI provider").
+4. **A monthly summary email** does not exist yet; decide if you want one (it would also carry the "My website" line).
 
 ## Still the owner's
 

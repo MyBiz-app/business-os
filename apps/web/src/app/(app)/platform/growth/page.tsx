@@ -30,7 +30,7 @@ export default async function PlatformGrowthPage() {
   const today = activity.at(-1);
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("hint", { days: DAYS })} />
 
       <section aria-labelledby="growth-funnel" className="card flex flex-col gap-4 p-6">

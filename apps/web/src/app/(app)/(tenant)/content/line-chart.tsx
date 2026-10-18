@@ -1,3 +1,5 @@
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
+
 const COLORS = ["#2563EB", "#7C3AED", "#06B6D4", "#F59E0B", "#10B981", "#EC4899"];
 const WIDTH = 640;
 const HEIGHT = 200;
@@ -72,9 +74,8 @@ export function LineChart({
           {formatDay(last)}
         </text>
       </svg>
-      <details className="text-sm">
-        <summary className="cursor-pointer font-medium text-primary-ink">{tableLabel}</summary>
-        <div className="mt-2 max-h-64 overflow-auto">
+      <CollapsibleSection variant="inline" className="text-sm" triggerClassName="font-medium text-primary-ink" title={tableLabel}>
+        <div className="max-h-64 overflow-auto">
           <table className="w-full text-start">
             <thead>
               <tr>
@@ -100,7 +101,7 @@ export function LineChart({
             </tbody>
           </table>
         </div>
-      </details>
+      </CollapsibleSection>
     </figure>
   );
 }

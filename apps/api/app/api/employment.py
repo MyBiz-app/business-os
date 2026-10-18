@@ -24,6 +24,7 @@ from app.api.common import not_found
 from app.api.deps import TenantContext, TenantDep, UserDep, require
 from app.api.staff import _ensure_member_in_reach
 from app.core.permissions import Permission
+from app.files import keep_copy, safe_name
 from app.payroll import credit_points
 from app.providers import secrets
 
@@ -451,6 +452,14 @@ def submit_form(
         },
     )
     _audit(context.session, context.tenant_id, "payroll.form101_signed", "member", user.id)
+    keep_copy(
+        context.session,
+        context.tenant_id,
+        "employees",
+        name=f"form-101-{tax_year}-{safe_name(body.signed_name)}.pdf",
+        content=form_pdf(context.session, user.id, tax_year),
+        owner_user_id=user.id,
+    )
     return _form(_find_form(context.session, user.id, tax_year), True)
 
 

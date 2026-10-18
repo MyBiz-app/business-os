@@ -8,7 +8,7 @@ import csv
 import datetime as dt
 import io
 import json
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
@@ -191,4 +191,25 @@ def export_audit_log(context: AuditDep, filters: FiltersDep) -> Response:
         content="﻿" + out.getvalue(),  # Excel opens Hebrew right with a BOM
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="audit-log.csv"'},
+    )
+
+
+class ExportNotice(BaseModel):
+    kind: Literal["sales_csv", "content_csv", "report_print"]
+    rows: int = Field(default=0, ge=0, le=1_000_000)
+
+
+@router.post("/exports", status_code=status.HTTP_204_NO_CONTENT, tags=["reports"])
+def log_export(
+    body: ExportNotice,
+    context: Annotated[TenantContext, Depends(require(Permission.REPORTS_READ))],
+) -> None:
+    """Records that someone took business data out as a CSV or a printed report. Some exports are
+    built in the browser from what the page already shows, so the page reports them here."""
+    record(
+        context.session,
+        f"export.{body.kind}",
+        entity_type="tenant",
+        entity_id=context.tenant_id,
+        rows=body.rows,
     )

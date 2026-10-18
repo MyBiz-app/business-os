@@ -90,7 +90,7 @@ CATALOG: dict[str, AgentSpec] = {
             _EVERYTHING | {"routing"},
             _AI,
             _ALL_STAFF,
-            routes=("/dashboard",),
+            routes=("/dashboard", "/settings", "/locations", "/files", "/documents", "/migration"),
         ),
         AgentSpec(
             "secretary",
@@ -103,7 +103,7 @@ CATALOG: dict[str, AgentSpec] = {
             frozenset({"schedule", "bookings", "clients", "messages", "routing", "tasks"}),
             _AI,
             _ALL_STAFF,
-            routes=("/schedule", "/calendar", "/clients"),
+            routes=("/schedule", "/calendar", "/clients", "/events", "/resources"),
         ),
         AgentSpec(
             "marketing",
@@ -112,7 +112,9 @@ CATALOG: dict[str, AgentSpec] = {
             "#EC4899",
             "Lead pipeline, follow-ups, sources, winning back inactive clients, campaign drafts.",
             "You handle marketing and leads: the pipeline, follow-ups that are due, where clients "
-            "come from and how to win back clients who went quiet. Draft wording, never send.",
+            "come from and how to win back clients who went quiet. Draft wording, never send. "
+            "When the business has no website and many leads come from Instagram or other social "
+            "networks, you may suggest ordering one from My website (/website), once, not pushy.",
             frozenset({"leads", "clients", "messages", "sources", "routing", "tasks"}),
             ("agent_marketing",),
             frozenset({"owner", "manager", "branch_manager"}),
@@ -129,7 +131,7 @@ CATALOG: dict[str, AgentSpec] = {
             frozenset({"sales", "plans", "quotes", "metrics", "clients", "routing", "tasks"}),
             _AI,
             _ALL_STAFF,
-            routes=("/plans", "/sales"),
+            routes=("/plans", "/sales", "/quotes", "/services"),
         ),
         AgentSpec(
             "finance",
@@ -142,7 +144,7 @@ CATALOG: dict[str, AgentSpec] = {
             frozenset({"billing", "receipts", "balances", "quotes", "time", "routing", "tasks"}),
             ("agent_finance",),
             frozenset({"owner", "manager", "branch_manager"}),
-            routes=("/billing", "/finance"),
+            routes=("/billing", "/finance", "/bills", "/invoices", "/receipts"),
         ),
         AgentSpec(
             "team",
@@ -155,16 +157,18 @@ CATALOG: dict[str, AgentSpec] = {
             frozenset({"shifts", "staff", "time", "schedule", "routing", "tasks"}),
             _AI,
             frozenset({"owner", "manager", "branch_manager"}),
-            routes=("/shifts", "/staff", "/team"),
+            routes=("/shifts", "/staff", "/team", "/time"),
         ),
         AgentSpec(
             "care",
             "Customer care",
-            {"he": "נוח", "en": "Noah"},
+            {"he": "ליאו", "en": "Leo"},
             "#14B8A6",
             "The inbox, WhatsApp replies, reviews and clients at risk of leaving.",
             "You handle customer care: the inbox, replies, reviews and members at risk of "
-            "leaving. Warm, short, and always offer a concrete next step.",
+            "leaving. Warm, short, and always offer a concrete next step. When a member says they "
+            "are away or hurt, or has stopped coming, suggest a freeze instead of leaving, using "
+            "suggest_freeze; it only suggests, the member asks for it in the app.",
             frozenset({"inbox", "reviews", "clients", "messages", "routing", "tasks"}),
             ("whatsapp_ai", "crm"),
             _ALL_STAFF,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, RotateCcw, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { CHIEF, connect, connectable, removeTeam, setTeam, type Draft } from "@/lib/ai-structure";
@@ -12,16 +12,12 @@ const TEAM_COLORS = ["#2563EB", "#7C3AED", "#06B6D4", "#10B981", "#F59E0B", "#F4
 type Props = {
   agents: Agent[];
   draft: Draft;
-  saving: boolean;
   error: string | null;
   onChange: (draft: Draft) => void;
-  onRelayout: () => void;
-  onSave: () => void;
-  onCancel: () => void;
 };
 
-/** Structure editing without a mouse: who each agent reports to and which team it is in, plus the teams themselves. Also the way to edit on a phone. */
-export function StructurePanel({ agents, draft, saving, error, onChange, onRelayout, onSave, onCancel }: Props) {
+/** Structure editing without a mouse (save and cancel live in the toolbar above the map): who each agent reports to and which team it is in, plus the teams themselves. Also the way to edit on a phone. */
+export function StructurePanel({ agents, draft, error, onChange }: Props) {
   const t = useTranslations("aiTeam.structure");
   const field = "rounded-xl border border-border bg-background px-2 py-1.5 text-sm";
 
@@ -42,18 +38,6 @@ export function StructurePanel({ agents, draft, saving, error, onChange, onRelay
             {t("title")}
           </h2>
           <p className="text-sm text-muted">{t("hint")}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button type="button" onClick={onRelayout} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
-            <RotateCcw aria-hidden="true" className="size-4" />
-            {t("relayout")}
-          </button>
-          <button type="button" onClick={onCancel} disabled={saving} className="btn-secondary px-3 py-1.5 text-sm">
-            {t("cancel")}
-          </button>
-          <button type="button" onClick={onSave} disabled={saving} className="btn-primary px-3 py-1.5 text-sm">
-            {saving ? t("saving") : t("save")}
-          </button>
         </div>
       </div>
       {error && (

@@ -41,6 +41,8 @@ export async function createLead(_state: FormState, formData: FormData): Promise
     return errorState(error);
   }
   refresh();
+  // In a window over the list the form closes itself and shows the confirmation.
+  if (formData.get("_modal")) return { saved: true };
   redirect(`/leads/${id}`);
 }
 

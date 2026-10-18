@@ -11,6 +11,7 @@ import { TopicHeader } from "../topic-header";
 
 import { disconnectProvider } from "./actions";
 import { ProviderForm } from "./provider-form";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 const ICONS = { payments: CreditCard, invoicing: FileText, messaging: MessageCircle } as const;
 
@@ -25,7 +26,7 @@ export default async function IntegrationsPage() {
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle")} />
       {integrations.map((integration) => {
         const Icon = ICONS[integration.capability];
@@ -45,12 +46,11 @@ export default async function IntegrationsPage() {
                 ? t("connectedOn", { date: integration.connected_at ? date.format(new Date(integration.connected_at)) : "" })
                 : t("platformDefault")}
             </p>
-            <details>
-              <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("change")}</summary>
+            <CollapsibleSection variant="inline" triggerClassName="font-medium text-primary-ink" title={t("change")}>
               <div className="pt-4">
                 <ProviderForm integration={integration} />
               </div>
-            </details>
+            </CollapsibleSection>
             {integration.own && (
               <form action={disconnectProvider.bind(null, integration.capability)}>
                 <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">

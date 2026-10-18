@@ -22,6 +22,7 @@ export async function MarketingFooter() {
       title: t("footer.product"),
       links: [
         { href: "/features", label: t("nav.features") },
+        { href: "/websites", label: t("nav.websites") },
         { href: "/pricing", label: t("nav.pricing") },
         { href: "/login", label: t("nav.login") },
         { href: "/start", label: t("nav.start") },
@@ -50,6 +51,7 @@ export async function MarketingFooter() {
       links: [
         { href: "/legal/terms", label: t("footer.terms") },
         { href: "/legal/privacy", label: t("footer.privacy") },
+        { href: "/legal/cancellation", label: t("footer.cancellation") },
         { href: "/legal/dpa", label: t("footer.dpa") },
         { href: "/legal/subprocessors", label: t("footer.subprocessors") },
         { href: "/legal/accessibility", label: t("footer.accessibility") },

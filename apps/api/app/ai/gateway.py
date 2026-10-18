@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from app.ai.models import MODELS, clean_text, model_for_tier, prices_of
+from app.ai.models import MODELS, clean_text, model_for_tier, prices_of, vendor_enabled
 from app.core.config import get_settings
 
 
@@ -217,22 +217,35 @@ class AnthropicProvider:
 
 
 def get_provider() -> LLMProvider | None:
-    """The configured provider. Without an API key: demo mode when enabled (a prototype without
-    paid services, decision T53), otherwise None (the assistant is not set up)."""
+    """The configured provider (API_AI_PROVIDER, Anthropic by default). Without its key, or when
+    its vendor is not switched on: demo mode when enabled (a prototype without paid services,
+    decision T53), otherwise None (the assistant is not set up)."""
     settings = get_settings()
-    if settings.anthropic_api_key is None:
+    vendor = settings.ai_provider
+    key = {
+        "anthropic": settings.anthropic_api_key,
+        "openai": settings.openai_api_key,
+        "gemini": settings.gemini_api_key,
+    }.get(vendor)
+    if key is None or not vendor_enabled(vendor):
         if settings.ai_demo:
             from app.ai.demo import DemoProvider
 
             return DemoProvider()
         return None
-    return AnthropicProvider(
-        settings.anthropic_api_key.get_secret_value(),
-        model_for_tier("fast"),
-        model_for_tier("standard"),
-        settings.ai_max_tokens,
-        settings.ai_timeout_seconds,
-    )
+    fast, standard = model_for_tier("fast", vendor), model_for_tier("standard", vendor)
+    if vendor == "anthropic":
+        return AnthropicProvider(
+            key.get_secret_value(),
+            fast,
+            standard,
+            settings.ai_max_tokens,
+            settings.ai_timeout_seconds,
+        )
+    from app.ai.vendors import GeminiProvider, OpenAIProvider
+
+    adapter = OpenAIProvider if vendor == "openai" else GeminiProvider
+    return adapter(key.get_secret_value(), fast, standard, settings.ai_max_tokens)
 
 
 class FallbackProvider:
