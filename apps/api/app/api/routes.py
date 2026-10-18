@@ -70,7 +70,7 @@ def load_current_tenant(session: Session) -> Tenant:
                                 CASE WHEN app.support_tenant_id() IS NOT NULL THEN 'support'
                                      ELSE 'platform' END) AS role,
                        r.name AS custom_role_name,
-                       r.permissions AS custom_permissions,
+                       r.permissions AS custom_permissions, m.ai_access,
                        coalesce((SELECT array_agg(tm.module_key ORDER BY tm.module_key)
                                  FROM app.tenant_modules tm WHERE tm.tenant_id = t.id), '{}')
                            AS modules,
@@ -95,7 +95,7 @@ def load_current_tenant(session: Session) -> Tenant:
     )
     data = dict(row)
     data["permissions"] = sorted(
-        effective_permissions(data["role"], data.pop("custom_permissions"))
+        effective_permissions(data["role"], data.pop("custom_permissions"), data.pop("ai_access"))
     )
     # The registration number is for the people who manage the business, not the whole team.
     if Permission.BUSINESS_SETTINGS.value not in data["permissions"]:

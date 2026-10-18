@@ -1812,6 +1812,8 @@
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
+      "ai_user_limit_reached": "You've reached your personal AI limit for this month.",
+      "ai_daily_pace_reached": "You've used your share of the AI for today. It opens again tomorrow.",
       "ai_rate_limited": "You're sending questions too fast. Wait a minute and try again.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
@@ -1835,7 +1837,34 @@
       "map": "Map",
       "list": "List"
     },
-    "usage": "{used} of {included} AI credits used this month",
+    "meter": {
+      "business": "{percent}% of this month's AI used",
+      "person": "{percent}% of your daily AI allowance used",
+      "reach": "At this pace the month's AI runs out on {date}",
+      "left": "About {count, plural, one {# question} other {# questions}} left this month",
+      "leftToday": "About {count, plural, one {# question} other {# questions}} left for you today",
+      "noPace": "No daily limit for you",
+      "paceMark": "Where an even pace would be today",
+      "openWindow": "Open the AI usage window",
+      "windowTitle": "AI usage",
+      "windowSubtitle": "{used} of {included} credits used this month",
+      "byDay": "Credits per day",
+      "byPerson": "By person",
+      "byAgent": "By agent",
+      "byKind": "Questions and tasks",
+      "kind": {
+        "asked": "Questions people asked",
+        "scheduled": "Tasks that ran by themselves"
+      },
+      "none": "Nothing used yet this month.",
+      "unknownPerson": "Someone who left or is unknown",
+      "aiUsers": "{count} of {allowed} people have access to the AI team",
+      "alertWarn": "The month's AI is almost used up. You can turn on pay-as-you-go or move to AI Pro.",
+      "alertOver": "The month's AI is used up. New questions wait until next month unless you turn on pay-as-you-go or move to AI Pro.",
+      "enablePayg": "Turn on pay-as-you-go",
+      "upgrade": "Upgrade to AI Pro",
+      "limitPerson": "Limit a person"
+    },
     "state": {
       "active": "Available",
       "locked": "Locked: not in your plan",
@@ -2003,7 +2032,8 @@
         "agent_unavailable": "The agent is not available",
         "business_closed": "The business is closed",
         "generic": "Something went wrong",
-        "ai_user_limit_reached": "The AI limit set for this person was reached"
+        "ai_user_limit_reached": "The AI limit set for this person was reached",
+        "ai_daily_pace_reached": "The person reached their daily AI pace"
       },
       "credits": "{credits} credits",
       "frequency": {
@@ -2259,6 +2289,8 @@
     }
   },
   "aiBubble": {
+    "levelWarn": "The month's AI is almost used up",
+    "levelOver": "The month's AI is used up",
     "open": "Ask {name} or the AI team",
     "close": "Close the chat",
     "openFull": "Open in the full team",
@@ -8143,6 +8175,7 @@
       "ai_not_configured": "The AI is not available right now.",
       "ai_limit_reached": "The monthly AI allowance is used up. You can still map the columns by hand.",
       "ai_user_limit_reached": "Your personal AI limit for this month is used up.",
+      "ai_daily_pace_reached": "You used your share of the AI for today. Map the rest by hand or try tomorrow.",
       "ai_busy": "The AI is busy. Try again in a moment.",
       "ai_unavailable": "The AI could not be reached. Try again later.",
       "ai_map_limit": "You used the AI mapping many times in this move. Map the rest by hand.",
@@ -8639,10 +8672,27 @@
     "noClasses": "Nothing to teach in the next {days} days.",
     "openPayRun": "Open the pay run",
     "aiTitle": "AI team",
-    "aiAllowed": "Can use the AI team",
-    "aiNotAllowed": "No access to the AI team",
-    "aiUsedThisMonth": "credits this month (the whole business: {used} of {included})",
-    "aiHint": "Access follows the role. Change it under Permissions.",
+    "aiNotAllowed": "The AI settings could not be loaded.",
+    "aiHint": "Without a personal switch, access follows the role. The owner is not limited.",
+    "ai": {
+      "usedMonth": "Credits this month",
+      "usedToday": "Credits today (pace: {limit})",
+      "access": "Can use the AI team",
+      "accessHint": "{count} of {allowed} people have access under the plan. An extra AI user costs a little more each month.",
+      "monthly": "Personal monthly limit (credits)",
+      "monthlyPlaceholder": "As the business",
+      "daily": "Daily pace (% of the month's AI, usually {default})",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "owner": "The owner always has access to the AI team and no daily pace.",
+      "errors": {
+        "ai_users_full": "The plan's AI users are all taken. Add an extra AI user first.",
+        "owner_always_has_ai": "The owner always has access.",
+        "invalid": "Check the numbers and try again.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
     "openAi": "Open the AI team",
     "permissionsTitle": "Role and permissions",
     "roleIs": "Role: {role}",
