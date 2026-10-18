@@ -1910,6 +1910,9 @@ h1[tabindex="-1"]:focus {
     opacity: 0.5;
   }
   .branch-dot {
+    transition: none;
+  }
+}
 
 /* ---- Page transitions (view transitions; see docs/design-system.md) ------------------------ */
 
