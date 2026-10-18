@@ -293,7 +293,7 @@ def _check_dates(starts_on: dt.date, ends_on: dt.date) -> None:
 
 def _load_request(db: Session, request_id: UUID) -> FreezeRequest:
     row = (
-        db.execute(text(f"{REQUEST_SELECT} WHERE r.id = :id"), {"id": request_id})
+        db.execute(text(REQUEST_SELECT + " WHERE r.id = :id"), {"id": request_id})
         .mappings()
         .first()
     )
@@ -371,7 +371,7 @@ def list_freeze_requests(
         params["branches"] = list(context.branches)
     rows = context.session.execute(
         text(
-            f"{REQUEST_SELECT} {filters}"
+            REQUEST_SELECT + f" {filters}"
             " ORDER BY (r.status = 'pending') DESC, r.starts_on, r.created_at LIMIT 200"
         ),
         params,
@@ -536,7 +536,7 @@ def my_freeze_preview(
 @client_router.get("/freeze-requests")
 def my_freeze_requests(context: ClientDep) -> list[FreezeRequest]:
     rows = context.session.execute(
-        text(f"{REQUEST_SELECT} ORDER BY r.created_at DESC LIMIT 50")
+        text(REQUEST_SELECT + " ORDER BY r.created_at DESC LIMIT 50")
     ).mappings()
     return [FreezeRequest.model_validate(dict(row)) for row in rows]
 

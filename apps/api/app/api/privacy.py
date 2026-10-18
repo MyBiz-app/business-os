@@ -213,6 +213,14 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "freeze_requests": _rows(
+            db,
+            """
+            SELECT reason, note, starts_on, ends_on, status, decided_at, created_at
+            FROM app.freeze_requests WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
         "time_entries": _rows(
             db,
             """
