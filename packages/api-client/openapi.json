@@ -16265,6 +16265,50 @@
         }
       }
     },
+    "/public/website-prices": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Website Prices",
+        "description": "The website price list in one currency (unknown currencies get USD), for the public\n/websites and pricing pages. The same list the order records.",
+        "operationId": "website_prices",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "USD",
+              "title": "Currency"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebsitePrices"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/website-visits": {
       "post": {
         "tags": [
@@ -64759,6 +64803,26 @@
         ],
         "title": "ProactiveSetting"
       },
+      "ProductPrice": {
+        "properties": {
+          "setup": {
+            "type": "integer",
+            "title": "Setup",
+            "description": "One-time, minor units"
+          },
+          "monthly": {
+            "type": "integer",
+            "title": "Monthly",
+            "description": "Minor units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "setup",
+          "monthly"
+        ],
+        "title": "ProductPrice"
+      },
       "PromoCode": {
         "properties": {
           "id": {
@@ -74937,6 +75001,27 @@
         },
         "type": "object",
         "title": "WebsiteOrderUpdate"
+      },
+      "WebsitePrices": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "landing_only": {
+            "$ref": "#/components/schemas/ProductPrice"
+          },
+          "landing_with_system": {
+            "$ref": "#/components/schemas/ProductPrice"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "landing_only",
+          "landing_with_system"
+        ],
+        "title": "WebsitePrices"
       },
       "WeekCopied": {
         "properties": {

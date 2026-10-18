@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from app.websites.brief import Brief, missing_for_submit
+from app.websites.pricing import price_for
 from app.websites.prompt import build_prompt
 from tests.conftest import AuthHeaders, add_member, make_staff
 
@@ -266,3 +267,16 @@ def test_the_prompt_carries_the_owner_words_and_the_hooks() -> None:
     assert "POST https://api.example.com/public/businesses/ABC123/inquiries" in prompt
     assert "https://api.example.com/public/website-visits" in prompt and VISIT_ID in prompt
     assert "Pilates: 60 ILS" in prompt and "Herzl 1" in prompt
+
+
+def test_the_public_price_list_is_the_orders_price_list(client: TestClient) -> None:
+    for currency in ("ILS", "USD", "EUR"):
+        body = client.get("/public/website-prices", params={"currency": currency}).json()
+        assert body["currency"] == currency
+        for product in ("landing_only", "landing_with_system"):
+            setup, monthly = price_for(product, currency)
+            assert body[product] == {"setup": setup, "monthly": monthly}
+    # An unknown currency falls back to USD, like the orders.
+    assert (
+        client.get("/public/website-prices", params={"currency": "JPY"}).json()["currency"] == "USD"
+    )

@@ -75,3 +75,18 @@ export async function resumeSubscription(): Promise<void> {
   unwrap(await api.DELETE("/billing/cancel", { params: scope }));
   revalidatePath("/", "layout");
 }
+
+export type ExtraAiUsersResult = { ok: true } | { ok: false; error: "ai_users_in_use" | "ai_module_required" | "generic" };
+
+/** Sets how many paid "extra AI user" add-ons the business has. Nothing is charged before payments exist. */
+export async function saveExtraAiUsers(count: number): Promise<ExtraAiUsersResult> {
+  const { api, scope } = await getTenant();
+  const { error } = await api.PUT("/ai/extra-users", { params: scope, body: { extra_ai_users: count } });
+  if (!error) {
+    revalidatePath("/settings/billing");
+    revalidatePath("/ai");
+    return { ok: true };
+  }
+  const detail = (error as { detail?: unknown }).detail;
+  return { ok: false, error: detail === "ai_users_in_use" || detail === "ai_module_required" ? detail : "generic" };
+}
