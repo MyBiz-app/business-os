@@ -73,6 +73,7 @@ ICONS = {
     "freeze_rejected": "📋",
     "waitlist_spot_open": "🎟️",
     "waitlist_spot_taken": "⏳",
+    "credit_returned": "🎁",
     "roster": "📅",
     "broadcast": "📣",
 }
