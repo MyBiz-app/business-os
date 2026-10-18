@@ -8,7 +8,7 @@ import { ToastOnChange } from "@/components/toast/toaster";
 import { unwrap } from "@/lib/api";
 
 import { HEALTH_TONE } from "../../clients/[id]/health-section";
-import { bookClient, bookClientOverCapacity, setBookingStatus } from "../actions";
+import { bookClient, bookClientOverCapacity, bookMyself, setBookingStatus } from "../actions";
 import { OverCapacityButton } from "./over-capacity-button";
 
 // Who may add a client to a full class (the API enforces the same list).
@@ -193,6 +193,13 @@ export async function Roster({ session, context, manageable, search, error }: Pr
               {t("search")}
             </button>
           </form>
+          {!perDependent && (
+            <form action={bookMyself.bind(null, session.id)}>
+              <button type="submit" className="btn-secondary px-3 py-1.5 text-sm">
+                {full ? t("addMeToWaitlist") : t("addMe")}
+              </button>
+            </form>
+          )}
           {search && (
             <ul aria-label={t("results")} className="flex flex-col divide-y divide-border rounded-lg border border-border bg-background">
               {matches.length === 0 && <li className="px-3 py-2 text-sm text-muted">{t("noMatches")}</li>}

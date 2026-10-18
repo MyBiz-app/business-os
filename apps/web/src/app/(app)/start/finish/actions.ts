@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { legalVersion } from "@business-os/i18n/brand";
 
 import { ApiError, getApi, type Tenant, unwrap } from "@/lib/api";
+import { addressFromForm } from "@/lib/address";
 import { clearResumePath } from "@/lib/resume";
 import { decodePlan } from "@/lib/signup-plan";
 import { setActiveTenant } from "@/lib/tenant";
@@ -57,9 +58,20 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
       })
       .catch(() => null);
   }
+  // The first branch gets the address typed in the journey (the API also pins it on the map).
+  const address = addressFromForm(formData);
+  if (address.city_code) {
+    const [branch] = await api.GET("/locations", { params: scope }).then(unwrap).catch(() => []);
+    if (branch) {
+      await api
+        .PATCH("/locations/{location_id}", { params: { ...scope, path: { location_id: branch.id } }, body: address })
+        .catch(() => null);
+    }
+  }
   await api.POST("/billing/payment-method", { params: scope, body: { brand } }).catch(() => null);
   await api
     .POST("/tenants/current/welcome-email", { params: scope, body: { expected_active_clients: plan.clients } })
     .catch(() => null);
-  redirect("/dashboard?welcome=1");
+  // Moving from another system: open the migration hub; starting fresh: the welcome tour.
+  redirect(plan.track === "existing" ? "/migration" : "/dashboard?welcome=1");
 }

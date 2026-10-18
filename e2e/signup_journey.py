@@ -36,6 +36,8 @@ with sync_playwright() as p:
     page = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True).new_page()
 
     page.goto(h.BASE + "/start")
+    # first question: a new business or one that already runs elsewhere
+    page.get_by_role("button", name=re.compile("אני פותח עסק חדש")).click()
     check(page, "1-industry")
     page.get_by_role("button", name=re.compile("יופי וספא")).click()
     # the category's kinds of business, then the business itself
