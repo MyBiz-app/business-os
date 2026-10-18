@@ -14,6 +14,7 @@ import { getTenant } from "@/lib/tenant";
 
 import { addTestCard, cancelSubscription, payInvoice, removeCard, resumeSubscription } from "./actions";
 import { AiSpend } from "./ai-spend";
+import { AiUsers } from "./ai-users";
 import { DetailsForm } from "./details-form";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { TopicHeader } from "../topic-header";
@@ -32,6 +33,7 @@ export default async function BillingPage() {
   const billing = unwrap(await api.GET("/billing", { params: scope }));
   // Only people who manage the AI team see the spend controls (403 for the rest).
   const aiSpend = (await api.GET("/ai/spend", { params: scope })).data;
+  const aiUsers = aiSpend ? (await api.GET("/ai/usage/breakdown", { params: scope })).data : undefined;
   const money = (amount: number, currency = billing.estimate.currency) => formatMoney(amount, currency, locale);
   const day = (value: string) => formatDay(value, locale, { day: "numeric", month: "long", year: "numeric" });
   const method = billing.payment_method;
@@ -170,6 +172,7 @@ export default async function BillingPage() {
       </CollapsibleSection>
 
       {aiSpend && <AiSpend spend={aiSpend} />}
+      {aiUsers && <AiUsers breakdown={aiUsers} />}
 
       <div className="grid items-start gap-6 xl:grid-cols-2">
         <CollapsibleSection

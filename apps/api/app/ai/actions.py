@@ -108,8 +108,8 @@ def decide(tenant: TenantContext, user_id: UUID, action_id: UUID, confirm: bool)
     action = (
         db.execute(
             text("""
-                SELECT id, requested_by, agent_key, tool_name, payload, payload_hash, status,
-                       expires_at < now() AS expired
+                SELECT id, requested_by, agent_key, tool_name, payload, payload_hash, preview,
+                       status, expires_at < now() AS expired
                 FROM app.pending_actions WHERE id = :id FOR UPDATE
             """),
             {"id": action_id},
@@ -169,7 +169,13 @@ def decide(tenant: TenantContext, user_id: UUID, action_id: UUID, confirm: bool)
         f"assistant.{action['tool_name']}",
         action["tool_name"],
         result,
-        {"pending_action_id": str(action_id), "payload": action["payload"], **result},
+        {
+            "pending_action_id": str(action_id),
+            "payload": action["payload"],
+            # An outside AI app asked for it (an MCP connector): the log says which.
+            **({"source": action["preview"]["source"]} if "source" in action["preview"] else {}),
+            **result,
+        },
     )
 
 

@@ -158,6 +158,9 @@ function UsageWindow({ meter, details, onClose }: { meter: Meter; details: Meter
           <Link href="/upgrade/ai" className="btn-secondary px-3 py-2 text-sm">
             {t("upgrade")}
           </Link>
+          <Link href="/settings/billing#ai-users-heading" className="btn-secondary px-3 py-2 text-sm">
+            {t("buyUser")}
+          </Link>
           <Link href="/team" className="btn-secondary px-3 py-2 text-sm">
             {t("limitPerson")}
           </Link>

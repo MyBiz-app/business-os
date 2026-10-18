@@ -44,13 +44,14 @@ from app.api.payslips import (
     correction_row,
 )
 from app.core.permissions import Permission
+from app.payroll.gate import require_open
 from app.payroll.net import compute_net
 from app.payroll.rates import resolve
 
 router = APIRouter(tags=["payroll"])
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.PAYROLL_READ))]
-ApproveDep = Annotated[TenantContext, Depends(require(Permission.PAYROLL_APPROVE))]
+ApproveDep = Annotated[TenantContext, Depends(require_open(Permission.PAYROLL_APPROVE))]
 YearPath = Annotated[int, Path(ge=2000, le=2100)]
 LIMIT_MINOR = 100_000_000
 

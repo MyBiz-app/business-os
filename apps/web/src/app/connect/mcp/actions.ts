@@ -6,7 +6,8 @@ import { getApi, unwrap } from "@/lib/api";
 
 const field = (form: FormData, name: string) => String(form.get(name) ?? "");
 
-/** The person lets the AI app read the business they picked: the API makes a one-time code and
+/** The person lets the AI app read the business they picked (and, if they ticked it, suggest
+ * changes that wait for their approval): the API makes a one-time code and
  * says where to send the browser back to (the app's own address, which it checked). */
 export async function approveConnection(form: FormData): Promise<void> {
   const { redirect_to } = unwrap(
@@ -17,6 +18,7 @@ export async function approveConnection(form: FormData): Promise<void> {
         redirect_uri: field(form, "redirect_uri"),
         code_challenge: field(form, "code_challenge"),
         state: field(form, "state"),
+        propose: form.get("propose") === "on",
       },
     }),
   );
