@@ -45,6 +45,7 @@ CLIENT_TABLES: dict[str, ClientTable] = {
     "quotes": ClientTable("quotes", "kept", "commercial records; accepting name cleared"),
     "receipts": ClientTable("receipts", "kept", "accounting records; name and email cleared"),
     "retainers": ClientTable("retainer", "kept", "billing terms, no personal data"),
+    "freeze_requests": ClientTable("freeze_requests", "kept", "membership history"),
     "reviews": ClientTable("reviews", "cleared", "the rating stays, the comment goes"),
     "time_entries": ClientTable("time_entries", "kept", "billing records"),
     "waitlist_offers": ClientTable("waitlist_offers", "deleted"),
