@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/avatar";
+import { CardTransition } from "@/components/ui/page-transition";
 import { capLanes, coverage, layOut, minutesIn, visibleHours } from "@/lib/calendar";
 import { formatDay, todayIn } from "@/lib/dates";
 
@@ -281,8 +282,8 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                       const top = y(event.start);
                       const tall = y(event.end) - top;
                       return (
+                        <CardTransition key={event.id} name={`session-${event.id}`}>
                         <Link
-                          key={event.id}
                           href={event.href}
                           className={`group absolute z-[1] flex flex-col overflow-hidden rounded-lg border-s-[3px] px-1.5 py-1 text-xs leading-tight shadow-sm outline-offset-1 transition-[box-shadow,transform] duration-150 hover:z-[5] hover:shadow-md focus-visible:z-[5] ${event.cancelled ? "opacity-55" : ""}`}
                           style={{
@@ -312,6 +313,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                             </span>
                           )}
                         </Link>
+                        </CardTransition>
                       );
                     })}
                     {more.map((block) => {

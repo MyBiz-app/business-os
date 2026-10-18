@@ -1342,6 +1342,8 @@
     "details": "פרטי השיעור",
     "cancelSession": "ביטול השיעור",
     "restoreSession": "החזרת השיעור",
+    "cancelledToast": "השיעור בוטל",
+    "restoredToast": "השיעור הוחזר",
     "series": "חלק מסדרה שבועית. שינויים כאן חלים רק על השיעור הזה.",
     "back": "חזרה ללוח",
     "needService": "הוסיפו קודם שירות, ואז אפשר לתזמן אותו.",
@@ -6625,7 +6627,10 @@
       "cancelClass": "ביטול שיעור",
       "cancelClassConfirm": "לבטל את השיעור? {count, plural, =0 {אין נרשמים.} one {נרשם אחד יקבל הודעה.} other {# נרשמים יקבלו הודעה.}}",
       "restoreClass": "שחזור שיעור",
-      "classRestored": "השיעור חזר ללוח."
+      "classRestored": "השיעור חזר ללוח.",
+      "classCancelled": "השיעור בוטל",
+      "markedCheckedIn": "{name} סומן כנוכח",
+      "markedNoShow": "{name} סומן כלא הגיע"
     },
     "leads": {
       "open": "פתוחים",
@@ -8622,7 +8627,11 @@
     "newFolder": "תיקייה חדשה כאן",
     "folderName": "שם התיקייה",
     "createFolder": "יצירת תיקייה",
-    "deleteFolder": "מחיקת התיקייה הריקה הזאת"
+    "deleteFolder": "מחיקת התיקייה הריקה הזאת",
+    "archivedToast": "{name} הועבר לארכיון",
+    "restoredToast": "{name} הוחזר מהארכיון",
+    "rootFolders": "תיקיות ראשיות",
+    "subfolders": "תיקיות בפנים"
   },
   "payroll": {
     "open": "תיק שכר",

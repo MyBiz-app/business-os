@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CardTransition } from "@/components/ui/page-transition";
 import { addDays, formatDay } from "@/lib/dates";
 
 import type { GridEvent } from "./time-grid";
@@ -65,6 +66,7 @@ export function MonthGrid({ start, days, month, today, locale, events, closed, l
               <ul className="flex flex-col gap-0.5">
                 {own.slice(0, CHIPS).map((event) => (
                   <li key={event.id}>
+                    <CardTransition name={`session-${event.id}`}>
                     <Link
                       href={event.href}
                       title={`${event.time} · ${event.title}`}
@@ -78,6 +80,7 @@ export function MonthGrid({ start, days, month, today, locale, events, closed, l
                         {event.title}
                       </span>
                     </Link>
+                    </CardTransition>
                   </li>
                 ))}
               </ul>

@@ -1342,6 +1342,8 @@
     "details": "Session details",
     "cancelSession": "Cancel this session",
     "restoreSession": "Restore this session",
+    "cancelledToast": "Session cancelled",
+    "restoredToast": "Session restored",
     "series": "Part of a weekly series. Changes here apply to this session only.",
     "back": "Back to schedule",
     "needService": "Add a service first, then you can schedule it.",
@@ -6625,7 +6627,10 @@
       "cancelClass": "Cancel class",
       "cancelClassConfirm": "Cancel this class? {count, plural, =0 {Nobody is booked.} one {# booked client will be told.} other {# booked clients will be told.}}",
       "restoreClass": "Restore class",
-      "classRestored": "The class is back on the schedule."
+      "classRestored": "The class is back on the schedule.",
+      "classCancelled": "Class cancelled",
+      "markedCheckedIn": "{name} checked in",
+      "markedNoShow": "{name} marked as no-show"
     },
     "leads": {
       "open": "Open",
@@ -8622,7 +8627,11 @@
     "newFolder": "New folder here",
     "folderName": "Folder name",
     "createFolder": "Create folder",
-    "deleteFolder": "Delete this empty folder"
+    "deleteFolder": "Delete this empty folder",
+    "archivedToast": "{name} archived",
+    "restoredToast": "{name} restored",
+    "rootFolders": "Top-level folders",
+    "subfolders": "Folders inside"
   },
   "payroll": {
     "open": "Payroll file",

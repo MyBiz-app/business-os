@@ -10,6 +10,7 @@ import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
 import { Pill } from "@/components/pill";
+import { CardTransition } from "@/components/ui/page-transition";
 
 import { addMeAsClient } from "./actions";
 import { StatusBadge } from "./status-badge";
@@ -239,6 +240,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
               {result.items.map((client) => (
                 <tr key={client.id} className="border-t border-border transition-colors hover:bg-primary/4">
                   <td className="px-4 py-2.5">
+                    <CardTransition name={`client-${client.id}`}>
                     <Link href={`/clients/${client.id}`} className="group flex items-center gap-3 font-medium">
                       <Avatar id={client.id} name={[client.first_name, client.last_name].filter(Boolean).join(" ")} />
                       <span dir="auto" className="text-primary-ink underline-offset-4 group-hover:underline">
@@ -246,6 +248,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                       </span>
                       {client.is_staff && <Pill tone="primary">{t("clients.staffBadge")}</Pill>}
                     </Link>
+                    </CardTransition>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3" dir="ltr">{client.phone}</td>
                   <td className="hidden max-w-56 truncate px-4 py-3 xl:table-cell" dir="ltr">{client.email}</td>

@@ -90,7 +90,8 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   app-kit (apps), same API: `toast("success" | "error" | "info", message, { action })`. A dark
   card in the corner at the reading start (top on a phone), several stack as a pile that opens on
   hover. Errors stay until closed; success and info fade after 5 seconds. Use `action` for
-  "Undo" after a delete or archive and "View" after a create. `FormNotice` also turns the form's
+  "Undo" after a delete or archive and "View" after a create (live examples: `files/archive-button.tsx`,
+  `schedule/[id]/session-status-button.tsx`; in the business app the session screen). `FormNotice` also turns the form's
   `SubmitButton` into "Saved" for a moment. Field errors stay next to the field.
 - Page transitions (web, view transitions, no library): `components/ui/page-transition.tsx`.
   `PageTransition` goes in a `template.tsx` (a layout persists, so enter/exit never fire there):
@@ -99,6 +100,20 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   `RouteModal transitionName="lead-<id>"` makes the card grow into its window and shrink back.
   Names must be unique on the page. The motion rules live at the end of `globals.css` and are off
   for `prefers-reduced-motion` and the accessibility widget; browsers without support just swap.
+  No `next.config` flag is needed (Next.js 16 runs `<ViewTransition>` as is). Cards with a window
+  today: lead, client, quote, invoice, receipt, session, service, plan, promo; a test
+  (`lib/view-transitions.test.ts`) fails when a card name has no window name or the other way round.
+  To give a new list this: wrap the card link in `CardTransition`, add the intercepting page under
+  `@modal/(.)<route>/[id]` with `RouteModal transitionName`, and keep the page body in a shared
+  `*-body.tsx` (see `clients/[id]/client-body.tsx`).
+- Route progress bar: `components/ui/route-progress.tsx`, mounted once in the root layout. It shows
+  only when a page change takes longer than 300ms. Do not add your own spinner for page changes;
+  add a `loading.tsx` with a skeleton of the page's shape instead (`components/layout/page-skeletons.tsx`).
+- Side menu with sub-items (R12): an area may list `children`: pages (`/catalog?tab=plans`, chosen by
+  `?tab=`) or sections of the open page (`/ai#ai-team`, which scrolls smoothly and follows the scroll).
+  The matching rules are in `lib/nav-match.ts` (tested): the most specific address wins, a sub-page
+  wins a tie with its area, a section link needs an element with that `id` on its page. Unfolded
+  state is remembered per browser.
 - Skip link: every page has one `<main id="main">`. `Container as="main"` sets the id for you;
   a bare `<main>` needs `id="main"`.
 
