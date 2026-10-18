@@ -2,9 +2,12 @@ import random
 from datetime import date, timedelta
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
+from app.geo.geocoder import NoGeocoder
+from app.reports.branch_insights import _city_point
 from app.seed import seed
 from tests.conftest import AuthHeaders, add_member, local_today
 
@@ -139,3 +142,55 @@ def test_members_at_risk(client: TestClient, engine: Engine, auth: AuthHeaders) 
             assert ends < local_today() + timedelta(days=14)
     bad = client.get("/metrics/members-at-risk", params={"days": 3}, headers=studio["headers"])
     assert bad.status_code == 422
+
+
+def test_branch_insights_show_client_origins_and_staff_cost(
+    client: TestClient, engine: Engine, auth: AuthHeaders, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("app.reports.branch_insights.get_geocoder", NoGeocoder)
+    _city_point.cache_clear()
+    studio = demo(engine, auth)
+    end = local_today() - timedelta(days=1)
+    start = end - timedelta(days=29)
+    with engine.begin() as connection:
+        branch = connection.execute(
+            text("SELECT id FROM app.locations WHERE tenant_id = :t ORDER BY created_at LIMIT 1"),
+            {"t": studio["tenant_id"]},
+        ).scalar_one()
+        city = connection.execute(
+            text("SELECT code FROM app.geo_cities ORDER BY code LIMIT 1")
+        ).scalar_one()
+        visitors = (
+            connection.execute(
+                text("""
+                SELECT DISTINCT b.client_id FROM app.bookings b
+                JOIN app.sessions s ON s.id = b.session_id
+                WHERE s.location_id = :l AND b.status IN ('booked', 'checked_in', 'no_show')
+                  AND s.starts_at::date BETWEEN :s AND :e
+            """),
+                {"l": branch, "s": start, "e": end},
+            )
+            .scalars()
+            .all()
+        )
+        for client_id in visitors:
+            connection.execute(
+                text("""
+                    INSERT INTO app.client_addresses
+                        (tenant_id, client_id, street, city, city_code)
+                    VALUES (:t, :c, 'x', 'x', :city)
+                """),
+                {"t": studio["tenant_id"], "c": client_id, "city": city},
+            )
+
+    response = client.get(
+        "/metrics/branch-insights", params={"start": start, "end": end}, headers=studio["headers"]
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    mine = next(b for b in body["branches"] if b["location_id"] == str(branch))
+    assert visitors and mine["origins"][0]["clients"] == len(visitors)
+    assert mine["origins"][0]["city_code"] == city
+    assert mine["origins"][0]["latitude"] is None  # no geocoder in tests
+    assert (body["staff_cost_period"] is None) == (mine["staff_cost_minor"] is None)

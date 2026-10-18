@@ -6,6 +6,7 @@ from uuid import uuid4
 from zoneinfo import ZoneInfo
 
 from fastapi.testclient import TestClient
+from sqlalchemy import Engine, text
 
 from tests.conftest import AuthHeaders, local_today
 from tests.test_appointments import at, barber  # noqa: F401 (fixture)
@@ -433,3 +434,55 @@ def test_a_freed_court_is_offered_and_paid_for_when_taken(
     assert client.get("/client/waitlist", headers=asker).json() == []
     mine = client.get("/client/bookings", headers=asker).json()
     assert [b["status"] for b in mine] == ["booked"]
+
+
+def test_the_schedule_counts_everyone_waiting_for_a_class(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    full_class(client, auth, studio, names=2)  # one booked, one on its own list
+    asker = app_clients(client, auth, studio, 1)[0]["headers"]
+    day = local_today() + timedelta(days=20)
+    for body in (
+        {"kind": "day", "day": day.isoformat()},
+        {"kind": "range", "day": day.isoformat(), "from_time": "17:00", "to_time": "19:00"},
+        {"kind": "range", "day": day.isoformat(), "from_time": "08:00", "to_time": "12:00"},
+    ):
+        made = client.post(
+            "/client/waitlist", json={"service_id": studio["service"]["id"], **body}, headers=asker
+        )
+        assert made.status_code == 201, made.text
+
+    shown = client.get(
+        "/sessions", params={"start": day.isoformat(), "days": 1}, headers=studio["headers"]
+    ).json()
+    assert [(s["waitlisted"], s["waiting_requests"]) for s in shown] == [(1, 2)]  # not the morning
+
+
+def test_a_client_signed_in_from_the_waitlist_may_cancel_free_for_half_an_hour(
+    client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine
+) -> None:
+    set_waitlist(client, studio["headers"], cancellation_window_minutes=10080)
+    session_id, people, bookings = full_class(
+        client, auth, studio, names=3, on=local_today() + timedelta(days=3)
+    )
+
+    def late(booking_id: str) -> bool:
+        roster = client.get(f"/sessions/{session_id}/bookings", headers=studio["headers"]).json()
+        return next(b for b in roster if b["id"] == booking_id)["late_cancel"]
+
+    client.post(f"/client/bookings/{bookings[0]['id']}/cancel", headers=people[0]["headers"])
+    assert late(bookings[0]["id"]) is True  # inside the window, as ever
+    assert "waitlist_promoted" in kinds(client, people[1]["headers"])  # signed in automatically
+
+    client.post(f"/client/bookings/{bookings[1]['id']}/cancel", headers=people[1]["headers"])
+    assert late(bookings[1]["id"]) is False  # still within the first half hour
+
+    with engine.begin() as connection:  # the next one found out 31 minutes ago and kept the spot
+        connection.execute(
+            text(
+                "UPDATE app.bookings SET updated_at = now() - interval '31 minutes' WHERE id = :id"
+            ),
+            {"id": bookings[2]["id"]},
+        )
+    client.post(f"/client/bookings/{bookings[2]['id']}/cancel", headers=people[2]["headers"])
+    assert late(bookings[2]["id"]) is True

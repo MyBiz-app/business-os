@@ -196,7 +196,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
           {t("roster")}
         </h2>
         <p className={`text-sm ${over > 0 ? "font-medium text-warning" : "text-muted"}`}>
-          {t("summary", { booked: session.booked, capacity: session.capacity, waitlisted: session.waitlisted })}
+          {t("summary", { booked: session.booked, capacity: session.capacity, waitlisted: session.waitlisted + session.waiting_requests })}
           {over > 0 && ` · ${t("overCapacityNote", { count: over })}`}
         </p>
       </div>

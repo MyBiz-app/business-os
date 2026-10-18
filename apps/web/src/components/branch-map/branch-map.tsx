@@ -27,6 +27,12 @@ export type MapBranch = {
   series: number[];
   /** A session is running there right now. */
   live: boolean;
+  /** The cities clients of the last 30 days come from, most first (a point when it was found). */
+  origins: { city: string; clients: number; latitude: number | null; longitude: number | null }[];
+  /** The branch's share of the latest payroll month's pay (minor units); null without payroll access. */
+  staffCost: number | null;
+  /** The payroll month (YYYY-MM-DD) the cost is from. */
+  staffCostMonth: string | null;
 };
 
 type ColorBy = "revenue" | "clients" | "occupancy";
@@ -69,6 +75,8 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
   const [selected, setSelected] = useState<string | null>(initialBranch);
   const [hovered, setHovered] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  const [showOrigins, setShowOrigins] = useState(false);
+  const originMarkers = useRef<Marker[]>([]);
 
   const number = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const metric = (branch: MapBranch, key: ColorBy) => (key === "revenue" ? branch.revenue : key === "clients" ? branch.clients : branch.occupancy);
@@ -162,6 +170,40 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
     else map.flyTo({ ...to, speed: 0.8, curve: 1.6, essential: false });
   }, [ready, selected, branches]);
 
+  // "Where clients come from": a dot per city, for the chosen branch (or all of them when none is).
+  useEffect(() => {
+    for (const marker of originMarkers.current) marker.remove();
+    originMarkers.current = [];
+    const map = mapRef.current;
+    if (!ready || !map || !showOrigins || !full) return;
+    let cancelled = false;
+    (async () => {
+      const maplibre = await import("maplibre-gl");
+      if (cancelled) return;
+      const chosen = selected ? branches.filter((b) => b.id === selected) : branches;
+      const byCity = new Map<string, { city: string; clients: number; latitude: number; longitude: number }>();
+      for (const branch of chosen) {
+        for (const o of branch.origins) {
+          if (o.latitude === null || o.longitude === null) continue;
+          const key = `${o.latitude},${o.longitude}`;
+          const known = byCity.get(key);
+          byCity.set(key, { city: o.city, latitude: o.latitude, longitude: o.longitude, clients: (known?.clients ?? 0) + o.clients });
+        }
+      }
+      for (const o of byCity.values()) {
+        const dot = document.createElement("div");
+        dot.className = "origin-dot";
+        const size = 10 + Math.min(18, Math.sqrt(o.clients) * 4);
+        dot.style.width = dot.style.height = `${size.toFixed(0)}px`;
+        dot.title = t("originPoint", { city: o.city, count: o.clients });
+        originMarkers.current.push(new maplibre.Marker({ element: dot }).setLngLat([o.longitude, o.latitude]).addTo(map));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, showOrigins, selected, branches, full, t]);
+
   const open = branches.find((b) => b.id === selected) ?? null;
   const peek = branches.find((b) => b.id === hovered) ?? null;
   const toggles: { value: ColorBy; label: string }[] = [
@@ -176,7 +218,13 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
       {failed && <p className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-muted">{t("failed")}</p>}
       {full && (
         <div className="absolute start-3 top-3 z-10 max-w-[calc(100%-1.5rem)]">
-          <SegmentedControl label={t("colorByLabel")} value={colorBy} options={toggles} onChange={setColorBy} />
+          <div className="flex flex-col items-start gap-2">
+            <SegmentedControl label={t("colorByLabel")} value={colorBy} options={toggles} onChange={setColorBy} />
+            <label className="card inline-flex items-center gap-2 px-3 py-1.5 text-sm">
+              <input type="checkbox" checked={showOrigins} onChange={(e) => setShowOrigins(e.target.checked)} />
+              {t("originsLayer")}
+            </label>
+          </div>
         </div>
       )}
       {peek && !open && (
@@ -213,6 +261,29 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
             <Stat label={t("panel.bookings")} value={count(open.bookings)} />
             <Stat label={t("panel.occupancy")} value={percent(open.occupancy)} />
           </dl>
+          {open.staffCost !== null && open.staffCostMonth && (
+            <dl className="grid grid-cols-1 gap-3 text-sm">
+              <Stat
+                label={t("panel.staffCost", { month: new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(open.staffCostMonth)) })}
+                value={money(open.staffCost)}
+                hint={t("panel.staffCostHint")}
+              />
+            </dl>
+          )}
+          <section className="flex flex-col gap-1">
+            <h3 className="text-xs text-muted">{t("panel.origins")}</h3>
+            {open.origins.length === 0 ? (
+              <p className="text-sm text-muted">{t("panel.originsEmpty")}</p>
+            ) : (
+              <ul className="flex flex-col gap-0.5 text-sm">
+                {open.origins.map((o) => (
+                  <li key={o.city} dir="auto">
+                    {t("panel.originRow", { city: o.city, count: number.format(o.clients) })}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
           <figure className="flex flex-col gap-1">
             <figcaption className="text-xs text-muted">{t("panel.trend")}</figcaption>
             <Sparkline values={open.series} />
@@ -242,11 +313,12 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="flex flex-col gap-0.5 rounded-xl bg-primary/5 p-3">
       <dt className="text-xs text-muted">{label}</dt>
       <dd dir="auto" className="text-base font-semibold">{value}</dd>
+      {hint && <dd className="text-xs text-muted">{hint}</dd>}
     </div>
   );
 }

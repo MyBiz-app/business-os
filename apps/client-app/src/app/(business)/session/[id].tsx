@@ -229,7 +229,7 @@ export default function SessionScreen() {
           ) : (
             <Badge label={t("cancelled")} tone="danger" palette={palette} />
           )}
-          {session.waitlisted > 0 && <Badge label={t("waitlist", { count: session.waitlisted })} palette={palette} />}
+          {session.waitlisted + session.waiting_requests > 0 && <Badge label={t("waitlist", { count: session.waitlisted + session.waiting_requests })} palette={palette} />}
           {session.room_name && <Badge label={session.room_name} palette={palette} />}
           {session.location_name && <Badge label={session.location_name} palette={palette} />}
         </View>

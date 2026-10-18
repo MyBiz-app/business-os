@@ -1902,6 +1902,16 @@ h1[tabindex="-1"]:focus {
     height 500ms var(--ease-out),
     background-color 500ms var(--ease-out);
 }
+.origin-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+  background: var(--brand-to);
+  opacity: 0.85;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+  cursor: default;
+}
 .branch-dot[data-selected="true"] {
   outline: 3px solid var(--primary-ink);
   outline-offset: 2px;

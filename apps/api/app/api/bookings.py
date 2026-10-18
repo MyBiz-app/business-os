@@ -283,15 +283,24 @@ def tenant_pack(db: Session, tenant_id: UUID) -> VerticalPack:
     return CATALOG[vertical]
 
 
+WAITLIST_GRACE_MINUTES = 30  # a client signed in from the waitlist may still cancel for free
+
+
 def cancel_booking(db: Session, booking_id: UUID, session_id: UUID) -> None:
     """Cancels a booking and fills the freed spot. Inside the policy's window it is a late
-    cancellation, which the policy may count as a used visit or only record."""
+    cancellation, which the policy may count as a used visit or only record.
+
+    A client who was signed in automatically from the waitlist (the booking carries its
+    `waitlisted_at` and was last changed when the spot opened) cancels without penalty in the
+    first `WAITLIST_GRACE_MINUTES`, since they did not choose the time themselves."""
     db.execute(
         text("""
             WITH terms AS (
                 SELECT b.id, ct.late_outcome,
                        b.status <> 'waitlisted'
                            AND now() > s.starts_at - make_interval(mins => ct.free_minutes)
+                           AND NOT (b.status = 'booked' AND b.waitlisted_at IS NOT NULL
+                                    AND b.updated_at > now() - make_interval(mins => :grace))
                        AS late
                 FROM app.bookings b
                 JOIN app.sessions s ON s.id = b.session_id
@@ -305,7 +314,7 @@ def cancel_booking(db: Session, booking_id: UUID, session_id: UUID) -> None:
             FROM terms
             WHERE b.id = terms.id
         """),
-        {"id": booking_id},
+        {"id": booking_id, "grace": WAITLIST_GRACE_MINUTES},
     )
     promote_waitlist(db, session_id)
 

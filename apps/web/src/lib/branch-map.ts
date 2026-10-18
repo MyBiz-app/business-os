@@ -22,6 +22,11 @@ export async function loadBranchMap({ api, scope, tenant }: Pick<Context, "api" 
   const locations = unwrap(await api.GET("/locations", { params: network })).filter((l) => l.active && l.latitude !== null && l.longitude !== null);
   if (locations.length === 0) return [];
 
+  const insights = await api
+    .GET("/metrics/branch-insights", { params: { ...network, query: { start, end } } })
+    .then((r) => r.data ?? null);
+  const insightOf = (id: string) => insights?.branches.find((b) => b.location_id === id);
+
   const canSeeSchedule = tenant.permissions.includes("schedule.read");
   const [rows, today, ...series] = await Promise.all([
     api
@@ -55,6 +60,9 @@ export async function loadBranchMap({ api, scope, tenant }: Pick<Context, "api" 
       bookings: valueOf(location.id, "sessions_held"),
       series: Array.from({ length: DAYS }, (_, d) => byDay.get(addDays(start, d)) ?? 0),
       live: running.has(location.id),
+      origins: (insightOf(location.id)?.origins ?? []).map((o) => ({ city: o.city_name, clients: o.clients, latitude: o.latitude, longitude: o.longitude })),
+      staffCost: insightOf(location.id)?.staff_cost_minor ?? null,
+      staffCostMonth: insights?.staff_cost_period ?? null,
     };
   });
 }

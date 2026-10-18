@@ -85,6 +85,7 @@ def load_current_tenant(session: Session) -> Tenant:
                                  || extract(epoch FROM t.cover_updated_at)::bigint END AS cover_url,
                        t.legal_entity_type, t.business_number,
                        t.address_line, t.address_city, t.employer_file_number, t.website_url,
+                       t.product_track, t.business_size,
                        t.business_license_number, t.business_license_expires_on
                 FROM app.tenants t
                 LEFT JOIN app.tenant_members m
@@ -321,19 +322,27 @@ def create_tenant(
     ensure_profile(session, user.id, user.email)
     if body.accepted_legal:
         check_versions(body.accepted_legal)
-    modules = (
-        body.modules
-        if body.modules is not None
-        else dict.fromkeys(PRESETS[VERTICAL_PACKS[body.vertical].default_preset], 1)
-    )
+    track = body.product_track or "full"
+    if body.modules is not None:
+        modules = body.modules
+    elif track == "website_only":
+        modules = {}  # the system can be added later (POST /website/add-system)
+    else:
+        modules = dict.fromkeys(PRESETS[VERTICAL_PACKS[body.vertical].default_preset], 1)
     check_selection(modules)
     tenant_id: UUID = session.execute(
         text("SELECT app.create_tenant(:name, :vertical, :locale, :time_zone, :currency)"),
-        body.model_dump(exclude={"modules", "accepted_legal"}),
+        body.model_dump(exclude={"modules", "accepted_legal", "product_track", "business_size"}),
     ).scalar_one()
     if body.accepted_legal:
         record_acceptance(session, request, user.id, body.accepted_legal, "signup", tenant_id)
     set_tenant(session, tenant_id)
+    session.execute(
+        text("""
+            UPDATE app.tenants SET product_track = :track, business_size = :size WHERE id = :t
+        """),
+        {"track": track, "size": body.business_size, "t": tenant_id},
+    )
     apply_vertical_pack(session, tenant_id, body.vertical, body.locale, body.currency)
     set_modules(session, tenant_id, modules)
     create_first_branches(session, tenant_id, body.locale, 1 + modules.get("extra_location", 0))
@@ -343,6 +352,8 @@ def create_tenant(
         "signup_completed",
         vertical=body.vertical,
         modules=len(modules),
+        track=track,
+        size=body.business_size or "unknown",
     )
     return load_current_tenant(session)
 

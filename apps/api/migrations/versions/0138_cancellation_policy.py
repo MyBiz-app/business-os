@@ -12,8 +12,8 @@ Nothing existing changes: a business with no policy row keeps its one cancellati
 late cancellation still counts as used; a plan with no quota is unlimited as before; the previous
 release never selects the new columns and a booking's `credit_released` defaults to false.
 
-Revision ID: 0137
-Revises: 0136
+Revision ID: 0138
+Revises: 0137
 Create Date: 2026-10-18
 """
 
@@ -21,8 +21,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0137"
-down_revision: str | None = "0136"
+revision: str = "0138"
+down_revision: str | None = "0137"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
