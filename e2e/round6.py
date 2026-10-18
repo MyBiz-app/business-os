@@ -94,6 +94,14 @@ with sync_playwright() as p:
             acknowledge.first.click()
             expect(acknowledge).to_have_count(before - 1, timeout=15000)
         sheet.get_by_role("button", name="סגירת החלון").click()
+    # The demo has a proposed one-off amount; a run cannot leave the additions stage while it waits.
+    page.goto(f"{h.BASE}/team/bonuses"); h.ready(page)
+    approve = page.get_by_role("main").get_by_role("button", name="אישור", exact=True)
+    while approve.count():
+        before = approve.count()
+        approve.first.click()
+        expect(approve).to_have_count(before - 1, timeout=15000)
+    page.goto(f"{h.BASE}/team/payroll"); h.ready(page)
     for step, hint in (
         ("נעילת השעות והמשך", "להוסיף בונוסים"),
         ("המשך לבדיקה", "לתקן כל שגיאה"),
