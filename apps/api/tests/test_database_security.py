@@ -24,6 +24,7 @@ GLOBAL_TABLES = {
     "platform_incidents",
     "geo_cities",  # the official city list, the same for every business; read-only for the API
     "geo_streets",  # the official street list; read-only for the API
+    "mcp_clients",  # AI apps that registered to ask for access; the API reads and adds rows
     "payroll_rates",  # law-driven rates, the same for every business; read-only for the API
 }
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no

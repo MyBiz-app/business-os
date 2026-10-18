@@ -89,9 +89,14 @@ from app.api import (
 from app.api import health as health_declarations
 from app.api import settings as business_settings
 from app.api.routes import router
+from app.mcp import oauth as mcp_oauth
+from app.mcp import server as mcp_server
 
 ROUTERS: list[APIRouter] = [
     router,
+    mcp_oauth.router,
+    mcp_oauth.hidden,
+    mcp_server.router,
     ai_tasks.router,
     internal.router,
     businesses.router,

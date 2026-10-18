@@ -354,6 +354,284 @@
         }
       }
     },
+    "/mcp-oauth/clients/{client_id}": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Client Info",
+        "description": "What the approval screen shows the signed-in person about the app asking (its self-chosen\nname: untrusted text, shown with the address it returns to).",
+        "operationId": "mcp_client_info",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Redirect Uri"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-oauth/approve": {
+      "post": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Approve",
+        "description": "The signed-in person lets the app read the business they are working in.",
+        "operationId": "mcp_approve",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Approval"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-connections": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "List Connections",
+        "description": "The AI apps the signed-in person connected to this business.",
+        "operationId": "list_mcp_connections",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/McpConnection"
+                  },
+                  "title": "Response List Mcp Connections"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp-connections/{connection_id}": {
+      "delete": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Revoke Connection",
+        "description": "Cuts an app off at once: its tokens stop working.",
+        "operationId": "revoke_mcp_connection",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Connection Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ai/tasks": {
       "get": {
         "tags": [
@@ -42744,6 +43022,51 @@
         ],
         "title": "AppointmentStaff"
       },
+      "Approval": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "title": "Client Id"
+          },
+          "redirect_uri": {
+            "type": "string",
+            "title": "Redirect Uri"
+          },
+          "code_challenge": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 43,
+            "title": "Code Challenge"
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "State",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "redirect_uri",
+          "code_challenge"
+        ],
+        "title": "Approval"
+      },
+      "ApprovalResult": {
+        "properties": {
+          "redirect_to": {
+            "type": "string",
+            "title": "Redirect To",
+            "description": "Send the browser here: back to the app, with the code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "redirect_to"
+        ],
+        "title": "ApprovalResult"
+      },
       "AttentionItem": {
         "properties": {
           "id": {
@@ -46486,6 +46809,25 @@
           "mode"
         ],
         "title": "ClientIdentity"
+      },
+      "ClientInfo": {
+        "properties": {
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "redirect_host": {
+            "type": "string",
+            "title": "Redirect Host",
+            "description": "Where the person is sent back to after approving"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_name",
+          "redirect_host"
+        ],
+        "title": "ClientInfo"
       },
       "ClientListItem": {
         "properties": {
@@ -55573,6 +55915,49 @@
         },
         "type": "object",
         "title": "MarkRead"
+      },
+      "McpConnection": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "calls": {
+            "type": "integer",
+            "title": "Calls"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "client_name",
+          "created_at",
+          "last_used_at",
+          "calls"
+        ],
+        "title": "McpConnection"
       },
       "Me": {
         "properties": {
