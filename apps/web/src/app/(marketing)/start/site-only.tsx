@@ -9,18 +9,17 @@ import { useId, useState, useTransition } from "react";
 
 import { Container } from "@/components/layout/container";
 import { formatMoney } from "@/lib/money";
-import { type Currency, encodePlan, type SignupPlan } from "@/lib/signup-plan";
+import { type Currency, encodePlan, type SignupPlan, type SiteFee } from "@/lib/signup-plan";
 import { industryTexts } from "@/lib/verticals";
-import { sitePricesFor } from "@/lib/website-prices";
 
 import { accountExists } from "./actions";
 
-type Props = { currency: Currency; signedIn: boolean };
+type Props = { currency: Currency; signedIn: boolean; price?: SiteFee };
 
 /** "Website only" from the landing page: first "do you already have an account?", so nobody opens
  * a second business; otherwise a short sign-up (name, email, kind of business) that opens a
  * business on the website-only track and goes straight to the website brief. */
-export function SiteOnlyStart({ currency, signedIn }: Props) {
+export function SiteOnlyStart({ currency, signedIn, price }: Props) {
   const t = useTranslations("start.siteOnly");
   const { text } = industryTexts(useTranslations());
   const locale = useLocale();
@@ -35,7 +34,6 @@ export function SiteOnlyStart({ currency, signedIn }: Props) {
   const [existing, setExisting] = useState(false);
   const [touched, setTouched] = useState(false);
   const [pending, start] = useTransition();
-  const price = sitePricesFor(currency).alone;
   const money = (amount: number) => formatMoney(amount, currency, locale);
   const emailOk = signedIn || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const valid = name.trim().length > 0 && isOpen(kind) && emailOk;
@@ -75,7 +73,7 @@ export function SiteOnlyStart({ currency, signedIn }: Props) {
         <p className="text-sm font-semibold text-primary-ink">{t("eyebrow")}</p>
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{t("title")}</h1>
         <p className="text-base text-muted sm:text-lg">{t("subtitle")}</p>
-        <p className="text-sm font-semibold">{t("price", { setup: money(price.setup), monthly: money(price.monthly) })}</p>
+        {price && <p className="text-sm font-semibold">{t("price", { setup: money(price.setup), monthly: money(price.monthly) })}</p>}
       </div>
 
       {!fresh ? (

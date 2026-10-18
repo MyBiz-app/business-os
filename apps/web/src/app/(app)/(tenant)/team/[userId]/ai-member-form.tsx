@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 
 import type { components } from "@business-os/api-client";
@@ -20,10 +21,12 @@ export function AiMemberForm({ ai }: { ai: MemberAi }) {
   const [monthly, setMonthly] = useState(ai.monthly_credits === null ? "" : String(ai.monthly_credits));
   const [daily, setDaily] = useState(ai.daily_percent === null ? "" : String(ai.daily_percent));
   const [error, setError] = useState<string | null>(null);
+  const [full, setFull] = useState(false);
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
+    setFull(false);
     start(async () => {
       const result = await saveMemberAi(ai.user_id, {
         // Matching what the role gives clears the personal switch, so a later role change still applies.
@@ -32,7 +35,10 @@ export function AiMemberForm({ ai }: { ai: MemberAi }) {
         daily_percent: daily.trim() === "" ? null : Number(daily),
       });
       if (result.ok) toast("success", t("saved"));
-      else setError(t(`errors.${result.error}` as "errors.generic"));
+      else {
+        setError(t(`errors.${result.error}` as "errors.generic"));
+        setFull(result.error === "ai_users_full");
+      }
     });
   };
 
@@ -57,6 +63,14 @@ export function AiMemberForm({ ai }: { ai: MemberAi }) {
       {error && (
         <p role="alert" className="text-sm text-danger">
           {error}
+          {full && (
+            <>
+              {" "}
+              <Link href="/settings/billing#ai-users-heading" className="font-semibold underline-offset-4 hover:underline">
+                {t("buyExtra")}
+              </Link>
+            </>
+          )}
         </p>
       )}
       <button type="submit" disabled={pending} className="btn-primary w-fit px-4 py-2 text-sm">

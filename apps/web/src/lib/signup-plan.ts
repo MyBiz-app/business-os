@@ -3,7 +3,6 @@
  * validates and prices the modules again when the business is created; this is the preview. */
 import { isOpen } from "@business-os/verticals";
 
-import { sitePricesFor } from "./website-prices.ts";
 
 export const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 /** Active-client sizes offered in the journey (the core plan's tiers; 1500 means 1,000+). */
@@ -167,8 +166,19 @@ type CatalogModuleLike = {
   requires_all?: string[];
 };
 
+/** What a website built by MyBiz costs: once, and a month (minor units). */
+export type SiteFee = { setup: number; monthly: number };
+/** The two website price lists: on its own, and with the system. */
+export type SiteFees = { alone: SiteFee; withSystem: SiteFee };
+
+/** The API's website price list (`/public/website-prices`) as the two fees the cart needs. */
+export function websiteFees(prices: { landing_only: SiteFee; landing_with_system: SiteFee } | null | undefined): SiteFees | undefined {
+  return prices ? { alone: prices.landing_only, withSystem: prices.landing_with_system } : undefined;
+}
+
 type CatalogLike = {
-  currency?: string;
+  /** Where the website fees go; without them a website adds no price lines. */
+  website?: SiteFees;
   core: { up_to_clients?: number | null; price: number }[];
   modules: CatalogModuleLike[];
 };
@@ -279,8 +289,8 @@ export function priceLines(
     if (quantity > 0 && entry) (entry.billing === "once" ? once : lines).push({ key, quantity, amount: entry.price * quantity });
   }
   // The website MyBiz builds: a monthly fee and a one-time setup (cheaper with the system).
-  if (plan.site === "build" || websiteOnly) {
-    const price = sitePricesFor(catalog.currency ?? "USD")[websiteOnly ? "alone" : "withSystem"];
+  const price = catalog.website?.[websiteOnly ? "alone" : "withSystem"];
+  if (price && (plan.site === "build" || websiteOnly)) {
     lines.push({ key: "website", quantity: 1, amount: price.monthly });
     once.push({ key: "website", quantity: 1, amount: price.setup });
   }

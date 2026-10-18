@@ -13,8 +13,8 @@ Expand step only: two nullable-or-defaulted columns on `app.tenants` and one loo
 # contract: only the downgrade drops anything (the columns and the function); the upgrade adds
 # them and touches nothing that exists, so the previous API version keeps working.
 
-Revision ID: 0135
-Revises: 0134
+Revision ID: 0137
+Revises: 0136
 Create Date: 2026-10-18
 """
 
@@ -22,8 +22,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0135"
-down_revision: str | None = "0134"
+revision: str = "0137"
+down_revision: str | None = "0136"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

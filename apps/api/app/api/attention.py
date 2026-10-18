@@ -28,7 +28,14 @@ class AttentionItem(BaseModel):
 
 
 class AttentionList(BaseModel):
-    kind: Literal["inactive", "plan_ending", "leads_due", "health_review", "license_expiring"]
+    kind: Literal[
+        "inactive",
+        "plan_ending",
+        "leads_due",
+        "health_review",
+        "freeze_requests",
+        "license_expiring",
+    ]
     count: int
     items: list[AttentionItem]
 
@@ -98,6 +105,28 @@ def get_attention(context: TenantDep) -> list[AttentionList]:
         )
         lists.append(_from_rows("health_review", rows))
 
+    if Permission.SALES_MANAGE in context.permissions:
+        # Freeze requests from the app waiting for a manager; the item is the client.
+        rows = (
+            db.execute(
+                text("""
+                SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name,
+                       r.starts_on AS date, count(*) OVER () AS total
+                FROM app.freeze_requests r
+                JOIN app.clients c ON c.id = r.client_id
+                JOIN app.entitlements e ON e.id = r.entitlement_id
+                WHERE r.status = 'pending' AND c.erased_at IS NULL
+                  AND (e.location_id IS NULL OR app.in_branch(e.location_id))
+                ORDER BY r.starts_on, r.created_at
+                LIMIT :shown
+            """),
+                {"shown": SHOWN},
+            )
+            .mappings()
+            .all()
+        )
+        lists.append(_from_rows("freeze_requests", rows))
+
     if Permission.BUSINESS_SETTINGS in context.permissions:
         # The business licence is optional; only an entered expiry date can ever remind.
         row = (
@@ -126,7 +155,9 @@ def get_attention(context: TenantDep) -> list[AttentionList]:
     return [entry for entry in lists if entry.count > 0]
 
 
-def _from_rows(kind: Literal["leads_due", "health_review"], rows: list) -> AttentionList:
+def _from_rows(
+    kind: Literal["leads_due", "health_review", "freeze_requests"], rows: list
+) -> AttentionList:
     return AttentionList(
         kind=kind,
         count=rows[0]["total"] if rows else 0,

@@ -22,6 +22,8 @@ const catalog = {
   ],
 };
 
+const ilsFees = { alone: { setup: 79000, monthly: 4900 }, withSystem: { setup: 49000, monthly: 2900 } };
+
 const plan: SignupPlan = {
   vertical: "beauty",
   name: "סלון שירה",
@@ -161,7 +163,7 @@ test("the website step survives the URL: kept for 'have', ignored otherwise", ()
 });
 
 test("a website built for a business with the system is a monthly line and a setup line", () => {
-  const withSite = { ...catalog, currency: "ILS" };
+  const withSite = { ...catalog, website: ilsFees };
   const { lines, total, once, onceTotal } = priceLines(withSite, { ...plan, site: "build" });
   assert.deepEqual(lines.at(-1), { key: "website", quantity: 1, amount: 2900 });
   assert.equal(total, 25600 + 2900);
@@ -171,7 +173,7 @@ test("a website built for a business with the system is a monthly line and a set
 });
 
 test("a website-only plan pays the stand-alone price and has no core plan or modules", () => {
-  const { lines, once } = priceLines({ ...catalog, currency: "ILS" }, { clients: 0, modules: { client_app: 1 }, track: "website_only" });
+  const { lines, once } = priceLines({ ...catalog, website: ilsFees }, { clients: 0, modules: { client_app: 1 }, track: "website_only" });
   assert.deepEqual(lines, [{ key: "website", quantity: 1, amount: 4900 }]);
   assert.deepEqual(once, [{ key: "website", quantity: 1, amount: 79000 }]);
   const decoded = decodePlan(encodePlan({ ...plan, modules: {}, track: "website_only" }));

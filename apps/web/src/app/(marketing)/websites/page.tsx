@@ -10,9 +10,8 @@ import { CtaBand, SectionHeading } from "@/components/marketing/sections";
 import { BandText } from "@/components/marketing/subpage";
 import { WebsiteLeadDemo } from "@/components/marketing/website-lead-demo";
 import { WebsitesShowcase, type ShowcaseSite } from "@/components/marketing/websites-showcase";
-import { loadCatalog } from "@/lib/pricing";
+import { loadCatalog, loadSitePrices } from "@/lib/pricing";
 import { formatMoney } from "@/lib/money";
-import { sitePricesFor } from "@/lib/website-prices";
 
 const SITES = [
   { key: "barber", tone: "bg-gradient-to-br from-navy to-primary" },
@@ -35,8 +34,9 @@ export default async function WebsitesPage({ searchParams }: PageProps<"/website
   const requested = typeof query.currency === "string" ? query.currency : "";
   const currency = (CURRENCIES as readonly string[]).includes(requested) ? requested : locale === "he" ? "ILS" : "USD";
   const money = (amount: number) => formatMoney(amount, currency, locale);
-  const { alone, withSystem } = sitePricesFor(currency);
-  const catalog = await loadCatalog(currency);
+  const [catalog, sitePrices] = await Promise.all([loadCatalog(currency), loadSitePrices(currency)]);
+  const alone = sitePrices?.landing_only;
+  const withSystem = sitePrices?.landing_with_system;
   const systemFrom = catalog?.core[0]?.price;
 
   const sites: ShowcaseSite[] = SITES.map(({ key, tone }) => ({
@@ -50,11 +50,11 @@ export default async function WebsitesPage({ searchParams }: PageProps<"/website
   }));
   const steps = t.raw("steps.items") as { title: string; text: string }[];
   const cards = [
-    { key: "siteOnly", setup: alone.setup, monthly: alone.monthly, href: `/start?track=site&currency=${currency}`, featured: false },
+    { key: "siteOnly", setup: alone?.setup ?? null, monthly: alone?.monthly ?? null, href: `/start?track=site&currency=${currency}`, featured: false },
     { key: "systemOnly", setup: null, monthly: systemFrom ?? null, href: "/pricing", featured: false },
-    { key: "both", setup: withSystem.setup, monthly: withSystem.monthly, href: `/start?site=build&currency=${currency}`, featured: true },
+    { key: "both", setup: withSystem?.setup ?? null, monthly: withSystem?.monthly ?? null, href: `/start?site=build&currency=${currency}`, featured: true },
   ] as const;
-  const saved = alone.setup - withSystem.setup;
+  const saved = alone && withSystem ? alone.setup - withSystem.setup : null;
 
   return (
     <main id="main" className="enter flex flex-col">
@@ -138,7 +138,7 @@ export default async function WebsitesPage({ searchParams }: PageProps<"/website
                     {point}
                   </li>
                 ))}
-                {card.featured && (
+                {card.featured && saved !== null && (
                   <li className="flex items-start gap-2 font-semibold text-success-ink">
                     <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
                     {t("prices.saving", { amount: money(saved) })}

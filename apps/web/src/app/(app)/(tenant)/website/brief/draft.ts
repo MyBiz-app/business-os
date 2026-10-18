@@ -20,3 +20,23 @@ export function normalize(brief: Brief | undefined): Draft {
     no_good_photos: brief?.no_good_photos ?? false,
   };
 }
+
+/** What the business already told us, as the starting answers: only fills what is still empty. */
+export function prefill(draft: Draft, tenant: { locale: string; address_city?: string | null; website_url?: string | null }): Draft {
+  const host = tenant.website_url ? websiteHost(tenant.website_url) : null;
+  return {
+    ...draft,
+    area: draft.area ?? (tenant.address_city || undefined),
+    languages: draft.languages.length > 0 ? draft.languages : [tenant.locale === "he" ? "he" : "en"],
+    domain: draft.domain ?? (host ? "have" : undefined),
+    domain_name: draft.domain_name ?? (host ?? undefined),
+  };
+}
+
+function websiteHost(url: string): string | null {
+  try {
+    return new URL(url.includes("://") ? url : `https://${url}`).hostname;
+  } catch {
+    return null;
+  }
+}

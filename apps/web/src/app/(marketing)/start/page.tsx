@@ -9,12 +9,13 @@ import { ChatMock, PhoneMock } from "@/components/marketing/mocks";
 import { API_URL } from "@/lib/api";
 import { providerButtons } from "@/lib/auth-providers";
 import { createClient } from "@/lib/supabase/server";
-import { CURRENCIES, type Currency, modulesFromParam, trialEndsOn, wholeParam, withLocations, withoutOrphans } from "@/lib/signup-plan";
+import { loadSitePrices } from "@/lib/pricing";
+import { CURRENCIES, type Currency, modulesFromParam, type SiteFees, trialEndsOn, websiteFees, wholeParam, withLocations, withoutOrphans } from "@/lib/signup-plan";
 
 import { SiteOnlyStart } from "./site-only";
 import { StartWizard } from "./start-wizard";
 
-type Catalog = components["schemas"]["Catalog"];
+type Catalog = components["schemas"]["Catalog"] & { website?: SiteFees };
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("start.meta");
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 async function loadCatalog(currency: Currency): Promise<Catalog | null> {
   try {
     const response = await fetch(`${API_URL}/public/pricing?currency=${currency}`, { next: { revalidate: 3600 } });
-    return response.ok ? ((await response.json()) as Catalog) : null;
+    return response.ok ? { ...((await response.json()) as Catalog), website: websiteFees(await loadSitePrices(currency)) } : null;
   } catch {
     return null;
   }
@@ -43,9 +44,10 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
   if (query.track === "site") {
     const { data: claims } = await (await createClient()).auth.getClaims();
     const wanted = asCurrency(query.currency);
+    const siteCurrency = wanted ?? (locale === "he" ? "ILS" : "USD");
     return (
       <main id="main" className="flex flex-col">
-        <SiteOnlyStart currency={wanted ?? (locale === "he" ? "ILS" : "USD")} signedIn={Boolean(claims?.claims)} />
+        <SiteOnlyStart currency={siteCurrency} signedIn={Boolean(claims?.claims)} price={websiteFees(await loadSitePrices(siteCurrency))?.alone} />
       </main>
     );
   }

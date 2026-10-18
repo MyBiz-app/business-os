@@ -239,3 +239,20 @@ def test_issued_documents_are_isolated_and_never_changed(
             with pytest.raises(Exception, match="permission denied"), connection.begin_nested():
                 connection.execute(text(statement))
     assert client.get(f"/issued-documents/{doc['id']}", headers=headers).status_code == 200
+
+
+def test_an_issued_document_is_also_filed_in_the_business_documents_folder(
+    client: TestClient, studio: dict
+) -> None:
+    headers = studio["headers"]
+    make_licensed(client, headers)
+    issue(client, headers)
+    issue(client, headers, kind="quote", valid_until="2026-11-30")
+
+    folders = client.get("/files/folders", headers=headers).json()
+    folder = next(f for f in folders if f["system_key"] == "business_docs")
+    files = client.get("/files", params={"folder_id": folder["id"]}, headers=headers).json()
+    assert sorted(f["name"] for f in files) == [
+        "quote-1001.pdf",
+        "tax_invoice_receipt-1001.pdf",
+    ]

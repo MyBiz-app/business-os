@@ -13,3 +13,15 @@ export async function loadCatalog(currency: string): Promise<Catalog | null> {
     return null;
   }
 }
+
+export type SitePrices = components["schemas"]["WebsitePrices"];
+
+/** The website price list in one currency (the API's single list), or null while it is unreachable. */
+export async function loadSitePrices(currency: string): Promise<SitePrices | null> {
+  try {
+    const response = await fetch(`${API_URL}/public/website-prices?currency=${currency}`, { next: { revalidate: 3600 } });
+    return response.ok ? ((await response.json()) as SitePrices) : null;
+  } catch {
+    return null;
+  }
+}

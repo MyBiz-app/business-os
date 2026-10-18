@@ -20,10 +20,10 @@ import {
   type EntityType,
   normalizeWebsiteUrl,
   SITE_CHOICES,
+  type SiteFee,
   type SiteChoice,
 } from "@/lib/signup-plan";
 import { formatMoney } from "@/lib/money";
-import { sitePricesFor } from "@/lib/website-prices";
 import { industryTexts } from "@/lib/verticals";
 
 import { ChoiceGroup, StepHeading, Stepper, TextInput } from "./journey-pieces";
@@ -293,19 +293,21 @@ export function SiteStep({
   draft,
   update,
   touched,
+  price,
   headingProps,
 }: {
   draft: Draft;
   update: (changes: Partial<Draft>) => void;
   /** Continue was pressed: show what is wrong with the address. */
   touched: boolean;
+  /** The website fees with the system (none while the price list is unreachable). */
+  price?: SiteFee;
   headingProps: HeadingProps;
 }) {
   const t = useTranslations("start");
   const locale = useLocale();
   const name = useId();
   const addressId = useId();
-  const price = sitePricesFor(draft.currency).withSystem;
   const money = (amount: number) => formatMoney(amount, draft.currency, locale);
   const invalid = touched && draft.site === "have" && !normalizeWebsiteUrl(draft.websiteUrl ?? "");
   return (
@@ -336,7 +338,7 @@ export function SiteStep({
                   {chosen && <Check aria-hidden="true" className="size-5 text-success-ink" />}
                 </span>
                 <span className="text-sm text-muted">{t(`site.choices.${choice}.text`)}</span>
-                {choice === "build" && (
+                {choice === "build" && price && (
                   <span className="text-sm font-semibold">
                     {t("site.price", { setup: money(price.setup), monthly: money(price.monthly) })}
                   </span>

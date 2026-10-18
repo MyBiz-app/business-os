@@ -29,6 +29,7 @@ import {
   type Offer,
   priceLines,
   type SignupPlan,
+  type SiteFees,
   normalizeWebsiteUrl,
   tierOf,
   tierPrice,
@@ -52,7 +53,7 @@ import {
 
 const SIGNUP_VISIT_KEY = `${BRAND.app.storagePrefix}-signup-visit`;
 
-type Catalog = components["schemas"]["Catalog"];
+type Catalog = components["schemas"]["Catalog"] & { website?: SiteFees };
 
 type Step = "account" | "industry" | "business" | "base" | Offer | "site" | "summary";
 const GROUPS = [
@@ -343,7 +344,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
       </>
     );
   } else if (step === "site") {
-    content = <SiteStep draft={draft} update={update} touched={siteTouched} headingProps={headingProps} />;
+    content = <SiteStep draft={draft} update={update} touched={siteTouched} price={catalog.website?.withSystem} headingProps={headingProps} />;
   } else if ((OFFERS as readonly string[]).includes(step)) {
     const offer = step as Offer;
     const tiers = OFFER_TIERS[offer];

@@ -26,7 +26,7 @@ from app.core.audit import record
 from app.core.permissions import Permission
 from app.files import system_folder_id
 from app.websites.brief import Brief, missing_for_submit
-from app.websites.pricing import Product, price_for
+from app.websites.pricing import PRICES, Product, price_for
 
 router = APIRouter(prefix="/website", tags=["website"])
 public_router = APIRouter(prefix="/public", tags=["public"])
@@ -330,6 +330,31 @@ def respond(body: Response, context: OwnerDep) -> OrderState:
     else:
         db.execute(text("UPDATE app.website_orders SET approved_at = now(), updated_at = now()"))
     return _state(db, context.tenant_id)
+
+
+class ProductPrice(BaseModel):
+    setup: int = Field(description="One-time, minor units")
+    monthly: int = Field(description="Minor units")
+
+
+class WebsitePrices(BaseModel):
+    currency: str
+    landing_only: ProductPrice
+    landing_with_system: ProductPrice
+
+
+@public_router.get("/website-prices")
+def website_prices(currency: str = "USD") -> WebsitePrices:
+    """The website price list in one currency (unknown currencies get USD), for the public
+    /websites and pricing pages. The same list the order records."""
+    code = currency.strip().upper()
+    code = code if code in PRICES["landing_only"] else "USD"
+    alone, system = price_for("landing_only", code), price_for("landing_with_system", code)
+    return WebsitePrices(
+        currency=code,
+        landing_only=ProductPrice(setup=alone[0], monthly=alone[1]),
+        landing_with_system=ProductPrice(setup=system[0], monthly=system[1]),
+    )
 
 
 @public_router.post("/website-visits", status_code=status.HTTP_202_ACCEPTED)

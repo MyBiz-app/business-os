@@ -11,7 +11,7 @@ import { PricingCalculator } from "@/components/marketing/pricing-calculator";
 import { CtaBand, Faq, PageHero, SectionHeading } from "@/components/marketing/sections";
 import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
 import { ModuleIcon } from "@/components/modules/module-icon";
-import { loadCatalog } from "@/lib/pricing";
+import { loadCatalog, loadSitePrices } from "@/lib/pricing";
 import { formatMoney, toMajor } from "@/lib/money";
 
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
@@ -40,7 +40,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
   const query = await searchParams;
   const requested = typeof query.currency === "string" ? query.currency : "";
   const currency = (CURRENCIES as readonly string[]).includes(requested) ? requested : locale === "he" ? "ILS" : "USD";
-  const catalog = await loadCatalog(currency);
+  const [catalog, sitePrices] = await Promise.all([loadCatalog(currency), loadSitePrices(currency)]);
   const money = (amount: number) => formatMoney(amount, currency, locale);
 
   const base = catalog?.core[0]?.price ?? 0;
@@ -232,8 +232,15 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
           <Container as="p" className="pb-10 text-center text-sm text-muted">{t("note")}</Container>
         </>
       )}
-      <Container className="pb-10 text-center">
-        <Link href="/websites" className="font-semibold text-primary-ink">{t("websiteAddon")}</Link>
+      <Container className="pb-10">
+        <Link href="/websites" className="card mx-auto flex max-w-3xl flex-col gap-1 p-5 text-center transition-shadow hover:shadow-lg">
+          <span className="font-bold">{t("websiteAddon")}</span>
+          {sitePrices && (
+            <span className="text-sm text-muted">
+              <bdi>{t("websiteAddonPrice", { setup: money(sitePrices.landing_with_system.setup), monthly: money(sitePrices.landing_with_system.monthly), alone: money(sitePrices.landing_only.setup) })}</bdi>
+            </span>
+          )}
+        </Link>
       </Container>
       <Faq />
       <CtaBand />

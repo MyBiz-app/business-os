@@ -32,8 +32,9 @@ from app.api.payroll_runs import (
 from app.core import identity
 from app.core.permissions import Permission
 from app.documents import render
-from app.files import store_file, system_folder_id
+from app.files import keep_copy, safe_name, store_file, system_folder_id
 from app.payroll import masav
+from app.payroll.gate import require_open
 from app.payroll.net import Funds, Net, compute_net
 from app.payroll.rates import Rates, resolve
 from app.providers import secrets
@@ -41,7 +42,7 @@ from app.providers import secrets
 router = APIRouter(tags=["payroll"])
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.PAYROLL_READ))]
-ApproveDep = Annotated[TenantContext, Depends(require(Permission.PAYROLL_APPROVE))]
+ApproveDep = Annotated[TenantContext, Depends(require_open(Permission.PAYROLL_APPROVE))]
 PDF_RESPONSES: dict[int | str, dict[str, Any]] = {200: {"content": {"application/pdf": {}}}}
 
 
@@ -474,6 +475,25 @@ def _chosen_correction(session: Session, run: Any, user_id: UUID, version: int |
     if version is not None and found is None:
         raise not_found()
     return found
+
+
+def file_payslips(session: Session, tenant_id: UUID, run: Any, final: bool = False) -> int:
+    """Files every payslip of an approved month in the payroll folder of the files area; returns
+    how many were kept. The first set goes in at approval (marked draft); `final` is the set after
+    the accountant's check, without the draft mark."""
+    count = 0
+    for line in _line_rows(session, run["id"]):
+        suffix = "-final" if final else ""
+        saved = keep_copy(
+            session,
+            tenant_id,
+            "payroll",
+            name=f"payslip-{run['period']:%Y-%m}-{safe_name(line['full_name'])}{suffix}.pdf",
+            content=payslip_pdf(session, tenant_id, run, line["user_id"]),
+            owner_user_id=line["user_id"],
+        )
+        count += saved is not None
+    return count
 
 
 @router.get(
