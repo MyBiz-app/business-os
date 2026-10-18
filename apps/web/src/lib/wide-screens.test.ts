@@ -26,13 +26,13 @@ describe("wide-screen policy", () => {
       }
       if (source.includes("CollapsibleSection")) assert.ok(source.includes("form-columns"), topic.name);
     }
-    expect(read("app/(app)/(tenant)/settings/settings-room.tsx")).toContain("@container");
+    assert.ok(read("app/(app)/(tenant)/settings/settings-room.tsx").includes("@container"));
     assert.match(read("app/globals.css"), /@container \(min-width: 56rem\)/);
   });
 
   it("adds columns to the cards from 1920px and keeps six dashboard tiles in a row", () => {
-    expect(read("app/(app)/(tenant)/clients/[id]/page.tsx")).toContain("min-[120rem]:grid-cols-7");
-    expect(read("app/(app)/(tenant)/team/[userId]/card-sections.tsx")).toContain("min-[120rem]:grid-cols-3");
-    expect(read("app/(app)/(tenant)/dashboard/page.tsx")).toContain("2xl:grid-cols-6");
+    assert.ok(read("app/(app)/(tenant)/clients/[id]/page.tsx").includes("min-[120rem]:grid-cols-7"));
+    assert.ok(read("app/(app)/(tenant)/team/[userId]/card-sections.tsx").includes("min-[120rem]:grid-cols-3"));
+    assert.ok(read("app/(app)/(tenant)/dashboard/page.tsx").includes("2xl:grid-cols-6"));
   });
 });
