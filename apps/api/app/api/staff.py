@@ -14,6 +14,7 @@ from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import SessionDep, TenantContext, UserDep, require
 from app.api.routes import ensure_profile
 from app.core.audit import record
+from app.core.business_size import grow_from_solo
 from app.core.permissions import ROLE_PERMISSIONS, Permission, effective_permissions
 from app.schedule.branch_managers import (
     TEAM_ROLES,
@@ -337,6 +338,7 @@ def create_invitation(
         email=body.email,
         role=body.role,
     )
+    grow_from_solo(context.session, context.tenant_id)  # the first employee ends solo mode
     return CreatedInvitation(**row, token=token)
 
 

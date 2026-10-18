@@ -21,6 +21,7 @@ import { unwrap } from "@/lib/api";
 import { addDays, formatDay, formatTime, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canManageSettings, canReadReports } from "@/lib/permissions";
+import { isSolo, SOLO_DASHBOARD_TILES, SOLO_ATTENTION } from "@/lib/solo";
 import { resolveRange } from "@/lib/range";
 import { getBranches, getTenant } from "@/lib/tenant";
 import { coverSrc } from "@/lib/workspace";
@@ -56,7 +57,9 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const range = resolveRange(query, today, { presets: PRESETS, fallback: 30 });
   const { start, end } = range;
   const reports = canReadReports(tenant);
-  const branches = reports ? await getBranches() : [];
+  const solo = isSolo(tenant);
+  const tiles = solo ? SOLO_DASHBOARD_TILES : TILES;
+  const branches = reports && !solo ? await getBranches() : [];
   // "Without team members": clients who are also on the team don't count in the numbers.
   const excludeStaff = query.staff === "exclude";
 
@@ -67,7 +70,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const [todays, [metrics, revenue, attendance], billing, setup, websiteOffer] = await Promise.all([
     canSeeSchedule ? api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }).then(unwrap) : [],
     reports
-      ? Promise.all([api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...TILES], exclude_staff: excludeStaff } } }).then(unwrap), series("revenue"), series("attendance")])
+      ? Promise.all([api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...tiles], exclude_staff: excludeStaff } } }).then(unwrap), series("revenue"), series("attendance")])
       : ([[], [], []] as const),
     // The MyBiz subscription: remind whoever manages settings before the trial ends or when an
     // invoice is unpaid.
@@ -236,7 +239,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </div>
       </div>
 
-      {mine.length > 0 && (
+      {!solo && mine.length > 0 && (
         <section aria-labelledby="mine-heading" className="flex flex-col gap-3 card-accent p-6">
           <h2 id="mine-heading" className="text-lg font-semibold">
             {t("dashboard.myClassesToday", { count: mine.length })}
@@ -245,7 +248,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </section>
       )}
 
-      <AttentionPanel context={{ api, scope }} />
+      <AttentionPanel context={{ api, scope }} only={solo ? SOLO_ATTENTION : undefined} />
       <WaitlistHint context={{ api, scope, tenant }} />
 
       {reports && (
@@ -256,19 +259,21 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               {t("dashboard.kpis")}
             </h2>
             <div className="flex flex-wrap items-center gap-3">
-              <Link
-                scroll={false}
-                href={{ pathname: "/dashboard", query: { ...query, staff: excludeStaff ? undefined : "exclude" } }}
-                aria-pressed={excludeStaff}
-                className={excludeStaff ? "btn-primary px-3 py-1.5 text-sm" : "btn-secondary px-3 py-1.5 text-sm"}
-              >
-                {t("dashboard.withoutStaff")}
-              </Link>
+              {!solo && (
+                <Link
+                  scroll={false}
+                  href={{ pathname: "/dashboard", query: { ...query, staff: excludeStaff ? undefined : "exclude" } }}
+                  aria-pressed={excludeStaff}
+                  className={excludeStaff ? "btn-primary px-3 py-1.5 text-sm" : "btn-secondary px-3 py-1.5 text-sm"}
+                >
+                  {t("dashboard.withoutStaff")}
+                </Link>
+              )}
               <PeriodPicker presets={PRESETS} value={range.key} from={start} to={end} today={today} />
             </div>
           </div>
           <PendingArea>
-          <ul className="enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+          <ul className={`enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ${solo ? "" : "2xl:grid-cols-6"}`}>
             {metrics.map((metric) => {
               const delta =
                 metric.value !== null && metric.previous !== null ? metric.value - metric.previous : null;
@@ -337,7 +342,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           </ul>
           </PendingArea>
         </section>
-        <PendingArea>
+        {!solo && <PendingArea>
         <section className="card grid gap-8 p-6 lg:grid-cols-2">
           <ColumnChart
             title={t("dashboard.weeklyRevenue")}
@@ -366,11 +371,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             }))}
           />
         </section>
-        </PendingArea>
+        </PendingArea>}
         </PeriodProvider>
       )}
 
-      {reports && branches.length > 1 && (
+      {reports && !solo && branches.length > 1 && (
         <Suspense fallback={null}>
           <BranchMapCard context={{ api, scope, tenant }} />
         </Suspense>

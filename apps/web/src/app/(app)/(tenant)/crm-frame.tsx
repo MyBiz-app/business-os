@@ -10,6 +10,7 @@ import { type NavChild, type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
+import { isSolo, SOLO_MAX_UPGRADES } from "@/lib/solo";
 import { canManageSettings, canManageTeam, canReadPayroll, canUseAssistant } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
 import { getBranches, getTenant, hasBookableRooms } from "@/lib/tenant";
@@ -41,6 +42,7 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
   const g = (key: (typeof order)[number]) => t(`nav.groups.${key}`);
   const sub = (key: string) => t(`nav.sub.${key}` as "nav.sub.people");
   const clientAppLocked = !hasUpgrade(tenant.modules, "client_app");
+  const solo = isSolo(tenant);
   const candidates: (NavItem & { permission?: string; upgrade?: Upgrade })[] = [
     { href: "/dashboard", group: g("overview"), label: t("nav.dashboard"), icon: "dashboard" },
     { href: "/reports", group: g("overview"), label: t("nav.reports"), icon: "reports", permission: "reports.read" },
@@ -74,14 +76,21 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     { href: "/sales", group: g("money"), label: t("nav.sales"), icon: "sales", permission: "reports.read",
       children: [{ href: "/sales", label: t("nav.sales") }, { href: "/sales/orders", label: sub("orders") }],
     },
-    { href: "/locations", group: g("business"), label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
+    ...(solo ? [] : [{ href: "/locations", group: g("business"), label: t("nav.locations"), icon: "locations" as const, permission: "catalog.read" }]),
     { href: "/files", group: g("business"), label: t("nav.files"), icon: "files", permission: "files.read" },
     { href: "/website", group: g("business"), label: t("nav.website"), icon: "website", permission: "business.settings" },
     { href: "/migration", group: g("business"), label: t("nav.migration"), icon: "migration", permission: "migration.manage" },
   ];
   // Modules the business doesn't have stay in the menu, locked, and open a preview.
+  let upgradeOffers = 0;
   const items: NavItem[] = candidates
     .filter((item) => !item.permission || allowed(item.permission))
+    // Solo mode: at most two suggestions to upgrade, the rest stay out of the menu.
+    .filter((item) => {
+      if (!solo || !item.upgrade || hasUpgrade(tenant.modules, item.upgrade)) return true;
+      upgradeOffers += 1;
+      return upgradeOffers <= SOLO_MAX_UPGRADES;
+    })
     .map(({ href, label, icon, upgrade, group, children }) =>
       upgrade && !hasUpgrade(tenant.modules, upgrade) ? { href: `/upgrade/${upgrade}`, label, icon, group, locked: true } : { href, label, icon, group, children },
     );
@@ -97,8 +106,10 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     ...(canReadPayroll(tenant) || allowed("payroll.propose") ? [{ href: "/team/bonuses", label: sub("bonuses") }] : []),
     { href: "/team/roles", label: sub("roles") },
   ];
-  const settingsChildren: NavChild[] = topicsFor(tenant.role).map(({ key, href }) => ({ href, label: t(`settings.nav.items.${key}` as "settings.nav.items.business") }));
-  if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team", group: g("business"), children: teamChildren });
+  const settingsChildren: NavChild[] = topicsFor(tenant.role)
+    .filter(({ key }) => !(solo && key === "audit"))
+    .map(({ key, href }) => ({ href, label: t(`settings.nav.items.${key}` as "settings.nav.items.business") }));
+  if (!solo && canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team", group: g("business"), children: teamChildren });
   if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings", group: g("business"), children: settingsChildren });
 
   // Items of one section sit together (the sort is stable, so the order inside a section stays).
