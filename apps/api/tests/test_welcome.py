@@ -74,7 +74,7 @@ def test_getting_started_checklist(client: TestClient, studio: dict) -> None:
     before = client.get("/tenants/current/getting-started", headers=headers).json()
     steps = {s["key"]: s["done"] for s in before["steps"]}
     assert steps["services"] and steps["team"]  # the fixture adds a service and a coach
-    assert not steps["card"] and not steps["clients"] and not steps["branding"]
+    assert not steps["card"] and not steps["clients"] and not steps["branding"] and not steps["post"]
     client.post("/billing/payment-method", json={"brand": "visa"}, headers=headers)
     after = client.get("/tenants/current/getting-started", headers=headers).json()
-    assert after["done"] == before["done"] + 1 and after["total"] == 6
+    assert after["done"] == before["done"] + 1 and after["total"] == 7
