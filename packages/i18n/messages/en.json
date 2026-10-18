@@ -353,6 +353,49 @@
       "autoApproveHint": "A request for one of these takes effect at once, without a manager.",
       "save": "Save",
       "saved": "Saved."
+    },
+    "cancellation": {
+      "title": "Cancellations",
+      "subtitle": "How long before a visit clients may cancel for free, and what happens when they cancel late or do not come.",
+      "confirm": "These are the usual terms for a business like yours. Check them and save once so they are yours.",
+      "group": "Free cancellation before a class",
+      "personal": "... before a personal session or appointment",
+      "resource": "... before a court or room",
+      "lateOutcome": "A late cancellation",
+      "noShowOutcome": "A client who does not come",
+      "outcomes": {
+        "counts": "Counts as a used visit",
+        "recorded": "Only noted, not counted"
+      },
+      "limit": "Pause app booking after repeated no-shows",
+      "limitCount": "No-shows in 30 days",
+      "limitHint": "Off by default. Staff can still book the client.",
+      "durations": {
+        "anytime": "Up to the start",
+        "minutes": "{count, plural, one {# minute} other {# minutes}} before",
+        "hours": "{count, plural, one {# hour} other {# hours}} before",
+        "days": "{count, plural, one {# day} other {# days}} before"
+      },
+      "live": {
+        "counts": "A client who cancels less than {time} loses the visit: it counts as used.",
+        "recorded": "A client who cancels less than {time} is noted as late, but keeps the visit."
+      },
+      "liveOthers": "(Personal sessions: {personal}. Courts and rooms: {resource}.)",
+      "liveNoShow": {
+        "counts": "A client who does not come loses the visit.",
+        "recorded": "A client who does not come is noted, but keeps the visit."
+      },
+      "suggested": "Suggested for your kind of business: {group} before a class, {personal} before a personal session.",
+      "feeNote": "A fee for late cancellations is built but stays off until online payments are on.",
+      "lawNote": "This is about cancelling a visit. Ending the membership itself follows consumer protection law (gyms have special rules); we recommend checking with a lawyer.",
+      "save": "Save",
+      "confirmSave": "Confirm and save",
+      "perService": "A service with its own terms",
+      "perServiceHint": "For example a personal session that needs a day's notice while classes need six hours.",
+      "perPlan": "A plan with its own terms",
+      "perPlanHint": "For example a VIP membership with cancellation up to an hour before. The plan wins over the service.",
+      "followBusiness": "Follow the business",
+      "saveRow": "Save"
     }
   },
   "locales": {
@@ -1406,10 +1449,21 @@
       "not_found": "The booking was not found. Refresh and try again.",
       "generic": "Something went wrong. Try again.",
       "dependent_required": "Choose who comes.",
-      "unknown_dependent": "That one isn't on this client's card any more."
+      "unknown_dependent": "That one isn't on this client's card any more.",
+      "nothing_to_return": "There is nothing to give back for this booking."
     },
     "noPlan": "No plan",
-    "showAll": "Show the whole history ({count})"
+    "showAll": "Show the whole history ({count})",
+    "waived": "Visit given back",
+    "notCounted": "Not counted",
+    "waive": {
+      "button": "Give the visit back",
+      "reason": "Reason (required)",
+      "placeholder": "For example illness or a family emergency",
+      "note": "The client keeps the visit and is told. Who and when are saved.",
+      "confirm": "Give back",
+      "thisYear": "{count, plural, one {# visit given back this year} other {# visits given back this year}}"
+    }
   },
   "areas": {
     "switch": "Switch area",
@@ -1657,7 +1711,8 @@
         "waitlist_spot_open": "A spot opened for {service}, {when}. Open the app to take it.",
         "waitlist_spot_taken": "The spot for {service}, {when} was taken. You stay on the list.",
         "freeze_approved": "Your freeze of {plan} was approved: {from} - {date}.",
-        "freeze_rejected": "Your freeze request for {plan} wasn't approved."
+        "freeze_rejected": "Your freeze request for {plan} wasn't approved.",
+        "credit_returned": "The business gave you back your visit for {service}, {when}."
       }
     },
     "pay": {
@@ -1892,7 +1947,13 @@
       "paperAttached": "paper attached",
       "frozenRange": "Frozen {from} - {to}",
       "keep": "Keep frozen"
-    }
+    },
+    "cancelLateQuota": "This is a late cancellation. The visit still counts, out of your {count, plural, one {# visit} other {# visits}} {unit, select, week {this week} other {this month}} ({used} used). Cancel anyway?",
+    "cancelLateCard": "This is a late cancellation. It will still use one entry of your {plan}. Cancel anyway?",
+    "cancelLateCounts": "This is a late cancellation. The visit counts as used. Cancel anyway?",
+    "cancelLateRecorded": "This is a late cancellation. It will be noted, but you keep the visit. Cancel anyway?",
+    "freeCancelUntil": "Free cancellation until {when}",
+    "cancelLateSoon": "Cancelling now counts as late"
   },
   "join": {
     "inviteToApp": "Invite to the app",
@@ -2009,7 +2070,19 @@
     "decided": "Done.",
     "requestsRequestedBy": "Requested by the client in the app",
     "requestPaper": "Open the attached paper",
-    "autoApproved": "Approved automatically"
+    "autoApproved": "Approved automatically",
+    "quota": "Visits limit",
+    "quotas": {
+      "none": "No limit",
+      "week": "Per week",
+      "month": "Per month"
+    },
+    "quotaVisits": "Visits allowed",
+    "quotaHint": "For example 2 visits per week. A late cancellation can use one up, as the cancellation policy says.",
+    "quotaShort": {
+      "week": "{count, plural, one {# visit} other {# visits}} per week",
+      "month": "{count, plural, one {# visit} other {# visits}} per month"
+    }
   },
   "metrics": {
     "revenue": "Revenue",
@@ -3534,7 +3607,8 @@
       "waitlist_spot_open": "A spot opened: {service} on {when}",
       "waitlist_spot_taken": "Someone was quicker: {service} on {when}",
       "freeze_approved": "Your freeze was approved: {from} to {date}",
-      "freeze_rejected": "About your freeze request"
+      "freeze_rejected": "About your freeze request",
+      "credit_returned": "We gave you back your visit: {service} on {when}"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -3552,7 +3626,8 @@
       "waitlist_spot_open": "A spot opened up for {service} on {when}, and whoever takes it first gets it. Open the app to take it.",
       "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens.",
       "freeze_approved": "{business} approved freezing your {plan} from {from} to {date}. Your end date moves by the same number of days.",
-      "freeze_rejected": "{business} couldn't approve freezing your {plan} from {from} to {date}."
+      "freeze_rejected": "{business} couldn't approve freezing your {plan} from {from} to {date}.",
+      "credit_returned": "{business} gave you back your visit for {service} on {when}. It no longer counts as used."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -6094,6 +6169,10 @@
         "title": "Set up your services",
         "text": "What you offer, how long it takes and what it costs."
       },
+      "policy": {
+        "title": "Confirm your cancellation policy",
+        "text": "How late a client may cancel for free, already filled in for your kind of business."
+      },
       "schedule": {
         "title": "Build your schedule",
         "text": "Weekly classes or working hours for appointments."
@@ -6120,7 +6199,7 @@
       "metaDescription": "A step-by-step guide to setting up your business on MyBiz: branding, services, schedule, team, clients and the client app.",
       "eyebrow": "Guide",
       "title": "Your first day with MyBiz",
-      "subtitle": "Six short steps, about 20 minutes, and your business is ready for clients. Each step has a link straight to the right screen.",
+      "subtitle": "Seven short steps, about 20 minutes, and your business is ready for clients. Each step has a link straight to the right screen.",
       "minutes": "~{count} min",
       "openInApp": "Open in MyBiz",
       "sections": [
@@ -6140,6 +6219,15 @@
             "We added starter services for your industry - rename or delete them.",
             "Set the length, price and number of spots for each service.",
             "Create plans: memberships, punch cards or single visits."
+          ]
+        },
+        {
+          "key": "policy",
+          "minutes": 2,
+          "tips": [
+            "The suggested terms are already filled in for your kind of business.",
+            "Choose how early clients cancel for free: a class, a personal session, a court or a room.",
+            "Decide whether a late cancellation or a no-show counts as a used visit."
           ]
         },
         {
@@ -10007,5 +10095,31 @@
       "rejected": "Declined",
       "cancelled": "Withdrawn"
     }
+  },
+  "cancellationPolicy": {
+    "units": {
+      "none": "any time before",
+      "day": "1 day",
+      "days": "{n} days",
+      "hour": "1 hour",
+      "hours": "{n} hours",
+      "minutes": "{n} minutes"
+    },
+    "free": "You can cancel for free up to {time} before the session.",
+    "freeFor": "You can cancel {kind} for free up to {time} before.",
+    "kinds": {
+      "group": "a class",
+      "personal": "a personal session or appointment",
+      "resource": "a court or room"
+    },
+    "late": {
+      "counts": "A later cancellation counts as a visit you used.",
+      "recorded": "A later cancellation is noted but does not count as a visit you used."
+    },
+    "noShow": {
+      "counts": "If you do not come, the visit counts as used.",
+      "recorded": "If you do not come, it is noted but does not count as a visit you used."
+    },
+    "limit": "After {n} missed visits in a month, booking from the app is paused until you contact the business."
   }
 }
