@@ -14,7 +14,7 @@ import helpers as h
 
 OWNER = sys.argv[1]
 WIDTHS = (390, 1440, 1920, 2560)
-CAP = 1600  # Container size "settings" (100rem)
+CAP_REM = 100  # Container size "settings" (100rem: 1600px, and it grows with the root font size on big screens)
 # (path, "capped" = a form room, "open" = a table or board that may use the whole screen)
 PAGES = [("/account", "capped"), ("/platform", "open"), ("/platform/businesses", "open"), ("/platform/billing", "capped")]
 problems: list[str] = []
@@ -37,17 +37,19 @@ with sync_playwright() as p:
                 """() => ({
                     scroll: document.documentElement.scrollWidth - document.documentElement.clientWidth,
                     main: document.getElementById("main")?.getBoundingClientRect().width ?? 0,
+                    rem: parseFloat(getComputedStyle(document.documentElement).fontSize),
                 })"""
             )
             label = f"{path} at {width}"
+            cap = CAP_REM * m["rem"]
             print(label, m, flush=True)
             if m["scroll"] > 0:
                 problems.append(f"{label}: scrolls sideways by {m['scroll']}px")
             if m["main"] == 0:
                 problems.append(f"{label}: no <main id=main> found")
-            elif kind == "capped" and m["main"] > CAP + 1:
-                problems.append(f"{label}: form room is {m['main']:.0f}px, cap is {CAP}px")
-            elif kind == "open" and width >= 1920 and m["main"] <= CAP:
+            elif kind == "capped" and m["main"] > cap + 1:
+                problems.append(f"{label}: form room is {m['main']:.0f}px, cap is {cap:.0f}px")
+            elif kind == "open" and width >= 1920 and m["main"] <= cap:
                 problems.append(f"{label}: table page stays at {m['main']:.0f}px on a {width}px screen")
     browser.close()
 
