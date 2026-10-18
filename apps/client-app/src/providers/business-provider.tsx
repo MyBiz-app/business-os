@@ -23,6 +23,8 @@ type BusinessContextValue = {
   palette: Palette;
   select: (tenantId: string) => Promise<void>;
   join: (code: string) => Promise<ClientBusiness>;
+  /** A team member signs up as a client of their own business, without a code. */
+  joinOwn: (tenantId: string) => Promise<ClientBusiness>;
   refresh: () => Promise<void>;
 };
 
@@ -69,6 +71,13 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     [select],
   );
 
+  const joinOwn = useCallback(async (tenantId: string) => {
+    const joined = unwrap(await apiClient().POST("/client/businesses/self", { body: { tenant_id: tenantId } }));
+    setBusinesses((current) => [...(current ?? []).filter((b) => b.id !== joined.id), joined]);
+    await select(joined.id);
+    return joined;
+  }, [select]);
+
   const business = businesses?.find((b) => b.id === selectedId) ?? null;
   const value = useMemo(
     () => ({
@@ -79,9 +88,10 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
       palette: brandPalette(palette, business?.primary_color),
       select,
       join,
+      joinOwn,
       refresh,
     }),
-    [businesses, business, palette, select, join, refresh],
+    [businesses, business, palette, select, join, joinOwn, refresh],
   );
 
   return <BusinessContext.Provider value={value}>{children}</BusinessContext.Provider>;

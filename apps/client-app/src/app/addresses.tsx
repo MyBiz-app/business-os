@@ -5,7 +5,9 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { BackBar, Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
+import { AddressPicker } from "@business-os/app-kit/components/address-picker";
 import { Button, Card, ErrorText, Field, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { addressBody, EMPTY_ADDRESS, isAddressComplete } from "@business-os/app-kit/lib/address";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
@@ -20,9 +22,7 @@ export default function Addresses() {
   const tAddress = useTranslations("jobs.address");
   const tProfile = useTranslations("client.profile");
   const { api, scope, business, palette } = useBusiness();
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [details, setDetails] = useState("");
+  const [address, setAddress] = useState(EMPTY_ADDRESS);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,19 +35,17 @@ export default function Addresses() {
   if (!business) return null;
 
   const add = async () => {
-    if (!street.trim() || !city.trim()) return setError(tAddress("required"));
+    if (!isAddressComplete(address)) return setError(tAddress("required"));
     setBusy(true);
     setError(null);
     try {
       unwrap(
         await api.POST("/client/addresses", {
           params: scope,
-          body: { street, city, details: details || null, notes: notes || null },
+          body: { ...addressBody(address), notes: notes || null },
         }),
       );
-      setStreet("");
-      setCity("");
-      setDetails("");
+      setAddress(EMPTY_ADDRESS);
       setNotes("");
       await reload();
     } catch {
@@ -86,9 +84,7 @@ export default function Addresses() {
       ))}
       <Card palette={palette}>
         <SectionTitle title={tAddress("add")} palette={palette} />
-        <Field label={tAddress("street")} palette={palette} value={street} onChangeText={setStreet} autoComplete="street-address" maxLength={200} />
-        <Field label={tAddress("city")} palette={palette} value={city} onChangeText={setCity} maxLength={80} />
-        <Field label={tAddress("details")} palette={palette} value={details} onChangeText={setDetails} maxLength={200} />
+        <AddressPicker palette={palette} value={address} onChange={setAddress} />
         <Field label={tAddress("notes")} hint={tAddress("notesHint")} palette={palette} value={notes} onChangeText={setNotes} maxLength={500} />
         <ErrorText message={error} palette={palette} />
         <Button label={tAddress("add")} palette={palette} busy={busy} onPress={() => void add()} />

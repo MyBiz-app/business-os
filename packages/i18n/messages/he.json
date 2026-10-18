@@ -455,6 +455,7 @@
     "business": "עסק",
     "openDetails": "לפרטים",
     "kpis": "מספרים מרכזיים",
+    "withoutStaff": "בלי אנשי צוות",
     "period": "תקופה",
     "lastDays": "{count} ימים אחרונים",
     "vsPrevious": "לעומת התקופה הקודמת",
@@ -811,6 +812,14 @@
     },
     "absentFilter": "ביקור אחרון",
     "absentAny": "בכל זמן",
+    "staffFilter": "אנשי צוות",
+    "staffAny": "כולם",
+    "staffOptions": {
+      "only": "אנשי צוות בלבד",
+      "exclude": "בלי אנשי צוות"
+    },
+    "staffBadge": "צוות",
+    "addMe": "הוסף אותי",
     "absentDays": "לא הגיעו {days} ימים",
     "homeBranch": "סניף הבית",
     "allBranches": "כל הסניפים",
@@ -931,6 +940,28 @@
       "occupancy": "תפוסה {value}"
     },
     "created": "השירות נוצר."
+  },
+  "address": {
+    "city": "עיר",
+    "cityPlaceholder": "התחילו להקליד שם עיר",
+    "street": "רחוב",
+    "streetPlaceholder": "התחילו להקליד שם רחוב",
+    "streetNeedsCity": "בחרו קודם עיר",
+    "houseNumber": "מספר בית",
+    "details": "דירה, קומה, כניסה",
+    "optional": "לא חובה",
+    "unlisted": "הרחוב שלי לא מופיע ברשימה",
+    "unlistedStreet": "שם הרחוב",
+    "unlistedNote": "הרחוב יסומן לבדיקה ויתווסף לרשימה.",
+    "current": "הכתובת השמורה כרגע: {address}. בחירה מהרשימה תחליף אותה.",
+    "backToList": "בחירה מהרשימה",
+    "noResults": "לא נמצאו תוצאות",
+    "chooseCity": "בחרו עיר מהרשימה",
+    "chooseStreet": "בחרו רחוב מהרשימה",
+    "reminder": {
+      "text": "השלימו את כתובת המגורים שלכם: עיר, רחוב ומספר בית.",
+      "action": "למילוי הכתובת"
+    }
   },
   "locations": {
     "manager": {
@@ -5620,6 +5651,11 @@
       "allBranches": "כל הסניפים",
       "rosterEmails": "שלחו לי מייל על המשמרות שלי",
       "rosterEmailsHint": "כשסידור העבודה מתפרסם, וכשמשמרת שלי משתנה או מוסרת.",
+      "signUpClientTitle": "הירשם גם כמתאמן",
+      "signUpClientHint": "כרטיס לקוח משלך בעסק הזה, כדי להזמין ולשלם כמו כל לקוח. את המעבר בין שני האזורים עושים למטה.",
+      "signUpClientButton": "הירשם אותי כלקוח",
+      "signUpClientDone": "בוצע. עוברים לאזור הלקוח למטה.",
+      "signUpClientError": "ההרשמה נכשלה. נסו שוב.",
       "colors": "הצבעים שלי",
       "colorsHint": "בחרו את צבע המותג. הוא צובע את אפליקציית הלקוחות, את אתר העסק ואת האפליקציה הזו.",
       "colorHex": "קוד צבע (#rrggbb)",
@@ -6627,7 +6663,7 @@
       "inactive": "לא בשימוש",
       "retire": "הפסקת שימוש",
       "restore": "שימוש מחדש",
-      "required": "צריך למלא רחוב ועיר.",
+      "required": "צריך לבחור עיר ורחוב מהרשימה ולמלא מספר בית.",
       "saveFailed": "השמירה נכשלה. נסו שוב."
     },
     "myDay": "העבודות שלי",

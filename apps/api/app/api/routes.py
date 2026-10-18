@@ -2,7 +2,7 @@ from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request, status
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
@@ -23,6 +23,7 @@ from app.commerce.modules import PRESETS
 from app.core import events
 from app.core.db import set_tenant
 from app.core.permissions import Permission, effective_permissions
+from app.geo.addresses import ADDRESS_KEYS, AddressFields, resolve_address
 from app.legal.documents import check_versions, pending_documents, record_acceptance
 from app.messaging.email import load_all_messages
 
@@ -237,6 +238,13 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
             text("""
                 SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin,
                        phone, birth_date, address_line, city, postal_code, email_roster,
+                       city_code, street_code, house_number, address_details, street_unlisted,
+                       (SELECT st.name_he FROM app.geo_streets st
+                        WHERE st.city_code = app.users.city_code
+                          AND st.code = app.users.street_code) AS street_name,
+                       (city_code IS NOT NULL AND (street_code IS NOT NULL
+                                                   OR street_unlisted IS NOT NULL)
+                        AND house_number IS NOT NULL) AS address_complete,
                        marketing_consent_at IS NOT NULL AS marketing_consent, palette,
                        CASE WHEN palette_background IS NULL THEN NULL
                             ELSE jsonb_build_object('background', palette_background,
@@ -333,7 +341,7 @@ def get_current_tenant(context: TenantDep) -> Tenant:
     return load_current_tenant(context.session)
 
 
-class ProfileUpdate(BaseModel):
+class ProfileUpdate(AddressFields):
     full_name: str | None = Field(default=None, max_length=120)
     phone: str | None = Field(default=None, max_length=30, pattern=r"^[0-9+()\- ]*$")
     birth_date: date | None = None
@@ -372,6 +380,22 @@ PROFILE_COLUMNS = frozenset(
 )
 
 
+def _profile_address(session: Session, user_id: UUID, changes: dict) -> dict:
+    """A home address chosen from the official lists (all optional): the structured columns, and
+    the text columns the rest of the system reads kept in step."""
+    current = (
+        session.execute(
+            text(f"SELECT {', '.join(ADDRESS_KEYS)} FROM app.users WHERE id = :id"),
+            {"id": user_id},
+        )
+        .mappings()
+        .one()
+    )
+    resolved = resolve_address(session, {**current, **changes}, required=False)
+    line = " ".join(p for p in (resolved.street, resolved.columns["house_number"]) if p)
+    return {**resolved.columns, "address_line": line or None, "city": resolved.city}
+
+
 @router.patch("/me", tags=["account"])
 def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     """The signed-in person's own profile: the name the team, clients and reports see, a phone
@@ -380,6 +404,8 @@ def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     they are."""
     ensure_profile(session, user.id, user.email)
     changes = body.model_dump(exclude_unset=True)
+    if body.address_given():
+        changes |= _profile_address(session, user.id, changes)
     colors = changes.pop("palette_colors", None)
     if changes.get("email_roster", True) is None:
         del changes["email_roster"]

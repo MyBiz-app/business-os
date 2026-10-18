@@ -455,6 +455,7 @@
     "business": "Business",
     "openDetails": "Open the details",
     "kpis": "Key numbers",
+    "withoutStaff": "Without team members",
     "period": "Period",
     "lastDays": "Last {count} days",
     "vsPrevious": "vs. the previous period",
@@ -811,6 +812,14 @@
     },
     "absentFilter": "Last visit",
     "absentAny": "Any time",
+    "staffFilter": "Team members",
+    "staffAny": "Everyone",
+    "staffOptions": {
+      "only": "Team members only",
+      "exclude": "Without team members"
+    },
+    "staffBadge": "Team",
+    "addMe": "Add me",
     "absentDays": "Not in {days} days",
     "homeBranch": "Home branch",
     "allBranches": "All branches",
@@ -931,6 +940,28 @@
       "occupancy": "{value} full"
     },
     "created": "Service created."
+  },
+  "address": {
+    "city": "City",
+    "cityPlaceholder": "Start typing a city",
+    "street": "Street",
+    "streetPlaceholder": "Start typing a street",
+    "streetNeedsCity": "Choose a city first",
+    "houseNumber": "House number",
+    "details": "Apartment, floor, entrance",
+    "optional": "optional",
+    "unlisted": "My street is not on the list",
+    "unlistedStreet": "Street name",
+    "unlistedNote": "The street will be flagged for review and added to the list.",
+    "current": "Saved address: {address}. Choosing from the list replaces it.",
+    "backToList": "Choose from the list",
+    "noResults": "No results",
+    "chooseCity": "Choose a city from the list",
+    "chooseStreet": "Choose a street from the list",
+    "reminder": {
+      "text": "Complete your home address: city, street and house number.",
+      "action": "Fill in the address"
+    }
   },
   "locations": {
     "manager": {
@@ -5620,6 +5651,11 @@
       "allBranches": "All branches",
       "rosterEmails": "Email me about my shifts",
       "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
+      "signUpClientTitle": "Join as a client too",
+      "signUpClientHint": "Get your own client card in this business, so you can book and pay like any client. You switch between the two areas below.",
+      "signUpClientButton": "Sign me up as a client",
+      "signUpClientDone": "Done. Switch to the client area below.",
+      "signUpClientError": "Could not sign you up. Try again.",
       "colors": "My colors",
       "colorsHint": "Pick your brand color. It colors your clients' app, your web app and this app.",
       "colorHex": "Color code (#rrggbb)",
@@ -6627,7 +6663,7 @@
       "inactive": "Not in use",
       "retire": "Stop using",
       "restore": "Use again",
-      "required": "Enter the street and the city.",
+      "required": "Choose the city and street from the list and enter the house number.",
       "saveFailed": "Couldn't save. Try again."
     },
     "myDay": "My jobs",

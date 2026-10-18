@@ -62,6 +62,15 @@ class Me(BaseModel):
     address_line: str | None = None
     city: str | None = None
     postal_code: str | None = None
+    city_code: int | None = Field(default=None, description="Home city, from the official list")
+    street_code: int | None = None
+    house_number: str | None = None
+    address_details: str | None = None
+    street_unlisted: str | None = None
+    street_name: str | None = Field(default=None, description="The home street's name")
+    address_complete: bool = Field(
+        default=False, description="City, street and house number are all filled in"
+    )
     email_roster: bool = Field(
         default=True, description="Email the person when their roster is published"
     )
