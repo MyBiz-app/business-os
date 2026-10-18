@@ -85,6 +85,24 @@ def test_payroll_exports_and_the_audit_export_are_logged_with_a_category(
     assert entry["action"] == "export.audit_log"
 
 
+def test_browser_built_exports_are_logged_by_kind(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    for kind in ("sales_csv", "content_csv", "report_print"):
+        response = client.post(
+            "/audit-log/exports", json={"kind": kind, "rows": 12}, headers=headers
+        )
+        assert response.status_code == 204, response.text
+    logged = entries(client, headers, category="export")
+    assert sorted(e["action"] for e in logged) == [
+        "export.content_csv",
+        "export.report_print",
+        "export.sales_csv",
+    ]
+    assert all(e["details"]["rows"] == 12 for e in logged)
+    bad = client.post("/audit-log/exports", json={"kind": "everything"}, headers=headers)
+    assert bad.status_code == 422
+
+
 def test_a_new_device_is_logged_in_each_business(
     client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine
 ) -> None:

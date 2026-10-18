@@ -28,6 +28,7 @@ has approved the cost.
 | Lawyer reviews `docs/legal/`, terms, privacy and DPA; real company details in `brand.json` | Owner | [legal README](../legal/README.md) |
 | Accessibility coordinator name, phone and email in the statement | Owner | [accessibility-checklist.md](../accessibility-checklist.md) |
 | App store accounts and the final app identifier | Owner | [go-live-checklist.md](go-live-checklist.md) "App stores" |
+| Firewall (WAF) in front of the site and API; company, bank account and insurance (A8); penetration test (A12) | Owner | [go-live-checklist.md](go-live-checklist.md) sections "Firewall in front of the website and API (WAF)", "Company, bank account and insurance (A8)", "Professional penetration test (A12)" |
 | Run the CI rehearsal once more on the commit that will be released | Claude | Actions: "Go-live rehearsal (CI)"; all steps green |
 
 ## The day, in order

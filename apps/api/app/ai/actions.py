@@ -13,7 +13,7 @@ from sqlalchemy import text
 
 from app.ai import scheduled
 from app.ai.tools import TOOLS, payload_hash
-from app.api import time_billing
+from app.api import cancellation, messaging, time_billing
 from app.api.bookings import cancel_booking, lock_session, place_booking
 from app.api.deps import TenantContext, has_module
 from app.messaging.notifications import notify_booking
@@ -23,6 +23,8 @@ from app.social import studio
 ENTITY = {
     "book_client": ("booking", lambda result: result["booking_id"]),
     "cancel_booking": ("booking", lambda result: result["booking_id"]),
+    "send_message": ("message", lambda result: result["message_id"]),
+    "give_back_visit": ("booking", lambda result: result["booking_id"]),
     "log_time": ("time_entry", lambda result: result["time_entry_id"]),
     "bill_month": ("quote", lambda result: result["bills"][0]),
     "publish_post": ("social_draft", lambda result: result["draft_id"]),
@@ -85,6 +87,25 @@ def _execute(
         cancel_booking(db, booking_id, row.session_id)
         notify_booking(db, booking_id, "booking_cancelled_by_studio")
         return {"booking_id": str(booking_id), "status": "cancelled"}
+    if tool_name == "send_message":
+        if not has_module(db, "whatsapp"):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
+        sent = messaging.send_direct(
+            messaging.DirectMessage(
+                client_id=UUID(payload["client_id"]),
+                channel=payload["channel"],
+                body=payload["body"],
+            ),
+            tenant,
+        )
+        return {"message_id": str(sent.id), "status": sent.status}
+    if tool_name == "give_back_visit":
+        # Re-validated now: the booking must still be a late cancellation or no-show not yet
+        # given back, in a branch this person can see (the same check as the button).
+        cancellation.waive(
+            UUID(payload["booking_id"]), cancellation.WaiveBody(reason=payload["reason"]), tenant
+        )
+        return {"booking_id": payload["booking_id"], "status": "returned"}
     if tool_name == "log_time":
         entry = time_billing.log_time(time_billing.TimeEntryCreate(**payload), tenant)
         return {"time_entry_id": str(entry.id)}

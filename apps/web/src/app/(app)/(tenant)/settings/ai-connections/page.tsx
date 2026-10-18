@@ -14,7 +14,7 @@ import { decideRequest, disconnectApp } from "./actions";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 const TONE: Record<string, Tone> = { pending: "warning", executed: "success", rejected: "muted", expired: "muted", failed: "danger" };
-const DETAILS = ["client", "service", "starts", "dependent", "date", "hours", "description", "month", "clients", "total"] as const;
+const DETAILS = ["client", "service", "starts", "dependent", "date", "hours", "description", "month", "clients", "total", "body", "reason"] as const;
 
 /** Settings → AI connections (R37b): Claude and ChatGPT connected to the business, the changes
  * they suggested (each waits here for approval), and how to connect another app. */

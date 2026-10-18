@@ -31,7 +31,8 @@ export default function Updates() {
   const [fresh, setFresh] = useState<Set<string>>(new Set());
   // Older pages loaded on request; the inbox itself only holds the newest page.
   const [older, setOlder] = useState<Notification[]>([]);
-  const [exhausted, setExhausted] = useState(false);
+  // Where the next older page starts: undefined until a page has been loaded here, null at the end.
+  const [cursor, setCursor] = useState<string | null | undefined>(undefined);
   const [loadingMore, setLoadingMore] = useState(false);
 
   useFocusEffect(
@@ -52,17 +53,17 @@ export default function Updates() {
   const newest = inbox?.items ?? [];
   const seen = new Set(newest.map((n) => n.id));
   const items = [...newest, ...older.filter((n) => !seen.has(n.id))];
-  // The API doesn't report a total: a short page means the end of the list.
-  const hasMore = !exhausted && newest.length >= PAGE;
+  const nextCursor = cursor === undefined ? (inbox?.next_cursor ?? null) : cursor;
+  const hasMore = nextCursor !== null;
 
   const loadMore = async () => {
     setLoadingMore(true);
     try {
       const next = unwrap(
-        await api.GET("/client/notifications", { params: { ...scope, query: { limit: PAGE, offset: items.length } } }),
+        await api.GET("/client/notifications", { params: { ...scope, query: { limit: PAGE, after: nextCursor ?? undefined } } }),
       );
       setOlder((current) => [...current, ...next.items]);
-      if (next.items.length < PAGE) setExhausted(true);
+      setCursor(next.next_cursor ?? null);
     } catch {
       // The button stays; tapping it again retries.
     } finally {

@@ -2,9 +2,12 @@
 
 import { Download } from "lucide-react";
 
+import { logExport } from "../export-log";
+
 /** Saves the rows as a CSV file (built in the browser from what the page already shows). */
 export function CsvButton({ label, filename, rows }: { label: string; filename: string; rows: (string | number)[][] }) {
   const download = () => {
+    void logExport("content_csv", rows.length);
     const quote = (cell: string | number) => `"${String(cell).replaceAll('"', '""')}"`;
     const text = `﻿${rows.map((row) => row.map(quote).join(",")).join("\r\n")}`;
     const link = document.createElement("a");

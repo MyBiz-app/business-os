@@ -50,6 +50,8 @@ export function ActionCard({ action, onDecide }: { action: PendingAction; onDeci
     task_kind?: string;
     schedule?: Schedule;
     first_run?: string;
+    body?: string;
+    reason?: string;
     instruction?: string;
     max_credits?: number;
     action?: { kind: string; client?: string; service?: string; starts?: string; month?: string; clients?: number; total?: number; currency?: string };
@@ -110,6 +112,14 @@ export function ActionCard({ action, onDecide }: { action: PendingAction; onDeci
             </p>
           )}
         </>
+      ) : preview.kind === "send_message" ? (
+        <p className="font-medium" dir="auto">
+          {t("sendMessagePreview", { client: isolate(preview.client ?? ""), body: isolate(preview.body ?? "") })}
+        </p>
+      ) : preview.kind === "give_back_visit" ? (
+        <p className="font-medium" dir="auto">
+          {t("giveBackPreview", { client: isolate(preview.client ?? ""), service: isolate(preview.service ?? ""), reason: isolate(preview.reason ?? "") })}
+        </p>
       ) : (
         <p className="font-medium" dir="auto">
           {preview.kind === "cancel_booking"

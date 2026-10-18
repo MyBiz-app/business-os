@@ -47,6 +47,8 @@ export async function GET(request: NextRequest) {
       r.simulated ? "1" : "0",
     ]),
   ];
+  // Best effort: the export is noted in the audit log, but a failed note never blocks the file.
+  await api.POST("/audit-log/exports", { params: scope, body: { kind: "sales_csv", rows: sales.receipts.length } }).catch(() => undefined);
   const csv = "﻿" + rows.map((row) => row.map(cell).join(",")).join("\r\n") + "\r\n";
   return new Response(csv, {
     headers: {

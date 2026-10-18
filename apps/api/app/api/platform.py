@@ -243,6 +243,9 @@ class SystemHealth(BaseModel):
     messages_failed_24h: int
     emails_waiting: int
     database_bytes: int
+    files_bytes: int = Field(
+        description="All kept files of all businesses (documents, logos, payslips)"
+    )
     ai_credits_today: float
     ai_alert_at: int
     routes: list[RouteTiming] = Field(description="Busiest routes of this API process")
@@ -281,6 +284,9 @@ def system_health(db: UsageDep) -> SystemHealth:
         messages_failed_24h=data["messages_failed_24h"],
         emails_waiting=data["emails_waiting"],
         database_bytes=data["database_bytes"],
+        files_bytes=db.execute(
+            text("SELECT coalesce(sum(app.storage_bytes(t.id)), 0)::bigint FROM app.tenants t")
+        ).scalar_one(),
         ai_credits_today=spent,
         ai_alert_at=get_settings().ai_daily_alert_credits,
         routes=[RouteTiming(**vars(stat)) for stat in metrics.route_stats()],
