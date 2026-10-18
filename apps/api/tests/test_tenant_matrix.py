@@ -66,6 +66,8 @@ OVERRIDES = {
     "social_audience": {"dimension": "'age'"},
     "social_posts": {"kind": "'post'"},
     "tenant_integrations": {"capability": "'payments'", "provider": "'stub'"},
+    "website_orders": {"product": "'landing_only'"},
+    "website_visits_daily": {"source": "'direct'"},
     "whatsapp_conversations": {"phone": "'0501234567'"},
     "whatsapp_inbox": {"from_phone": "'0501234567'"},
     "whatsapp_offers": {"kind": "'book_session'"},

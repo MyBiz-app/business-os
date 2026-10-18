@@ -11,8 +11,8 @@ for a client whose request is approved automatically.
 Nothing existing changes: a plan with no cycle behaves as before, a business with no rules row
 does not accept requests, and the previous release never selects the new columns.
 
-Revision ID: 0132
-Revises: 0131
+Revision ID: 0134
+Revises: 0133
 Create Date: 2026-10-18
 """
 
@@ -20,8 +20,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0132"
-down_revision: str | None = "0131"
+revision: str = "0134"
+down_revision: str | None = "0133"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
