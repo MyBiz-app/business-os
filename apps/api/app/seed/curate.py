@@ -17,6 +17,7 @@ from sqlalchemy import Connection, text
 
 from app.seed.business import seed
 from app.seed.common import DEMOS, profile_id
+from app.seed.guard import refuse_blocked_owner
 from app.seed.profiles import enrich_profiles
 
 RENAMES = {"Iron & Flow": "Adir fitness"}
@@ -43,6 +44,7 @@ def _owned(conn: Connection, user: object) -> list[tuple[object, str]]:
 def curate(
     conn: Connection, owner_email: str, months: int, rng: random.Random
 ) -> dict[str, object]:
+    refuse_blocked_owner(owner_email)
     owner = profile_id(conn, owner_email)
     if owner is None:
         sys.exit(f"No account for {owner_email}: sign up on the site first, then run again.")

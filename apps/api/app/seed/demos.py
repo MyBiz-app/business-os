@@ -7,6 +7,7 @@ from sqlalchemy import Connection, text
 
 from app.seed.business import seed
 from app.seed.common import DEMOS, profile_id
+from app.seed.guard import refuse_blocked_owner
 
 
 def seed_demo(
@@ -20,6 +21,7 @@ def seed_demo(
 ) -> list[UUID]:
     """Creates a demo's businesses for one owner. With `replace`, the owner's earlier copies
     of these businesses (same names, owned by them) are removed first."""
+    refuse_blocked_owner(owner_email)
     specs = DEMOS[demo]
     profile_id(conn, owner_email)  # the name below needs the profile
     if owner_name:

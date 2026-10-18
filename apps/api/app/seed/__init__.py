@@ -36,6 +36,7 @@ from app.seed.common import (
 )
 from app.seed.curate import curate
 from app.seed.demos import seed_demo
+from app.seed.guard import refuse_blocked_owner
 from app.seed.platform import seed_platform
 from app.seed.profiles import enrich_profiles
 
@@ -92,6 +93,8 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--database-url", default=None, help="Defaults to API_DATABASE_URL")
     args = parser.parse_args()
+    if args.demo != "platform":
+        refuse_blocked_owner(args.owner_email)
 
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
