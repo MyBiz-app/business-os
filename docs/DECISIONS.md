@@ -300,6 +300,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - The leaked-password check is built and off until a paid Supabase plan (`go-live-checklist.md`).
 - Staging demo browsing (2026-10-17): the demo owner `adiredri73@gmail.com` is listed in `API_MFA_DEMO_EXEMPT_EMAILS` (and `MFA_DEMO_EXEMPT_EMAILS` on the web app) so it can read the demo without a code. The API honors the list only when `API_ENVIRONMENT=staging`; production, local and test ignore it. No other account is affected.
 
+### MyBiz Sites core (2026-10-18, round 7 R24, migration 0132)
+
+- **One order per business** (`app.website_orders`), stages `briefing`, `received`, `building`, `review`, `live`. The business edits the brief until MyBiz starts building; the console cannot move an order that is still `briefing`. When an order goes `live` the site address becomes the business's website (R22).
+- **Prices are configuration** (`app/websites/pricing.py`), not catalog modules: with the system 490 setup + 29 a month, website only 790 + 49 (decision 18.12). The order records the prices it was offered. Nothing is charged before #46. They are not in `MODULES` so the public pricing page and the configurator stay as they are; R25a decides how a "website only" business is priced and billed.
+- **The build prompt is generated, not stored**: the console builds it from the brief plus a snapshot of the business (name, branches, services, join code) taken when the brief is sent, so it always matches what the owner approved.
+- **Visits** are counted per business, day and source (`direct`, `search`, `social`, `other`) by an anonymous call from the finished site, only while the order is `live`; no cookies, nothing personal.
 ### Cities, streets and branch coordinates (2026-10-18, round 7 R34, migration 0129)
 
 - Cities and streets come from the official data.gov.il lists (free), kept as a compressed snapshot in the code and loaded into shared read-only tables; yearly refresh by script. A faithful copy of the same two datasets was used to build the first snapshot because the build environment could not reach data.gov.il; the next refresh should run the script against data.gov.il itself.
@@ -307,7 +313,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - A branch's map point is looked up once per saved address through Nominatim (OpenStreetMap), never blocking the save; the pin can be placed by hand through the API (the draggable-pin screen is part of the branches map slice, R35).
 - Home addresses of people stay visible only to the person (existing row policy); a team member without a full home address sees a reminder line until they fill it in (nobody is locked out).
 
-### AI connectors: Claude and ChatGPT through MCP (2026-10-18, round 7 R37a, migration 0132)
+### AI connectors: Claude and ChatGPT through MCP (2026-10-18, round 7 R37a, migration 0133)
 
 - MyBiz runs its own small OAuth 2.1 server instead of Supabase's. Supabase's OAuth server for MCP could not be checked from the build environment and would tie sign-in to a beta feature; ours is a few hundred lines, needs no paid plan, and keeps a business's connections in the business's own table with row level security. Apps register themselves (public clients, no secrets, PKCE S256 required); redirect addresses must be https or local http.
 - The MCP endpoint is hand-written JSON-RPC over HTTP (initialize, ping, tools/list, tools/call; no sessions, no streaming) rather than the MCP Python library: four methods, no new dependency, and every request is authenticated and scoped by us.

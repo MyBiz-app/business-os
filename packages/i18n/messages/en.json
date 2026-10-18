@@ -544,7 +544,8 @@
     "sidebarLight": "Use a light sidebar",
     "sidebarDark": "Use a dark sidebar",
     "quotesEvents": "Quotes and events",
-    "catalog": "Catalog"
+    "catalog": "Catalog",
+    "website": "My website"
   },
   "terms": {
     "fitness": {
@@ -2471,7 +2472,8 @@
       "ai": "AI",
       "health": "System health",
       "incidents": "Incident banners",
-      "growth": "Growth"
+      "growth": "Growth",
+      "websiteOrders": "Website orders"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -3015,6 +3017,29 @@
       "save": "Save",
       "saved": "Saved",
       "invalid": "Check the numbers: suspension must come after read-only."
+    },
+    "websites": {
+      "title": "Website orders",
+      "hint": "Landing page orders by stage, from the brief to live. Every order has a ready-made prompt for Claude Code.",
+      "empty": "There are no website orders yet.",
+      "changesAsked": "Changes asked",
+      "prompt": "Claude Code prompt and files",
+      "copy": "Copy the prompt",
+      "copied": "Copied",
+      "files": "Download the files (ZIP)",
+      "stage": "Stage",
+      "siteUrl": "Site address",
+      "message": "Message to the customer",
+      "notes": "Internal notes",
+      "save": "Save",
+      "writing": "The business is still writing the brief.",
+      "stages": {
+        "briefing": "Brief in progress",
+        "received": "Received",
+        "building": "Building",
+        "review": "With the customer for approval",
+        "live": "Live"
+      }
     }
   },
   "permissions": {
@@ -7770,7 +7795,8 @@
       "employees": "Employees",
       "business_docs": "Business documents",
       "imports": "Imports",
-      "general": "General"
+      "general": "General",
+      "website": "Website"
     },
     "count": "{count, plural, =0 {No files} one {# file} other {# files}}",
     "sealed": "Sealed",
@@ -8824,5 +8850,251 @@
     "deny": "Cancel",
     "invalid": "This connection link is not valid. Start again from the app.",
     "noBusiness": "You have no business in MyBiz yet. Create one and try again."
+  },
+  "website": {
+    "title": "My website",
+    "subtitle": "A branded landing page for your business, built by the MyBiz team and connected to your system.",
+    "wizardTitle": "Tell us about your website",
+    "wizardHint": "Eight short steps. Every step is saved, so you can leave and come back any time.",
+    "stepOf": "Step {current} of {total}",
+    "summaryStep": "Summary and send",
+    "back": "Back",
+    "next": "Next",
+    "toSummary": "To the summary",
+    "send": "Send to MyBiz",
+    "autosave": "Saved automatically",
+    "sent": "Your brief was sent. We will start building your website.",
+    "errors": {
+      "locked": "Building has started, so the brief can no longer change. Tell us what to change.",
+      "invalid": "One of the answers is not valid. Check it and try again.",
+      "generic": "Something went wrong. Try again in a moment.",
+      "storage_full": "There is not enough file space in the business."
+    },
+    "steps": {
+      "goal": {
+        "title": "What is the website for?",
+        "hint": "Pick everything that applies, then the single most important action.",
+        "goals": "The website is meant to",
+        "mainAction": "The most important action on the page",
+        "mainActionHint": "For example: book a free trial class"
+      },
+      "business": {
+        "title": "About the business",
+        "hint": "In your own words. A few short sentences are enough.",
+        "unique": "What makes you special? (three sentences)",
+        "audience": "Who is your audience?",
+        "area": "Which area do you serve?"
+      },
+      "sections": {
+        "title": "What goes on the page?",
+        "hint": "Pick the sections. We will arrange them well.",
+        "legend": "Sections"
+      },
+      "branding": {
+        "title": "Branding",
+        "hint": "Logo, colors and style. What is already set in the system is taken from there.",
+        "logo": "Logo",
+        "uploadLogo": "Upload a logo",
+        "replaceLogo": "Replace the logo",
+        "noLogo": "I do not have a logo",
+        "fromBrand": "Use the business color from the system",
+        "color": "Color {number}",
+        "addColor": "Add a color",
+        "style": "Style",
+        "font": "Font (optional)",
+        "fontHint": "If you have none, we pick one that fits the style"
+      },
+      "motion": {
+        "title": "Motion",
+        "hint": "How much life the page should have.",
+        "legend": "Level of motion"
+      },
+      "images": {
+        "title": "Images",
+        "hint": "Your own photos are the best thing for a website. They are kept in the \"Website\" folder of your files.",
+        "upload": "Upload images",
+        "uploading": "Uploading...",
+        "note": "Note for the image (optional)",
+        "remove": "Remove the image",
+        "noGood": "I do not have good photos",
+        "noGoodHint": "We will add fitting stock photos"
+      },
+      "inspiration": {
+        "title": "Inspiration and texts",
+        "hint": "Sites you like, and who writes the texts.",
+        "sites": "Up to three sites you like",
+        "url": "Site address {number}",
+        "likes": "What do you like about it?",
+        "copy": "The texts"
+      },
+      "domain": {
+        "title": "Domain and languages",
+        "hint": "Where the site lives, in which languages, and when it should be ready.",
+        "legend": "Domain",
+        "name": "Your domain name",
+        "languages": "Website languages",
+        "dueDate": "Target date (optional)"
+      }
+    },
+    "goals": {
+      "leads": "Bring in inquiries",
+      "bookings": "Bring in bookings",
+      "showcase": "Present the business",
+      "sell": "Sell"
+    },
+    "sections": {
+      "hero": {
+        "title": "Hero",
+        "hint": "The main line and the main button"
+      },
+      "services": {
+        "title": "Services and prices",
+        "hint": "Pulled from your catalog"
+      },
+      "gallery": {
+        "title": "Gallery",
+        "hint": "Photos of the business"
+      },
+      "team": {
+        "title": "Team",
+        "hint": "Who we are"
+      },
+      "testimonials": {
+        "title": "Testimonials",
+        "hint": "Pulled from your reviews"
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "hint": "Answers to the questions that come back"
+      },
+      "location": {
+        "title": "Location and hours",
+        "hint": "Address, map and opening hours"
+      },
+      "contact": {
+        "title": "Contact",
+        "hint": "An inquiry form that lands in the system"
+      },
+      "booking": {
+        "title": "Book an appointment or class",
+        "hint": "Directly through MyBiz",
+        "needsSystem": "Only for a business that uses the system"
+      },
+      "whatsapp": {
+        "title": "WhatsApp button",
+        "hint": "A chat in one tap"
+      }
+    },
+    "styles": {
+      "clean": {
+        "title": "Modern and clean",
+        "hint": "Lots of air, sharp lines"
+      },
+      "luxury": {
+        "title": "Luxurious",
+        "hint": "Restrained, elegant, careful"
+      },
+      "warm": {
+        "title": "Warm and family-friendly",
+        "hint": "Soft colors and rounded corners"
+      },
+      "vibrant": {
+        "title": "Young and vibrant",
+        "hint": "Strong colors and energy"
+      }
+    },
+    "motions": {
+      "none": {
+        "title": "No motion",
+        "hint": "A quiet, fast page"
+      },
+      "subtle": {
+        "title": "Subtle",
+        "hint": "Soft fades and hover accents"
+      },
+      "rich": {
+        "title": "Rich",
+        "hint": "Scroll animations and transitions between sections"
+      }
+    },
+    "domains": {
+      "have": {
+        "title": "I have a domain",
+        "hint": "We will connect it to the site"
+      },
+      "buy": {
+        "title": "I want to buy one",
+        "hint": "We buy it for you at cost plus 20 shekels a year"
+      },
+      "temporary": {
+        "title": "A temporary address",
+        "hint": "A subdomain until you decide"
+      }
+    },
+    "languages": {
+      "he": "Hebrew",
+      "en": "English"
+    },
+    "copyBy": {
+      "me": "I write them",
+      "you": "Write them for me"
+    },
+    "summary": {
+      "title": "All set?",
+      "hint": "Check your answers and send. You can change them until we start building.",
+      "missing": "To send, you still need:"
+    },
+    "missing": {
+      "goals": "The website's goal",
+      "sections": "Sections on the page",
+      "booking_needs_system": "Booking is only available with the system",
+      "style": "Style",
+      "motion": "Level of motion",
+      "copy_by": "Who writes the texts",
+      "domain": "Domain",
+      "domain_name": "The domain name",
+      "languages": "Languages"
+    },
+    "offer": {
+      "title": "A website for your business, without the headache",
+      "body": "You answer a few questions and we build a designed, branded landing page, with an inquiry form that lands in your system and a visit counter. You approve the site before it goes live.",
+      "price": "One-time setup {setup} and {monthly} a month (hosting, security, upkeep and one small change a month).",
+      "nothingCharged": "Nothing is charged until payments are switched on in the system.",
+      "start": "Start the brief"
+    },
+    "status": {
+      "title": "Order status",
+      "submitted": "Sent on {date}",
+      "prices": "Price offered: setup {setup} and {monthly} a month",
+      "message": "A message from the MyBiz team",
+      "yourRequest": "What you asked to change",
+      "open": "Open the website",
+      "continue": "Continue the brief",
+      "edit": "Edit the brief"
+    },
+    "stages": {
+      "briefing": "Brief",
+      "received": "Received",
+      "building": "Building",
+      "review": "Your approval",
+      "live": "Live"
+    },
+    "stageHint": {
+      "briefing": "The brief was not sent yet. Continue where you stopped.",
+      "received": "We received your brief. You can edit it until we start building.",
+      "building": "The website is being built. We will update you here when it is ready to view.",
+      "review": "The website is ready to view. Approve it or ask for changes.",
+      "live": "The website is live."
+    },
+    "review": {
+      "title": "The website is ready to view",
+      "body": "Open the link in the message, then approve or ask for changes.",
+      "approve": "Approve the website",
+      "askChanges": "Ask for changes",
+      "changesLabel": "What should change?",
+      "sendChanges": "Send the request",
+      "cancel": "Cancel",
+      "approved": "You approved the website. We are putting it live."
+    }
   }
 }

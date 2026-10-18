@@ -15903,6 +15903,336 @@
         }
       }
     },
+    "/website/order": {
+      "get": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Get Order",
+        "description": "The business's website order (none yet), the price list and what the brief still lacks.",
+        "operationId": "get_order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Save Brief",
+        "description": "Saves the brief as a draft; the first save opens the order. Locked once MyBiz builds.",
+        "operationId": "save_brief",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BriefSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/website/order/submit": {
+      "post": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Submit Order",
+        "description": "Sends the brief to MyBiz (the order moves to \"received\").",
+        "operationId": "submit_order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/website/order/respond": {
+      "post": {
+        "tags": [
+          "website"
+        ],
+        "summary": "Respond",
+        "description": "The business answers a site that waits for its review: approve it, or ask for changes\n(the order goes back to \"building\" with the request).",
+        "operationId": "respond",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Response"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/website-visits": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Count Visit",
+        "description": "The finished site reports a visit: a count per day and source, nothing personal.",
+        "operationId": "count_visit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Visit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/services": {
       "get": {
         "tags": [
@@ -36315,6 +36645,147 @@
         ]
       }
     },
+    "/platform/website-orders": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Website Orders",
+        "description": "The board: every website order that was started, with its brief and the build prompt.",
+        "operationId": "website_orders",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WebsiteOrder"
+                  },
+                  "type": "array",
+                  "title": "Response Website Orders"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/website-orders/{order_id}": {
+      "patch": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Update Website Order",
+        "description": "Moves an order along the board, sets the site address (it becomes the business's website\nwhen the site goes live), internal notes and the message the business sees.",
+        "operationId": "update_website_order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebsiteOrderUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WebsiteOrder"
+                  },
+                  "title": "Response Update Website Order"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/website-orders/{order_id}/files.zip": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Website Order Files",
+        "description": "The images and logo the business uploaded, as one ZIP.",
+        "operationId": "website_order_files",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/ai/costs": {
       "get": {
         "tags": [
@@ -45347,6 +45818,272 @@
         ],
         "title": "BreakdownItem"
       },
+      "Brief": {
+        "properties": {
+          "goals": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "leads",
+                "bookings",
+                "showcase",
+                "sell"
+              ]
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Goals"
+          },
+          "main_action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Main Action"
+          },
+          "unique": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unique"
+          },
+          "audience": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audience"
+          },
+          "area": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          },
+          "sections": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "hero",
+                "services",
+                "gallery",
+                "team",
+                "testimonials",
+                "faq",
+                "location",
+                "contact",
+                "booking",
+                "whatsapp"
+              ]
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Sections"
+          },
+          "no_logo": {
+            "type": "boolean",
+            "title": "No Logo",
+            "default": false
+          },
+          "logo_file_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo File Id"
+          },
+          "colors_from_brand": {
+            "type": "boolean",
+            "title": "Colors From Brand",
+            "default": true
+          },
+          "colors": {
+            "items": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Colors"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "clean",
+                  "luxury",
+                  "warm",
+                  "vibrant"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Style"
+          },
+          "font": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Font"
+          },
+          "motion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "subtle",
+                  "rich"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motion"
+          },
+          "images": {
+            "items": {
+              "$ref": "#/components/schemas/ImageNote"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Images"
+          },
+          "no_good_photos": {
+            "type": "boolean",
+            "title": "No Good Photos",
+            "default": false
+          },
+          "inspiration": {
+            "items": {
+              "$ref": "#/components/schemas/Inspiration"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Inspiration"
+          },
+          "copy_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "me",
+                  "you"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Copy By"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "have",
+                  "buy",
+                  "temporary"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "domain_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain Name"
+          },
+          "languages": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "array",
+            "maxItems": 2,
+            "title": "Languages"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Brief",
+        "description": "Eight steps, in the wizard's order."
+      },
+      "BriefSave": {
+        "properties": {
+          "brief": {
+            "$ref": "#/components/schemas/Brief"
+          }
+        },
+        "type": "object",
+        "required": [
+          "brief"
+        ],
+        "title": "BriefSave"
+      },
       "BusinessAICost": {
         "properties": {
           "tenant_id": {
@@ -53199,6 +53936,33 @@
         "title": "IdentitySummary",
         "description": "What a screen may show: never the full number."
       },
+      "ImageNote": {
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "File Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "file_id"
+        ],
+        "title": "ImageNote"
+      },
       "ImportIssue": {
         "properties": {
           "line": {
@@ -53673,6 +54437,34 @@
           "first_name"
         ],
         "title": "InquiryCreate"
+      },
+      "Inspiration": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 300,
+            "pattern": "^https?://[^\\s]+$",
+            "title": "Url"
+          },
+          "likes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "Inspiration"
       },
       "Instructor": {
         "properties": {
@@ -58931,6 +59723,157 @@
         ],
         "title": "Order"
       },
+      "OrderOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "briefing",
+              "received",
+              "building",
+              "review",
+              "live"
+            ],
+            "title": "Stage"
+          },
+          "product": {
+            "type": "string",
+            "enum": [
+              "landing_only",
+              "landing_with_system"
+            ],
+            "title": "Product"
+          },
+          "brief": {
+            "$ref": "#/components/schemas/Brief"
+          },
+          "site_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Url"
+          },
+          "customer_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Message",
+            "description": "The platform team's note to the business"
+          },
+          "change_request": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Request",
+            "description": "What the business asked to change"
+          },
+          "setup_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Price"
+          },
+          "monthly_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Price"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "live_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "stage",
+          "product",
+          "brief",
+          "site_url",
+          "customer_message",
+          "change_request",
+          "setup_price",
+          "monthly_price",
+          "currency",
+          "submitted_at",
+          "approved_at",
+          "live_at",
+          "updated_at"
+        ],
+        "title": "OrderOut"
+      },
       "OrderPage": {
         "properties": {
           "items": {
@@ -58963,6 +59906,51 @@
           "total"
         ],
         "title": "OrderPage"
+      },
+      "OrderState": {
+        "properties": {
+          "order": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrderOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "with_system": {
+            "type": "boolean",
+            "title": "With System",
+            "description": "The business also uses the system"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing",
+            "description": "Answers the brief still needs before it can be sent"
+          },
+          "files_folder_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Files Folder Id",
+            "description": "Where the wizard's images are uploaded"
+          }
+        },
+        "type": "object",
+        "required": [
+          "order",
+          "price",
+          "with_system",
+          "missing",
+          "files_folder_id"
+        ],
+        "title": "OrderState"
       },
       "OtherIncome": {
         "properties": {
@@ -60841,6 +61829,40 @@
           "audience"
         ],
         "title": "PreviewBody"
+      },
+      "Price": {
+        "properties": {
+          "product": {
+            "type": "string",
+            "enum": [
+              "landing_only",
+              "landing_with_system"
+            ],
+            "title": "Product"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "setup": {
+            "type": "integer",
+            "title": "Setup",
+            "description": "One-time, minor units"
+          },
+          "monthly": {
+            "type": "integer",
+            "title": "Monthly",
+            "description": "Minor units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product",
+          "currency",
+          "setup",
+          "monthly"
+        ],
+        "title": "Price"
       },
       "Proactive": {
         "properties": {
@@ -63350,6 +64372,35 @@
           "occupancy_percent"
         ],
         "title": "ResourceUsageRow"
+      },
+      "Response": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "changes"
+            ],
+            "title": "Action"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "Response"
       },
       "Retainer": {
         "properties": {
@@ -70263,6 +71314,33 @@
         "type": "object",
         "title": "VenuePayment"
       },
+      "Visit": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 8,
+            "pattern": "^[0-9a-f]+$",
+            "title": "Key"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "direct",
+              "search",
+              "social",
+              "other"
+            ],
+            "title": "Source",
+            "default": "other"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "title": "Visit"
+      },
       "VoidInvoice": {
         "properties": {
           "reason": {
@@ -70277,6 +71355,275 @@
           "reason"
         ],
         "title": "VoidInvoice"
+      },
+      "WebsiteOrder": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "tenant_name": {
+            "type": "string",
+            "title": "Tenant Name"
+          },
+          "product": {
+            "type": "string",
+            "enum": [
+              "landing_only",
+              "landing_with_system"
+            ],
+            "title": "Product"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "briefing",
+              "received",
+              "building",
+              "review",
+              "live"
+            ],
+            "title": "Stage"
+          },
+          "brief": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Brief"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "setup_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Price",
+            "description": "Minor units"
+          },
+          "monthly_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Price",
+            "description": "Minor units"
+          },
+          "site_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Url"
+          },
+          "internal_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Internal Notes"
+          },
+          "customer_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Message"
+          },
+          "change_request": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Request",
+            "description": "What the business asked to change"
+          },
+          "contact_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "contact_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Name"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "live_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "prompt": {
+            "type": "string",
+            "title": "Prompt",
+            "description": "Ready-made prompt for Claude Code, built from the brief"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tenant_id",
+          "tenant_name",
+          "product",
+          "stage",
+          "brief",
+          "currency",
+          "setup_price",
+          "monthly_price",
+          "site_url",
+          "internal_notes",
+          "customer_message",
+          "change_request",
+          "contact_email",
+          "contact_name",
+          "submitted_at",
+          "approved_at",
+          "live_at",
+          "updated_at",
+          "prompt"
+        ],
+        "title": "WebsiteOrder"
+      },
+      "WebsiteOrderUpdate": {
+        "properties": {
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "briefing",
+                  "received",
+                  "building",
+                  "review",
+                  "live"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "site_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Url",
+            "description": "'' clears it"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message",
+            "description": "To the business"
+          }
+        },
+        "type": "object",
+        "title": "WebsiteOrderUpdate"
       },
       "WeekCopied": {
         "properties": {

@@ -112,6 +112,7 @@ BOUNDED = {
     "/social/accounts": "connected accounts",
     "/social/audience": "one row per network",
     "/platform/staff": "the MyBiz team",
+    "/platform/website-orders": "one order per business, capped at 300 in SQL",
     "/platform/usage": "one row per day, at most 366",
     "/platform/funnel": "one row per sign-up step, nine",
     "/platform/activity": "one row per day, at most 90",

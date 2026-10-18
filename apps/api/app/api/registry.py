@@ -85,6 +85,7 @@ from app.api import (
     time_off_requests,
     tours,
     webhooks,
+    website_orders,
     welcome,
     whatsapp_ai,
 )
@@ -136,6 +137,8 @@ ROUTERS: list[APIRouter] = [
     migration_notice.router,
     whatsapp_ai.router,
     leads.public_router,
+    website_orders.router,
+    website_orders.public_router,
     services.router,
     legal.router,
     location_groups.router,
