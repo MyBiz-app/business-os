@@ -29,6 +29,8 @@ const KNOWN_ERRORS = [
   "session_cancelled",
   "not_found",
   "no_valid_plan",
+  "period_quota_reached",
+  "no_show_limit",
   "health_declaration_required",
   "health_declaration_review",
   "dependent_required",

@@ -9,6 +9,7 @@ import { useTranslations } from "use-intl";
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { ApiError, apiClient, assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { brandPalette } from "@business-os/app-kit/lib/brand";
+import { CancellationPolicyCard } from "@/components/cancellation-policy-card";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
@@ -34,6 +35,8 @@ export default function Join() {
   const [lastName, setLastName] = useState(known?.last_name ?? "");
   // Marketing messages are opt-in: off until the person ticks it.
   const [marketing, setMarketing] = useState(false);
+  // Set once joined: the next step shows the business's cancellation rules before the home screen.
+  const [joinedId, setJoinedId] = useState<string | null>(null);
   const palette = brandPalette(basePalette, profile?.primary_color);
 
   const lookUp = async (value: string) => {
@@ -70,7 +73,8 @@ export default function Join() {
       // A failure here must not undo the join; the person can still choose on their profile.
       if (marketing) await apiClient().PUT("/me/marketing-consent", { body: { consent: true, source: "app_join" } }).catch(() => undefined);
       await refresh();
-      router.replace("/home");
+      setJoinedId(joined.id);
+      setBusy(false);
     } catch {
       setError(t("generic"));
       setBusy(false);
@@ -81,6 +85,17 @@ export default function Join() {
   // A join link opened before signing in: sign in first, then come back with the code.
   if (!loading && !session) {
     return <Redirect href={params.code ? { pathname: "/sign-in", params: { code: normalize(params.code) } } : "/sign-in"} />;
+  }
+
+  if (joinedId) {
+    return (
+      <Screen palette={palette}>
+        <Heading palette={palette}>{t("joinedTitle", { name: profile?.name ?? "" })}</Heading>
+        <Text style={[styles.muted, { color: palette.muted }]}>{t("joinedBody")}</Text>
+        <CancellationPolicyCard palette={palette} tenantId={joinedId} />
+        <Button label={t("toHome")} palette={palette} onPress={() => router.replace("/home")} />
+      </Screen>
+    );
   }
 
   return (

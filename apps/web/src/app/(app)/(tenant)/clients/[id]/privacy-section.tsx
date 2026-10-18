@@ -7,6 +7,7 @@ import { CheckboxField } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
 
 import { eraseClient, type EraseState } from "./privacy-actions";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 /** Privacy requests (owners): download the client's data, or erase their personal details. */
 export function PrivacySection({ clientId, name }: { clientId: string; name: string }) {
@@ -30,9 +31,8 @@ export function PrivacySection({ clientId, name }: { clientId: string; name: str
           {t("export")}
         </a>
       </div>
-      <details className="border-t border-border pt-4">
-        <summary className="cursor-pointer font-semibold text-danger">{t("erase")}</summary>
-        <form action={action} className="mt-3 flex flex-col gap-3">
+      <CollapsibleSection variant="inline" className="border-t border-border pt-4" triggerClassName="font-semibold text-danger" title={t("erase")}>
+        <form action={action} className="flex flex-col gap-3">
           <p className="text-sm">{t("eraseExplain")}</p>
           <FormError message={state.error && t(`errors.${state.error}`)} />
           <CheckboxField label={t("eraseConfirm", { name })} name="confirm" />
@@ -47,7 +47,7 @@ export function PrivacySection({ clientId, name }: { clientId: string; name: str
             </button>
           </div>
         </form>
-      </details>
+      </CollapsibleSection>
     </section>
   );
 }

@@ -301,7 +301,9 @@ class BreakdownRow:
         return 100.0 * self.no_shows / expected if expected else None
 
 
-def breakdown(db: Session, dimension: Dimension, start: date, end: date) -> list[BreakdownRow]:
+def breakdown(
+    db: Session, dimension: Dimension, start: date, end: date, exclude_staff: bool = False
+) -> list[BreakdownRow]:
     key_sql, label_sql = _DIMENSION_SQL[dimension]
     rows = db.execute(
         text(f"""{PERIOD}
@@ -319,13 +321,14 @@ def breakdown(db: Session, dimension: Dimension, start: date, end: date) -> list
                        count(*) FILTER (WHERE b.status = 'checked_in') AS attended,
                        count(*) FILTER (WHERE b.status = 'no_show') AS no_shows
                 FROM app.bookings b WHERE b.session_id = s.id
+                  AND {_not_staff("b.client_id")}
             ) bk
             WHERE s.status = 'scheduled' AND s.starts_at >= period.from_at
               AND s.starts_at < least(period.to_at, now()) AND app.in_branch(s.location_id)
             GROUP BY 1, 2
             ORDER BY sum(bk.attended) DESC, 2
         """),
-        {"start": start, "end": end},
+        {"start": start, "end": end, "exclude_staff": exclude_staff},
     ).all()
     return [
         BreakdownRow(
@@ -350,11 +353,13 @@ class MemberAtRisk:
     plan_ends_on: date | None
 
 
-def members_at_risk(db: Session, days: int, limit: int = 100) -> list[MemberAtRisk]:
+def members_at_risk(
+    db: Session, days: int, limit: int = 100, exclude_staff: bool = False
+) -> list[MemberAtRisk]:
     """Retention list: members with a valid plan and no check-in in `days` (inactive), and
     members whose last valid plan ends within `days` with nothing bought after it."""
     rows = db.execute(
-        text("""
+        text(f"""
             WITH t AS (
                 SELECT time_zone, (now() AT TIME ZONE time_zone)::date AS today
                 FROM app.tenants WHERE id = app.current_tenant_id()
@@ -387,6 +392,7 @@ def members_at_risk(db: Session, days: int, limit: int = 100) -> list[MemberAtRi
                 WHERE p.holds_valid AND c.erased_at IS NULL
                   -- clients without a home branch belong to every branch
                   AND (c.home_location_id IS NULL OR app.in_branch(c.home_location_id))
+                  AND {_not_staff("c.id")}
             )
             SELECT m.id::text AS client_id, m.name,
                    CASE WHEN m.last_visit IS NULL
@@ -400,6 +406,6 @@ def members_at_risk(db: Session, days: int, limit: int = 100) -> list[MemberAtRi
             ORDER BY reason, m.last_visit NULLS FIRST, m.plan_ends_on
             LIMIT :limit
         """),
-        {"days": days, "limit": limit},
+        {"days": days, "limit": limit, "exclude_staff": exclude_staff},
     ).mappings()
     return [MemberAtRisk(**row) for row in rows]

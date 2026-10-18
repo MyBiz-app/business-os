@@ -10,7 +10,7 @@ import { type NavChild, type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
-import { isSolo, SOLO_MAX_UPGRADES } from "@/lib/solo";
+import { isSolo, SOLO_MAX_UPGRADES, visibleTopics } from "@/lib/solo";
 import { canManageSettings, canManageTeam, canReadPayroll, canUseAssistant } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
 import { getBranches, getTenant, hasBookableRooms } from "@/lib/tenant";
@@ -106,8 +106,7 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     ...(canReadPayroll(tenant) || allowed("payroll.propose") ? [{ href: "/team/bonuses", label: sub("bonuses") }] : []),
     { href: "/team/roles", label: sub("roles") },
   ];
-  const settingsChildren: NavChild[] = topicsFor(tenant.role)
-    .filter(({ key }) => !(solo && key === "audit"))
+  const settingsChildren: NavChild[] = visibleTopics(topicsFor(tenant.role), solo)
     .map(({ key, href }) => ({ href, label: t(`settings.nav.items.${key}` as "settings.nav.items.business") }));
   if (!solo && canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team", group: g("business"), children: teamChildren });
   if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings", group: g("business"), children: settingsChildren });

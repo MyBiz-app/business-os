@@ -19,6 +19,7 @@ import {
   scheduleBroadcast,
   sendTest,
 } from "./actions";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Kind = BroadcastBody["kind"];
 type Channel = BroadcastBody["channels"][number];
@@ -154,9 +155,8 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
           {t("audienceTitle")}
         </h2>
         <Checks legend={t("audienceTitle")} items={GROUPS.map((g) => ({ value: g, label: t(`groups.${g}`) }))} selected={audience.groups} onChange={(groups) => update({ groups })} />
-        <details className="rounded-xl border border-border p-3" open={Boolean(audience.status || audience.verticals.length || audience.locales.length || audience.modules.length || audience.business_ids.length)}>
-          <summary className="cursor-pointer text-sm font-medium">{t("filters.title")}</summary>
-          <div className="mt-3 flex flex-col gap-4">
+        <CollapsibleSection variant="inline" className="rounded-xl border border-border p-3" defaultOpen={Boolean(audience.status || audience.verticals.length || audience.locales.length || audience.modules.length || audience.business_ids.length)} triggerClassName="font-medium text-primary-ink" title={t("filters.title")}>
+          <div className="flex flex-col gap-4">
             <p className="text-xs text-muted">{t("filters.hint")}</p>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="b-status" className="text-sm font-medium">
@@ -173,7 +173,7 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
             <Checks legend={t("filters.modules")} items={modules.map((m) => ({ value: m.value, label: m.label }))} selected={audience.modules} onChange={(next) => update({ modules: next })} />
             <Checks legend={t("filters.businesses")} items={businesses.map((b) => ({ value: b.value, label: b.label }))} selected={audience.business_ids} onChange={(next) => update({ business_ids: next })} />
           </div>
-        </details>
+        </CollapsibleSection>
         <div aria-live="polite" className="rounded-xl bg-primary/10 px-4 py-3 text-sm">
           <p className="font-semibold">
             {t("preview.title")}: {shown ? t("preview.total", { count: shown.total }) : "..."}

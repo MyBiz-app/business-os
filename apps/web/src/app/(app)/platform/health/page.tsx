@@ -44,7 +44,7 @@ export default async function PlatformHealthPage() {
   ];
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <PageHeader titleId="health-heading" title={t("title")} description={t("subtitle")} />
 
       <section aria-labelledby="health-queues" className="flex flex-col gap-4">

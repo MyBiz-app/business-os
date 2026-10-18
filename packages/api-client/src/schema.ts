@@ -10846,6 +10846,11 @@ export interface components {
              * @description The branch's share of the latest payroll month's gross pay (needs payroll access; people who did not clock in are not counted)
              */
             staff_cost_minor: number | null;
+            /**
+             * Staff Count
+             * @description Team members assigned to the branch or based there
+             */
+            staff_count: number;
         };
         /** BranchInsights */
         BranchInsights: {
@@ -38651,6 +38656,8 @@ export interface operations {
             query: {
                 start: string;
                 end: string;
+                /** @description Leave out clients who are also team members */
+                exclude_staff?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -38688,6 +38695,8 @@ export interface operations {
         parameters: {
             query?: {
                 days?: number;
+                /** @description Leave out clients who are also team members */
+                exclude_staff?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -38729,6 +38738,8 @@ export interface operations {
                 keys?: ("revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held")[] | null;
                 /** @description Only these branches (within the person's own) */
                 location_id?: string[] | null;
+                /** @description Leave out clients who are also team members */
+                exclude_staff?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;

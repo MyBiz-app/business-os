@@ -11,6 +11,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 import { Pill } from "@/components/pill";
 
 import { updateWebsiteOrder } from "./actions";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Order = components["schemas"]["WebsiteOrder"];
 
@@ -51,9 +52,8 @@ export function OrderCard({ order, price }: { order: Order; price: string }) {
       )}
 
       {submitted && (
-        <details className="rounded-xl border border-border bg-surface p-3">
-          <summary className="cursor-pointer text-sm font-medium">{t("prompt")}</summary>
-          <div className="mt-3 flex flex-wrap gap-2">
+        <CollapsibleSection variant="inline" className="rounded-xl border border-border bg-surface p-3" triggerClassName="font-medium text-primary-ink" title={t("prompt")}>
+          <div className="flex flex-wrap gap-2">
             <button type="button" onClick={copy} className="btn-plain btn-secondary inline-flex items-center gap-2 px-3 py-2 text-sm">
               {copied ? <Check aria-hidden="true" className="size-4" /> : <Copy aria-hidden="true" className="size-4" />}
               {copied ? t("copied") : t("copy")}
@@ -64,7 +64,7 @@ export function OrderCard({ order, price }: { order: Order; price: string }) {
             </a>
           </div>
           <pre dir="ltr" className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-lg bg-background p-3 text-xs" tabIndex={0}>{order.prompt}</pre>
-        </details>
+        </CollapsibleSection>
       )}
 
       {submitted ? (

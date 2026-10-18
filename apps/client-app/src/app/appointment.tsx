@@ -29,6 +29,8 @@ const KNOWN = [
   "slot_taken",
   "outside_hours",
   "no_valid_plan",
+  "period_quota_reached",
+  "no_show_limit",
   "health_declaration_required",
   "health_declaration_review",
   "dependent_required",

@@ -10,15 +10,19 @@ import { getBranches, getTenant } from "@/lib/tenant";
 
 import { revokeInvitation } from "./actions";
 import { InviteForm, MemberRow } from "./team-forms";
+import { StaffCardWindow } from "./staff-card-window";
+import { openedId, withOpen } from "@/lib/open-window";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
-export default async function TeamPage() {
+export default async function TeamPage({ searchParams }: PageProps<"/team">) {
+  const query = await searchParams;
   const t = await getTranslations();
   const locale = await getLocale();
   const { me, tenant, api, scope } = await getTenant();
   const branches = await getBranches();
   if (!canManageTeam(tenant)) redirect("/dashboard");
+  const openedMember = openedId(query);
 
   const [team, roles] = await Promise.all([
     api.GET("/staff", { params: scope }).then(unwrap),
@@ -94,6 +98,7 @@ export default async function TeamPage() {
               title={member.job_title ?? null}
               allPermissions={roles.permissions}
               permissions={member.permissions}
+              openHref={withOpen("/team", query, member.user_id)}
             />
           ))}
         </ul>
@@ -135,6 +140,7 @@ export default async function TeamPage() {
           </ul>
         )}
       </section>
+      {openedMember && <StaffCardWindow id={openedMember} tab={query.tab} closeHref={withOpen("/team", {}, null)} tabBase={withOpen("/team", {}, openedMember)} />}
     </Container>
   );
 }

@@ -12,6 +12,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 import { industryTexts } from "@/lib/verticals";
 
 import { type InboxState, saveNotes, updateRequest } from "./actions";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Request = components["schemas"]["ContactRequest"];
 
@@ -117,9 +118,8 @@ export function RequestCard({ request, when }: { request: Request; when: string 
       </div>
 
       {/* Internal notes stay folded until someone needs them (open when there are some). */}
-      <details open={Boolean(request.notes) || state.saved} className="group">
-        <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("notes")}</summary>
-        <form action={action} className="mt-2 flex flex-col gap-2">
+      <CollapsibleSection variant="inline" className="group" defaultOpen={Boolean(request.notes) || state.saved} triggerClassName="font-medium text-primary-ink" title={t("notes")}>
+        <form action={action} className="flex flex-col gap-2">
           <FormNotice message={state.saved ? tCommon("saved") : undefined} />
           <label className="flex flex-col gap-1.5 text-sm">
             <span className="sr-only">{t("notes")}</span>
@@ -129,7 +129,7 @@ export function RequestCard({ request, when }: { request: Request; when: string 
             <SubmitButton>{t("saveNotes")}</SubmitButton>
           </div>
         </form>
-      </details>
+      </CollapsibleSection>
     </li>
   );
 }

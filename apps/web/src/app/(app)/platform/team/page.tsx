@@ -29,7 +29,7 @@ export default async function PlatformTeamPage() {
     email !== staff.email && level !== "primary_owner" && (isOwner || level === "employee");
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("subtitle")} />
       <p className="flex items-start gap-2 rounded-xl bg-primary/10 px-4 py-3 text-sm">
         <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary-ink" />

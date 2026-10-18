@@ -38,7 +38,7 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
       .join(" · ");
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader titleId="audit-heading" title={t("audit.title")} description={t("audit.subtitle")} />
       {entries.length === 0 ? (
         <EmptyState variant="list">{t("audit.empty")}</EmptyState>

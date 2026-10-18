@@ -7,6 +7,7 @@ import { canWriteClients } from "@/lib/permissions";
 import type { getTenant } from "@/lib/tenant";
 
 import { reviewDeclaration } from "./health-actions";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type HealthState = components["schemas"]["ClientHealth"]["state"];
 
@@ -74,9 +75,8 @@ export async function HealthSection({ clientId, context }: Props) {
               {t("reviewNote", { note: latest.review_note })}
             </p>
           )}
-          <details className="text-sm">
-            <summary className="cursor-pointer text-primary-ink">{t("showAll")}</summary>
-            <ul className="mt-2 flex flex-col gap-1" dir="auto">
+          <CollapsibleSection variant="inline" className="text-sm" title={t("showAll")}>
+            <ul className="flex flex-col gap-1" dir="auto">
               {latest.answers.map((answer) => (
                 <li key={answer.id} className="flex justify-between gap-4">
                   <span>{answer.question}</span>
@@ -87,7 +87,7 @@ export async function HealthSection({ clientId, context }: Props) {
             <p className="mt-2 text-muted" dir="auto">
               {latest.statement}
             </p>
-          </details>
+          </CollapsibleSection>
         </div>
       )}
 
