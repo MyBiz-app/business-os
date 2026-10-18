@@ -229,3 +229,23 @@ def test_deposit_through_a_payments_provider(client: TestClient, studio: dict) -
     assert done.status_code == 204, done.text
     after = client.get(link).json()
     assert after["paid"] == 315_000 and after["deposit_due"] == 0
+
+
+def test_quotes_summary_counts_every_quote_and_list_pages(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    dana = new_client(client, headers, "Dana")
+    first = new_quote(client, headers, dana)
+    new_quote(client, headers, dana, title="Second")
+    new_quote(client, headers, dana, title="Third")
+    assert client.post(f"/quotes/{first['id']}/send", headers=headers).status_code == 200
+
+    summary = client.get("/quotes/summary", headers=headers)
+    assert summary.status_code == 200, summary.text
+    by_status = {row["status"]: row for row in summary.json()}
+    assert by_status["draft"]["count"] == 2 and by_status["sent"]["count"] == 1
+    assert by_status["sent"]["total"] == 1_050_000 and by_status["sent"]["currency"] == "ILS"
+
+    page = client.get("/quotes?limit=2&offset=1", headers=headers).json()
+    assert [row["number"] for row in page] == [1002, 1001]
+    drafts = client.get("/quotes?status=draft", headers=headers).json()
+    assert len(drafts) == 2
