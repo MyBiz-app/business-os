@@ -9,6 +9,8 @@ import { getTenant } from "@/lib/tenant";
 export type SessionFormState = {
   error?: "invalid_reference" | "no_occurrences" | "invalid" | "generic";
   saved?: boolean;
+  /** Where a window over the schedule goes once the form is saved. */
+  next?: string;
 };
 
 function toState(error: unknown): SessionFormState {
@@ -61,6 +63,8 @@ export async function createSessions(_state: SessionFormState, formData: FormDat
     return toState(error);
   }
   revalidatePath("/schedule");
+  // In a window over the schedule the form closes itself, shows the confirmation and opens the week.
+  if (formData.get("_modal")) return { saved: true, next: `/schedule?week=${date}` };
   redirect(`/schedule?week=${date}`);
 }
 
