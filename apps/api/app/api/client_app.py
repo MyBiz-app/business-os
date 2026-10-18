@@ -106,6 +106,10 @@ class ClientLocation(BaseModel):
     website_url: str | None = Field(
         default=None, description="The branch's website, else the business's; none if neither set"
     )
+    latitude: float | None = Field(
+        default=None, description="The branch's point on the map, for navigation links"
+    )
+    longitude: float | None = None
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
@@ -238,7 +242,7 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
     """The business's branches with their addresses (the home screen's business details)."""
     rows = context.session.execute(
         text("""
-            SELECT l.id, l.name, l.address, l.kind,
+            SELECT l.id, l.name, l.address, l.kind, l.latitude, l.longitude,
                    coalesce(l.website_url, (SELECT website_url FROM app.tenants
                                             WHERE id = l.tenant_id)) AS website_url,
                    coalesce(

@@ -10508,6 +10508,13 @@ export interface components {
              * @description The branch's website, else the business's; none if neither set
              */
             website_url?: string | null;
+            /**
+             * Latitude
+             * @description The branch's point on the map, for navigation links
+             */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
         };
         /** ClientNote */
         ClientNote: {
