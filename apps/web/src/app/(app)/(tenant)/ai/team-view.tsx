@@ -77,6 +77,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   const [error, setError] = useState<ChatError | null>(null);
   // The chat whose last exchange the next new chat carries over (switching agent or branches).
   const carry = useRef<string | null>(null);
+  const tourHelp = useRef<HTMLButtonElement>(null);
 
   // Structure editing: a working copy of the lines, teams and places, saved in one go.
   const saved = useMemo(() => draftOf(team.agents, team.teams ?? []), [team]);
@@ -110,6 +111,8 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   function endTour() {
     setTouring(false);
     void markAiTourSeen();
+    // The first guide opens by itself, so there is no opener to return to: land on the help button.
+    window.setTimeout(() => tourHelp.current?.focus(), 0);
   }
 
   const agent = team.agents.find((a) => a.key === selected) ?? null;
@@ -264,7 +267,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         description={t("subtitle")}
         actions={
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => setTouring(true)} disabled={structuring} className="btn-secondary inline-flex h-11 items-center gap-2 px-4 text-sm">
+            <button ref={tourHelp} type="button" onClick={() => setTouring(true)} disabled={structuring} className="btn-secondary inline-flex h-11 items-center gap-2 px-4 text-sm">
               <CircleHelp aria-hidden="true" className="size-4" />
               {t("tour.help")}
             </button>
