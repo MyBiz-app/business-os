@@ -12,7 +12,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { Card, elevation, styles } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { lastVisit, nextBooking, type HomeCard } from "@business-os/app-kit/lib/client-home";
-import { googleMapsLink } from "@business-os/app-kit/lib/maps";
+import { googleMapsLink, wazeLink } from "@business-os/app-kit/lib/maps";
 import { bookingModesFor, termsFor } from "@business-os/app-kit/lib/vertical";
 import { BookingActions } from "@/components/booking-actions";
 import { addressOf, type Location } from "@/lib/use-locations";
@@ -323,7 +323,10 @@ function BusinessInfo({ data }: { data: HomeData }) {
               <Text style={[local.lineMeta, { color: palette.muted }]}>{location.address ?? t("noAddress")}</Text>
             </View>
             {location.address ? (
-              <ActionPill label={t("navigate")} icon="navigate-outline" palette={palette} onPress={() => void Linking.openURL(googleMapsLink(location.address!))} />
+              <>
+                <ActionPill label={t("navigateWaze")} icon="navigate-outline" palette={palette} onPress={() => void Linking.openURL(wazeLink(location.address!, location))} />
+                <ActionPill label={t("navigateGoogle")} icon="map-outline" palette={palette} onPress={() => void Linking.openURL(googleMapsLink(location.address!, location))} />
+              </>
             ) : null}
             {location.website_url ? (
               <ActionPill label={t("website")} icon="globe-outline" palette={palette} onPress={() => void Linking.openURL(location.website_url!)} />

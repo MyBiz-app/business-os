@@ -1044,6 +1044,44 @@
       "action": "Fill in the address"
     }
   },
+  "branchMap": {
+    "title": "Branches map",
+    "subtitle": "Where your branches are, sized by the numbers of the last 30 days. Pick one to fly to its street.",
+    "mapLabel": "Map of the branches",
+    "failed": "The map could not be loaded. Try again in a moment.",
+    "colorByLabel": "Color and size by",
+    "colorBy": {
+      "revenue": "Revenue",
+      "clients": "Clients",
+      "occupancy": "Occupancy"
+    },
+    "hover": {
+      "clients": "Active clients: {value}",
+      "revenue": "Revenue: {value}",
+      "occupancy": "Occupancy: {value}"
+    },
+    "panel": {
+      "revenue": "Revenue",
+      "clients": "Active clients",
+      "bookings": "Sessions held",
+      "occupancy": "Average occupancy",
+      "trend": "Revenue per day, last 30 days",
+      "report": "Branch report",
+      "schedule": "Branch schedule"
+    },
+    "close": "Close",
+    "openFull": "Open the full map",
+    "empty": "No branch has a point on the map yet. Add the address of a branch and it appears here.",
+    "emptyLink": "To the branches",
+    "pin": {
+      "label": "The branch's point on the map",
+      "none": "The point on the map appears after you save an address.",
+      "hint": "Drag the pin if the point is not exactly right, then save.",
+      "moved": "The new point is saved with the branch.",
+      "readOnly": "The branch's point on the map.",
+      "failed": "The map could not be loaded."
+    }
+  },
   "locations": {
     "manager": {
       "title": "Branch manager",
@@ -1733,6 +1771,8 @@
       "nothingBooked": "Nothing booked yet.",
       "bookNow": "Book now",
       "navigate": "Navigate",
+      "navigateWaze": "Navigate with Waze",
+      "navigateGoogle": "Navigate with Google Maps",
       "website": "Website",
       "addToCalendar": "Add to calendar",
       "cancelFailed": "The cancellation didn't go through. Try again.",
@@ -5883,6 +5923,7 @@
       "card": "Card number",
       "expiry": "Expiry (MM/YY)",
       "cvc": "CVC",
+      "branchAddress": "Main branch address",
       "holder": "Name on card",
       "simulated": "Test mode: the card is filled in for you and nothing is charged.",
       "secure": "Secure, encrypted payment",
