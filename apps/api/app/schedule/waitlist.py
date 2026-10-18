@@ -1,4 +1,4 @@
-"""The smart waitlist (round 7, R30; migration 0132).
+"""The smart waitlist (round 7, R30; migration 0134).
 
 The database decides who is waiting for a spot that opens (`app.waitlist_on_freed`) and
 cleans up when it is taken (`app.waitlist_on_booked`): they are SECURITY DEFINER functions

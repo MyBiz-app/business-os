@@ -3,15 +3,17 @@ and MyBiz's own team (migration 0037). Each part needs a console permission; own
 them all. The database functions enforce the same rules."""
 
 import datetime as dt
+import io
 import json
 import logging
 import os
+import zipfile
 from collections.abc import Callable
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
@@ -65,6 +67,7 @@ AdminDep = Annotated[Session, Depends(require_platform(PlatformPermission.BUSINE
 UsageDep = Annotated[Session, Depends(require_platform(PlatformPermission.USAGE_READ))]
 InboxDep = Annotated[Session, Depends(require_platform(PlatformPermission.INBOX_MANAGE))]
 BillingDep = Annotated[Session, Depends(require_platform(PlatformPermission.BILLING_MANAGE))]
+ActDep = Annotated[Session, Depends(require_platform(PlatformPermission.BUSINESSES_ACT))]
 TeamDep = Annotated[Session, Depends(require_platform(PlatformPermission.STAFF_MANAGE))]
 
 
@@ -599,3 +602,113 @@ def set_dunning(body: DunningSettings, db: BillingDep) -> DunningSettings:
         },
     )
     return get_dunning(db)
+
+
+# --- Website orders (MyBiz Sites, round 7 R24) -------------------------------------------------
+
+WebsiteStage = Literal["briefing", "received", "building", "review", "live"]
+
+
+class WebsiteOrder(BaseModel):
+    id: UUID
+    tenant_id: UUID
+    tenant_name: str
+    product: Literal["landing_only", "landing_with_system"]
+    stage: WebsiteStage
+    brief: dict[str, Any]
+    currency: str
+    setup_price: int | None = Field(description="Minor units")
+    monthly_price: int | None = Field(description="Minor units")
+    site_url: str | None
+    internal_notes: str | None
+    customer_message: str | None
+    change_request: str | None = Field(description="What the business asked to change")
+    contact_email: str | None
+    contact_name: str | None
+    submitted_at: dt.datetime | None
+    approved_at: dt.datetime | None
+    live_at: dt.datetime | None
+    updated_at: dt.datetime
+    prompt: str = Field(description="Ready-made prompt for Claude Code, built from the brief")
+
+
+class WebsiteOrderUpdate(BaseModel):
+    stage: WebsiteStage | None = None
+    site_url: str | None = Field(default=None, max_length=300, description="'' clears it")
+    notes: str | None = Field(default=None, max_length=4000)
+    message: str | None = Field(default=None, max_length=2000, description="To the business")
+
+
+def _website_orders(db: Session) -> list[WebsiteOrder]:
+    from app.websites.prompt import build_prompt
+
+    api_url = get_settings().api_url
+    orders = []
+    for row in db.execute(text("SELECT * FROM app.platform_website_orders()")).mappings():
+        data = dict(row)
+        snapshot = data.pop("snapshot")
+        key = data.pop("tracking_key")
+        prompt = build_prompt(
+            brief=data["brief"],
+            snapshot=snapshot,
+            tracking_key=key,
+            api_url=api_url,
+            with_system=data["product"] == "landing_with_system",
+        )
+        orders.append(
+            WebsiteOrder.model_validate({**data, "currency": data["currency"], "prompt": prompt})
+        )
+    return orders
+
+
+@router.get("/website-orders")
+def website_orders(db: ActDep) -> list[WebsiteOrder]:
+    """The board: every website order that was started, with its brief and the build prompt."""
+    return _website_orders(db)
+
+
+@router.patch("/website-orders/{order_id}")
+def update_website_order(
+    order_id: UUID, body: WebsiteOrderUpdate, db: ActDep
+) -> list[WebsiteOrder]:
+    """Moves an order along the board, sets the site address (it becomes the business's website
+    when the site goes live), internal notes and the message the business sees."""
+    run_rule(
+        db,
+        "SELECT app.platform_website_order_update(:id, :stage, :site_url, :notes, :message)",
+        {
+            "id": order_id,
+            "stage": body.stage,
+            "site_url": body.site_url,
+            "notes": body.notes,
+            "message": body.message,
+        },
+    )
+    return _website_orders(db)
+
+
+@router.get("/website-orders/{order_id}/files.zip")
+def website_order_files(order_id: UUID, db: ActDep) -> Response:
+    """The images and logo the business uploaded, as one ZIP."""
+    from app.files import read_file
+
+    rows = db.execute(
+        text("SELECT * FROM app.platform_website_order_files(:id)"), {"id": order_id}
+    ).mappings()
+    buffer = io.BytesIO()
+    names: set[str] = set()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for row in rows:
+            name = row["name"].replace("/", "_").replace("\\", "_")
+            while name in names:
+                name = f"{len(names)}_{name}"
+            names.add(name)
+            archive.writestr(name, read_file(db, dict(row)))
+    return Response(
+        content=buffer.getvalue(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": 'attachment; filename="website-files.zip"',
+            "Cache-Control": "private, no-store",
+        },
+    )

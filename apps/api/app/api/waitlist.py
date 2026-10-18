@@ -1,4 +1,4 @@
-"""The smart waitlist (round 7, R30; migration 0132).
+"""The smart waitlist (round 7, R30; migration 0134).
 
 A client waits for a given time, a range of hours or a whole day of a class, an appointment or a
 court. When a spot opens, the business's mode decides what happens (see app/schedule/waitlist.py):

@@ -14,8 +14,8 @@ Expand step, nothing is dropped or retyped, so the previous release keeps workin
 - Two SECURITY DEFINER functions find the waiting clients and tell them (the client who cancels
   cannot read other clients' rows), like `promote_waitlist` always did.
 
-Revision ID: 0132
-Revises: 0131
+Revision ID: 0134
+Revises: 0133
 Create Date: 2026-10-18
 """
 
@@ -23,8 +23,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0132"
-down_revision: str | None = "0131"
+revision: str = "0134"
+down_revision: str | None = "0133"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

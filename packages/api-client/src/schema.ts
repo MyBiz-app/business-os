@@ -102,6 +102,87 @@ export interface paths {
         patch: operations["update_tenant"];
         trace?: never;
     };
+    "/mcp-oauth/clients/{client_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Info
+         * @description What the approval screen shows the signed-in person about the app asking (its self-chosen
+         *     name: untrusted text, shown with the address it returns to).
+         */
+        get: operations["mcp_client_info"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mcp-oauth/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve
+         * @description The signed-in person lets the app read the business they are working in.
+         */
+        post: operations["mcp_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mcp-connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Connections
+         * @description The AI apps the signed-in person connected to this business.
+         */
+        get: operations["list_mcp_connections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mcp-connections/{connection_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke Connection
+         * @description Cuts an app off at once: its tokens stop working.
+         */
+        delete: operations["revoke_mcp_connection"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/tasks": {
         parameters: {
             query?: never;
@@ -2894,6 +2975,91 @@ export interface paths {
          * @description Someone interested leaves their details; the business sees them as a new lead.
          */
         post: operations["submit_inquiry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/website/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Order
+         * @description The business's website order (none yet), the price list and what the brief still lacks.
+         */
+        get: operations["get_order"];
+        /**
+         * Save Brief
+         * @description Saves the brief as a draft; the first save opens the order. Locked once MyBiz builds.
+         */
+        put: operations["save_brief"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/website/order/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Order
+         * @description Sends the brief to MyBiz (the order moves to "received").
+         */
+        post: operations["submit_order"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/website/order/respond": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Respond
+         * @description The business answers a site that waits for its review: approve it, or ask for changes
+         *     (the order goes back to "building" with the request).
+         */
+        post: operations["respond"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/website-visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Count Visit
+         * @description The finished site reports a visit: a count per day and source, nothing personal.
+         */
+        post: operations["count_visit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7213,6 +7379,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/website-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Website Orders
+         * @description The board: every website order that was started, with its brief and the build prompt.
+         */
+        get: operations["website_orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/website-orders/{order_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Website Order
+         * @description Moves an order along the board, sets the site address (it becomes the business's website
+         *     when the site goes live), internal notes and the message the business sees.
+         */
+        patch: operations["update_website_order"];
+        trace?: never;
+    };
+    "/platform/website-orders/{order_id}/files.zip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Website Order Files
+         * @description The images and logo the business uploaded, as one ZIP.
+         */
+        get: operations["website_order_files"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/ai/costs": {
         parameters: {
             query?: never;
@@ -9283,6 +9510,28 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** Approval */
+        Approval: {
+            /** Client Id */
+            client_id: string;
+            /** Redirect Uri */
+            redirect_uri: string;
+            /** Code Challenge */
+            code_challenge: string;
+            /**
+             * State
+             * @default
+             */
+            state: string;
+        };
+        /** ApprovalResult */
+        ApprovalResult: {
+            /**
+             * Redirect To
+             * @description Send the browser here: back to the app, with the code
+             */
+            redirect_to: string;
+        };
         /** AttentionItem */
         AttentionItem: {
             /**
@@ -10007,6 +10256,67 @@ export interface components {
              * @description Percent of expected clients who didn't come
              */
             no_show_rate: number | null;
+        };
+        /**
+         * Brief
+         * @description Eight steps, in the wizard's order.
+         */
+        Brief: {
+            /** Goals */
+            goals?: ("leads" | "bookings" | "showcase" | "sell")[];
+            /** Main Action */
+            main_action?: string | null;
+            /** Unique */
+            unique?: string | null;
+            /** Audience */
+            audience?: string | null;
+            /** Area */
+            area?: string | null;
+            /** Sections */
+            sections?: ("hero" | "services" | "gallery" | "team" | "testimonials" | "faq" | "location" | "contact" | "booking" | "whatsapp")[];
+            /**
+             * No Logo
+             * @default false
+             */
+            no_logo: boolean;
+            /** Logo File Id */
+            logo_file_id?: string | null;
+            /**
+             * Colors From Brand
+             * @default true
+             */
+            colors_from_brand: boolean;
+            /** Colors */
+            colors?: string[];
+            /** Style */
+            style?: ("clean" | "luxury" | "warm" | "vibrant") | null;
+            /** Font */
+            font?: string | null;
+            /** Motion */
+            motion?: ("none" | "subtle" | "rich") | null;
+            /** Images */
+            images?: components["schemas"]["ImageNote"][];
+            /**
+             * No Good Photos
+             * @default false
+             */
+            no_good_photos: boolean;
+            /** Inspiration */
+            inspiration?: components["schemas"]["Inspiration"][];
+            /** Copy By */
+            copy_by?: ("me" | "you") | null;
+            /** Domain */
+            domain?: ("have" | "buy" | "temporary") | null;
+            /** Domain Name */
+            domain_name?: string | null;
+            /** Languages */
+            languages?: ("he" | "en")[];
+            /** Due Date */
+            due_date?: string | null;
+        };
+        /** BriefSave */
+        BriefSave: {
+            brief: components["schemas"]["Brief"];
         };
         /** BusinessAICost */
         BusinessAICost: {
@@ -10856,6 +11166,16 @@ export interface components {
              * @description off, optional or required: whether this business asks
              */
             mode: string;
+        };
+        /** ClientInfo */
+        ClientInfo: {
+            /** Client Name */
+            client_name: string;
+            /**
+             * Redirect Host
+             * @description Where the person is sent back to after approving
+             */
+            redirect_host: string;
         };
         /**
          * ClientListItem
@@ -13093,6 +13413,16 @@ export interface components {
              */
             can_reveal: boolean;
         };
+        /** ImageNote */
+        ImageNote: {
+            /**
+             * File Id
+             * Format: uuid
+             */
+            file_id: string;
+            /** Note */
+            note?: string | null;
+        };
         /** ImportIssue */
         ImportIssue: {
             /**
@@ -13262,6 +13592,13 @@ export interface components {
             interest?: string | null;
             /** Website */
             website?: string | null;
+        };
+        /** Inspiration */
+        Inspiration: {
+            /** Url */
+            url: string;
+            /** Likes */
+            likes?: string | null;
         };
         /** Instructor */
         Instructor: {
@@ -14291,6 +14628,25 @@ export interface components {
              */
             ids?: string[] | null;
         };
+        /** McpConnection */
+        McpConnection: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Last Used At */
+            last_used_at: string | null;
+            /** Calls */
+            calls: number;
+        };
         /** Me */
         Me: {
             /**
@@ -15304,6 +15660,54 @@ export interface components {
             /** Completed At */
             completed_at: string | null;
         };
+        /** OrderOut */
+        OrderOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "briefing" | "received" | "building" | "review" | "live";
+            /**
+             * Product
+             * @enum {string}
+             */
+            product: "landing_only" | "landing_with_system";
+            brief: components["schemas"]["Brief"];
+            /** Site Url */
+            site_url: string | null;
+            /**
+             * Customer Message
+             * @description The platform team's note to the business
+             */
+            customer_message: string | null;
+            /**
+             * Change Request
+             * @description What the business asked to change
+             */
+            change_request: string | null;
+            /** Setup Price */
+            setup_price: number | null;
+            /** Monthly Price */
+            monthly_price: number | null;
+            /** Currency */
+            currency: string;
+            /** Submitted At */
+            submitted_at: string | null;
+            /** Approved At */
+            approved_at: string | null;
+            /** Live At */
+            live_at: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** OrderPage */
         OrderPage: {
             /** Items */
@@ -15315,6 +15719,27 @@ export interface components {
              * @description Pass as `after` for the next (older) page
              */
             next_cursor?: string | null;
+        };
+        /** OrderState */
+        OrderState: {
+            order: components["schemas"]["OrderOut"] | null;
+            price: components["schemas"]["Price"];
+            /**
+             * With System
+             * @description The business also uses the system
+             */
+            with_system: boolean;
+            /**
+             * Missing
+             * @description Answers the brief still needs before it can be sent
+             */
+            missing: string[];
+            /**
+             * Files Folder Id
+             * Format: uuid
+             * @description Where the wizard's images are uploaded
+             */
+            files_folder_id: string;
         };
         /** OtherIncome */
         OtherIncome: {
@@ -16123,6 +16548,26 @@ export interface components {
              */
             kind: "marketing" | "service";
             audience: components["schemas"]["Audience"];
+        };
+        /** Price */
+        Price: {
+            /**
+             * Product
+             * @enum {string}
+             */
+            product: "landing_only" | "landing_with_system";
+            /** Currency */
+            currency: string;
+            /**
+             * Setup
+             * @description One-time, minor units
+             */
+            setup: number;
+            /**
+             * Monthly
+             * @description Minor units
+             */
+            monthly: number;
         };
         /** Proactive */
         Proactive: {
@@ -17070,6 +17515,16 @@ export interface components {
             currency: string;
             /** Occupancy Percent */
             occupancy_percent: number | null;
+        };
+        /** Response */
+        Response: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "approve" | "changes";
+            /** Message */
+            message?: string | null;
         };
         /** Retainer */
         Retainer: {
@@ -19713,6 +20168,17 @@ export interface components {
              */
             method: "card" | "cash" | "transfer" | "other";
         };
+        /** Visit */
+        Visit: {
+            /** Key */
+            key: string;
+            /**
+             * Source
+             * @default other
+             * @enum {string}
+             */
+            source: "direct" | "search" | "social" | "other";
+        };
         /** VoidInvoice */
         VoidInvoice: {
             /** Reason */
@@ -19867,6 +20333,95 @@ export interface components {
              * @description The most wanted services
              */
             services: components["schemas"]["WaitlistServiceCount"][];
+        };
+        /** WebsiteOrder */
+        WebsiteOrder: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Tenant Name */
+            tenant_name: string;
+            /**
+             * Product
+             * @enum {string}
+             */
+            product: "landing_only" | "landing_with_system";
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "briefing" | "received" | "building" | "review" | "live";
+            /** Brief */
+            brief: {
+                [key: string]: unknown;
+            };
+            /** Currency */
+            currency: string;
+            /**
+             * Setup Price
+             * @description Minor units
+             */
+            setup_price: number | null;
+            /**
+             * Monthly Price
+             * @description Minor units
+             */
+            monthly_price: number | null;
+            /** Site Url */
+            site_url: string | null;
+            /** Internal Notes */
+            internal_notes: string | null;
+            /** Customer Message */
+            customer_message: string | null;
+            /**
+             * Change Request
+             * @description What the business asked to change
+             */
+            change_request: string | null;
+            /** Contact Email */
+            contact_email: string | null;
+            /** Contact Name */
+            contact_name: string | null;
+            /** Submitted At */
+            submitted_at: string | null;
+            /** Approved At */
+            approved_at: string | null;
+            /** Live At */
+            live_at: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Prompt
+             * @description Ready-made prompt for Claude Code, built from the brief
+             */
+            prompt: string;
+        };
+        /** WebsiteOrderUpdate */
+        WebsiteOrderUpdate: {
+            /** Stage */
+            stage?: ("briefing" | "received" | "building" | "review" | "live") | null;
+            /**
+             * Site Url
+             * @description '' clears it
+             */
+            site_url?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Message
+             * @description To the business
+             */
+            message?: string | null;
         };
         /** WeekCopied */
         WeekCopied: {
@@ -20601,6 +21156,142 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Tenant"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mcp_client_info: {
+        parameters: {
+            query: {
+                redirect_uri: string;
+            };
+            header?: never;
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mcp_approve: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Approval"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_mcp_connections: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["McpConnection"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_mcp_connection: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -27507,6 +28198,179 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["InquiryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_order: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_brief: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BriefSave"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_order: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    respond: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Response"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    count_visit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Visit"];
             };
         };
         responses: {
@@ -37375,6 +38239,92 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DunningSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    website_orders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebsiteOrder"][];
+                };
+            };
+        };
+    };
+    update_website_order: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebsiteOrderUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebsiteOrder"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    website_order_files: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

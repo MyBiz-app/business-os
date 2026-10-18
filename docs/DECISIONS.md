@@ -300,6 +300,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - The leaked-password check is built and off until a paid Supabase plan (`go-live-checklist.md`).
 - Staging demo browsing (2026-10-17): the demo owner `adiredri73@gmail.com` is listed in `API_MFA_DEMO_EXEMPT_EMAILS` (and `MFA_DEMO_EXEMPT_EMAILS` on the web app) so it can read the demo without a code. The API honors the list only when `API_ENVIRONMENT=staging`; production, local and test ignore it. No other account is affected.
 
+### MyBiz Sites core (2026-10-18, round 7 R24, migration 0132)
+
+- **One order per business** (`app.website_orders`), stages `briefing`, `received`, `building`, `review`, `live`. The business edits the brief until MyBiz starts building; the console cannot move an order that is still `briefing`. When an order goes `live` the site address becomes the business's website (R22).
+- **Prices are configuration** (`app/websites/pricing.py`), not catalog modules: with the system 490 setup + 29 a month, website only 790 + 49 (decision 18.12). The order records the prices it was offered. Nothing is charged before #46. They are not in `MODULES` so the public pricing page and the configurator stay as they are; R25a decides how a "website only" business is priced and billed.
+- **The build prompt is generated, not stored**: the console builds it from the brief plus a snapshot of the business (name, branches, services, join code) taken when the brief is sent, so it always matches what the owner approved.
+- **Visits** are counted per business, day and source (`direct`, `search`, `social`, `other`) by an anonymous call from the finished site, only while the order is `live`; no cookies, nothing personal.
 ### Cities, streets and branch coordinates (2026-10-18, round 7 R34, migration 0129)
 
 - Cities and streets come from the official data.gov.il lists (free), kept as a compressed snapshot in the code and loaded into shared read-only tables; yearly refresh by script. A faithful copy of the same two datasets was used to build the first snapshot because the build environment could not reach data.gov.il; the next refresh should run the script against data.gov.il itself.
@@ -307,7 +313,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - A branch's map point is looked up once per saved address through Nominatim (OpenStreetMap), never blocking the save; the pin can be placed by hand through the API (the draggable-pin screen is part of the branches map slice, R35).
 - Home addresses of people stay visible only to the person (existing row policy); a team member without a full home address sees a reminder line until they fill it in (nobody is locked out).
 
-### Smart waitlist (2026-10-18, round 7 R30, migration 0132)
+### Smart waitlist (2026-10-18, round 7 R30, migration 0134)
 
 - Four modes per kind (classes, appointments, courts or rooms): off, auto, first come, manual. A service can override the business mode.
 - **Auto** only means the class's own waitlist: the first person is promoted when a spot opens, but only when the class starts later than the configured hours (default 3, 0 to 72), so nobody is booked at the last minute. Requests for a day or a time range behave as first come, since nobody is on a class list.
@@ -316,6 +322,13 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Up to 5 active requests per client; a request expires after its day. Courts paid in the app need the client's explicit payment on claim.
 - Appointments and courts have no session to promote, so claiming creates a new one through the normal booking functions.
 - Vertical defaults: fitness and classes auto/first come, sports first come, beauty no waitlist for courts, clinic manual, other categories disabled.
+### AI connectors: Claude and ChatGPT through MCP (2026-10-18, round 7 R37a, migration 0133)
+
+- MyBiz runs its own small OAuth 2.1 server instead of Supabase's. Supabase's OAuth server for MCP could not be checked from the build environment and would tie sign-in to a beta feature; ours is a few hundred lines, needs no paid plan, and keeps a business's connections in the business's own table with row level security. Apps register themselves (public clients, no secrets, PKCE S256 required); redirect addresses must be https or local http.
+- The MCP endpoint is hand-written JSON-RPC over HTTP (initialize, ping, tools/list, tools/call; no sessions, no streaming) rather than the MCP Python library: four methods, no new dependency, and every request is authenticated and scoped by us.
+- Connectors read through the assistant's own tools, a fixed list (`MCP_READ_TOOLS`), so permissions, branches and modules behave exactly as in the app. Anything that proposes a change stays out until R37b adds actions that wait for approval in the CRM.
+- Reads run in a READ ONLY transaction and results are wrapped as untrusted data. Usage is the meter `mcp_calls` (one per call); the ceiling is 600 per business per rolling 24 hours, a setting.
+- Tokens: access 60 minutes, refresh 90 days and rotated on use, code 5 minutes; only SHA-256 hashes are stored. Connection lookups by hash are SECURITY DEFINER functions because the token endpoint knows no business yet.
 
 ## Open
 

@@ -62,6 +62,8 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # one person's AI connections in one business: at most 20 (the cap when approving)
+    "/mcp-connections": "capped",
     # the console's unpaid-invoice list: the function returns at most 500 businesses
     "/platform/billing/overdue": "capped",
     # the SQL function returns at most 5 open banners, or the latest 50
@@ -110,6 +112,7 @@ BOUNDED = {
     "/social/accounts": "connected accounts",
     "/social/audience": "one row per network",
     "/platform/staff": "the MyBiz team",
+    "/platform/website-orders": "one order per business, capped at 300 in SQL",
     "/platform/usage": "one row per day, at most 366",
     "/platform/funnel": "one row per sign-up step, nine",
     "/platform/activity": "one row per day, at most 90",

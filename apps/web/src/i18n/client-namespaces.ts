@@ -92,7 +92,8 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "tour",
     "verticals",
     "visitNotes",
-    "waitlist"
+    "waitlist",
+    "website"
   ],
   "platform": [
     "billing",
