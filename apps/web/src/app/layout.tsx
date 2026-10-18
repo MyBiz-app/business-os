@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { Suspense } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -8,6 +9,7 @@ import { clientMessages } from "@/components/scoped-messages";
 import { PaletteScript } from "@/components/palette-script";
 import { SkipLink } from "@/components/skip-link";
 import { ThemeProvider } from "@/components/theme-provider";
+import { RouteProgress } from "@/components/ui/route-progress";
 import { Toaster } from "@/components/toast/toaster";
 import { localeDirection } from "@/i18n/config";
 import { NONCE_HEADER } from "@/lib/csp";
@@ -41,6 +43,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider nonce={nonce}>
           <NextIntlClientProvider messages={messages}>
             <SkipLink />
+            <Suspense fallback={null}>
+              <RouteProgress />
+            </Suspense>
             <Toaster>{children}</Toaster>
           </NextIntlClientProvider>
         </ThemeProvider>

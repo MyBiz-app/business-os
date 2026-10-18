@@ -1,4 +1,4 @@
-import { Archive, ArchiveRestore, Download, FileText, Folder, FolderOpen, FolderPlus, Lock, Trash2 } from "lucide-react";
+import { Archive, Download, FileText, FolderOpen, FolderPlus, Lock, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -9,15 +9,19 @@ import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 import { getTenantFor } from "@/lib/tenant";
 
-import { deleteFile, deleteFolder, setArchived } from "./actions";
+import { deleteFile, deleteFolder } from "./actions";
+import { ArchiveButton } from "./archive-button";
 import { NewFolderForm, UploadForm } from "./forms";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { ContentSwap } from "@/components/ui/content-swap";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 
 const SYSTEM_KEYS = ["payroll", "employees", "business_docs", "imports", "website", "general"] as const;
 
 /** The business's files (round 6, F1): system folders plus its own, each opened by its own permission. */
 export default async function FilesPage({ searchParams }: PageProps<"/files">) {
   const t = await getTranslations("files");
+  const tc = await getTranslations("common");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("files.read");
   const query = await searchParams;
@@ -42,6 +46,16 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
     return parent ? 1 + depthOf(parent.parent_id) : 0;
   };
   const children = folders.filter((f) => f.parent_id === open?.id);
+  // The top row slides between the top-level folders; folders inside the open one show as chips below.
+  const roots = folders.filter((f) => f.parent_id === null);
+  const rootOf = (folder: (typeof folders)[number] | undefined): (typeof folders)[number] | undefined => {
+    let current = folder;
+    while (current?.parent_id) current = folders.find((f) => f.id === current?.parent_id);
+    return current;
+  };
+  const rootOfOpen = rootOf(open);
+  const descendantsOf = (id: string): typeof folders => folders.filter((f) => f.parent_id === id).flatMap((f) => [f, ...descendantsOf(f.id)]);
+  const inside = rootOfOpen ? descendantsOf(rootOfOpen.id) : [];
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
@@ -54,25 +68,32 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
         }
         description={t("subtitle")}
       />
-      <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
-        <nav aria-label={t("folders")} className="card flex flex-col gap-1 p-3">
-          {folders.map((folder) => (
-            <Link scroll={false}
-              key={folder.id}
-              href={`/files?folder=${folder.id}`}
-              aria-current={folder.id === open?.id ? "page" : undefined}
-              style={{ paddingInlineStart: `${0.75 + depthOf(folder.parent_id) * 1}rem` }}
-              className={`flex items-center justify-between gap-2 rounded-lg py-2 pe-3 text-sm ${folder.id === open?.id ? "bg-primary/10 font-semibold text-primary-ink" : "hover:bg-foreground/[0.04]"}`}
-            >
-              <span className="flex min-w-0 items-center gap-2">
-                <Folder aria-hidden="true" className="size-4 shrink-0" />
-                <span className="truncate" dir="auto">{folderName(folder)}</span>
-              </span>
-              <span className="text-xs tabular-nums text-muted">{folder.file_count}</span>
-            </Link>
-          ))}
-        </nav>
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3">
+          <div className="overflow-x-auto pb-1">
+            <LinkSegmented
+              label={t("rootFolders")}
+              loadingLabel={tc("loading")}
+              active={rootOfOpen?.id ?? ""}
+              options={roots.map((folder) => ({ key: folder.id, label: `${folderName(folder)} · ${folder.file_count}`, href: `/files?folder=${folder.id}` }))}
+            />
+          </div>
+          {inside.length > 0 && (
+            <LinkSegmented
+              variant="chips"
+              label={t("subfolders")}
+              loadingLabel={tc("loading")}
+              active={open?.id ?? ""}
+              options={[rootOfOpen, ...inside].filter((f): f is (typeof folders)[number] => !!f).map((folder) => ({
+                key: folder.id,
+                label: `${"› ".repeat(Math.max(0, depthOf(folder.parent_id) - (rootOfOpen ? depthOf(rootOfOpen.parent_id) + 1 : 0)))}${folderName(folder)} · ${folder.file_count}`,
+                href: `/files?folder=${folder.id}`,
+              }))}
+            />
+          )}
+        </div>
 
+        <ContentSwap swapKey={`${open?.id ?? "none"}-${showArchived ? "a" : "f"}`}>
         {open ? (
           <section aria-labelledby="folder-heading" className="card flex flex-col gap-5 p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -118,12 +139,18 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
                     </div>
                     {open.can_upload && (
                       <div className="flex items-center gap-1">
-                        <form action={setArchived.bind(null, file.id, !file.archived_at)}>
-                          <button type="submit" className="btn-secondary px-2.5 py-1 text-xs">
-                            {file.archived_at ? <ArchiveRestore aria-hidden="true" className="size-3.5" /> : <Archive aria-hidden="true" className="size-3.5" />}
-                            {file.archived_at ? t("restore") : t("archive")}
-                          </button>
-                        </form>
+                        <ArchiveButton
+                          fileId={file.id}
+                          name={file.name}
+                          archived={!!file.archived_at}
+                          labels={{
+                            archive: t("archive"),
+                            restore: t("restore"),
+                            archived: t("archivedToast", { name: file.name }),
+                            restored: t("restoredToast", { name: file.name }),
+                            undo: tc("undo"),
+                          }}
+                        />
                         {!open.retain && (
                           <form action={deleteFile.bind(null, file.id)}>
                             <button type="submit" aria-label={t("delete", { name: file.name })} className="btn-plain rounded-lg p-1 text-muted hover:bg-danger/10 hover:text-danger">
@@ -159,6 +186,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
         ) : (
           <EmptyState variant="list">{t("noFolders")}</EmptyState>
         )}
+        </ContentSwap>
       </div>
     </Container>
   );

@@ -17,6 +17,7 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { monthRange } from "./month";
 import { EmptyState } from "@/components/empty-state";
+import { CardTransition } from "@/components/ui/page-transition";
 
 const PRESETS = [7, 30, 90] as const;
 
@@ -181,9 +182,11 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
                 {receipts.map((r) => (
                   <tr key={r.id} className="border-t border-border transition-colors hover:bg-primary/4">
                     <td className="px-4 py-2.5">
+                      <CardTransition name={`receipt-${r.id}`}>
                       <Link href={`/receipts/${r.id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline">
                         <Ltr>{r.number}</Ltr>
                       </Link>
+                      </CardTransition>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">{day(r.issued_at)}</td>
                     <td className="px-4 py-2.5" dir="auto">
