@@ -22,7 +22,7 @@ nothing in production was touched.
 | # | Topic | State | Pull request | What is left, and who |
 |---|---|---|---|---|
 | 1 | HTTPS and HSTS | ✅ | #385 | `includeSubDomains` with the real domain (checklist, GL5) |
-| 1 | WAF / DDoS | 🟡 | #396 | Cloudflare in front of the domain (free) or Vercel Firewall (Pro): owner, at domain set-up |
+| 1 | WAF / DDoS | 🟡 | #396 | Cloudflare in front of the domain (free) or Vercel Firewall (Pro): owner, at domain set-up; steps in [go-live-checklist.md](../deploy/go-live-checklist.md) "Firewall in front of the website and API (WAF)", plus A8 (company, bank, insurance) and A12 (penetration test) |
 | 1 | Rate limiting | ✅ | #405 | Shared limiter store needs Render Key Value before a second API instance (documented in `production.md`) |
 | 1 | SQL injection | ✅ | #384 | Automatic test on every new f-string in SQL; ruff `S` |
 | 1 | XSS and CSP | ✅ | #385 | Nonce policy enforced |
@@ -44,7 +44,7 @@ nothing in production was touched.
 | 5 | Indexes | ✅ | #403 | Trigram index for client search; index tests |
 | 5 | Connection pooling | ✅ | #405 | Worst case 60 connections worked out in `production.md` section 1; compare with the Supabase compute limit at go-live |
 | 5 | Load tests | ✅ | #405 | k6 parallel run in CI (50 to 200 users) |
-| 5 | Paging of lists | ✅ | #403 | Keyset paging; known gap: the CRM quotes list shows the first 200 and has no "load more" |
+| 5 | Paging of lists | ✅ | #403 | Keyset paging; the CRM quotes list got "load more" in #431. Open: the Expo lists still page by offset (see GL17 in the coverage audit) |
 | 5 | Autoscaling | 🟡 | #405 | Second instance after the Key Value limiter store (paid, later) |
 | 6 | Health checks | ✅ | #396 | `/health` live, `/health/ready` database; the host checks readiness |
 | 6 | Migrations on release | ✅ | #396 | One pre-deploy step in production |

@@ -2142,6 +2142,8 @@
     "bookPreview": "לרשום את {client} ל{service}",
     "publishPreview": "לפרסם ב{network} ({account}): {text}",
     "cancelPreview": "לבטל את ההרשמה של {client} ל{service}",
+    "sendMessagePreview": "לשלוח ל{client} הודעה: {body}",
+    "giveBackPreview": "להחזיר ל{client} את הביקור ב{service} ({reason})",
     "fullWaitlist": "המפגש מלא, ולכן הלקוח יתווסף לרשימת ההמתנה.",
     "confirm": "אישור",
     "reject": "לא לבצע",
@@ -3274,6 +3276,7 @@
       "messagesFailed": "הודעות שנכשלו (24 שעות)",
       "emailsWaiting": "מיילים ממתינים",
       "database": "גודל מסד הנתונים",
+      "files": "קבצים שמורים",
       "aiToday": "קרדיטי AI היום",
       "aiLimit": "מתוך {limit}",
       "release": "גרסה",
@@ -4068,6 +4071,8 @@
       "upTo": "עד {count} לקוחות פעילים",
       "custom": "מעל 1,000 לקוחות פעילים",
       "customPrice": "מחיר מותאם",
+      "aiAllowance": "עד {users} משתמשי AI, {credits} קרדיטי AI בחודש",
+      "aiExtraUser": "משתמש AI נוסף: {price} לחודש",
       "modulesTitle": "תוספות",
       "presetsTitle": "חבילות מומלצות",
       "presets": {
@@ -4588,7 +4593,8 @@
             ]
           }
         ],
-        "coordinatorLine": "רכז הנגישות: {name}, {email}."
+        "coordinatorLine": "רכז הנגישות: {name}, {email}.",
+        "coordinatorPhone": "טלפון: {phone}."
       },
       "dpa": {
         "title": "הסכם עיבוד מידע",
@@ -10178,7 +10184,9 @@
       "book_client": "רישום לקוח לשיעור",
       "cancel_booking": "ביטול הזמנה",
       "log_time": "רישום שעות",
-      "bill_month": "חיוב חודש"
+      "bill_month": "חיוב חודש",
+      "send_message": "שליחת הודעה",
+      "give_back_visit": "החזרת ביקור"
     },
     "fields": {
       "client": "לקוח",
@@ -10190,7 +10198,9 @@
       "description": "עבודה",
       "month": "חודש",
       "clients": "לקוחות",
-      "total": "סך הכול"
+      "total": "סך הכול",
+      "body": "הודעה",
+      "reason": "סיבה"
     },
     "full": "השיעור מלא: הלקוח יצטרף לרשימת ההמתנה.",
     "historyTitle": "בקשות אחרונות",

@@ -23,6 +23,13 @@ def test_public_pricing_needs_no_sign_in(client: TestClient) -> None:
     catalog = response.json()
     assert catalog["currency"] == "ILS" and catalog["core"][0]["price"] > 0
     assert {m["key"] for m in catalog["modules"]} >= {"client_app", "ai_basic"}
+    by_key = {m["key"]: m for m in catalog["modules"]}
+    assert (
+        by_key["ai_basic"]["ai_users_included"] == 3 and by_key["ai_pro"]["ai_users_included"] == 10
+    )
+    assert by_key["ai_basic"]["ai_credits_included"] == 400
+    assert by_key["client_app"]["ai_users_included"] == 0
+    assert catalog["ai_extra_user_price"] == 1900
 
 
 def test_contact_requests_reach_platform_admins_only(
