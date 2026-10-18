@@ -38,10 +38,14 @@ def new_page(browser, **kw):
 
 
 def visit(page, path: str, expect_policy: bool = True) -> None:
-    response = page.goto(f"{h.BASE}{path}")
-    page.wait_for_load_state("networkidle")
-    time.sleep(0.5)  # late-loading chunks and the hydration scripts
-    policy = (response.headers.get("content-security-policy") or "") if response else ""
+    policy = ""
+    for _ in range(3):  # a navigation that races a redirect can hand back the redirect's response; a real gap persists
+        response = page.goto(f"{h.BASE}{path}")
+        page.wait_for_load_state("networkidle")
+        time.sleep(0.5)  # late-loading chunks and the hydration scripts
+        policy = (response.headers.get("content-security-policy") or "") if response else ""
+        if policy or not expect_policy:
+            break
     if expect_policy and not re.search(r"script-src 'self' 'nonce-[^']+' 'strict-dynamic'", policy):
         problems.append(f"{path}: no enforced nonce policy ({policy[:80]!r})")
     if "unsafe-inline" in re.sub(r"style-src[^;]*", "", policy):
