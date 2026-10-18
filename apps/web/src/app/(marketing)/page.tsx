@@ -16,6 +16,7 @@ import {
   FactsStrip,
   PricingTeaser,
 } from "@/components/marketing/home";
+import { AiTeamSection } from "@/components/marketing/ai-team-sections";
 import { HomePhone } from "@/components/marketing/home-phone";
 import { HeroIntro } from "@/components/marketing/hero-intro";
 import { Reveal } from "@/components/marketing/reveal";
@@ -141,6 +142,8 @@ export default async function Home() {
       <BentoFeatures />
 
       <DemoSection />
+
+      <AiTeamSection />
 
       {/* AI assistant */}
       <Section

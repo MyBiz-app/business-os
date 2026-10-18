@@ -6,6 +6,7 @@ import { siteOrigin } from "@/lib/origin";
 const PAGES = [
   "/",
   "/features",
+  "/ai-team",
   "/pricing",
   "/start",
   "/getting-started",

@@ -12,7 +12,7 @@ from playwright.sync_api import sync_playwright
 import helpers as h
 
 PUBLIC = [
-    "/", "/features", "/pricing", "/industries", "/industries/pilates", "/about", "/contact",
+    "/", "/features", "/ai-team", "/pricing", "/industries", "/industries/pilates", "/about", "/contact",
     "/start", "/getting-started", "/legal/privacy", "/legal/terms", "/login", "/signup", "/forgot-password",
 ]
 CRM = [

@@ -15,6 +15,7 @@ import { moveFocus, useDismiss } from "@/components/use-dismiss";
 const LINKS = [
   { href: "/features", key: "features" },
   { href: "/industries/fitness", key: "industries", match: "/industries" },
+  { href: "/ai-team", key: "aiTeam" },
   { href: "/pricing", key: "pricing" },
   { href: "/about", key: "about" },
   { href: "/contact", key: "contact" },
