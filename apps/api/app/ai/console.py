@@ -429,7 +429,7 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "our_prices",
-            "MyBiz's own price list: every module and each website product, monthly price in "
+            "Our own price list: every module and each website product, monthly price in "
             "minor units per currency.",
             {},
             "usage.read",
@@ -451,7 +451,7 @@ TOOLS: dict[str, Tool] = {
             "each with the item (from our_prices), the competitor, the currency (ILS, USD or "
             "EUR), the monthly price in minor units, the https link you read it on, the date "
             "(YYYY-MM-DD) and a short note (or an empty string). Never send a price without a "
-            "source. The server marks where MyBiz is dearer than the cheapest competitor.",
+            "source. The server marks where we are dearer than the cheapest competitor.",
             {
                 "title": {"type": "string"},
                 "summary": {"type": "string"},
