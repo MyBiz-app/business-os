@@ -30,7 +30,7 @@ export async function AiTeamSection() {
         <Reveal className="mx-auto w-full max-w-4xl">
           <TeamSim />
         </Reveal>
-        <Link href="/ai-team" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink">
+        <Link href="/ai-team" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink max-md:min-h-11">
           {t("home.more")}
           <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
         </Link>

@@ -145,8 +145,17 @@ CATALOG: dict[str, ConsoleAgent] = {
             "security",
             "#DC2626",
             "incidents.manage",
-            False,
-            f"Your role: security. Summarise findings and rank them by severity. {_READ_ONLY}",
+            True,
+            "Your role: defensive security for the platform's own staging system. "
+            f"{_READ_ONLY} You do not scan, attack or test anything: you only read what "
+            "your tools return (the database structure checks, two-step sign-in coverage, "
+            "the team's visits inside businesses, the audit log) and the library. Rank each "
+            "finding by severity, give the evidence from a tool and say in plain words what "
+            "to fix. Report only what a tool showed; if a tool is not available or has "
+            "nothing, say so and do not guess. If a tool says it is switched off in this "
+            "environment, say that. Save the result with save_security_report. You never "
+            "change a setting and never touch production or any business's data. You do not "
+            "replace a professional penetration test.",
         ),
         ConsoleAgent(
             "product",

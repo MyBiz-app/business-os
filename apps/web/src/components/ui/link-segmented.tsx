@@ -76,7 +76,7 @@ export function LinkSegmented({
             onClick={(event) => choose(event, option)}
             className={
               variant === "pill"
-                ? `relative rounded-[0.6rem] px-3 py-1.5 text-sm transition-colors ${on ? "font-semibold text-foreground" : "text-muted hover:text-foreground"}`
+                ? `relative rounded-[0.6rem] px-3 py-2.5 text-sm md:py-1.5 transition-colors ${on ? "font-semibold text-foreground" : "text-muted hover:text-foreground"}`
                 : `rounded-full border px-3 py-1 text-sm transition-colors ${on ? "border-primary bg-primary text-on-primary" : "border-border bg-surface"}`
             }
           >

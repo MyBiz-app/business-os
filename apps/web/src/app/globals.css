@@ -405,6 +405,10 @@ h3,
     opacity: 0;
     transform: translateY(-4px) scale(0.97);
     pointer-events: none;
+    /* On a phone a hidden panel must not widen the page. */
+    @media (width < 40rem) {
+      display: none;
+    }
   }
   &[data-open="true"] {
     visibility: visible;
@@ -443,6 +447,48 @@ h3,
     border-color: var(--primary);
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 18%, transparent);
   }
+}
+
+/* Touch screens: every button, icon button and field gets a 44px hit area (WCAG 2.5.5), and text
+   fields use 16px type so a phone browser does not zoom the page when one is focused. These are
+   plain (unlayered) rules so they win over the size classes a page puts on a single control. */
+@media (pointer: coarse), (width < 40rem) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger,
+  .btn-icon,
+  .btn-plain {
+    min-block-size: 2.75rem;
+  }
+  .btn-icon {
+    min-inline-size: 2.75rem;
+  }
+  .btn-link {
+    padding-block: 0.5rem;
+  }
+  input.control:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]),
+  select.control,
+  button.control,
+  textarea.control {
+    min-block-size: 2.75rem;
+    font-size: 1rem;
+  }
+  /* A plain text link inside a table cell, list item or paragraph: a taller touch area without
+     moving the text (vertical padding on an inline link does not change the line height). */
+  :where(td, th, dd, li, p) a:not([class*="btn-"], [class*="flex"], [class*="block"], [class*="grid"], [class*="card"], [class*="size-"], [class*="h-"]) {
+    padding-block: 0.75rem;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-inline-size: 1.25rem;
+    min-block-size: 1.25rem;
+  }
+}
+
+/* A select never outgrows the space it is given (its longest option would otherwise set its width). */
+select {
+  max-inline-size: 100%;
 }
 
 /* ---- Layout ----------------------------------------------------------------------------- */

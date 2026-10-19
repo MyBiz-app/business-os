@@ -268,7 +268,7 @@ function FileCard({
           <p className="truncate font-medium" dir="auto">{file.filename}</p>
           <p className="text-sm text-muted">{t("files.rows", { count: file.rows })}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex max-w-full flex-wrap items-center gap-3">
           <select
             aria-label={t("files.kind")}
             value={file.kind ?? ""}
