@@ -34,6 +34,7 @@ Epics: [#34](https://github.com/MyBiz-app/business-os/issues/34) go-live, [#35](
 |---|---|---|---|
 | Foundation | Core, schedule and appointments, clients, plans, client app, AI assistant (demo), reports, modules, billing, CRM leads, messaging, reviews, promo codes | ✅ Done | earlier PRs |
 | Spec v3 | Phased plan, spec in Hebrew and English (Markdown and Word) | ✅ Done | #26 |
+| Spec v4 | System spec in `docs/spec/current/`, English and Hebrew (Markdown and Word) | ✅ Done | D2 |
 | 1 - Marketing website | Full site, sign-up journey (cart, summary, simulated payment), welcome email, getting started | ✅ Done | #27 |
 | 2 - Business web app | Locked modules with previews and upsell, sales page, profiles, full review | ✅ Done | #28 |
 | 3 - MyBiz console | Team levels and permissions, working inside a business, actions, support inbox, audit | ✅ Done | #29 |
