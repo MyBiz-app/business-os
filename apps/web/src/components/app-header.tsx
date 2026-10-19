@@ -14,7 +14,7 @@ export async function AppHeader({ children }: { children?: React.ReactNode }) {
         children ? "nav-dark" : "bg-background/75 backdrop-blur-xl"
       }`}
     >
-      <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
+      <Link href="/" className="group flex items-center gap-2 py-1 text-lg font-bold max-md:min-h-11">
         <BrandMark className="size-8 drop-shadow-md transition-transform duration-300 group-hover:rotate-12" />
         {t("name")}
       </Link>
