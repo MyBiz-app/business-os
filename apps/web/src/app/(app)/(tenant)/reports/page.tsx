@@ -152,12 +152,6 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       />
 
       <PendingArea className="flex flex-col gap-6">
-      <ReviewsSummary
-        summary={reviews}
-        locale={locale}
-        timeZone={tenant.time_zone}
-        title={tReviews("title", { count: chosen.days })}
-      />
       {compared.length > 1 && <BranchComparison rows={compared} currency={tenant.currency} locale={locale} />}
       {/* Comparing branches matters once there is more than one (and none is selected). */}
       {byBranch.length > 1 && table("by-branch", t("byBranch"), t("branch"), byBranch, (row) => row.label || t("noBranch"), (row) =>
@@ -239,6 +233,13 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           </CollapsibleSection>
         )}
       </section>
+      {/* Reviews come last: the numbers people act on every day go first. */}
+      <ReviewsSummary
+        summary={reviews}
+        locale={locale}
+        timeZone={tenant.time_zone}
+        title={tReviews("title", { count: chosen.days })}
+      />
       </PendingArea>
       </PeriodProvider>
     </Container>

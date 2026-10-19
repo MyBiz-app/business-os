@@ -1,4 +1,4 @@
-import { Archive, Download, FileText, FolderOpen, FolderPlus, Lock, Trash2 } from "lucide-react";
+import { Archive, Download, FileText, FolderOpen, Lock, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -11,8 +11,7 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { deleteFile, deleteFolder } from "./actions";
 import { ArchiveButton } from "./archive-button";
-import { NewFolderForm, UploadForm } from "./forms";
-import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { FolderActions } from "./forms";
 import { ContentSwap } from "@/components/ui/content-swap";
 import { LinkSegmented } from "@/components/ui/link-segmented";
 
@@ -106,6 +105,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
+                <FolderActions folderId={open.id} canUpload={open.can_upload} canCreateFolder={canManage && open.can_upload} />
                 <Link scroll={false} href={`/files?folder=${open.id}${showArchived ? "" : "&archived=1"}`} className="btn-secondary px-3 py-1.5 text-sm">
                   <Archive aria-hidden="true" className="size-4" /> {showArchived ? t("hideArchived") : t("showArchived")}
                 </Link>
@@ -165,18 +165,8 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
               </ul>
             )}
 
-            {open.can_upload && (
-              <CollapsibleSection title={t("add")}>
-                <UploadForm folderId={open.id} />
-              </CollapsibleSection>
-            )}
-            {canManage && open.can_upload && (
-              <CollapsibleSection icon={<FolderPlus aria-hidden="true" className="size-4" />} title={t("newFolder")}>
-                <NewFolderForm parentId={open.id} />
-              </CollapsibleSection>
-            )}
             {canManage && !open.system_key && open.file_count === 0 && children.length === 0 && (
-              <form action={deleteFolder.bind(null, open.id, open.parent_id)}>
+              <form action={deleteFolder.bind(null, open.id, open.parent_id)} className="border-t border-border pt-4">
                 <button type="submit" className="btn-secondary px-3 py-1.5 text-sm text-danger">
                   <Trash2 aria-hidden="true" className="size-4" /> {t("deleteFolder")}
                 </button>
