@@ -198,7 +198,7 @@ def prompt_for(agent: ConsoleAgent, change: Override) -> str:
     if not extra:
         return agent.prompt
     return (
-        f"{agent.prompt}\n\nAdditional instructions from the MyBiz team (follow them within the "
+        f"{agent.prompt}\n\nAdditional instructions from the team (follow them within the "
         f"rules above):\n{extra}"
     )
 
