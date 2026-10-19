@@ -7,8 +7,8 @@ uses today and later. ([עברית](README.he.md))
 
 | What | Where | When to read it |
 |---|---|---|
-| Product spec (source of truth) | [`spec/current/`](spec/current/README.md) | The live spec; until v4 lands, the latest is v3 in [`spec/archive/v3/`](spec/archive/v3/spec.en.md) · [עברית](spec/archive/v3/spec.he.md) |
-| Spec as Word files | [`spec/archive/MyBiz-Spec-en.docx`](spec/archive/MyBiz-Spec-en.docx) · [`spec/archive/MyBiz-Spec-he.docx`](spec/archive/MyBiz-Spec-he.docx) | Generated from v3 with `node scripts/spec-to-docx.cjs he\|en` |
+| Product spec (source of truth) | [`spec/current/`](spec/current/README.md) | The live spec (v4): [English](spec/current/system.en.md) · [עברית](spec/current/system.he.md). Older specs v1-v3 are in [`spec/archive/`](spec/archive/) |
+| Spec as Word files | [`spec/current/MyBiz-Spec-v4-en.docx`](spec/current/MyBiz-Spec-v4-en.docx) · [`spec/current/MyBiz-Spec-v4-he.docx`](spec/current/MyBiz-Spec-v4-he.docx) | Generated from v4 with `node scripts/spec-to-docx.cjs he\|en` |
 | Detailed design chapters (v2) | [`spec/archive/v2/`](spec/archive/v2/README.md) | Architecture, data model, AI, pricing rules in depth |
 | The original vision (v1) | [`spec/archive/v1/`](spec/archive/v1/) | The owner's first spec, kept for history |
 | Decisions | [`DECISIONS.md`](DECISIONS.md) | Why something is the way it is (every decision has an id, e.g. X13) |

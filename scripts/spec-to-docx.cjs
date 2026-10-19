@@ -1,9 +1,9 @@
-// Turns the Markdown spec (docs/spec/archive/v3/spec.<locale>.md) into a Word document.
-// Supports what the spec uses: #/##/### headings, paragraphs, "- " bullets, "1. " numbered
+// Turns the Markdown spec (docs/spec/current/system.<locale>.md) into a Word document.
+// Supports what the spec uses: #/##/### headings, fenced code blocks, paragraphs, "- " bullets, "1. " numbered
 // items (nested by three spaces) and pipe tables. Hebrew is laid out right-to-left.
 //
-//   node scripts/spec-to-docx.cjs he   → docs/spec/archive/MyBiz-Spec-he.docx
-//   node scripts/spec-to-docx.cjs en   → docs/spec/archive/MyBiz-Spec-en.docx
+//   node scripts/spec-to-docx.cjs he   → docs/spec/current/MyBiz-Spec-v4-he.docx
+//   node scripts/spec-to-docx.cjs en   → docs/spec/current/MyBiz-Spec-v4-en.docx
 //
 // Needs the `docx` npm package (npm i -g docx, or run from a folder that has it).
 
@@ -30,8 +30,8 @@ const {
 const locale = process.argv[2] === "en" ? "en" : "he";
 const rtl = locale === "he";
 const root = path.join(__dirname, "..");
-const source = fs.readFileSync(path.join(root, "docs/spec/archive/v3", `spec.${locale}.md`), "utf8");
-const output = path.join(root, "docs/spec/archive", `MyBiz-Spec-${locale}.docx`);
+const source = fs.readFileSync(path.join(root, "docs/spec/current", `system.${locale}.md`), "utf8");
+const output = path.join(root, "docs/spec/current", `MyBiz-Spec-v4-${locale}.docx`);
 
 const FONT = rtl ? "Arial" : "Calibri";
 const BRAND = "4F46E5";
@@ -96,6 +96,20 @@ for (let i = 0; i < lines.length; i++) {
     while (i < lines.length && lines[i].startsWith("|")) block.push(lines[i++]);
     i--;
     children.push(table(block), new Paragraph({ children: [], spacing: { after: 120 } }));
+    continue;
+  }
+  if (line.startsWith("```")) {
+    // Fenced block: monospace, left-to-right, one paragraph per line.
+    while (++i < lines.length && !lines[i].startsWith("```")) {
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: lines[i] || " ", font: "Consolas", size: 18 })],
+          alignment: AlignmentType.LEFT,
+          spacing: { after: 0 },
+        }),
+      );
+    }
+    children.push(new Paragraph({ children: [], spacing: { after: 120 } }));
     continue;
   }
   const heading = line.match(/^(#{1,3}) (.*)$/);
