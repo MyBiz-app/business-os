@@ -3310,17 +3310,20 @@
         "product": {
           "name": "Lior",
           "title": "Product manager",
-          "topic": "Collects feature requests and suggests priorities."
+          "topic": "Collects feature requests and suggests priorities.",
+          "weekly": "Weekly report: group the open requests and cancellation reasons into themes, say what changed, and give the three things to build or fix next."
         },
         "success": {
           "name": "Maya",
           "title": "Customer success",
-          "topic": "Finds businesses in danger and drafts a personal message."
+          "topic": "Finds businesses in danger and drafts a personal message.",
+          "weekly": "Weekly report: which businesses are at risk, ranked by urgency, which new businesses have not started, and who I should contact first."
         },
         "marketing": {
           "name": "Ori",
           "title": "MyBiz marketing",
-          "topic": "Landing page text, posts and SEO, as drafts."
+          "topic": "Landing page text, posts and SEO, as drafts.",
+          "weekly": "Weekly report: a short marketing plan for this week: three post ideas and one landing page improvement, based on the signup funnel and the industry catalog."
         }
       },
       "mapLabel": "MyBiz AI team",
@@ -3352,7 +3355,8 @@
         "health": "Who is at risk of leaving, who has not started.",
         "billing": "Invoices, overdue amounts, unusual AI use.",
         "growth": "Follow-ups to leads and announcements, as drafts."
-      }
+      },
+      "weeklyReport": "Weekly report"
     },
     "health": {
       "title": "System health",
