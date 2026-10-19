@@ -6,7 +6,7 @@ import { getPlatform } from "@/lib/platform";
 
 export type ActionState = { error?: string; done?: string };
 
-const KNOWN = new Set(["already_void", "forbidden", "not_found", "invalid_days"]);
+const KNOWN = new Set(["already_void", "forbidden", "not_found", "invalid_days", "invalid_tags", "unknown_account_owner", "invalid_note"]);
 
 async function failed(response: Response): Promise<ActionState> {
   const body = (await response.json().catch(() => null)) as { detail?: unknown } | null;
@@ -17,6 +17,7 @@ async function failed(response: Response): Promise<ActionState> {
 function refresh(id: string) {
   revalidatePath(`/platform/businesses/${id}`);
   revalidatePath("/platform/businesses");
+  revalidatePath("/platform/trials");
 }
 
 export async function extendTrial(id: string, _state: ActionState, formData: FormData): Promise<ActionState> {
@@ -57,4 +58,32 @@ export async function voidInvoice(id: string, _state: ActionState, formData: For
   if (!response.ok) return failed(response);
   refresh(id);
   return { done: "void" };
+}
+
+/** The business card's tags (comma separated) and account owner. */
+export async function saveCard(id: string, _state: ActionState, formData: FormData): Promise<ActionState> {
+  const { api } = await getPlatform();
+  const tags = String(formData.get("tags") ?? "")
+    .split(/[,،]/)
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  const { response } = await api.PUT("/platform/businesses/{tenant_id}/card", {
+    params: { path: { tenant_id: id } },
+    body: { tags, account_owner: String(formData.get("account_owner") ?? "").trim() || null },
+  });
+  if (!response.ok) return failed(response);
+  refresh(id);
+  return { done: "card" };
+}
+
+/** An internal note about the business. */
+export async function addNote(id: string, _state: ActionState, formData: FormData): Promise<ActionState> {
+  const { api } = await getPlatform();
+  const { response } = await api.POST("/platform/businesses/{tenant_id}/notes", {
+    params: { path: { tenant_id: id } },
+    body: { body: String(formData.get("body") ?? "") },
+  });
+  if (!response.ok) return failed(response);
+  refresh(id);
+  return { done: "note" };
 }

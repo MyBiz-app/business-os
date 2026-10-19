@@ -2826,7 +2826,8 @@
       "churn": "נטישה",
       "metrics": "מדדי SaaS",
       "email": "מסירת מיילים",
-      "catalog": "קטלוג ומחירון"
+      "catalog": "קטלוג ומחירון",
+      "trials": "ניסיון שנגמר"
     },
     "levels": {
       "primary_owner": "בעלים ראשי",
@@ -3643,6 +3644,80 @@
       "credits": "{count} קרדיטי AI בחודש",
       "users": "{count} משתמשי AI",
       "needs": "דורש {list}"
+    },
+    "card": {
+      "title": "כרטיס עסק 360",
+      "intro": "כל מה שידוע לנו על העסק במקום אחד. ההערות והתגיות פנימיות ולא מוצגות לעסק.",
+      "tags": "תגיות",
+      "tagsHint": "מופרדות בפסיקים, עד 12, למשל vip, שותף, צריך-עזרה.",
+      "accountOwner": "איש קשר אצלנו",
+      "accountOwnerHint": "איש צוות MyBiz שמטפל בעסק (המייל שלו להתחברות). אפשר להשאיר ריק.",
+      "save": "שמירה",
+      "saved": "נשמר.",
+      "notes": "הערות פנימיות",
+      "noteLabel": "הערה חדשה",
+      "notePlaceholder": "עם מי דיברת ומה הוא רוצה.",
+      "addNote": "הוספת הערה",
+      "noteAdded": "ההערה נוספה.",
+      "noNotes": "אין עדיין הערות.",
+      "timeline": "ציר זמן",
+      "noTimeline": "אין עדיין אירועים.",
+      "by": "על ידי {who}",
+      "errors": {
+        "invalid_tags": "עד 12 תגיות, כל אחת עד 30 תווים.",
+        "unknown_account_owner": "המייל הזה אינו של איש צוות פעיל ב-MyBiz.",
+        "invalid_note": "ההערה צריכה להיות באורך של 1 עד 2000 תווים.",
+        "forbidden": "אין לך הרשאה לפעולה הזו.",
+        "not_found": "לא נמצא.",
+        "generic": "משהו השתבש. כדאי לנסות שוב."
+      },
+      "events": {
+        "signup": "נרשם",
+        "trial_ends": "סיום תקופת הניסיון",
+        "closed": "סגר את העסק",
+        "invoice": "חשבונית {number} · {amount} · {status}",
+        "invoiceStatus": {
+          "open": "פתוחה",
+          "paid": "שולמה",
+          "void": "זוכתה"
+        },
+        "request": "פנייה ({status})",
+        "requestFromBusiness": "פנייה מהעסק ({status})",
+        "requestStatus": {
+          "new": "חדשה",
+          "in_progress": "בטיפול",
+          "done": "טופלה"
+        },
+        "note": "הערה",
+        "changes": {
+          "trial_extended": "הניסיון הוארך ב-{days} ימים",
+          "modules_changed": "החבילה שונתה",
+          "invoice_voided": "חשבונית זוכתה",
+          "card_updated": "תגיות או איש קשר שונו"
+        }
+      }
+    },
+    "trials": {
+      "title": "ניסיון שנגמר",
+      "hint": "עסקים שתקופת הניסיון שלהם מסתיימת בקרוב, או הסתיימה בשלושת הימים האחרונים. זה הרגע שבו הם מחליטים אם לשלם.",
+      "range": "להציג את {days} הימים הקרובים",
+      "empty": "אין ניסיונות שמסתיימים בתקופה הזו.",
+      "business": "עסק",
+      "owner": "בעלים",
+      "ends": "סיום הניסיון",
+      "clients": "לקוחות פעילים",
+      "card": "כרטיס",
+      "accountOwner": "איש קשר אצלנו",
+      "actions": "פעולות",
+      "cardYes": "קיים",
+      "cardNo": "אין",
+      "endsOn": "{date}",
+      "ended": "הסתיים ב-{date}",
+      "message": "לכתוב לבעלים",
+      "open": "פתיחת הכרטיס",
+      "extend": "הארכה",
+      "extendDays": "ימים",
+      "extendDone": "הניסיון מסתיים עכשיו ב-{date}."
     }
   },
   "permissions": {
