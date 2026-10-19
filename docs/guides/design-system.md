@@ -126,7 +126,7 @@ Checked at 390, 1440, 1920 and 2560 px. More columns, never longer lines.
 | Page kind | Rule |
 |---|---|
 | Lists, boards, dashboard | `Container size="full"`; card grids add columns (dashboard: 6 tiles in one row from `2xl`, charts side by side). |
-| Forms and settings | `Container size="settings"` (up to 1600px) plus the `form-columns` class on the page's section stack: one column, two columns once the room itself is 56rem wide (a container query, so the side menus are counted). The settings room is the `@container`. |
+| Forms and settings | `Container size="settings"` (up to 1600px) plus the `form-columns` class on the page's section stack: always one column, in reading order (a two-column zigzag put open sections beside closed ones). Only small cards of equal height that never collapse use `form-grid`: one column, two once the room itself is 56rem wide (a container query, so the side menus are counted). The settings room is the `@container`. |
 | Client / staff card | Content + side column; from 1920px (`min-[120rem]`) the side column becomes two columns (client card) or the overview grid gets three (staff card). |
 | Long text (policies, help) | `prose`, 44rem, unchanged. |
 
