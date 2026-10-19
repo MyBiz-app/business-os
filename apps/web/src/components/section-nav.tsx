@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { OPEN_EVENT } from "@/components/ui/collapsible-section";
+import { scrollToSection } from "@/lib/scroll-to-section";
 
 import { useScrollSpy } from "./use-scroll-spy";
 
@@ -12,7 +12,7 @@ export type SectionNavItem = { id: string; label: ReactNode; icon?: ReactNode; h
 
 /**
  * The inner menu of a long page. A click scrolls smoothly to that section (opening it if it is
- * folded) and keeps the address `#id` in step without a jump; while the page scrolls the section
+ * folded, and landing it fully below the sticky header) and keeps the address `#id` in step without a jump; while the page scrolls the section
  * being read is marked. Wide screens: a sticky column. Narrow screens: a bar of buttons that sticks
  * under the app header and keeps the marked one in view, with touch-sized targets.
  */
@@ -21,11 +21,19 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
   const spied = useScrollSpy(sections);
   // A click marks its section at once; the scroll spy takes over when the scroll has settled.
   const [clicked, setClicked] = useState<string | null>(null);
-  const settle = useRef<number | undefined>(undefined);
   const bar = useRef<HTMLUListElement>(null);
   const active = clicked ?? spied ?? sections[0] ?? null;
 
-  useEffect(() => () => window.clearTimeout(settle.current), []);
+  // The clicked item stays marked until the person scrolls on their own; then the scroll spy takes over.
+  useEffect(() => {
+    if (clicked === null) return;
+    const release = () => setClicked(null);
+    const types = ["wheel", "touchmove", "keydown"];
+    for (const type of types) window.addEventListener(type, release, { passive: true });
+    return () => {
+      for (const type of types) window.removeEventListener(type, release);
+    };
+  }, [clicked]);
 
   // On the narrow bar, bring the marked button into view without moving the page.
   useEffect(() => {
@@ -37,18 +45,13 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
 
   function go(event: React.MouseEvent<HTMLAnchorElement>, id: string) {
     event.preventDefault();
-    window.dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: id }));
     setClicked(id);
-    window.clearTimeout(settle.current);
-    settle.current = window.setTimeout(() => setClicked(null), 1000);
     try {
       window.history.replaceState(null, "", `#${id}`);
     } catch {
       // Not critical: the page still scrolls.
     }
-    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // A folded section unfolds while it scrolls, so wait a frame for it to take its place.
-    requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" }));
+    scrollToSection(id);
   }
 
   return (

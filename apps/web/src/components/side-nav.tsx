@@ -7,6 +7,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useId, useState, useSyncExternalStore } from "react";
 
 import { anchorOf, matchArea, matchQueryChild, pathOf, sectionAnchors } from "@/lib/nav-match";
+import { scrollToSection } from "@/lib/scroll-to-section";
 
 import { useScrollSpy } from "./use-scroll-spy";
 
@@ -72,8 +73,7 @@ function readChosen() {
 function goToSection(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
-  const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });
+  scrollToSection(id);
   el.setAttribute("data-nav-flash", "");
   window.setTimeout(() => el.removeAttribute("data-nav-flash"), 1500);
   try {
