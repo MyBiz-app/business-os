@@ -1157,6 +1157,9 @@
     }
   },
   "locations": {
+    "settingsTitle": "Branch settings",
+    "settingsHint": "Client policy and branch groups",
+    "detailsTitle": "Branch details",
     "manager": {
       "title": "Branch manager",
       "subtitle": "Who runs this branch. They get manager rights here only: staff, shifts, bookings and clients of this branch.",
@@ -6963,7 +6966,7 @@
   },
   "account": {
     "link": "Settings",
-    "title": "Settings",
+    "title": "My account",
     "subtitle": "Your personal profile and how the app works for you. Only you see these choices.",
     "name": "Full name",
     "nameHint": "Shown on the schedule, in the client app and in reports.",
@@ -6988,6 +6991,8 @@
     },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
+    "addressTitle": "Address",
+    "accessibilityTitle": "Accessibility",
     "birthDate": "Date of birth",
     "birthDateHint": "Only you see this.",
     "addressLine": "Street and number",
@@ -10164,6 +10169,10 @@
       "unknownDevice": "Unknown device",
       "when": "When"
     }
+  },
+  "noticeStack": {
+    "summary": "{count, plural, one {# thing is waiting for you} other {# things are waiting for you}}",
+    "toggle": "Things waiting for you"
   },
   "legalUpdate": {
     "title": "We updated our terms",

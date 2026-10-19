@@ -17,6 +17,7 @@ import { BranchManager } from "../branch-manager";
 import { LocationForm } from "../location-form";
 import { Rooms } from "../rooms";
 import { UserText } from "@/components/bidi";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -41,23 +42,19 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/locations" label={t("nav.locations")} />
       <PageHeader title={<UserText>{location.name}</UserText>} />
-      <LocationForm
-        action={updateLocation.bind(null, location.id)}
-        location={location}
-        submitLabel={t("common.save")}
-        readOnly={readOnly}
-        kindOptions={branchKindOptions(tenant.vertical, industryTexts(t).text, t("locations.kindSame"))}
-      />
-      {team && <BranchManager location={location} members={managers} />}
-      {canManageSettings(tenant) && <BranchBranding location={location} logo={apiAssetUrl(location.logo_url)} networkColor={tenant.primary_color} />}
-      {emails && <ContactEmails data={emails} locationId={location.id} />}
-      <section aria-labelledby="opening-heading" className="flex flex-col gap-4 card p-6">
-        <div className="flex flex-col gap-1">
-          <h2 id="opening-heading" className="text-lg font-semibold">
-            {t("openingHours.title")}
-          </h2>
-          <p className="text-sm text-muted">{t("openingHours.subtitle")}</p>
-        </div>
+      <section aria-labelledby="details-heading" className="card flex flex-col gap-4 p-6">
+        <h2 id="details-heading" className="text-lg font-semibold">
+          {t("locations.detailsTitle")}
+        </h2>
+        <LocationForm
+          action={updateLocation.bind(null, location.id)}
+          location={location}
+          submitLabel={t("common.save")}
+          readOnly={readOnly}
+          kindOptions={branchKindOptions(tenant.vertical, industryTexts(t).text, t("locations.kindSame"))}
+        />
+      </section>
+      <CollapsibleSection title={t("openingHours.title")} description={t("openingHours.subtitle")} storageKey="branch-hours" defaultOpen>
         {readOnly ? (
           <OpeningHoursList hours={hours?.intervals ?? []} weekStartsOn={weekStartFor(tenant.locale)} />
         ) : (
@@ -68,13 +65,25 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
             initial={(hours?.intervals ?? []).map((i) => ({ weekday: i.weekday, starts: i.opens.slice(0, 5), ends: i.closes.slice(0, 5) }))}
           />
         )}
-      </section>
-      <section aria-labelledby="rooms-heading" className="flex flex-col gap-4 card p-6">
-        <h2 id="rooms-heading" className="text-lg font-semibold">
-          {t("locations.rooms")}
-        </h2>
+      </CollapsibleSection>
+      <CollapsibleSection title={t("locations.rooms")} storageKey="branch-rooms">
         <Rooms locationId={location.id} rooms={location.rooms} readOnly={readOnly} />
-      </section>
+      </CollapsibleSection>
+      {team && (
+        <CollapsibleSection title={t("locations.manager.title")} description={t("locations.manager.subtitle")} storageKey="branch-manager">
+          <BranchManager location={location} members={managers} />
+        </CollapsibleSection>
+      )}
+      {emails && (
+        <CollapsibleSection title={t("settings.contactEmails.branchTitle")} description={t("settings.contactEmails.branchHint")} storageKey="branch-emails">
+          <ContactEmails data={emails} locationId={location.id} grouped />
+        </CollapsibleSection>
+      )}
+      {canManageSettings(tenant) && (
+        <CollapsibleSection title={t("locations.brandingTitle")} description={t("locations.brandingHint")} storageKey="branch-branding">
+          <BranchBranding location={location} logo={apiAssetUrl(location.logo_url)} networkColor={tenant.primary_color} />
+        </CollapsibleSection>
+      )}
     </Container>
   );
 }
