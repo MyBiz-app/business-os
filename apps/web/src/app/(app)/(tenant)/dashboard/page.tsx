@@ -177,31 +177,8 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const weekLabel = (bucket: string) => formatDay(bucket, locale, { day: "numeric", month: "numeric" });
 
   return (
-    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <LiveRefresh />
-      {billingNotice && (
-        <Link
-          href="/settings/billing"
-          className="flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-warning/15"
-        >
-          <CreditCard aria-hidden="true" className="size-5 shrink-0" />
-          <span className="flex-1">{billingNotice}</span>
-          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-        </Link>
-      )}
-      {usageNotices.map((notice) => (
-        <Link
-          key={notice}
-          href="/settings/billing"
-          className="flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-warning/15"
-        >
-          <Luggage aria-hidden="true" className="size-5 shrink-0" />
-          <span className="flex-1">{notice}</span>
-          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-        </Link>
-      ))}
-      {websiteOffer?.show && <WebsiteOfferCard />}
-      {setup && (welcome || setup.done < setup.total) && <GettingStartedCard setup={setup} welcome={welcome} business={tenant.name} />}
       <div className="card-accent relative flex flex-wrap items-end justify-between gap-6 overflow-hidden p-0">
         {tenant.cover_url ? (
           // The business's own cover image, under a fade that keeps the text readable.
@@ -239,6 +216,35 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </div>
       </div>
 
+      {setup && welcome && <GettingStartedCard setup={setup} welcome business={tenant.name} />}
+
+      {(billingNotice || usageNotices.length > 0 || websiteOffer?.show) && (
+      <div className="flex flex-col gap-3">
+      {billingNotice && (
+        <Link
+          href="/settings/billing"
+          className="flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-warning/15"
+        >
+          <CreditCard aria-hidden="true" className="size-5 shrink-0" />
+          <span className="flex-1">{billingNotice}</span>
+          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+        </Link>
+      )}
+      {usageNotices.map((notice) => (
+        <Link
+          key={notice}
+          href="/settings/billing"
+          className="flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-warning/15"
+        >
+          <Luggage aria-hidden="true" className="size-5 shrink-0" />
+          <span className="flex-1">{notice}</span>
+          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+        </Link>
+      ))}
+      {websiteOffer?.show && <WebsiteOfferCard />}
+      </div>
+      )}
+
       {!solo && mine.length > 0 && (
         <section aria-labelledby="mine-heading" className="flex flex-col gap-3 card-accent p-6">
           <h2 id="mine-heading" className="text-lg font-semibold">
@@ -250,6 +256,18 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
 
       <AttentionPanel context={{ api, scope }} only={solo ? SOLO_ATTENTION : undefined} />
       <WaitlistHint context={{ api, scope, tenant }} />
+
+      {canSeeSchedule && <section aria-labelledby="today-heading" className="card flex flex-col gap-3 p-6">
+        <h2 id="today-heading" className="text-lg font-semibold">
+          {t("dashboard.today")}
+        </h2>
+        {todays.length === 0 ? (
+          <p className="text-muted">{t("dashboard.emptyToday")}</p>
+        ) : (
+          <div className="max-h-96 overflow-y-auto">{sessionList(todays)}</div>
+        )}
+      </section>}
+      {setup && !welcome && setup.done < setup.total && <GettingStartedCard setup={setup} welcome={false} business={tenant.name} />}
 
       {reports && (
         <PeriodProvider>
@@ -343,7 +361,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           </PendingArea>
         </section>
         {!solo && <PendingArea>
-        <section className="card grid gap-8 p-6 lg:grid-cols-2">
+        <section aria-labelledby="trends-heading" className="flex flex-col gap-4">
+        <h2 id="trends-heading" className="text-lg font-semibold">
+          {t("dashboard.trends")}
+        </h2>
+        <div className="card grid gap-8 p-6 lg:grid-cols-2">
           <ColumnChart
             title={t("dashboard.weeklyRevenue")}
             unit={{ kind: "money", currency: tenant.currency }}
@@ -370,6 +392,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               href: `/schedule?${new URLSearchParams({ view: "week", date: point.bucket })}`,
             }))}
           />
+        </div>
         </section>
         </PendingArea>}
         </PeriodProvider>
@@ -380,17 +403,6 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           <BranchMapCard context={{ api, scope, tenant }} />
         </Suspense>
       )}
-
-      {canSeeSchedule && <section aria-labelledby="today-heading" className="card flex flex-col gap-3 p-6">
-        <h2 id="today-heading" className="text-lg font-semibold">
-          {t("dashboard.today")}
-        </h2>
-        {todays.length === 0 ? (
-          <p className="text-muted">{t("dashboard.emptyToday")}</p>
-        ) : (
-          sessionList(todays)
-        )}
-      </section>}
     </Container>
   );
 }
