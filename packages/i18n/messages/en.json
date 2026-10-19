@@ -896,6 +896,14 @@
     }
   },
   "clients": {
+    "nav": {
+      "label": "Client sections",
+      "details": "Details",
+      "membership": "Plans and visits",
+      "paperwork": "Quotes and documents",
+      "talk": "Notes and messages",
+      "privacy": "Consent and privacy"
+    },
     "joinedChip": "Joined {range}",
     "noShowChip": "Missed a class {range}",
     "activeFilters": "Active filters",
@@ -5728,6 +5736,13 @@
     }
   },
   "leads": {
+    "nav": {
+      "label": "Lead sections",
+      "stage": "Stage",
+      "details": "Details",
+      "activity": "Activity",
+      "messages": "Messages"
+    },
     "truncated": "Showing {shown} of {total} leads.",
     "showMore": "Show more leads",
     "title": "Leads",
