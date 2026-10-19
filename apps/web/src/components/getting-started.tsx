@@ -1,7 +1,8 @@
 import type { components } from "@business-os/api-client";
-import { ArrowRight, BookOpen, Check, ChevronDown, CreditCard, Megaphone, Palette, CalendarDays, ShieldCheck, Sparkles, Tags, Users, UsersRound } from "lucide-react";
+import { ArrowRight, BookOpen, Check, CreditCard, Megaphone, Palette, CalendarDays, ShieldCheck, Sparkles, Tags, Users, UsersRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { isolate } from "@/lib/bidi";
 
 type GettingStarted = components["schemas"]["GettingStarted"];
@@ -25,27 +26,15 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
   const percent = Math.round((setup.done / setup.total) * 100);
 
   return (
-    <details open={welcome} className={`${welcome ? "card-accent" : "card"} group/setup p-4 sm:p-6`}>
-      <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
-        <h2 id="setup-heading" className="text-lg font-semibold">
-          {t("title")}
-        </h2>
-        <span className="flex items-center gap-3 text-sm font-medium text-muted">
-          {t("progress", { done: setup.done, total: setup.total })}
-          <ChevronDown aria-hidden="true" className="size-4 transition-transform group-open/setup:rotate-180" />
-        </span>
-      <div
-        role="progressbar"
-        aria-valuenow={percent}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={t("progress", { done: setup.done, total: setup.total })}
-        className="mt-3 h-2 w-full overflow-hidden rounded-full bg-foreground/10"
-      >
-        <span className="block h-full rounded-full bg-gradient-to-r from-brand-from to-brand-to transition-[width] duration-700" style={{ width: `${percent}%` }} />
-      </div>
-      </summary>
-      <div className="mt-5 flex flex-col gap-5">
+    <CollapsibleSection
+      id="getting-started"
+      storageKey="getting-started"
+      defaultOpen={welcome}
+      title={t("title")}
+      description={t("progress", { done: setup.done, total: setup.total })}
+      className={welcome ? "card-accent" : undefined}
+    >
+      <div className="flex flex-col gap-5">
       {welcome && (
         <div className="flex flex-col gap-2">
           <p className="flex items-center gap-2 text-sm font-semibold text-primary-ink">
@@ -60,6 +49,16 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
         <BookOpen aria-hidden="true" className="size-4" />
         {t("guide")}
       </Link>
+      <div
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={t("progress", { done: setup.done, total: setup.total })}
+        className="h-2 overflow-hidden rounded-full bg-foreground/10"
+      >
+        <span className="block h-full rounded-full bg-gradient-to-r from-brand-from to-brand-to transition-[width] duration-700" style={{ width: `${percent}%` }} />
+      </div>
       <ol className="enter-items grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {setup.steps.map((step) => {
           const { href, Icon } = SETUP_STEPS[step.key];
@@ -88,6 +87,6 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
         })}
       </ol>
       </div>
-    </details>
+    </CollapsibleSection>
   );
 }
