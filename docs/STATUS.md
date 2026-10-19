@@ -1,11 +1,32 @@
 # Project status
 
-_Last updated: 2026-10-18_ · Updated with every merged pull request. Open work lives in
+_Last updated: 2026-10-19_ · Updated with every merged pull request. Open work lives in
 [GitHub issues](https://github.com/MyBiz-app/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
-**Now:** round 7 (R1-R37b) is mostly merged; what is left is closing coverage gaps, a green e2e run on main, and the owner steps for go-live (A1-A12 in `docs/deploy/go-live-checklist.md`).
-**Next:** final sync (GitHub, local), one Vercel deploy once the owner approves, domain check, then go-live following the checklist.
+**Now (2026-10-19):** everything in the written specs (v3, rounds 3 to 7, go-live readiness GL1-GL25) is built and merged to `main`; two coverage audits found no unbuilt item and the gaps they found were closed (#475-#478). Closing steps: a green end-to-end run on `main` (fixed in #474 and #482), then one Vercel deploy that the owner runs by hand, then syncing the owner's computer. In parallel, the approved plan for MyBiz console AI agents and console gaps has started ([#487](https://github.com/MyBiz-app/business-os/issues/487)), and the docs are being tidied (D1 merged in #484, D2 spec v4, D3 this head).
+**Next:** the console agents plan in waves (K1, K3, then C1, K2, K5, then C2 to C4, C6, K4, then C5; one migration at a time, last one today is 0142), the small round 7 leftovers ([#479](https://github.com/MyBiz-app/business-os/issues/479)), then go-live following `docs/deploy/go-live-checklist.md`.
+
+### Snapshot
+
+| Area | State |
+|---|---|
+| Product (website, business web app, console, three areas in one Expo app) | ✅ Built; the apps run in the browser and in Expo Go, **not built for the app stores** |
+| Specs v3, rounds 3 to 7, go-live readiness (GL1-GL25) | ✅ Built and merged (142 migrations, about 500 pull requests) |
+| Closing: e2e on `main`, one Vercel deploy, owner's computer sync | 🟡 In progress; the deploy is a manual step for the owner |
+| Console AI agents and console gaps ([#487](https://github.com/MyBiz-app/business-os/issues/487)) | 🟡 Approved on 2026-10-19; wave 1 running (K1, K3, D1 done) |
+| Paid services (payments #46, invoicing #47, WhatsApp and SMS #49, real AI key #50, store builds #51) | ⚪ Built as disabled adapters; switched on at go-live (see "Built and switched off" in the spec) |
+| Go-live | ⚪ When the owner decides ([#34](https://github.com/MyBiz-app/business-os/issues/34)) |
+
+### Waiting for the owner
+
+- The one Vercel deploy (Actions, "Deploy web to Vercel", then "Deploy the Expo app to the web (Vercel)" with app = all), once `main` is green.
+- Sync of `C:\dev\business-os` (the remote session card is waiting for approval).
+- Decisions and steps that cost money or need a professional: payments and invoicing providers (#46, #47), final brand name (#36), lawyer for the legal texts, accountant for the payroll rates, live AI simulation (R19, [#508](https://github.com/MyBiz-app/business-os/issues/508)). The full list is in `docs/deploy/go-live-checklist.md` (A1-A12).
+
+### Open issues map
+
+Epics: [#34](https://github.com/MyBiz-app/business-os/issues/34) go-live, [#35](https://github.com/MyBiz-app/business-os/issues/35) apps, [#479](https://github.com/MyBiz-app/business-os/issues/479) round 7 (leftovers [#502](https://github.com/MyBiz-app/business-os/issues/502) to [#508](https://github.com/MyBiz-app/business-os/issues/508)), [#487](https://github.com/MyBiz-app/business-os/issues/487) console agents ([#489](https://github.com/MyBiz-app/business-os/issues/489) to [#501](https://github.com/MyBiz-app/business-os/issues/501)), [#488](https://github.com/MyBiz-app/business-os/issues/488) docs upkeep. The nightly end-to-end failure [#483](https://github.com/MyBiz-app/business-os/issues/483) closes when the fix is confirmed green.
 
 ## Board
 
