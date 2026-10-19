@@ -38,6 +38,8 @@ PLATFORM_TABLES = {
     "platform_ai_pauses",
     "announcements",
     "announcement_deliveries",
+    "platform_business_notes",
+    "platform_business_cards",
 }
 
 

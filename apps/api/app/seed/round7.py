@@ -51,6 +51,8 @@ NO_DEMO: dict[str, str] = {
     "payslip_corrections": "need a paid run; the demo runs are not paid",
     "person_identities": "ID numbers, written only through the encrypted identity form",
     "platform_ai_pauses": "set by the platform team in the console",
+    "platform_business_cards": "internal tags and account owner, written by the platform team",
+    "platform_business_notes": "internal notes of the platform team, never part of a demo",
     "product_events": "usage analytics of real visits",
     "retainers": "only for industries that bill by time, none of the curated three",
     "room_hours": "only for industries that rent rooms, none of the curated three",
