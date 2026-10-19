@@ -574,6 +574,7 @@
     "points": "{value} pts",
     "better": "better",
     "worse": "worse",
+    "trends": "Trends",
     "weeklyRevenue": "Revenue per week",
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
