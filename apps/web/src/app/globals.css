@@ -465,9 +465,15 @@ h3,
   }
   input.control:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]),
   select.control,
+  button.control,
   textarea.control {
     min-block-size: 2.75rem;
     font-size: 1rem;
+  }
+  /* A plain text link inside a table cell, list item or paragraph: a taller touch area without
+     moving the text (vertical padding on an inline link does not change the line height). */
+  :where(td, th, dd, li, p) a:not([class*="btn-"], [class*="flex"], [class*="block"], [class*="grid"], [class*="card"], [class*="size-"], [class*="h-"]) {
+    padding-block: 0.75rem;
   }
   input[type="checkbox"],
   input[type="radio"] {
