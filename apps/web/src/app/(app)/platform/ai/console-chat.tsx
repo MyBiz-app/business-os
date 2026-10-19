@@ -27,10 +27,10 @@ export function ConsoleChat({ agents, canEdit, chats: saved, initial }: { agents
   const [error, setError] = useState<string>();
   const [pending, start] = useTransition();
 
-  const send = () => {
-    const question = text.trim();
+  const send = (override?: string) => {
+    const question = (override ?? text).trim();
     if (!question) return;
-    setText("");
+    if (override === undefined) setText("");
     setError(undefined);
     setTurns((all) => [...all, { role: "user", text: question }]);
     start(async () => {
@@ -73,6 +73,7 @@ export function ConsoleChat({ agents, canEdit, chats: saved, initial }: { agents
   const stamp = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const agent = agents.find((a) => a.key === role) ?? agents[0];
   const askable = !!agent && agent.ready && agent.enabled;
+  const weeklyKey = agent ? (`agents.${agent.key}.weekly` as "agents.product.weekly") : null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -129,6 +130,13 @@ export function ConsoleChat({ agents, canEdit, chats: saved, initial }: { agents
         ))}
         {pending && <li className="self-start text-sm text-muted">{t("thinking")}</li>}
       </ol>
+      {askable && weeklyKey && t.has(weeklyKey) && (
+        <div>
+          <button type="button" onClick={() => send(t(weeklyKey))} disabled={pending} className="btn-secondary px-3 py-2 text-sm">
+            {t("weeklyReport")}
+          </button>
+        </div>
+      )}
       <form
         onSubmit={(event) => {
           event.preventDefault();
