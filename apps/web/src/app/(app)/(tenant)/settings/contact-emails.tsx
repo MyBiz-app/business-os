@@ -68,8 +68,18 @@ function PurposeForm({ locationId, item }: { locationId: string | null; item: Pu
 }
 
 /** The addresses of the business, or (with a branch) of that branch; unset ones fall back. */
-export function ContactEmails({ data, locationId }: { data: State; locationId: string | null }) {
+export function ContactEmails({ data, locationId, grouped = false }: { data: State; locationId: string | null; grouped?: boolean }) {
   const t = useTranslations("settings.contactEmails");
+  // Inside a settings group the group supplies the card and the heading.
+  if (grouped) {
+    return (
+      <div className="flex flex-col gap-4">
+        {data.purposes.map((item) => (
+          <PurposeForm key={item.purpose} locationId={locationId} item={item} />
+        ))}
+      </div>
+    );
+  }
   return (
     <section aria-labelledby={`contact-emails-${locationId ?? "business"}`} className="flex flex-col gap-4 card p-6">
       <div className="flex flex-col gap-1">
