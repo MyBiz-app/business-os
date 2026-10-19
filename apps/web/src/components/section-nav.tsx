@@ -57,7 +57,7 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
   return (
     <nav
       aria-label={label}
-      className="section-nav sticky top-14 z-20 -mx-[var(--swipe-gutter,1rem)] border-b border-border bg-background/95 px-[var(--swipe-gutter,1rem)] backdrop-blur print:hidden md:top-16 lg:top-24 lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:backdrop-blur-none"
+      className="section-nav sticky top-(--sticky-top) z-20 -mx-[var(--swipe-gutter,1rem)] border-b border-border bg-background/95 px-[var(--swipe-gutter,1rem)] backdrop-blur print:hidden lg:top-[calc(var(--sticky-top)+2rem)] lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:backdrop-blur-none"
     >
       <ul ref={bar} className="flex gap-1 overflow-x-auto py-2 [scrollbar-width:none] lg:flex-col lg:overflow-visible lg:py-0">
         {items.map((item, index) => {

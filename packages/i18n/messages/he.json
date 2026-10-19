@@ -1396,6 +1396,7 @@
     "copyWeekDone": "{created, plural, =0 {אין שיעורים חדשים להעתקה} one {הועתק שיעור אחד} other {הועתקו # שיעורים}}{skipped, plural, =0 {} one { (אחד כבר קיים)} other { (# כבר קיימים)}}.",
     "copyWeekError": "לא הצלחנו להעתיק את השבוע. נסו שוב.",
     "closedDays": "ימים סגורים",
+    "moreActions": "עוד",
     "closedDay": "סגור",
     "grid": "לוח השנה, ניתן לגלילה",
     "closeDay": "סגירת יום",

@@ -17,6 +17,7 @@ import { AiSpend } from "./ai-spend";
 import { AiUsers } from "./ai-users";
 import { DetailsForm } from "./details-form";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Note } from "@/components/ui/note";
 import { TopicHeader } from "../topic-header";
 import { Ltr } from "@/components/bidi";
 import { ScrollRegion } from "@/components/scroll-region";
@@ -58,10 +59,7 @@ export default async function BillingPage({ searchParams }: PageProps<"/settings
     <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle")} />
 
-      <p role="note" className="flex items-center gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
-        <FlaskConical aria-hidden="true" className="size-4 shrink-0" />
-        {t("simulated")}
-      </p>
+      <Note icon={<FlaskConical />}>{t("simulated")}</Note>
 
       <section aria-labelledby="status-heading" className="card-accent flex flex-col gap-4 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">

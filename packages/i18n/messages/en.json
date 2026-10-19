@@ -1396,6 +1396,7 @@
     "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
     "copyWeekError": "Couldn't copy the week. Try again.",
     "closedDays": "Closed days",
+    "moreActions": "More",
     "closedDay": "Closed",
     "grid": "Calendar grid, scrollable",
     "closeDay": "Close a day",

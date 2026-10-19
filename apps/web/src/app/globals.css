@@ -534,6 +534,32 @@ select {
   padding-block: clamp(4.5rem, 9vw, 8rem);
 }
 
+/* Sticky chrome. --sticky-top is where the signed-in app header ends; everything that sticks under
+   it (the section bar, filter bars, side columns) starts there, and --section-bar is the extra
+   height of the section menu while it spans the phone width. Anchors use .scroll-anchor so a
+   section heading never lands hidden under them. */
+:root {
+  --sticky-top: 3.5rem;
+  --section-bar: 3.75rem;
+}
+@media (min-width: 48rem) {
+  :root {
+    --sticky-top: 4rem;
+  }
+}
+@media (min-width: 64rem) {
+  :root {
+    --section-bar: 0rem;
+  }
+}
+@utility sticky-below-header {
+  position: sticky;
+  top: calc(var(--sticky-top) + 0.5rem);
+}
+@utility scroll-anchor {
+  scroll-margin-top: calc(var(--sticky-top) + var(--section-bar) + 1rem);
+}
+
 /* Settings and record rooms: one column, in the order the sections are written. A zigzag of two
    columns put open sections beside closed ones and left holes, so it was dropped (CRM order audit,
    S1). Only small cards of equal height that never collapse (integrations) use .form-grid, which
@@ -1749,6 +1775,17 @@ h1[tabindex="-1"]:focus {
   padding: 0.75rem 1.25rem;
   border-top: 1px solid var(--border);
   background: var(--surface);
+}
+/* The same row in a full page sticks to the bottom of the screen, so a long form never hides its save button. */
+/* (:where keeps this weaker than the window rule below.) */
+:where(form) .form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding-block: 0.75rem;
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklab, var(--background) 92%, transparent);
+  backdrop-filter: blur(8px);
 }
 @media (min-width: 40rem) {
   .modal-panel .form-actions {
