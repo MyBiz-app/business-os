@@ -890,6 +890,14 @@
     }
   },
   "clients": {
+    "nav": {
+      "label": "אזורי כרטיס הלקוח",
+      "details": "פרטים",
+      "membership": "מנויים וביקורים",
+      "paperwork": "הצעות ומסמכים",
+      "talk": "הערות והודעות",
+      "privacy": "הסכמות ופרטיות"
+    },
     "joinedChip": "הצטרפו {range}",
     "noShowChip": "לא הגיעו {range}",
     "activeFilters": "מסננים פעילים",
@@ -5706,6 +5714,13 @@
     }
   },
   "leads": {
+    "nav": {
+      "label": "אזורי כרטיס הליד",
+      "stage": "שלב",
+      "details": "פרטים",
+      "activity": "פעילות",
+      "messages": "הודעות"
+    },
     "truncated": "מוצגים {shown} לידים מתוך {total}.",
     "showMore": "הצג עוד לידים",
     "title": "לידים",
