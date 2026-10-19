@@ -15,6 +15,7 @@ it is a new provider class, or a different choice in settings.
 | Push notifications | `app/messaging/push.py` (Expo push; phones register via `PUT /me/push-tokens`) | `expo` | the platform: `API_PUSH_PROVIDER` (`expo` / `log` / `off`), optional `API_EXPO_ACCESS_TOKEN` |
 | AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_AI_PROVIDER` (`anthropic` / `openai` / `gemini`), the vendor's key, and `API_AI_ENABLED_VENDORS` for non-Anthropic vendors |
 | Storage | `storage.py`: `StorageProvider` - `put`, `get`, `delete`, `signed_url` | `database` (also `supabase`: Supabase Storage, T80) | the platform: `API_STORAGE_PROVIDER` |
+| Embeddings (search by meaning for the console agents' libraries) | `app/ai/embeddings.py`: `EmbeddingProvider` - `embed(texts, query=...)` | none: **off** (`voyage` is built) | the platform: `API_KB_EMBEDDINGS_PROVIDER` (`off` / `voyage`) and `API_VOYAGE_API_KEY` |
 
 - `registry.py`: `@register(capability, name, label, fields=…)` and `SettingField`.
 - `choice.py`: `choose(db, tenant_id, capability)` - the business's own connection, else the

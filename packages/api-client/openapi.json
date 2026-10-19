@@ -41121,6 +41121,826 @@
         ]
       }
     },
+    "/platform/ai/agents/{key}/library": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "List Library",
+        "description": "The documents of one agent's library: at most 200, the list of a few dozen in practice.",
+        "operationId": "list_library",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LibraryDocument"
+                  },
+                  "title": "Response List Library"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Add Library Document",
+        "description": "Adds a note, a summary, a link or pasted text to an agent's library.",
+        "operationId": "add_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/agents/{key}/library/upload": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Upload Library File",
+        "description": "Adds a file (text, Markdown, HTML, Word or PDF) to an agent's library.",
+        "operationId": "upload_library_file",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_library_file"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Get Library Document",
+        "operationId": "get_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Change Library Document",
+        "description": "Saves a change. A changed text is a new version; the earlier ones stay.",
+        "operationId": "change_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Delete Library Document",
+        "operationId": "delete_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/versions": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Library Versions",
+        "description": "Every saved version of a document, newest first (at most 100).",
+        "operationId": "library_versions",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LibraryVersion"
+                  },
+                  "title": "Response Library Versions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/versions/{version}": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Library Version",
+        "description": "The document as it was in one version.",
+        "operationId": "library_version",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/restore": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Restore Library Version",
+        "description": "Brings an earlier version back as a new version (nothing is lost).",
+        "operationId": "restore_library_version",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryRestore"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/enabled": {
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Switch Library Document",
+        "description": "Switches a document off (the agent stops using it) or on, without deleting it.",
+        "operationId": "switch_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryEnabled"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/refresh": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Refresh Library Document",
+        "description": "Reads the document's source link again; a changed text is a new version, and the\n\"last reviewed\" date becomes today (the source was checked).",
+        "operationId": "refresh_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/agents/{key}/library/refresh": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Refresh Library",
+        "description": "Reads the sources of an agent's library, a few at a time: call again with the offset\nadvanced by the number of results until `remaining` is 0.",
+        "operationId": "refresh_library",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/reindex": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Reindex Library",
+        "description": "Embeds the pieces that are not yet embedded, for search by meaning. Nothing happens\nwhile the embeddings provider is off (the default).",
+        "operationId": "reindex_library",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReindexResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/ai/agents/{key}/library/search": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Search Library",
+        "description": "What the agent would find for a question, to check a library before trusting it.",
+        "operationId": "search_library",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LibrarySearchHit"
+                  },
+                  "title": "Response Search Library"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/businesses/{tenant_id}/card": {
       "get": {
         "tags": [
@@ -49702,6 +50522,86 @@
           "file"
         ],
         "title": "Body_upload_file"
+      },
+      "Body_upload_library_file": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^https?://\\S+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "il",
+                  "us",
+                  "eu",
+                  "all"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "reviewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed On"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_library_file"
       },
       "Body_upload_location_logo": {
         "properties": {
@@ -63718,6 +64618,535 @@
         ],
         "title": "LegalPending"
       },
+      "LibraryChange": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "file",
+              "link",
+              "note",
+              "summary"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^https?://\\S+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "il",
+                  "us",
+                  "eu",
+                  "all"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "reviewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed On"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 400000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "change_note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "title"
+        ],
+        "title": "LibraryChange"
+      },
+      "LibraryDocument": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_key": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "support",
+              "health",
+              "billing",
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
+            ],
+            "title": "Agent Key"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "file",
+              "link",
+              "note",
+              "summary"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "il",
+                  "us",
+                  "eu",
+                  "all"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "reviewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed On"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "chars": {
+            "type": "integer",
+            "title": "Chars",
+            "description": "Length of the current text; 0 for a link without text"
+          },
+          "chunks": {
+            "type": "integer",
+            "title": "Chunks",
+            "description": "Pieces the agent can find; 0 means it cannot find it yet"
+          },
+          "updated_by": {
+            "type": "string",
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_key",
+          "kind",
+          "title",
+          "source_url",
+          "source_org",
+          "country",
+          "reviewed_on",
+          "enabled",
+          "version",
+          "chars",
+          "chunks",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "LibraryDocument"
+      },
+      "LibraryDocumentBody": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_key": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "support",
+              "health",
+              "billing",
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
+            ],
+            "title": "Agent Key"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "file",
+              "link",
+              "note",
+              "summary"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "il",
+                  "us",
+                  "eu",
+                  "all"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "reviewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed On"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "updated_by": {
+            "type": "string",
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_key",
+          "kind",
+          "title",
+          "source_url",
+          "source_org",
+          "country",
+          "reviewed_on",
+          "enabled",
+          "version",
+          "body",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "LibraryDocumentBody"
+      },
+      "LibraryEnabled": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "LibraryEnabled"
+      },
+      "LibraryRestore": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "LibraryRestore"
+      },
+      "LibrarySearchHit": {
+        "properties": {
+          "document": {
+            "type": "string",
+            "title": "Document"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "last_reviewed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Reviewed"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document",
+          "source_url",
+          "source_org",
+          "country",
+          "last_reviewed",
+          "section",
+          "text"
+        ],
+        "title": "LibrarySearchHit"
+      },
+      "LibraryVersion": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "change_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Note"
+          },
+          "created_by": {
+            "type": "string",
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "chars": {
+            "type": "integer",
+            "title": "Chars"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "change_note",
+          "created_by",
+          "created_at",
+          "chars"
+        ],
+        "title": "LibraryVersion"
+      },
       "LimitsUpdate": {
         "properties": {
           "limits": {
@@ -72059,6 +73488,82 @@
           "modules"
         ],
         "title": "Recommendation"
+      },
+      "RefreshReport": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/RefreshResult"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "remaining": {
+            "type": "integer",
+            "title": "Remaining",
+            "description": "Sources still to read; call again with a later offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "results",
+          "remaining"
+        ],
+        "title": "RefreshReport"
+      },
+      "RefreshResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "updated",
+              "unchanged",
+              "failed"
+            ],
+            "title": "Result"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "result"
+        ],
+        "title": "RefreshResult"
+      },
+      "ReindexResult": {
+        "properties": {
+          "embedded": {
+            "type": "integer",
+            "title": "Embedded",
+            "description": "Pieces embedded now; 0 while search by meaning is off"
+          }
+        },
+        "type": "object",
+        "required": [
+          "embedded"
+        ],
+        "title": "ReindexResult"
       },
       "RemoveResult": {
         "properties": {

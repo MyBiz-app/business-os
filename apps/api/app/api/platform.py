@@ -8,7 +8,8 @@ import json
 import logging
 import os
 import zipfile
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -93,11 +94,13 @@ def require_owner(session: StaffDep) -> Session:
 OwnerDep = Annotated[Session, Depends(require_owner)]
 
 
-def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
-    """Calls a console function whose rules raise errors; maps them to HTTP errors."""
+@contextmanager
+def rule_errors(db: Session) -> Iterator[None]:
+    """Runs a block of console function calls in a savepoint; the errors their rules raise become
+    HTTP errors."""
     try:
         with db.begin_nested():
-            return db.execute(text(sql), params).scalar()
+            yield
     except DBAPIError as error:
         code = getattr(error.orig, "sqlstate", None)
         detail = str(getattr(getattr(error.orig, "diag", None), "message_primary", "")) or "error"
@@ -108,6 +111,12 @@ def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
         if code in ("P0001", "23514"):
             raise HTTPException(status_code=422, detail=detail) from error
         raise
+
+
+def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
+    """Calls a console function whose rules raise errors; maps them to HTTP errors."""
+    with rule_errors(db):
+        return db.execute(text(sql), params).scalar()
 
 
 class PlatformBusiness(BaseModel):

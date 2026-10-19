@@ -8,8 +8,8 @@ requests (exports, erasures, closures) without any client details. No table chan
 Two-step sign-in lives in Supabase's `auth` schema, which a plain Postgres (tests, local) may not
 have: there the flag is NULL ("unknown"), never a made-up false.
 
-Revision ID: 0148
-Revises: 0147
+Revision ID: 0149
+Revises: 0148
 Create Date: 2026-10-19
 """
 
@@ -17,8 +17,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0148"
-down_revision: str | None = "0147"
+revision: str = "0149"
+down_revision: str | None = "0148"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     gemini_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("API_GEMINI_API_KEY", "GEMINI_API_KEY")
     )
+    # Search by meaning for the console agents' libraries (slice C3a). Built but off: "voyage" with
+    # a key switches it on. It costs money, so it waits for go-live (go-live-checklist.md).
+    kb_embeddings_provider: str = "off"  # off | voyage
+    voyage_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("API_VOYAGE_API_KEY", "VOYAGE_API_KEY")
+    )
     # Everyday questions run on the cheap model; a turn that needs many tool calls escalates to
     # the stronger one (P0-6). Prices live in app/ai/gateway.py.
     ai_model: str = "claude-haiku-5-5"
