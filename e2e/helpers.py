@@ -32,6 +32,19 @@ def ready(page) -> None:
     )
 
 
+def visit(page, url: str) -> None:
+    """goto() that retries when the browser reports the load as aborted: the page we just left can still be
+    finishing a client-side navigation (a view transition or a refresh), which supersedes the load."""
+    for attempt in range(3):
+        try:
+            page.goto(url)
+            return
+        except Exception as error:
+            if "ERR_ABORTED" not in str(error) or attempt == 2:
+                raise
+            page.wait_for_timeout(1000)
+
+
 def skip_tour(page) -> None:
     """Close the AI team's first-time guide if it opened by itself (it covers the page until skipped)."""
     dialog = page.get_by_role("dialog", name="הכירו את הצוות שלכם")

@@ -62,7 +62,7 @@ with sync_playwright() as p:
     member.wait_for_url("**/join**")
     h.accept_legal(member)
     member.get_by_label("שם פרטי").fill("נועה")
-    member.get_by_role("button", name="הצטרפות לסטודיו עדכונים").click(); member.wait_for_url("**/home")
+    member.get_by_role("button", name="הצטרפות לסטודיו עדכונים").click(); member.get_by_role("button", name="להמשך", exact=True).click(); member.wait_for_url("**/home")
     member.goto(f"{h.APP}/updates")
     expect(member.get_by_text("אין עדכונים עדיין")).to_be_visible(timeout=30000)
     print("1. member joined; empty updates: ok")

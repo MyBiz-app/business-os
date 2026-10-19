@@ -71,7 +71,7 @@ export function RangeSlider({ value, onChange, min, max, step, gap, palette, lab
   );
 
   return (
-    <View style={local.wrap} onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
+    <View {...webLtr} style={local.wrap} onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
       <View style={[local.track, { backgroundColor: palette.border }]} />
       <View style={[local.fill, { left: left + THUMB / 2, width: Math.max(0, right - left), backgroundColor: palette.primary }]} />
       {thumb("from", left)}
@@ -80,8 +80,11 @@ export function RangeSlider({ value, onChange, min, max, step, gap, palette, lab
   );
 }
 
+// react-native-web reads `dir`; the native View type does not declare it.
+const webLtr = { dir: "ltr" } as object;
+
 const local = StyleSheet.create({
-  wrap: { height: THUMB + 8, justifyContent: "center", direction: "ltr" },
+  wrap: { height: THUMB + 8, justifyContent: "center" },
   track: { position: "absolute", left: THUMB / 2, right: THUMB / 2, height: 6, borderRadius: 3 },
   fill: { position: "absolute", height: 6, borderRadius: 3 },
   thumb: { position: "absolute", width: THUMB, height: THUMB, borderRadius: THUMB / 2, borderWidth: 3, top: 4 },

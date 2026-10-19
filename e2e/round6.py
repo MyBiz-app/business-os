@@ -65,7 +65,7 @@ with sync_playwright() as p:
         page.locator("aside button[aria-expanded][aria-controls]").first.click()  # the header has menus too
         page.get_by_role("dialog").get_by_role("button", name=re.compile("Adir fitness")).click()
         page.wait_for_url("**/dashboard"); h.ready(page)
-    expect(page.get_by_role("heading", level=1)).to_contain_text("Adir fitness")
+    expect(page.get_by_role("heading", level=1)).to_contain_text("Adir fitness", timeout=30000)
 
     # The time clock: the demo team's month of hours is there and approved.
     page.goto(f"{h.BASE}/team/time-clock"); h.ready(page)
@@ -93,7 +93,15 @@ with sync_playwright() as p:
             before = acknowledge.count()
             acknowledge.first.click()
             expect(acknowledge).to_have_count(before - 1, timeout=15000)
-        sheet.get_by_role("button", name="סגירה").click()
+        sheet.get_by_role("button", name="סגירת החלון").click()
+    # The demo has a proposed one-off amount; a run cannot leave the additions stage while it waits.
+    page.goto(f"{h.BASE}/team/bonuses"); h.ready(page)
+    approve = page.get_by_role("main").get_by_role("button", name="אישור", exact=True)
+    while approve.count():
+        before = approve.count()
+        approve.first.click()
+        expect(approve).to_have_count(before - 1, timeout=15000)
+    page.goto(f"{h.BASE}/team/payroll"); h.ready(page)
     for step, hint in (
         ("נעילת השעות והמשך", "להוסיף בונוסים"),
         ("המשך לבדיקה", "לתקן כל שגיאה"),

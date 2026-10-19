@@ -193,7 +193,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
               )}
               </div>
               {unfolded && (
-                <ul id={childrenId} className="enter my-0.5 ms-5 flex flex-col gap-0.5 border-s border-border ps-2">
+                <ul id={childrenId} className="my-0.5 ms-5 flex flex-col gap-0.5 border-s border-border ps-2">
                   {children.map((child) => {
                     const anchor = anchorOf(child.href);
                     const here = anchor ? pathOf(child.href) === pathname : false;

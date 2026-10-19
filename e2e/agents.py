@@ -25,6 +25,8 @@ issues: list[str] = []
 
 
 def check(page, label: str) -> None:
+    # A window that is still fading in makes its text look low-contrast; measure the settled page.
+    page.evaluate("Promise.all(document.getAnimations().filter((animation) => Number.isFinite(animation.effect.getComputedTiming().endTime)).map((animation) => animation.finished.catch(() => undefined)))")
     found = [v for v in axe.run(page).response["violations"] if v["impact"] in ("serious", "critical")]
     issues.extend(f"{label}: {v['id']} {[n['target'] for n in v['nodes']]}" for v in found)
 

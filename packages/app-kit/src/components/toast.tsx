@@ -55,7 +55,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 function ToastStack({ toasts, onDone }: { toasts: Toast[]; onDone: (id: number) => void }) {
   const insets = useSafeAreaInsets();
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { bottom: insets.bottom + 88 }]}>
+    <View style={[styles.wrap, { pointerEvents: "box-none" }, { bottom: insets.bottom + 88 }]}>
       {toasts.map((toast) => (
         <ToastView key={toast.id} toast={toast} onDone={() => onDone(toast.id)} />
       ))}

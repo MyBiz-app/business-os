@@ -12,8 +12,8 @@ from playwright.sync_api import expect, sync_playwright
 import helpers as h
 from helpers import APP, login, otp
 
-# A session on the schedule grid links to /schedule/<id>; the other /schedule/... links are pages (new, closed, ...).
-SESSION_LINK = 'main a[href^="/schedule/"]:not([href*="?"]):not([href="/schedule/closed"])'
+# A session on the schedule grid opens as a window over the board (/schedule?...&open=<id>).
+SESSION_LINK = 'main a[href*="open="]'
 ADMIN = sys.argv[1]  # a platform admin's email (see README)
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 stamp = time.time_ns()
@@ -24,10 +24,28 @@ a11y: list[str] = []
 
 def check_a11y(page, label):
     h.ready(page)  # client-side navigations can still be fading in
+    # A page that redirects after its shell streamed (a module the plan lacks) renders a meta refresh first.
+    page.wait_for_function("!document.getElementById('__next-page-redirect')", timeout=10000)
+    h.ready(page)
     results = axe.run(page)
     serious = [v for v in results.response["violations"] if v["impact"] in ("serious", "critical")]
     for v in serious:
-        a11y.append(f"{label}: {v['id']} ({v['impact']}) x{len(v['nodes'])}: {v['nodes'][0]['target']}")
+        node = v["nodes"][0]
+        checks = node.get("any", []) + node.get("all", []) + node.get("none", [])
+        why = checks[0]["message"] if checks else ""
+        if v["id"] == "color-contrast":
+            try:
+                sel = node["target"][-1]
+                chain = page.evaluate("""(sel) => { const out = []; let el = document.querySelector(sel);
+                  const r = el.getBoundingClientRect(); const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                  out.push('top=' + (top && top.tagName + '.' + top.className).slice(0, 80));
+                  while (el && out.length < 9) { const c = getComputedStyle(el);
+                    out.push(el.tagName + '.' + String(el.className).slice(0, 40) + ' bg=' + c.backgroundColor + ' op=' + c.opacity + ' color=' + c.color); el = el.parentElement; }
+                  return out; }""", sel)
+                a11y.append(f"{label}: contrast chain {chain}")
+            except Exception as e:  # diagnostics only
+                a11y.append(f"{label}: contrast chain failed {e}")
+        a11y.append(f"{label}: {v['id']} ({v['impact']}) x{len(v['nodes'])}: {node['target']} {why} {node['html'][:160]}")
 
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
@@ -113,6 +131,8 @@ with sync_playwright() as p:
             JOIN app.users u ON u.id = m.user_id WHERE u.email = %s
         """, (owner_email,)).fetchone()[0]
     member = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, has_touch=True).new_page()
+    member_console: list[str] = []  # what the app logged: Expo's dev toast appears when it logs an error or warning
+    member.on("console", lambda m: member_console.append(f"{m.type}: {m.text[:300]}") if m.type in ("error", "warning") else None)
     member.goto(APP); member.wait_for_url("**/sign-in", timeout=60000)
     member.get_by_label("אימייל").fill(member_email)
     member.get_by_role("button", name="שליחת קוד").click()
@@ -123,7 +143,7 @@ with sync_playwright() as p:
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
     member.get_by_label("שם פרטי").fill("נועה")
-    member.get_by_role("button", name="הצטרפות לסטודיו DoD").click(); member.wait_for_url("**/home", timeout=90000)
+    member.get_by_role("button", name="הצטרפות לסטודיו DoD").click(); member.get_by_role("button", name="להמשך", exact=True).click(); member.wait_for_url("**/home", timeout=90000)
     hero = member.get_by_role("heading", name="סטודיו DoD").locator("..")
     expect(hero).to_have_css("background-color", "rgb(15, 118, 110)")
     expect(member.get_by_text("היי נועה")).to_be_visible()  # claimed the client record by email
@@ -139,8 +159,9 @@ with sync_playwright() as p:
 
     # Owner sees the booking.
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
+    owner.locator(SESSION_LINK).first.wait_for(state="attached", timeout=20000)
     owner.locator(SESSION_LINK).first.click(); h.ready(owner)
-    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("נועה כהן")).to_be_visible()
+    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("נועה כהן")).to_be_visible(timeout=30000)
     print("6. owner sees the booking: ok")
 
     # AI: question, then an action that needs confirmation.
@@ -166,7 +187,7 @@ with sync_playwright() as p:
     expect(owner.get_by_role("status").filter(has_text="בוצע")).to_be_visible()
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
     owner.locator(SESSION_LINK).first.click(); h.ready(owner)
-    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("דנה כהן")).to_be_visible()
+    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("דנה כהן")).to_be_visible(timeout=30000)
     print("7. AI answered, proposed an action, confirmed, executed: ok")
     check_a11y(owner, "he-light session roster")
     owner.get_by_role("region", name="רשימת משתתפים").get_by_role("link", name="נועה כהן").click()
@@ -196,18 +217,23 @@ with sync_playwright() as p:
         "/settings/audit", "/settings/data", "/settings/help",
         "/account", "/migration",
     ]  # fmt: skip
+    # Tall viewport: the side menu scrolls inside its own column when sub-items unfold, and axe works out the
+    # background of text scrolled out of view from the page behind it (a false contrast failure on navy).
+    owner.set_viewport_size({"width": 1280, "height": 2000})
     for path in pages:
-        owner.goto(f"{h.BASE}{path}"); h.ready(owner); check_a11y(owner, f"he-light {path}")
-    en = b.new_context(locale="en-US", color_scheme="dark", viewport={"width": 1280, "height": 900})
+        h.visit(owner, f"{h.BASE}{path}"); h.ready(owner); check_a11y(owner, f"he-light {path}")
+    en = b.new_context(locale="en-US", color_scheme="dark", viewport={"width": 1280, "height": 2000})
     en.add_cookies([{"name": "NEXT_LOCALE", "value": "en", "url": h.BASE}])
     en_page = en.new_page(); login(en_page, owner_email)
     for path in pages:
-        en_page.goto(f"{h.BASE}{path}"); h.ready(en_page); check_a11y(en_page, f"en-dark {path}")
+        h.visit(en_page, f"{h.BASE}{path}"); h.ready(en_page); check_a11y(en_page, f"en-dark {path}")
     check_a11y(member, "app he-light /schedule")
     for path in ("/home", "/bookings", "/profile"):
         member.goto(f"{APP}{path}"); member.wait_for_timeout(1500); check_a11y(member, f"app he-light {path}")
     print("9. accessibility:", "no serious issues" if not a11y else f"{len(a11y)} serious issues")
     for line in a11y:
         print("   ", line)
+    if a11y:
+        print("member app console:", *member_console[-15:], sep="\n    ")
     b.close()
     assert not a11y, f"{len(a11y)} serious accessibility issues (listed above)"

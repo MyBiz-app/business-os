@@ -84,7 +84,7 @@ with sync_playwright() as p:
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
     member.get_by_label("שם פרטי").fill("נועה")
-    member.get_by_role("button", name="הצטרפות לסטודיו בריאות").click(); member.wait_for_url("**/home")
+    member.get_by_role("button", name="הצטרפות לסטודיו בריאות").click(); member.get_by_role("button", name="להמשך", exact=True).click(); member.wait_for_url("**/home")
     expect(member.get_by_text("לפני הביקור הראשון, יש למלא הצהרת בריאות קצרה.")).to_be_visible()
 
     member.goto(f"{h.APP}/schedule")
