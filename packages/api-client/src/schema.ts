@@ -7602,6 +7602,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/businesses/{tenant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business
+         * @description One business, for its card (the list is paged, so the card cannot search it).
+         */
+        get: operations["business"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/usage": {
         parameters: {
             query?: never;
@@ -7793,6 +7813,23 @@ export interface paths {
          * @description The signed-in team member's level and permissions (the console shows what they hold).
          */
         get: operations["platform_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/staff-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff Templates */
+        get: operations["staff_templates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -18260,7 +18297,7 @@ export interface components {
          * PlatformPermission
          * @enum {string}
          */
-        PlatformPermission: "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage";
+        PlatformPermission: "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage" | "incidents.manage";
         /** Point */
         Point: {
             /**
@@ -20930,10 +20967,22 @@ export interface components {
              */
             permissions: components["schemas"]["PlatformPermission"][];
             /**
+             * Template
+             * @description Start from a ready-made permission set; added to `permissions`
+             */
+            template?: "support" | null;
+            /**
              * Disabled
              * @default false
              */
             disabled: boolean;
+        };
+        /** StaffTemplate */
+        StaffTemplate: {
+            /** Key */
+            key: string;
+            /** Permissions */
+            permissions: components["schemas"]["PlatformPermission"][];
         };
         /** StageBody */
         StageBody: {
@@ -40907,6 +40956,37 @@ export interface operations {
             };
         };
     };
+    business: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformBusiness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     usage: {
         parameters: {
             query?: {
@@ -41178,6 +41258,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StaffMe"];
+                };
+            };
+        };
+    };
+    staff_templates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffTemplate"][];
                 };
             };
         };

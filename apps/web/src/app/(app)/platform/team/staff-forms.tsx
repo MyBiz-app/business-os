@@ -10,7 +10,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 import { removeStaff, saveStaff, setPaused, type StaffState } from "./actions";
 
 type Level = "owner" | "manager" | "employee";
-type Permission = "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage";
+type Permission = "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage" | "incidents.manage";
 
 export type Member = {
   email: string;
@@ -29,6 +29,8 @@ type Actor = {
   levels: Level[];
   /** Permissions this person holds (and so may give). */
   permissions: Permission[];
+  /** Ready-made permission sets, by key (for example "support"). */
+  templates: Record<string, Permission[]>;
 };
 
 function useError() {
@@ -40,7 +42,17 @@ function useError() {
 function LevelAndPermissions({ actor, level: initialLevel, permissions }: { actor: Actor; level: Level; permissions: Permission[] }) {
   const t = useTranslations("platform");
   const [level, setLevel] = useState<Level>(initialLevel);
+  const [selected, setSelected] = useState<Permission[]>(
+    permissions.length === 0 && initialLevel === "manager" ? ["staff.manage"] : permissions,
+  );
   const offered = actor.permissions.filter((p) => !(level === "employee" && p === "staff.manage"));
+  const toggle = (permission: Permission, on: boolean) =>
+    setSelected((all) => (on ? [...all.filter((p) => p !== permission), permission] : all.filter((p) => p !== permission)));
+  /** A template can only give what this person holds. */
+  const applyTemplate = (key: string) => {
+    if (actor.levels.includes("employee")) setLevel("employee");
+    setSelected(actor.templates[key].filter((p) => actor.permissions.includes(p)));
+  };
   return (
     <>
       <fieldset className="flex flex-col gap-2">
@@ -67,6 +79,13 @@ function LevelAndPermissions({ actor, level: initialLevel, permissions }: { acto
       ) : (
         <fieldset className="flex flex-col gap-2">
           <legend className="text-sm font-medium">{t("team.permissions")}</legend>
+          <div className="flex flex-wrap gap-2">
+            {Object.keys(actor.templates).map((name) => (
+              <button key={name} type="button" onClick={() => applyTemplate(name)} className="btn-secondary px-3 py-1.5 text-sm" title={t(`team.templates.${name as "support"}.hint`)}>
+                {t(`team.templates.${name as "support"}.name`)}
+              </button>
+            ))}
+          </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {offered.map((permission) => (
               <label key={permission} className="flex items-start gap-2 rounded-xl border border-border p-3 text-sm">
@@ -74,7 +93,8 @@ function LevelAndPermissions({ actor, level: initialLevel, permissions }: { acto
                   type="checkbox"
                   name="permissions"
                   value={permission}
-                  defaultChecked={permissions.includes(permission) || (level === "manager" && permission === "staff.manage" && permissions.length === 0)}
+                  checked={selected.includes(permission)}
+                  onChange={(event) => toggle(permission, event.target.checked)}
                   className="mt-0.5 size-4 accent-[var(--primary)]"
                 />
                 <span className="flex flex-col">

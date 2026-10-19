@@ -38992,6 +38992,55 @@
         }
       }
     },
+    "/platform/businesses/{tenant_id}": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Business",
+        "description": "One business, for its card (the list is paged, so the card cannot search it).",
+        "operationId": "business",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBusiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/usage": {
       "get": {
         "tags": [
@@ -39474,6 +39523,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StaffMe"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/staff-templates": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Staff Templates",
+        "operationId": "staff_templates",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StaffTemplate"
+                  },
+                  "type": "array",
+                  "title": "Response Staff Templates"
                 }
               }
             }
@@ -67973,7 +68052,8 @@
           "inbox.manage",
           "usage.read",
           "staff.manage",
-          "broadcasts.manage"
+          "broadcasts.manage",
+          "incidents.manage"
         ],
         "title": "PlatformPermission"
       },
@@ -75002,6 +75082,19 @@
             "title": "Permissions",
             "default": []
           },
+          "template": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "support"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template",
+            "description": "Start from a ready-made permission set; added to `permissions`"
+          },
           "disabled": {
             "type": "boolean",
             "title": "Disabled",
@@ -75013,6 +75106,27 @@
           "level"
         ],
         "title": "StaffSave"
+      },
+      "StaffTemplate": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformPermission"
+            },
+            "type": "array",
+            "title": "Permissions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "permissions"
+        ],
+        "title": "StaffTemplate"
       },
       "StageBody": {
         "properties": {

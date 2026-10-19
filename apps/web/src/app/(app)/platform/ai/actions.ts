@@ -69,3 +69,12 @@ export async function askConsoleAssistant(chatId: string | null, role: ChatRole,
   }
   return { id: data.id, turns: data.turns };
 }
+
+export type ChatOpened = { id: string; role: ChatRole; turns: ChatTurn[] };
+
+/** An earlier conversation of the signed-in team member, with its turns. */
+export async function openConsoleChat(chatId: string): Promise<ChatOpened | null> {
+  const { api } = await getPlatform();
+  const { data } = await api.GET("/platform/ai/assistant/conversations/{chat_id}", { params: { path: { chat_id: chatId } } });
+  return data ? { id: data.id, role: data.role, turns: data.turns } : null;
+}

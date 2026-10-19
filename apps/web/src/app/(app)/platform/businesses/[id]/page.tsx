@@ -24,12 +24,11 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
   const locale = await getLocale();
   const { me } = await getActiveMembership();
   const { api, can } = await getPlatformFor("businesses.read");
-  const [businesses, usage, invoices] = await Promise.all([
-    api.GET("/platform/businesses").then(unwrap),
+  const [business, usage, invoices] = await Promise.all([
+    api.GET("/platform/businesses/{tenant_id}", { params: { path: { tenant_id: id } } }).then((result) => result.data ?? null),
     can("usage.read") ? api.GET("/platform/usage", { params: { query: { tenant_id: id, days: 90 } } }).then(unwrap) : [],
     can("billing.manage") ? api.GET("/platform/businesses/{tenant_id}/invoices", { params: { path: { tenant_id: id } } }).then(unwrap) : [],
   ]);
-  const business = businesses.find((b) => b.id === id);
   if (!business) notFound();
   // Prices in the business's own currency.
   const catalog = can("billing.manage")

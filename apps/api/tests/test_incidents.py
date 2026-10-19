@@ -43,12 +43,12 @@ def test_a_banner_is_public_until_the_team_resolves_it(
     assert kept["id"] == incident_id
 
 
-def test_only_the_broadcast_permission_opens_a_banner(
+def test_only_the_incident_permission_opens_a_banner(
     client: TestClient, engine: Engine, auth: AuthHeaders, studio: dict
 ) -> None:
     allowed, plain = uuid4(), uuid4()
-    make_staff(engine, allowed, "employee", ("broadcasts.manage",))
-    make_staff(engine, plain, "employee", ("inbox.manage",))
+    make_staff(engine, allowed, "employee", ("incidents.manage",))
+    make_staff(engine, plain, "employee", ("inbox.manage", "broadcasts.manage"))
     assert client.post("/platform/incidents", json=BANNER, headers=auth(allowed)).status_code == 201
     assert client.post("/platform/incidents", json=BANNER, headers=auth(plain)).status_code == 403
     assert client.get("/platform/incidents", headers=auth(plain)).status_code == 403

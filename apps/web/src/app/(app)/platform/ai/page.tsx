@@ -21,6 +21,11 @@ export default async function PlatformAiPage() {
   const costs = unwrap(await api.GET("/platform/ai/costs", { params: { query: { days: 30 } } }));
   const settings = unwrap(await api.GET("/platform/ai/settings"));
   const connectors = unwrap(await api.GET("/platform/ai/connectors", { params: { query: { days: 30 } } }));
+  // The conversation left open last time comes back after a refresh.
+  const chats = unwrap(await api.GET("/platform/ai/assistant/conversations"));
+  const latest = chats[0]
+    ? (await api.GET("/platform/ai/assistant/conversations/{chat_id}", { params: { path: { chat_id: chats[0].id } } })).data
+    : undefined;
   const stamp = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const canChange = can("billing.manage");
@@ -146,7 +151,10 @@ export default async function PlatformAiPage() {
         <h2 id="ai-team" className="text-lg font-semibold">{t("team")}</h2>
         <p className="text-sm text-muted">{t("teamHint")}</p>
         <div className="card p-5">
-          <ConsoleChat />
+          <ConsoleChat
+            chats={chats.map((chat) => ({ id: chat.id, role: chat.role, title: chat.title, updatedAt: chat.updated_at }))}
+            initial={latest ? { id: latest.id, role: latest.role, turns: latest.turns } : null}
+          />
         </div>
       </section>
     </Container>
