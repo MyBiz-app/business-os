@@ -40798,6 +40798,60 @@
         }
       }
     },
+    "/platform/metrics/saas": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Saas Metrics",
+        "description": "MRR, ARR, ARPU, churn and the AI margin, with a month-by-month history.",
+        "operationId": "saas_metrics",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaasMetrics"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/metrics/email": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Email Deliverability",
+        "description": "Which addresses bounced or complained: they are never mailed again.",
+        "operationId": "email_deliverability",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliverability"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/support-access": {
       "get": {
         "tags": [
@@ -45595,6 +45649,37 @@
           "businesses"
         ],
         "title": "AICostBoard"
+      },
+      "AIMargin": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "cost_usd_minor": {
+            "type": "integer",
+            "title": "Cost Usd Minor",
+            "description": "Model cost of the period, US cents"
+          },
+          "revenue_usd_minor": {
+            "type": "integer",
+            "title": "Revenue Usd Minor",
+            "description": "Monthly price of the AI modules in USD, cents"
+          },
+          "margin_usd_minor": {
+            "type": "integer",
+            "title": "Margin Usd Minor",
+            "description": "Revenue minus cost for businesses billed in USD"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "cost_usd_minor",
+          "revenue_usd_minor",
+          "margin_usd_minor"
+        ],
+        "title": "AIMargin"
       },
       "AIPause": {
         "properties": {
@@ -51511,6 +51596,43 @@
         ],
         "title": "Child"
       },
+      "ChurnMetrics": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "title": "Month"
+          },
+          "cancelled": {
+            "type": "integer",
+            "title": "Cancelled"
+          },
+          "paying_at_start": {
+            "type": "integer",
+            "title": "Paying At Start"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate",
+            "description": "Cancelled over paying at the month's start"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "cancelled",
+          "paying_at_start",
+          "rate"
+        ],
+        "title": "ChurnMetrics"
+      },
       "ChurnMonth": {
         "properties": {
           "month": {
@@ -55352,6 +55474,51 @@
         "type": "object",
         "title": "CreditOverride"
       },
+      "CurrencyMetrics": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "mrr": {
+            "type": "integer",
+            "title": "Mrr",
+            "description": "Billed in the latest invoiced month, minor units"
+          },
+          "arr": {
+            "type": "integer",
+            "title": "Arr",
+            "description": "MRR times twelve, minor units"
+          },
+          "arpu": {
+            "type": "integer",
+            "title": "Arpu",
+            "description": "MRR per invoiced business, minor units"
+          },
+          "mrr_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Mrr Month"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/RevenueMonth"
+            },
+            "type": "array",
+            "title": "Months"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "mrr",
+          "arr",
+          "arpu",
+          "mrr_month",
+          "months"
+        ],
+        "title": "CurrencyMetrics"
+      },
       "CurrencyRevenue": {
         "properties": {
           "currency": {
@@ -55732,6 +55899,30 @@
           "confirm"
         ],
         "title": "DeleteAccountRequest"
+      },
+      "DeliverabilityMonth": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "title": "Month"
+          },
+          "bounced": {
+            "type": "integer",
+            "title": "Bounced"
+          },
+          "complained": {
+            "type": "integer",
+            "title": "Complained"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "bounced",
+          "complained"
+        ],
+        "title": "DeliverabilityMonth"
       },
       "DeliveryStats": {
         "properties": {
@@ -56570,6 +56761,54 @@
           "suspend_after_days"
         ],
         "title": "DunningSettings"
+      },
+      "EmailDeliverability": {
+        "properties": {
+          "emails_waiting": {
+            "type": "integer",
+            "title": "Emails Waiting"
+          },
+          "bounced": {
+            "type": "integer",
+            "title": "Bounced",
+            "description": "Hard bounces in the last 12 months"
+          },
+          "complained": {
+            "type": "integer",
+            "title": "Complained",
+            "description": "Spam complaints in the last 12 months"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/DeliverabilityMonth"
+            },
+            "type": "array",
+            "title": "Months"
+          },
+          "recent": {
+            "items": {
+              "$ref": "#/components/schemas/SuppressedAddress"
+            },
+            "type": "array",
+            "title": "Recent",
+            "description": "The latest 50, addresses masked"
+          },
+          "webhook_open": {
+            "type": "boolean",
+            "title": "Webhook Open",
+            "description": "Is the provider's bounce webhook switched on"
+          }
+        },
+        "type": "object",
+        "required": [
+          "emails_waiting",
+          "bounced",
+          "complained",
+          "months",
+          "recent",
+          "webhook_open"
+        ],
+        "title": "EmailDeliverability"
       },
       "Embed": {
         "properties": {
@@ -70787,6 +71026,43 @@
         ],
         "title": "RevealedBank"
       },
+      "RevenueMonth": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "title": "Month"
+          },
+          "billed": {
+            "type": "integer",
+            "title": "Billed",
+            "description": "Paid and open invoices, minor units"
+          },
+          "paid": {
+            "type": "integer",
+            "title": "Paid",
+            "description": "Minor units"
+          },
+          "open": {
+            "type": "integer",
+            "title": "Open",
+            "description": "Minor units"
+          },
+          "invoices": {
+            "type": "integer",
+            "title": "Invoices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "billed",
+          "paid",
+          "open",
+          "invoices"
+        ],
+        "title": "RevenueMonth"
+      },
       "Review": {
         "properties": {
           "approve": {
@@ -72000,6 +72276,45 @@
           "severity"
         ],
         "title": "RunWarning"
+      },
+      "SaasMetrics": {
+        "properties": {
+          "currencies": {
+            "items": {
+              "$ref": "#/components/schemas/CurrencyMetrics"
+            },
+            "type": "array",
+            "title": "Currencies"
+          },
+          "churn": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChurnMetrics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ai": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AIMargin"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only for team members who may read usage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currencies",
+          "churn",
+          "ai"
+        ],
+        "title": "SaasMetrics"
       },
       "Sale": {
         "properties": {
@@ -75292,6 +75607,35 @@
           "path"
         ],
         "title": "SupportVisit"
+      },
+      "SuppressedAddress": {
+        "properties": {
+          "address": {
+            "type": "string",
+            "title": "Address",
+            "description": "Masked: the first letter and the domain"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "bounced",
+              "complained"
+            ],
+            "title": "Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "address",
+          "reason",
+          "created_at"
+        ],
+        "title": "SuppressedAddress"
       },
       "SwapCreate": {
         "properties": {

@@ -7,8 +7,8 @@ businesses could also put a banner on every page. They now need `incidents.manag
 `app.platform_business(id)` returns one business with the same columns as
 `app.platform_businesses()`, so the business card no longer loads every business to show one.
 
-Revision ID: 0143
-Revises: 0142
+Revision ID: 0144
+Revises: 0143
 Create Date: 2026-10-19
 """
 
@@ -16,8 +16,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0143"
-down_revision: str | None = "0142"
+revision: str = "0144"
+down_revision: str | None = "0143"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
