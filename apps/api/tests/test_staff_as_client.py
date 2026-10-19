@@ -126,3 +126,16 @@ def test_each_area_gives_only_that_areas_permissions(
     me = client.get("/me", headers=as_staff).json()
     roles = {m["tenant_id"]: m["role"] for m in me["memberships"]}
     assert roles[str(studio["tenant_id"])] == "staff"
+
+
+def test_me_says_which_team_businesses_offer_a_client_area(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    code = client.get("/tenants/current", headers=studio["headers"]).json()["join_code"]
+    offers = client.get(f"/public/businesses/{code}").json()["client_app"]
+
+    me = client.get("/me", headers=auth(studio["coach"])).json()
+
+    assert {m["tenant_id"]: m["client_app"] for m in me["memberships"]} == {
+        str(studio["tenant_id"]): offers
+    }

@@ -16600,6 +16600,12 @@ export interface components {
              * @enum {string}
              */
             role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
+            /**
+             * Client App
+             * @description The business offers the client app (the member's client area)
+             * @default false
+             */
+            client_app: boolean;
         };
         /** Message */
         Message: {

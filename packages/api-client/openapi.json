@@ -63913,6 +63913,12 @@
               "front_desk"
             ],
             "title": "Role"
+          },
+          "client_app": {
+            "type": "boolean",
+            "title": "Client App",
+            "description": "The business offers the client app (the member's client area)",
+            "default": false
           }
         },
         "type": "object",

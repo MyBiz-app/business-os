@@ -296,7 +296,9 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
     )
     memberships = session.execute(
         text("""
-            SELECT m.tenant_id, t.name AS tenant_name, m.role
+            SELECT m.tenant_id, t.name AS tenant_name, m.role,
+                   coalesce((SELECT b.client_app
+                             FROM app.business_by_join_code(t.join_code) b), false) AS client_app
             FROM app.tenant_members m
             JOIN app.tenants t ON t.id = m.tenant_id
             WHERE m.user_id = app.current_user_id()
