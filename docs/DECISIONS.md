@@ -382,6 +382,8 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **The R33 cancellation text needs a lawyer.** The cancellation wording and the policy page are drafts. Do not publish them before a lawyer reviews them.
 - **The 129 "solo" price needs its own decision**: billing sums module prices and has no bundle discount, so the solo bundle cannot show a discounted total on the invoice yet. Choose how a bundle discount appears on the invoice, then build it.
 - **Not touched here, to avoid colliding with open slices:** the subscription-cancel confirmation (R33 replaces that screen with its own cancel flow) and the demo data for the cancellation policy, solo mode and freeze extras (R18 owns the seed files).
+- **SaaS numbers are computed from billed invoices (K3).** MRR is paid plus open invoices of the latest month that has invoices (void excluded), per currency, never converted; ARR is MRR times 12; ARPU is MRR divided by that month's invoice count (one invoice per business per month). Churn is cancelled over businesses past their trial at the month start, for the last finished month. The AI margin counts only businesses billed in USD (credits are US cents). Real card revenue replaces these once payments are live.
+- **Email delivery adds one migration despite the spec saying none (K3).** The suppression table has no direct grants by design, so the console reads it through `app.platform_email_suppressions()` (usage permission, last 12 months, max 500). Addresses are masked in the API (first letter and domain).
 
 ## Open
 
