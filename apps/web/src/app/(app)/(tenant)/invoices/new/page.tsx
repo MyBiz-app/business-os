@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
 
 import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";

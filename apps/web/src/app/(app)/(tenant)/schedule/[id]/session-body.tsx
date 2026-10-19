@@ -1,6 +1,5 @@
 import { FormNotice } from "@/components/form/form-message";
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { unwrap } from "@/lib/api";
@@ -16,6 +15,7 @@ import { JobPanel } from "./job-panel";
 import { Roster } from "./roster";
 import { SessionStatusButton } from "./session-status-button";
 import { UserText, Ltr } from "@/components/bidi";
+import { BackLink } from "@/components/back-link";
 import { PageHeader } from "@/components/layout/page-header";
 
 type Query = Record<string, string | string[] | undefined>;
@@ -55,9 +55,7 @@ export async function SessionBody({ id, query, inModal = false }: { id: string; 
   return (
     <div className="flex flex-1 flex-col gap-6">
       {!inModal && (
-        <Link href={`/schedule?week=${day}`} className="text-sm text-primary-ink underline-offset-4 hover:underline">
-          {t("back")}
-        </Link>
+        <BackLink href={`/schedule?week=${day}`} label={t("back")} />
       )}
       <div className="flex flex-col gap-2">
         <PageHeader
