@@ -10,6 +10,7 @@ import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { askConsoleAssistant, openConsoleChat, type ChatOpened, type ChatRole, type ChatTurn } from "./actions";
 import { AgentEditor } from "./agent-editor";
 import { AgentsMap, useAgentName, type AgentCard } from "./agents-map";
+import { LibraryPanel } from "./library-panel";
 
 export type ChatListItem = { id: string; role: string; title: string | null; updatedAt: string };
 
@@ -113,6 +114,11 @@ export function ConsoleChat({ agents, canEdit, chats: saved, initial }: { agents
       {canEdit && agent && (
         <CollapsibleSection title={t("agentSettings")} variant="inline">
           <AgentEditor agent={agent} />
+        </CollapsibleSection>
+      )}
+      {agent && (
+        <CollapsibleSection title={t("library.title")} variant="inline">
+          <LibraryPanel key={agent.key} agent={agent.key} canEdit={canEdit} />
         </CollapsibleSection>
       )}
       <FormError message={error} />

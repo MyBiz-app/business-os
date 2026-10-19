@@ -210,6 +210,26 @@ in `apps/api` with the provider's key set. It asks about 60 questions of three w
 the cap, needs no passwords, and prints credits, seconds and errors per kind. Without both guards
 it refuses; on the demo provider it is a free dry run.
 
+## Switching on search by meaning for the agents' libraries (slice C3a)
+
+Built and **off**; the libraries work today with a words search (free). Search by meaning finds a
+passage even when the question uses other words ("money back" for "refund"). It needs a paid
+embeddings provider, so it waits for the owner's "connect":
+
+1. The database has the `vector` extension: on Supabase migration 0147 creates it by itself (free).
+   Check with `select extname from pg_extension where extname = 'vector'`.
+2. Create a Voyage AI account and a key (about one cent per 100 pages, one time; a question costs a
+   fraction of a cent). The owner pastes the key, never in chat.
+3. On Render set `API_VOYAGE_API_KEY` and `API_KB_EMBEDDINGS_PROVIDER=voyage`.
+4. In the console, AI area, any agent, Library: save a document (new text is embedded when it is
+   saved) or call `POST /platform/ai/library/reindex` to embed what is already there. The words
+   search keeps working if the provider is down.
+5. Switching back is `API_KB_EMBEDDINGS_PROVIDER=off`; embeddings already stored are simply ignored.
+
+The libraries start with links to official public sources; the "Read the sources" button in the
+console fetches their text (free). Standards that are copyrighted must not be uploaded without a
+licence.
+
 ## Firewall in front of the website and API (WAF)
 
 The API already limits requests per address and per business, but nothing filters traffic before it
