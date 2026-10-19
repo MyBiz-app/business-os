@@ -32,6 +32,17 @@ export async function saveAiSettings(_state: AiState, formData: FormData): Promi
   return { saved: true };
 }
 
+/** Switches web search for the console agents on or off and sets the searches allowed per month. */
+export async function saveWebSearch(_state: AiState, formData: FormData): Promise<AiState> {
+  const { api } = await getPlatform();
+  const { response } = await api.PUT("/platform/ai/web-search", {
+    body: { enabled: formData.get("enabled") === "on", monthly_limit: Number(formData.get("monthly_limit") ?? 0) || 0 },
+  });
+  if (!response.ok) return errorOf(response);
+  revalidatePath("/platform/ai");
+  return { saved: true };
+}
+
 /** Stops AI for one business (with a reason) or lets it run again. */
 export async function setBusinessAiPaused(tenantId: string, paused: boolean, reason: string): Promise<AiState> {
   const { api } = await getPlatform();

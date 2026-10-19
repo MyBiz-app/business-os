@@ -3243,7 +3243,8 @@
         "ai_unavailable": "The AI is not answering right now.",
         "ai_not_configured": "AI is not set up on this server.",
         "agent_disabled": "This agent is switched off.",
-        "agent_not_ready": "This agent cannot be asked yet."
+        "agent_not_ready": "This agent cannot be asked yet.",
+        "webSearch": "The web search settings were not saved."
       },
       "connectors": {
         "title": "AI connectors",
@@ -3355,6 +3356,32 @@
         "health": "Who is at risk of leaving, who has not started.",
         "billing": "Invoices, overdue amounts, unusual AI use.",
         "growth": "Follow-ups to leads and announcements, as drafts."
+      },
+      "webSearch": {
+        "title": "Web search",
+        "hint": "Lets the market researcher read competitors' public pricing pages. It costs about $10 per 1,000 searches, so it is off until you switch it on, and it stops at the monthly limit.",
+        "enabled": "Allow web search",
+        "limit": "Searches allowed per month",
+        "used": "Used this month: {count}",
+        "forbidden": "You need billing permission to change this."
+      },
+      "reports": {
+        "title": "Saved reports",
+        "hint": "Price comparisons the market researcher saved. Every price has a link and the date it was read. A price change is always your decision.",
+        "empty": "No reports yet. Ask the market researcher for one.",
+        "summary": "Summary",
+        "item": "Item",
+        "ours": "Us",
+        "cheapest": "Cheapest",
+        "gap": "Gap",
+        "pricier": "We are dearer",
+        "competitor": "Competitor",
+        "source": "Source",
+        "checked": "Read on",
+        "by": "By",
+        "open": "Show details",
+        "close": "Hide details",
+        "dearer": "{count} items where we are dearer than the cheapest competitor"
       },
       "weeklyReport": "Weekly report"
     },

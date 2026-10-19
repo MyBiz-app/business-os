@@ -17,6 +17,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.ai import market, web_search
 from app.ai.console_agents import AGENT_KEYS, agent_prompt
 from app.ai.gateway import (
     LLMProvider,
@@ -458,6 +459,64 @@ TOOLS: dict[str, Tool] = {
             _signup_funnel,
         ),
         Tool(
+            "our_prices",
+            "Our own price list: every module and each website product, monthly price in "
+            "minor units per currency.",
+            {},
+            "usage.read",
+            frozenset({"market"}),
+            market.our_prices,
+        ),
+        Tool(
+            "competitors",
+            "The competitors to compare with (name, region, website). Prices are not stored: "
+            "read them from the competitor's public pricing page.",
+            {},
+            "usage.read",
+            frozenset({"market"}),
+            market.competitor_list,
+        ),
+        Tool(
+            "save_market_report",
+            "Saves a price comparison as a report. Send one row per competitor price you read, "
+            "each with the item (from our_prices), the competitor, the currency (ILS, USD or "
+            "EUR), the monthly price in minor units, the https link you read it on, the date "
+            "(YYYY-MM-DD) and a short note (or an empty string). Never send a price without a "
+            "source. The server marks where we are dearer than the cheapest competitor.",
+            {
+                "title": {"type": "string"},
+                "summary": {"type": "string"},
+                "rows": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "item": {"type": "string"},
+                            "competitor": {"type": "string"},
+                            "currency": {"type": "string"},
+                            "price_minor": {"type": "integer"},
+                            "source_url": {"type": "string"},
+                            "checked_on": {"type": "string"},
+                            "note": {"type": "string"},
+                        },
+                        "required": [
+                            "item",
+                            "competitor",
+                            "currency",
+                            "price_minor",
+                            "source_url",
+                            "checked_on",
+                            "note",
+                        ],
+                        "additionalProperties": False,
+                    },
+                },
+            },
+            "usage.read",
+            frozenset({"market"}),
+            market.save_market_report,
+        ),
+        Tool(
             "price_list",
             "The price list: the core price by number of active clients and the monthly price "
             "of every module, by currency.",
@@ -564,7 +623,10 @@ def ask(
     role = row["role"]
     tools = tools_for(role, permissions_of(db))
     offered = frozenset(t.name for t in tools)
-    definitions = [t.definition() for t in tools]
+    definitions: list[dict[str, Any]] = [t.definition() for t in tools]
+    search = web_search.tool_for(db, provider, role)
+    if search:
+        definitions.append(search)
     system = SYSTEM_PROMPT + "\n\n" + agent_prompt(db, role)
     messages: list[dict[str, Any]] = list(row["messages"])
     messages.append(
@@ -579,6 +641,8 @@ def ask(
             )
             spent.append(response)
             messages.append({"role": "assistant", "content": response.content})
+            if response.stop_reason == "pause_turn":
+                continue  # the provider's own search loop paused: send the turn back to resume
             if response.stop_reason != "tool_use":
                 break
             results = []
@@ -635,8 +699,12 @@ def ask(
 
 def _add_credits(db: Session, conversation_id: UUID, spent: list[LLMResponse]) -> None:
     total = sum(credits(r.model, r.usage) for r in spent)
+    searches = sum(r.usage.web_searches for r in spent)
     if total:
         db.execute(
-            text("UPDATE app.platform_ai_conversations SET credits = credits + :c WHERE id = :id"),
-            {"c": total, "id": conversation_id},
+            text(
+                "UPDATE app.platform_ai_conversations "
+                "SET credits = credits + :c, web_searches = web_searches + :s WHERE id = :id"
+            ),
+            {"c": total, "s": searches, "id": conversation_id},
         )
