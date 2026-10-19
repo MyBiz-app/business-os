@@ -17,7 +17,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.ai import knowledge, market, security, web_search
+from app.ai import knowledge, market, professional, security, web_search
 from app.ai.console_agents import AGENT_KEYS, agent_prompt
 from app.ai.gateway import (
     LLMProvider,
@@ -199,6 +199,9 @@ def _business_detail(db: Session, args: dict[str, Any]) -> dict[str, Any]:
         "vertical": r["vertical"],
         "locale": r["locale"],
         "currency": r["currency"],
+        "country": db.execute(
+            text("SELECT app.platform_business_country(:id)"), {"id": r["id"]}
+        ).scalar(),
         "time_zone": r["time_zone"],
         "created_at": r["created_at"].date().isoformat(),
         "members": r["members"],
@@ -418,7 +421,18 @@ TOOLS: dict[str, Tool] = {
             "Pass a name fragment to filter, or an empty string for the newest.",
             {"name": {"type": "string"}},
             "businesses.read",
-            frozenset({"manager", "health", "billing", "growth", "success", "product"}),
+            frozenset(
+                {
+                    "manager",
+                    "health",
+                    "billing",
+                    "growth",
+                    "success",
+                    "product",
+                    "legal",
+                    "accountant",
+                }
+            ),
             _list_businesses,
         ),
         Tool(
@@ -443,7 +457,7 @@ TOOLS: dict[str, Tool] = {
             "What the platform billed per month and currency: issued, paid and open amounts.",
             {},
             "billing.manage",
-            frozenset({"manager", "billing"}),
+            frozenset({"manager", "billing", "accountant"}),
             _billing_overview,
         ),
         Tool(
@@ -456,11 +470,22 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "business_detail",
-            "One business by its id (from list_businesses): size, activity, modules, AI use "
-            "and the owner's email.",
+            "One business by its id (from list_businesses): country, size, activity, modules, AI "
+            "use and the owner's email.",
             {"id": {"type": "string"}},
             "businesses.read",
-            frozenset({"manager", "health", "billing", "growth", "success", "support"}),
+            frozenset(
+                {
+                    "manager",
+                    "health",
+                    "billing",
+                    "growth",
+                    "success",
+                    "support",
+                    "legal",
+                    "accountant",
+                }
+            ),
             _business_detail,
         ),
         Tool(
@@ -807,6 +832,7 @@ def ask(
             response = clean_response(provider.create(system, messages, definitions, True))
             spent.append(response)
             messages.append({"role": "assistant", "content": response.content})
+        _add_notice(messages, role, question)
     except (ProviderBusy, ProviderUnavailable):
         work.rollback()
         _add_credits(db, conversation_id, spent)
@@ -827,6 +853,16 @@ def ask(
             "id": conversation_id,
         },
     )
+
+
+def _add_notice(messages: list[dict[str, Any]], role: str, question: str) -> None:
+    """The legal and accountant agents end every answer with the fixed "not advice" line."""
+    notice = professional.notice_for(role, question)
+    if notice is None:
+        return
+    content = messages[-1]["content"]
+    if not any(notice in b.get("text", "") for b in content if b.get("type") == "text"):
+        content.append({"type": "text", "text": notice})
 
 
 def _add_credits(db: Session, conversation_id: UUID, spent: list[LLMResponse]) -> None:
