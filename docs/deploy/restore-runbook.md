@@ -5,7 +5,7 @@ drill (last section) once the production database exists.
 
 **Status:** staging runs on the Supabase free plan, which has **no usable backups and no
 point-in-time restore**. Everything below the "Production" heading assumes the Pro plan with daily
-backups and the PITR add-on (go-live item B1/B4 in [the go-live review](../reviews/go-live-readiness-2026-10.md)).
+backups and the PITR add-on (go-live item B1/B4 in [the go-live review](../reviews/archive/go-live-readiness-2026-10.md)).
 Until then, the only safety net is the demo seed ([`seed-staging.yml`](../../.github/workflows/seed-staging.yml)).
 
 ## What holds data, and how it comes back

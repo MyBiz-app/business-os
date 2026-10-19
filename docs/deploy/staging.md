@@ -80,7 +80,7 @@ only) and not the transaction pooler (port 6543).
   service and redeploy.
 - The same store counts each business's signed-in requests: `API_TENANT_RATE_LIMIT_PER_MINUTE`
   (default 600, 0 turns it off) answers 429 `tenant_rate_limited` over it. See
-  [the load test](../reviews/load-test-2026-10.md).
+  [the load test](../reviews/archive/load-test-2026-10.md).
 - With `API_ENVIRONMENT=production` the API also refuses to start when `API_JWKS_URL`,
   `API_SECRETS_KEY`, `API_INTERNAL_TOKEN`, `API_WEB_URL`, `API_API_URL` or `API_CORS_ORIGINS`
   is missing or still points at localhost; the error names the missing ones. The background-job

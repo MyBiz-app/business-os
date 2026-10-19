@@ -1,9 +1,9 @@
-// Turns the Markdown spec (docs/spec/v3/spec.<locale>.md) into a Word document.
+// Turns the Markdown spec (docs/spec/archive/v3/spec.<locale>.md) into a Word document.
 // Supports what the spec uses: #/##/### headings, paragraphs, "- " bullets, "1. " numbered
 // items (nested by three spaces) and pipe tables. Hebrew is laid out right-to-left.
 //
-//   node scripts/spec-to-docx.cjs he   → docs/spec/MyBiz-Spec-he.docx
-//   node scripts/spec-to-docx.cjs en   → docs/spec/MyBiz-Spec-en.docx
+//   node scripts/spec-to-docx.cjs he   → docs/spec/archive/MyBiz-Spec-he.docx
+//   node scripts/spec-to-docx.cjs en   → docs/spec/archive/MyBiz-Spec-en.docx
 //
 // Needs the `docx` npm package (npm i -g docx, or run from a folder that has it).
 
@@ -30,8 +30,8 @@ const {
 const locale = process.argv[2] === "en" ? "en" : "he";
 const rtl = locale === "he";
 const root = path.join(__dirname, "..");
-const source = fs.readFileSync(path.join(root, "docs/spec/v3", `spec.${locale}.md`), "utf8");
-const output = path.join(root, "docs/spec", `MyBiz-Spec-${locale}.docx`);
+const source = fs.readFileSync(path.join(root, "docs/spec/archive/v3", `spec.${locale}.md`), "utf8");
+const output = path.join(root, "docs/spec/archive", `MyBiz-Spec-${locale}.docx`);
 
 const FONT = rtl ? "Arial" : "Calibri";
 const BRAND = "4F46E5";
