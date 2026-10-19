@@ -5,16 +5,16 @@ _Last updated: 2026-10-19_ · Updated with every merged pull request. Open work 
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 **Now (2026-10-19):** everything in the written specs (v3, rounds 3 to 7, go-live readiness GL1-GL25) is built and merged to `main`; two coverage audits found no unbuilt item and the gaps they found were closed (#475-#478). Closing steps: a green end-to-end run on `main` (fixed in #474 and #482), then one Vercel deploy that the owner runs by hand, then syncing the owner's computer. In parallel, the approved plan for MyBiz console AI agents and console gaps has started ([#487](https://github.com/MyBiz-app/business-os/issues/487)), and the docs are being tidied (D1 merged in #484, D2 spec v4, D3 this head).
-**Next:** the console agents plan in waves (K1, K3, then C1, K2, K5, then C2 to C4, C6, K4, then C5 (done); one migration at a time, last one today is 0150), the small round 7 leftovers ([#479](https://github.com/MyBiz-app/business-os/issues/479)), then go-live following `docs/deploy/go-live-checklist.md`.
+**Next:** the console agents plan in waves (K1, K3, then C1, K2, K5, then C2 to C4, C6, K4, then C5 (done); one migration at a time, last one on `main` is 0150; K1 to K5, C1 to C6 except C3b, D1 to D3 are merged and C3b is open as a draft), the small round 7 leftovers ([#479](https://github.com/MyBiz-app/business-os/issues/479)), then go-live following `docs/deploy/go-live-checklist.md`.
 
 ### Snapshot
 
 | Area | State |
 |---|---|
 | Product (website, business web app, console, three areas in one Expo app) | ✅ Built; the apps run in the browser and in Expo Go, **not built for the app stores** |
-| Specs v3, rounds 3 to 7, go-live readiness (GL1-GL25) | ✅ Built and merged (142 migrations, about 500 pull requests) |
+| Specs v3, rounds 3 to 7, go-live readiness (GL1-GL25) | ✅ Built and merged (149 migrations, about 525 pull requests) |
 | Closing: e2e on `main`, one Vercel deploy, owner's computer sync | 🟡 In progress; the deploy is a manual step for the owner |
-| Console AI agents and console gaps ([#487](https://github.com/MyBiz-app/business-os/issues/487)) | 🟡 Approved on 2026-10-19; wave 1 done, wave 2 running (C1, C2, K2, C3a and C4 done) |
+| Console AI agents and console gaps ([#487](https://github.com/MyBiz-app/business-os/issues/487)) | 🟡 Approved on 2026-10-19; everything merged (K1 to K5, C1 to C6, D1 to D3) except C3b (legal and accountant agents), open as a draft |
 | Paid services (payments #46, invoicing #47, WhatsApp and SMS #49, real AI key #50, store builds #51) | ⚪ Built as disabled adapters; switched on at go-live (see "Built and switched off" in the spec) |
 | Go-live | ⚪ When the owner decides ([#34](https://github.com/MyBiz-app/business-os/issues/34)) |
 
