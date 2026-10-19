@@ -21,7 +21,7 @@ router = APIRouter(prefix="/platform", tags=["platform"])
 
 class BusinessCard(BaseModel):
     tags: list[str]
-    account_owner: str | None = Field(description="The MyBiz team member who looks after it")
+    account_owner: str | None = Field(description="The team member who looks after this business")
     updated_by: str | None
     updated_at: dt.datetime | None
     trial_ends_at: dt.datetime

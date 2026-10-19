@@ -50564,7 +50564,7 @@
               }
             ],
             "title": "Account Owner",
-            "description": "The MyBiz team member who looks after it"
+            "description": "The team member who looks after this business"
           },
           "updated_by": {
             "anyOf": [

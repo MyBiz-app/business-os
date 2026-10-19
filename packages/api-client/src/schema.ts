@@ -11365,7 +11365,7 @@ export interface components {
             tags: string[];
             /**
              * Account Owner
-             * @description The MyBiz team member who looks after it
+             * @description The team member who looks after this business
              */
             account_owner: string | null;
             /** Updated By */
