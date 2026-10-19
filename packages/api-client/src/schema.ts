@@ -8525,6 +8525,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/security/owners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Security Owners
+         * @description Two-step sign-in and risk confirmations of business owners, with the exposed ones first.
+         */
+        get: operations["security_owners"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/security/visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Security Visits
+         * @description How often each MyBiz team member viewed or changed a business, in the last days.
+         */
+        get: operations["security_visits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/legal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Legal Center
+         * @description Current document versions and who accepted them, plus the privacy requests.
+         */
+        get: operations["legal_center"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/support-access": {
         parameters: {
             query?: never;
@@ -9880,6 +9940,30 @@ export interface components {
             documents: {
                 [key: string]: string;
             };
+        };
+        /** Acceptance */
+        Acceptance: {
+            /**
+             * Accepted At
+             * Format: date-time
+             */
+            accepted_at: string;
+            /** Email */
+            email: string;
+            /** Business Name */
+            business_name: string | null;
+            /**
+             * Document
+             * @enum {string}
+             */
+            document: "terms" | "privacy" | "dpa";
+            /** Version */
+            version: string;
+            /**
+             * Context
+             * @enum {string}
+             */
+            context: "signup" | "client_join" | "reaccept";
         };
         /** Accepted */
         Accepted: {
@@ -14246,6 +14330,23 @@ export interface components {
              */
             created_at: string;
         };
+        /** DocumentCoverage */
+        DocumentCoverage: {
+            /**
+             * Document
+             * @enum {string}
+             */
+            document: "terms" | "privacy" | "dpa";
+            /** Version */
+            version: string;
+            /** Accepted */
+            accepted: number;
+            /**
+             * Eligible
+             * @description People who have to accept it: everyone, or owners for dpa
+             */
+            eligible: number;
+        };
         /** DocumentLink */
         DocumentLink: {
             /**
@@ -16348,6 +16449,23 @@ export interface components {
             /** Source */
             source?: ("manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other") | null;
         };
+        /** LegalCenter */
+        LegalCenter: {
+            /** Days */
+            days: number;
+            /** Documents */
+            documents: components["schemas"]["DocumentCoverage"][];
+            /**
+             * Acceptances
+             * @description The latest 200
+             */
+            acceptances: components["schemas"]["Acceptance"][];
+            /**
+             * Privacy Requests
+             * @description The last 12 months, latest 200
+             */
+            privacy_requests: components["schemas"]["PrivacyRequest"][];
+        };
         /** LegalPending */
         LegalPending: {
             /** Document */
@@ -17874,6 +17992,33 @@ export interface components {
              */
             free_minutes: number;
         };
+        /** OwnerSecurity */
+        OwnerSecurity: {
+            /** Email */
+            email: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Requires Mfa
+             * @description The business requires two-step sign-in of its team
+             */
+            requires_mfa: boolean;
+            /**
+             * Mfa Enrolled
+             * @description None when the sign-in provider can't be read
+             */
+            mfa_enrolled: boolean | null;
+            /**
+             * Risk Acknowledged At
+             * @description When the owner confirmed they understand the risk, for the current warning
+             */
+            risk_acknowledged_at: string | null;
+        };
         /**
          * PaletteColors
          * @description The three colors a person picks for "my own colors" (`#rrggbb`). The app derives every
@@ -18768,6 +18913,36 @@ export interface components {
              * @description Minor units
              */
             monthly: number;
+        };
+        /** PrivacyRequest */
+        PrivacyRequest: {
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "business_export" | "client_export" | "client_erasure" | "business_closure";
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "building" | "ready" | "failed" | "done" | "waiting";
+            /**
+             * Delete After
+             * @description Closed businesses: the deletion date
+             */
+            delete_after: string | null;
         };
         /** Proactive */
         Proactive: {
@@ -20588,6 +20763,40 @@ export interface components {
              */
             kind: "mfa_enabled" | "mfa_disabled";
         };
+        /** SecurityOwners */
+        SecurityOwners: {
+            /**
+             * Owners
+             * @description People who own at least one open business
+             */
+            owners: number;
+            /**
+             * With Mfa
+             * @description None when the sign-in provider can't be read
+             */
+            with_mfa: number | null;
+            /**
+             * Acknowledged Risk
+             * @description Without two-step sign-in, confirmed the risk
+             */
+            acknowledged_risk: number;
+            /**
+             * Exposed
+             * @description Without two-step sign-in and no confirmation yet
+             */
+            exposed: number | null;
+            /** Businesses */
+            businesses: number;
+            /** Businesses Requiring Mfa */
+            businesses_requiring_mfa: number;
+            /** Risk Version */
+            risk_version: string;
+            /**
+             * Rows
+             * @description Owners without two-step sign-in first
+             */
+            rows: components["schemas"]["OwnerSecurity"][];
+        };
         /** SecurityPolicy */
         SecurityPolicy: {
             /**
@@ -21811,6 +22020,34 @@ export interface components {
             color: string;
             /** Lead Key */
             lead_key?: string | null;
+        };
+        /** TeamVisit */
+        TeamVisit: {
+            /** Actor Email */
+            actor_email: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /** Views */
+            views: number;
+            /** Changes */
+            changes: number;
+            /**
+             * Last At
+             * Format: date-time
+             */
+            last_at: string;
+        };
+        /** TeamVisits */
+        TeamVisits: {
+            /** Days */
+            days: number;
+            /** Visits */
+            visits: components["schemas"]["TeamVisit"][];
         };
         /** Template */
         Template: {
@@ -42980,6 +43217,88 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EmailDeliverability"];
+                };
+            };
+        };
+    };
+    security_owners: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SecurityOwners"];
+                };
+            };
+        };
+    };
+    security_visits: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamVisits"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    legal_center: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LegalCenter"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
