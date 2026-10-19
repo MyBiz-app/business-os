@@ -1,4 +1,4 @@
-// Design-system guards (docs/design-system.md, "Lint rules"):
+// Design-system guards (docs/guides/design-system.md, "Lint rules"):
 //  - no-raw-colors: colors come from the tokens (globals.css, @business-os/design-tokens), so a hex
 //    value or a Tailwind palette class (bg-amber-500, text-red-600) outside the allow-list in
 //    eslint.config.mjs is an error. Use text-success-ink, bg-primary/10, text-danger and so on.

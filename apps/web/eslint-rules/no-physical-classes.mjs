@@ -1,4 +1,4 @@
-// Direction-neutral layout (docs/design-system.md): Hebrew pages are right-to-left, so classes
+// Direction-neutral layout (docs/guides/design-system.md): Hebrew pages are right-to-left, so classes
 // that name a physical side (ml-2, text-left, left-0, rounded-r-lg) put things on the wrong side
 // in one of the two languages. Use the logical ones: ms-/me-, ps-/pe-, start-/end-, text-start/
 // text-end, border-s/border-e, rounded-s/rounded-e.

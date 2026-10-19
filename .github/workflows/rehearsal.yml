@@ -4,7 +4,7 @@ name: Go-live rehearsal (CI)
 # throwaway Postgres 17 that looks like production: migrations from empty, an encrypted dump and a
 # timed restore (the same scripts as the real backup and drill), a planned database outage with the
 # health check, and a migration step back and forward. It never touches staging or production data.
-# Results are written to the job summary; copy them into docs/reviews/go-live-scorecard-2026-10.md.
+# Results are written to the job summary; copy them into docs/reviews/current/go-live-scorecard-2026-10.md.
 # The full end-to-end, accessibility and load runs stay in e2e.yml and the CI job.
 on:
   workflow_dispatch:

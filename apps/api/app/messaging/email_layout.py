@@ -5,7 +5,7 @@ Used by the API (client notifications, staff rosters, the welcome email) and by
 supabase/templates/build.py (sign-in, verification and password emails, which Supabase sends).
 Table layout and inline CSS so Gmail, Outlook and phone clients render it the same; a small
 `prefers-color-scheme` block adds a dark version where the client supports it, and the inline
-colors stay readable where it does not. Palette and fonts follow docs/design-system.md."""
+colors stay readable where it does not. Palette and fonts follow docs/guides/design-system.md."""
 
 import html
 import json

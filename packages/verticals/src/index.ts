@@ -7,7 +7,7 @@
  * never branches on the industry: it reads the resolved entry.
  *
  * To add one: `pnpm vertical:new <key> [--parent <category>]`, then `pnpm verticals:export`
- * (see docs/verticals.md).
+ * (see docs/guides/verticals.md).
  */
 import { CATALOG } from "./catalog.generated";
 

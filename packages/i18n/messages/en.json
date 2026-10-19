@@ -3007,7 +3007,7 @@
       "simulated": "Simulated",
       "live": "Live",
       "businesses": "{count, plural, one {# business} other {# businesses}}",
-      "howTo": "A new provider is one class registered in the API (see docs/integrations.md); the default changes with API_<SERVICE>_PROVIDER.",
+      "howTo": "A new provider is one class registered in the API (see docs/guides/integrations.md); the default changes with API_<SERVICE>_PROVIDER.",
       "capabilities": {
         "email": "Email",
         "ai": "AI assistant",

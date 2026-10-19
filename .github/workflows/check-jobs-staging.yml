@@ -2,7 +2,7 @@ name: Check background jobs on staging
 
 # Fails when a scheduled job is late or keeps failing (its last success is older than allowed,
 # see MAX_HOURS in apps/api/app/jobs/). A late job alerts the MyBiz owners' phones (push) and
-# email (GL13, docs/monitoring.md), and GitHub emails the repository's watchers on the failed run.
+# email (GL13, docs/guides/monitoring.md), and GitHub emails the repository's watchers on the failed run.
 # Runs after the 02:17 daily jobs.
 on:
   schedule:

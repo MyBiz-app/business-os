@@ -56,6 +56,9 @@ jobs:
       - name: Check no em or en dashes are used
         run: node scripts/check-no-long-dash.cjs
 
+      - name: Check Markdown links in docs
+        run: node scripts/check-doc-links.cjs
+
       - name: Check the generated API client is up to date
         run: |
           pnpm api:generate

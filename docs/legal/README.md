@@ -14,8 +14,8 @@ fictitious until the owner registers the real company (go-live task).
 | [vendor-review.md](vendor-review.md) | Annual review of the sub-processors, with the checklist and the current list | English |
 
 Related, already in the repository: the privacy policy, terms and data processing agreement shown on
-the site (`apps/web` legal pages, drafts marked for a lawyer), [privacy review](../reviews/privacy-2026-10.md),
-[security review](../reviews/security-2026-10.md), [on-call and incident response](../deploy/on-call.md),
+the site (`apps/web` legal pages, drafts marked for a lawyer), [privacy review](../reviews/archive/privacy-2026-10.md),
+[security review](../reviews/archive/security-2026-10.md), [on-call and incident response](../deploy/on-call.md),
 [incident templates](../deploy/incident-templates.md).
 
 ## How MyBiz sits in the law (our understanding, to confirm)
