@@ -2,10 +2,31 @@
 
 # סטטוס הפרויקט
 
-_עודכן לאחרונה: 18.10.2026_ · מתעדכן עם כל מיזוג (Pull Request). העבודה הפתוחה מנוהלת ב-[Issues ב-GitHub](https://github.com/MyBiz-app/business-os/issues): כל שלב הוא משימת־אב (`epic`), ותתי־המשימות שלו מראות את ההתקדמות. ([English version](STATUS.md))
+_עודכן לאחרונה: 19.10.2026_ · מתעדכן עם כל מיזוג (Pull Request). העבודה הפתוחה מנוהלת ב-[Issues ב-GitHub](https://github.com/MyBiz-app/business-os/issues): כל שלב הוא משימת־אב (`epic`), ותתי־המשימות שלו מראות את ההתקדמות. ([English version](STATUS.md))
 
-**עכשיו:** סבב 7 (R1-R37b) מוזג ברובו; נשארו סגירת פערי כיסוי, ריצת e2e ירוקה על main וצעדי הבעלים לעלייה לאוויר (A1-A12 ב-`docs/deploy/go-live-checklist.md`).
-**הבא בתור:** סנכרון סופי (GitHub, מקומי), פריסת Vercel אחת באישורך, אימות הדומיין, ואז העלייה לאוויר לפי רשימת הבדיקה.
+**עכשיו (19.10.2026):** כל מה שכתוב באפיונים (v3, סבבים 3 עד 7, מוכנות לעלייה GL1-GL25) בנוי וממוזג ל-`main`; שתי בדיקות כיסוי לא מצאו פריט שלא בוצע, והפערים שהן מצאו נסגרו (#475-#478). שלבי הסגירה: ריצת e2e ירוקה על `main` (תוקנה ב-#474 וב-#482), אחר כך פריסת Vercel אחת שאתה מריץ ביד, ואחר כך סנכרון המחשב שלך. במקביל התחילה התוכנית המאושרת לסוכני AI בקונסולה ולפערי הקונסולה ([#487](https://github.com/MyBiz-app/business-os/issues/487)), ומסדרים את המסמכים (D1 מוזג ב-#484, D2 אפיון v4, D3 הראש הזה).
+**הבא בתור:** תוכנית סוכני הקונסולה בגלים (K1, K3, אחריהם C1, K2, K5, אחריהם C2 עד C4, C6, K4, ובסוף C5; מיגרציה אחת בכל פעם, האחרונה היום היא 0142), שאריות קטנות של סבב 7 ([#479](https://github.com/MyBiz-app/business-os/issues/479)), ואז עלייה לאוויר לפי `docs/deploy/go-live-checklist.md`.
+
+### תמונת מצב
+
+| תחום | מצב |
+|---|---|
+| המוצר (אתר, מערכת העסק, קונסולה, שלושה אזורים באפליקציית Expo אחת) | ✅ נבנה; האפליקציות עובדות בדפדפן וב-Expo Go, **לא נבנו לחנויות** |
+| אפיונים v3, סבבים 3 עד 7, מוכנות לעלייה (GL1-GL25) | ✅ נבנו וממוזגים (142 מיגרציות, כ-500 PR) |
+| סגירה: e2e על `main`, פריסת Vercel אחת, סנכרון המחשב שלך | 🟡 בעבודה; הפריסה היא צעד ידני שלך |
+| סוכני AI בקונסולה ופערי קונסולה ([#487](https://github.com/MyBiz-app/business-os/issues/487)) | 🟡 אושר ב-19.10; גל 1 רץ (K1, K3, ו-D1 הסתיים) |
+| שירותים בתשלום (סליקה #46, חשבוניות #47, וואטסאפ ו-SMS #49, מפתח AI אמיתי #50, בניות לחנויות #51) | ⚪ נבנו כמתאמים כבויים; נדלקים בעלייה לאוויר |
+| עלייה לאוויר | ⚪ כשתחליט ([#34](https://github.com/MyBiz-app/business-os/issues/34)) |
+
+### מחכה לך
+
+- פריסת Vercel אחת (Actions, "Deploy web to Vercel", ואז "Deploy the Expo app to the web (Vercel)" עם app = all), כש-`main` ירוק.
+- סנכרון `C:\dev\business-os` (כרטיס האישור לשרשור המרוחק מחכה).
+- החלטות וצעדים שעולים כסף או דורשים איש מקצוע: ספקי סליקה וחשבוניות (#46, #47), שם מותג סופי (#36), עורך דין לטקסטים המשפטיים, רואה חשבון לשיעורי השכר, סימולציית AI חיה (R19, [#508](https://github.com/MyBiz-app/business-os/issues/508)). הרשימה המלאה ב-`docs/deploy/go-live-checklist.md` (A1-A12).
+
+### מפת ה-Issues הפתוחים
+
+משימות־אב: [#34](https://github.com/MyBiz-app/business-os/issues/34) עלייה לאוויר, [#35](https://github.com/MyBiz-app/business-os/issues/35) אפליקציות, [#479](https://github.com/MyBiz-app/business-os/issues/479) סבב 7 (שאריות [#502](https://github.com/MyBiz-app/business-os/issues/502) עד [#508](https://github.com/MyBiz-app/business-os/issues/508)), [#487](https://github.com/MyBiz-app/business-os/issues/487) סוכני קונסולה ([#489](https://github.com/MyBiz-app/business-os/issues/489) עד [#501](https://github.com/MyBiz-app/business-os/issues/501)), [#488](https://github.com/MyBiz-app/business-os/issues/488) סידור מסמכים. כשל ה-e2e הלילי [#483](https://github.com/MyBiz-app/business-os/issues/483) ייסגר אחרי אישור שהתיקון ירוק.
 
 ## לוח השלבים
 
