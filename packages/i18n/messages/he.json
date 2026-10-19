@@ -574,6 +574,7 @@
     "points": "{value} נק׳",
     "better": "שיפור",
     "worse": "הרעה",
+    "trends": "מגמות",
     "weeklyRevenue": "הכנסות לפי שבוע",
     "weeklyAttendance": "הגעות לפי שבוע",
     "showTable": "הצגה כטבלה",
@@ -895,6 +896,14 @@
     }
   },
   "clients": {
+    "nav": {
+      "label": "אזורי כרטיס הלקוח",
+      "details": "פרטים",
+      "membership": "מנויים וביקורים",
+      "paperwork": "הצעות ומסמכים",
+      "talk": "הערות והודעות",
+      "privacy": "הסכמות ופרטיות"
+    },
     "joinedChip": "הצטרפו {range}",
     "noShowChip": "לא הגיעו {range}",
     "activeFilters": "מסננים פעילים",
@@ -1231,6 +1240,22 @@
     }
   },
   "team": {
+    "tabsLabel": "אזורי הצוות",
+    "tabs": {
+      "members": "עובדים",
+      "shifts": "משמרות",
+      "timeOff": "חופשות",
+      "timeClock": "שעון נוכחות",
+      "swaps": "החלפות",
+      "payroll": "שכר",
+      "bonuses": "בונוסים",
+      "organization": "מבנה",
+      "roles": "תפקידים"
+    },
+    "inviteButton": "הזמנת עובד",
+    "moreActions": "עוד פעולות עבור {name}",
+    "changeRole": "שינוי תפקיד",
+    "branchesMenu": "סניפים",
     "title": "צוות",
     "subtitle": "האנשים שעובדים בעסק ומה כל אחד יכול לעשות.",
     "members": "חברי צוות",
@@ -5711,6 +5736,13 @@
     }
   },
   "leads": {
+    "nav": {
+      "label": "אזורי כרטיס הליד",
+      "stage": "שלב",
+      "details": "פרטים",
+      "activity": "פעילות",
+      "messages": "הודעות"
+    },
     "truncated": "מוצגים {shown} לידים מתוך {total}.",
     "showMore": "הצג עוד לידים",
     "title": "לידים",
@@ -8687,6 +8719,8 @@
     "cycle": "זה ייצור לולאה: האדם הזה כבר מנהל אותם."
   },
   "shifts": {
+    "settingsTitle": "הגדרות משמרות",
+    "settingsHint": "חדרים, איוש מינימלי, פרסום וקצב התכנון.",
     "title": "משמרות",
     "soloTitle": "שעות וזמינות",
     "soloSubtitle": "העסק מנוהל על ידך לבד, ולכן אין לוח משמרות. כאן מעדכנים שעות פתיחה וזמינות.",

@@ -1,17 +1,16 @@
-import { CalendarClock, Network } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { avatarSrc } from "@/components/avatar";
 import { unwrap } from "@/lib/api";
-import { canManageTeam, canReadPayroll } from "@/lib/permissions";
+import { canManageTeam } from "@/lib/permissions";
 import { getBranches, getTenant } from "@/lib/tenant";
 
 import { revokeInvitation } from "./actions";
-import { InviteForm, MemberRow } from "./team-forms";
+import { InviteButton, MemberRow } from "./team-forms";
 import { StaffCardWindow } from "./staff-card-window";
 import { openedId, withOpen } from "@/lib/open-window";
+import { TeamTabs } from "./team-tabs";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -33,44 +32,9 @@ export default async function TeamPage({ searchParams }: PageProps<"/team">) {
     new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone }).format(new Date(iso));
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
-      <div className="flex flex-col gap-4">
-        <PageHeader title={t("team.title")} description={t("team.subtitle")} />
-        <div className="grid grid-cols-2 gap-2 *:justify-center sm:flex sm:flex-wrap">
-          <Link href="/team/organization" className="btn-secondary px-3 py-2 text-sm">
-            <Network aria-hidden="true" className="size-4" />
-            {t("organization.title")}
-          </Link>
-          <Link href="/team/shifts" className="btn-secondary px-3 py-2 text-sm">
-            <CalendarClock aria-hidden="true" className="size-4" />
-            {t("shifts.title")}
-          </Link>
-          <Link href="/team/time-off" className="btn-secondary px-3 py-2 text-sm">
-            {t("timeOffQueue.open")}
-          </Link>
-          {tenant.permissions.includes("time.approve") && (
-            <Link href="/team/time-clock" className="btn-secondary px-3 py-2 text-sm">
-              {t("timeClock.open")}
-            </Link>
-          )}
-          <Link href="/team/shift-swaps" className="btn-secondary px-3 py-2 text-sm">
-            {t("shiftSwapQueue.open")}
-          </Link>
-          {canReadPayroll(tenant) && (
-            <Link href="/team/payroll" className="btn-secondary px-3 py-2 text-sm">
-              {t("payRun.title")}
-            </Link>
-          )}
-          {(canReadPayroll(tenant) || tenant.permissions.includes("payroll.propose")) && (
-            <Link href="/team/bonuses" className="btn-secondary px-3 py-2 text-sm">
-              {t("payBonuses.title")}
-            </Link>
-          )}
-          <Link href="/team/roles" className="btn-ghost px-3 py-2 text-sm">
-            {t("team.manageRoles")}
-          </Link>
-        </div>
-      </div>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <TeamTabs active="members" tenant={tenant} />
+      <PageHeader title={t("team.title")} description={t("team.subtitle")} actions={<InviteButton allowOwner={isOwner} />} />
 
       <section aria-labelledby="members-heading" className="flex flex-col gap-3">
         <div className="flex items-baseline justify-between gap-3">
@@ -102,13 +66,6 @@ export default async function TeamPage({ searchParams }: PageProps<"/team">) {
             />
           ))}
         </ul>
-      </section>
-
-      <section aria-labelledby="invite-heading" className="flex flex-col gap-4 card p-6">
-        <h2 id="invite-heading" className="text-lg font-semibold">
-          {t("team.invite")}
-        </h2>
-        <InviteForm allowOwner={isOwner} />
       </section>
 
       <section aria-labelledby="pending-heading" className="flex flex-col gap-3">

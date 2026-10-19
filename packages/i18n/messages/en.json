@@ -574,6 +574,7 @@
     "points": "{value} pts",
     "better": "better",
     "worse": "worse",
+    "trends": "Trends",
     "weeklyRevenue": "Revenue per week",
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
@@ -895,6 +896,14 @@
     }
   },
   "clients": {
+    "nav": {
+      "label": "Client sections",
+      "details": "Details",
+      "membership": "Plans and visits",
+      "paperwork": "Quotes and documents",
+      "talk": "Notes and messages",
+      "privacy": "Consent and privacy"
+    },
     "joinedChip": "Joined {range}",
     "noShowChip": "Missed a class {range}",
     "activeFilters": "Active filters",
@@ -1231,6 +1240,22 @@
     }
   },
   "team": {
+    "tabsLabel": "Team sections",
+    "tabs": {
+      "members": "People",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "timeClock": "Time clock",
+      "swaps": "Swaps",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "organization": "Structure",
+      "roles": "Roles"
+    },
+    "inviteButton": "Invite someone",
+    "moreActions": "More actions for {name}",
+    "changeRole": "Change role",
+    "branchesMenu": "Branches",
     "title": "Team",
     "subtitle": "People who work in the business and what they can do.",
     "members": "Members",
@@ -5711,6 +5736,13 @@
     }
   },
   "leads": {
+    "nav": {
+      "label": "Lead sections",
+      "stage": "Stage",
+      "details": "Details",
+      "activity": "Activity",
+      "messages": "Messages"
+    },
     "truncated": "Showing {shown} of {total} leads.",
     "showMore": "Show more leads",
     "title": "Leads",
@@ -8687,6 +8719,8 @@
     "cycle": "That would make a loop: this person already manages them."
   },
   "shifts": {
+    "settingsTitle": "Shift settings",
+    "settingsHint": "Rooms, minimum staffing, publishing and planning rhythm.",
     "title": "Shifts",
     "soloTitle": "Hours and availability",
     "soloSubtitle": "You run the business on your own, so there is no shift board. Keep your opening hours and availability up to date.",
