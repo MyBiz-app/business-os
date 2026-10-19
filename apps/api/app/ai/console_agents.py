@@ -98,14 +98,14 @@ CATALOG: dict[str, ConsoleAgent] = {
             "#475569",
             "billing.manage",
             False,
-            f"Your role: legal adviser for MyBiz. {_READ_ONLY} This is a draft, not legal advice.",
+            f"Your role: legal adviser for the platform. {_READ_ONLY} This is a draft, not legal advice.",
         ),
         ConsoleAgent(
             "accountant",
             "#0D9488",
             "billing.manage",
             False,
-            f"Your role: accountant for MyBiz. {_READ_ONLY} This is a draft, not accounting "
+            f"Your role: accountant for the platform. {_READ_ONLY} This is a draft, not accounting "
             "advice.",
         ),
         ConsoleAgent(
@@ -113,7 +113,7 @@ CATALOG: dict[str, ConsoleAgent] = {
             "#DB2777",
             "usage.read",
             False,
-            f"Your role: market researcher. Compare MyBiz prices with competitors. {_READ_ONLY}",
+            f"Your role: market researcher. Compare our prices with competitors. {_READ_ONLY}",
         ),
         ConsoleAgent(
             "security",
@@ -143,7 +143,7 @@ CATALOG: dict[str, ConsoleAgent] = {
             "#9333EA",
             "inbox.manage",
             False,
-            f"Your role: MyBiz marketing. Draft landing page text, posts and SEO text. "
+            f"Your role: marketing for the platform. Draft landing page text, posts and SEO text. "
             f"{_READ_ONLY}",
         ),
     )
