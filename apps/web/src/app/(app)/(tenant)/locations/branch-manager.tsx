@@ -20,14 +20,7 @@ export function BranchManager({ location, members }: { location: Location; membe
   const [state, action] = useActionState<FormState, FormData>(setBranchManager.bind(null, location.id), {});
 
   return (
-    <section aria-labelledby="branch-manager-heading" className="flex flex-col gap-4 card p-6">
-      <div className="flex flex-col gap-1">
-        <h2 id="branch-manager-heading" className="text-lg font-semibold">
-          {t("title")}
-        </h2>
-        <p className="text-sm text-muted">{t("subtitle")}</p>
-      </div>
-      <form action={action} className="flex flex-col gap-3">
+    <form action={action} className="flex flex-col gap-3">
         <FormError message={state.error && tCommon("errors.generic")} />
         <FormNotice message={state.saved ? tCommon("saved") : undefined} />
         <SelectField
@@ -39,7 +32,6 @@ export function BranchManager({ location, members }: { location: Location; membe
         <div>
           <SubmitButton>{t("save")}</SubmitButton>
         </div>
-      </form>
-    </section>
+    </form>
   );
 }

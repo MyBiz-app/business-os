@@ -38,14 +38,7 @@ export function BranchBranding({ location, logo, networkColor }: { location: Loc
       : logoState.error && tCommon("errors.generic");
 
   return (
-    <section aria-labelledby="branding-heading" className="flex flex-col gap-6 card p-6">
-      <div className="flex flex-col gap-1">
-        <h2 id="branding-heading" className="text-lg font-semibold">
-          {t("brandingTitle")}
-        </h2>
-        <p className="text-sm text-muted">{t("brandingHint")}</p>
-      </div>
-
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
         <h3 className="font-semibold">{t("logo")}</h3>
         <div className="flex flex-wrap items-center gap-4">
@@ -124,6 +117,6 @@ export function BranchBranding({ location, logo, networkColor }: { location: Loc
           <SubmitButton>{tCommon("save")}</SubmitButton>
         </div>
       </form>
-    </section>
+    </div>
   );
 }
