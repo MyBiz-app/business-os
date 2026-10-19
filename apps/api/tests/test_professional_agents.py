@@ -17,7 +17,7 @@ from tests.conftest import AuthHeaders, make_staff
 from tests.test_assistant import FakeProvider, calls, says, use_provider
 
 MIGRATION = (
-    Path(__file__).parents[1] / "migrations/versions/0149_country_and_professional_guides.py"
+    Path(__file__).parents[1] / "migrations/versions/0150_country_and_professional_guides.py"
 )
 
 

@@ -9,8 +9,8 @@ The legal and accountant agents start with four draft guides (legal and tax, Isr
 States) in their libraries, written from the public official sources the library already links.
 They are marked as not reviewed: the team's lawyer and accountant approve them first.
 
-Revision ID: 0149
-Revises: 0148
+Revision ID: 0150
+Revises: 0149
 Create Date: 2026-10-19
 """
 
@@ -20,8 +20,8 @@ from pathlib import Path
 import sqlalchemy as sa
 from alembic import op
 
-revision: str = "0149"
-down_revision: str | None = "0148"
+revision: str = "0150"
+down_revision: str | None = "0149"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

@@ -6,6 +6,14 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 
 The order of the day itself, with who does what and how to go back, is in [go-live-day.md](go-live-day.md); the state of every topic is in the [scorecard](../reviews/current/go-live-scorecard-2026-10.md).
 
+## Switch the full CI back on (before go-live)
+
+During the functional build (2026-10-19) pull requests run only a fast core; see DECISIONS "Fast CI during the functional build".
+
+- [ ] On GitHub: Settings, Secrets and variables, Actions, Variables: add `CI_FULL` = `true`. Pull requests then run the whole API suite (4 shards), the security scans and the load test.
+- [ ] In `.github/workflows/e2e.yml` add `push: branches: [main]` back under `on:` so the end-to-end walk-through runs after every merge.
+- [ ] Then delete the "FAST MODE" comment at the top of `ci.yml`.
+
 ## Blockers
 
 | # | Item | State | To switch on |
