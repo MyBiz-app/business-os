@@ -40798,6 +40798,33 @@
         }
       }
     },
+    "/platform/catalog": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Platform Catalog",
+        "description": "Every industry, module and price in one read-only view.",
+        "operationId": "platform_catalog",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCatalog"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/platform/metrics/saas": {
       "get": {
         "tags": [
@@ -51176,6 +51203,54 @@
         ],
         "title": "Catalog"
       },
+      "CatalogIndustryRow": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "live",
+              "beta",
+              "planned"
+            ],
+            "title": "Status"
+          },
+          "requests": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requests",
+            "description": "Site requests naming it (latest 300); null without the inbox permission"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "parent",
+          "status",
+          "requests"
+        ],
+        "title": "CatalogIndustryRow"
+      },
       "CatalogModule": {
         "properties": {
           "key": {
@@ -51321,6 +51396,113 @@
           "billing"
         ],
         "title": "CatalogModule"
+      },
+      "CatalogModuleRow": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "prices": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Prices",
+            "description": "Monthly (or one-time), minor units, by currency"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "per_unit": {
+            "type": "boolean",
+            "title": "Per Unit"
+          },
+          "billing": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "once"
+            ],
+            "title": "Billing"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group"
+          },
+          "requires_any": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requires Any"
+          },
+          "requires_all": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requires All"
+          },
+          "ai_credits_included": {
+            "type": "integer",
+            "title": "Ai Credits Included"
+          },
+          "ai_users_included": {
+            "type": "integer",
+            "title": "Ai Users Included"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "prices",
+          "available",
+          "per_unit",
+          "billing",
+          "group",
+          "requires_any",
+          "requires_all",
+          "ai_credits_included",
+          "ai_users_included"
+        ],
+        "title": "CatalogModuleRow"
+      },
+      "CatalogTierRow": {
+        "properties": {
+          "up_to_clients": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Up To Clients"
+          },
+          "prices": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Prices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "up_to_clients",
+          "prices"
+        ],
+        "title": "CatalogTierRow"
       },
       "Chat": {
         "properties": {
@@ -68042,6 +68224,49 @@
           "options"
         ],
         "title": "PlatformCapability"
+      },
+      "PlatformCatalog": {
+        "properties": {
+          "core": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogTierRow"
+            },
+            "type": "array",
+            "title": "Core"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogModuleRow"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "presets": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Presets"
+          },
+          "industries": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogIndustryRow"
+            },
+            "type": "array",
+            "title": "Industries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "core",
+          "modules",
+          "presets",
+          "industries"
+        ],
+        "title": "PlatformCatalog"
       },
       "PlatformPermission": {
         "type": "string",
