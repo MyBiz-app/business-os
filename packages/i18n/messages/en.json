@@ -1149,6 +1149,9 @@
     }
   },
   "locations": {
+    "settingsTitle": "Branch settings",
+    "settingsHint": "Client policy and branch groups",
+    "detailsTitle": "Branch details",
     "manager": {
       "title": "Branch manager",
       "subtitle": "Who runs this branch. They get manager rights here only: staff, shifts, bookings and clients of this branch.",
