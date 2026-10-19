@@ -402,6 +402,15 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Broken links fail CI**: `scripts/check-doc-links.cjs` checks relative links in all Markdown files.
 - **How-to documents moved to `docs/guides/`** (design system, industries, integrations, Claude Code usage, accessibility, mobile builds, monitoring, brand rename); code comments and `CLAUDE.md` now point there.
 
+### Fast CI during the functional build (2026-10-19, no migration)
+
+- **Owner request:** do not run the full checking machinery on every change until the functional build of the whole site is finished and agreed. Heavy layers are switched off for pull requests, not deleted.
+- **Measured:** the pull request check took 30 to 32 minutes, and 29 of them were one step (`Run checks`), mostly the API suite (about 150 files, thousands of fast tests, no single slow test). The security scans, load test and Expo bundle ran in parallel in 1 to 2 minutes each and did not add wall time.
+- **A pull request now runs:** the em/en dash check, doc links, the generated API client check, lint, typecheck, build, the JavaScript tests, the Expo web bundle and 20 API guard test files (tenant isolation and its matrix, database security, every-route-needs-login, pagination, router registry, migration chain and contract, model layer, config, production guards, SQL guards, permissions, roles, modules, provider contracts, AI structure, privacy, health).
+- **Moved off pull requests:** the whole API suite (now split into 4 parallel jobs), security scans and load test run after every merge to main (`ci.yml`), and again with the nightly security scan; the end-to-end walk-through (`e2e.yml`) no longer runs after every merge, only nightly and on demand.
+- **One switch back:** set the repository variable `CI_FULL` to `true` (GitHub, Settings, Secrets and variables, Actions, Variables) and pull requests run everything again, with the suite in 4 shards. For the end-to-end run after every merge, add `push: branches: [main]` back under `on:` in `e2e.yml`. Both are in the go-live checklist and must be done before go-live.
+- Job names are unchanged; skipped jobs count as passed for branch protection, so no required check blocks a merge.
+
 ## Open
 
 
