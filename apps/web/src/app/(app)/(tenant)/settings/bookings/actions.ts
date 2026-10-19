@@ -46,6 +46,6 @@ export async function updateServiceWaitlist(serviceId: string, _state: FormState
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/settings/bookings");
+  revalidatePath("/settings", "layout");
   return { saved: true };
 }

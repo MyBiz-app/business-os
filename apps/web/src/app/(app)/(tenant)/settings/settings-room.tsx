@@ -3,7 +3,6 @@
 import {
   Building2,
   CalendarClock,
-  ChevronLeft,
   CreditCard,
   Database,
   History,
@@ -16,10 +15,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useLayoutEffect } from "react";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 
+import { SectionNav, type SectionNavItem } from "@/components/section-nav";
 import { PageHeader } from "@/components/layout/page-header";
 import { ContentSwap } from "@/components/ui/content-swap";
 
@@ -41,8 +40,12 @@ const ICONS: Record<TopicKey, LucideIcon> = {
 
 type Item = { key: TopicKey; href: string; group: TopicGroup };
 
-/** The room's frame. Desktop: a sticky menu beside the topic. Phone: the menu is the page at
- * `/settings` and a topic opens with a way back. */
+/** Topics shown as sections of the `/settings` page (see `page.tsx`); the rest open as pages of their own. */
+export const INLINE_TOPICS = ["business", "memberships", "bookings", "branding", "modules", "integrations", "aiConnections", "data", "help"] as const satisfies readonly TopicKey[];
+
+/** The room's frame: one inner menu. On `/settings` a click scrolls to that topic's section on the
+ * same page; topics with a page of their own (billing, audit), and the topic pages reached by a
+ * direct link, open as normal links. */
 export function SettingsRoom({
   items,
   title,
@@ -58,64 +61,28 @@ export function SettingsRoom({
   const pathname = usePathname();
   const isIndex = pathname === "/settings";
   const current = items.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
-  const groups = [...new Set(items.map((item) => item.group))];
+  const menu: SectionNavItem[] = items.map((item) => {
+    const Icon = ICONS[item.key];
+    const inline = (INLINE_TOPICS as readonly TopicKey[]).includes(item.key);
+    return {
+      id: item.key,
+      label: t(`nav.items.${item.key}`),
+      icon: <Icon aria-hidden="true" className="size-4 shrink-0" />,
+      group: t(`nav.groups.${item.group}`),
+      href: inline && isIndex ? undefined : inline ? `/settings#${item.key}` : item.href,
+      current: !isIndex && current?.key === item.key,
+    };
+  });
 
   return (
     <>
       <PageHeader title={title} description={description} className="print:hidden" />
-      <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start xl:gap-10">
-        <nav
-          aria-label={t("nav.label")}
-          className={`${isIndex ? "" : "hidden lg:block"} flex flex-col gap-5 print:hidden lg:sticky lg:top-24`}
-        >
-          {groups.map((group) => (
-            <div key={group} className="flex flex-col gap-1">
-              <p className="px-3 text-xs font-semibold uppercase tracking-wide text-muted">{t(`nav.groups.${group}`)}</p>
-              <ul className="flex flex-col gap-0.5">
-                {items
-                  .filter((item) => item.group === group)
-                  .map((item) => {
-                    const Icon = ICONS[item.key];
-                    const active = current?.key === item.key;
-                    return (
-                      <li key={item.key}>
-                        <Link
-                          href={item.href}
-                          aria-current={active ? "page" : undefined}
-                          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
-                            active ? "bg-primary/10 font-semibold text-foreground" : "text-foreground hover:bg-foreground/5"
-                          }`}
-                        >
-                          <Icon aria-hidden="true" className="size-4 shrink-0" />
-                          <span className="flex-1">{t(`nav.items.${item.key}`)}</span>
-                          <ChevronLeft aria-hidden="true" className="size-4 text-muted lg:hidden ltr:rotate-180" />
-                        </Link>
-                      </li>
-                    );
-                  })}
-              </ul>
-            </div>
-          ))}
-        </nav>
-        <div className={`${isIndex ? "hidden lg:block" : ""} @container flex min-w-0 flex-col gap-4`}>
-          {!isIndex && (
-            <Link href="/settings" className="inline-flex items-center gap-1 text-sm text-primary-ink underline-offset-4 hover:underline print:hidden lg:hidden">
-              <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
-              {t("nav.back")}
-            </Link>
-          )}
-          <ContentSwap swapKey={current?.key ?? "index"}>{children}</ContentSwap>
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-6 xl:gap-10">
+        <SectionNav items={menu} label={t("nav.label")} />
+        <div className="@container flex min-w-0 flex-col gap-4">
+          <ContentSwap swapKey={isIndex ? "index" : (current?.key ?? "index")}>{children}</ContentSwap>
         </div>
       </div>
     </>
   );
-}
-
-/** `/settings` itself: on a phone the menu is the page; on a wide screen it opens the first topic. */
-export function OpenFirstTopicOnDesktop({ href }: { href: string }) {
-  const router = useRouter();
-  useLayoutEffect(() => {
-    if (window.matchMedia("(min-width: 64rem)").matches) router.replace(href);
-  }, [router, href]);
-  return null;
 }

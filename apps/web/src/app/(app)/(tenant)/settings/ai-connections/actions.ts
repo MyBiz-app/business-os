@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
 
-const PATH = "/settings/ai-connections";
 
 /** Approves or rejects a change an AI app suggested. The API checks everything again at this
  * moment; when it refuses (a full class, an expired request) the list shows the outcome. */
@@ -16,12 +15,12 @@ export async function decideRequest(id: string, decision: "confirm" | "reject"):
       params: { ...scope, path: { action_id: id } },
     });
   } finally {
-    revalidatePath(PATH);
+    revalidatePath("/settings", "layout");
   }
 }
 
 export async function disconnectApp(id: string): Promise<void> {
   const { api, scope } = await getTenant();
   unwrap(await api.DELETE("/mcp-connections/{connection_id}", { params: { ...scope, path: { connection_id: id } } }));
-  revalidatePath(PATH);
+  revalidatePath("/settings", "layout");
 }

@@ -42325,6 +42325,135 @@
         ]
       }
     },
+    "/platform/security/owners": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Security Owners",
+        "description": "Two-step sign-in and risk confirmations of business owners, with the exposed ones first.",
+        "operationId": "security_owners",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityOwners"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/security/visits": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Security Visits",
+        "description": "How often each MyBiz team member viewed or changed a business, in the last days.",
+        "operationId": "security_visits",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamVisits"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/legal": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Legal Center",
+        "description": "Current document versions and who accepted them, plus the privacy requests.",
+        "operationId": "legal_center",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LegalCenter"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/support-access": {
       "get": {
         "tags": [
@@ -47417,6 +47546,62 @@
           "documents"
         ],
         "title": "AcceptRequest"
+      },
+      "Acceptance": {
+        "properties": {
+          "accepted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Accepted At"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "business_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Name"
+          },
+          "document": {
+            "type": "string",
+            "enum": [
+              "terms",
+              "privacy",
+              "dpa"
+            ],
+            "title": "Document"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "context": {
+            "type": "string",
+            "enum": [
+              "signup",
+              "client_join",
+              "reaccept"
+            ],
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accepted_at",
+          "email",
+          "business_name",
+          "document",
+          "version",
+          "context"
+        ],
+        "title": "Acceptance"
       },
       "Accepted": {
         "properties": {
@@ -58715,6 +58900,40 @@
         ],
         "title": "Document"
       },
+      "DocumentCoverage": {
+        "properties": {
+          "document": {
+            "type": "string",
+            "enum": [
+              "terms",
+              "privacy",
+              "dpa"
+            ],
+            "title": "Document"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "accepted": {
+            "type": "integer",
+            "title": "Accepted"
+          },
+          "eligible": {
+            "type": "integer",
+            "title": "Eligible",
+            "description": "People who have to accept it: everyone, or owners for dpa"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document",
+          "version",
+          "accepted",
+          "eligible"
+        ],
+        "title": "DocumentCoverage"
+      },
       "DocumentLink": {
         "properties": {
           "url": {
@@ -64342,6 +64561,45 @@
         "type": "object",
         "title": "LeadUpdate"
       },
+      "LegalCenter": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentCoverage"
+            },
+            "type": "array",
+            "title": "Documents"
+          },
+          "acceptances": {
+            "items": {
+              "$ref": "#/components/schemas/Acceptance"
+            },
+            "type": "array",
+            "title": "Acceptances",
+            "description": "The latest 200"
+          },
+          "privacy_requests": {
+            "items": {
+              "$ref": "#/components/schemas/PrivacyRequest"
+            },
+            "type": "array",
+            "title": "Privacy Requests",
+            "description": "The last 12 months, latest 200"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "documents",
+          "acceptances",
+          "privacy_requests"
+        ],
+        "title": "LegalCenter"
+      },
       "LegalPending": {
         "properties": {
           "document": {
@@ -68671,6 +68929,63 @@
         ],
         "title": "OverridePolicy"
       },
+      "OwnerSecurity": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "business_name": {
+            "type": "string",
+            "title": "Business Name"
+          },
+          "requires_mfa": {
+            "type": "boolean",
+            "title": "Requires Mfa",
+            "description": "The business requires two-step sign-in of its team"
+          },
+          "mfa_enrolled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mfa Enrolled",
+            "description": "None when the sign-in provider can't be read"
+          },
+          "risk_acknowledged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Risk Acknowledged At",
+            "description": "When the owner confirmed they understand the risk, for the current warning"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "business_id",
+          "business_name",
+          "requires_mfa",
+          "mfa_enrolled",
+          "risk_acknowledged_at"
+        ],
+        "title": "OwnerSecurity"
+      },
       "PaletteColors": {
         "properties": {
           "background": {
@@ -70885,6 +71200,68 @@
           "monthly"
         ],
         "title": "Price"
+      },
+      "PrivacyRequest": {
+        "properties": {
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "business_export",
+              "client_export",
+              "client_erasure",
+              "business_closure"
+            ],
+            "title": "Kind"
+          },
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "business_name": {
+            "type": "string",
+            "title": "Business Name"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "building",
+              "ready",
+              "failed",
+              "done",
+              "waiting"
+            ],
+            "title": "Status"
+          },
+          "delete_after": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delete After",
+            "description": "Closed businesses: the deletion date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "occurred_at",
+          "kind",
+          "business_id",
+          "business_name",
+          "status",
+          "delete_after"
+        ],
+        "title": "PrivacyRequest"
       },
       "Proactive": {
         "properties": {
@@ -75674,6 +76051,76 @@
         ],
         "title": "SecurityEventBody"
       },
+      "SecurityOwners": {
+        "properties": {
+          "owners": {
+            "type": "integer",
+            "title": "Owners",
+            "description": "People who own at least one open business"
+          },
+          "with_mfa": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "With Mfa",
+            "description": "None when the sign-in provider can't be read"
+          },
+          "acknowledged_risk": {
+            "type": "integer",
+            "title": "Acknowledged Risk",
+            "description": "Without two-step sign-in, confirmed the risk"
+          },
+          "exposed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exposed",
+            "description": "Without two-step sign-in and no confirmation yet"
+          },
+          "businesses": {
+            "type": "integer",
+            "title": "Businesses"
+          },
+          "businesses_requiring_mfa": {
+            "type": "integer",
+            "title": "Businesses Requiring Mfa"
+          },
+          "risk_version": {
+            "type": "string",
+            "title": "Risk Version"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/OwnerSecurity"
+            },
+            "type": "array",
+            "title": "Rows",
+            "description": "Owners without two-step sign-in first"
+          }
+        },
+        "type": "object",
+        "required": [
+          "owners",
+          "with_mfa",
+          "acknowledged_risk",
+          "exposed",
+          "businesses",
+          "businesses_requiring_mfa",
+          "risk_version",
+          "rows"
+        ],
+        "title": "SecurityOwners"
+      },
       "SecurityPolicy": {
         "properties": {
           "mfa_enforced": {
@@ -79005,6 +79452,67 @@
           "name"
         ],
         "title": "TeamGroup"
+      },
+      "TeamVisit": {
+        "properties": {
+          "actor_email": {
+            "type": "string",
+            "title": "Actor Email"
+          },
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "business_name": {
+            "type": "string",
+            "title": "Business Name"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          },
+          "changes": {
+            "type": "integer",
+            "title": "Changes"
+          },
+          "last_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actor_email",
+          "business_id",
+          "business_name",
+          "views",
+          "changes",
+          "last_at"
+        ],
+        "title": "TeamVisit"
+      },
+      "TeamVisits": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/TeamVisit"
+            },
+            "type": "array",
+            "title": "Visits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "visits"
+        ],
+        "title": "TeamVisits"
       },
       "Template": {
         "properties": {

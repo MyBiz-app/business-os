@@ -35,7 +35,7 @@ export async function saveCancellationPolicy(_state: FormState, formData: FormDa
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/settings/bookings");
+  revalidatePath("/settings", "layout");
   revalidatePath("/dashboard");
   return { saved: true };
 }
@@ -72,6 +72,6 @@ export async function saveOverride(
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/settings/bookings");
+  revalidatePath("/settings", "layout");
   return { saved: true };
 }
