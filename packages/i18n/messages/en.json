@@ -2827,7 +2827,9 @@
       "metrics": "SaaS numbers",
       "email": "Email delivery",
       "catalog": "Catalog and prices",
-      "trials": "Trials ending"
+      "trials": "Trials ending",
+      "security": "Security center",
+      "legal": "Legal center"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -3796,6 +3798,84 @@
       "extend": "Extend",
       "extendDays": "Days",
       "extendDone": "The trial now ends on {date}."
+    },
+    "security": {
+      "title": "Security center",
+      "hint": "Two-step sign-in of business owners, the MyBiz team's visits inside businesses and what the security agent found.",
+      "owners": "Owners",
+      "withMfa": "With two-step sign-in",
+      "acknowledged": "Confirmed the risk",
+      "exposed": "Without protection",
+      "unknown": "Unknown here",
+      "unknownNote": "This environment can't read the sign-in provider, so two-step sign-in can't be counted.",
+      "businesses": "Businesses",
+      "requiring": "Businesses requiring two-step sign-in of their team",
+      "ownersTitle": "Owners",
+      "ownersHint": "Owners without two-step sign-in come first. Without it, sensitive actions stay blocked until the owner confirms they understand the risk (warning of {version}).",
+      "ownersEmpty": "No business owners yet.",
+      "owner": "Owner",
+      "business": "Business",
+      "protection": "Two-step sign-in",
+      "on": "On",
+      "off": "Off",
+      "confirmed": "Confirmed {date}",
+      "notConfirmed": "Not confirmed",
+      "visitsTitle": "MyBiz team inside businesses",
+      "visitsHint": "Every visit is also shown to the business owner in the business audit log. Last {days} days.",
+      "visitsEmpty": "The team did not enter any business in this period.",
+      "member": "Team member",
+      "views": "Views",
+      "changes": "Changes",
+      "lastVisit": "Last visit",
+      "findingsTitle": "Security agent findings",
+      "findingsHint": "Saved reports of the security agent, newest first.",
+      "findingsEmpty": "The security agent has not saved a report yet.",
+      "by": "by"
+    },
+    "legal": {
+      "title": "Legal center",
+      "hint": "The current version of each legal document, who accepted it, and the privacy requests.",
+      "documentsTitle": "Document versions",
+      "document": "Document",
+      "version": "Current version",
+      "accepted": "Accepted",
+      "eligible": "Have to accept",
+      "documents": {
+        "terms": "Terms of use",
+        "privacy": "Privacy policy",
+        "dpa": "Data processing terms"
+      },
+      "acceptancesTitle": "Latest acceptances",
+      "acceptancesHint": "Each row is a record: who accepted which version, when and where from. Last {days} days.",
+      "acceptancesEmpty": "No one accepted a document in this period.",
+      "person": "Person",
+      "business": "Business",
+      "when": "When",
+      "context": "Where",
+      "contexts": {
+        "signup": "Sign-up",
+        "client_join": "Joining a business",
+        "reaccept": "New version"
+      },
+      "privacyTitle": "Privacy requests",
+      "privacyHint": "Exports, erasures and closures of the last 12 months. Client details are never shown here.",
+      "privacyEmpty": "No privacy requests in the last 12 months.",
+      "kind": "Request",
+      "kinds": {
+        "business_export": "Business data export",
+        "client_export": "Client data export",
+        "client_erasure": "Client erasure",
+        "business_closure": "Business closure"
+      },
+      "status": "Status",
+      "statuses": {
+        "building": "Building",
+        "ready": "Ready",
+        "failed": "Failed",
+        "done": "Done",
+        "waiting": "Waiting for deletion"
+      },
+      "deleteAfter": "Deleted on {date}"
     }
   },
   "permissions": {
