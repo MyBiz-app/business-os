@@ -8220,6 +8220,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/ai/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Console Agents Map
+         * @description The console's AI agents this team member may ask, for the map: the chief and the
+         *     specialists, each with the team's changes (name, portrait, place, switched off).
+         */
+        get: operations["console_agents_map"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change Console Agent
+         * @description Switches an agent on or off, renames it, sets its portrait and place, and writes the extra
+         *     instructions it always gets. Written to the console audit log.
+         */
+        put: operations["change_console_agent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/ai/assistant/conversations": {
         parameters: {
             query?: never;
@@ -11731,7 +11773,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "manager" | "support" | "health" | "billing" | "growth";
+            role: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
             /** Title */
             title: string | null;
             /** Turns */
@@ -11751,7 +11793,7 @@ export interface components {
              * @default manager
              * @enum {string}
              */
-            role: "manager" | "support" | "health" | "billing" | "growth";
+            role: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
         };
         /** ChatSummary */
         ChatSummary: {
@@ -12998,6 +13040,63 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** ConsoleAgentCard */
+        ConsoleAgentCard: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            /** Color */
+            color: string;
+            /** Chief */
+            chief: boolean;
+            /**
+             * Ready
+             * @description False until a later slice gives the agent its tools
+             */
+            ready: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Name He
+             * @description The team's own name for the agent, if set
+             */
+            name_he: string | null;
+            /** Name En */
+            name_en: string | null;
+            /** Portrait Url */
+            portrait_url: string | null;
+            /**
+             * X
+             * @description Place on the map in percent, null: automatic
+             */
+            x: number | null;
+            /** Y */
+            y: number | null;
+            /**
+             * Instructions
+             * @description Extra instructions; only shown to a member who can change them
+             */
+            instructions: string | null;
+        };
+        /** ConsoleAgentChange */
+        ConsoleAgentChange: {
+            /** Enabled */
+            enabled: boolean;
+            /** Name He */
+            name_he?: string | null;
+            /** Name En */
+            name_en?: string | null;
+            /** Instructions */
+            instructions?: string | null;
+            /** X */
+            x?: number | null;
+            /** Y */
+            y?: number | null;
+            /** Portrait Url */
+            portrait_url?: string | null;
         };
         /** Consumer */
         Consumer: {
@@ -41909,6 +42008,61 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AISettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    console_agents_map: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsoleAgentCard"][];
+                };
+            };
+        };
+    };
+    change_console_agent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsoleAgentChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsoleAgentCard"][];
                 };
             };
             /** @description Validation Error */

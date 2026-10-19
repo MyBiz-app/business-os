@@ -40611,6 +40611,113 @@
         }
       }
     },
+    "/platform/ai/agents": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Console Agents Map",
+        "description": "The console's AI agents this team member may ask, for the map: the chief and the\nspecialists, each with the team's changes (name, portrait, place, switched off).",
+        "operationId": "console_agents_map",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConsoleAgentCard"
+                  },
+                  "type": "array",
+                  "title": "Response Console Agents Map"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/ai/agents/{key}": {
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Change Console Agent",
+        "description": "Switches an agent on or off, renames it, sets its portrait and place, and writes the extra\ninstructions it always gets. Written to the console audit log.",
+        "operationId": "change_console_agent",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsoleAgentChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConsoleAgentCard"
+                  },
+                  "title": "Response Change Console Agent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/ai/assistant/conversations": {
       "get": {
         "tags": [
@@ -51336,7 +51443,14 @@
               "support",
               "health",
               "billing",
-              "growth"
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
             ],
             "title": "Role"
           },
@@ -51388,7 +51502,14 @@
               "support",
               "health",
               "billing",
-              "growth"
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
             ],
             "title": "Role",
             "default": "manager"
@@ -54606,6 +54727,217 @@
           "created_at"
         ],
         "title": "ConsentEvent"
+      },
+      "ConsoleAgentCard": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "support",
+              "health",
+              "billing",
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
+            ],
+            "title": "Key"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          },
+          "chief": {
+            "type": "boolean",
+            "title": "Chief"
+          },
+          "ready": {
+            "type": "boolean",
+            "title": "Ready",
+            "description": "False until a later slice gives the agent its tools"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "name_he": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name He",
+            "description": "The team's own name for the agent, if set"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "portrait_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait Url"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X",
+            "description": "Place on the map in percent, null: automatic"
+          },
+          "y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions",
+            "description": "Extra instructions; only shown to a member who can change them"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "color",
+          "chief",
+          "ready",
+          "enabled",
+          "name_he",
+          "name_en",
+          "portrait_url",
+          "x",
+          "y",
+          "instructions"
+        ],
+        "title": "ConsoleAgentCard"
+      },
+      "ConsoleAgentChange": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "name_he": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name He"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X"
+          },
+          "y": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y"
+          },
+          "portrait_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500,
+                "pattern": "^https://\\S+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "ConsoleAgentChange"
       },
       "Consumer": {
         "properties": {
