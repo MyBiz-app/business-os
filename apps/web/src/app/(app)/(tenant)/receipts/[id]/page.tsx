@@ -1,8 +1,9 @@
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
 
+import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { DownloadLink } from "@/components/download-link";
+import { PageHeader } from "@/components/layout/page-header";
 import { PrintButton } from "@/components/print-button";
 
 import { loadReceipt, ReceiptBody } from "./receipt-body";
@@ -14,16 +15,19 @@ export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]"
   const { receipt } = await loadReceipt(id);
 
   return (
-    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10 print:max-w-none print:p-0">
-      <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link href={`/clients/${receipt.client_id}`} className="text-sm text-primary-ink underline-offset-4 hover:underline">
-          {t("back")}
-        </Link>
-        <div className="flex flex-wrap items-center gap-2">
-          <DownloadLink href={`/receipts/${id}/pdf`} label={t("download")} />
-          <PrintButton label={t("print")} />
-        </div>
-      </div>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10 print:max-w-none print:p-0">
+      <BackLink href="/sales" label={t("back")} />
+      <PageHeader
+        className="print:hidden"
+        title={t("title", { number: receipt.number })}
+        description={<span dir="auto">{receipt.client_name}</span>}
+        actions={
+          <>
+            <DownloadLink href={`/receipts/${id}/pdf`} label={t("download")} />
+            <PrintButton label={t("print")} />
+          </>
+        }
+      />
       <ReceiptBody id={id} />
     </Container>
   );
