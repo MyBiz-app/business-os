@@ -15,7 +15,7 @@ import { getActiveMembership } from "@/lib/tenant";
 
 import { savePalette } from "./actions";
 import { PhoneLogin } from "./phone-login";
-import { AccountMenu } from "./account-menu";
+import { SectionNav } from "@/components/section-nav";
 import { SecuritySettings } from "./security-settings";
 import { NotificationsForm, PictureForm, ProfileForm } from "./profile-form";
 import { Container } from "@/components/layout/container";
@@ -58,8 +58,8 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
   return (
     <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("account.title")} description={t("account.subtitle")} />
-      <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start xl:gap-10">
-        <AccountMenu items={menu} />
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-6 xl:gap-10">
+        <SectionNav items={menu} label={t("account.nav.label")} />
         <div className="form-columns @container min-w-0">
           <CollapsibleSection id="profile" className="form-span" storageKey={key("profile")} defaultOpen title={t("account.detailsTitle")}>
             <div className="flex flex-col gap-6">
