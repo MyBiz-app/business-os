@@ -29,6 +29,13 @@ def check_a11y(page, label):
     h.ready(page)
     results = axe.run(page)
     serious = [v for v in results.response["violations"] if v["impact"] in ("serious", "critical")]
+    if serious:
+        # A page that fades in after a client-side navigation can be scanned mid-fade (colors blended with the
+        # background): look again once it has settled. A real problem shows up in the second scan too.
+        page.wait_for_timeout(1500)
+        h.ready(page)
+        results = axe.run(page)
+        serious = [v for v in results.response["violations"] if v["impact"] in ("serious", "critical")]
     for v in serious:
         node = v["nodes"][0]
         checks = node.get("any", []) + node.get("all", []) + node.get("none", [])
