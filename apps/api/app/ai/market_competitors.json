@@ -1,0 +1,14 @@
+{
+  "note": "Competitors the market researcher compares us with. Edit this file to add or remove one. Prices are never stored here: the researcher reads them from the competitor's public pricing page, with a link and a date.",
+  "competitors": [
+    {"name": "Arbox", "region": "IL", "url": "https://www.arboxapp.com"},
+    {"name": "Boostapp", "region": "IL", "url": "https://www.boostapp.co.il"},
+    {"name": "Lee", "region": "IL", "url": "https://www.lee.co.il"},
+    {"name": "Wix", "region": "IL", "url": "https://www.wix.com"},
+    {"name": "Mindbody", "region": "US", "url": "https://www.mindbodyonline.com"},
+    {"name": "Glofox", "region": "US", "url": "https://www.glofox.com"},
+    {"name": "Vagaro", "region": "US", "url": "https://www.vagaro.com"},
+    {"name": "Fresha", "region": "US", "url": "https://www.fresha.com"},
+    {"name": "Square Appointments", "region": "US", "url": "https://squareup.com/appointments"}
+  ]
+}

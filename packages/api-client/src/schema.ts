@@ -8220,6 +8220,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/ai/web-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Web Search Settings
+         * @description Web search for console agents: off by default, with a monthly limit on searches.
+         */
+        get: operations["web_search_settings"];
+        /**
+         * Change Web Search
+         * @description Switches web search on or off and sets the searches allowed per month. Written to the
+         *     console audit log. Searches cost money: nothing is searched unless this is on.
+         */
+        put: operations["change_web_search"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Reports
+         * @description Saved reports of one kind, newest first. Needs the console permission of the kind.
+         */
+        get: operations["list_reports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/reports/{report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Report */
+        get: operations["get_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/ai/agents": {
         parameters: {
             query?: never;
@@ -19382,6 +19444,61 @@ export interface components {
             /** Ends On */
             ends_on?: string | null;
         };
+        /** Report */
+        Report: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "market" | "security";
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Created By */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Body
+             * @description The full report: for a market report, the prices with their sources and our price against the cheapest competitor
+             */
+            body: {
+                [key: string]: unknown;
+            };
+        };
+        /** ReportSummary */
+        ReportSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "market" | "security";
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Created By */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** ReservationCreate */
         ReservationCreate: {
             /**
@@ -22570,6 +22687,30 @@ export interface components {
              * @description Newest first, at most 50
              */
             items: components["schemas"]["Waiver"][];
+        };
+        /** WebSearchChange */
+        WebSearchChange: {
+            /** Enabled */
+            enabled: boolean;
+            /** Monthly Limit */
+            monthly_limit: number;
+        };
+        /** WebSearchSettings */
+        WebSearchSettings: {
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Monthly Limit
+             * @description Searches allowed per calendar month
+             */
+            monthly_limit: number;
+            /** Used This Month */
+            used_this_month: number;
+            /**
+             * Cost Per 1000 Usd
+             * @description Anthropic's price at the last check; verify
+             */
+            cost_per_1000_usd: number;
         };
         /** WebsiteOrder */
         WebsiteOrder: {
@@ -42104,6 +42245,122 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AISettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    web_search_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebSearchSettings"];
+                };
+            };
+        };
+    };
+    change_web_search: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebSearchChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebSearchSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_reports: {
+        parameters: {
+            query?: {
+                kind?: "market" | "security";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
                 };
             };
             /** @description Validation Error */

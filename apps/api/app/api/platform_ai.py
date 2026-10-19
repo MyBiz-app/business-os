@@ -11,9 +11,10 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
-from app.ai import console, console_agents
+from app.ai import console, console_agents, web_search
 from app.ai import models as ai_models
 from app.ai.gateway import LLMProvider, ProviderBusy, ProviderUnavailable
 from app.api.assistant import ProviderDep, _check_user_rate, _model_calls
@@ -240,6 +241,97 @@ def pause_business_ai(tenant_id: UUID, body: PauseChange, db: BillingDep) -> AIS
         {"t": tenant_id, "paused": body.paused, "reason": body.reason},
     )
     return _settings(db)
+
+
+# --- Web search and saved reports -----------------------------------------------------------
+
+
+class WebSearchSettings(BaseModel):
+    enabled: bool
+    monthly_limit: int = Field(description="Searches allowed per calendar month")
+    used_this_month: int
+    cost_per_1000_usd: int = Field(description="Anthropic's price at the last check; verify")
+
+
+class WebSearchChange(BaseModel):
+    enabled: bool
+    monthly_limit: int = Field(ge=0, le=web_search.MAX_MONTHLY_LIMIT)
+
+
+def _web_search(db: Session) -> WebSearchSettings:
+    state = web_search.state(db)
+    return WebSearchSettings(
+        enabled=state.enabled,
+        monthly_limit=state.monthly_limit,
+        used_this_month=state.used_this_month,
+        cost_per_1000_usd=10,
+    )
+
+
+@router.get("/web-search")
+def web_search_settings(db: UsageDep) -> WebSearchSettings:
+    """Web search for console agents: off by default, with a monthly limit on searches."""
+    return _web_search(db)
+
+
+@router.put("/web-search")
+def change_web_search(body: WebSearchChange, db: BillingDep) -> WebSearchSettings:
+    """Switches web search on or off and sets the searches allowed per month. Written to the
+    console audit log. Searches cost money: nothing is searched unless this is on."""
+    run_rule(
+        db,
+        "SELECT app.platform_ai_web_search_set(:enabled, :limit)",
+        {"enabled": body.enabled, "limit": body.monthly_limit},
+    )
+    return _web_search(db)
+
+
+def _read_rows(db: Session, sql: str, params: dict) -> list[dict]:
+    """Rows of a console function, a refused permission as 403."""
+    try:
+        with db.begin_nested():
+            return [dict(r) for r in db.execute(text(sql), params).mappings()]
+    except DBAPIError as error:
+        if getattr(error.orig, "sqlstate", None) == "42501":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="forbidden"
+            ) from error
+        raise
+
+
+class ReportSummary(BaseModel):
+    id: UUID
+    kind: Literal["market", "security"]
+    title: str
+    summary: str
+    created_by: str
+    created_at: dt.datetime
+
+
+class Report(ReportSummary):
+    body: dict = Field(
+        description="The full report: for a market report, the prices with their "
+        "sources and our price against the cheapest competitor"
+    )
+
+
+@router.get("/reports")
+def list_reports(
+    db: StaffDep,
+    kind: Literal["market", "security"] = "market",
+    limit: Annotated[int, Query(ge=1, le=100)] = 30,
+) -> list[ReportSummary]:
+    """Saved reports of one kind, newest first. Needs the console permission of the kind."""
+    rows = _read_rows(db, "SELECT * FROM app.platform_ai_reports(:k, :n)", {"k": kind, "n": limit})
+    return [ReportSummary.model_validate(r) for r in rows]
+
+
+@router.get("/reports/{report_id}")
+def get_report(report_id: UUID, db: StaffDep) -> Report:
+    rows = _read_rows(db, "SELECT * FROM app.platform_ai_report_get(:id)", {"id": report_id})
+    if not rows:
+        raise not_found()
+    return Report.model_validate(rows[0])
 
 
 # --- The agents map -------------------------------------------------------------------------

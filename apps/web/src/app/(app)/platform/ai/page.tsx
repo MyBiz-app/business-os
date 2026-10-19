@@ -10,7 +10,9 @@ import { getPlatformFor } from "@/lib/platform";
 
 import { ConsoleChat } from "./console-chat";
 import { PauseButton } from "./pause-button";
+import { MarketReports } from "./reports";
 import { AiSettingsForm } from "./settings-form";
+import { WebSearchForm } from "./web-search-form";
 
 /** AI in the console: what each business costs against what it pays, which models run, the
  * emergency stop, and MyBiz's own AI helpers. */
@@ -27,6 +29,7 @@ export default async function PlatformAiPage() {
     ? (await api.GET("/platform/ai/assistant/conversations/{chat_id}", { params: { path: { chat_id: chats[0].id } } })).data
     : undefined;
   const agents = unwrap(await api.GET("/platform/ai/agents"));
+  const webSearch = unwrap(await api.GET("/platform/ai/web-search"));
   const stamp = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const canChange = can("billing.manage");
@@ -146,6 +149,20 @@ export default async function PlatformAiPage() {
             canChange={canChange}
           />
         </div>
+      </section>
+
+      <section aria-labelledby="ai-web-search" className="flex flex-col gap-4">
+        <h2 id="ai-web-search" className="text-lg font-semibold">{t("webSearch.title")}</h2>
+        <p className="text-sm text-muted">{t("webSearch.hint")}</p>
+        <div className="card p-5">
+          <WebSearchForm enabled={webSearch.enabled} monthlyLimit={webSearch.monthly_limit} used={webSearch.used_this_month} canChange={canChange} />
+        </div>
+      </section>
+
+      <section aria-labelledby="ai-reports" className="flex flex-col gap-4">
+        <h2 id="ai-reports" className="text-lg font-semibold">{t("reports.title")}</h2>
+        <p className="text-sm text-muted">{t("reports.hint")}</p>
+        <MarketReports />
       </section>
 
       <section aria-labelledby="ai-team" className="flex flex-col gap-4">
