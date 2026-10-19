@@ -20,6 +20,7 @@ import { SaveDefault } from "./save-default";
 import { Container } from "@/components/layout/container";
 import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
+import { MoreMenu } from "@/components/more-menu";
 import { openedId } from "@/lib/open-window";
 
 import { SessionWindow } from "./session-window";
@@ -49,7 +50,9 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const asked = explicit ? known(String(query.branches).split(",")) : branch ? [] : known(tenant.schedule_default_branches ?? []);
   let laneIds = limitLanes(asked, view);
   // Nothing picked and no menu branch: all of them side by side when they fit (a month: the first).
-  if (laneIds.length === 0 && !branch && branches.length > 1 && (view === "month" || branches.length <= LANE_LIMIT[view])) {
+  // A week with more than two branches opens as one merged column (branch tags on each class): three lanes cut the class names short.
+  const fits = view === "week" ? branches.length <= 2 : branches.length <= LANE_LIMIT[view];
+  if (laneIds.length === 0 && !branch && branches.length > 1 && (view === "month" || fits)) {
     laneIds = limitLanes(branches.map((b) => b.id), view);
   }
   const multi = laneIds.length > 0;
@@ -206,18 +209,22 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         }
         actions={
           <>
-          {canWriteSchedule(tenant) && (
-            <Link href="/schedule/closed" className="btn-ghost px-3 py-2 text-sm">
-              {t("closedDays")}
-            </Link>
+          {(canWriteSchedule(tenant) || tenant.waitlist_enabled) && (
+            <MoreMenu label={t("moreActions")}>
+              {canWriteSchedule(tenant) && (
+                <Link href="/schedule/closed" className="btn-ghost justify-start px-3 py-2 text-sm">
+                  {t("closedDays")}
+                </Link>
+              )}
+              {tenant.waitlist_enabled && (
+                <Link href="/schedule/waitlist" className="btn-ghost justify-start px-3 py-2 text-sm">
+                  {t("waitlists")}
+                </Link>
+              )}
+              {canWriteSchedule(tenant) && <PublishWeek />}
+              {canWriteSchedule(tenant) && view === "week" && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
+            </MoreMenu>
           )}
-          {tenant.waitlist_enabled && (
-            <Link href="/schedule/waitlist" className="btn-ghost px-3 py-2 text-sm">
-              {t("waitlists")}
-            </Link>
-          )}
-          {canWriteSchedule(tenant) && <PublishWeek />}
-          {canWriteSchedule(tenant) && view === "week" && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
           {tenant.permissions.includes("bookings.manage") && (
             <Link href={`/schedule/appointment?date=${start > today ? start : today}`} className="btn-secondary px-4 py-2.5 text-sm">
               {tAppointments("new")}

@@ -1396,6 +1396,7 @@
     "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
     "copyWeekError": "Couldn't copy the week. Try again.",
     "closedDays": "Closed days",
+    "moreActions": "More",
     "closedDay": "Closed",
     "grid": "Calendar grid, scrollable",
     "closeDay": "Close a day",
@@ -4293,7 +4294,7 @@
       "other": "Other"
     },
     "print": "Print",
-    "back": "Back to the client",
+    "back": "All sales",
     "thanks": "Thank you!",
     "email": "Email",
     "legalDocument": "Tax document no. {number} was issued by your invoicing provider",
@@ -7045,6 +7046,7 @@
       "Sample"
     ],
     "orders": {
+      "back": "All sales",
       "title": "Online orders",
       "subtitle": "Plans clients bought in the app, newest first.",
       "date": "Date",

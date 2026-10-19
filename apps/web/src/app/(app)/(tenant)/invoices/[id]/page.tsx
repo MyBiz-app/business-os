@@ -14,7 +14,7 @@ export default async function InvoicePage({ params }: PageProps<"/invoices/[id]"
   const { doc } = await loadInvoice(id);
 
   return (
-    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/invoices" label={t("back")} />
       <PageHeader
         title={

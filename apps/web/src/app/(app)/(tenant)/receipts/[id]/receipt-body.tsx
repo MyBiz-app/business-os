@@ -50,7 +50,7 @@ export async function ReceiptBody({ id }: { id: string }) {
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <p className="text-2xl font-bold" dir="auto">{receipt.business_name}</p>
-          <h1 className="text-lg font-semibold text-muted">{t("title", { number: receipt.number })}</h1>
+          <h2 className="text-lg font-semibold text-muted">{t("title", { number: receipt.number })}</h2>
         </div>
         <dl className="grid grid-cols-[auto_auto] gap-x-4 gap-y-1 text-sm">
           <dt className="text-muted">{t("issuedAt")}</dt>

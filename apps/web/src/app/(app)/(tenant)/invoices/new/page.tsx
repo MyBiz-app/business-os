@@ -15,7 +15,7 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/invo
   const params = await searchParams;
 
   return (
-    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/invoices" label={t("back")} />
       <PageHeader title={startsCredit(params) ? t("newCredit") : t("new")} />
       <NewDocumentBody params={params} />

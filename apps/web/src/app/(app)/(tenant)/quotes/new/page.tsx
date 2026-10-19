@@ -14,7 +14,7 @@ export default async function NewQuotePage({ searchParams }: PageProps<"/quotes/
   const { client, example } = await searchParams;
 
   return (
-    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/quotes" label={t("back")} />
       <PageHeader title={t("new")} />
       <NewQuoteBody client={client} example={example === "1"} />
