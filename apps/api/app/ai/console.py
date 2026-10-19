@@ -1,10 +1,11 @@
 """The MyBiz console assistant (round 5, A9): the platform team's AI helpers.
 
-Five roles (manager, support, health, billing, growth) answer from tools that read across
-businesses. The tools are the console's own SECURITY DEFINER functions, so each one needs the
-same console permission it needs in the console, and a team member never gets more through the
-AI than they hold. Tools only read; replies and announcements come back as drafts for a human to
-send. Every tool call is written to the console audit log as the AI acting for the team member."""
+The agents of the console team (the catalog is in console_agents.py) answer from tools that
+read across businesses. The tools are the console's own SECURITY DEFINER functions, so each one
+needs the same console permission it needs in the console, and a team member never gets more
+through the AI than they hold. Tools only read; replies and announcements come back as drafts for
+a human to send. Every tool call is written to the console audit log as the AI acting for the team
+member."""
 
 import datetime as dt
 import json
@@ -174,7 +175,150 @@ def _inbox(db: Session, _args: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _clip(value: Any, limit: int = 300) -> str:
+    return str(value or "")[:limit]
+
+
+def _business_detail(db: Session, args: dict[str, Any]) -> dict[str, Any]:
+    rows = _rows(db, "SELECT * FROM app.platform_business(:id)", {"id": UUID(str(args["id"]))})
+    if not rows:
+        return {"error": "no business with this id"}
+    r = rows[0]
+    return {
+        "id": str(r["id"]),
+        "name": r["name"],
+        "vertical": r["vertical"],
+        "locale": r["locale"],
+        "currency": r["currency"],
+        "time_zone": r["time_zone"],
+        "created_at": r["created_at"].date().isoformat(),
+        "members": r["members"],
+        "clients": r["clients"],
+        "active_clients": r["active_clients"],
+        "bookings_30d": r["bookings_30d"],
+        "ai_credits_30d": float(r["ai_credits_30d"]),
+        "modules": r["modules"],
+        "owner_email": r["owner_email"],
+    }
+
+
+def _system_health(db: Session, _args: dict[str, Any]) -> dict[str, Any]:
+    health = db.execute(text("SELECT app.platform_health()")).scalar_one()
+    return json.loads(json.dumps(health, default=str))
+
+
+def _incident_banners(db: Session, _args: dict[str, Any]) -> dict[str, Any]:
+    rows = _rows(db, "SELECT * FROM app.incident_rows()")
+    return {
+        "open": sum(1 for r in rows if r["resolved_at"] is None),
+        "banners": [
+            {
+                "id": str(r["id"]),
+                "kind": r["kind"],
+                "content": r["content"],
+                "status_url": r["status_url"],
+                "opened": r["created_at"].isoformat(),
+                "resolved": r["resolved_at"].isoformat() if r["resolved_at"] else None,
+            }
+            for r in rows[:MAX_ROWS]
+        ],
+    }
+
+
+def _churn(db: Session, args: dict[str, Any]) -> dict[str, Any]:
+    days = min(max(int(args.get("days") or 90), 1), 365)
+    since = dt.datetime.now(dt.UTC) - dt.timedelta(days=days)
+    rows = [
+        r
+        for r in _rows(db, "SELECT * FROM app.platform_cancellations()")
+        if r["created_at"] >= since
+    ]
+    reasons: dict[str, int] = {}
+    for r in rows:
+        key = _clip(r["reason"], 80) or "none"
+        reasons[key] = reasons.get(key, 0) + 1
+    months = _rows(db, "SELECT * FROM app.platform_churn_months()")
+    return {
+        "days": days,
+        "total": len(rows),
+        "by_reason": dict(sorted(reasons.items(), key=lambda kv: -kv[1])[:MAX_ROWS]),
+        "recent": [
+            {
+                "business": r["name"],
+                "owner_email": r["owner_email"],
+                "outcome": r["outcome"],
+                "reason": _clip(r["reason"], 80),
+                "note": _clip(r["note"]),
+                "date": r["created_at"].date().isoformat(),
+                "resumed": r["resumed_at"] is not None,
+            }
+            for r in rows[:MAX_ROWS]
+        ],
+        "months": json.loads(json.dumps(months, default=str)),
+    }
+
+
+def _website_orders(db: Session, args: dict[str, Any]) -> dict[str, Any]:
+    stage = str(args.get("stage") or "").strip().lower()
+    rows = _rows(db, "SELECT * FROM app.platform_website_orders()")
+    if stage:
+        rows = [r for r in rows if r["stage"] == stage]
+    return {
+        "total": len(rows),
+        "orders": [
+            {
+                "id": str(r["id"]),
+                "business": r["tenant_name"],
+                "product": r["product"],
+                "stage": r["stage"],
+                "currency": r["currency"],
+                "setup_price": r["setup_price"],
+                "monthly_price": r["monthly_price"],
+                "site_url": r["site_url"],
+                "contact_email": r["contact_email"],
+                "submitted": r["submitted_at"].date().isoformat() if r["submitted_at"] else None,
+                "updated": r["updated_at"].date().isoformat(),
+                "change_request": _clip(r["change_request"]),
+                "internal_notes": _clip(r["internal_notes"]),
+            }
+            for r in rows[:MAX_ROWS]
+        ],
+    }
+
+
+def _audit_log(db: Session, args: dict[str, Any]) -> dict[str, Any]:
+    limit = min(max(int(args.get("limit") or MAX_ROWS), 1), 100)
+    needle = str(args.get("action") or "").strip().lower()
+    rows = _rows(db, "SELECT * FROM app.platform_audit_list(:n)", {"n": 500 if needle else limit})
+    if needle:
+        rows = [r for r in rows if needle in r["action"].lower()]
+    return {
+        "entries": [
+            {
+                "at": r["occurred_at"].isoformat(),
+                "who": r["actor_email"],
+                "action": r["action"],
+                "business": r["tenant_name"],
+                "details": _clip(json.dumps(r["details"], default=str, ensure_ascii=False)),
+            }
+            for r in rows[:limit]
+        ]
+    }
+
+
+def _signup_funnel(db: Session, args: dict[str, Any]) -> dict[str, Any]:
+    days = min(max(int(args.get("days") or 30), 1), 365)
+    rows = _rows(db, "SELECT * FROM app.platform_funnel(:d)", {"d": days})
+    return {
+        "days": days,
+        "steps": [
+            {"event": r["event"], "step": r["step"], "visitors": int(r["visitors"])} for r in rows
+        ],
+    }
+
+
 _ALL = frozenset(ROLES)
+OWNER = "level.owner"  # not a console permission: held by MyBiz owners, for owner-only tools
 TOOLS: dict[str, Tool] = {
     t.name: t
     for t in (
@@ -220,13 +364,78 @@ TOOLS: dict[str, Tool] = {
             frozenset({"manager", "support", "growth"}),
             _inbox,
         ),
+        Tool(
+            "business_detail",
+            "One business by its id (from list_businesses): size, activity, modules, AI use "
+            "and the owner's email.",
+            {"id": {"type": "string"}},
+            "businesses.read",
+            frozenset({"manager", "health", "billing", "growth", "success", "support"}),
+            _business_detail,
+        ),
+        Tool(
+            "system_health",
+            "The platform's health: background jobs (last run, failures in 24 hours), message "
+            "and email queues, failures.",
+            {},
+            "usage.read",
+            frozenset({"manager", "health", "security"}),
+            _system_health,
+        ),
+        Tool(
+            "incident_banners",
+            "The incident, maintenance and security banners shown to every business, open "
+            "and resolved.",
+            {},
+            "incidents.manage",
+            frozenset({"manager", "health", "security", "support"}),
+            _incident_banners,
+        ),
+        Tool(
+            "churn",
+            "Cancelled and paused subscriptions in the last days, with reasons and notes, and "
+            "the 12-month churn trend.",
+            {"days": {"type": "integer"}},
+            "billing.manage",
+            frozenset({"manager", "billing", "growth", "success", "product"}),
+            _churn,
+        ),
+        Tool(
+            "website_orders",
+            "Website orders from businesses by stage (briefing, received, building, review, "
+            "live). Pass a stage to filter, or an empty string for all.",
+            {"stage": {"type": "string"}},
+            "businesses.act",
+            frozenset({"manager", "support", "success"}),
+            _website_orders,
+        ),
+        Tool(
+            "audit_log",
+            "What the console team and the console AI did, newest first. Owners only. Pass an "
+            "action fragment to filter, or an empty string for all.",
+            {"limit": {"type": "integer"}, "action": {"type": "string"}},
+            OWNER,
+            frozenset({"manager", "security"}),
+            _audit_log,
+        ),
+        Tool(
+            "signup_funnel",
+            "Visitors at each step of the signup wizard over the last days.",
+            {"days": {"type": "integer"}},
+            "usage.read",
+            frozenset({"manager", "growth", "product", "marketing"}),
+            _signup_funnel,
+        ),
     )
 }
 
 
 def permissions_of(db: Session) -> frozenset[str]:
-    row = db.execute(text("SELECT permissions FROM app.platform_me()")).first()
-    return frozenset(row.permissions) if row else frozenset()
+    row = db.execute(text("SELECT permissions, level FROM app.platform_me()")).first()
+    if not row:
+        return frozenset()
+    owner = {OWNER} if row.level in ("primary_owner", "owner") else set()
+    return frozenset(row.permissions) | owner
 
 
 def tools_for(role: str, permissions: frozenset[str]) -> list[Tool]:
