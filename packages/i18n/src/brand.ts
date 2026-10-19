@@ -1,6 +1,6 @@
 // The product's name, in one place (decision X21: "MyBiz" for now). Translations write the
 // name as "MyBiz"; withBrand swaps it for BRAND.name, so renaming the product is a change to
-// brand.json, then `pnpm brand:sync` for the copies the API and the Expo config need (docs/brand-rename.md).
+// brand.json, then `pnpm brand:sync` for the copies the API and the Expo config need (docs/guides/brand-rename.md).
 import brand from "../brand.json";
 
 export const BRAND: typeof brand = brand;

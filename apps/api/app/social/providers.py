@@ -1,8 +1,8 @@
 """Social providers: how a network is connected and how its numbers are read.
 
 Each provider is one small class registered here. Adding a network is adding one file and one
-`register_social` call (see docs/integrations.md). The networks a business can see are listed in
-NETWORKS; a network whose provider is not registered yet shows as "coming soon".
+`register_social` call (see docs/guides/integrations.md). The networks a business can see are
+listed in NETWORKS; a network whose provider is not registered yet shows as "coming soon".
 
 Only summarized, public numbers of the business's own accounts are read: followers, reach, views,
 engagement, its own posts and audience shares. Never private messages, never personal data of

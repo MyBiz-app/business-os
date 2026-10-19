@@ -1,5 +1,5 @@
 // The product's name has one home, packages/i18n/brand.json. This fails when code spells it out
-// somewhere else, so renaming the product stays a change to that one file (docs/brand-rename.md).
+// somewhere else, so renaming the product stays a change to that one file (docs/guides/brand-rename.md).
 // Comments and docstrings may say "MyBiz"; so may tests, docs and translation files (which are
 // written with the name and swapped at build time, see packages/i18n/src/brand.ts).
 import assert from "node:assert/strict";
@@ -21,10 +21,10 @@ const ALLOWED = new Map([
   ["apps/api/app/core/identity.py", "HMAC label of stored hashes: changing it would invalidate every one"],
   ["packages/brand/app-ids.json", "the store id can never change after the first upload"],
   ["packages/brand/scripts/build-assets.mjs", "names the brand file in a message"],
-  [".github/workflows/auth-settings-staging.yml", "redirect list of the staging Supabase (docs/brand-rename.md)"],
-  [".github/workflows/deploy-apps-web.yml", "Vercel project names (docs/brand-rename.md)"],
-  ["infra/legacy-redirects/vercel.json", "points the old address at the current app (docs/brand-rename.md)"],
-  ["infra/legacy-redirects/index.html", "points the old address at the current app (docs/brand-rename.md)"],
+  [".github/workflows/auth-settings-staging.yml", "redirect list of the staging Supabase (docs/guides/brand-rename.md)"],
+  [".github/workflows/deploy-apps-web.yml", "Vercel project names (docs/guides/brand-rename.md)"],
+  ["infra/legacy-redirects/vercel.json", "points the old address at the current app (docs/guides/brand-rename.md)"],
+  ["infra/legacy-redirects/index.html", "points the old address at the current app (docs/guides/brand-rename.md)"],
   ["scripts/backup/backup-db.sh", "backup file names; the restore drill reads them by this prefix"],
   ["scripts/spec-to-docx.cjs", "builds the spec document, not the product"],
   ["scripts/setup-windows.ps1", "the GitHub repository's address"],

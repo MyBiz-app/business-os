@@ -141,7 +141,7 @@
   --color-navy: #111827;
   --color-ai: #7c3aed;
   --color-electric: #06b6d4;
-  /* The site's font: set once in app/fonts.ts (see docs/design-system.md). */
+  /* The site's font: set once in app/fonts.ts (see docs/guides/design-system.md). */
   --font-sans: var(--font-main), system-ui, sans-serif;
   --font-display-stack: var(--font-display), var(--font-main), system-ui, sans-serif;
 }
@@ -488,7 +488,7 @@ h3,
   padding-block: clamp(4.5rem, 9vw, 8rem);
 }
 
-/* Wide-screen policy (docs/design-system.md, "Page widths"): the sections of a form room or a
+/* Wide-screen policy (docs/guides/design-system.md, "Page widths"): the sections of a form room or a
    record card flow into two columns once the room itself is wide enough (a container query, so
    the app's side menu and the settings menu are accounted for). Long text keeps 44rem. */
 .form-columns {
@@ -1958,7 +1958,7 @@ h1[tabindex="-1"]:focus {
   }
 }
 
-/* ---- Page transitions (view transitions; see docs/design-system.md) ------------------------ */
+/* ---- Page transitions (view transitions; see docs/guides/design-system.md) ------------------------ */
 
 /* Clicks go through to the live page while a transition runs. */
 ::view-transition {

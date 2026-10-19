@@ -135,7 +135,7 @@ Full guide: [releases.md](releases.md).
 EAS **environment** `production`. In expo.dev, Project, Environment variables, create the three
 `EXPO_PUBLIC_*` variables there with the production addresses (the publishable key is public by
 design; no secret goes in an app). Android needs no paid account; iOS needs the Apple Developer
-program (about $99 a year), see [../mobile-builds.md](../mobile-builds.md).
+program (about $99 a year), see [../mobile-builds.md](../guides/mobile-builds.md).
 
 ## 8. Who can reach what
 

@@ -1,4 +1,4 @@
-"""Outside services behind swappable providers (decision X13, docs/integrations.md).
+"""Outside services behind swappable providers (decision X13, docs/guides/integrations.md).
 
 Each capability (payments, invoicing, messaging, email, AI, storage) has an interface in the
 system's own words, built-in providers that need no account, and a registry: a vendor is one

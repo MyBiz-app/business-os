@@ -48,7 +48,7 @@ let texts;
 if (parent) {
   const found = find(parent);
   if (!found) fail(`No catalog entry "${parent}".`);
-  // A sub-category inherits everything; add only what differs (see docs/verticals.md).
+  // A sub-category inherits everything; add only what differs (see docs/guides/verticals.md).
   found.entry.children = [...(found.entry.children ?? []), { key, status: "planned" }];
   writeFileSync(join(CATALOG_DIR, `${found.category.key}.json`), `${JSON.stringify(found.category, null, 2)}\n`);
   texts = { name: TODO("name"), tagline: TODO("one-line tagline") };
