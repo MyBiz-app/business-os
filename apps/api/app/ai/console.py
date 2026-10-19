@@ -595,7 +595,7 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "security_visits",
-            "The MyBiz team's visits inside businesses (views and changes) in the last days, "
+            "The platform team's visits inside businesses (views and changes) in the last days, "
             "up to 90. Owners only.",
             {"days": {"type": "integer"}},
             OWNER,
