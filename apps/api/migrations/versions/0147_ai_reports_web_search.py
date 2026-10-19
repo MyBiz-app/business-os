@@ -7,8 +7,8 @@ costs money). Searches are counted per conversation. Like the other console AI t
 table is not reachable from the API role: only SECURITY DEFINER functions touch it, and they
 check the console permission of the report's kind. This only adds; nothing is changed or dropped.
 
-Revision ID: 0146
-Revises: 0145
+Revision ID: 0147
+Revises: 0146
 Create Date: 2026-10-19
 """
 
@@ -16,8 +16,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0146"
-down_revision: str | None = "0145"
+revision: str = "0147"
+down_revision: str | None = "0146"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
