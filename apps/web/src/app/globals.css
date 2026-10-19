@@ -486,6 +486,11 @@ h3,
   }
 }
 
+/* A select never outgrows the space it is given (its longest option would otherwise set its width). */
+select {
+  max-inline-size: 100%;
+}
+
 /* ---- Layout ----------------------------------------------------------------------------- */
 
 /* A row of cards that swipes sideways on a phone (the next card peeks in) and is an ordinary
