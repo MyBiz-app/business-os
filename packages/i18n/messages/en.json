@@ -2864,6 +2864,10 @@
       "broadcasts_manage": {
         "name": "Broadcasts",
         "hint": "Send messages and pop-ups to MyBiz users."
+      },
+      "incidents_manage": {
+        "name": "Incident banners",
+        "hint": "Open and resolve the banner shown on every page when something is wrong."
       }
     },
     "you": "You · {level}",
@@ -2878,6 +2882,12 @@
       "level": "Level",
       "permissions": "Permissions",
       "allPermissions": "All permissions",
+      "templates": {
+        "support": {
+          "name": "Support worker",
+          "hint": "Reads businesses, answers the inbox and handles incident banners."
+        }
+      },
       "save": "Save",
       "added": "Saved.",
       "remove": "Remove",
@@ -3224,6 +3234,10 @@
         "billing": "Invoices, overdue amounts, unusual AI use.",
         "growth": "Follow-ups to leads and announcements, as drafts."
       },
+      "history": "History",
+      "newChat": "Start a new conversation",
+      "noHistory": "No earlier conversations",
+      "untitled": "Untitled",
       "question": "Ask a question",
       "send": "Send",
       "thinking": "Thinking...",

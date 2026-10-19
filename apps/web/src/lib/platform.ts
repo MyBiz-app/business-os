@@ -17,6 +17,7 @@ export const PLATFORM_PERMISSIONS: PlatformPermission[] = [
   "usage.read",
   "staff.manage",
   "broadcasts.manage",
+  "incidents.manage",
 ];
 
 /** The signed-in MyBiz team member (404 for everyone else) and what they may do. */
