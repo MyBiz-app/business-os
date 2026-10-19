@@ -34,8 +34,15 @@ describe("wide-screen policy", () => {
     assert.match(read("app/globals.css"), /@container \(min-width: 56rem\)/);
   });
 
-  it("adds columns to the cards from 1920px and keeps six dashboard tiles in a row", () => {
-    assert.ok(read("app/(app)/(tenant)/clients/[id]/client-body.tsx").includes("min-[120rem]:grid-cols-7"));
+  it("gives the client and lead cards the settings width with an inner menu and one column", () => {
+    for (const card of ["clients", "leads"]) {
+      assert.match(read(`app/(app)/(tenant)/${card}/[id]/page.tsx`), /size="settings"/);
+      assert.ok(read(`app/(app)/(tenant)/${card}/[id]/${card === "clients" ? "client" : "lead"}-body.tsx`).includes("RecordLayout"), card);
+    }
+    assert.ok(!read("app/(app)/(tenant)/clients/[id]/client-body.tsx").includes("min-[120rem]:grid-cols"));
+  });
+
+  it("adds columns to the staff card from 1920px and keeps six dashboard tiles in a row", () => {
     assert.ok(read("app/(app)/(tenant)/team/[userId]/card-sections.tsx").includes("min-[120rem]:grid-cols-3"));
     assert.ok(read("app/(app)/(tenant)/dashboard/page.tsx").includes("2xl:grid-cols-6"));
   });

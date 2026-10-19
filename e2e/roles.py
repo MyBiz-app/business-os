@@ -34,6 +34,7 @@ with sync_playwright() as p:
 
     owner.goto(f"{h.BASE}/team")
     h.ready(owner)
+    owner.get_by_role("button", name="הזמנת עובד").click()
     owner.get_by_label("אימייל", exact=True).fill(coach_email)
     owner.get_by_label("תפקיד", exact=True).select_option("staff")
     owner.get_by_role("button", name="יצירת קישור הזמנה").click()
@@ -79,12 +80,16 @@ with sync_playwright() as p:
     # Give it to the coach from the team page.
     owner.goto(f"{h.BASE}/team")
     h.ready(owner)
-    select = owner.get_by_label(f"תפקיד: {coach_email}")
+    def open_role_window():
+        owner.get_by_role("button", name=f"עוד פעולות עבור {coach_email}").click()
+        owner.get_by_role("menuitem", name="שינוי תפקיד").click()
+        return owner.get_by_label(f"תפקיד: {coach_email}")
+
     with owner.expect_response(lambda r: r.request.method == "POST"):
-        select.select_option(label="מנהל מסלולים")
+        open_role_window().select_option(label="מנהל מסלולים")
     owner.reload()
     h.ready(owner)
-    expect(owner.get_by_label(f"תפקיד: {coach_email}")).to_have_value(re.compile("custom:"))
+    expect(open_role_window()).to_have_value(re.compile("custom:"))
 
     coach.goto(f"{h.BASE}/plans/new")
     h.ready(coach)

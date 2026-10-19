@@ -372,8 +372,8 @@
       "subtitle": "How long before a visit clients may cancel for free, and what happens when they cancel late or do not come.",
       "confirm": "These are the usual terms for a business like yours. Check them and save once so they are yours.",
       "group": "Free cancellation before a class",
-      "personal": "... before a personal session or appointment",
-      "resource": "... before a court or room",
+      "personal": "Free cancellation before a personal session or appointment",
+      "resource": "Free cancellation before a court or room",
       "lateOutcome": "A late cancellation",
       "noShowOutcome": "A client who does not come",
       "outcomes": {
@@ -896,6 +896,14 @@
     }
   },
   "clients": {
+    "nav": {
+      "label": "Client sections",
+      "details": "Details",
+      "membership": "Plans and visits",
+      "paperwork": "Quotes and documents",
+      "talk": "Notes and messages",
+      "privacy": "Consent and privacy"
+    },
     "joinedChip": "Joined {range}",
     "noShowChip": "Missed a class {range}",
     "activeFilters": "Active filters",
@@ -1232,6 +1240,22 @@
     }
   },
   "team": {
+    "tabsLabel": "Team sections",
+    "tabs": {
+      "members": "People",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "timeClock": "Time clock",
+      "swaps": "Swaps",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "organization": "Structure",
+      "roles": "Roles"
+    },
+    "inviteButton": "Invite someone",
+    "moreActions": "More actions for {name}",
+    "changeRole": "Change role",
+    "branchesMenu": "Branches",
     "title": "Team",
     "subtitle": "People who work in the business and what they can do.",
     "members": "Members",
@@ -5712,6 +5736,13 @@
     }
   },
   "leads": {
+    "nav": {
+      "label": "Lead sections",
+      "stage": "Stage",
+      "details": "Details",
+      "activity": "Activity",
+      "messages": "Messages"
+    },
     "truncated": "Showing {shown} of {total} leads.",
     "showMore": "Show more leads",
     "title": "Leads",
@@ -8690,6 +8721,8 @@
     "cycle": "That would make a loop: this person already manages them."
   },
   "shifts": {
+    "settingsTitle": "Shift settings",
+    "settingsHint": "Rooms, minimum staffing, publishing and planning rhythm.",
     "title": "Shifts",
     "soloTitle": "Hours and availability",
     "soloSubtitle": "You run the business on your own, so there is no shift board. Keep your opening hours and availability up to date.",

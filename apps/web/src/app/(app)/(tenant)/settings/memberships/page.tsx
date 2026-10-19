@@ -17,7 +17,7 @@ export default async function MembershipSettingsPage() {
 
   return (
     <div className="form-columns">
-      <TopicHeader title={t("freezeRules.title")} description={t("nav.hints.memberships")} />
+      <TopicHeader title={t("nav.items.memberships")} description={t("nav.hints.memberships")} />
       <FreezeRulesForm key={JSON.stringify(rules)} rules={rules} currency={tenant.currency} />
     </div>
   );

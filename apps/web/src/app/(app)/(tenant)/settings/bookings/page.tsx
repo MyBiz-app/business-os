@@ -23,39 +23,46 @@ export default async function BookingSettingsPage() {
   return (
     <div className="form-columns">
       <TopicHeader title={t("nav.items.bookings")} description={t("nav.hints.bookings")} />
-      <CollapsibleSection title={t("cancellation.title")} description={t("cancellation.subtitle")} defaultOpen storageKey="settings-cancellation">
-        <CancellationForm key={JSON.stringify(cancellation.business)} overview={cancellation} />
+      <CollapsibleSection title={t("cancellation.title")} description={t("cancellation.subtitle")} defaultOpen storageKey="settings-cancellation-v2">
+        <div className="flex flex-col gap-5">
+          <CancellationForm key={JSON.stringify(cancellation.business)} overview={cancellation} />
+          {cancellation.services.length > 0 && (
+            <CollapsibleSection variant="inline" className="border-t border-border pt-4" title={t("cancellation.perService")}>
+              <p className="mb-2 text-sm text-muted">{t("cancellation.perServiceHint")}</p>
+              <ul className="flex flex-col divide-y divide-border">
+                {cancellation.services.map((service) => (
+                  <OverrideRow key={`${service.service_id}-${JSON.stringify(service.policy)}`} kind="service" row={{ id: service.service_id, name: service.name, policy: service.policy }} fallback={cancellation.business} />
+                ))}
+              </ul>
+            </CollapsibleSection>
+          )}
+          {cancellation.plans.length > 0 && (
+            <CollapsibleSection variant="inline" className="border-t border-border pt-4" title={t("cancellation.perPlan")}>
+              <p className="mb-2 text-sm text-muted">{t("cancellation.perPlanHint")}</p>
+              <ul className="flex flex-col divide-y divide-border">
+                {cancellation.plans.map((plan) => (
+                  <OverrideRow key={`${plan.plan_id}-${JSON.stringify(plan.policy)}`} kind="plan" row={{ id: plan.plan_id, name: plan.name, policy: plan.policy }} fallback={cancellation.business} />
+                ))}
+              </ul>
+            </CollapsibleSection>
+          )}
+        </div>
       </CollapsibleSection>
-      {cancellation.services.length > 0 && (
-        <CollapsibleSection title={t("cancellation.perService")} description={t("cancellation.perServiceHint")} storageKey="settings-cancellation-services">
-          <ul className="flex flex-col divide-y divide-border">
-            {cancellation.services.map((service) => (
-              <OverrideRow key={`${service.service_id}-${JSON.stringify(service.policy)}`} kind="service" row={{ id: service.service_id, name: service.name, policy: service.policy }} fallback={cancellation.business} />
-            ))}
-          </ul>
-        </CollapsibleSection>
-      )}
-      {cancellation.plans.length > 0 && (
-        <CollapsibleSection title={t("cancellation.perPlan")} description={t("cancellation.perPlanHint")} storageKey="settings-cancellation-plans">
-          <ul className="flex flex-col divide-y divide-border">
-            {cancellation.plans.map((plan) => (
-              <OverrideRow key={`${plan.plan_id}-${JSON.stringify(plan.policy)}`} kind="plan" row={{ id: plan.plan_id, name: plan.name, policy: plan.policy }} fallback={cancellation.business} />
-            ))}
-          </ul>
-        </CollapsibleSection>
-      )}
-      <CollapsibleSection title={t("waitlist.title")} description={t("waitlist.subtitle")} defaultOpen storageKey="settings-waitlist">
-        <WaitlistForm tenant={tenant} />
+      <CollapsibleSection title={t("waitlist.title")} description={t("waitlist.subtitle")} storageKey="settings-waitlist-v2">
+        <div className="flex flex-col gap-5">
+          <WaitlistForm tenant={tenant} />
+          {services.length > 0 && (
+            <CollapsibleSection variant="inline" className="border-t border-border pt-4" title={t("waitlist.perService")}>
+              <p className="mb-2 text-sm text-muted">{t("waitlist.perServiceHint")}</p>
+              <ul className="flex flex-col divide-y divide-border">
+                {services.map((service) => (
+                  <ServiceWaitlistRow key={`${service.id}-${service.waitlist_mode}`} id={service.id} name={service.name} mode={service.waitlist_mode ?? ""} />
+                ))}
+              </ul>
+            </CollapsibleSection>
+          )}
+        </div>
       </CollapsibleSection>
-      {services.length > 0 && (
-        <CollapsibleSection title={t("waitlist.perService")} description={t("waitlist.perServiceHint")} storageKey="settings-waitlist-services">
-          <ul className="flex flex-col divide-y divide-border">
-            {services.map((service) => (
-              <ServiceWaitlistRow key={`${service.id}-${service.waitlist_mode}`} id={service.id} name={service.name} mode={service.waitlist_mode ?? ""} />
-            ))}
-          </ul>
-        </CollapsibleSection>
-      )}
     </div>
   );
 }
