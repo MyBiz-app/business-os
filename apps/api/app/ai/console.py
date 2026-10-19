@@ -411,7 +411,7 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "audit_log",
-            "What the MyBiz team and the console AI did, newest first. Owners only. Pass an "
+            "What the console team and the console AI did, newest first. Owners only. Pass an "
             "action fragment to filter, or an empty string for all.",
             {"limit": {"type": "integer"}, "action": {"type": "string"}},
             OWNER,
