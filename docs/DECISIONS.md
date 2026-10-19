@@ -390,7 +390,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 
 - **Nothing is deleted, old material goes to an archive.** Files move with `git mv` so each keeps its history: `docs/spec/archive/` (v1, v2, v3, old Word files), `docs/proposals/done/`, `docs/reviews/archive/`. Owner approved the structure and "archive, not delete" on 2026-10-19.
 - **Round specs live in the repository** under `docs/plans/<year-month>/`, copied from the project folder (long dashes replaced by plain hyphens, the CI rule). New specs are saved there in the first pull request of a round.
-- **Spec v4 will live in `docs/spec/current/`** (English and Hebrew, written in slice D2); until then v3 is the latest written spec and the current folder says so.
+- **Spec v4 lives in `docs/spec/current/`** (English and Hebrew, Word files generated from it; written in slice D2 on 2026-10-19). It is the source of truth; v1 to v3 stay in `docs/spec/archive/`.
 - **Broken links fail CI**: `scripts/check-doc-links.cjs` checks relative links in all Markdown files.
 - **How-to documents moved to `docs/guides/`** (design system, industries, integrations, Claude Code usage, accessibility, mobile builds, monitoring, brand rename); code comments and `CLAUDE.md` now point there.
 

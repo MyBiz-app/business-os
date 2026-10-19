@@ -16,10 +16,10 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 ## Status and documents
 
 - **Start here:** [`docs/README.md`](docs/README.md) ([עברית](docs/README.he.md)) - where every document is, how the system is built, and the outside services today and at go-live.
-- **Product spec (v3):** [English](docs/spec/archive/v3/spec.en.md) · [עברית](docs/spec/archive/v3/spec.he.md) ·
-  Word: [`docs/spec/archive/MyBiz-Spec-en.docx`](docs/spec/archive/MyBiz-Spec-en.docx),
-  [`docs/spec/archive/MyBiz-Spec-he.docx`](docs/spec/archive/MyBiz-Spec-he.docx)
-  (regenerate with `node scripts/spec-to-docx.cjs he|en`, needs the `docx` npm package).
+- **Product spec (v4, source of truth):** [English](docs/spec/current/system.en.md) · [עברית](docs/spec/current/system.he.md) ·
+  Word: [`docs/spec/current/MyBiz-Spec-v4-en.docx`](docs/spec/current/MyBiz-Spec-v4-en.docx),
+  [`docs/spec/current/MyBiz-Spec-v4-he.docx`](docs/spec/current/MyBiz-Spec-v4-he.docx)
+  (regenerate with `node scripts/spec-to-docx.cjs he|en`, needs the `docx` npm package). Older specs: [`docs/spec/archive/`](docs/spec/archive/).
 - **Decisions:** [`docs/DECISIONS.md`](docs/DECISIONS.md) - every product and technical decision.
 - **Status:** [`docs/STATUS.md`](docs/STATUS.md) ([Hebrew](docs/STATUS.he.md)) - what is done, in progress and next; open work in GitHub issues.
 - **Detailed v2 chapters:** [`docs/spec/archive/v2/`](docs/spec/archive/v2/README.md) (architecture, data model, AI).
@@ -38,7 +38,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 | `packages/i18n` | Shared translations (he / en) and locale helpers for the web and the apps |
 | `packages/app-kit` | What the three apps share: API client, design tokens, components, providers |
 | `packages/verticals` | The industry catalog: categories and sub-categories, shared by the API, the web and the apps ([how to add one](docs/guides/verticals.md)) |
-| `docs/` | Spec (v3 overview + Word files, v2 chapters) and decision log |
+| `docs/` | Spec (v4, with archived v1-v3) and decision log |
 | `scripts/` | Developer machine setup, spec → Word |
 
 ## Run locally

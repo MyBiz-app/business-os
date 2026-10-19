@@ -35,7 +35,8 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 | `e2e/` | End-to-end checks (Playwright, Python) |
 | `docs/spec/archive/v1/` | Original owner spec (Hebrew + English .docx) |
 | `docs/spec/archive/v2/` | Detailed v2 chapters (architecture, data model, AI) |
-| `docs/spec/archive/v3/` | Latest written product spec (source of truth until v4 lands in `docs/spec/current/`), English and Hebrew |
+| `docs/spec/current/` | Spec v4: the source of truth (`system.en.md`, `system.he.md`, plus Word files) |
+| `docs/spec/archive/` | Older specs v1-v3 (v3 up to about 12.10), kept for history |
 | `docs/plans/` | The owner-approved spec of each work round (Hebrew); save new round specs here |
 | `docs/proposals/` (`open/`, `done/`), `docs/reviews/` (`current/`, `archive/`) | Design proposals per feature; architecture reviews |
 | `docs/DECISIONS.md` | Decision log |
