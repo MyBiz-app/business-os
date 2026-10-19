@@ -18,7 +18,7 @@ export function NoticeStack({ count, children }: { count: number; children: Reac
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="flex min-h-11 w-full items-center justify-center gap-2 border-b border-border bg-primary/10 px-4 text-sm font-medium md:hidden"
+        className="btn-plain flex min-h-11 w-full items-center justify-center gap-2 border-b border-border bg-primary/10 px-4 text-sm font-medium md:hidden"
       >
         <Bell aria-hidden="true" className="size-4" />
         <span>{t("summary", { count })}</span>
