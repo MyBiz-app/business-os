@@ -105,9 +105,9 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
       <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
         <Link href={`${linkTo({})}#receipts-heading`} className="contents">
         <section aria-labelledby="total-heading" className="card-accent card-hover flex flex-col gap-2 p-6">
-          <h2 id="total-heading" className="text-sm font-medium text-muted">
+          <p id="total-heading" className="text-sm font-medium text-muted">
             {t("total")}
-          </h2>
+          </p>
           <p className="text-4xl font-extrabold tracking-tight">
             <bdi>{money(sales.total)}</bdi>
           </p>
@@ -115,9 +115,9 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
         </section>
         </Link>
         <section aria-labelledby="methods-heading" className="card flex flex-col gap-3 p-6">
-          <h2 id="methods-heading" className="text-sm font-medium text-muted">
+          <p id="methods-heading" className="text-sm font-medium text-muted">
             {t("byMethod")}
-          </h2>
+          </p>
           {sales.by_method.length === 0 ? (
             <p className="text-sm text-muted">{t("empty")}</p>
           ) : (

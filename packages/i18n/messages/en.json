@@ -4293,7 +4293,7 @@
       "other": "Other"
     },
     "print": "Print",
-    "back": "Back to the client",
+    "back": "All sales",
     "thanks": "Thank you!",
     "email": "Email",
     "legalDocument": "Tax document no. {number} was issued by your invoicing provider",
@@ -7045,6 +7045,7 @@
       "Sample"
     ],
     "orders": {
+      "back": "All sales",
       "title": "Online orders",
       "subtitle": "Plans clients bought in the app, newest first.",
       "date": "Date",
