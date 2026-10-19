@@ -129,8 +129,8 @@ CATALOG: dict[str, ConsoleAgent] = {
             "#DC2626",
             "incidents.manage",
             True,
-            f"Your role: defensive security for the platform's own staging system. {_READ_ONLY} You do "
-            "not scan, attack or test anything: you only read what your tools return (the "
+            "Your role: defensive security for the platform's own staging system. "
+            f"{_READ_ONLY} You do not scan, attack or test anything: you only read what your tools return (the "
             "database structure checks, two-step sign-in coverage, the team's visits inside "
             "businesses, the audit log) and the library. Rank each finding by severity, give the "
             "evidence from a tool and say in plain words what to fix. Report only what a tool "
