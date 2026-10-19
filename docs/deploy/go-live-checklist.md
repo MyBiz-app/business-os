@@ -4,7 +4,7 @@ Copy of section 1 of the 2026-10-11 remaining-work plan, plus how each item is s
 code. Everything marked **off** is built and disabled; nothing that costs money turns on by itself.
 Tick items here as they are done (and record cost decisions in `docs/DECISIONS.md`).
 
-The order of the day itself, with who does what and how to go back, is in [go-live-day.md](go-live-day.md); the state of every topic is in the [scorecard](../reviews/go-live-scorecard-2026-10.md).
+The order of the day itself, with who does what and how to go back, is in [go-live-day.md](go-live-day.md); the state of every topic is in the [scorecard](../reviews/current/go-live-scorecard-2026-10.md).
 
 ## Blockers
 
@@ -12,7 +12,7 @@ The order of the day itself, with who does what and how to go back, is in [go-li
 |---|---|---|---|
 | P0-1 | Production environment: Vercel Pro, Render Starter or above, Supabase Pro, backups. About $55-75 a month | Owner approves first | Create the services, then set the variables below |
 | P0-2 | Background jobs as Render cron (GitHub schedules skip runs) | Built, **off** | Stop the staging GitHub schedules for the same database, then Render → New → Blueprint → `render.production.yaml`. Set `API_DATABASE_URL` and `API_SECRETS_KEY` when asked. The two crons run `run-daily` and `run-hourly`, which already include the payroll jobs (`remind-payroll` daily, `notify-payslips` hourly), so no extra scheduler is needed; the GitHub workflows `jobs-staging.yml` and `jobs-hourly-staging.yml` are staging only |
-| P0-3 | Monitoring: JSON logs and request ids exist; error tracking (Sentry) and an uptime monitor do not | Built (GL13), **off** until accounts exist | Follow [monitoring.md](../monitoring.md): Sentry DSNs, UptimeRobot on `/health/ready` with phone alert, status page and `NEXT_PUBLIC_STATUS_URL` |
+| P0-3 | Monitoring: JSON logs and request ids exist; error tracking (Sentry) and an uptime monitor do not | Built (GL13), **off** until accounts exist | Follow [monitoring.md](../guides/monitoring.md): Sentry DSNs, UptimeRobot on `/health/ready` with phone alert, status page and `NEXT_PUBLIC_STATUS_URL` |
 | GL13 | Alerts to the owner's phone for a failed or late job; console "System health" page | Built | **Your manual check:** sign in to the MyBiz app on your phone once, then run the GitHub workflow "Send a test alert (staging)"; the push and email must arrive. Then the real test: in staging, stop one job's workflow for a day and see the `check-jobs` alert |
 | P0-7 | Files in object storage | Built | `API_STORAGE_PROVIDER=supabase` and `API_STORAGE_SETTINGS` (see `docs/STATUS.md`) |
 | P0-8 | Supabase Auth settings applied from CI | Built | Add `SUPABASE_ACCESS_TOKEN` to the GitHub environment; see `auth-settings.md` |
@@ -132,7 +132,7 @@ Nothing was built for the stores, submitted or paid for. What waits for you, in 
 | 5 | Production values in EAS | Free | expo.dev → the project → Environment variables → environment **production**: `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` (the production ones, see [production.md](production.md) section 7) |
 | 6 | First Android build | Free tier, may queue | In `apps/client-app`: `npx eas-cli build --profile production --platform android`. Result: an `.aab` file. Install-test with the `preview` profile first |
 | 7 | First iOS build | Needs step 3 | `npx eas-cli build --profile production --platform ios`; EAS asks to create the signing certificates, answer yes |
-| 8 | Crash reports with readable stack traces | Free Sentry plan | With the Sentry account ([monitoring.md](../monitoring.md)): create an auth token and add `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` as EAS secrets (app) and as Vercel variables (website). The plugin is already wired and switches on by itself when the token exists |
+| 8 | Crash reports with readable stack traces | Free Sentry plan | With the Sentry account ([monitoring.md](../guides/monitoring.md)): create an auth token and add `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` as EAS secrets (app) and as Vercel variables (website). The plugin is already wired and switches on by itself when the token exists |
 | 9 | Fill the store forms | Free | Paste from [listing.md](../store/listing.md); Play → Policy → Data safety and Apple → App Privacy from [data-safety.md](../store/data-safety.md); reviewer notes and test login from [review-notes.md](../store/review-notes.md); privacy URL = `<domain>/legal/privacy` |
 | 10 | Screenshots and Play feature graphic | Free | [screenshots.md](../store/screenshots.md) |
 | 11 | Submit to the internal track first | Free | Play → Testing → Internal testing → upload the `.aab`, add your email as a tester. iOS: `npx eas-cli submit --profile production --platform ios` then TestFlight. Only then production review |
@@ -174,7 +174,7 @@ no longer be used (the API answers `account_deleted`), but the login row stays a
 
 ## Load test on staging (GL18)
 
-Optional, free, at night: the real figure for "how many businesses one Starter instance holds" (the table in [the load test](../reviews/load-test-2026-10.md) is an estimate until then). Steps are in that document ("Run it", against staging); use `VUS=20`, then `50`, and write the numbers into its table. Switch the rate limits back on afterwards. When a second API instance is added, also create the Render Key Value and set `API_RATE_LIMIT_REDIS_URL` ([staging.md](staging.md)).
+Optional, free, at night: the real figure for "how many businesses one Starter instance holds" (the table in [the load test](../reviews/archive/load-test-2026-10.md) is an estimate until then). Steps are in that document ("Run it", against staging); use `VUS=20`, then `50`, and write the numbers into its table. Switch the rate limits back on afterwards. When a second API instance is added, also create the Render Key Value and set `API_RATE_LIMIT_REDIS_URL` ([staging.md](staging.md)).
 
 ## Incident response and Amendment 13 (GL23)
 
@@ -238,7 +238,7 @@ Needed before the first paying customer, not before staging:
 
 Do it after about 20 to 50 businesses or when a large customer asks for it (cost: thousands up to
 tens of thousands of shekels). Give the tester a staging copy with demo data, the
-[ASVS self-check](../reviews/go-live-asvs-self-check-2026-10.md) and the scope (website, API,
+[ASVS self-check](../reviews/archive/go-live-asvs-self-check-2026-10.md) and the scope (website, API,
 apps). Track every finding as a GitHub issue; fix the high ones before the next release.
 
 ## Decisions waiting for you (round 7 leftovers)

@@ -4,7 +4,7 @@ at a chosen size, a signing key, and the key set the API checks sign-in tokens a
     uv run python -m tests.load.local_stack --clients 5000      # prints the tenant id and a token
 
 then, in another terminal, start the API against the same database with
-`API_JWKS_URL=http://127.0.0.1:54399/jwks.json` (see docs/reviews/load-test-2026-10.md). The script
+`API_JWKS_URL=http://127.0.0.1:54399/jwks.json` (see docs/reviews/archive/load-test-2026-10.md). The script
 keeps serving the key set until it is stopped. Nothing here touches staging or production."""
 
 import argparse

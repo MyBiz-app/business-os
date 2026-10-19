@@ -3005,7 +3005,7 @@
       "simulated": "מדומה",
       "live": "פעיל",
       "businesses": "{count, plural, one {עסק אחד} other {# עסקים}}",
-      "howTo": "ספק חדש הוא מחלקה אחת שנרשמת בשרת (ראו docs/integrations.md); ברירת המחדל מוחלפת דרך API_<SERVICE>_PROVIDER.",
+      "howTo": "ספק חדש הוא מחלקה אחת שנרשמת בשרת (ראו docs/guides/integrations.md); ברירת המחדל מוחלפת דרך API_<SERVICE>_PROVIDER.",
       "capabilities": {
         "email": "מייל",
         "ai": "עוזר AI",

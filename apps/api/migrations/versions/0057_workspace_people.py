@@ -1,4 +1,4 @@
-"""People and structure of a business (workspace upgrade, docs/proposals/crm-upgrade-2026-10.md).
+"""People and structure of a business (workspace upgrade, docs/proposals/done/crm-upgrade-2026-10.md).
 
 - Personal profiles: a profile picture (kept in the database like the business logo, at most
   512 KB) and a phone number on `app.users`, plus the person's color palette. Pictures are read

@@ -6,7 +6,7 @@ name: Uptime check and keep the staging API awake
 # emails the repository's watchers) when /health/ready does not answer {"status":"ok"} after
 # three tries, or when the web app is down. The free plan's 750 hours a month cover one service
 # running all month. Remove the keep-awake part when the API moves to a paid plan, which never
-# sleeps; keep the check (or use an outside monitor, see docs/monitoring.md).
+# sleeps; keep the check (or use an outside monitor, see docs/guides/monitoring.md).
 #
 # Optional repository variables (Settings → Secrets and variables → Actions → Variables) point
 # the check at production: UPTIME_API_URL and UPTIME_WEB_URL.

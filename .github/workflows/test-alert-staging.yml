@@ -2,7 +2,7 @@ name: Send a test alert (staging)
 
 # Manual. Sends the alert that a late or failing job sends (push to the MyBiz owners' phones, then
 # email) so you can see it arrives. The run fails when neither channel reached anyone. See
-# docs/monitoring.md, "Alerts to your phone".
+# docs/guides/monitoring.md, "Alerts to your phone".
 on:
   workflow_dispatch:
 

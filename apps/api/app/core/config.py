@@ -93,7 +93,7 @@ class Settings(BaseSettings):
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
     email_smtp_port: int = 465
     email_smtp_user: str | None = None  # defaults to the address in email_from
-    # Outside services (decision X13, docs/integrations.md): the platform's default provider
+    # Outside services (decision X13, docs/guides/integrations.md): the platform's default provider
     # per capability and its settings as a JSON object; a business can connect its own
     # (settings → Integrations) for payments, invoicing and messaging.
     payments_provider: str = "simulated"

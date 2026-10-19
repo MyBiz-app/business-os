@@ -11,7 +11,7 @@ may object under the data processing agreement.
 ## Checklist per provider
 
 1. Still needed? Is there a cheaper or safer choice (all outside services are behind swappable
-   providers, see [integrations](../integrations.md))?
+   providers, see [integrations](../guides/integrations.md))?
 2. Which data does it receive, and is that the least needed?
 3. Where is the data stored (country and region)? If outside Israel, is the transfer covered
    (adequacy, contract terms)? **To confirm with counsel.**

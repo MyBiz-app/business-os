@@ -1,4 +1,4 @@
-"""The owner's default schedule view (docs/proposals/schedule-board-2026-10.md).
+"""The owner's default schedule view (docs/proposals/done/schedule-board-2026-10.md).
 
 A business picks the range (day, week or month) and the branches its schedule opens with, so a
 network sees its branches side by side without choosing them each time. No branches stored means
