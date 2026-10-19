@@ -8235,6 +8235,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/metrics/saas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Saas Metrics
+         * @description MRR, ARR, ARPU, churn and the AI margin, with a month-by-month history.
+         */
+        get: operations["saas_metrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/metrics/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Email Deliverability
+         * @description Which addresses bounced or complained: they are never mailed again.
+         */
+        get: operations["email_deliverability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/support-access": {
         parameters: {
             query?: never;
@@ -9468,6 +9508,26 @@ export interface components {
             revenue: components["schemas"]["CurrencyRevenue"][];
             /** Businesses */
             businesses: components["schemas"]["BusinessAICost"][];
+        };
+        /** AIMargin */
+        AIMargin: {
+            /** Days */
+            days: number;
+            /**
+             * Cost Usd Minor
+             * @description Model cost of the period, US cents
+             */
+            cost_usd_minor: number;
+            /**
+             * Revenue Usd Minor
+             * @description Monthly price of the AI modules in USD, cents
+             */
+            revenue_usd_minor: number;
+            /**
+             * Margin Usd Minor
+             * @description Revenue minus cost for businesses billed in USD
+             */
+            margin_usd_minor: number;
         };
         /** AIPause */
         AIPause: {
@@ -11754,6 +11814,23 @@ export interface components {
              */
             lives_with_me: boolean;
         };
+        /** ChurnMetrics */
+        ChurnMetrics: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /** Cancelled */
+            cancelled: number;
+            /** Paying At Start */
+            paying_at_start: number;
+            /**
+             * Rate
+             * @description Cancelled over paying at the month's start
+             */
+            rate: number | null;
+        };
         /** ChurnMonth */
         ChurnMonth: {
             /**
@@ -13254,6 +13331,33 @@ export interface components {
             /** Note */
             note?: string | null;
         };
+        /** CurrencyMetrics */
+        CurrencyMetrics: {
+            /** Currency */
+            currency: string;
+            /**
+             * Mrr
+             * @description Billed in the latest invoiced month, minor units
+             */
+            mrr: number;
+            /**
+             * Arr
+             * @description MRR times twelve, minor units
+             */
+            arr: number;
+            /**
+             * Arpu
+             * @description MRR per invoiced business, minor units
+             */
+            arpu: number;
+            /**
+             * Mrr Month
+             * Format: date
+             */
+            mrr_month: string;
+            /** Months */
+            months: components["schemas"]["RevenueMonth"][];
+        };
         /** CurrencyRevenue */
         CurrencyRevenue: {
             /** Currency */
@@ -13440,6 +13544,18 @@ export interface components {
              * @description Must be true: deleting cannot be undone
              */
             confirm: boolean;
+        };
+        /** DeliverabilityMonth */
+        DeliverabilityMonth: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /** Bounced */
+            bounced: number;
+            /** Complained */
+            complained: number;
         };
         /** DeliveryStats */
         DeliveryStats: {
@@ -13756,6 +13872,33 @@ export interface components {
             read_only_after_days: number;
             /** Suspend After Days */
             suspend_after_days: number;
+        };
+        /** EmailDeliverability */
+        EmailDeliverability: {
+            /** Emails Waiting */
+            emails_waiting: number;
+            /**
+             * Bounced
+             * @description Hard bounces in the last 12 months
+             */
+            bounced: number;
+            /**
+             * Complained
+             * @description Spam complaints in the last 12 months
+             */
+            complained: number;
+            /** Months */
+            months: components["schemas"]["DeliverabilityMonth"][];
+            /**
+             * Recent
+             * @description The latest 50, addresses masked
+             */
+            recent: components["schemas"]["SuppressedAddress"][];
+            /**
+             * Webhook Open
+             * @description Is the provider's bounce webhook switched on
+             */
+            webhook_open: boolean;
         };
         /**
          * Embed
@@ -19266,6 +19409,31 @@ export interface components {
             /** Account */
             account: string;
         };
+        /** RevenueMonth */
+        RevenueMonth: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /**
+             * Billed
+             * @description Paid and open invoices, minor units
+             */
+            billed: number;
+            /**
+             * Paid
+             * @description Minor units
+             */
+            paid: number;
+            /**
+             * Open
+             * @description Minor units
+             */
+            open: number;
+            /** Invoices */
+            invoices: number;
+        };
         /** Review */
         Review: {
             /** Approve */
@@ -19709,6 +19877,14 @@ export interface components {
              * @default false
              */
             acknowledged: boolean;
+        };
+        /** SaasMetrics */
+        SaasMetrics: {
+            /** Currencies */
+            currencies: components["schemas"]["CurrencyMetrics"][];
+            churn: components["schemas"]["ChurnMetrics"] | null;
+            /** @description Only for team members who may read usage */
+            ai: components["schemas"]["AIMargin"] | null;
         };
         /** Sale */
         Sale: {
@@ -20938,6 +21114,24 @@ export interface components {
              * @default false
              */
             changed: boolean;
+        };
+        /** SuppressedAddress */
+        SuppressedAddress: {
+            /**
+             * Address
+             * @description Masked: the first letter and the domain
+             */
+            address: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "bounced" | "complained";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** SwapCreate */
         SwapCreate: {
@@ -41743,6 +41937,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    saas_metrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaasMetrics"];
+                };
+            };
+        };
+    };
+    email_deliverability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailDeliverability"];
                 };
             };
         };

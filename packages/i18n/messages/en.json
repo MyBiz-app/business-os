@@ -2822,7 +2822,9 @@
       "incidents": "Incident banners",
       "growth": "Growth",
       "websiteOrders": "Website orders",
-      "churn": "Churn"
+      "churn": "Churn",
+      "metrics": "SaaS numbers",
+      "email": "Email delivery"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -3439,6 +3441,53 @@
       "refund": "Refund (recorded)",
       "note": "Note",
       "back": "Taken back"
+    },
+    "metrics": {
+      "title": "SaaS numbers",
+      "hint": "Recurring revenue, churn and the AI margin. Money is shown per currency and is never converted.",
+      "empty": "No invoices yet.",
+      "currency": "{currency}",
+      "mrr": "Monthly recurring revenue (MRR)",
+      "mrrMonth": "Billed in {month}, the latest invoiced month",
+      "arr": "Annual recurring revenue (ARR)",
+      "arrNote": "MRR times twelve",
+      "arpu": "Revenue per business (ARPU)",
+      "arpuNote": "MRR divided by invoiced businesses",
+      "chart": "Billed per month ({currency})",
+      "month": "Month",
+      "invoices": "Invoices",
+      "paid": "Paid",
+      "open": "Open",
+      "billed": "Billed",
+      "churn": "Churn",
+      "churnRate": "Churn in {month}",
+      "cancelled": "Cancelled",
+      "paying": "Paying at the month start",
+      "ai": "AI margin",
+      "aiHint": "Businesses billed in USD, model cost of the last {days} days against the monthly price of their AI modules.",
+      "aiRevenue": "AI revenue per month",
+      "aiCost": "AI model cost",
+      "aiMargin": "AI margin"
+    },
+    "emailHealth": {
+      "title": "Email delivery",
+      "hint": "Addresses that bounced or marked a message as spam. They are never mailed again.",
+      "webhookClosed": "The provider's bounce webhook is switched off, so bounces are not recorded.",
+      "bounced": "Hard bounces, last 12 months",
+      "complained": "Spam complaints, last 12 months",
+      "waiting": "Emails waiting to be sent",
+      "chart": "Blocked addresses per month",
+      "month": "Month",
+      "blocked": "Blocked",
+      "recent": "Latest blocked addresses",
+      "address": "Address",
+      "reason": "Reason",
+      "when": "Date",
+      "reasons": {
+        "bounced": "Bounced",
+        "complained": "Spam complaint"
+      },
+      "empty": "No blocked addresses."
     }
   },
   "permissions": {
