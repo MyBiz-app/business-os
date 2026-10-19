@@ -41,7 +41,7 @@ export function ProfileForm({ name, email, phone, birthDate, addressLine, city, 
         <Field label={t("account.birthDate")} hint={t("account.birthDateHint")} name="birth_date" type="date" defaultValue={birthDate ?? ""} max={new Date().toISOString().slice(0, 10)} autoComplete="bday" dir="ltr" />
       </div>
       <fieldset className="flex flex-col gap-4">
-        <legend className="mb-1 text-sm font-medium">{t("account.detailsTitle")}</legend>
+        <legend className="mb-1 text-sm font-medium">{t("account.addressTitle")}</legend>
         <p className="-mt-2 text-xs text-muted">{t("account.addressHint")}</p>
         <AddressPicker defaults={address} legacyText={[addressLine, city].filter(Boolean).join(", ") || null} />
         <div className="grid gap-4 sm:grid-cols-2">
