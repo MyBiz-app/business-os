@@ -28,12 +28,15 @@ export default function Home() {
   const { palette } = useTheme();
 
   const load = useCallback(async () => {
-    const [requests, businesses, billing] = await Promise.all([
+    const [requests, businesses, billing, incidents, overdue, health] = await Promise.all([
       can("inbox.manage") ? api.GET("/platform/contact-requests").then(unwrap) : [],
       can("businesses.read") ? api.GET("/platform/businesses").then(unwrap) : [],
       can("billing.manage") ? api.GET("/platform/billing").then(unwrap) : [],
+      can("incidents.manage") ? api.GET("/platform/incidents").then(unwrap) : [],
+      can("billing.manage") ? api.GET("/platform/billing/overdue").then(unwrap) : [],
+      can("usage.read") ? api.GET("/platform/health").then(unwrap) : null,
     ]);
-    return { requests, businesses, billing };
+    return { requests, businesses, billing, incidents, overdue, health };
   }, [api, can]);
   const { data, loading, reload } = useLoad(load);
   useFocusEffect(
@@ -47,6 +50,9 @@ export default function Home() {
   const businesses = data?.businesses ?? [];
   const fresh = businesses.filter((b) => new Date(b.created_at).getTime() > since);
   const month = [...(data?.billing ?? [])].sort((a, b) => b.month.localeCompare(a.month))[0];
+  const openBanners = (data?.incidents ?? []).filter((i) => !i.resolved_at).length;
+  const owing = data?.overdue.length ?? 0;
+  const troubled = data?.health ? data.health.jobs.filter((j) => j.late || j.last_ok === false).length + data.health.messages_failed_24h : 0;
   const number = new Intl.NumberFormat(locale);
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
 
@@ -91,6 +97,39 @@ export default function Home() {
             })}
           </Text>
         </Card>
+      )}
+
+      {(can("usage.read") || can("incidents.manage") || can("billing.manage")) && (
+        <View style={{ gap: 8 }}>
+          <SectionTitle title={t("tools")} palette={palette} />
+          {can("usage.read") && (
+            <ListRow
+              palette={palette}
+              title={t("health")}
+              subtitle={troubled > 0 ? t("alarm") : undefined}
+              trailing={troubled > 0 ? <Badge label={number.format(troubled)} tone="danger" palette={palette} /> : undefined}
+              onPress={() => router.push("/platform/health")}
+            />
+          )}
+          {can("incidents.manage") && (
+            <ListRow
+              palette={palette}
+              title={t("incidents")}
+              subtitle={t("banners", { count: openBanners })}
+              trailing={openBanners > 0 ? <Badge label={number.format(openBanners)} tone="danger" palette={palette} /> : undefined}
+              onPress={() => router.push("/platform/incidents")}
+            />
+          )}
+          {can("billing.manage") && (
+            <ListRow
+              palette={palette}
+              title={t("debts")}
+              subtitle={t("debtsCount", { count: owing })}
+              trailing={owing > 0 ? <Badge label={number.format(owing)} tone="danger" palette={palette} /> : undefined}
+              onPress={() => router.push("/platform/debts")}
+            />
+          )}
+        </View>
       )}
 
       {open.length === 0 && fresh.length === 0 && !loading ? (

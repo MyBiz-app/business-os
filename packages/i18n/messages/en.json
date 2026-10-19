@@ -2825,7 +2825,8 @@
       "websiteOrders": "Website orders",
       "churn": "Churn",
       "metrics": "SaaS numbers",
-      "email": "Email delivery"
+      "email": "Email delivery",
+      "catalog": "Catalog and prices"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -3503,6 +3504,35 @@
         "complained": "Spam complaint"
       },
       "empty": "No blocked addresses."
+    },
+    "catalog": {
+      "title": "Catalog and prices",
+      "hint": "Every industry, module and price in one place, read-only. Prices are set in code; ask the developers to change them.",
+      "industries": "Industries",
+      "empty": "No industries.",
+      "status": {
+        "live": "Open",
+        "beta": "Beta",
+        "planned": "Coming soon"
+      },
+      "requests": "{count, plural, =0 {No one asked yet} one {# request} other {# requests}}",
+      "requestsHint": "Site requests that named this industry (among the latest 300)",
+      "core": "Core price by active clients",
+      "tier": "Active clients",
+      "tierUpTo": "Up to {count}",
+      "tierOver": "Over {count} (a floor, quoted by hand)",
+      "modules": "Modules",
+      "placeholder": "These prices are placeholders from the spec, for modelling only.",
+      "module": "Module",
+      "notes": "Notes",
+      "or": "or",
+      "once": "One-time",
+      "perUnit": "Per unit",
+      "oneOf": "One of its group ({group})",
+      "soon": "Coming soon",
+      "credits": "{count} AI credits a month",
+      "users": "{count} AI users",
+      "needs": "Needs {list}"
     }
   },
   "permissions": {
@@ -7034,7 +7064,8 @@
       "home": "MyBiz",
       "businesses": "Businesses",
       "inbox": "Inbox",
-      "me": "Me"
+      "me": "Me",
+      "ai": "AI"
     },
     "notStaff": {
       "title": "This app is for the MyBiz team",
@@ -7055,7 +7086,14 @@
       "latest": "Open requests",
       "newest": "New this week",
       "billing": "Billing, {month}",
-      "paidOpen": "{paid} paid · {open} open"
+      "paidOpen": "{paid} paid · {open} open",
+      "tools": "More",
+      "health": "System health",
+      "incidents": "Incident banners",
+      "debts": "Unpaid invoices",
+      "banners": "{count, plural, =0 {No open banners} one {# open banner} other {# open banners}}",
+      "debtsCount": "{count, plural, =0 {No unpaid invoices} one {# business owes} other {# businesses owe}}",
+      "alarm": "Something needs a look"
     },
     "businesses": {
       "search": "Search a business",
@@ -7105,6 +7143,24 @@
       "email": "Email",
       "error": "Something went wrong. Try again.",
       "you": "you"
+    },
+    "ai": {
+      "title": "AI helpers",
+      "noPermission": "You don't have the usage permission."
+    },
+    "health": {
+      "back": "Back",
+      "noPermission": "You don't have the usage permission."
+    },
+    "incidents": {
+      "back": "Back",
+      "noPermission": "You don't have the incidents permission.",
+      "newOne": "New banner",
+      "titleHint": "Shown in the current language to everyone"
+    },
+    "debts": {
+      "back": "Back",
+      "noPermission": "You don't have the billing permission."
     }
   },
   "verticals": {

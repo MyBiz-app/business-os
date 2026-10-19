@@ -8272,6 +8272,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Platform Catalog
+         * @description Every industry, module and price in one read-only view.
+         */
+        get: operations["platform_catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/metrics/saas": {
         parameters: {
             query?: never;
@@ -11676,6 +11696,23 @@ export interface components {
              */
             ai_extra_user_price: number;
         };
+        /** CatalogIndustryRow */
+        CatalogIndustryRow: {
+            /** Key */
+            key: string;
+            /** Parent */
+            parent: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "live" | "beta" | "planned";
+            /**
+             * Requests
+             * @description Site requests naming it (latest 300); null without the inbox permission
+             */
+            requests: number | null;
+        };
         /** CatalogModule */
         CatalogModule: {
             /**
@@ -11719,6 +11756,46 @@ export interface components {
              * @default 0
              */
             ai_credits_included: number;
+        };
+        /** CatalogModuleRow */
+        CatalogModuleRow: {
+            /** Key */
+            key: string;
+            /**
+             * Prices
+             * @description Monthly (or one-time), minor units, by currency
+             */
+            prices: {
+                [key: string]: number;
+            };
+            /** Available */
+            available: boolean;
+            /** Per Unit */
+            per_unit: boolean;
+            /**
+             * Billing
+             * @enum {string}
+             */
+            billing: "monthly" | "once";
+            /** Group */
+            group: string | null;
+            /** Requires Any */
+            requires_any: string[];
+            /** Requires All */
+            requires_all: string[];
+            /** Ai Credits Included */
+            ai_credits_included: number;
+            /** Ai Users Included */
+            ai_users_included: number;
+        };
+        /** CatalogTierRow */
+        CatalogTierRow: {
+            /** Up To Clients */
+            up_to_clients: number | null;
+            /** Prices */
+            prices: {
+                [key: string]: number;
+            };
         };
         /** Chat */
         Chat: {
@@ -18298,6 +18375,19 @@ export interface components {
             };
             /** Options */
             options: components["schemas"]["ProviderOption"][];
+        };
+        /** PlatformCatalog */
+        PlatformCatalog: {
+            /** Core */
+            core: components["schemas"]["CatalogTierRow"][];
+            /** Modules */
+            modules: components["schemas"]["CatalogModuleRow"][];
+            /** Presets */
+            presets: {
+                [key: string]: string[];
+            };
+            /** Industries */
+            industries: components["schemas"]["CatalogIndustryRow"][];
         };
         /**
          * PlatformPermission
@@ -42043,6 +42133,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    platform_catalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformCatalog"];
                 };
             };
         };
