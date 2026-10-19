@@ -11,8 +11,8 @@ Like the other console AI settings the tables are not reachable from the API rol
 DEFINER functions touch them. Reading needs the console team, changing needs `billing.manage`, and
 every change is written to the console audit log.
 
-Revision ID: 0147
-Revises: 0146
+Revision ID: 0148
+Revises: 0147
 Create Date: 2026-10-19
 """
 
@@ -21,8 +21,8 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 from alembic import op
 
-revision: str = "0147"
-down_revision: str | None = "0146"
+revision: str = "0148"
+down_revision: str | None = "0147"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

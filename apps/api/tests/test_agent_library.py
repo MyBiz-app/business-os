@@ -403,8 +403,8 @@ def test_with_embeddings_on_the_agent_also_finds_by_meaning(
 
 
 def seed(engine: Engine) -> None:
-    """Loads the sources of migration 0147 again (the tests empty the tables first)."""
-    path = Path(__file__).parents[1] / "migrations/versions/0147_agent_knowledge_library.py"
+    """Loads the sources of migration 0148 again (the tests empty the tables first)."""
+    path = Path(__file__).parents[1] / "migrations/versions/0148_agent_knowledge_library.py"
     spec = importlib.util.spec_from_file_location("kb_migration", path)
     module = importlib.util.module_from_spec(spec)  # type: ignore[arg-type]
     spec.loader.exec_module(module)  # type: ignore[union-attr]
@@ -413,7 +413,7 @@ def seed(engine: Engine) -> None:
 
 
 def test_the_seeded_sources_are_well_formed() -> None:
-    path = Path(__file__).parents[1] / "migrations/versions/0147_agent_knowledge_library.py"
+    path = Path(__file__).parents[1] / "migrations/versions/0148_agent_knowledge_library.py"
     spec = importlib.util.spec_from_file_location("kb_migration", path)
     module = importlib.util.module_from_spec(spec)  # type: ignore[arg-type]
     spec.loader.exec_module(module)  # type: ignore[union-attr]

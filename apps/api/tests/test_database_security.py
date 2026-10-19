@@ -15,6 +15,7 @@ GLOBAL_TABLES = {
     "platform_kb_documents",  # the console agents' libraries; no API access at all
     "platform_kb_versions",
     "platform_kb_chunks",
+    "platform_ai_reports",
     "push_tokens",
     "user_tours",
     "login_devices",
@@ -86,6 +87,7 @@ def test_every_table_has_row_level_security(engine: Engine) -> None:
         "platform_kb_documents",
         "platform_kb_versions",
         "platform_kb_chunks",
+        "platform_ai_reports",
     }
     own = tuple(sorted(PLATFORM_TABLES | own_extra))
     reachable = _query(

@@ -216,7 +216,7 @@ Built and **off**; the libraries work today with a words search (free). Search b
 passage even when the question uses other words ("money back" for "refund"). It needs a paid
 embeddings provider, so it waits for the owner's "connect":
 
-1. The database has the `vector` extension: on Supabase migration 0147 creates it by itself (free).
+1. The database has the `vector` extension: on Supabase migration 0148 creates it by itself (free).
    Check with `select extname from pg_extension where extname = 'vector'`.
 2. Create a Voyage AI account and a key (about one cent per 100 pages, one time; a question costs a
    fraction of a cent). The owner pastes the key, never in chat.

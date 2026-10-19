@@ -7,7 +7,7 @@ source. Notes and approved summaries are small and always go into the agent's pr
 
 Search is by words (PostgreSQL full text search, which works for Hebrew and English). Search by
 meaning is built behind a switch: see embeddings.py. The database functions do the access checks;
-see migration 0147."""
+see migration 0148."""
 
 import io
 import json
