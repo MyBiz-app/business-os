@@ -61,7 +61,7 @@ export function CancellationForm({ overview }: { overview: Overview }) {
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
       {!policy.configured && <p className="rounded-xl bg-primary/5 p-3 text-sm">{t("confirm")}</p>}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <SelectField label={t("group")} name="group_minutes" value={String(group)} onChange={(e) => setGroup(Number(e.target.value))} options={windowOptions(group, duration)} />
         <SelectField label={t("personal")} name="personal_minutes" value={String(personal)} onChange={(e) => setPersonal(Number(e.target.value))} options={windowOptions(personal, duration)} />
         <SelectField label={t("resource")} name="resource_minutes" value={String(resource)} onChange={(e) => setResource(Number(e.target.value))} options={windowOptions(resource, duration)} />

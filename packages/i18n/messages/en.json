@@ -372,8 +372,8 @@
       "subtitle": "How long before a visit clients may cancel for free, and what happens when they cancel late or do not come.",
       "confirm": "These are the usual terms for a business like yours. Check them and save once so they are yours.",
       "group": "Free cancellation before a class",
-      "personal": "... before a personal session or appointment",
-      "resource": "... before a court or room",
+      "personal": "Free cancellation before a personal session or appointment",
+      "resource": "Free cancellation before a court or room",
       "lateOutcome": "A late cancellation",
       "noShowOutcome": "A client who does not come",
       "outcomes": {
