@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { ScrollRegion } from "@/components/scroll-region";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { unwrap } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
 import { formatMoney } from "@/lib/money";
@@ -38,15 +39,18 @@ export async function MarketReports() {
         const prices = (report.body.prices ?? []) as PriceRow[];
         const dearer = comparison.filter((c) => c.pricier).length;
         return (
-          <details key={report.id} className="card p-5">
-            <summary className="flex cursor-pointer flex-col gap-1">
-              <span className="font-semibold" dir="auto">{report.title}</span>
-              <span className="text-sm text-muted">
-                {stamp.format(new Date(report.created_at))} · {t("by")} <bdi>{report.created_by}</bdi>
+          <CollapsibleSection
+            key={report.id}
+            storageKey={`ai-report-${report.id}`}
+            title={
+              <span dir="auto">
+                {report.title}
                 {dearer > 0 && <span className="ms-2 rounded-full bg-danger/10 px-2 py-0.5 text-xs text-danger">{t("dearer", { count: dearer })}</span>}
               </span>
-            </summary>
-            <div className="mt-4 flex flex-col gap-4">
+            }
+            description={`${stamp.format(new Date(report.created_at))} - ${t("by")} ${report.created_by}`}
+          >
+            <div className="flex flex-col gap-4">
               <p className="text-sm" dir="auto">{report.summary}</p>
               <ScrollRegion labelledBy={`report-${report.id}`} className="rounded-xl border border-border">
                 <table id={`report-${report.id}`} className="w-full text-sm">
@@ -89,7 +93,7 @@ export async function MarketReports() {
                 ))}
               </ul>
             </div>
-          </details>
+          </CollapsibleSection>
         );
       })}
     </div>
