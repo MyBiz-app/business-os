@@ -351,7 +351,11 @@ def test_product_success_and_marketing_agents_are_ready_with_their_own_tools(
         headers=headers,
     )
     assert reply.status_code == 200, reply.text
-    assert {t["name"] for t in provider.calls[0]["tools"]} == {"price_list", "industry_catalog"}
+    assert {t["name"] for t in provider.calls[0]["tools"]} == {
+        "price_list",
+        "industry_catalog",
+        "search_library",
+    }
     result = provider.calls[1]["messages"][-1]["content"][0]
     assert "core_by_active_clients" in result["content"] and not result.get("is_error")
     cards = client.get("/platform/ai/agents", headers=headers).json()

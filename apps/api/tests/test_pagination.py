@@ -64,6 +64,10 @@ def test_leads_board_is_paged_with_whole_board_counts(
 BOUNDED = {
     # the twelve console AI agents: a fixed catalog in code
     "/platform/ai/agents": "fixed list",
+    # the versions of one library document: the SQL returns the latest 100
+    "/platform/ai/library/{doc_id}/versions": "limit in SQL",
+    # the pieces an agent finds for one question: the SQL returns at most 20
+    "/platform/ai/agents/{key}/library/search": "limit in SQL",
     # the ready-made permission sets of the team form: a fixed list in code
     "/platform/staff-templates": "fixed list",
     # waiting requests first, then the latest decided: LIMIT 200 (a business) and 50 (a client)

@@ -8396,6 +8396,235 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/ai/agents/{key}/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Library
+         * @description The documents of one agent's library: at most 200, the list of a few dozen in practice.
+         */
+        get: operations["list_library"];
+        put?: never;
+        /**
+         * Add Library Document
+         * @description Adds a note, a summary, a link or pasted text to an agent's library.
+         */
+        post: operations["add_library_document"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}/library/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Library File
+         * @description Adds a file (text, Markdown, HTML, Word or PDF) to an agent's library.
+         */
+        post: operations["upload_library_file"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Library Document */
+        get: operations["get_library_document"];
+        /**
+         * Change Library Document
+         * @description Saves a change. A changed text is a new version; the earlier ones stay.
+         */
+        put: operations["change_library_document"];
+        post?: never;
+        /** Delete Library Document */
+        delete: operations["delete_library_document"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Library Versions
+         * @description Every saved version of a document, newest first (at most 100).
+         */
+        get: operations["library_versions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/versions/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Library Version
+         * @description The document as it was in one version.
+         */
+        get: operations["library_version"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore Library Version
+         * @description Brings an earlier version back as a new version (nothing is lost).
+         */
+        post: operations["restore_library_version"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/enabled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Switch Library Document
+         * @description Switches a document off (the agent stops using it) or on, without deleting it.
+         */
+        put: operations["switch_library_document"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Library Document
+         * @description Reads the document's source link again; a changed text is a new version, and the
+         *     "last reviewed" date becomes today (the source was checked).
+         */
+        post: operations["refresh_library_document"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}/library/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Library
+         * @description Reads the sources of an agent's library, a few at a time: call again with the offset
+         *     advanced by the number of results until `remaining` is 0.
+         */
+        post: operations["refresh_library"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/reindex": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reindex Library
+         * @description Embeds the pieces that are not yet embedded, for search by meaning. Nothing happens
+         *     while the embeddings provider is off (the default).
+         */
+        post: operations["reindex_library"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}/library/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Library
+         * @description What the agent would find for a question, to check a library before trusting it.
+         */
+        get: operations["search_library"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/businesses/{tenant_id}/card": {
         parameters: {
             query?: never;
@@ -10947,6 +11176,21 @@ export interface components {
             owner_user_id?: string | null;
             /** Location Id */
             location_id?: string | null;
+        };
+        /** Body_upload_library_file */
+        Body_upload_library_file: {
+            /** File */
+            file: string;
+            /** Title */
+            title?: string | null;
+            /** Source Url */
+            source_url?: string | null;
+            /** Source Org */
+            source_org?: string | null;
+            /** Country */
+            country?: ("il" | "us" | "eu" | "all") | null;
+            /** Reviewed On */
+            reviewed_on?: string | null;
         };
         /** Body_upload_location_logo */
         Body_upload_location_logo: {
@@ -16355,6 +16599,166 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** LibraryChange */
+        LibraryChange: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "file" | "link" | "note" | "summary";
+            /** Title */
+            title: string;
+            /** Source Url */
+            source_url?: string | null;
+            /** Source Org */
+            source_org?: string | null;
+            /** Country */
+            country?: ("il" | "us" | "eu" | "all") | null;
+            /** Reviewed On */
+            reviewed_on?: string | null;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /** Body */
+            body?: string | null;
+            /** Change Note */
+            change_note?: string | null;
+        };
+        /** LibraryDocument */
+        LibraryDocument: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Agent Key
+             * @enum {string}
+             */
+            agent_key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "file" | "link" | "note" | "summary";
+            /** Title */
+            title: string;
+            /** Source Url */
+            source_url: string | null;
+            /** Source Org */
+            source_org: string | null;
+            /** Country */
+            country: ("il" | "us" | "eu" | "all") | null;
+            /** Reviewed On */
+            reviewed_on: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Version */
+            version: number;
+            /**
+             * Chars
+             * @description Length of the current text; 0 for a link without text
+             */
+            chars: number;
+            /**
+             * Chunks
+             * @description Pieces the agent can find; 0 means it cannot find it yet
+             */
+            chunks: number;
+            /** Updated By */
+            updated_by: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** LibraryDocumentBody */
+        LibraryDocumentBody: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Agent Key
+             * @enum {string}
+             */
+            agent_key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "file" | "link" | "note" | "summary";
+            /** Title */
+            title: string;
+            /** Source Url */
+            source_url: string | null;
+            /** Source Org */
+            source_org: string | null;
+            /** Country */
+            country: ("il" | "us" | "eu" | "all") | null;
+            /** Reviewed On */
+            reviewed_on: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Version */
+            version: number;
+            /** Body */
+            body: string | null;
+            /** Updated By */
+            updated_by: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** LibraryEnabled */
+        LibraryEnabled: {
+            /** Enabled */
+            enabled: boolean;
+        };
+        /** LibraryRestore */
+        LibraryRestore: {
+            /** Version */
+            version: number;
+        };
+        /** LibrarySearchHit */
+        LibrarySearchHit: {
+            /** Document */
+            document: string;
+            /** Source Url */
+            source_url: string | null;
+            /** Source Org */
+            source_org: string | null;
+            /** Country */
+            country: string | null;
+            /** Last Reviewed */
+            last_reviewed: string | null;
+            /** Section */
+            section: string | null;
+            /** Text */
+            text: string;
+        };
+        /** LibraryVersion */
+        LibraryVersion: {
+            /** Version */
+            version: number;
+            /** Change Note */
+            change_note: string | null;
+            /** Created By */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Chars */
+            chars: number;
+        };
         /** LimitsUpdate */
         LimitsUpdate: {
             /** Limits */
@@ -19563,6 +19967,41 @@ export interface components {
             modules: {
                 [key: string]: number;
             };
+        };
+        /** RefreshReport */
+        RefreshReport: {
+            /** Results */
+            results: components["schemas"]["RefreshResult"][];
+            /**
+             * Remaining
+             * @description Sources still to read; call again with a later offset
+             */
+            remaining: number;
+        };
+        /** RefreshResult */
+        RefreshResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Result
+             * @enum {string}
+             */
+            result: "updated" | "unchanged" | "failed";
+            /** Error */
+            error?: string | null;
+        };
+        /** ReindexResult */
+        ReindexResult: {
+            /**
+             * Embedded
+             * @description Pieces embedded now; 0 while search by meaning is off
+             */
+            embedded: number;
         };
         /** RemoveResult */
         RemoveResult: {
@@ -42745,6 +43184,454 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlatformCatalog"];
+                };
+            };
+        };
+    };
+    list_library: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocument"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_library_file: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_library_file"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    library_versions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryVersion"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    library_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_library_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryRestore"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    switch_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryEnabled"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefreshResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_library: {
+        parameters: {
+            query?: {
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefreshReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reindex_library: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReindexResult"];
+                };
+            };
+        };
+    };
+    search_library: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibrarySearchHit"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
