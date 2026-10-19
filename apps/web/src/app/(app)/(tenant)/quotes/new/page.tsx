@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { getTenantFor } from "@/lib/tenant";
@@ -14,8 +15,8 @@ export default async function NewQuotePage({ searchParams }: PageProps<"/quotes/
   const { client, example } = await searchParams;
 
   return (
-    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/quotes" className="text-sm text-primary-ink underline-offset-4 hover:underline">{t("back")}</Link>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <BackLink href="/quotes" label={t("back")} />
       <PageHeader title={t("new")} />
       <NewQuoteBody client={client} example={example === "1"} />
     </Container>
