@@ -115,7 +115,7 @@ export function CollapsibleSection({
   }
 
   return (
-    <section id={id} className={`card scroll-mt-24 overflow-hidden ${className ?? ""}`}>
+    <section id={id} className={`card scroll-anchor overflow-hidden ${className ?? ""}`}>
       <div className="flex items-center gap-3 pe-4">
         <button
           type="button"

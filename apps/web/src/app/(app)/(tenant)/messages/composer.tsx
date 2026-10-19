@@ -115,7 +115,7 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+    <div className="grid gap-6 lg:grid-cols-[1fr_20rem] xl:grid-cols-1 2xl:grid-cols-[1fr_20rem]">
       <form action={action} className="flex flex-col gap-4">
         <FormError message={state.error && t("errors.generic")} />
         <FormNotice message={state.sent !== undefined ? t("sentTo", { count: state.sent }) : undefined} />
@@ -268,7 +268,7 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
         </div>
       </form>
 
-      <figure aria-label={t("preview")} className="mx-auto w-full max-w-xs">
+      <figure aria-label={t("preview")} className={`mx-auto w-full max-w-xs ${preview ? "" : "max-lg:hidden"}`}>
         <div className="overflow-hidden rounded-[2rem] border-8 border-zinc-900 bg-[#efe7dd] shadow-xl dark:border-zinc-700 dark:bg-[#0b141a]">
           <div className="flex items-center gap-2 bg-[#075e54] px-4 py-3 text-sm font-semibold text-white">
             <span aria-hidden="true" className="flex size-7 items-center justify-center rounded-full bg-white/20">
