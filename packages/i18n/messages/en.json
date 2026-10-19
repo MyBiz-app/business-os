@@ -10169,6 +10169,10 @@
       "when": "When"
     }
   },
+  "noticeStack": {
+    "summary": "{count, plural, one {# thing is waiting for you} other {# things are waiting for you}}",
+    "toggle": "Things waiting for you"
+  },
   "legalUpdate": {
     "title": "We updated our terms",
     "text": "Our legal documents were updated. Please read and accept:",

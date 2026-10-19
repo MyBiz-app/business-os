@@ -5,6 +5,7 @@ import { ActivityGuard } from "@/components/activity-guard";
 import { DeviceCheck } from "@/components/device-check";
 import { IncidentBanner, type BannerItem } from "@/components/incident-banner";
 import { LegalBanner } from "@/components/legal-banner";
+import { NoticeStack } from "@/components/notice-stack";
 import { MfaBanner } from "@/components/mfa-banner";
 import { AnnouncementsPopup, type PopupItem } from "@/components/announcements-popup";
 import { AppHeader } from "@/components/app-header";
@@ -57,6 +58,8 @@ async function incidents(): Promise<BannerItem[]> {
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { me } = await getActiveMembership();
   const [announcements, banners] = await Promise.all([popups(), incidents()]);
+  const legalPending = me.legal_pending ?? [];
+  const showAddressReminder = me.memberships.length > 0 && !me.address_complete;
 
   return (
     <ScopedMessages scopes={["app"]}>
@@ -74,8 +77,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         />
       </AppHeader>
       <IncidentBanner items={banners} />
-      <LegalBanner pending={me.legal_pending ?? []} />
-      <AddressReminder show={me.memberships.length > 0 && !me.address_complete} />
+      <NoticeStack count={(legalPending.length > 0 ? 1 : 0) + (showAddressReminder ? 1 : 0)}>
+        <LegalBanner pending={legalPending} />
+        <AddressReminder show={showAddressReminder} />
+      </NoticeStack>
       <MfaBanner memberships={me.memberships.map((m) => m.role)} platform={me.platform_admin} />
       {children}
       <ActivityGuard />
