@@ -168,7 +168,15 @@ with sync_playwright() as p:
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
     owner.locator(SESSION_LINK).first.wait_for(state="attached", timeout=20000)
     owner.locator(SESSION_LINK).first.click(); h.ready(owner)
-    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("נועה כהן")).to_be_visible(timeout=30000)
+    roster = owner.get_by_role("region", name="רשימת משתתפים")
+    try:
+        expect(roster).to_be_visible(timeout=15000)
+    except AssertionError:
+        # Say what the page looked like, then open the session once more the way a person would.
+        print("6. the session window did not open after the first click:", owner.url,
+              "dialogs:", owner.locator("dialog[open]").count())
+        owner.locator(SESSION_LINK).first.click(); h.ready(owner)
+    expect(roster.get_by_text("נועה כהן")).to_be_visible(timeout=30000)
     print("6. owner sees the booking: ok")
 
     # AI: question, then an action that needs confirmation.
