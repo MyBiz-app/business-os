@@ -68,7 +68,7 @@ export default function Ai() {
     try {
       const chat = unwrap(await api.GET("/platform/ai/assistant/conversations/{chat_id}", { params: { path: { chat_id: id } } }));
       setChatId(chat.id);
-      setRole(chat.role);
+      if ((ROLES as readonly string[]).includes(chat.role)) setRole(chat.role as Role);
       setTurns(chat.turns);
     } catch (caught) {
       fail(caught);
@@ -140,7 +140,7 @@ export default function Ai() {
               palette={palette}
               title={chat.title ?? t("untitled")}
               subtitle={stamp.format(new Date(chat.updated_at))}
-              trailing={<Badge label={t(`roles.${chat.role as Role}`)} tone={chat.id === chatId ? "primary" : "muted"} palette={palette} />}
+              trailing={<Badge label={t(`agents.${chat.role}.name`)} tone={chat.id === chatId ? "primary" : "muted"} palette={palette} />}
               onPress={() => void open(chat.id)}
             />
           ))}

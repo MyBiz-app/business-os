@@ -11,6 +11,7 @@ GLOBAL_TABLES = {
     "platform_audit",
     "platform_ai_settings",
     "platform_ai_conversations",
+    "platform_ai_agents",
     "push_tokens",
     "user_tours",
     "login_devices",
@@ -76,6 +77,7 @@ def test_every_table_has_row_level_security(engine: Engine) -> None:
         "announcement_views",
         "platform_incidents",
         "email_suppressions",
+        "platform_ai_agents",
     }
     own = tuple(sorted(PLATFORM_TABLES | own_extra))
     reachable = _query(

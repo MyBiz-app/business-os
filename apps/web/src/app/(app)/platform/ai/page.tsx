@@ -26,6 +26,7 @@ export default async function PlatformAiPage() {
   const latest = chats[0]
     ? (await api.GET("/platform/ai/assistant/conversations/{chat_id}", { params: { path: { chat_id: chats[0].id } } })).data
     : undefined;
+  const agents = unwrap(await api.GET("/platform/ai/agents"));
   const stamp = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const canChange = can("billing.manage");
@@ -152,6 +153,8 @@ export default async function PlatformAiPage() {
         <p className="text-sm text-muted">{t("teamHint")}</p>
         <div className="card p-5">
           <ConsoleChat
+            agents={agents}
+            canEdit={canChange}
             chats={chats.map((chat) => ({ id: chat.id, role: chat.role, title: chat.title, updatedAt: chat.updated_at }))}
             initial={latest ? { id: latest.id, role: latest.role, turns: latest.turns } : null}
           />

@@ -5,18 +5,20 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
 import { FormError } from "@/components/form/form-message";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 import { askConsoleAssistant, openConsoleChat, type ChatOpened, type ChatRole, type ChatTurn } from "./actions";
-
-const ROLES: ChatRole[] = ["manager", "support", "health", "billing", "growth"];
+import { AgentEditor } from "./agent-editor";
+import { AgentsMap, useAgentName, type AgentCard } from "./agents-map";
 
 export type ChatListItem = { id: string; role: string; title: string | null; updatedAt: string };
 
-/** MyBiz's own AI team: pick a helper, ask a question. The helpers only read and draft. The
+/** MyBiz's own AI team: pick an agent on the map, ask a question. The agents only read and draft. The
  * conversations are saved, so a refresh or a later visit picks them up again. */
-export function ConsoleChat({ chats: saved, initial }: { chats: ChatListItem[]; initial: ChatOpened | null }) {
+export function ConsoleChat({ agents, canEdit, chats: saved, initial }: { agents: AgentCard[]; canEdit: boolean; chats: ChatListItem[]; initial: ChatOpened | null }) {
   const t = useTranslations("platform.ai");
   const locale = useLocale();
+  const nameOf = useAgentName();
   const [chats, setChats] = useState(saved);
   const [role, setRole] = useState<ChatRole>(initial?.role ?? "manager");
   const [chatId, setChatId] = useState<string | null>(initial?.id ?? null);
@@ -62,7 +64,15 @@ export function ConsoleChat({ chats: saved, initial }: { chats: ChatListItem[]; 
     setError(undefined);
   };
 
+  // Picking another agent starts a fresh conversation with it; the same agent keeps the open one.
+  const pick = (agent: AgentCard) => {
+    if (agent.key !== role) startNew();
+    setRole(agent.key);
+  };
+
   const stamp = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
+  const agent = agents.find((a) => a.key === role) ?? agents[0];
+  const askable = !!agent && agent.ready && agent.enabled;
 
   return (
     <div className="flex flex-col gap-4">
@@ -80,7 +90,7 @@ export function ConsoleChat({ chats: saved, initial }: { chats: ChatListItem[]; 
           {chatId === null && <option value="">{chats.length === 0 ? t("noHistory") : t("newChat")}</option>}
           {chats.map((chat) => (
             <option key={chat.id} value={chat.id}>
-              {t(`roles.${chat.role as ChatRole}`)} · {chat.title ?? t("untitled")} · {stamp.format(new Date(chat.updatedAt))}
+              {t(`agents.${chat.role as ChatRole}.name`)} · {chat.title ?? t("untitled")} · {stamp.format(new Date(chat.updatedAt))}
             </option>
           ))}
         </select>
@@ -88,25 +98,22 @@ export function ConsoleChat({ chats: saved, initial }: { chats: ChatListItem[]; 
           {t("newChat")}
         </button>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <label htmlFor="console-role" className="text-sm font-medium">
-          {t("assistantRole")}
-        </label>
-        <select
-          id="console-role"
-          value={role}
-          disabled={chatId !== null}
-          onChange={(event) => setRole(event.target.value as ChatRole)}
-          className="control px-3 py-2"
-        >
-          {ROLES.map((value) => (
-            <option key={value} value={value}>
-              {t(`roles.${value}`)}
-            </option>
-          ))}
-        </select>
-        <span className="text-sm text-muted">{t(`roleHints.${role}`)}</span>
-      </div>
+      {agents.length > 0 && <AgentsMap agents={agents} selected={role} onPick={pick} />}
+      {agent && (
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold" dir="auto">
+            {nameOf(agent)} <span className="font-normal text-muted">· {t(`agents.${agent.key}.title`)}</span>
+          </p>
+          <p className="text-sm text-muted">{t(`agents.${agent.key}.topic`)}</p>
+          {!agent.ready && <p className="text-sm text-muted">{t("agentState.soonHint")}</p>}
+          {agent.ready && !agent.enabled && <p className="text-sm text-muted">{t("agentState.offHint")}</p>}
+        </div>
+      )}
+      {canEdit && agent && (
+        <CollapsibleSection title={t("agentSettings")} variant="inline">
+          <AgentEditor agent={agent} />
+        </CollapsibleSection>
+      )}
       <FormError message={error} />
       <ol aria-live="polite" className="flex max-h-[28rem] flex-col gap-3 overflow-y-auto">
         {turns.map((turn, index) => (
@@ -137,10 +144,11 @@ export function ConsoleChat({ chats: saved, initial }: { chats: ChatListItem[]; 
           value={text}
           onChange={(event) => setText(event.target.value)}
           maxLength={4000}
+          disabled={!askable}
           placeholder={t("question")}
           className="control min-w-0 flex-1 px-3 py-2"
         />
-        <button type="submit" disabled={pending || !text.trim()} className="btn-primary inline-flex items-center gap-2 px-4 py-2">
+        <button type="submit" disabled={pending || !askable || !text.trim()} className="btn-primary inline-flex items-center gap-2 px-4 py-2">
           <Send aria-hidden="true" className="size-4 rtl:-scale-x-100" />
           {t("send")}
         </button>

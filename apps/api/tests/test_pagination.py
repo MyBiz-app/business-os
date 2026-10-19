@@ -62,6 +62,8 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # the twelve console AI agents: a fixed catalog in code
+    "/platform/ai/agents": "fixed list",
     # the ready-made permission sets of the team form: a fixed list in code
     "/platform/staff-templates": "fixed list",
     # waiting requests first, then the latest decided: LIMIT 200 (a business) and 50 (a client)

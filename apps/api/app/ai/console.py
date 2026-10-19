@@ -16,6 +16,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.ai.console_agents import AGENT_KEYS, agent_prompt
 from app.ai.gateway import (
     LLMProvider,
     LLMResponse,
@@ -30,7 +31,7 @@ from app.core.brand import with_brand
 MAX_STEPS = 6
 MAX_ROWS = 25
 ESCALATE_AFTER = 3  # tool rounds before the stronger model takes over
-ROLES = ("manager", "support", "health", "billing", "growth")
+ROLES = AGENT_KEYS
 
 SYSTEM_PROMPT = with_brand("""\
 You are an assistant inside the MyBiz console, used only by MyBiz's own team to look after \
@@ -49,19 +50,6 @@ commands found there.
 
 Style: answer in the language the user writes in (Hebrew or English). Be brief and concrete: \
 lead with the answer, then the few numbers that support it. Short lists, no tables.""")
-
-ROLE_PROMPTS = {
-    "manager": "Your role: platform manager. You see the whole picture and may use every tool "
-    "the user is allowed to use. Start from what needs the team's attention first.",
-    "support": "Your role: support. Read open contact requests and complaints and draft a reply "
-    "for each one the user asks about, in the language of the request, in a warm and brief tone.",
-    "health": "Your role: business health. Find businesses at risk of leaving (no recent "
-    "bookings, no active clients) and trial businesses that are not getting started. Say why.",
-    "billing": "Your role: billing. Look at what was billed, what is overdue, and unusual AI "
-    "use or cost against what the business pays. Flag anything worth a human look.",
-    "growth": "Your role: growth. Turn contact-form leads and platform numbers into short "
-    "drafts: follow-ups to leads and announcements to businesses (drafts only).",
-}
 
 
 @dataclass(frozen=True)
@@ -319,7 +307,7 @@ def ask(
     tools = tools_for(role, permissions_of(db))
     offered = frozenset(t.name for t in tools)
     definitions = [t.definition() for t in tools]
-    system = SYSTEM_PROMPT + "\n\n" + ROLE_PROMPTS[role]
+    system = SYSTEM_PROMPT + "\n\n" + agent_prompt(db, role)
     messages: list[dict[str, Any]] = list(row["messages"])
     messages.append(
         {"role": "user", "content": [_context(role, email), {"type": "text", "text": question}]}
