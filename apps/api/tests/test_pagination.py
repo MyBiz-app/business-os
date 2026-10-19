@@ -135,6 +135,9 @@ BOUNDED = {
     "/platform/billing": "one row per month",
     "/platform/broadcasts": "announcements",
     "/platform/businesses/{tenant_id}/invoices": "one row per month",
+    "/platform/businesses/{tenant_id}/notes": "the last 200 in SQL",
+    "/platform/businesses/{tenant_id}/timeline": "the last 150 in SQL",
+    "/platform/trials-ending": "at most 200 in SQL",
     "/payroll/rates": "one row per rate",
     # the rows of one person
     "/me/devices": "capped in code",

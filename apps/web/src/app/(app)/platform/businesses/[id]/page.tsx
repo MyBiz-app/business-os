@@ -11,8 +11,11 @@ import { getPlatformFor } from "@/lib/platform";
 import { openAsSupport } from "../../actions";
 
 import { BusinessActions } from "./business-actions";
+import { CardForm, NoteForm } from "./card-forms";
+import { Timeline } from "./timeline";
 import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
+import { Pill } from "@/components/pill";
 import { PageHeader } from "@/components/layout/page-header";
 import { Ltr, UserText } from "@/components/bidi";
 
@@ -24,10 +27,12 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
   const locale = await getLocale();
   const { me } = await getActiveMembership();
   const { api, can } = await getPlatformFor("businesses.read");
-  const [business, usage, invoices] = await Promise.all([
+  const [business, usage, invoices, card, timeline] = await Promise.all([
     api.GET("/platform/businesses/{tenant_id}", { params: { path: { tenant_id: id } } }).then((result) => result.data ?? null),
     can("usage.read") ? api.GET("/platform/usage", { params: { query: { tenant_id: id, days: 90 } } }).then(unwrap) : [],
     can("billing.manage") ? api.GET("/platform/businesses/{tenant_id}/invoices", { params: { path: { tenant_id: id } } }).then(unwrap) : [],
+    api.GET("/platform/businesses/{tenant_id}/card", { params: { path: { tenant_id: id } } }).then((result) => result.data ?? null),
+    api.GET("/platform/businesses/{tenant_id}/timeline", { params: { path: { tenant_id: id } } }).then((result) => result.data ?? []),
   ]);
   if (!business) notFound();
   // Prices in the business's own currency.
@@ -67,6 +72,40 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           </div>
         ))}
       </dl>
+      {card && (
+        <section aria-labelledby="card-heading" className="card flex flex-col gap-4 p-6">
+          <div className="flex flex-col gap-1">
+            <h2 id="card-heading" className="text-lg font-semibold">
+              {t("platform.card.title")}
+            </h2>
+            <p className="text-sm text-muted">{t("platform.card.intro")}</p>
+          </div>
+          {card.tags.length > 0 && (
+            <ul className="flex flex-wrap gap-2" aria-label={t("platform.card.tags")}>
+              {card.tags.map((tag) => (
+                <li key={tag}>
+                  <Pill tone="primary">
+                    <UserText>{tag}</UserText>
+                  </Pill>
+                </li>
+              ))}
+            </ul>
+          )}
+          <CardForm tenantId={business.id} tags={card.tags} accountOwner={card.account_owner} mayAct={mayAct} />
+        </section>
+      )}
+      <section aria-labelledby="notes-heading" className="card flex flex-col gap-4 p-6">
+        <h2 id="notes-heading" className="text-lg font-semibold">
+          {t("platform.card.notes")}
+        </h2>
+        {mayAct && <NoteForm tenantId={business.id} />}
+      </section>
+      <section aria-labelledby="timeline-heading" className="card flex flex-col gap-2 p-6">
+        <h2 id="timeline-heading" className="text-lg font-semibold">
+          {t("platform.card.timeline")}
+        </h2>
+        <Timeline events={timeline} />
+      </section>
       {mayAct && (
         <section aria-labelledby="act-heading" className="card-accent flex flex-col gap-3 p-5">
           <h2 id="act-heading" className="font-semibold">

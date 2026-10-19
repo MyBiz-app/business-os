@@ -8334,6 +8334,95 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/businesses/{tenant_id}/card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Card
+         * @description Tags, the account owner and the trial end of one business.
+         */
+        get: operations["business_card"];
+        /**
+         * Set Business Card
+         * @description Replaces the tags and the account owner (an email of the MyBiz team, or empty).
+         */
+        put: operations["set_business_card"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Notes
+         * @description Internal notes, newest first (the last 200).
+         */
+        get: operations["business_notes"];
+        put?: never;
+        /**
+         * Add Business Note
+         * @description Writes an internal note about a business; returns the notes.
+         */
+        post: operations["add_business_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Timeline
+         * @description Sign-up, trial, invoices, requests, changes by the team and notes, newest first (150).
+         */
+        get: operations["business_timeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/trials-ending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Trials Ending
+         * @description Businesses whose free trial ends within `days` or ended in the last three days
+         *     (at most 200), soonest first.
+         */
+        get: operations["trials_ending"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/metrics/saas": {
         parameters: {
             query?: never;
@@ -11270,6 +11359,27 @@ export interface components {
             /** Paused */
             paused: boolean;
         };
+        /** BusinessCard */
+        BusinessCard: {
+            /** Tags */
+            tags: string[];
+            /**
+             * Account Owner
+             * @description The MyBiz team member who looks after it
+             */
+            account_owner: string | null;
+            /** Updated By */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
+            /**
+             * Trial Ends At
+             * Format: date-time
+             */
+            trial_ends_at: string;
+            /** Closed At */
+            closed_at: string | null;
+        };
         /** BusinessInvoice */
         BusinessInvoice: {
             /**
@@ -11338,6 +11448,23 @@ export interface components {
              * @description About, at one credit per question
              */
             questions_left: number | null;
+        };
+        /** BusinessNote */
+        BusinessNote: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Author Email */
+            author_email: string;
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** BusinessPolicy */
         BusinessPolicy: {
@@ -11719,6 +11846,13 @@ export interface components {
              * @description Set when the owner took it back
              */
             resumed_at: string | null;
+        };
+        /** CardChange */
+        CardChange: {
+            /** Tags */
+            tags: string[];
+            /** Account Owner */
+            account_owner?: string | null;
         };
         /** Catalog */
         Catalog: {
@@ -17326,6 +17460,11 @@ export interface components {
             /** Booking Id */
             booking_id?: string | null;
         };
+        /** NoteIn */
+        NoteIn: {
+            /** Body */
+            body: string;
+        };
         /** NoticeOut */
         NoticeOut: {
             /**
@@ -22220,6 +22359,25 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** TimelineEvent */
+        TimelineEvent: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /**
+             * Kind
+             * @description signup, trial_ends, closed, invoice, request, change or note; the details depend on the kind
+             */
+            kind: string;
+            /** Actor */
+            actor: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+        };
         /** TopPost */
         TopPost: {
             /**
@@ -22258,6 +22416,29 @@ export interface components {
              * Format: date-time
              */
             trial_ends_at: string;
+        };
+        /** TrialEnding */
+        TrialEnding: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /** Owner Email */
+            owner_email: string | null;
+            /**
+             * Trial Ends At
+             * Format: date-time
+             */
+            trial_ends_at: string;
+            /** Active Clients */
+            active_clients: number;
+            /** Has Card */
+            has_card: boolean;
+            /** Account Owner */
+            account_owner: string | null;
         };
         /** TrialExtension */
         TrialExtension: {
@@ -42307,6 +42488,201 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlatformCatalog"];
+                };
+            };
+        };
+    };
+    business_card: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_business_card: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CardChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_notes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessNote"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_business_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessNote"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_timeline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimelineEvent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trials_ending: {
+        parameters: {
+            query?: {
+                /** @description Look ahead this many days */
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrialEnding"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

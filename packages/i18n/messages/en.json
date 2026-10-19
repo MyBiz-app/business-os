@@ -2826,7 +2826,8 @@
       "churn": "Churn",
       "metrics": "SaaS numbers",
       "email": "Email delivery",
-      "catalog": "Catalog and prices"
+      "catalog": "Catalog and prices",
+      "trials": "Trials ending"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -3612,6 +3613,80 @@
       "credits": "{count} AI credits a month",
       "users": "{count} AI users",
       "needs": "Needs {list}"
+    },
+    "card": {
+      "title": "Business 360",
+      "intro": "Everything we know about this business in one place. Notes and tags are internal and never shown to the business.",
+      "tags": "Tags",
+      "tagsHint": "Separated by commas, up to 12, for example vip, partner, needs-help.",
+      "accountOwner": "Account owner",
+      "accountOwnerHint": "The MyBiz team member who looks after this business (their sign-in email). Leave empty for none.",
+      "save": "Save",
+      "saved": "Saved.",
+      "notes": "Internal notes",
+      "noteLabel": "New note",
+      "notePlaceholder": "Who you spoke to and what they want.",
+      "addNote": "Add note",
+      "noteAdded": "Note added.",
+      "noNotes": "No notes yet.",
+      "timeline": "Timeline",
+      "noTimeline": "Nothing yet.",
+      "by": "by {who}",
+      "errors": {
+        "invalid_tags": "Use up to 12 tags of at most 30 characters.",
+        "unknown_account_owner": "That email is not an active member of the MyBiz team.",
+        "invalid_note": "The note must have 1 to 2000 characters.",
+        "forbidden": "You don't have permission for this.",
+        "not_found": "Not found.",
+        "generic": "Something went wrong. Please try again."
+      },
+      "events": {
+        "signup": "Signed up",
+        "trial_ends": "Free trial ends",
+        "closed": "Closed the business",
+        "invoice": "Invoice {number} · {amount} · {status}",
+        "invoiceStatus": {
+          "open": "open",
+          "paid": "paid",
+          "void": "credited"
+        },
+        "request": "Contact request ({status})",
+        "requestFromBusiness": "Request from the business ({status})",
+        "requestStatus": {
+          "new": "new",
+          "in_progress": "in progress",
+          "done": "done"
+        },
+        "note": "Note",
+        "changes": {
+          "trial_extended": "Trial extended by {days} days",
+          "modules_changed": "Plan changed",
+          "invoice_voided": "Invoice credited",
+          "card_updated": "Tags or account owner changed"
+        }
+      }
+    },
+    "trials": {
+      "title": "Trials ending",
+      "hint": "Businesses whose free trial ends soon, or ended in the last three days. This is the moment they decide whether to pay.",
+      "range": "Show the next {days} days",
+      "empty": "No trials ending in this period.",
+      "business": "Business",
+      "owner": "Owner",
+      "ends": "Trial ends",
+      "clients": "Active clients",
+      "card": "Card",
+      "accountOwner": "Account owner",
+      "actions": "Actions",
+      "cardYes": "On file",
+      "cardNo": "None",
+      "endsOn": "{date}",
+      "ended": "Ended {date}",
+      "message": "Write to the owner",
+      "open": "Open the card",
+      "extend": "Extend",
+      "extendDays": "Days",
+      "extendDone": "The trial now ends on {date}."
     }
   },
   "permissions": {
