@@ -1232,6 +1232,22 @@
     }
   },
   "team": {
+    "tabsLabel": "Team sections",
+    "tabs": {
+      "members": "People",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "timeClock": "Time clock",
+      "swaps": "Swaps",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "organization": "Structure",
+      "roles": "Roles"
+    },
+    "inviteButton": "Invite someone",
+    "moreActions": "More actions for {name}",
+    "changeRole": "Change role",
+    "branchesMenu": "Branches",
     "title": "Team",
     "subtitle": "People who work in the business and what they can do.",
     "members": "Members",
@@ -8688,6 +8704,8 @@
     "cycle": "That would make a loop: this person already manages them."
   },
   "shifts": {
+    "settingsTitle": "Shift settings",
+    "settingsHint": "Rooms, minimum staffing, publishing and planning rhythm.",
     "title": "Shifts",
     "soloTitle": "Hours and availability",
     "soloSubtitle": "You run the business on your own, so there is no shift board. Keep your opening hours and availability up to date.",

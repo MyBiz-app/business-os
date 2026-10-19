@@ -3,12 +3,12 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { BRAND } from "@business-os/i18n/brand";
 
-import { BackLink } from "@/components/back-link";
 import { unwrap } from "@/lib/api";
 import { canManageTeam } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 import { DecisionForm } from "./decision-form";
+import { TeamTabs } from "../team-tabs";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -31,8 +31,8 @@ export default async function TimeOffRequestsPage() {
   const period = (from: string, to: string) => (from === to ? day(from) : `${day(from)} - ${day(to)}`);
 
   return (
-    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <BackLink href="/team/shifts" label={t("back")} />
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <TeamTabs active="timeOff" tenant={tenant} />
       <PageHeader title={t("title")} description={t("subtitle")} />
       <section aria-labelledby="pending-heading" className="flex flex-col gap-3">
         <h2 id="pending-heading" className="text-lg font-semibold">

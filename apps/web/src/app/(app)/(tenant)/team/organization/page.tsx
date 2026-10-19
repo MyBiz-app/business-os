@@ -3,12 +3,12 @@ import { getTranslations } from "next-intl/server";
 import { BRAND } from "@business-os/i18n/brand";
 
 import { avatarSrc } from "@/components/avatar";
-import { BackLink } from "@/components/back-link";
 import { unwrap } from "@/lib/api";
 import { canManageTeam } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { type OrgPerson, OrgChart } from "./org-chart";
+import { TeamTabs } from "../team-tabs";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -39,7 +39,7 @@ export default async function OrganizationPage() {
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <BackLink href="/team" label={t("team.title")} />
+      <TeamTabs active="organization" tenant={tenant} />
       <PageHeader title={t("organization.title")} description={t("organization.subtitle")} />
       <OrgChart people={people} canEdit={canManageTeam(tenant)} />
     </Container>
