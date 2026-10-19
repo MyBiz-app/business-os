@@ -242,7 +242,7 @@ def test_the_agents_map_shows_only_agents_the_member_may_ask(
     assert keys[0] == "manager" and "billing" in keys and "legal" in keys
     assert "support" not in keys and "security" not in keys  # needs inbox / incidents
     assert next(a for a in cards if a["key"] == "manager")["chief"] is True
-    assert next(a for a in cards if a["key"] == "legal")["ready"] is False
+    assert next(a for a in cards if a["key"] == "legal")["ready"] is True
 
 
 def test_an_agent_can_be_renamed_switched_off_and_given_extra_instructions(
@@ -304,9 +304,9 @@ def test_an_agent_can_be_renamed_switched_off_and_given_extra_instructions(
 def test_agents_without_tools_yet_or_without_permission_cannot_be_asked(
     client: TestClient, engine: Engine, auth: AuthHeaders
 ) -> None:
-    _, _, owner = staff(engine, auth, "billing.manage")
+    _, _, owner = staff(engine, auth, "billing.manage", "incidents.manage")
     soon = client.post(
-        "/platform/ai/assistant/conversations", json={"role": "legal"}, headers=owner
+        "/platform/ai/assistant/conversations", json={"role": "security"}, headers=owner
     )
     assert soon.status_code == 409 and soon.json()["detail"] == "agent_not_ready"
     _, _, other = staff(engine, auth, "usage.read")
