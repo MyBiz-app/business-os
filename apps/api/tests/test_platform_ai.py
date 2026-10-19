@@ -301,14 +301,10 @@ def test_an_agent_can_be_renamed_switched_off_and_given_extra_instructions(
     assert chief["enabled"] is True
 
 
-def test_agents_without_tools_yet_or_without_permission_cannot_be_asked(
+def test_agents_without_permission_or_unknown_cannot_be_asked(
     client: TestClient, engine: Engine, auth: AuthHeaders
 ) -> None:
-    _, _, owner = staff(engine, auth, "billing.manage", "incidents.manage")
-    soon = client.post(
-        "/platform/ai/assistant/conversations", json={"role": "security"}, headers=owner
-    )
-    assert soon.status_code == 409 and soon.json()["detail"] == "agent_not_ready"
+    _, _, owner = staff(engine, auth, "billing.manage")
     _, _, other = staff(engine, auth, "usage.read")
     denied = client.post(
         "/platform/ai/assistant/conversations", json={"role": "billing"}, headers=other

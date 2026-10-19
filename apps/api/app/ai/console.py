@@ -17,11 +17,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-<<<<<<< HEAD
-from app.ai import knowledge, market, professional, web_search
-=======
-from app.ai import knowledge, market, security, web_search
->>>>>>> origin/main
+from app.ai import knowledge, market, professional, security, web_search
 from app.ai.console_agents import AGENT_KEYS, agent_prompt
 from app.ai.gateway import (
     LLMProvider,
