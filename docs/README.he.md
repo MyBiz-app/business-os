@@ -8,8 +8,8 @@
 
 | מה | איפה | מתי לקרוא |
 |---|---|---|
-| אפיון המוצר (המקור הקובע) | [`spec/current/`](spec/current/README.md) | האפיון החי; עד ש-v4 ייכתב, העדכני ביותר הוא v3 ב-[`spec/archive/v3/`](spec/archive/v3/spec.he.md) · [English](spec/archive/v3/spec.en.md) |
-| האפיון כקובצי Word | [`spec/archive/MyBiz-Spec-he.docx`](spec/archive/MyBiz-Spec-he.docx) · [`spec/archive/MyBiz-Spec-en.docx`](spec/archive/MyBiz-Spec-en.docx) | נוצרים מ-v3 עם `node scripts/spec-to-docx.cjs he\|en` |
+| אפיון המוצר (המקור הקובע) | [`spec/current/`](spec/current/README.md) | האפיון החי (v4): [עברית](spec/current/system.he.md) · [English](spec/current/system.en.md). אפיונים ישנים (v1-v3) ב-[`spec/archive/`](spec/archive/) |
+| האפיון כקובצי Word | [`spec/current/MyBiz-Spec-v4-he.docx`](spec/current/MyBiz-Spec-v4-he.docx) · [`spec/current/MyBiz-Spec-v4-en.docx`](spec/current/MyBiz-Spec-v4-en.docx) | נוצרים מ-v4 עם `node scripts/spec-to-docx.cjs he\|en` |
 | פרקי תכנון מפורטים (v2) | [`spec/archive/v2/`](spec/archive/v2/README.md) | ארכיטקטורה, מודל נתונים, AI וכללי תמחור לעומק |
 | החזון המקורי (v1) | [`spec/archive/v1/`](spec/archive/v1/) | האפיון הראשון שלך, נשמר לתיעוד |
 | החלטות | [`DECISIONS.md`](DECISIONS.md) | למה משהו בנוי כמו שהוא (לכל החלטה יש מזהה, למשל X13) |
