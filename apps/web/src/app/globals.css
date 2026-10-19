@@ -445,6 +445,37 @@ h3,
   }
 }
 
+/* Touch screens: every button, icon button and field gets a 44px hit area (WCAG 2.5.5), and text
+   fields use 16px type so a phone browser does not zoom the page when one is focused. These are
+   plain (unlayered) rules so they win over the size classes a page puts on a single control. */
+@media (pointer: coarse), (width < 40rem) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger,
+  .btn-icon,
+  .btn-plain {
+    min-block-size: 2.75rem;
+  }
+  .btn-icon {
+    min-inline-size: 2.75rem;
+  }
+  .btn-link {
+    padding-block: 0.5rem;
+  }
+  input.control:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]),
+  select.control,
+  textarea.control {
+    min-block-size: 2.75rem;
+    font-size: 1rem;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-inline-size: 1.25rem;
+    min-block-size: 1.25rem;
+  }
+}
+
 /* ---- Layout ----------------------------------------------------------------------------- */
 
 /* A row of cards that swipes sideways on a phone (the next card peeks in) and is an ordinary

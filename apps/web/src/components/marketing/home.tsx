@@ -169,7 +169,7 @@ export async function PricingTeaser() {
             <PricingCalculator catalog={catalog} compact />
           </Reveal>
         )}
-        <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink">
+        <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink max-md:min-h-11">
           {t("seeAll")}
           <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
         </Link>
@@ -191,7 +191,7 @@ export async function AboutTeaser() {
           {t("title")}
         </h2>
         <p className="text-lg text-muted">{t("intro")}</p>
-        <Link href="/about" className="group inline-flex items-center gap-1 font-semibold text-primary-ink">
+        <Link href="/about" className="group inline-flex items-center gap-1 font-semibold text-primary-ink max-md:min-h-11">
           {th("more")}
           <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
         </Link>

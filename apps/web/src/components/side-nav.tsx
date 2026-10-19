@@ -153,7 +153,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                 onClick={() => setOpen(false)}
                 aria-current={active ? "page" : undefined}
                 aria-label={item.locked ? t("lockedItem", { name: item.label }) : undefined}
-                className={`group relative flex items-center gap-3 whitespace-nowrap rounded-xl py-2 ps-3 text-sm ${children.length > 0 ? "pe-10" : "pe-3"} font-medium transition-colors duration-200 ${
+                className={`group relative flex items-center gap-3 whitespace-nowrap rounded-xl py-2.5 ps-3 text-sm md:py-2 ${children.length > 0 ? "pe-10" : "pe-3"} font-medium transition-colors duration-200 ${
                   active
                     ? "bg-primary/20 text-foreground"
                     : inArea
@@ -186,7 +186,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                   aria-controls={childrenId}
                   aria-label={t(unfolded ? "collapse" : "expand", { name: item.label })}
                   onClick={() => toggle(item.href, unfolded)}
-                  className="btn-plain absolute inset-y-0 end-1 my-auto flex size-7 items-center justify-center rounded-lg text-muted hover:bg-foreground/10 hover:text-foreground"
+                  className="btn-plain absolute inset-y-0 end-1 my-auto flex size-9 items-center justify-center rounded-lg text-muted hover:bg-foreground/10 md:size-7 hover:text-foreground"
                 >
                   <ChevronRight aria-hidden="true" className={`size-4 transition-transform duration-200 rtl:-scale-x-100 ${unfolded ? "rotate-90 rtl:-rotate-90" : ""}`} />
                 </button>
@@ -211,7 +211,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                             }
                           }}
                           aria-current={childActive ? (anchor ? "location" : "page") : undefined}
-                          className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors duration-200 ${
+                          className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors md:py-1.5 duration-200 ${
                             childActive ? "bg-primary/15 font-semibold text-foreground" : "text-muted hover:bg-foreground/5 hover:text-foreground"
                           }`}
                         >
