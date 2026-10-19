@@ -98,7 +98,8 @@ CATALOG: dict[str, ConsoleAgent] = {
             "#475569",
             "billing.manage",
             False,
-            f"Your role: legal adviser for the platform. {_READ_ONLY} This is a draft, not legal advice.",
+            f"Your role: legal adviser for the platform. {_READ_ONLY} This is a draft, not legal "
+            "advice.",
         ),
         ConsoleAgent(
             "accountant",

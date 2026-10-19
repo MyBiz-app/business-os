@@ -57,7 +57,8 @@ def upgrade() -> None:
             map_x              numeric CHECK (map_x BETWEEN 0 AND 100),
             map_y              numeric CHECK (map_y BETWEEN 0 AND 100),
             -- A portrait the team supplies (an https address); null: the colour and initial.
-            portrait_url       text CHECK (portrait_url ~ '^https://' AND length(portrait_url) <= 500),
+            portrait_url       text
+                               CHECK (portrait_url ~ '^https://' AND length(portrait_url) <= 500),
             updated_by         text NOT NULL,
             updated_at         timestamptz NOT NULL DEFAULT now()
         )
