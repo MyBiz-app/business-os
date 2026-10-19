@@ -232,6 +232,11 @@
     "requireMfaForStaffHint": "Every team member must enter an authenticator code after their password before they can work in this business. Clients are not affected.",
     "auditLink": "Audit log",
     "auditHint": "Who changed roles, team, settings and exports.",
+    "detailsGroups": {
+      "booking": "Booking and cancellation",
+      "clients": "Clients",
+      "sales": "Sales and security"
+    },
     "detailsHint": "Name, language, currency, time zone and booking rules.",
     "nav": {
       "label": "Settings topics",
@@ -569,6 +574,7 @@
     "points": "{value} pts",
     "better": "better",
     "worse": "worse",
+    "trends": "Trends",
     "weeklyRevenue": "Revenue per week",
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
