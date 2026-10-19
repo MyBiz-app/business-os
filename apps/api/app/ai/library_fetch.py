@@ -13,11 +13,12 @@ import ssl
 import urllib.parse
 
 from app.ai.knowledge import MAX_TEXT, UnsupportedFile, extract_text
+from app.core.brand import NAME
 
 MAX_BYTES = 8 * 1024 * 1024
 MAX_REDIRECTS = 3
 TIMEOUT = 15.0
-USER_AGENT = "MyBizLibraryBot/1.0"
+USER_AGENT = f"{NAME}LibraryBot/1.0"
 
 
 class FetchError(Exception):

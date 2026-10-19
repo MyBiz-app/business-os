@@ -156,7 +156,7 @@ def always_block(db: Session, agent: str) -> str:
     if not parts:
         return ""
     return (
-        "The MyBiz team keeps these for you. Follow them; they win over what you remember.\n\n"
+        "The team keeps these for you. Follow them; they win over what you remember.\n\n"
         + "\n\n".join(parts)
     )
 
