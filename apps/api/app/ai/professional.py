@@ -9,7 +9,7 @@ from pathlib import Path
 
 PROFESSIONAL_ROLES = frozenset({"legal", "accountant"})
 COUNTRIES = {"IL": "Israel", "US": "United States"}
-DEFAULT_COUNTRY = "IL"  # MyBiz itself is an Israeli company
+DEFAULT_COUNTRY = "IL"  # the platform itself is run from Israel
 
 GUIDES = Path(__file__).parent / "guides"
 

@@ -1,6 +1,6 @@
 # Accounting and tax guide, United States (draft summary)
 
-Status: written by the MyBiz team from public official sources as a starting point. Not yet reviewed by a CPA. Figures change every year: always check the current IRS page, and send anything important to a real CPA.
+Status: written by the platform team from public official sources as a starting point. Not yet reviewed by a CPA. Figures change every year: always check the current IRS page, and send anything important to a real CPA.
 
 ## Choosing a business structure
 

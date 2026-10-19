@@ -1,6 +1,6 @@
 # Legal guide, Israel (draft summary)
 
-Status: written by the MyBiz team from public official sources as a starting point. Not yet reviewed by a lawyer. Always check the source named in each section and send anything important to a real lawyer.
+Status: written by the platform team from public official sources as a starting point. Not yet reviewed by a lawyer. Always check the source named in each section and send anything important to a real lawyer.
 
 ## Privacy: the Protection of Privacy Law (חוק הגנת הפרטיות)
 

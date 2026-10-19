@@ -50,7 +50,7 @@ _PROFESSIONAL = (
     "prepare questions for a real professional, and the server adds the line saying so to "
     "every answer. Work by country. The countries in your library are Israel (IL) and the "
     "United States (US). When the question is about one business, use its country from "
-    "business_detail; when it is about MyBiz itself, use Israel unless the user says another. "
+    "business_detail; when it is about the platform itself, use Israel unless the user says another. "
     "If the country is empty, or is another country, say so and do not guess the rules. Search "
     "the library first (search_library, with the country in the question) and rely only on what "
     "it returns plus what you are sure of; name the document, the section and the source link "
@@ -123,7 +123,7 @@ CATALOG: dict[str, ConsoleAgent] = {
             True,
             f"Your role: accountant for the platform. {_READ_ONLY} {_PROFESSIONAL} Help with "
             "VAT and sales tax, invoice numbering, preparing the annual report and the payroll "
-            "rates, using the billing and price tools for MyBiz's own numbers.",
+            "rates, using the billing and price tools for the platform's own numbers.",
         ),
         ConsoleAgent(
             "market",

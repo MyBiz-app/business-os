@@ -1,6 +1,6 @@
 # Accounting and tax guide, Israel (draft summary)
 
-Status: written by the MyBiz team from public official sources as a starting point. Not yet reviewed by an accountant. Rates and thresholds change: always check the current figure on the Israel Tax Authority site (https://www.gov.il/he/departments/israel_tax_authority/govil-landing-page) and send anything important to a real accountant (רואה חשבון).
+Status: written by the platform team from public official sources as a starting point. Not yet reviewed by an accountant. Rates and thresholds change: always check the current figure on the Israel Tax Authority site (https://www.gov.il/he/departments/israel_tax_authority/govil-landing-page) and send anything important to a real accountant (רואה חשבון).
 
 ## VAT (מע"מ)
 
@@ -24,7 +24,7 @@ Self-employed people and companies report income to the Tax Authority, make adva
 
 ## Employees: payroll deductions and National Insurance (ביטוח לאומי)
 
-An employer deducts income tax and employee National Insurance and health insurance contributions from each salary, pays the employer's share, and reports and pays to the Tax Authority and the National Insurance Institute. Mandatory pension contributions apply to employees by the extension order. Payroll rates and brackets change by year: use the rates table that the accountant confirms in MyBiz. Source: Israel Tax Authority and the National Insurance Institute.
+An employer deducts income tax and employee National Insurance and health insurance contributions from each salary, pays the employer's share, and reports and pays to the Tax Authority and the National Insurance Institute. Mandatory pension contributions apply to employees by the extension order. Payroll rates and brackets change by year: use the rates table that the accountant confirms in the platform. Source: Israel Tax Authority and the National Insurance Institute.
 
 ## Withholding at source (ניכוי מס במקור)
 
