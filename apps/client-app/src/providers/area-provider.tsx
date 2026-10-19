@@ -27,7 +27,7 @@ const AreaContext = createContext<AreaContextValue | null>(null);
  * businesses they are a client of. Opens the last one used and lets them switch. */
 export function AreaProvider({ children }: { children: React.ReactNode }) {
   const { session } = useSession();
-  const { businesses, select } = useBusiness();
+  const { businesses, select, joinOwn } = useBusiness();
   const userId = session?.user.id;
   const [identity, setIdentity] = useState<{ platformAdmin: boolean; memberships: Parameters<typeof buildAreas>[0]["memberships"] } | null>(null);
   const [storedKey, setStoredKey] = useState<string | null>(null);
@@ -61,12 +61,14 @@ export function AreaProvider({ children }: { children: React.ReactNode }) {
     async (key: string) => {
       const next = areas?.find((a) => a.key === key);
       if (!next) return;
+      // A team member's first visit to their business as a client makes their client card.
+      if (next.joinOnOpen && next.tenantId) await joinOwn(next.tenantId);
       setStoredKey(key);
       await AsyncStorage.setItem(ACTIVE_KEY, key);
       if (next.kind === "client" && next.tenantId) await select(next.tenantId);
       router.replace(areaHome(next));
     },
-    [areas, select],
+    [areas, select, joinOwn],
   );
 
   const value = useMemo(() => ({ areas, active, switchTo }), [areas, active, switchTo]);

@@ -1478,6 +1478,7 @@
     }
   },
   "areas": {
+    "joinError": "Could not open the client area. Try again.",
     "switch": "Switch area",
     "current": "Current",
     "client": "Member",
@@ -6890,11 +6891,6 @@
       "allBranches": "All branches",
       "rosterEmails": "Email me about my shifts",
       "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
-      "signUpClientTitle": "Join as a client too",
-      "signUpClientHint": "Get your own client card in this business, so you can book and pay like any client. You switch between the two areas below.",
-      "signUpClientButton": "Sign me up as a client",
-      "signUpClientDone": "Done. Switch to the client area below.",
-      "signUpClientError": "Could not sign you up. Try again.",
       "colors": "My colors",
       "colorsHint": "Pick your brand color. It colors your clients' app, your web app and this app.",
       "colorHex": "Color code (#rrggbb)",

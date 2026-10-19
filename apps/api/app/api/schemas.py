@@ -21,6 +21,9 @@ class Membership(BaseModel):
     tenant_id: UUID
     tenant_name: str
     role: Role
+    client_app: bool = Field(
+        default=False, description="The business offers the client app (the member's client area)"
+    )
 
 
 class SupportAccess(BaseModel):

@@ -19,7 +19,12 @@ def test_create_tenant_makes_the_creator_its_owner(client: TestClient, auth: Aut
     me = client.get("/me", headers=auth(owner)).json()
     assert me["id"] == str(owner)
     assert me["memberships"] == [
-        {"tenant_id": tenant["id"], "tenant_name": "Studio Flow", "role": "owner"}
+        {
+            "tenant_id": tenant["id"],
+            "tenant_name": "Studio Flow",
+            "role": "owner",
+            "client_app": True,
+        }
     ]
 
 
