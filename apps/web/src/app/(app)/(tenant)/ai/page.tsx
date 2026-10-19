@@ -68,10 +68,10 @@ export default async function AiTeamPage({ searchParams }: PageProps<"/ai">) {
       <div id="ai-team">
       <TeamView team={team} branches={branches.map(({ id, name }) => ({ id, name }))} enabled={status.enabled} demo={status.demo} upsells={upsells} canAdd={canManageSettings(tenant)} timeZone={tenant.time_zone} roles={roles} tourSeen={tours.includes("ai_team")} initialAgent={typeof agent === "string" ? agent : null} meter={meter} meterDetails={meterDetails} />
       </div>
-      {/* The two cards share one width, padding and header, side by side on a wide screen. */}
+      {/* The two cards share one width, padding and header, side by side on a wide screen, the task board first. */}
       <div id="ai-tasks" className="grid gap-6 xl:grid-cols-2 xl:items-start">
-        <ProactiveSettingsPanel settings={proactive} timeZone={tenant.time_zone} />
         <TasksBoard board={tasks} agents={Object.fromEntries(team.agents.map((a) => [a.key, a.name]))} timeZone={tenant.time_zone} />
+        <ProactiveSettingsPanel settings={proactive} timeZone={tenant.time_zone} />
       </div>
     </Container>
   );
