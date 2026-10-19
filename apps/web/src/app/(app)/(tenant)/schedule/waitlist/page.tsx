@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/empty-state";
@@ -39,10 +40,8 @@ export default async function WaitlistPage({ searchParams }: PageProps<"/schedul
   };
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/schedule" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-        {tSchedule("back")}
-      </Link>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <BackLink href="/schedule" label={tSchedule("back")} />
       <PageHeader title={t("title")} description={t("subtitle")} />
 
       <form method="get" className="card flex flex-wrap items-end gap-3 p-4" aria-label={t("filters.label")}>

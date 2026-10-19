@@ -194,7 +194,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const customized = isBoardRange(query.view) || explicit || serviceId !== null || instructorId !== null || isDay(query.date) || isDay(query.week);
 
   return (
-    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-5 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <LiveRefresh />
       <PageHeader
         title={term("schedule")}
