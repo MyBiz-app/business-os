@@ -1,7 +1,7 @@
 import type { ApiClient, components } from "@business-os/api-client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
+import { ApiError, apiClient, unwrap } from "@business-os/app-kit/lib/api";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useAreas } from "@/providers/area-provider";
 
@@ -12,6 +12,8 @@ type PlatformContextValue = {
   /** null while loading or signed out; undefined-level means not on the team. */
   staff: StaffMe | null;
   onTeam: boolean | null;
+  /** On the team, but the API wants a two-step sign-in code first (not "off the team"). */
+  mfaRequired: boolean;
   api: ApiClient;
   can: (permission: PlatformPermission) => boolean;
   refresh: () => Promise<void>;
@@ -24,6 +26,7 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
   const { session } = useSession();
   const [staff, setStaff] = useState<StaffMe | null>(null);
   const [onTeam, setOnTeam] = useState<boolean | null>(null);
+  const [mfaRequired, setMfaRequired] = useState(false);
   const { active } = useAreas();
   const userId = session?.user.id;
   // Only people working in the MyBiz area ask the platform who they are.
@@ -33,14 +36,17 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
     if (!userId || !inPlatform) {
       setStaff(null);
       setOnTeam(null);
+      setMfaRequired(false);
       return;
     }
     try {
       setStaff(unwrap(await apiClient().GET("/platform/me")));
       setOnTeam(true);
-    } catch {
+      setMfaRequired(false);
+    } catch (error) {
       setStaff(null);
       setOnTeam(false);
+      setMfaRequired(error instanceof ApiError && error.detail === "mfa_required");
     }
   }, [userId, inPlatform]);
 
@@ -52,11 +58,12 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
     () => ({
       staff,
       onTeam,
+      mfaRequired,
       api: apiClient(),
       can: (permission: PlatformPermission) => staff?.permissions.includes(permission) ?? false,
       refresh,
     }),
-    [staff, onTeam, refresh],
+    [staff, onTeam, mfaRequired, refresh],
   );
 
   return <PlatformContext.Provider value={value}>{children}</PlatformContext.Provider>;

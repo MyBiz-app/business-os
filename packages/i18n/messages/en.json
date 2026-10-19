@@ -7029,6 +7029,8 @@
     "notStaff": {
       "title": "This app is for the MyBiz team",
       "text": "The email you signed in with isn't on the MyBiz team. If it should be, ask an owner to add it.",
+      "mfaTitle": "Two-step sign-in needed",
+      "mfaText": "You are on the MyBiz team, but the team area needs a two-step sign-in code. Sign in on the website, turn on two-step sign-in under Account > Security, then come back.",
       "signOut": "Sign in with another email"
     },
     "home": {
