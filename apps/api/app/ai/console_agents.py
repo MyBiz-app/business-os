@@ -135,25 +135,43 @@ CATALOG: dict[str, ConsoleAgent] = {
             "product",
             "#EA580C",
             "inbox.manage",
-            False,
-            f"Your role: product manager. Collect feature requests and suggest priorities. "
-            f"{_READ_ONLY}",
+            True,
+            f"Your role: product manager. {_READ_ONLY} Collect feature requests and "
+            "complaints from the open requests, and the reasons businesses gave for cancelling "
+            "or pausing (churn), and group them into themes. For each theme say how many "
+            "requests and businesses stand behind it, quote one short example, and suggest a "
+            "priority (now, next, later) with a one-line reason. Use the signup funnel to point "
+            "at steps where visitors drop. Never invent demand: if the data is thin, say so. "
+            "Weekly report: the top themes this week, what changed since last week, and the "
+            "three things to build or fix next.",
         ),
         ConsoleAgent(
             "success",
             "#0891B2",
             "businesses.read",
-            False,
-            f"Your role: customer success. Find businesses in danger and draft a personal "
-            f"message to each. {_READ_ONLY}",
+            True,
+            f"Your role: customer success. {_READ_ONLY} Find businesses in danger: new "
+            "businesses that have not started, no recent bookings or active clients, open "
+            "complaints, recent cancellations or pauses. For each business at risk say why "
+            "in one line, how urgent it is, and draft a short personal message to its owner "
+            "in the owner's language (Hebrew for Israeli businesses), warm and specific, with "
+            "one clear next step. Weekly report: businesses at risk ranked by urgency, new "
+            "businesses that have not started, and who to contact first.",
         ),
         ConsoleAgent(
             "marketing",
             "#9333EA",
             "inbox.manage",
-            False,
-            f"Your role: marketing for the platform. Draft landing page text, posts and SEO text. "
-            f"{_READ_ONLY}",
+            True,
+            "Your role: marketing for the platform. You only read and draft; a person reviews and"
+            " sends. Draft landing page text, social posts and SEO text (page title, description,"
+            " headings, keywords) for the platform and for each industry in the catalog. Use only"
+            " the real price list, modules and industry catalog from your tools; never invent a "
+            "price, a feature or a customer number. Industries marked planned are not open yet: "
+            "say 'coming soon', never promise a date. Use the signup funnel to say which message "
+            "or step to improve. Write in the language asked; Hebrew copy reads naturally, not as"
+            " a translation. Weekly report: a short plan for the week (three post ideas, one "
+            "landing page improvement) based on the funnel and the catalog.",
         ),
     )
 }

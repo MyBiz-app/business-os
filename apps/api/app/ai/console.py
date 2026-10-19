@@ -28,6 +28,8 @@ from app.ai.gateway import (
     credits,
 )
 from app.ai.untrusted import prepare
+from app.catalog.verticals import CATALOG
+from app.commerce.modules import AI_CREDITS_INCLUDED, CORE_TIERS, MODULES
 from app.core.brand import with_brand
 
 MAX_STEPS = 6
@@ -318,6 +320,35 @@ def _signup_funnel(db: Session, args: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _price_list(_db: Session, _args: dict[str, Any]) -> dict[str, Any]:
+    """The price list as the code holds it: the same numbers as the console catalog page."""
+    return {
+        "money": "minor units (divide by 100) by currency, monthly unless billing is once",
+        "core_by_active_clients": [
+            {"up_to_clients": limit, "prices": prices} for limit, prices in CORE_TIERS
+        ],
+        "modules": [
+            {
+                "key": m.key,
+                "prices": m.prices,
+                "billing": m.billing,
+                "available": m.available,
+                "ai_credits_included": AI_CREDITS_INCLUDED.get(m.key, 0),
+            }
+            for m in MODULES.values()
+        ],
+    }
+
+
+def _industry_catalog(_db: Session, _args: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "industries": [
+            {"key": pack.key, "parent": pack.parent, "status": pack.status}
+            for pack in CATALOG.values()
+        ]
+    }
+
+
 _ALL = frozenset(ROLES)
 OWNER = "level.owner"  # not a console permission: held by MyBiz owners, for owner-only tools
 TOOLS: dict[str, Tool] = {
@@ -329,7 +360,7 @@ TOOLS: dict[str, Tool] = {
             "Pass a name fragment to filter, or an empty string for the newest.",
             {"name": {"type": "string"}},
             "businesses.read",
-            frozenset({"manager", "health", "billing", "growth"}),
+            frozenset({"manager", "health", "billing", "growth", "success", "product"}),
             _list_businesses,
         ),
         Tool(
@@ -337,7 +368,7 @@ TOOLS: dict[str, Tool] = {
             "Businesses at risk of leaving and new businesses that have not started.",
             {},
             "businesses.read",
-            frozenset({"manager", "health"}),
+            frozenset({"manager", "health", "success"}),
             _business_health,
         ),
         Tool(
@@ -362,7 +393,7 @@ TOOLS: dict[str, Tool] = {
             "Open contact requests, complaints and setup orders from the inbox.",
             {},
             "inbox.manage",
-            frozenset({"manager", "support", "growth"}),
+            frozenset({"manager", "support", "growth", "success", "product"}),
             _inbox,
         ),
         Tool(
@@ -484,6 +515,24 @@ TOOLS: dict[str, Tool] = {
             "usage.read",
             frozenset({"market"}),
             market.save_market_report,
+        ),
+        Tool(
+            "price_list",
+            "The price list: the core price by number of active clients and the monthly price "
+            "of every module, by currency.",
+            {},
+            "inbox.manage",
+            frozenset({"manager", "marketing"}),
+            _price_list,
+        ),
+        Tool(
+            "industry_catalog",
+            "The industries (categories and sub-categories) and whether each is live, in beta "
+            "or planned (not open yet).",
+            {},
+            "inbox.manage",
+            frozenset({"manager", "marketing", "product"}),
+            _industry_catalog,
         ),
     )
 }

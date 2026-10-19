@@ -181,7 +181,7 @@ def test_the_console_assistant_offers_only_tools_the_member_may_use(
     )
     assert reply.status_code == 200, reply.text
     offered = [t["name"] for t in provider.calls[0]["tools"]]
-    assert offered == ["open_requests"]
+    assert "open_requests" in offered and "list_businesses" not in offered
     refused = provider.calls[1]["messages"][-1]["content"][0]
     assert refused["is_error"] is True and "not available" in refused["content"]
     last = reply.json()["turns"][-1]
@@ -318,3 +318,45 @@ def test_agents_without_tools_yet_or_without_permission_cannot_be_asked(
         "/platform/ai/assistant/conversations", json={"role": "nobody"}, headers=owner
     )
     assert unknown.status_code == 422
+
+
+def test_product_success_and_marketing_agents_are_ready_with_their_own_tools(
+    client: TestClient, engine: Engine, auth: AuthHeaders, use_provider
+) -> None:
+    from app.ai.console import tools_for
+
+    everything = frozenset(
+        {"inbox.manage", "businesses.read", "billing.manage", "usage.read", "businesses.act"}
+    )
+    names = {
+        role: {t.name for t in tools_for(role, everything)}
+        for role in ("product", "success", "marketing")
+    }
+    assert {"open_requests", "churn", "signup_funnel", "industry_catalog"} <= names["product"]
+    assert {"business_health", "business_detail", "churn", "open_requests"} <= names["success"]
+    assert {"price_list", "industry_catalog", "signup_funnel"} <= names["marketing"]
+    assert "price_list" not in names["product"] and "price_list" not in names["success"]
+    assert "churn" not in names["marketing"] and "open_requests" not in names["marketing"]
+
+    provider = FakeProvider([calls("price_list", {}), says("Draft: a landing page text.")])
+    use_provider(provider)
+    _, _, headers = staff(engine, auth, "inbox.manage")
+    chat = client.post(
+        "/platform/ai/assistant/conversations", json={"role": "marketing"}, headers=headers
+    )
+    assert chat.status_code == 201, chat.text
+    reply = client.post(
+        f"/platform/ai/assistant/conversations/{chat.json()['id']}/messages",
+        json={"text": "Write landing page text"},
+        headers=headers,
+    )
+    assert reply.status_code == 200, reply.text
+    assert {t["name"] for t in provider.calls[0]["tools"]} == {"price_list", "industry_catalog"}
+    result = provider.calls[1]["messages"][-1]["content"][0]
+    assert "core_by_active_clients" in result["content"] and not result.get("is_error")
+    cards = client.get("/platform/ai/agents", headers=headers).json()
+    ready = {a["key"]: a["ready"] for a in cards}
+    assert ready["product"] and ready["marketing"]
+    _, _, readers = staff(engine, auth, "businesses.read")
+    cards = client.get("/platform/ai/agents", headers=readers).json()
+    assert next(a for a in cards if a["key"] == "success")["ready"] is True

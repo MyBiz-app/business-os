@@ -79,7 +79,7 @@ def test_every_table_has_row_level_security(engine: Engine) -> None:
         "platform_incidents",
         "email_suppressions",
         "platform_ai_agents",
-    "platform_ai_reports",
+        "platform_ai_reports",
     }
     own = tuple(sorted(PLATFORM_TABLES | own_extra))
     reachable = _query(
