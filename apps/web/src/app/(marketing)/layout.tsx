@@ -1,6 +1,5 @@
 import { ScopedMessages } from "@/components/scoped-messages";
 import { AccessibilityWidget } from "@/components/accessibility-widget";
-import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
 import { SignedOutNotice } from "@/components/marketing/signed-out-notice";
 
@@ -12,7 +11,6 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
       <SignedOutNotice />
       <MarketingHeader />
       <div className="flex flex-1 flex-col">{children}</div>
-      <MarketingFooter />
       <AccessibilityWidget />
     </div>
     </ScopedMessages>
