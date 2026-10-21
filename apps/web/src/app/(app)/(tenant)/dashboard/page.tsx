@@ -398,7 +398,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </PeriodProvider>
       )}
 
-      {reports && !solo && branches.length > 1 && (
+      {reports && !solo && branches.length > 0 && (
         <Suspense fallback={null}>
           <BranchMapCard context={{ api, scope, tenant }} />
         </Suspense>

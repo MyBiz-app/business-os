@@ -65,7 +65,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [history, setHistory] = useState<ConversationSummary[]>([]);
   const [scope, setScope] = useState<string[] | null>(null);
-  const [view, setView] = useState<"map" | "list">("map");
+  const [view, setView] = useState<"map" | "structure" | "list">("map");
   const [closedAgent, setClosedAgent] = useState<Agent | null>(null);
   const router = useRouter();
   const [touring, setTouring] = useState(!tourSeen);
@@ -89,7 +89,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   function startEditing() {
     setSelected(null);
     setConversation(null);
-    setView("map");
+    setView("structure");
     setStructureError(null);
     setDraft(saved);
   }
@@ -112,7 +112,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
     setTouring(false);
     void markAiTourSeen();
     // The first guide opens by itself, so there is no opener to return to: land on the help button.
-    window.setTimeout(() => tourHelp.current?.focus(), 0);
+    window.setTimeout(() => tourHelp.current?.focus({ preventScroll: true }), 0);
   }
 
   const agent = team.agents.find((a) => a.key === selected) ?? null;
@@ -306,7 +306,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
             </div>
             <div className="flex items-center gap-2">
               <div className="hidden md:block">
-                <SegmentedControl label={t("view")} value={view} onChange={setView} options={[{ value: "map", label: t("views.map") }, { value: "list", label: t("views.list") }]} />
+                <SegmentedControl label={t("view")} value={view} onChange={setView} options={[{ value: "map", label: t("views.map") }, { value: "structure", label: t("views.structure") }, { value: "list", label: t("views.list") }]} />
               </div>
               {team.can_manage && (
                 <button type="button" onClick={startEditing} className="btn-secondary inline-flex h-9 items-center gap-2 px-3 text-sm">
@@ -334,10 +334,10 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
               {wide ? <Minimize2 aria-hidden="true" className="size-4" /> : <Maximize2 aria-hidden="true" className="size-4" />}
             </button>
           )}
-          {view === "map" ? (
+          {view !== "list" ? (
             <>
               <div className="hidden md:block">
-                <TeamMap agents={team.agents} selected={selected} compact={chatOpen && !wide} onPick={open} draft={draft ?? saved} editing={structuring} onDraft={setDraft} />
+                <TeamMap agents={team.agents} selected={selected} compact={chatOpen && !wide} onPick={open} draft={draft ?? saved} shape={view === "structure" ? "tree" : "ring"} editing={structuring} onDraft={setDraft} />
               </div>
               <div className="md:hidden">
                 <TeamList agents={team.agents} selected={selected} onPick={open} />

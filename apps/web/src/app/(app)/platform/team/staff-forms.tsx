@@ -8,6 +8,7 @@ import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { removeStaff, saveStaff, setPaused, type StaffState } from "./actions";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type Level = "owner" | "manager" | "employee";
 type Permission = "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage" | "incidents.manage";
@@ -142,6 +143,7 @@ export function AddStaffForm({ actor }: { actor: Actor }) {
 
 export function StaffRow({ member, actor, manageable }: { member: Member; actor: Actor; manageable: boolean }) {
   const t = useTranslations("platform");
+  const confirm = useConfirm();
   const error = useError();
   const [editing, setEditing] = useState(false);
   const [state, action] = useActionState<StaffState, FormData>(saveStaff, {});
@@ -203,8 +205,8 @@ export function StaffRow({ member, actor, manageable }: { member: Member; actor:
           <button
             type="button"
             disabled={pending}
-            onClick={() => {
-              if (window.confirm(t("team.removeConfirm", { email: member.email }))) {
+            onClick={async () => {
+              if (await confirm({ message: t("team.removeConfirm", { email: member.email }), confirmLabel: t("team.remove"), danger: true })) {
                 startTransition(async () => setRowState(await removeStaff(member.email)));
               }
             }}

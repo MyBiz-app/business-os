@@ -9,6 +9,7 @@ import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
 import type { FormState } from "@/lib/form-state";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type Action = (state: FormState, formData: FormData) => Promise<FormState>;
 
@@ -52,6 +53,7 @@ function GroupForm({
 
 export function LocationGroups({ branches, groups, saveGroup, removeGroup }: Props) {
   const t = useTranslations("locations.groups");
+  const confirm = useConfirm();
   return (
     <section className="flex flex-col gap-3 border-t border-border pt-6" aria-labelledby="location-groups-heading">
       <div className="flex flex-col gap-1">
@@ -67,8 +69,8 @@ export function LocationGroups({ branches, groups, saveGroup, removeGroup }: Pro
             branches={branches}
             group={group}
             action={saveGroup.bind(null, group.id)}
-            onDelete={() => {
-              if (window.confirm(t("confirmDelete", { name: group.name }))) void removeGroup(group.id);
+            onDelete={async () => {
+              if (await confirm({ message: t("confirmDelete", { name: group.name }), confirmLabel: t("delete"), danger: true })) void removeGroup(group.id);
             }}
           />
         </CollapsibleSection>

@@ -48,6 +48,8 @@ type Props = {
   /** "card" is the small dashboard version: no side panel, a click opens the full map. */
   variant?: "full" | "card";
   initialBranch?: string | null;
+  /** Shows where clients come from from the start, also in the card (a business with one branch). */
+  originsOn?: boolean;
   /** Server action: opens the branch's report or schedule (form field `branch_id`, `to`). */
   openBranch?: (formData: FormData) => Promise<void>;
 };
@@ -65,7 +67,7 @@ function Sparkline({ values }: { values: number[] }) {
 
 /** The branches on a map: a dot per branch sized by the chosen number, a card on hover and, in
  * the full version, a side panel that the map flies to when a branch is chosen. */
-export function BranchMap({ branches, currency, variant = "full", initialBranch = null, openBranch }: Props) {
+export function BranchMap({ branches, currency, variant = "full", initialBranch = null, originsOn = false, openBranch }: Props) {
   const t = useTranslations("branchMap");
   const locale = useLocale();
   const full = variant === "full";
@@ -77,7 +79,7 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
   const [selected, setSelected] = useState<string | null>(initialBranch);
   const [hovered, setHovered] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
-  const [showOrigins, setShowOrigins] = useState(false);
+  const [showOrigins, setShowOrigins] = useState(originsOn);
   const originMarkers = useRef<Marker[]>([]);
 
   const number = useMemo(() => new Intl.NumberFormat(locale), [locale]);
@@ -177,7 +179,7 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
     for (const marker of originMarkers.current) marker.remove();
     originMarkers.current = [];
     const map = mapRef.current;
-    if (!ready || !map || !showOrigins || !full) return;
+    if (!ready || !map || !showOrigins || !(full || originsOn)) return;
     let cancelled = false;
     (async () => {
       const maplibre = await import("maplibre-gl");
@@ -200,11 +202,18 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
         dot.title = t("originPoint", { city: o.city, count: o.clients });
         originMarkers.current.push(new maplibre.Marker({ element: dot }).setLngLat([o.longitude, o.latitude]).addTo(map));
       }
+      // The card shows the branch and the cities its clients come from in one view.
+      if (!full && byCity.size > 0) {
+        const bounds = new maplibre.LngLatBounds();
+        for (const b of chosen) bounds.extend([b.longitude, b.latitude]);
+        for (const o of byCity.values()) bounds.extend([o.longitude, o.latitude]);
+        map.fitBounds(bounds, { padding: 50, maxZoom: 11, duration: 0 });
+      }
     })();
     return () => {
       cancelled = true;
     };
-  }, [ready, showOrigins, selected, branches, full, t]);
+  }, [ready, showOrigins, selected, branches, full, originsOn, t]);
 
   const open = branches.find((b) => b.id === selected) ?? null;
   const peek = branches.find((b) => b.id === hovered) ?? null;

@@ -6,10 +6,11 @@ import { type ReactNode, useCallback, useId, useLayoutEffect, useRef, useState, 
 
 const CLOSE_MS = 150; // matches `.modal-dialog[data-closing]` in globals.css
 
-/** A near full-screen window over the current page (a sheet from the bottom on a phone). The page
- * behind stays visible and blurred. Esc, the X and a click on the backdrop close it; with `dirty`
+/** The one window of the product: always centered with room around it (a sheet from the bottom on a
+ * phone, or along the end edge with `placement="side"`). The page behind stays visible and blurred,
+ * and does not scroll. Esc, the X and a click on the backdrop close it; with `dirty`
  * they first ask "Leave without saving?". Focus moves in and returns to the button that opened it
- * (native `<dialog>`). Put the save and cancel buttons in `footer`: it stays visible without scrolling.
+ * (native `<dialog>`; mark a button `data-autofocus` to start on it). Put the save and cancel buttons in `footer`: it stays visible without scrolling.
  * Mount it only while it is open, or pass `open`. With `transitionName` the window grows out of the
  * card that has the same name (see `CardTransition`) and shrinks back into it. */
 export function Modal({
@@ -21,6 +22,7 @@ export function Modal({
   footer,
   dirty = false,
   size = "lg",
+  placement = "center",
   transitionName,
 }: {
   open?: boolean;
@@ -32,6 +34,8 @@ export function Modal({
   /** True while the form holds changes that are not saved yet. */
   dirty?: boolean;
   size?: "sm" | "md" | "lg";
+  /** `side`: a sheet along the end edge that keeps a list in view (a full-screen sheet on a phone). */
+  placement?: "center" | "side";
   /** The name of the card this window grows out of (a view transition shared element). */
   transitionName?: string;
 }) {
@@ -48,7 +52,11 @@ export function Modal({
   useLayoutEffect(() => {
     const element = dialog.current;
     if (!open || !element) return;
-    if (!element.open) element.showModal();
+    if (!element.open) {
+      element.showModal();
+      // The browser focuses the first control (the X); a window may name a better one.
+      element.querySelector<HTMLElement>("[data-autofocus]")?.focus({ preventScroll: true });
+    }
     return () => {
       window.clearTimeout(timer.current);
       if (element.open) element.close();
@@ -81,6 +89,7 @@ export function Modal({
       ref={dialog}
       className="modal-dialog"
       data-closing={closing || undefined}
+      data-placement={placement === "side" ? "side" : undefined}
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       onCancel={(event) => {

@@ -2,11 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getTenant } from "@/lib/tenant";
+import { apiFetch } from "@/lib/api";
 
-/** Closes the "website" card on the dashboard for good, for this person. */
+/** Closes the "website" card on the dashboard for good, for this person. The card is per person,
+ * so this is a plain request for the signed-in person: closing a card never redirects anywhere,
+ * and a failure just leaves the card for one more visit. */
 export async function dismissWebsiteOffer(): Promise<void> {
-  const { api } = await getTenant();
-  await api.PUT("/me/tours/{key}", { params: { path: { key: "website_offer" } } });
+  try {
+    await apiFetch("/me/tours/website_offer", { method: "PUT" }, "");
+  } catch {
+    return;
+  }
   revalidatePath("/dashboard");
 }
