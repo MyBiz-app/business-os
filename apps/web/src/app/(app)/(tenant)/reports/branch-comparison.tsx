@@ -1,6 +1,7 @@
 import type { components } from "@business-os/api-client";
 import { getTranslations } from "next-intl/server";
 
+import { Card, CardHeader } from "@/components/ui/card";
 import { branchColor } from "@/lib/calendar";
 import { formatMoney } from "@/lib/money";
 
@@ -19,23 +20,23 @@ export async function BranchComparison({ rows, currency, locale }: { rows: Branc
     value === null ? "-" : unit === "money" ? formatMoney(Math.round(value), currency, locale) : unit === "percent" ? `${number.format(Math.round(value))}%` : number.format(value);
 
   return (
-    <section aria-labelledby="compare-heading" className="card flex flex-col gap-5 p-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h2 id="compare-heading" className="text-lg font-semibold">
-            {t("title")}
-          </h2>
-          <p className="text-sm text-muted">{t("subtitle")}</p>
-        </div>
-        <ul className="flex flex-wrap gap-3 text-xs text-muted">
-          {rows.map((row, i) => (
-            <li key={row.location_id} className="flex items-center gap-1.5">
-              <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: branchColor(i) }} />
-              <span dir="auto">{row.name}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <Card as="section" aria-labelledby="compare-heading" className="flex flex-col gap-5">
+      <CardHeader
+        titleId="compare-heading"
+        title={t("title")}
+        description={t("subtitle")}
+        className="mb-0"
+        actions={
+          <ul className="flex flex-wrap gap-3 text-xs text-muted">
+            {rows.map((row, i) => (
+              <li key={row.location_id} className="flex items-center gap-1.5">
+                <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: branchColor(i) }} />
+                <span dir="auto">{row.name}</span>
+              </li>
+            ))}
+          </ul>
+        }
+      />
       <div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
         {keys.map((key) => {
           const values = rows.map((row) => row.metrics.find((m) => m.key === key)!);
@@ -72,6 +73,6 @@ export async function BranchComparison({ rows, currency, locale }: { rows: Branc
           );
         })}
       </div>
-    </section>
+    </Card>
   );
 }

@@ -12,6 +12,7 @@ import { ColorChoice, DomainChecks, FaceChooser, type Face, RoleChecks, type Rol
 import type { Tone } from "@/lib/agent-templates";
 import { type Branch, ScopePicker } from "./scope-picker";
 import type { Agent } from "./types";
+import { Button } from "@/components/ui/button";
 
 const TIERS = ["fast", "standard", "strong"] as const;
 const TONES: Tone[] = ["friendly", "formal", "short"];
@@ -110,12 +111,12 @@ export function AgentEditor({ agent, branches, roles, onClose, onSaved, onDelete
       onClose={onClose}
       footer={
         <>
-          <button type="button" onClick={onClose} className="btn-secondary px-4 py-2 text-sm">
+          <Button type="button" onClick={onClose}>
             {tEdit("cancel")}
-          </button>
-          <button type="submit" form={formId} disabled={busy} className="btn-primary px-4 py-2 text-sm">
+          </Button>
+          <Button variant="primary" type="submit" form={formId} disabled={busy}>
             {tEdit("save")}
-          </button>
+          </Button>
         </>
       }
     >
@@ -153,18 +154,18 @@ export function AgentEditor({ agent, branches, roles, onClose, onSaved, onDelete
               {confirmDelete ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="flex-1 text-sm">{tEdit("deleteAsk", { name: agent.name })}</p>
-                  <button type="button" onClick={remove} disabled={busy} className="btn-secondary px-3 py-1.5 text-sm text-danger">
+                  <Button type="button" onClick={remove} disabled={busy} className="text-danger">
                     {tEdit("deleteYes")}
-                  </button>
-                  <button type="button" onClick={() => setConfirmDelete(false)} className="btn-ghost px-3 py-1.5 text-sm">
+                  </Button>
+                  <Button variant="quiet" type="button" onClick={() => setConfirmDelete(false)}>
                     {tEdit("cancel")}
-                  </button>
+                  </Button>
                 </div>
               ) : (
-                <button type="button" onClick={() => setConfirmDelete(true)} className="btn-ghost text-sm text-danger">
+                <Button variant="quiet" type="button" onClick={() => setConfirmDelete(true)} className="text-danger">
                   <Trash2 aria-hidden="true" className="size-4" />
                   {tEdit("delete")}
-                </button>
+                </Button>
               )}
             </div>
           )}

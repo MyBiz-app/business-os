@@ -8,48 +8,6 @@
   "src/app/(app)/(tenant)/ai-bubble/ai-bubble.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/ai/agent-dialog.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/agent-editor.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/agent-fields.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/agent-wizard.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/ai-tour.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/chat-panel.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/proactive-settings.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/scope-picker.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/structure-panel.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/tasks-board.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/team-list.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/team-map.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/team-view.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/usage-meter.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/bills/page.tsx": [
     "button"
   ],
@@ -119,9 +77,6 @@
   ],
   "src/app/(app)/(tenant)/receipts/[id]/receipt-body.tsx": [
     "table"
-  ],
-  "src/app/(app)/(tenant)/reports/branch-link.tsx": [
-    "button"
   ],
   "src/app/(app)/(tenant)/reports/busy-hours.tsx": [
     "table"
