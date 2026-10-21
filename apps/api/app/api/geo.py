@@ -6,10 +6,11 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
 
-from app.api.deps import SessionDep, UserDep
+from app.api.deps import AnonymousSessionDep, SessionDep, UserDep
 from app.geo.addresses import search_cities, search_streets
 
 router = APIRouter(prefix="/geo", tags=["geo"])
+public_router = APIRouter(prefix="/public/geo", tags=["geo"])
 
 
 class City(BaseModel):
@@ -43,3 +44,11 @@ def list_streets(
 ) -> list[Street]:
     """Streets of one city whose name (or an alternative spelling) contains the letters."""
     return [Street(**row) for row in search_streets(session, city_code, q, limit)]
+
+
+@public_router.get("/cities")
+def list_cities_public(
+    session: AnonymousSessionDep, q: QueryParam = "", limit: LimitParam = 12
+) -> list[City]:
+    """The same city list for a form anyone can open (a business's inquiry form)."""
+    return [City(**row) for row in search_cities(session, q, limit)]

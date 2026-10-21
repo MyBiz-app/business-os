@@ -7,6 +7,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
 from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.api.common import not_found, set_clause
 from app.api.deps import AnonymousSessionDep, TenantContext, TenantDep, require
@@ -18,6 +19,7 @@ from app.core.legal_readiness import Readiness, evaluate
 from app.core.permissions import Permission
 from app.files import check_space
 from app.files.scan import ensure_clean
+from app.geo.addresses import resolve_address
 
 router = APIRouter(tags=["settings"])
 
@@ -48,6 +50,26 @@ def israeli_number_valid(number: str) -> bool:
     return check_digit_valid(number)
 
 
+def _legal_address(session: Session, changes: dict) -> dict:
+    """The legal address chosen from the official lists (all optional): the structured columns,
+    and the older text columns that documents and the readiness card read kept in step."""
+    current = (
+        session.execute(
+            text(
+                "SELECT city_code, street_code, house_number, address_details, street_unlisted"
+                " FROM app.tenants WHERE id = app.current_tenant_id()"
+            )
+        )
+        .mappings()
+        .one()
+    )
+    resolved = resolve_address(session, {**current, **changes}, required=False)
+    line = " ".join(p for p in (resolved.street, resolved.columns["house_number"]) if p)
+    if line and resolved.columns["address_details"]:
+        line = f"{line} ({resolved.columns['address_details']})"
+    return {**resolved.columns, "address_line": line or None, "address_city": resolved.city}
+
+
 @router.patch("/tenants/current")
 def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
     # An explicit null clears the brand color and the business identifier; other fields
@@ -63,6 +85,11 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
             "business_number",
             "address_line",
             "address_city",
+            "city_code",
+            "street_code",
+            "house_number",
+            "address_details",
+            "street_unlisted",
             "website_url",
             "employer_file_number",
             "business_license_number",
@@ -72,6 +99,8 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
             "weekly_release_time",
         )
     }
+    if body.address_given():
+        changes |= _legal_address(context.session, changes)
     if changes.get("business_number"):
         currency = (
             changes.get("currency")

@@ -19072,6 +19072,69 @@
         }
       }
     },
+    "/public/geo/cities": {
+      "get": {
+        "tags": [
+          "geo"
+        ],
+        "summary": "List Cities Public",
+        "description": "The same city list for a form anyone can open (a business's inquiry form).",
+        "operationId": "list_cities_public",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 60,
+              "description": "Letters from the name; empty: all",
+              "default": "",
+              "title": "Q"
+            },
+            "description": "Letters from the name; empty: all"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 12,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/City"
+                  },
+                  "title": "Response List Cities Public"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/staff": {
       "get": {
         "tags": [
@@ -53993,6 +54056,28 @@
             ],
             "title": "Home Location Id"
           },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code"
+          },
+          "city_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Name"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -54095,6 +54180,8 @@
           "source",
           "custom_fields",
           "home_location_id",
+          "city_code",
+          "city_name",
           "created_at",
           "updated_at",
           "erased_at"
@@ -54642,6 +54729,18 @@
             "title": "Home Location Id",
             "description": "The client's home branch; new clients default to the current branch"
           },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "The city the client comes from, from the official list"
+          },
           "first_name": {
             "type": "string",
             "maxLength": 100,
@@ -54953,6 +55052,28 @@
             ],
             "title": "Home Location Id"
           },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code"
+          },
+          "city_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Name"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -55092,6 +55213,8 @@
           "source",
           "custom_fields",
           "home_location_id",
+          "city_code",
+          "city_name",
           "created_at",
           "updated_at",
           "erased_at",
@@ -55802,6 +55925,18 @@
             ],
             "title": "Home Location Id",
             "description": "The client's home branch; new clients default to the current branch"
+          },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "The city the client comes from, from the official list"
           },
           "first_name": {
             "anyOf": [
@@ -61992,7 +62127,8 @@
               "invalid_email",
               "invalid_date",
               "invalid_status",
-              "duplicate"
+              "duplicate",
+              "unknown_city"
             ],
             "title": "Code"
           }
@@ -62028,7 +62164,8 @@
                     "phone",
                     "date_of_birth",
                     "notes",
-                    "status"
+                    "status",
+                    "city"
                   ]
                 },
                 {
@@ -62065,6 +62202,16 @@
             "type": "integer",
             "title": "Invalid"
           },
+          "cities_matched": {
+            "type": "integer",
+            "title": "Cities Matched",
+            "description": "New clients whose city was found in the official list"
+          },
+          "cities_unmatched": {
+            "type": "integer",
+            "title": "Cities Unmatched",
+            "description": "New clients whose city was not recognized; they are imported without a city"
+          },
           "imported": {
             "type": "boolean",
             "title": "Imported"
@@ -62095,6 +62242,8 @@
           "ready",
           "duplicates",
           "invalid",
+          "cities_matched",
+          "cities_unmatched",
           "imported",
           "issues",
           "sample"
@@ -62139,6 +62288,18 @@
               }
             ],
             "title": "Phone"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City",
+            "description": "The official city it was matched to"
           }
         },
         "type": "object",
@@ -62422,6 +62583,18 @@
               }
             ],
             "title": "Interest"
+          },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "Where they are from (optional)"
           },
           "website": {
             "anyOf": [
@@ -64089,6 +64262,96 @@
             "type": "string",
             "format": "date-time",
             "title": "Stage Changed At"
+          },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "Where the lead is from, from the official list"
+          },
+          "city_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Name"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code"
+          },
+          "street_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Name"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address",
+            "description": "The address as one line of text"
           }
         },
         "type": "object",
@@ -64109,7 +64372,15 @@
           "client_id",
           "created_at",
           "updated_at",
-          "stage_changed_at"
+          "stage_changed_at",
+          "city_code",
+          "city_name",
+          "street_code",
+          "street_name",
+          "house_number",
+          "address_details",
+          "street_unlisted",
+          "address"
         ],
         "title": "Lead"
       },
@@ -64174,6 +64445,68 @@
       },
       "LeadCreate": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "last_name": {
             "anyOf": [
               {
@@ -64453,6 +64786,96 @@
             "format": "date-time",
             "title": "Stage Changed At"
           },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "Where the lead is from, from the official list"
+          },
+          "city_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Name"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code"
+          },
+          "street_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Name"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address",
+            "description": "The address as one line of text"
+          },
           "activities": {
             "items": {
               "$ref": "#/components/schemas/Activity"
@@ -64480,6 +64903,14 @@
           "created_at",
           "updated_at",
           "stage_changed_at",
+          "city_code",
+          "city_name",
+          "street_code",
+          "street_name",
+          "house_number",
+          "address_details",
+          "street_unlisted",
+          "address",
           "activities"
         ],
         "title": "LeadDetail"
@@ -64505,6 +64936,68 @@
       },
       "LeadUpdate": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "last_name": {
             "anyOf": [
               {
@@ -79831,6 +80324,78 @@
             "title": "Address City",
             "description": "Settings managers only"
           },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "Settings managers only: the legal address's city (official list)"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "Settings managers only"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number",
+            "description": "Settings managers only"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Settings managers only"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "Settings managers only"
+          },
+          "street_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Name",
+            "description": "Settings managers only"
+          },
           "employer_file_number": {
             "anyOf": [
               {
@@ -80338,6 +80903,68 @@
       },
       "TenantUpdate": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "name": {
             "anyOf": [
               {
@@ -83263,6 +83890,18 @@
               }
             ],
             "title": "Phone"
+          },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "Where the client is from (official list); left out: unchanged"
           }
         },
         "type": "object",

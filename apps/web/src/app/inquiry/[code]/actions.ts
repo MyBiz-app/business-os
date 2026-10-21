@@ -1,5 +1,6 @@
 "use server";
 
+import { cityFromForm } from "@/lib/address";
 import { API_URL } from "@/lib/api";
 
 export type InquiryState = { sent?: boolean; error?: "invalid" | "contact" | "too_many_requests" | "generic" };
@@ -18,6 +19,7 @@ export async function sendInquiry(code: string, _state: InquiryState, formData: 
       email: text(formData, "email"),
       phone: text(formData, "phone"),
       interest: text(formData, "interest"),
+      city_code: cityFromForm(formData).city_code ?? null,
       website: text(formData, "website"),
     }),
   }).catch(() => null);

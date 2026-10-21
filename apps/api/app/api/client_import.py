@@ -25,6 +25,7 @@ from app.catalog.importing import (
 )
 from app.core.permissions import Permission
 from app.files.scan import ensure_clean
+from app.geo.addresses import CityMatcher
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -37,7 +38,14 @@ MAPPING = TypeAdapter(list[ImportField | None])
 class ImportIssue(BaseModel):
     line: int = Field(description="Row number in the file (the header is row 1)")
     field: str | None
-    code: Literal["missing_name", "invalid_email", "invalid_date", "invalid_status", "duplicate"]
+    code: Literal[
+        "missing_name",
+        "invalid_email",
+        "invalid_date",
+        "invalid_status",
+        "duplicate",
+        "unknown_city",
+    ]
 
 
 class ImportedClient(BaseModel):
@@ -45,6 +53,7 @@ class ImportedClient(BaseModel):
     last_name: str | None
     email: str | None
     phone: str | None
+    city: str | None = Field(default=None, description="The official city it was matched to")
 
 
 class ImportResult(BaseModel):
@@ -55,6 +64,10 @@ class ImportResult(BaseModel):
     ready: int = Field(description="New clients the import adds (or added)")
     duplicates: int
     invalid: int
+    cities_matched: int = Field(description="New clients whose city was found in the official list")
+    cities_unmatched: int = Field(
+        description="New clients whose city was not recognized; they are imported without a city"
+    )
     imported: bool
     issues: list[ImportIssue] = Field(description=f"The first {MAX_ISSUES} problems")
     sample: list[ImportedClient] = Field(description="The first new clients")
@@ -104,9 +117,13 @@ def import_clients(
     phones = {phone_key(row[1]) for row in existing if row[1] and phone_key(row[1])}
     names = {_name_key(row[2], row[3]) for row in existing}
 
+    cities = CityMatcher(db)
+    city_names = {
+        code: name for code, name in db.execute(text("SELECT code, name_he FROM app.geo_cities"))
+    }
     issues: list[ImportIssue] = []
     ready: list[dict] = []
-    duplicates = invalid = 0
+    duplicates = invalid = matched = unmatched = 0
     for row in parse_rows(table, columns):
         if row.errors:
             invalid += 1
@@ -129,7 +146,14 @@ def import_clients(
         if phone:
             phones.add(phone)
         names.add(name)
-        ready.append(row.values)
+        city_code = cities.find(row.values["city"])
+        if row.values["city"] and city_code is None:
+            unmatched += 1
+            # Not a reason to leave the client out: they come in without a city.
+            issues.append(ImportIssue(line=row.line, field="city", code="unknown_city"))
+        elif city_code is not None:
+            matched += 1
+        ready.append({**row.values, "city_code": city_code})
 
     if commit and ready:
         try:
@@ -137,11 +161,18 @@ def import_clients(
                 text("""
                     INSERT INTO app.clients
                         (tenant_id, first_name, last_name, email, phone, date_of_birth, notes,
-                         status, source)
+                         status, source, city_code)
                     VALUES (:tenant_id, :first_name, :last_name, :email, :phone, :date_of_birth,
-                            :notes, :status, :source)
+                            :notes, :status, :source, :city_code)
                 """),
-                [{**values, "tenant_id": context.tenant_id, "source": source} for values in ready],
+                [
+                    {
+                        **{k: v for k, v in values.items() if k != "city"},
+                        "tenant_id": context.tenant_id,
+                        "source": source,
+                    }
+                    for values in ready
+                ],
             )
         except IntegrityError as error:  # another import added the same email meanwhile
             raise HTTPException(
@@ -174,7 +205,12 @@ def import_clients(
         ready=len(ready),
         duplicates=duplicates,
         invalid=invalid,
+        cities_matched=matched,
+        cities_unmatched=unmatched,
         imported=commit and bool(ready),
         issues=issues[:MAX_ISSUES],
-        sample=[ImportedClient.model_validate(values) for values in ready[:5]],
+        sample=[
+            ImportedClient.model_validate({**v, "city": city_names.get(v["city_code"])})
+            for v in ready[:5]
+        ],
     )

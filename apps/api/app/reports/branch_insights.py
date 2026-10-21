@@ -5,12 +5,9 @@ payroll run split by where each person clocked in."""
 
 import datetime as dt
 from dataclasses import dataclass
-from functools import lru_cache
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
-from app.geo.geocoder import get_geocoder
 
 TOP_CITIES = 6
 # A city is shown only when at least this many clients come from it, so no single client can be
@@ -27,17 +24,11 @@ class Origin:
     longitude: float | None
 
 
-@lru_cache(maxsize=2048)
-def _city_point(city_name: str) -> tuple[float, float] | None:
-    """A city's centre, looked up once per process (the free geocoder asks for light use)."""
-    point = get_geocoder().find(street=None, house_number=None, city=city_name)
-    return (point.latitude, point.longitude) if point else None
-
-
 def client_origins(db: Session, location_id: str, start: dt.date, end: dt.date) -> list[Origin]:
     """The cities of the clients who booked a session at the branch in [start, end], most first.
-    A client counts once, in the city of their latest saved address. Cities with fewer than
-    MIN_CLIENTS_PER_CITY clients are left out."""
+    A client counts once, in the city on their record, else the city of their latest saved
+    address. City centers come from the city list. Cities with fewer than MIN_CLIENTS_PER_CITY
+    clients are left out."""
     rows = db.execute(
         text("""
             WITH tz AS (SELECT coalesce(t.time_zone, 'UTC') AS time_zone FROM app.tenants t
@@ -51,15 +42,19 @@ def client_origins(db: Session, location_id: str, start: dt.date, end: dt.date) 
                   AND s.starts_at >= (CAST(:start AS date)::timestamp AT TIME ZONE tz.time_zone)
                   AND s.starts_at < ((CAST(:end AS date) + 1)::timestamp AT TIME ZONE tz.time_zone)
             )
-            SELECT c.code AS city_code, c.name_he AS city_name, count(*) AS clients
+            SELECT c.code AS city_code, c.name_he AS city_name, c.latitude, c.longitude,
+                   count(*) AS clients
             FROM visitors v
+            JOIN app.clients cl ON cl.id = v.client_id
             CROSS JOIN LATERAL (
-                SELECT a.city_code FROM app.client_addresses a
-                WHERE a.client_id = v.client_id AND a.active AND a.city_code IS NOT NULL
-                ORDER BY a.updated_at DESC LIMIT 1
+                SELECT coalesce(cl.city_code, (
+                    SELECT a.city_code FROM app.client_addresses a
+                    WHERE a.client_id = v.client_id AND a.active AND a.city_code IS NOT NULL
+                    ORDER BY a.updated_at DESC LIMIT 1
+                )) AS city_code
             ) addr
             JOIN app.geo_cities c ON c.code = addr.city_code
-            GROUP BY c.code, c.name_he
+            GROUP BY c.code, c.name_he, c.latitude, c.longitude
             HAVING count(*) >= :min_clients
             ORDER BY count(*) DESC, c.name_he
             LIMIT :limit
@@ -72,11 +67,10 @@ def client_origins(db: Session, location_id: str, start: dt.date, end: dt.date) 
             "min_clients": MIN_CLIENTS_PER_CITY,
         },
     ).all()
-    result = []
-    for row in rows:
-        point = _city_point(row.city_name)
-        result.append(Origin(row.city_code, row.city_name, row.clients, *(point or (None, None))))
-    return result
+    return [
+        Origin(row.city_code, row.city_name, row.clients, row.latitude, row.longitude)
+        for row in rows
+    ]
 
 
 def staff_cost_by_branch(db: Session) -> tuple[dt.date | None, dict[str, int]]:

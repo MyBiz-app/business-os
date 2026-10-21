@@ -158,6 +158,7 @@ ROUTERS: list[APIRouter] = [
     data_export.public_router,
     locations.router,
     geo.router,
+    geo.public_router,
     staff.router,
     people.router,
     devices.router,

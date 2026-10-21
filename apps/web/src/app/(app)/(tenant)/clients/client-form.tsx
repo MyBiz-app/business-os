@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { AddressPicker } from "@/components/address-picker";
 import { Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -104,6 +105,15 @@ function ClientFields({ client, readOnly, branches, homeBranch }: FieldsProps) {
             ...SOURCES.map((value) => ({ value, label: t(`sources.${value}`) })),
           ]}
         />
+        <div className="sm:col-span-2">
+          <AddressPicker
+            mode="city"
+            cityLabel={t("city")}
+            cityHint={t("cityHint")}
+            defaults={{ city_code: client?.city_code, city_name: client?.city_name }}
+            disabled={readOnly}
+          />
+        </div>
         <div className="sm:col-span-2">
           <TextAreaField label={t("notes")} name="notes" maxLength={5000} defaultValue={client?.notes ?? ""} />
         </div>

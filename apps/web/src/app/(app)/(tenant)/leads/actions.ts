@@ -4,6 +4,7 @@ import type { components } from "@business-os/api-client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { addressFromForm } from "@/lib/address";
 import { unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
 import { getTenant } from "@/lib/tenant";
@@ -24,6 +25,7 @@ function readForm(formData: FormData) {
     follow_up_on: value("follow_up_on") || null,
     owner_user_id: value("owner_user_id") || null,
     source: (value("source") || "manual") as LeadSource,
+    ...addressFromForm(formData),
   };
 }
 

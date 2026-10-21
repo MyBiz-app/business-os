@@ -732,6 +732,7 @@ def test_branches_without_a_point_get_their_city_street_and_point(engine: Engine
             {"t": tenant_id},
         ).all()
     assert first["located"] >= 1 and first["city_only"] == 1 and first["unplaced"] == 1
+    assert all(asked["street"] for asked in fake.asked)  # a city's centre is stored, not asked
     assert again == {"located": 0, "city_only": 0, "unplaced": 1}  # only the unplaced one is tried
     by_name = {name: (has_city, has_point) for name, has_city, has_point in rows}
     assert by_name["No street match"] == (True, True)  # fell back to the city's centre

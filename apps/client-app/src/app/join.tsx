@@ -6,7 +6,9 @@ import { Image, Linking, Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
+import { AddressPicker } from "@business-os/app-kit/components/address-picker";
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { EMPTY_ADDRESS } from "@business-os/app-kit/lib/address";
 import { ApiError, apiClient, assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { brandPalette } from "@business-os/app-kit/lib/brand";
 import { CancellationPolicyCard } from "@/components/cancellation-policy-card";
@@ -33,6 +35,9 @@ export default function Join() {
   const known = businesses?.[0];
   const [firstName, setFirstName] = useState(known?.first_name ?? "");
   const [lastName, setLastName] = useState(known?.last_name ?? "");
+  // Optional: "which city are you from?" helps the business see where its community lives.
+  const [city, setCity] = useState(EMPTY_ADDRESS);
+  const tAddress = useTranslations("address");
   // Marketing messages are opt-in: off until the person ticks it.
   const [marketing, setMarketing] = useState(false);
   // Set once joined: the next step shows the business's cancellation rules before the home screen.
@@ -68,7 +73,7 @@ export default function Join() {
       const joined = await join(code);
       await apiClient().PATCH("/client/profile", {
         params: { header: { "X-Tenant-Id": joined.id } },
-        body: { first_name: firstName.trim(), last_name: lastName.trim() || joined.last_name || null, phone: joined.phone ?? known?.phone ?? null },
+        body: { first_name: firstName.trim(), last_name: lastName.trim() || joined.last_name || null, phone: joined.phone ?? known?.phone ?? null, ...(city.cityCode !== null ? { city_code: city.cityCode } : {}) },
       }).then(unwrap);
       // A failure here must not undo the join; the person can still choose on their profile.
       if (marketing) await apiClient().PUT("/me/marketing-consent", { body: { consent: true, source: "app_join" } }).catch(() => undefined);
@@ -118,6 +123,7 @@ export default function Join() {
             <>
               <Field label={t("firstName")} palette={palette} value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" />
               <Field label={t("lastName")} palette={palette} value={lastName} onChangeText={setLastName} autoComplete="family-name" textContentType="familyName" />
+              <AddressPicker palette={palette} value={city} onChange={setCity} cityOnly cityLabel={tAddress("fromCity")} cityHint={tAddress("fromCityHint")} />
               <Pressable
                 role="checkbox"
                 aria-checked={marketing}

@@ -118,6 +118,15 @@ tables `geo_cities` and `geo_streets` by migration 0129. Refresh once a year:
 counts, commit the file, then `uv run python -m app.geo.loader` against each database (rows are
 inserted or updated, never deleted: saved addresses point at them).
 
+City centers (the point of each city on the map) are stored in `geo_cities.latitude/longitude`,
+loaded from `apps/api/app/geo/data/il_city_centers.json` by migration 0153 and by
+`python -m app.geo.loader`. The file is built by `PYTHONPATH=. uv run python
+scripts/build_geo_centers.py` from the GeoNames Israel dump (free, CC BY 4.0, credit
+"GeoNames, geonames.org"): cities are matched by name, and a city GeoNames does not know gets the
+middle of its region, marked `center_source = 'region'`. Rerun it after refreshing the city snapshot.
+No request leaves the system when a city center is needed, and a client's address is never sent to
+an outside service.
+
 A branch's point on the map comes from OpenStreetMap's free Nominatim service
 (`app/geo/geocoder.py`): one request when a branch address is saved, never per page view, with
 an identifying `User-Agent` (`API_GEOCODER_USER_AGENT`). `API_GEOCODER=none` turns it off (tests

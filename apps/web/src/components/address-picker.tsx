@@ -50,12 +50,14 @@ type ComboboxProps = {
   required?: boolean;
   invalidMessage: string;
   disabledHint?: string;
+  /** A short line under the box, e.g. why the city is worth giving. */
+  hint?: string;
   onText: (text: string) => void;
   onPick: (option: Option) => void;
 };
 
 /** A text box that suggests official names; only a name picked from the list counts. */
-function Combobox({ label, placeholder, text, chosen, url, disabled, required, invalidMessage, disabledHint, onText, onPick }: ComboboxProps) {
+function Combobox({ label, placeholder, text, chosen, url, disabled, required, invalidMessage, disabledHint, hint, onText, onPick }: ComboboxProps) {
   const t = useTranslations("address");
   const id = useId();
   const [open, setOpen] = useState(false);
@@ -115,6 +117,7 @@ function Combobox({ label, placeholder, text, chosen, url, disabled, required, i
           }
         }}
       />
+      {hint && <p className="text-xs text-muted">{hint}</p>}
       {showList && (
         <ul id={`${id}-list`} role="listbox" aria-label={label} className="popover absolute inset-x-0 top-full z-40 mt-1 max-h-60 overflow-auto p-1">
           {options.length === 0 && <li className="px-3 py-2 text-sm text-muted">{t("noResults")}</li>}
@@ -154,6 +157,14 @@ type Props = {
   disabled?: boolean;
   /** The older free-text address of something saved before the lists existed. */
   legacyText?: string | null;
+  /** "city": only the city (where a person or lead is from); the street parts are left out. */
+  mode?: "full" | "city";
+  /** Where the city suggestions come from; a form anyone can open uses the public list. */
+  citiesUrl?: string;
+  /** Replaces the label of the city box ("Which city are you from?"). */
+  cityLabel?: string;
+  /** A line under the city box: a soft request for it, not a requirement. */
+  cityHint?: string;
 };
 
 /**
@@ -162,7 +173,7 @@ type Props = {
  * ("my street is not listed"); it is flagged for review. Sends city_code, street_code,
  * street_unlisted, house_number and address_details with the form (see lib/address.ts).
  */
-export function AddressPicker({ defaults = {}, required = false, prefix = "", disabled = false, legacyText = null }: Props) {
+export function AddressPicker({ defaults = {}, required = false, prefix = "", disabled = false, legacyText = null, mode = "full", citiesUrl = "/geo/cities", cityLabel, cityHint }: Props) {
   const t = useTranslations("address");
   const [city, setCity] = useState({ code: defaults.city_code ?? null, text: defaults.city_name ?? "" });
   const [street, setStreet] = useState({ code: defaults.street_code ?? null, text: defaults.street_name ?? "" });
@@ -178,11 +189,12 @@ export function AddressPicker({ defaults = {}, required = false, prefix = "", di
         </p>
       )}
       <Combobox
-        label={t("city")}
+        label={cityLabel ?? t("city")}
         placeholder={t("cityPlaceholder")}
+        hint={cityHint}
         text={city.text}
         chosen={city.code !== null}
-        url="/geo/cities"
+        url={citiesUrl}
         disabled={disabled}
         required={required}
         invalidMessage={t("chooseCity")}
@@ -195,7 +207,7 @@ export function AddressPicker({ defaults = {}, required = false, prefix = "", di
           setStreet({ code: null, text: "" });
         }}
       />
-      {unlisted ? (
+      {mode === "full" && (unlisted ? (
         <div className="flex flex-col gap-1.5">
           <label htmlFor={`${name("street_unlisted")}-input`} className="text-sm font-medium">
             {t("unlistedStreet")}
@@ -236,7 +248,9 @@ export function AddressPicker({ defaults = {}, required = false, prefix = "", di
             </button>
           )}
         </div>
-      )}
+      ))}
+      {mode === "full" && (
+        <>
       <div className="flex flex-col gap-1.5">
         <label htmlFor={`${name("house_number")}-input`} className="text-sm font-medium">
           {t("houseNumber")}
@@ -268,10 +282,16 @@ export function AddressPicker({ defaults = {}, required = false, prefix = "", di
           autoComplete="off"
         />
       </div>
+        </>
+      )}
       {defaults.city_code && city.code === null && <input type="hidden" name={name("address_clear")} value="1" />}
       <input type="hidden" name={name("city_code")} value={city.code ?? ""} disabled={disabled} />
-      <input type="hidden" name={name("street_code")} value={unlisted ? "" : (street.code ?? "")} disabled={disabled} />
-      <input type="hidden" name={name("street_unlisted")} value={unlisted ? unlistedText : ""} disabled={disabled} />
+      {mode === "full" && (
+        <>
+          <input type="hidden" name={name("street_code")} value={unlisted ? "" : (street.code ?? "")} disabled={disabled} />
+          <input type="hidden" name={name("street_unlisted")} value={unlisted ? unlistedText : ""} disabled={disabled} />
+        </>
+      )}
     </div>
   );
 }

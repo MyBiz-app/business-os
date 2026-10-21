@@ -17,6 +17,7 @@ const FIELDS: ImportField[] = [
   "date_of_birth",
   "notes",
   "status",
+  "city",
 ];
 const SOURCES = ["walk_in", "referral", "instagram", "facebook", "google", "website", "app", "other"] as const;
 const CONTROL =
@@ -156,6 +157,12 @@ export function ImportForm() {
               <li className="font-semibold">{t("ready", { count: result.ready })}</li>
               <li>{t("duplicates", { count: result.duplicates })}</li>
               <li>{t("invalid", { count: result.invalid })}</li>
+              {result.cities_matched + result.cities_unmatched > 0 && (
+                <>
+                  <li>{t("citiesMatched", { count: result.cities_matched })}</li>
+                  <li>{t("citiesUnmatched", { count: result.cities_unmatched })}</li>
+                </>
+              )}
             </ul>
             {result.sample.length > 0 && (
               <div className="flex flex-col gap-1">
@@ -164,8 +171,8 @@ export function ImportForm() {
                   {result.sample.map((client, i) => (
                     <li key={i}>
                       {[client.first_name, client.last_name].filter(Boolean).join(" ")}
-                      {(client.phone || client.email) && (
-                        <span className="text-muted"> · {[client.phone, client.email].filter(Boolean).join(" · ")}</span>
+                      {(client.phone || client.email || client.city) && (
+                        <span className="text-muted"> · {[client.phone, client.email, client.city].filter(Boolean).join(" · ")}</span>
                       )}
                     </li>
                   ))}
