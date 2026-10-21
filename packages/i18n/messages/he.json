@@ -1940,6 +1940,14 @@
       }
     },
     "homeCards": {
+      "nearMe": "הסניף הקרוב אליי",
+      "nearMeDenied": "המיקום כבוי לאפליקציה, ולכן אי אפשר למצוא את הסניף הקרוב.",
+      "nearMeUnavailable": "לא הצלחנו לאתר אותך כרגע.",
+      "nearestAway": "הקרוב ביותר, במרחק {distance}",
+      "away": "במרחק {distance}",
+      "meters": "{value} מ׳",
+      "kilometers": "{value} ק״מ",
+      "mapLabel": "מפת הסניפים",
       "nothingBooked": "עדיין לא נקבע כלום.",
       "bookNow": "להזמין עכשיו",
       "navigate": "ניווט",

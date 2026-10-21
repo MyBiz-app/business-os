@@ -1940,6 +1940,14 @@
       }
     },
     "homeCards": {
+      "nearMe": "Branch near me",
+      "nearMeDenied": "Location is off for this app, so we can't find the nearest branch.",
+      "nearMeUnavailable": "Couldn't find where you are right now.",
+      "nearestAway": "Nearest, {distance} away",
+      "away": "{distance} away",
+      "meters": "{value} m",
+      "kilometers": "{value} km",
+      "mapLabel": "Map of the branches",
       "nothingBooked": "Nothing booked yet.",
       "bookNow": "Book now",
       "navigate": "Navigate",
