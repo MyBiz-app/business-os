@@ -2270,6 +2270,7 @@
     "view": "View",
     "views": {
       "map": "Map",
+      "structure": "Structure",
       "list": "List"
     },
     "meter": {

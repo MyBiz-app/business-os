@@ -4,7 +4,7 @@ import { Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState, useSyncExternalStore } from "react";
 
-import { CHIEF, connect, connectable, disconnect, isCustom, setTeam, teamFrame, treeLayout, type Draft } from "@/lib/ai-structure";
+import { CHIEF, connect, connectable, disconnect, setTeam, teamFrame, treeLayout, type Draft } from "@/lib/ai-structure";
 
 import { AgentAvatar } from "./agent-avatar";
 import type { Agent } from "./types";
@@ -25,12 +25,14 @@ function useReducedMotion(): boolean {
 type Spot = { x: number; y: number };
 
 /** The chief in the middle, the other built-in agents on a ring around, custom agents on an outer ring. Percent of the stage. */
-export function layout(agents: Agent[], wide: boolean): Map<string, Spot> {
+export function layout(agents: Agent[], wide: boolean, teamOf: Draft["teamOf"] = {}): Map<string, Spot> {
   const spots = new Map<string, Spot>();
   const chief = agents.find((a) => a.key === "chief");
   const others = agents.filter((a) => a !== chief);
-  const inner = others.filter((a) => a.builtin);
-  const outer = others.filter((a) => !a.builtin);
+  // Members of one team sit side by side on the ring, so the team's halo is one unbroken arc.
+  const byTeam = (a: Agent, b: Agent) => (teamOf[a.key] ?? "￿").localeCompare(teamOf[b.key] ?? "￿");
+  const inner = others.filter((a) => a.builtin).sort(byTeam);
+  const outer = others.filter((a) => !a.builtin).sort(byTeam);
   // A wide stage stretches the rings sideways so the nodes keep an even distance on screen.
   const stretch = wide ? 0.85 : 1.3;
   const ring = (list: Agent[], radius: number, start: number) =>
@@ -58,19 +60,22 @@ type MapProps = {
   /** Structure editing: lines are dragged between agents, agents moved, lines clicked away. */
   editing?: boolean;
   onDraft?: (draft: Draft) => void;
+  /** "ring": the chief in the middle, teams as soft halos. "tree": the org chart, top to bottom. Editing always uses the tree. */
+  shape?: "ring" | "tree";
 };
 
-export function TeamMap({ agents, selected, compact, onPick, draft, editing = false, onDraft }: MapProps) {
+export function TeamMap({ agents, selected, compact, onPick, draft, editing = false, onDraft, shape = "ring" }: MapProps) {
   const t = useTranslations("aiTeam");
   const reduced = useReducedMotion();
   const stage = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
-  const tree = editing || isCustom(draft);
-  const spots = tree ? treeLayout(agents, draft.parents, draft.pos) : layout(agents, !compact);
+  const tree = editing || shape === "tree";
+  const spots = tree ? treeLayout(agents, draft.parents, draft.pos) : layout(agents, !compact, draft.teamOf);
   const spotOf = (key: string) => spots.get(key) ?? { x: 50, y: 50 };
-  const parentOf = (agent: Agent) => (tree ? (draft.parents[agent.key] ?? CHIEF) : CHIEF);
+  const parentOf = (agent: Agent) => draft.parents[agent.key] ?? CHIEF;
+  const members = (teamId: string) => agents.filter((a) => draft.teamOf[a.key] === teamId).map((a) => spotOf(a.key));
   const frames = draft.teams
-    .map((team) => ({ team, frame: teamFrame(agents.filter((a) => draft.teamOf[a.key] === team.id).map((a) => spotOf(a.key))) }))
+    .map((team) => ({ team, frame: teamFrame(members(team.id)) }))
     .filter((f) => f.frame !== null);
 
   function percent(event: React.PointerEvent): { x: number; y: number } {
@@ -132,19 +137,27 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
       onPointerCancel={() => setDrag(null)}
       className={`ai-stage relative w-full overflow-hidden rounded-3xl border border-border bg-surface transition-[aspect-ratio] duration-700 ${compact ? "aspect-[3/4]" : "aspect-[16/10] min-h-[30rem]"}`}
     >
-      {frames.map(({ team, frame }) => (
-        <div
-          key={team.id}
-          aria-hidden="true"
-          className="pointer-events-none absolute rounded-3xl border-2 border-dashed"
-          style={{ left: `${frame!.x}%`, top: `${frame!.y}%`, width: `${frame!.w}%`, height: `${frame!.h}%`, borderColor: `${team.color}99`, backgroundColor: `${team.color}12` }}
-        >
-          <span className="absolute -top-3 start-4 rounded-full px-2 text-xs font-semibold" style={{ backgroundColor: team.color, color: "#fff" }} dir="auto">
-            {team.name}
-          </span>
-        </div>
-      ))}
+      {tree &&
+        frames.map(({ team, frame }) => (
+          <div
+            key={team.id}
+            aria-hidden="true"
+            className="pointer-events-none absolute rounded-3xl border-2 border-dashed"
+            style={{ left: `${frame!.x}%`, top: `${frame!.y}%`, width: `${frame!.w}%`, height: `${frame!.h}%`, borderColor: `${team.color}99`, backgroundColor: `${team.color}12` }}
+          >
+            <span className="absolute -top-3 start-4 rounded-full px-2 text-xs font-semibold" style={{ backgroundColor: team.color, color: "#fff" }} dir="auto">
+              {team.name}
+            </span>
+          </div>
+        ))}
       <svg aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none" className={`pointer-events-none absolute inset-0 size-full transition-opacity ${compact ? "opacity-0 duration-150" : "opacity-100 delay-500 duration-500"}`}>
+        {!tree &&
+          draft.teams.map((team) => {
+            const spotsOf = members(team.id);
+            if (!spotsOf.length) return null;
+            const path = spotsOf.map((p, i) => `${i ? "L" : "M"}${p.x},${p.y}`).join(" ") + (spotsOf.length === 1 ? ` L${spotsOf[0]!.x + 0.01},${spotsOf[0]!.y}` : "");
+            return <path key={team.id} d={path} fill="none" stroke={team.color} strokeOpacity={0.16} strokeWidth="96" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" style={{ filter: "blur(10px)" }} />;
+          })}
         {agents.map((agent) => {
           const spot = spots.get(agent.key);
           const from = spotOf(parentOf(agent));
@@ -178,6 +191,26 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
         })}
         {(drag?.mode === "link" || drag?.mode === "adopt") && <line x1={spotOf(drag.key).x} y1={spotOf(drag.key).y} x2={drag.x} y2={drag.y} stroke="currentColor" strokeWidth="2" strokeDasharray="4 3" vectorEffect="non-scaling-stroke" className="text-primary-ink" />}
       </svg>
+
+      {!tree &&
+        draft.teams.map((team) => {
+          const spotsOf = members(team.id);
+          if (!spotsOf.length) return null;
+          const mid = spotsOf[Math.floor(spotsOf.length / 2)]!;
+          // The label sits on the outer side of the arc, away from the chief.
+          const away = { x: mid.x - 50, y: mid.y - 50 };
+          const norm = Math.hypot(away.x, away.y) || 1;
+          return (
+            <span
+              key={team.id}
+              className="pointer-events-none absolute z-0 -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-0.5 text-xs font-semibold"
+              style={{ left: `${mid.x + (away.x / norm) * 11}%`, top: `${mid.y + (away.y / norm) * 17}%`, color: team.color, backgroundColor: `${team.color}1f` }}
+              dir="auto"
+            >
+              {team.name}
+            </span>
+          );
+        })}
 
       {agents.map((agent, index) => {
         const base = spots.get(agent.key);
