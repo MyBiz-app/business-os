@@ -7,7 +7,9 @@ import { useActionState, useRef, useState } from "react";
 import { type AddressDefaults, AddressPicker } from "@/components/address-picker";
 import { Avatar } from "@/components/avatar";
 import { ImageCropDialog } from "@/components/image-crop-dialog";
-import { CheckboxField, Field } from "@/components/form/field";
+import { Field } from "@/components/form/field";
+import { InputRow, SettingsRows, SwitchRow } from "@/components/form/rows";
+import { SaveBar } from "@/components/form/save-bar";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -32,14 +34,12 @@ export function ProfileForm({ name, email, phone, birthDate, addressLine, city, 
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t("account.name")} hint={t("account.nameHint")} name="full_name" defaultValue={name ?? ""} maxLength={120} autoComplete="name" dir="auto" />
-        <Field label={t("account.phone")} hint={t("account.phoneHint")} name="phone" type="tel" defaultValue={phone ?? ""} maxLength={30} autoComplete="tel" dir="ltr" pattern="[0-9+()\- ]*" />
-      </div>
-      <Field label={t("account.email")} hint={t("account.emailHint")} value={email} readOnly dir="ltr" />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t("account.birthDate")} hint={t("account.birthDateHint")} name="birth_date" type="date" defaultValue={birthDate ?? ""} max={new Date().toISOString().slice(0, 10)} autoComplete="bday" dir="ltr" />
-      </div>
+      <SettingsRows>
+        <InputRow label={t("account.name")} hint={t("account.nameHint")} name="full_name" defaultValue={name ?? ""} maxLength={120} autoComplete="name" dir="auto" />
+        <InputRow label={t("account.phone")} hint={t("account.phoneHint")} name="phone" type="tel" defaultValue={phone ?? ""} maxLength={30} autoComplete="tel" dir="ltr" pattern="[0-9+()\- ]*" />
+        <InputRow label={t("account.email")} hint={t("account.emailHint")} value={email} readOnly dir="ltr" />
+        <InputRow label={t("account.birthDate")} hint={t("account.birthDateHint")} name="birth_date" type="date" defaultValue={birthDate ?? ""} max={new Date().toISOString().slice(0, 10)} autoComplete="bday" dir="ltr" />
+      </SettingsRows>
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-1 text-sm font-medium">{t("account.addressTitle")}</legend>
         <p className="-mt-2 text-xs text-muted">{t("account.addressHint")}</p>
@@ -48,9 +48,7 @@ export function ProfileForm({ name, email, phone, birthDate, addressLine, city, 
           <Field label={t("account.postalCode")} name="postal_code" defaultValue={postalCode ?? ""} maxLength={20} autoComplete="postal-code" dir="ltr" />
         </div>
       </fieldset>
-      <div>
-        <SubmitButton>{t("common.save")}</SubmitButton>
-      </div>
+      <SaveBar />
     </form>
   );
 }
@@ -62,13 +60,10 @@ export function NotificationsForm({ emailRoster }: { emailRoster: boolean }) {
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <div className="flex flex-col gap-1">
-        <CheckboxField label={t("account.rosterEmails")} name="email_roster" defaultChecked={emailRoster} />
-        <p className="text-xs text-muted">{t("account.rosterEmailsHint")}</p>
-      </div>
-      <div>
-        <SubmitButton>{t("common.save")}</SubmitButton>
-      </div>
+      <SettingsRows>
+        <SwitchRow label={t("account.rosterEmails")} hint={t("account.rosterEmailsHint")} name="email_roster" defaultChecked={emailRoster} />
+      </SettingsRows>
+      <SaveBar />
     </form>
   );
 }

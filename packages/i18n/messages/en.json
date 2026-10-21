@@ -1028,6 +1028,8 @@
     "undo": "Undo",
     "notifications": "Notifications",
     "savedShort": "Saved",
+    "unsavedChanges": "You have unsaved changes",
+    "discardChanges": "Discard changes",
     "dismiss": "Close notification",
     "skipToContent": "Skip to main content",
     "loadFailed": "Couldn't load this right now.",
