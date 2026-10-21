@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { stickyOffset } from "@/lib/scroll-to-section";
+
 /** The id of the section being read: the first of `ids` whose box crosses the band just below the sticky header. */
 export function useScrollSpy(ids: string[]): string | null {
   const [active, setActive] = useState<string | null>(null);
@@ -27,10 +29,18 @@ export function useScrollSpy(ids: string[]): string | null {
         // Between two sections the last one stays marked.
         if (first) setActive(first);
       },
-      { rootMargin: "-96px 0px -55% 0px" },
+      { rootMargin: `-${stickyOffset() + 8}px 0px -55% 0px` },
     );
     for (const el of targets) observer.observe(el);
-    return () => observer.disconnect();
+    // The last sections of a page cannot reach the top band: at the very bottom the last one is the one read.
+    const atBottom = () => {
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) setActive(list[list.length - 1] ?? null);
+    };
+    window.addEventListener("scroll", atBottom, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", atBottom);
+    };
   }, [key]);
 
   return active !== null && ids.includes(active) ? active : null;

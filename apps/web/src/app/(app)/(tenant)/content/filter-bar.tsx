@@ -115,7 +115,7 @@ export function FilterBar({
   const dot = "grid size-4 shrink-0 place-items-center rounded-full border border-border peer-checked:border-[5px] peer-checked:border-primary";
 
   return (
-    <section aria-label={labels.bar} aria-busy={pending} className="card sticky top-2 z-20 flex flex-col gap-3 p-3 print:hidden">
+    <section aria-label={labels.bar} aria-busy={pending} className="card sticky-below-header z-20 flex flex-col gap-3 p-3 print:hidden">
       <button type="button" aria-expanded={sheet} onClick={() => setSheet((value) => !value)} className="btn-secondary flex items-center justify-center gap-2 px-4 py-2 sm:hidden">
         <SlidersHorizontal aria-hidden="true" className="size-4" />
         {labels.filtersButton}

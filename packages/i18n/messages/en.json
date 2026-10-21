@@ -232,6 +232,11 @@
     "requireMfaForStaffHint": "Every team member must enter an authenticator code after their password before they can work in this business. Clients are not affected.",
     "auditLink": "Audit log",
     "auditHint": "Who changed roles, team, settings and exports.",
+    "detailsGroups": {
+      "booking": "Booking and cancellation",
+      "clients": "Clients",
+      "sales": "Sales and security"
+    },
     "detailsHint": "Name, language, currency, time zone and booking rules.",
     "nav": {
       "label": "Settings topics",
@@ -367,8 +372,8 @@
       "subtitle": "How long before a visit clients may cancel for free, and what happens when they cancel late or do not come.",
       "confirm": "These are the usual terms for a business like yours. Check them and save once so they are yours.",
       "group": "Free cancellation before a class",
-      "personal": "... before a personal session or appointment",
-      "resource": "... before a court or room",
+      "personal": "Free cancellation before a personal session or appointment",
+      "resource": "Free cancellation before a court or room",
       "lateOutcome": "A late cancellation",
       "noShowOutcome": "A client who does not come",
       "outcomes": {
@@ -569,6 +574,7 @@
     "points": "{value} pts",
     "better": "better",
     "worse": "worse",
+    "trends": "Trends",
     "weeklyRevenue": "Revenue per week",
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
@@ -890,6 +896,14 @@
     }
   },
   "clients": {
+    "nav": {
+      "label": "Client sections",
+      "details": "Details",
+      "membership": "Plans and visits",
+      "paperwork": "Quotes and documents",
+      "talk": "Notes and messages",
+      "privacy": "Consent and privacy"
+    },
     "joinedChip": "Joined {range}",
     "noShowChip": "Missed a class {range}",
     "activeFilters": "Active filters",
@@ -1143,6 +1157,9 @@
     }
   },
   "locations": {
+    "settingsTitle": "Branch settings",
+    "settingsHint": "Client policy and branch groups",
+    "detailsTitle": "Branch details",
     "manager": {
       "title": "Branch manager",
       "subtitle": "Who runs this branch. They get manager rights here only: staff, shifts, bookings and clients of this branch.",
@@ -1226,6 +1243,22 @@
     }
   },
   "team": {
+    "tabsLabel": "Team sections",
+    "tabs": {
+      "members": "People",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "timeClock": "Time clock",
+      "swaps": "Swaps",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "organization": "Structure",
+      "roles": "Roles"
+    },
+    "inviteButton": "Invite someone",
+    "moreActions": "More actions for {name}",
+    "changeRole": "Change role",
+    "branchesMenu": "Branches",
     "title": "Team",
     "subtitle": "People who work in the business and what they can do.",
     "members": "Members",
@@ -1363,6 +1396,7 @@
     "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
     "copyWeekError": "Couldn't copy the week. Try again.",
     "closedDays": "Closed days",
+    "moreActions": "More",
     "closedDay": "Closed",
     "grid": "Calendar grid, scrollable",
     "closeDay": "Close a day",
@@ -2827,7 +2861,9 @@
       "metrics": "SaaS numbers",
       "email": "Email delivery",
       "catalog": "Catalog and prices",
-      "trials": "Trials ending"
+      "trials": "Trials ending",
+      "security": "Security center",
+      "legal": "Legal center"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -3796,6 +3832,84 @@
       "extend": "Extend",
       "extendDays": "Days",
       "extendDone": "The trial now ends on {date}."
+    },
+    "security": {
+      "title": "Security center",
+      "hint": "Two-step sign-in of business owners, the MyBiz team's visits inside businesses and what the security agent found.",
+      "owners": "Owners",
+      "withMfa": "With two-step sign-in",
+      "acknowledged": "Confirmed the risk",
+      "exposed": "Without protection",
+      "unknown": "Unknown here",
+      "unknownNote": "This environment can't read the sign-in provider, so two-step sign-in can't be counted.",
+      "businesses": "Businesses",
+      "requiring": "Businesses requiring two-step sign-in of their team",
+      "ownersTitle": "Owners",
+      "ownersHint": "Owners without two-step sign-in come first. Without it, sensitive actions stay blocked until the owner confirms they understand the risk (warning of {version}).",
+      "ownersEmpty": "No business owners yet.",
+      "owner": "Owner",
+      "business": "Business",
+      "protection": "Two-step sign-in",
+      "on": "On",
+      "off": "Off",
+      "confirmed": "Confirmed {date}",
+      "notConfirmed": "Not confirmed",
+      "visitsTitle": "MyBiz team inside businesses",
+      "visitsHint": "Every visit is also shown to the business owner in the business audit log. Last {days} days.",
+      "visitsEmpty": "The team did not enter any business in this period.",
+      "member": "Team member",
+      "views": "Views",
+      "changes": "Changes",
+      "lastVisit": "Last visit",
+      "findingsTitle": "Security agent findings",
+      "findingsHint": "Saved reports of the security agent, newest first.",
+      "findingsEmpty": "The security agent has not saved a report yet.",
+      "by": "by"
+    },
+    "legal": {
+      "title": "Legal center",
+      "hint": "The current version of each legal document, who accepted it, and the privacy requests.",
+      "documentsTitle": "Document versions",
+      "document": "Document",
+      "version": "Current version",
+      "accepted": "Accepted",
+      "eligible": "Have to accept",
+      "documents": {
+        "terms": "Terms of use",
+        "privacy": "Privacy policy",
+        "dpa": "Data processing terms"
+      },
+      "acceptancesTitle": "Latest acceptances",
+      "acceptancesHint": "Each row is a record: who accepted which version, when and where from. Last {days} days.",
+      "acceptancesEmpty": "No one accepted a document in this period.",
+      "person": "Person",
+      "business": "Business",
+      "when": "When",
+      "context": "Where",
+      "contexts": {
+        "signup": "Sign-up",
+        "client_join": "Joining a business",
+        "reaccept": "New version"
+      },
+      "privacyTitle": "Privacy requests",
+      "privacyHint": "Exports, erasures and closures of the last 12 months. Client details are never shown here.",
+      "privacyEmpty": "No privacy requests in the last 12 months.",
+      "kind": "Request",
+      "kinds": {
+        "business_export": "Business data export",
+        "client_export": "Client data export",
+        "client_erasure": "Client erasure",
+        "business_closure": "Business closure"
+      },
+      "status": "Status",
+      "statuses": {
+        "building": "Building",
+        "ready": "Ready",
+        "failed": "Failed",
+        "done": "Done",
+        "waiting": "Waiting for deletion"
+      },
+      "deleteAfter": "Deleted on {date}"
     }
   },
   "permissions": {
@@ -4180,7 +4294,7 @@
       "other": "Other"
     },
     "print": "Print",
-    "back": "Back to the client",
+    "back": "All sales",
     "thanks": "Thank you!",
     "email": "Email",
     "legalDocument": "Tax document no. {number} was issued by your invoicing provider",
@@ -5626,6 +5740,13 @@
     }
   },
   "leads": {
+    "nav": {
+      "label": "Lead sections",
+      "stage": "Stage",
+      "details": "Details",
+      "activity": "Activity",
+      "messages": "Messages"
+    },
     "truncated": "Showing {shown} of {total} leads.",
     "showMore": "Show more leads",
     "title": "Leads",
@@ -6846,7 +6967,7 @@
   },
   "account": {
     "link": "Settings",
-    "title": "Settings",
+    "title": "My account",
     "subtitle": "Your personal profile and how the app works for you. Only you see these choices.",
     "name": "Full name",
     "nameHint": "Shown on the schedule, in the client app and in reports.",
@@ -6871,6 +6992,8 @@
     },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
+    "addressTitle": "Address",
+    "accessibilityTitle": "Accessibility",
     "birthDate": "Date of birth",
     "birthDateHint": "Only you see this.",
     "addressLine": "Street and number",
@@ -6923,6 +7046,7 @@
       "Sample"
     ],
     "orders": {
+      "back": "All sales",
       "title": "Online orders",
       "subtitle": "Plans clients bought in the app, newest first.",
       "date": "Date",
@@ -8602,6 +8726,8 @@
     "cycle": "That would make a loop: this person already manages them."
   },
   "shifts": {
+    "settingsTitle": "Shift settings",
+    "settingsHint": "Rooms, minimum staffing, publishing and planning rhythm.",
     "title": "Shifts",
     "soloTitle": "Hours and availability",
     "soloSubtitle": "You run the business on your own, so there is no shift board. Keep your opening hours and availability up to date.",
@@ -10044,6 +10170,10 @@
       "unknownDevice": "Unknown device",
       "when": "When"
     }
+  },
+  "noticeStack": {
+    "summary": "{count, plural, one {# thing is waiting for you} other {# things are waiting for you}}",
+    "toggle": "Things waiting for you"
   },
   "legalUpdate": {
     "title": "We updated our terms",

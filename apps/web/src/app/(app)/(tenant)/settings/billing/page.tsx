@@ -17,6 +17,7 @@ import { AiSpend } from "./ai-spend";
 import { AiUsers } from "./ai-users";
 import { DetailsForm } from "./details-form";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Note } from "@/components/ui/note";
 import { TopicHeader } from "../topic-header";
 import { Ltr } from "@/components/bidi";
 import { ScrollRegion } from "@/components/scroll-region";
@@ -58,10 +59,7 @@ export default async function BillingPage({ searchParams }: PageProps<"/settings
     <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle")} />
 
-      <p role="note" className="flex items-center gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
-        <FlaskConical aria-hidden="true" className="size-4 shrink-0" />
-        {t("simulated")}
-      </p>
+      <Note icon={<FlaskConical />}>{t("simulated")}</Note>
 
       <section aria-labelledby="status-heading" className="card-accent flex flex-col gap-4 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -138,10 +136,76 @@ export default async function BillingPage({ searchParams }: PageProps<"/settings
       </section>
 
       <CollapsibleSection
+        title={t("plan")}
+        defaultOpen
+        storageKey="billing-plan-v2"
+        actions={
+          <Link href="/settings/modules" className="text-sm text-primary-ink underline-offset-4 hover:underline">
+            {t("changeModules")}
+          </Link>
+        }
+      >
+        <div className="flex flex-col gap-4">
+        <ul className="flex flex-col divide-y divide-border text-sm">
+          {estimateLines.map((line) => (
+            <li key={line.key} className="flex items-center justify-between gap-3 py-2">
+              <span>{line.label}</span>
+              <bdi className="tabular-nums">{money(line.amount)}</bdi>
+            </li>
+          ))}
+        </ul>
+        <p className="flex items-baseline justify-between gap-3 border-t border-border pt-3">
+          <span className="font-semibold">{t("perMonth")}</span>
+          <bdi className="text-2xl font-bold tabular-nums">{money(billing.estimate.total)}</bdi>
+        </p>
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection title={t("paymentMethod")} storageKey="billing-method-v2">
+        <div className="flex flex-col gap-4">
+        {method ? (
+          <>
+            <div
+              dir="ltr"
+              className="relative flex aspect-[1.7] max-w-xs flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-black p-5 text-white shadow-lg"
+            >
+              <span aria-hidden="true" className="absolute -end-10 -top-10 size-36 rounded-full bg-white/10" />
+              <span className="flex items-center justify-between">
+                <span className="text-sm font-semibold uppercase tracking-wide">{t(`brands.${method.brand}`)}</span>
+                {method.simulated && (
+                  <span className="rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-background">{t("testCard")}</span>
+                )}
+              </span>
+              <span className="font-mono text-lg tracking-widest">•••• •••• •••• {method.last4}</span>
+              <span className="text-xs opacity-80">{method.exp}</span>
+            </div>
+            <form action={removeCard}>
+              <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
+                {t("removeCard")}
+              </button>
+            </form>
+          </>
+        ) : (
+          <form action={addTestCard} className="flex flex-col gap-3">
+            <p className="text-sm text-muted">{t("noCard")}</p>
+            <SelectField
+              label={t("brand")}
+              name="brand"
+              defaultValue="visa"
+              options={BRANDS.map((brand) => ({ value: brand, label: t(`brands.${brand}`) }))}
+            />
+            <div>
+              <SubmitButton>{t("addTestCard")}</SubmitButton>
+            </div>
+          </form>
+        )}
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection
         title={t("usage.title", { pack: t(`usage.packs.${usage.pack ?? "included"}`) })}
         description={t("usage.since", { date: day(usage.month_start) })}
-        defaultOpen
-        storageKey="billing-usage"
+        storageKey="billing-usage-v2"
       >
         <div className="flex flex-col gap-4">
         <Meter
@@ -175,118 +239,7 @@ export default async function BillingPage({ searchParams }: PageProps<"/settings
       {aiSpend && <AiSpend spend={aiSpend} />}
       {aiUsers && <AiUsers breakdown={aiUsers} />}
 
-      <div className="grid items-start gap-6 xl:grid-cols-2">
-        <CollapsibleSection
-          title={t("plan")}
-          storageKey="billing-plan"
-          actions={
-            <Link href="/settings/modules" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-              {t("changeModules")}
-            </Link>
-          }
-        >
-          <div className="flex flex-col gap-4">
-          <ul className="flex flex-col divide-y divide-border text-sm">
-            {estimateLines.map((line) => (
-              <li key={line.key} className="flex items-center justify-between gap-3 py-2">
-                <span>{line.label}</span>
-                <bdi className="tabular-nums">{money(line.amount)}</bdi>
-              </li>
-            ))}
-          </ul>
-          <p className="flex items-baseline justify-between gap-3 border-t border-border pt-3">
-            <span className="font-semibold">{t("perMonth")}</span>
-            <bdi className="text-2xl font-bold tabular-nums">{money(billing.estimate.total)}</bdi>
-          </p>
-          </div>
-        </CollapsibleSection>
-
-        <CollapsibleSection title={t("paymentMethod")} storageKey="billing-method">
-          <div className="flex flex-col gap-4">
-          {method ? (
-            <>
-              <div
-                dir="ltr"
-                className="relative flex aspect-[1.7] max-w-xs flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-black p-5 text-white shadow-lg"
-              >
-                <span aria-hidden="true" className="absolute -end-10 -top-10 size-36 rounded-full bg-white/10" />
-                <span className="flex items-center justify-between">
-                  <span className="text-sm font-semibold uppercase tracking-wide">{t(`brands.${method.brand}`)}</span>
-                  {method.simulated && (
-                    <span className="rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-background">{t("testCard")}</span>
-                  )}
-                </span>
-                <span className="font-mono text-lg tracking-widest">•••• •••• •••• {method.last4}</span>
-                <span className="text-xs opacity-80">{method.exp}</span>
-              </div>
-              <form action={removeCard}>
-                <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
-                  {t("removeCard")}
-                </button>
-              </form>
-            </>
-          ) : (
-            <form action={addTestCard} className="flex flex-col gap-3">
-              <p className="text-sm text-muted">{t("noCard")}</p>
-              <SelectField
-                label={t("brand")}
-                name="brand"
-                defaultValue="visa"
-                options={BRANDS.map((brand) => ({ value: brand, label: t(`brands.${brand}`) }))}
-              />
-              <div>
-                <SubmitButton>{t("addTestCard")}</SubmitButton>
-              </div>
-            </form>
-          )}
-          </div>
-        </CollapsibleSection>
-      </div>
-
-      <CollapsibleSection title={t("details")} storageKey="billing-details">
-        <DetailsForm details={billing.details} />
-      </CollapsibleSection>
-
-      <CollapsibleSection title={t("subscription.title")} storageKey="billing-subscription">
-        <div className="flex flex-col gap-4">
-        {cancelled ? <p className="text-sm font-medium text-success-ink" role="status">{t("cancelFlow.done", { date: collection.cancel_at ? day(collection.cancel_at) : "" })}</p> : null}
-        {collection.cancel_at ? (
-          <>
-            <p className="text-sm">{t("subscription.cancelling", { date: day(collection.cancel_at) })}</p>
-            {collection.refund_minor ? (
-              <p className="text-sm text-muted">{t("subscription.refund", { amount: money(collection.refund_minor, collection.currency ?? undefined) })}</p>
-            ) : null}
-            <form action={resumeSubscription}>
-              <SubmitButton>{t("subscription.resume")}</SubmitButton>
-            </form>
-          </>
-        ) : (
-          <>
-            {collection.paused_until ? (
-              <>
-                <p className="text-sm">{t("subscription.paused", { date: day(collection.paused_until) })}</p>
-                <form action={endPause}>
-                  <SubmitButton>{t("subscription.endPause")}</SubmitButton>
-                </form>
-              </>
-            ) : null}
-            <p className="text-sm text-muted">{t("subscription.hint")}</p>
-            {tenant.role === "owner" ? (
-              <div>
-                <Link href="/settings/billing/cancel" className="btn-link font-medium text-danger underline-offset-4 hover:underline">
-                  {t("subscription.cancelStart")}
-                </Link>
-              </div>
-            ) : null}
-            <Link href="/legal/cancellation" target="_blank" className="text-sm text-primary-ink underline underline-offset-4">
-              {t("subscription.policy")}
-            </Link>
-          </>
-        )}
-        </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection title={t("invoices")} defaultOpen={billing.invoices.length > 0} storageKey="billing-invoices">
+      <CollapsibleSection title={t("invoices")} storageKey="billing-invoices-v2">
         {billing.invoices.length === 0 ? (
           <p className="text-sm text-muted">{t("noInvoices")}</p>
         ) : (
@@ -340,6 +293,50 @@ export default async function BillingPage({ searchParams }: PageProps<"/settings
           </ScrollRegion>
         )}
       </CollapsibleSection>
+
+      <CollapsibleSection title={t("details")} storageKey="billing-details-v2">
+        <DetailsForm details={billing.details} />
+      </CollapsibleSection>
+
+      <CollapsibleSection title={t("subscription.title")} storageKey="billing-subscription-v2">
+        <div className="flex flex-col gap-4">
+        {cancelled ? <p className="text-sm font-medium text-success-ink" role="status">{t("cancelFlow.done", { date: collection.cancel_at ? day(collection.cancel_at) : "" })}</p> : null}
+        {collection.cancel_at ? (
+          <>
+            <p className="text-sm">{t("subscription.cancelling", { date: day(collection.cancel_at) })}</p>
+            {collection.refund_minor ? (
+              <p className="text-sm text-muted">{t("subscription.refund", { amount: money(collection.refund_minor, collection.currency ?? undefined) })}</p>
+            ) : null}
+            <form action={resumeSubscription}>
+              <SubmitButton>{t("subscription.resume")}</SubmitButton>
+            </form>
+          </>
+        ) : (
+          <>
+            {collection.paused_until ? (
+              <>
+                <p className="text-sm">{t("subscription.paused", { date: day(collection.paused_until) })}</p>
+                <form action={endPause}>
+                  <SubmitButton>{t("subscription.endPause")}</SubmitButton>
+                </form>
+              </>
+            ) : null}
+            <p className="text-sm text-muted">{t("subscription.hint")}</p>
+            {tenant.role === "owner" ? (
+              <div>
+                <Link href="/settings/billing/cancel" className="btn-link font-medium text-danger underline-offset-4 hover:underline">
+                  {t("subscription.cancelStart")}
+                </Link>
+              </div>
+            ) : null}
+            <Link href="/legal/cancellation" target="_blank" className="text-sm text-primary-ink underline underline-offset-4">
+              {t("subscription.policy")}
+            </Link>
+          </>
+        )}
+        </div>
+      </CollapsibleSection>
+
     </div>
   );
 }

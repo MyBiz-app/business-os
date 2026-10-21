@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
-import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { canManageSettings } from "@/lib/permissions";
 import { isSolo } from "@/lib/solo";
 import { getTenant } from "@/lib/tenant";
@@ -9,6 +8,7 @@ import { getTenant } from "@/lib/tenant";
 import { ContactEmails } from "../contact-emails";
 import { LegalReadiness } from "../legal-readiness";
 import { DetailsForm, IdentityForm } from "../settings-forms";
+import { SettingsGroup } from "../settings-group";
 import { SoloCard } from "../solo-card";
 import { TopicHeader } from "../topic-header";
 
@@ -22,23 +22,25 @@ export default async function BusinessSettingsPage() {
   const readiness = (await context.api.GET("/tenants/current/readiness", { params: context.scope })).data;
 
   return (
-    <div className="form-columns">
+    <div className="flex flex-col gap-8">
       <TopicHeader title={t("nav.items.business")} description={t("nav.hints.business")} />
       {isSolo(tenant) && <SoloCard />}
-      <CollapsibleSection title={t("details")} description={t("detailsHint")} defaultOpen storageKey="settings-details">
-        <DetailsForm tenant={tenant} timeZones={Intl.supportedValuesOf("timeZone")} />
-      </CollapsibleSection>
-      <CollapsibleSection title={t("identity.title")} description={t("identity.subtitle")} storageKey="settings-identity">
+      <SettingsGroup id="identity" title={t("identity.title")} description={t("identity.subtitle")}>
         <IdentityForm type={tenant.legal_entity_type ?? null} number={tenant.business_number ?? null} />
-      </CollapsibleSection>
+      </SettingsGroup>
       {readiness && (
-        <div id="readiness-heading" className="scroll-mt-24">
-          <CollapsibleSection title={t("readiness.title")} description={t("readiness.subtitle")} storageKey="settings-readiness">
-            <LegalReadiness tenant={tenant} readiness={readiness} />
-          </CollapsibleSection>
-        </div>
+        <SettingsGroup id="readiness-heading" title={t("readiness.title")} description={t("readiness.subtitle")}>
+          <LegalReadiness tenant={tenant} readiness={readiness} />
+        </SettingsGroup>
       )}
-      {emails && <ContactEmails data={emails} locationId={null} />}
+      <SettingsGroup id="details" title={t("details")} description={t("detailsHint")}>
+        <DetailsForm tenant={tenant} timeZones={Intl.supportedValuesOf("timeZone")} />
+      </SettingsGroup>
+      {emails && (
+        <SettingsGroup id="emails" title={t("contactEmails.title")} description={t("contactEmails.hint")}>
+          <ContactEmails data={emails} locationId={null} grouped />
+        </SettingsGroup>
+      )}
     </div>
   );
 }

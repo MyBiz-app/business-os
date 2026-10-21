@@ -164,7 +164,7 @@ export function AiBubble() {
   return (
     <div
       ref={wrapper}
-      className="fixed bottom-5 end-5 z-40 print:hidden"
+      className="fixed bottom-4 end-4 z-40 print:hidden md:bottom-5 md:end-5"
       onPointerLeave={(event) => event.pointerType === "mouse" && setFan(false)}
       onBlur={(event) => !wrapper.current?.contains(event.relatedTarget as Node | null) && setFan(false)}
     >
@@ -311,7 +311,7 @@ export function AiBubble() {
         aria-haspopup="dialog"
         aria-label={t("open", { name: shown.name })}
         title={t("open", { name: shown.name })}
-        className="btn-plain ai-bubble relative block size-14 rounded-full shadow-lg ring-2 ring-offset-2 ring-offset-background transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4"
+        className="btn-plain ai-bubble relative block size-12 md:size-14 rounded-full shadow-lg ring-2 ring-offset-2 ring-offset-background transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4"
         style={{ ["--tw-ring-color" as string]: shown.color }}
         onPointerEnter={(event) => event.pointerType === "mouse" && setFan(true)}
         onPointerDown={(event) => {

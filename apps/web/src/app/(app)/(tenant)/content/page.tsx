@@ -47,10 +47,10 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
   ]);
 
   const notice = <ConnectNotice query={query} canManage={canManage} />;
-  const header = <PageHeader eyebrow={t("subtitle")} title={t("title")} />;
+  const header = <PageHeader title={t("title")} description={t("subtitle")} />;
   if (accounts.length === 0) {
     return (
-      <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8">
+      <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
         {header}
         {notice}
         <ConnectCards networks={providers.networks} canManage={canManage} withDemo={providers.demo_available} />
@@ -131,10 +131,10 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
   const audienceGroups = (["age", "gender", "city"] as const).map((dimension) => ({ dimension, rows: audience.filter((a) => a.dimension === dimension) })).filter((g) => g.rows.length > 0);
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader
-        eyebrow={t("subtitle")}
         title={t("title")}
+        description={t("subtitle")}
         actions={
           <>
             <CsvButton label={t("export.csv")} filename={`content-${from}-${to}.csv`} rows={csv} />

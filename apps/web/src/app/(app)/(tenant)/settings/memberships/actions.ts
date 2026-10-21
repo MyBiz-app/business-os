@@ -33,6 +33,6 @@ export async function saveFreezeRules(_state: FormState, formData: FormData): Pr
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/settings/memberships");
+  revalidatePath("/settings", "layout");
   return { saved: true };
 }

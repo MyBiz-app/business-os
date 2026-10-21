@@ -13,7 +13,7 @@ describe("wide-screen policy", () => {
     assert.ok(read("components/layout/container.tsx").includes('settings: "max-w-[100rem]"'));
   });
 
-  it("flows every settings topic into columns inside a container query", () => {
+  it("keeps every collapsible settings topic in one column and only small card grids in two", () => {
     const dir = join(SRC, "app/(app)/(tenant)/settings");
     const topics = readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory());
     for (const topic of topics) {
@@ -24,14 +24,25 @@ describe("wide-screen policy", () => {
       } catch {
         continue;
       }
-      if (source.includes("CollapsibleSection")) assert.ok(source.includes("form-columns"), topic.name);
+      if (source.includes("CollapsibleSection") && topic.name !== "integrations") {
+        assert.ok(source.includes("form-columns"), topic.name);
+        assert.ok(!source.includes("form-grid"), topic.name);
+      }
     }
+    assert.ok(read("app/(app)/(tenant)/settings/integrations/page.tsx").includes("form-grid"));
     assert.ok(read("app/(app)/(tenant)/settings/settings-room.tsx").includes("@container"));
     assert.match(read("app/globals.css"), /@container \(min-width: 56rem\)/);
   });
 
-  it("adds columns to the cards from 1920px and keeps six dashboard tiles in a row", () => {
-    assert.ok(read("app/(app)/(tenant)/clients/[id]/client-body.tsx").includes("min-[120rem]:grid-cols-7"));
+  it("gives the client and lead cards the settings width with an inner menu and one column", () => {
+    for (const card of ["clients", "leads"]) {
+      assert.match(read(`app/(app)/(tenant)/${card}/[id]/page.tsx`), /size="settings"/);
+      assert.ok(read(`app/(app)/(tenant)/${card}/[id]/${card === "clients" ? "client" : "lead"}-body.tsx`).includes("RecordLayout"), card);
+    }
+    assert.ok(!read("app/(app)/(tenant)/clients/[id]/client-body.tsx").includes("min-[120rem]:grid-cols"));
+  });
+
+  it("adds columns to the staff card from 1920px and keeps six dashboard tiles in a row", () => {
     assert.ok(read("app/(app)/(tenant)/team/[userId]/card-sections.tsx").includes("min-[120rem]:grid-cols-3"));
     assert.ok(read("app/(app)/(tenant)/dashboard/page.tsx").includes("2xl:grid-cols-6"));
   });

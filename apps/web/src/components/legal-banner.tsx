@@ -19,7 +19,7 @@ export async function LegalBanner({ pending }: { pending: Pending[] }) {
       <span>{t("text")}</span>
       <span className="flex flex-wrap gap-x-3">
         {pending.map((item) => (
-          <Link key={item.document} href={`/legal/${item.document}`} target="_blank" className="font-medium underline underline-offset-4">
+          <Link key={item.document} href={`/legal/${item.document}`} target="_blank" className="inline-block py-2 font-medium underline underline-offset-4 md:py-0">
             {t(`documents.${item.document as "terms" | "privacy" | "dpa"}`)}
           </Link>
         ))}

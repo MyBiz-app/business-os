@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { Accessibility, Bell, Building2, Palette, Phone, ShieldCheck, UserRound } from "lucide-react";
 import { BRAND } from "@business-os/i18n/brand";
 
 import { avatarSrc } from "@/components/avatar";
@@ -15,7 +16,7 @@ import { getActiveMembership } from "@/lib/tenant";
 
 import { savePalette } from "./actions";
 import { PhoneLogin } from "./phone-login";
-import { AccountMenu } from "./account-menu";
+import { SectionNav, type SectionNavItem } from "@/components/section-nav";
 import { SecuritySettings } from "./security-settings";
 import { NotificationsForm, PictureForm, ProfileForm } from "./profile-form";
 import { Container } from "@/components/layout/container";
@@ -43,23 +44,22 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
   const { data: policy } = await api.GET("/me/security");
   const { data: auth } = phoneCodes ? await (await createClient()).auth.getUser() : { data: null };
 
-  const menu = [
-    { id: "profile", label: t("account.detailsTitle") },
-    ...(phoneCodes ? [{ id: "phone-login", label: t("account.phoneLogin.title") }] : []),
-    { id: "notifications", label: t("account.notificationsTitle") },
-    { id: "accessibility", label: t("accessibility.title") },
-    { id: "appearance", label: t("appearance.title") },
-    { id: "security", label: t("security.title") },
-    { id: "password", label: t("account.password") },
-    ...(me.memberships.length > 0 ? [{ id: "businesses", label: t("account.businesses") }] : []),
+  const menu: SectionNavItem[] = [
+    { id: "profile", label: t("account.detailsTitle"), icon: <UserRound aria-hidden="true" className="size-4 shrink-0" /> },
+    ...(phoneCodes ? [{ id: "phone-login", label: t("account.phoneLogin.title"), icon: <Phone aria-hidden="true" className="size-4 shrink-0" /> }] : []),
+    { id: "notifications", label: t("account.notificationsTitle"), icon: <Bell aria-hidden="true" className="size-4 shrink-0" /> },
+    { id: "accessibility", label: t("account.accessibilityTitle"), icon: <Accessibility aria-hidden="true" className="size-4 shrink-0" /> },
+    { id: "appearance", label: t("appearance.title"), icon: <Palette aria-hidden="true" className="size-4 shrink-0" /> },
+    { id: "security", label: t("security.title"), icon: <ShieldCheck aria-hidden="true" className="size-4 shrink-0" /> },
+    ...(me.memberships.length > 0 ? [{ id: "businesses", label: t("account.businesses"), icon: <Building2 aria-hidden="true" className="size-4 shrink-0" /> }] : []),
   ];
   const key = (id: string) => `account:${id}`;
 
   return (
     <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("account.title")} description={t("account.subtitle")} />
-      <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start xl:gap-10">
-        <AccountMenu items={menu} />
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-6 xl:gap-10">
+        <SectionNav items={menu} label={t("account.nav.label")} />
         <div className="form-columns @container min-w-0">
           <CollapsibleSection id="profile" className="form-span" storageKey={key("profile")} defaultOpen title={t("account.detailsTitle")}>
             <div className="flex flex-col gap-6">
@@ -85,7 +85,7 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
           <CollapsibleSection id="notifications" storageKey={key("notifications")} title={t("account.notificationsTitle")}>
             <NotificationsForm emailRoster={me.email_roster ?? true} />
           </CollapsibleSection>
-          <CollapsibleSection id="accessibility" storageKey={key("accessibility")} title={t("accessibility.title")} description={t("accessibility.subtitle")}>
+          <CollapsibleSection id="accessibility" storageKey={key("accessibility")} title={t("account.accessibilityTitle")} description={t("accessibility.subtitle")}>
             <AccessibilitySettings />
           </CollapsibleSection>
           <CollapsibleSection id="appearance" storageKey={key("appearance")} title={t("appearance.title")} description={t("appearance.subtitle")}>
@@ -99,11 +99,12 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
               riskOptional={!me.platform_admin && Boolean(policy?.mfa_enforced)}
               riskAcknowledged={policy?.mfa_risk_acknowledged ?? false}
             />
-          </CollapsibleSection>
-          <CollapsibleSection id="password" storageKey={key("password")} title={t("account.password")}>
-            <Link href="/reset-password" className="btn-secondary inline-flex px-4 py-2 text-sm">
-              {t("account.changePassword")}
-            </Link>
+            <div className="mt-6 flex flex-col gap-3 border-t border-border pt-6">
+              <h3 className="font-medium">{t("account.password")}</h3>
+              <Link href="/reset-password" className="btn-secondary inline-flex self-start px-4 py-2 text-sm">
+                {t("account.changePassword")}
+              </Link>
+            </div>
           </CollapsibleSection>
           {me.memberships.length > 0 && (
             <CollapsibleSection id="businesses" storageKey={key("businesses")} title={t("account.businesses")}>
@@ -119,6 +120,8 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
               </ul>
             </CollapsibleSection>
           )}
+          {/* Room below the last short section, so a click in the menu can bring it to the top of the screen. */}
+          <div aria-hidden="true" className="h-[60vh] print:hidden" />
         </div>
       </div>
     </Container>

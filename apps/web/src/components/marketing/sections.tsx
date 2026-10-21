@@ -248,7 +248,7 @@ export async function AddOnsStrip() {
           ))}
         </ul>
       </Reveal>
-      <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink">
+      <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink max-md:min-h-11">
         {t("cta")}
         <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
       </Link>

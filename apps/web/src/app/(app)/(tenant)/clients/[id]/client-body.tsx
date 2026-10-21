@@ -5,8 +5,11 @@ import { notFound } from "next/navigation";
 
 import { AiScreen } from "../../ai-bubble/screen-context";
 import { Avatar } from "@/components/avatar";
+import { BackLink } from "@/components/back-link";
 import { Pill, type Tone } from "@/components/pill";
+import { RecordLayout } from "@/components/record-layout";
 import { ReviewsSummary } from "@/components/reviews-summary";
+import type { SectionNavItem } from "@/components/section-nav";
 import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
 import { canSell, canWriteClients } from "@/lib/permissions";
@@ -145,13 +148,21 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
   const workSections = vertical(tenant.vertical)?.timeBilling ?? false;
   const whatsapp = client.phone ? whatsappLink(client.phone, tenant.time_zone) : null;
 
+  // The inner menu of the card, in the order the sections follow.
+  const showPrivacy = !erased || reviews.count > 0;
+  const menu: SectionNavItem[] = [
+    { id: "details", label: t("nav.details") },
+    { id: "membership", label: t("nav.membership") },
+    { id: "paperwork", label: t("nav.paperwork") },
+    { id: "talk", label: t("nav.talk") },
+    ...(showPrivacy ? [{ id: "privacy", label: t("nav.privacy") }] : []),
+  ];
+
   return (
     <div className="flex flex-1 flex-col gap-6">
       <AiScreen label={tBubble("screenClient", { name })} />
       {!inModal && (
-        <Link href="/clients" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-          {t("back")}
-        </Link>
+        <BackLink href="/clients" label={t("back")} />
       )}
 
       <header className="card-accent flex flex-col gap-5 p-6">
@@ -225,8 +236,29 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
         </p>
       )}
 
-      <div className="grid items-start gap-6 lg:grid-cols-5 min-[120rem]:grid-cols-7">
-        <div className="flex min-w-0 flex-col gap-6 lg:col-span-3">
+      <RecordLayout items={menu} label={t("nav.label")} menu={!inModal}>
+        <div id="details" className="flex flex-col gap-6">
+          <section aria-labelledby="details-heading" className="card p-6">
+            <h2 id="details-heading" className="mb-4 text-lg font-semibold">
+              {t("details")}
+            </h2>
+            <ClientForm
+              action={updateClient.bind(null, client.id)}
+              client={client}
+              submitLabel={t("save")}
+              readOnly={!writable}
+              branches={branches}
+            />
+          </section>
+
+          <DependentsSection clientId={client.id} context={context} locked={erased} />
+
+          <AddressesSection clientId={client.id} context={context} locked={erased} />
+
+          <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
+        </div>
+
+        <div id="membership" className="flex flex-col gap-6">
           <PlansSection clientId={client.id} context={context} locked={erased} />
 
           <section aria-labelledby="bookings-heading" className="flex flex-col gap-4 card p-6">
@@ -265,13 +297,17 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
               </div>
             )}
           </section>
+        </div>
 
+        <div id="paperwork" className="flex flex-col gap-6">
           <QuotesSection clientId={client.id} context={context} locked={erased} />
 
           {workSections && <TimeSection clientId={client.id} context={context} locked={erased} />}
 
           <DocumentsSection clientId={client.id} context={context} locked={erased} />
+        </div>
 
+        <div id="talk" className="flex flex-col gap-6">
           <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
 
           <MessagesSection
@@ -283,46 +319,29 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
           />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-6 lg:col-span-2 min-[120rem]:col-span-4 min-[120rem]:grid min-[120rem]:grid-cols-2 min-[120rem]:items-start">
-          <section aria-labelledby="details-heading" className="card p-6">
-            <h2 id="details-heading" className="mb-4 text-lg font-semibold">
-              {t("details")}
-            </h2>
-            <ClientForm
-              action={updateClient.bind(null, client.id)}
-              client={client}
-              submitLabel={t("save")}
-              readOnly={!writable}
-              branches={branches}
-            />
-          </section>
+        {showPrivacy && (
+          <div id="privacy" className="flex flex-col gap-6">
+            {!erased && <ConsentSection clientId={client.id} consent={client.marketing_consent} optedOut={client.marketing_opted_out_at != null} events={consentEvents} canWrite={canWriteClients(tenant)} />}
 
-          <DependentsSection clientId={client.id} context={context} locked={erased} />
+            {!erased && tenant.client_id_number !== "off" && <IdentitySection clientId={client.id} />}
 
-          <AddressesSection clientId={client.id} context={context} locked={erased} />
+            {!erased && tenant.requires_health_declaration && <HealthSection clientId={client.id} context={context} />}
 
-          <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
+            {reviews.count > 0 && (
+              <ReviewsSummary
+                summary={reviews}
+                locale={locale}
+                timeZone={tenant.time_zone}
+                title={tReviews("clientTitle")}
+                withClients={false}
+                withGroups={false}
+              />
+            )}
 
-          {!erased && <ConsentSection clientId={client.id} consent={client.marketing_consent} optedOut={client.marketing_opted_out_at != null} events={consentEvents} canWrite={canWriteClients(tenant)} />}
-
-          {!erased && tenant.client_id_number !== "off" && <IdentitySection clientId={client.id} />}
-
-          {!erased && tenant.requires_health_declaration && <HealthSection clientId={client.id} context={context} />}
-
-          {reviews.count > 0 && (
-            <ReviewsSummary
-              summary={reviews}
-              locale={locale}
-              timeZone={tenant.time_zone}
-              title={tReviews("clientTitle")}
-              withClients={false}
-              withGroups={false}
-            />
-          )}
-
-          {!erased && tenant.permissions.includes("clients.privacy") && <PrivacySection clientId={client.id} name={name} />}
-        </div>
-      </div>
+            {!erased && tenant.permissions.includes("clients.privacy") && <PrivacySection clientId={client.id} name={name} />}
+          </div>
+        )}
+      </RecordLayout>
     </div>
   );
 }

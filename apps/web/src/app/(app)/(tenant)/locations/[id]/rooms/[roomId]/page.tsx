@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { HoursForm } from "@/components/form/hours-form";
@@ -9,6 +8,7 @@ import { toBlocks, weekStartFor } from "@/lib/hours";
 import { getTenantFor } from "@/lib/tenant";
 
 import { saveRoomHours } from "../../../actions";
+import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -24,9 +24,7 @@ export default async function RoomHoursPage({ params }: PageProps<"/locations/[i
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href={`/locations/${id}`} className="text-sm text-primary-ink underline-offset-4 hover:underline">
-        {t("common.back")}
-      </Link>
+      <BackLink href={`/locations/${id}`} label={t("common.back")} />
       <PageHeader title={t("locations.openingHours", { name: isolate(room.name) })} description={t("resources.hoursHint", { branch: isolate(location.name) })} />
       {!room.bookable && <p role="status" className="card p-4 text-sm">{t("resources.notBookable")}</p>}
       <section className="card p-6">

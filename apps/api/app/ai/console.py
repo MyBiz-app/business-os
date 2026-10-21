@@ -17,7 +17,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.ai import knowledge, market, web_search
+from app.ai import knowledge, market, professional, security, web_search
 from app.ai.console_agents import AGENT_KEYS, agent_prompt
 from app.ai.gateway import (
     LLMProvider,
@@ -31,6 +31,7 @@ from app.ai.untrusted import prepare
 from app.catalog.verticals import CATALOG
 from app.commerce.modules import AI_CREDITS_INCLUDED, CORE_TIERS, MODULES
 from app.core.brand import with_brand
+from app.core.mfa import RISK_VERSION
 
 MAX_STEPS = 6
 MAX_ROWS = 25
@@ -198,6 +199,9 @@ def _business_detail(db: Session, args: dict[str, Any]) -> dict[str, Any]:
         "vertical": r["vertical"],
         "locale": r["locale"],
         "currency": r["currency"],
+        "country": db.execute(
+            text("SELECT app.platform_business_country(:id)"), {"id": r["id"]}
+        ).scalar(),
         "time_zone": r["time_zone"],
         "created_at": r["created_at"].date().isoformat(),
         "members": r["members"],
@@ -314,6 +318,48 @@ def _audit_log(db: Session, args: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _security_owners(db: Session, _args: dict[str, Any]) -> dict[str, Any]:
+    security.ensure_allowed()
+    rows = _rows(db, "SELECT * FROM app.platform_security_owners(:v)", {"v": RISK_VERSION})
+    people: dict[str, dict[str, Any]] = {}
+    for r in rows:
+        p = people.setdefault(r["email"], {"mfa": False, "known": True, "confirmed": False})
+        p["mfa"] = p["mfa"] or bool(r["mfa_enrolled"])
+        p["known"] = p["known"] and r["mfa_enrolled"] is not None
+        p["confirmed"] = p["confirmed"] or r["risk_acknowledged_at"] is not None
+    if any(not p["known"] for p in people.values()):
+        return {"owners": len(people), "note": "two-step sign-in cannot be read here"}
+    exposed = [e for e, p in people.items() if not p["mfa"] and not p["confirmed"]]
+    return {
+        "owners": len(people),
+        "with_two_step": sum(1 for p in people.values() if p["mfa"]),
+        "without_but_confirmed_risk": sum(
+            1 for p in people.values() if not p["mfa"] and p["confirmed"]
+        ),
+        "exposed_without_confirmation": len(exposed),
+        "exposed_examples": exposed[:10],
+    }
+
+
+def _security_visits(db: Session, args: dict[str, Any]) -> dict[str, Any]:
+    security.ensure_allowed()
+    days = min(max(int(args.get("days") or 30), 1), 90)
+    rows = _rows(db, "SELECT * FROM app.platform_security_visits(:d)", {"d": days})
+    return {
+        "days": days,
+        "visits": [
+            {
+                "team_member": r["actor_email"],
+                "business": r["business_name"],
+                "views": r["views"],
+                "changes": r["changes"],
+                "last_at": r["last_at"].isoformat(),
+            }
+            for r in rows[:MAX_ROWS]
+        ],
+    }
+
+
 def _signup_funnel(db: Session, args: dict[str, Any]) -> dict[str, Any]:
     days = min(max(int(args.get("days") or 30), 1), 365)
     rows = _rows(db, "SELECT * FROM app.platform_funnel(:d)", {"d": days})
@@ -375,7 +421,18 @@ TOOLS: dict[str, Tool] = {
             "Pass a name fragment to filter, or an empty string for the newest.",
             {"name": {"type": "string"}},
             "businesses.read",
-            frozenset({"manager", "health", "billing", "growth", "success", "product"}),
+            frozenset(
+                {
+                    "manager",
+                    "health",
+                    "billing",
+                    "growth",
+                    "success",
+                    "product",
+                    "legal",
+                    "accountant",
+                }
+            ),
             _list_businesses,
         ),
         Tool(
@@ -400,7 +457,7 @@ TOOLS: dict[str, Tool] = {
             "What the platform billed per month and currency: issued, paid and open amounts.",
             {},
             "billing.manage",
-            frozenset({"manager", "billing"}),
+            frozenset({"manager", "billing", "accountant"}),
             _billing_overview,
         ),
         Tool(
@@ -413,11 +470,22 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "business_detail",
-            "One business by its id (from list_businesses): size, activity, modules, AI use "
-            "and the owner's email.",
+            "One business by its id (from list_businesses): country, size, activity, modules, AI "
+            "use and the owner's email.",
             {"id": {"type": "string"}},
             "businesses.read",
-            frozenset({"manager", "health", "billing", "growth", "success", "support"}),
+            frozenset(
+                {
+                    "manager",
+                    "health",
+                    "billing",
+                    "growth",
+                    "success",
+                    "support",
+                    "legal",
+                    "accountant",
+                }
+            ),
             _business_detail,
         ),
         Tool(
@@ -530,6 +598,63 @@ TOOLS: dict[str, Tool] = {
             "usage.read",
             frozenset({"market"}),
             market.save_market_report,
+        ),
+        Tool(
+            "security_db_checks",
+            "Read-only checks of the database structure on staging: tables the API can reach "
+            "without row level security, owner-rights functions without a fixed search_path or "
+            "open to everyone. Returns what was checked and the findings, worst first.",
+            {},
+            "incidents.manage",
+            frozenset({"security"}),
+            security.db_checks,
+        ),
+        Tool(
+            "security_owners",
+            "How many business owners have two-step sign-in, how many confirmed the risk "
+            "without it, and how many are exposed. Owners only.",
+            {},
+            OWNER,
+            frozenset({"security"}),
+            _security_owners,
+        ),
+        Tool(
+            "security_visits",
+            "The platform team's visits inside businesses (views and changes) in the last days, "
+            "up to 90. Owners only.",
+            {"days": {"type": "integer"}},
+            OWNER,
+            frozenset({"security"}),
+            _security_visits,
+        ),
+        Tool(
+            "save_security_report",
+            "Saves the security findings as a report. Send each finding with a severity "
+            "(critical, high, medium, low or info), a status (open, in_progress or fixed), a "
+            "short title, the evidence from a tool, and how to fix it in plain words. Only "
+            "report what a tool showed. The server sorts and counts them.",
+            {
+                "title": {"type": "string"},
+                "summary": {"type": "string"},
+                "findings": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "severity": {"type": "string"},
+                            "status": {"type": "string"},
+                            "title": {"type": "string"},
+                            "evidence": {"type": "string"},
+                            "fix": {"type": "string"},
+                        },
+                        "required": ["severity", "status", "title", "evidence", "fix"],
+                        "additionalProperties": False,
+                    },
+                },
+            },
+            "incidents.manage",
+            frozenset({"security"}),
+            security.save_security_report,
         ),
         Tool(
             "price_list",
@@ -707,6 +832,7 @@ def ask(
             response = clean_response(provider.create(system, messages, definitions, True))
             spent.append(response)
             messages.append({"role": "assistant", "content": response.content})
+        _add_notice(messages, role, question)
     except (ProviderBusy, ProviderUnavailable):
         work.rollback()
         _add_credits(db, conversation_id, spent)
@@ -727,6 +853,16 @@ def ask(
             "id": conversation_id,
         },
     )
+
+
+def _add_notice(messages: list[dict[str, Any]], role: str, question: str) -> None:
+    """The legal and accountant agents end every answer with the fixed "not advice" line."""
+    notice = professional.notice_for(role, question)
+    if notice is None:
+        return
+    content = messages[-1]["content"]
+    if not any(notice in b.get("text", "") for b in content if b.get("type") == "text"):
+        content.append({"type": "text", "text": notice})
 
 
 def _add_credits(db: Session, conversation_id: UUID, spent: list[LLMResponse]) -> None:
