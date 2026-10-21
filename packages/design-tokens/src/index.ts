@@ -23,8 +23,8 @@ export const palette = {
     ai: "#7c3aed", // AI Purple: AI features only
     // Darker than the web's #16a34a fill so it reads as text on white (WCAG AA): the web's success ink.
     success: "#15803d",
-    successInk: "#15803d",
-    warning: "#b45309",
+    successInk: "#127a37",
+    warning: "#a84a08",
     danger: "#b91c1c",
     onDanger: "#ffffff",
     // Status tints (a very light background; the matching ink is the text on it).
