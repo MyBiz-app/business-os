@@ -53,7 +53,6 @@ export function NeedsYou({
   const locale = useLocale();
   const [all, setAll] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const list = new Intl.ListFormat(locale, { type: "conjunction" });
 
   const rows: Row[] = [];
   usageNotices.forEach((notice, index) =>
@@ -69,7 +68,7 @@ export function NeedsYou({
       icon,
       tone,
       title: tAttention(`kinds.${group.kind}`),
-      detail: list.format(group.items.slice(0, 2).map((item) => item.name)),
+      detail: group.items.slice(0, 2).map((item) => item.name).join(", "),
       count: group.count,
       items: group.items.map((item) => ({
         id: item.id,
