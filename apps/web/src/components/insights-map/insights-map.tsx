@@ -312,7 +312,6 @@ export function InsightsMap({ areas, branches, totals, canOpenClients }: Props) 
 
       {areas.length > 0 && (
         <CollapsibleSection title={t("table.show")}>
-          {/* eslint-disable-next-line design-system/no-handrolled-ui -- DataTable lands in W4-1 */}
           <table className="w-full text-start text-sm">
             <thead>
               <tr className="text-muted">

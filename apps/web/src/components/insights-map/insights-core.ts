@@ -1,4 +1,4 @@
-import { RADII_KM, distanceKm, type BranchSpot, type LngLat } from "../branch-map/planned-core";
+import { RADII_KM, distanceKm, type BranchSpot, type LngLat } from "../branch-map/planned-core.ts";
 
 /** The numbers beside the insights map. Everything is counted from the city a person lives in and
  * the city's centre, never from an address; inside one business every client and lead counts, with
