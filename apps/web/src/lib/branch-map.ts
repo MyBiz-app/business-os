@@ -5,6 +5,7 @@ import { addDays, todayIn } from "@/lib/dates";
 import type { getTenant } from "@/lib/tenant";
 
 import type { MapBranch } from "@/components/branch-map/branch-map";
+import type { ClientCity } from "@/components/branch-map/planned-core";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 
@@ -52,6 +53,7 @@ export async function loadBranchMap({ api, scope, tenant }: Pick<Context, "api" 
       id: location.id,
       name: location.name,
       city: location.city_name,
+      cityCode: location.city_code,
       latitude: location.latitude as number,
       longitude: location.longitude as number,
       revenue: valueOf(location.id, "revenue"),
@@ -66,4 +68,18 @@ export async function loadBranchMap({ api, scope, tenant }: Pick<Context, "api" 
       staffCount: insightOf(location.id)?.staff_count ?? 0,
     };
   });
+}
+
+/** Where the clients live, by city, for the "planned branch" mode. Null without the right to see
+ * reports, or for someone who works in only some of the branches (the clients are the whole
+ * business's); the map then simply has no such mode. */
+export async function loadClientCities({ api, scope, tenant }: Pick<Context, "api" | "scope" | "tenant">): Promise<{ cities: ClientCity[]; total: number } | null> {
+  if (!tenant.permissions.includes("reports.read")) return null;
+  const network = { header: { "X-Tenant-Id": scope.header["X-Tenant-Id"] } };
+  const found = await api.GET("/metrics/client-cities", { params: network }).then((r) => r.data ?? null);
+  if (!found) return null;
+  return {
+    total: found.clients_total,
+    cities: found.cities.map((c) => ({ code: c.city_code, name: c.city_name, clients: c.clients, latitude: c.latitude, longitude: c.longitude })),
+  };
 }

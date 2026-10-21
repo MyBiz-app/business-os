@@ -1,5 +1,12 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 
+/** The map library, told where its worker is (see scripts/copy-maplibre-worker.mjs). */
+export async function loadMaplibre() {
+  const maplibre = await import("maplibre-gl");
+  maplibre.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
+  return maplibre;
+}
+
 /** Free vector styles from OpenFreeMap (OpenStreetMap data, no key, no sign-up). */
 const STYLES = {
   light: "https://tiles.openfreemap.org/styles/positron",

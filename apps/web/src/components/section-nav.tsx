@@ -19,6 +19,8 @@ export type SectionNavItem = {
   current?: boolean;
   /** A section of the open page listed under its page's item: indented, and the one the marker follows. */
   nested?: boolean;
+  /** For a nested item: the item it is listed under. Wide screens show it only while its parent, or a sibling, is being read. */
+  parent?: string;
 };
 
 /**
@@ -37,6 +39,8 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
   const active = clicked ?? spied ?? (items.some((item) => item.nested) ? null : (sections[0] ?? null));
   const sectionRead = items.find((item) => !item.href && item.id === active);
   const { box, glide } = useGlide(bar, "[data-pill]");
+  // Sections listed under an item show only while that item (or one of them) is the one being read.
+  const openParent = items.find((item) => item.id === active)?.parent ?? active;
 
   // The clicked item stays marked until the person scrolls on their own; then the scroll spy takes over.
   useEffect(() => {
@@ -84,7 +88,12 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
           // The marker rests on the section being read; the page's own item is the fallback (and what a phone shows).
           const pill = item === sectionRead || (item.href && item.current) || undefined;
           return (
-            <li key={item.id} data-current={isCurrent || undefined} className={`lg:w-full ${item.nested ? "max-lg:hidden" : ""}`}>
+            <li
+              key={item.id}
+              data-current={isCurrent || undefined}
+              hidden={item.parent !== undefined && item.parent !== openParent}
+              className={`lg:w-full ${item.nested ? "max-lg:hidden" : ""}`}
+            >
               {heading && <p className="mb-1 mt-4 hidden px-3 text-xs font-semibold uppercase tracking-wide text-muted lg:block">{heading}</p>}
               {item.href ? (
                 <Link href={item.href} aria-current={isCurrent ? "page" : undefined} data-pill={pill} className={classes}>

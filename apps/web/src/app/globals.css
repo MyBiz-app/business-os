@@ -2282,6 +2282,54 @@ html:has(dialog:modal) {
   box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
   cursor: default;
 }
+/* A city on the console's business map: size and color are set inline. */
+.business-dot {
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+  opacity: 0.88;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.3);
+  cursor: pointer;
+}
+.business-dot:focus-visible {
+  outline: 3px solid var(--primary-ink);
+  outline-offset: 2px;
+}
+/* The pin of the planned-branch mode: MapLibre moves the outer element, the teardrop is its child. */
+.planned-pin {
+  width: 30px;
+  height: 38px;
+  cursor: grab;
+}
+.planned-pin:active {
+  cursor: grabbing;
+}
+.planned-pin-shape {
+  position: absolute;
+  left: 1px;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px 9999px 9999px 0;
+  transform: rotate(-45deg);
+  transform-origin: 50% 50%;
+  background: var(--primary);
+  border: 3px solid var(--surface);
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.35);
+}
+.planned-pin-shape::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 9999px;
+  background: var(--surface);
+}
+.planned-pin:focus-visible {
+  outline: none;
+}
+.planned-pin:focus-visible .planned-pin-shape {
+  outline: 3px solid var(--primary-ink);
+  outline-offset: 3px;
+}
 .branch-dot[data-selected="true"] {
   outline: 3px solid var(--primary-ink);
   outline-offset: 2px;
@@ -2465,5 +2513,26 @@ html[data-motion="reduce"] ::view-transition-new(*) {
   .tour-step {
     transition: none;
     animation: none;
+  }
+}
+
+/* The save bar of a settings form (components/form/save-bar.tsx): rises from the bottom edge when a
+   field changes, and settles back when the form is saved or discarded. */
+.save-bar {
+  opacity: 0;
+  transform: translateY(1rem);
+  pointer-events: none;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out;
+}
+.save-bar[data-open] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .save-bar {
+    transition: none;
   }
 }

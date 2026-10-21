@@ -44,7 +44,7 @@ export default async function SettingsIndexPage(): Promise<ReactNode> {
       {keys.map((key, index) => {
         const Topic = PAGES[key];
         return (
-          <section key={key} id={key} className={`scroll-anchor ${index > 0 ? "border-t border-border pt-10" : ""}`}>
+          <section key={key} id={key} data-settings-topic={key} className={`scroll-anchor ${index > 0 ? "border-t border-border pt-10" : ""}`}>
             <Suspense fallback={<div aria-hidden="true" className="h-40 animate-pulse rounded-2xl bg-foreground/5" />}>
               <Topic />
             </Suspense>

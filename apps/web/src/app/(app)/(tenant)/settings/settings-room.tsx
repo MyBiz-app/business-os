@@ -63,14 +63,16 @@ export function SettingsRoom({
   const current = items.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
   // The groups of the open topic page, listed under its item and followed as the page scrolls.
   const content = useRef<HTMLDivElement>(null);
-  const [groups, setGroups] = useState<{ id: string; title: string }[]>([]);
+  const [groups, setGroups] = useState<{ id: string; title: string; topic: string | null }[]>([]);
   useEffect(() => {
     const element = content.current;
-    if (!element || isIndex) return;
+    if (!element) return;
     const read = () => {
       const next = Array.from(element.querySelectorAll<HTMLElement>("[data-settings-group][id]")).map((group) => ({
         id: group.id,
         title: group.querySelector("h3")?.textContent?.trim() || group.id,
+        // On `/settings` every topic is a section of the page, and its groups belong to it.
+        topic: group.closest<HTMLElement>("[data-settings-topic]")?.dataset.settingsTopic ?? null,
       }));
       setGroups((now) => (JSON.stringify(now) === JSON.stringify(next) ? now : next));
     };
@@ -88,6 +90,7 @@ export function SettingsRoom({
     const Icon = ICONS[item.key];
     const inline = (INLINE_TOPICS as readonly TopicKey[]).includes(item.key);
     const isCurrent = !isIndex && current?.key === item.key;
+    const own = groups.filter((group) => (isIndex ? group.topic === item.key : isCurrent));
     const topic: SectionNavItem = {
       id: item.key,
       label: t(`nav.items.${item.key}`),
@@ -96,7 +99,7 @@ export function SettingsRoom({
       href: inline && isIndex ? undefined : inline ? `/settings#${item.key}` : item.href,
       current: isCurrent,
     };
-    const sections: SectionNavItem[] = isCurrent ? groups.map((group) => ({ id: group.id, label: group.title, nested: true })) : [];
+    const sections: SectionNavItem[] = own.map((group) => ({ id: group.id, label: group.title, nested: true, parent: isIndex ? item.key : undefined }));
     return [topic, ...sections];
   });
 

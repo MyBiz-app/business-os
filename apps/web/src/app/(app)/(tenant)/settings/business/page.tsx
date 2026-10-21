@@ -33,9 +33,7 @@ export default async function BusinessSettingsPage() {
           <LegalReadiness tenant={tenant} readiness={readiness} />
         </SettingsGroup>
       )}
-      <SettingsGroup id="details" title={t("details")} description={t("detailsHint")}>
-        <DetailsForm tenant={tenant} timeZones={Intl.supportedValuesOf("timeZone")} />
-      </SettingsGroup>
+      <DetailsForm tenant={tenant} timeZones={Intl.supportedValuesOf("timeZone")} />
       {emails && (
         <SettingsGroup id="emails" title={t("contactEmails.title")} description={t("contactEmails.hint")}>
           <ContactEmails data={emails} locationId={null} grouped />
