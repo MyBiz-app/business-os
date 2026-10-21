@@ -202,8 +202,11 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
       </div>
     </div>
     {aiBubble && <AiBubble />}
-    {/* Forms that open as a window over the page (round 7); the slot is empty otherwise. */}
-    {modal}
+    {/* Forms that open as a window over the page (round 7); the slot is empty otherwise. It sits
+        outside the frame above, so it carries the business's brand color itself. */}
+    <div style={brandStyle(brandColor)} className="brand contents">
+      {modal}
+    </div>
     </ScreenContextProvider>
     </ScopedMessages>
   );

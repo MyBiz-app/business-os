@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { addDays, addMonths, dayOf, isDay, localToInstant, localValue, monthGrid, monthStart, todayIn, toApiWeekday, weekStart } from "../src/dates.ts";
+import { addDays, addMonths, dayOf, formatDay, isDay, localToInstant, localValue, monthGrid, monthStart, todayIn, toApiWeekday, weekStart } from "../src/dates.ts";
 
 test("today depends on the business time zone, not the server's", () => {
   const instant = new Date("2026-10-11T22:30:00Z"); // Sunday night in UTC, Monday in Israel
@@ -44,4 +44,10 @@ test("converts between an instant and a zone's wall clock", () => {
   assert.equal(localToInstant("2026-01-01T09:00", "Asia/Jerusalem"), "2026-01-01T07:00:00.000Z");
   assert.equal(localValue("2026-07-01T06:00:00.000Z", "Asia/Jerusalem"), "2026-07-01T09:00");
   assert.equal(localValue(localToInstant("2026-10-12T23:30", "America/New_York"), "America/New_York"), "2026-10-12T23:30");
+});
+
+test("formatDay takes a day or an instant (an API timestamp used to throw Invalid time value)", () => {
+  const options = { day: "numeric", month: "numeric", year: "numeric" } as const;
+  assert.equal(formatDay("2026-09-01", "en-GB", options), "01/09/2026");
+  assert.equal(formatDay("2026-09-01T18:34:24.584791Z", "en-GB", options), "01/09/2026");
 });

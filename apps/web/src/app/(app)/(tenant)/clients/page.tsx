@@ -19,7 +19,8 @@ import { StatusBadge } from "./status-badge";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/empty-state";
-import { ColumnPicker, HIDDEN_COLUMNS_PARAM, hiddenColumns } from "@/components/column-picker";
+import { ColumnPicker } from "@/components/column-picker";
+import { HIDDEN_COLUMNS_PARAM, hiddenColumns } from "@/components/column-picker-params";
 import { SavedViews } from "@/components/saved-views";
 import { openedId, withOpen } from "@/lib/open-window";
 

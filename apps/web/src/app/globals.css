@@ -30,10 +30,10 @@
   --primary-subtle: color-mix(in oklab, var(--primary) 8%, var(--surface));
   /* Bright green for fills and dots; the ink is the AA-safe one for text (5:1 on white and on its tint). */
   --success: #16a34a;
-  --success-ink: #15803d;
+  --success-ink: #127a37;
   --danger: #b91c1c;
   --on-danger: #ffffff;
-  --warning: #b45309;
+  --warning: #a84a08;
   /* Status tints: a very light background with the dark ink as text (badges, banners). */
   --success-soft: #ecfdf3;
   --warning-soft: #fff7e6;

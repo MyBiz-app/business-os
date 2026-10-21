@@ -4,16 +4,9 @@ import { Columns3 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
+import { HIDDEN_COLUMNS_PARAM } from "@/components/column-picker-params";
 import { Button } from "@/components/ui/button";
 import { Popover } from "@/components/ui/popover";
-
-/** The query parameter that lists the hidden columns, so a view (a bookmark, a saved view) keeps them. */
-export const HIDDEN_COLUMNS_PARAM = "hide";
-
-export function hiddenColumns(value: string | string[] | undefined, allowed: string[]) {
-  const raw = Array.isArray(value) ? value.join(",") : (value ?? "");
-  return raw.split(",").filter((key) => allowed.includes(key));
-}
 
 /** Chooses which columns of a list show. The choice goes into the URL (`hide=phone,email`), where
  * the server page reads it, so it travels with the filters and with saved views. */

@@ -28,9 +28,20 @@ export function RecordLayout({ tabs, label, aside }: { tabs: RecordTab[]; label:
       const id = window.location.hash.slice(1);
       if (id && tabs.some((tab) => tab.id === id)) setActive(id);
     };
+    // A link to `#tab` inside the page (the "Sell a plan" button) goes through Next's router, which
+    // changes the address with pushState and fires no hashchange, so the click itself opens the tab.
+    const fromLink = (event: MouseEvent) => {
+      const href = (event.target as Element | null)?.closest?.("a[href^='#']")?.getAttribute("href");
+      const id = href?.slice(1);
+      if (id && tabs.some((tab) => tab.id === id)) setActive(id);
+    };
     fromAddress();
     window.addEventListener("hashchange", fromAddress);
-    return () => window.removeEventListener("hashchange", fromAddress);
+    document.addEventListener("click", fromLink);
+    return () => {
+      window.removeEventListener("hashchange", fromAddress);
+      document.removeEventListener("click", fromLink);
+    };
   }, [tabs]);
 
   function open(id: string) {
