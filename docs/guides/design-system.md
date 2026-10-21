@@ -22,6 +22,7 @@ same value in several files, it should become a token here first.
 | The color palettes a person picks (MyBiz, Ocean, Forest, X25) | `[data-palette=…]` blocks (light and `.dark`) in `globals.css`, the list in `apps/web/src/components/palette.tsx` | `--palette-primary` / `--palette-on-primary` feed `--primary`; a business's brand color still wins inside its area. A new palette: add its CSS block, its entry in `PALETTES`, its name in the translations and in the API's allowed values (`users.palette` check). |
 | Branch colors (calendar, switcher, branch comparison) | `BRANCH_COLORS` in `apps/web/src/lib/calendar.ts` | A branch keeps its color by its place in the branch list. |
 | Shadows, motion easing | `--elevation*`, `--ease-out` in `globals.css` | |
+| See or try a component (light/dark, left-to-right/right-to-left) | `pnpm --filter web storybook` (port 6006), stories next to each component as `*.stories.tsx`; `.storybook/` | Free, no Chromatic: before/after screenshots of whole pages stay in `e2e/screen_sweep.py`. A new shared component comes with a story. |
 | Buttons, cards, inputs, entrance animations | `@utility btn-primary`, `btn-secondary`, `card`, `card-accent`, `control`, `enter`… in `globals.css` | Pages use these utilities, so restyling a button restyles every button. |
 | Add-on icons and colors | `apps/web/src/components/modules/module-icon.tsx` | One entry per module; used by pricing, sign-up and cart. |
 | Industry icons, colors, services, plans, client fields | `packages/verticals/catalog/*.json` | Then `pnpm verticals:export`. See [verticals.md](verticals.md). |
@@ -92,6 +93,25 @@ page Foundations). Quiet: hierarchy by size, not weight; hairlines instead of he
 
 ## Components
 
+- **React components (CRM Premium W3-1, `apps/web/src/components/ui`)**, built once on the Calm tokens; screens compose
+  them and never restyle them. The text always comes in as props (nothing is translated inside a component).
+  - `Button` (`primary` the one main action, `secondary` the default, `quiet` cancel/toolbar, `danger` delete, `plain` a
+    card or row that is a button), `ButtonLink` (goes somewhere), `IconButton` (needs a `label`). 36px tall on a desktop,
+    44px on a touch screen (the global rule in `globals.css`), `size="lg"` for a call to action, `pending` disables and
+    announces busy. `type` defaults to `button`.
+  - `Card` (flat surface, hairline, 16px padding on a phone and 20px on a desktop; `tone="accent"`, `interactive`) and
+    `CardHeader`. No card inside a card.
+  - `PageHeader` (`components/layout`, title, optional lead-in and actions), `Tabs` and `TabPanel` (underline tabs that
+    glide; button tabs for one content area, or `href` items for one address per tab, never jumping the page),
+    `Badge` (soft tint) and `StatusDot` (a dot with its meaning in words), `StatTile` (one number, small trend, optional link),
+    `EmptyState` (`components/empty-state.tsx`, now with `title` and `action`).
+  - `Popover` and `Menu`: one positioning method. The panel is a native top-layer element (`popover="manual"`), placed by
+    `lib/popover-position.ts` (tested): it opens on the preferred side, flips when it does not fit, stays inside the screen
+    and follows the reading direction (`bottom-start` aligns to the right edge in Hebrew). A click outside and Esc close it;
+    the arrow keys move in a menu. Use these for every new menu; the older hand-made ones (`user-menu.tsx`, `more-menu.tsx`)
+    move over in the page passes.
+  - Already there, reuse: `Modal`, `ConfirmDialog`, `Sheet` (`placement="side"`), `Tour`, `SegmentedControl`, `Pill`,
+    `SummaryTiles`. `DataTable` comes in W4-1.
 - Buttons: `btn-primary`, `btn-secondary`, `btn-danger` (visible buttons), `btn-ghost` (quiet
   button), `btn-lg` (size). Three bare variants keep focus ring, cursor and disabled behavior
   identical when the element is not a filled button: `btn-link` (text action, underlines on hover),
@@ -197,6 +217,12 @@ The team list opens a person's card as a window over the list with `?open=<userI
   `LinkSegmented` (`components/ui/link-segmented.tsx`): the pill slides at once, the page stays
   put and dots show while the data loads. Heavy pages have a `loading.tsx` built from
   `components/layout/page-skeletons.tsx` at the page's own `Container` width.
+- `design-system/no-handrolled-ui`: new code uses `Button` / `IconButton` / `ButtonLink` instead of a bare `<button>`, and
+  (from W4-1) `DataTable` instead of a bare `<table>`. The components themselves (`components/ui/`) and stories are exempt.
+  Files that predate the components are listed in `apps/web/eslint-rules/handrolled-ui-baseline.json`, a list that only
+  shrinks: after moving a file over, run `node scripts/handrolled-ui-baseline.mjs` in `apps/web` (the test
+  `src/lib/handrolled-ui.test.ts` fails while a listed file no longer needs its entry). Until `DataTable` exists, a new
+  table needs `// eslint-disable-next-line design-system/no-handrolled-ui -- DataTable lands in W4-1`.
 - `design-system/no-raw-button`: a `<button>` needs `btn-primary`, `btn-secondary`, `btn-ghost`,
   `btn-danger`, `btn-link`, `btn-icon`, `btn-plain` or `control` in its `className`.
 

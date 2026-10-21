@@ -78,6 +78,9 @@ jobs:
           pnpm turbo run lint typecheck build
           pnpm turbo run test --filter='!api'
 
+      - name: Build Storybook (the component catalog)
+        run: pnpm --filter web build-storybook
+
       # Fast mode only: the guard tests of the API. The whole suite runs in the shards below.
       - name: API guard tests
         if: github.event_name == 'pull_request' && vars.CI_FULL != 'true'

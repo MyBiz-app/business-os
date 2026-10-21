@@ -4,7 +4,21 @@ export type EmptyVariant = "calendar" | "people" | "list" | "chart" | "inbox";
 
 /** A friendly empty state: a small animated illustration (in the brand colors, decorative only)
  * above the message. The motion is gentle and stops for reduced motion. */
-export function EmptyState({ variant = "list", children, className = "" }: { variant?: EmptyVariant; children: ReactNode; className?: string }) {
+export function EmptyState({
+  variant = "list",
+  title,
+  action,
+  children,
+  className = "",
+}: {
+  variant?: EmptyVariant;
+  /** A short heading above the message ("No clients yet"). */
+  title?: ReactNode;
+  /** What to do about it: one `Button` or `ButtonLink`, under the message. */
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <div role="status" className={`flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border p-10 text-center text-muted ${className}`}>
       <svg aria-hidden="true" viewBox="0 0 96 72" className="es-bob h-20 w-auto" fill="none">
@@ -49,7 +63,11 @@ export function EmptyState({ variant = "list", children, className = "" }: { var
           </>
         )}
       </svg>
-      <div className="max-w-prose">{children}</div>
+      <div className="flex max-w-prose flex-col gap-1">
+        {title && <p className="text-lg font-semibold text-foreground">{title}</p>}
+        <div>{children}</div>
+      </div>
+      {action}
     </div>
   );
 }

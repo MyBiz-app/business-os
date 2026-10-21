@@ -434,6 +434,39 @@ h3,
   }
 }
 
+/* A panel that floats over the page (menu, popover): a native top-layer element (`popover="manual"`),
+   so no parent's overflow, transform or stacking can clip or hide it. `components/ui/popover.tsx`
+   sets its left/top (`lib/popover-position.ts`) and flips `data-state` to animate it. */
+@utility floating-panel {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: var(--elevation-floating);
+  /* Undo the browser's centered, bordered, clipped default for [popover]. */
+  &[popover] {
+    inset: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 160ms var(--ease-out);
+  &[data-state="closed"] {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+    pointer-events: none;
+  }
+  &[data-state="open"] {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
 /* The large call to action (hero, bands): comfortable on a phone, generous on a wide screen. */
 @utility btn-lg {
   padding: 0.625rem 1.25rem;
