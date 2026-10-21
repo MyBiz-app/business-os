@@ -18,6 +18,7 @@ from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import AnonymousSessionDep, TenantContext, has_module, require
 from app.api.pagination import MAX_LIMIT
 from app.core.permissions import Permission
+from app.geo.addresses import ADDRESS_KEYS, AddressFields, resolve_address
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 public_router = APIRouter(prefix="/public", tags=["public"])
@@ -43,7 +44,7 @@ ReadDep = Annotated[TenantContext, Depends(_crm(Permission.CLIENTS_READ))]
 WriteDep = Annotated[TenantContext, Depends(_crm(Permission.CLIENTS_WRITE))]
 
 
-class LeadFields(BaseModel):
+class LeadFields(AddressFields):
     last_name: str | None = Field(default=None, max_length=100)
     email: EmailStr | None = None
     phone: str | None = Field(default=None, max_length=30)
@@ -125,6 +126,14 @@ class Lead(BaseModel):
     created_at: datetime
     updated_at: datetime
     stage_changed_at: datetime
+    city_code: int | None = Field(description="Where the lead is from, from the official list")
+    city_name: str | None
+    street_code: int | None
+    street_name: str | None
+    house_number: str | None
+    address_details: str | None
+    street_unlisted: str | None
+    address: str | None = Field(description="The address as one line of text")
 
 
 class LeadDetail(Lead):
@@ -152,7 +161,12 @@ SELECT = """
     SELECT l.id, l.first_name, l.last_name, l.email, l.phone, l.interest, l.source, l.campaign,
            l.stage, l.lost_reason, l.follow_up_on, l.owner_user_id,
            coalesce(nullif(trim(u.full_name), ''), split_part(u.email, '@', 1)) AS owner_name,
-           l.client_id, l.created_at, l.updated_at, l.stage_changed_at
+           l.client_id, l.created_at, l.updated_at, l.stage_changed_at,
+           l.city_code, l.street_code, l.house_number, l.address_details, l.street_unlisted,
+           l.address,
+           (SELECT c.name_he FROM app.geo_cities c WHERE c.code = l.city_code) AS city_name,
+           (SELECT st.name_he FROM app.geo_streets st
+             WHERE st.city_code = l.city_code AND st.code = l.street_code) AS street_name
     FROM app.leads l LEFT JOIN app.users u ON u.id = l.owner_user_id
 """
 
@@ -203,6 +217,16 @@ def _load(db: Session, lead_id: UUID) -> LeadDetail:
     return LeadDetail(
         **dict(row), activities=[Activity.model_validate(dict(a)) for a in activities]
     )
+
+
+def _address_columns(db: Session, fields: dict, current: dict | None = None) -> dict:
+    """The lead's address checked against the official lists. A city is expected but a lead
+    without one is fine (soft), and so is a city without a street; the text column is composed
+    from what is there."""
+    merged = {key: (current or {}).get(key) for key in ADDRESS_KEYS}
+    merged.update({key: fields[key] for key in ADDRESS_KEYS if key in fields})
+    resolved = resolve_address(db, merged, required=False)
+    return {**resolved.columns, "address": resolved.text}
 
 
 def _check_owner(db: Session, owner_user_id: UUID | None) -> None:
@@ -295,16 +319,19 @@ def list_leads(
 def create_lead(body: LeadCreate, context: WriteDep) -> LeadDetail:
     db = context.session
     _check_owner(db, body.owner_user_id)
+    values = body.model_dump() | _address_columns(db, body.model_dump())
     lead_id = db.execute(
         text("""
             INSERT INTO app.leads
                 (tenant_id, first_name, last_name, email, phone, interest, source, campaign,
-                 follow_up_on, owner_user_id)
+                 follow_up_on, owner_user_id, city_code, street_code, house_number,
+                 address_details, street_unlisted, address)
             VALUES (:tenant_id, :first_name, :last_name, lower(:email), :phone, :interest,
-                    :source, :campaign, :follow_up_on, :owner_user_id)
+                    :source, :campaign, :follow_up_on, :owner_user_id, :city_code, :street_code,
+                    :house_number, :address_details, :street_unlisted, :address)
             RETURNING id
         """),
-        {**body.model_dump(), "tenant_id": context.tenant_id},
+        {**values, "tenant_id": context.tenant_id},
     ).scalar_one()
     _log(db, context.tenant_id, lead_id, "created", to_stage="new")
     return _load(db, lead_id)
@@ -347,8 +374,23 @@ def update_lead(lead_id: UUID, body: LeadUpdate, context: WriteDep) -> LeadDetai
         _check_owner(db, changes["owner_user_id"])
     if changes.get("email"):
         changes["email"] = changes["email"].lower()
+    if body.address_given():
+        current = (
+            db.execute(
+                text(
+                    "SELECT city_code, street_code, house_number, address_details, street_unlisted"
+                    " FROM app.leads WHERE id = :id"
+                ),
+                {"id": lead_id},
+            )
+            .mappings()
+            .first()
+        )
+        if current is None:
+            raise not_found()
+        changes |= _address_columns(db, changes, dict(current))
     if changes:
-        assignments = set_clause(changes, LeadUpdate.model_fields)
+        assignments = set_clause(changes, {*LeadUpdate.model_fields, "address"})
         updated = db.execute(
             text(f"UPDATE app.leads SET {assignments} WHERE id = :id RETURNING id"),
             {**changes, "id": lead_id},
@@ -437,9 +479,10 @@ def convert_lead(lead_id: UUID, context: WriteDep) -> LeadDetail:
         client_id = db.execute(
             text("""
                 INSERT INTO app.clients
-                    (tenant_id, first_name, last_name, email, phone, notes, status, source)
+                    (tenant_id, first_name, last_name, email, phone, notes, status, source,
+                     city_code)
                 VALUES (:tenant_id, :first_name, :last_name, :email, :phone, :notes, 'active',
-                        :source)
+                        :source, :city_code)
                 RETURNING id
             """),
             {
@@ -450,6 +493,7 @@ def convert_lead(lead_id: UUID, context: WriteDep) -> LeadDetail:
                 "phone": lead["phone"],
                 "notes": lead["interest"],
                 "source": source,
+                "city_code": lead["city_code"],
             },
         ).scalar_one()
     db.execute(
@@ -474,6 +518,7 @@ class InquiryCreate(BaseModel):
     email: EmailStr | None = None
     phone: str | None = Field(default=None, min_length=6, max_length=30)
     interest: str | None = Field(default=None, max_length=2000)
+    city_code: int | None = Field(default=None, description="Where they are from (optional)")
     # A field people never see: bots that fill every input fill it too.
     website: str | None = Field(default=None, max_length=200)
 
@@ -495,7 +540,7 @@ def submit_inquiry(code: str, body: InquiryCreate, db: AnonymousSessionDep) -> N
             db.execute(
                 text("""
                     SELECT app.submit_lead(
-                        :code, :first_name, :last_name, :email, :phone, :interest)
+                        :code, :first_name, :last_name, :email, :phone, :interest, :city_code)
                 """),
                 {"code": code, **body.model_dump(exclude={"website"})},
             )
@@ -507,4 +552,6 @@ def submit_inquiry(code: str, body: InquiryCreate, db: AnonymousSessionDep) -> N
             ) from error
         if code_ == "P0002":
             raise not_found() from error
+        if code_ == "P0003":
+            raise HTTPException(status_code=422, detail="unknown_city") from error
         raise

@@ -8,6 +8,7 @@ from pydantic import BaseModel, BeforeValidator, Field, field_validator, model_v
 
 from app.catalog.verticals import VERTICAL_PACKS
 from app.core.website import normalize_website
+from app.geo.addresses import AddressFields
 
 LegalEntityType = Literal[
     "company", "licensed_dealer", "exempt_dealer", "nonprofit", "partnership", "other"
@@ -158,7 +159,7 @@ class TenantCreate(BaseModel):
 WaitlistModeSetting = Literal["off", "auto", "first_come", "manual"]
 
 
-class TenantUpdate(BaseModel):
+class TenantUpdate(AddressFields):
     name: str | None = Field(default=None, min_length=1, max_length=120)
     locale: Locale | None = None
     time_zone: str | None = None
@@ -286,6 +287,14 @@ class Tenant(BaseModel):
     )
     address_line: str | None = Field(default=None, description="Settings managers only")
     address_city: str | None = Field(default=None, description="Settings managers only")
+    city_code: int | None = Field(
+        default=None, description="Settings managers only: the legal address's city (official list)"
+    )
+    street_code: int | None = Field(default=None, description="Settings managers only")
+    house_number: str | None = Field(default=None, description="Settings managers only")
+    address_details: str | None = Field(default=None, description="Settings managers only")
+    street_unlisted: str | None = Field(default=None, description="Settings managers only")
+    street_name: str | None = Field(default=None, description="Settings managers only")
     employer_file_number: str | None = Field(default=None, description="Settings managers only")
     business_license_number: str | None = Field(default=None, description="Settings managers only")
     business_license_expires_on: dt.date | None = Field(

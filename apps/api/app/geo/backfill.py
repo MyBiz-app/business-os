@@ -18,7 +18,7 @@ from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
 from app.geo.addresses import resolve_address, search_cities, search_streets
-from app.geo.geocoder import Geocoder, get_geocoder
+from app.geo.geocoder import Geocoder, Point, get_geocoder
 from app.geo.snapshot import normalize_search
 
 log = logging.getLogger(__name__)
@@ -92,9 +92,13 @@ def locate_branches(
             point = geocoder.find(street=resolved.street, house_number=house, city=city["name_he"])
             exact = point is not None
             if point is None and resolved.street:
-                if pause:
-                    time.sleep(pause)
-                point = geocoder.find(street=None, house_number=None, city=city["name_he"])
+                # The street is unknown to the map service: the city's stored center, no
+                # second request.
+                center = conn.execute(
+                    text("SELECT latitude, longitude FROM app.geo_cities WHERE code = :code"),
+                    {"code": city["code"]},
+                ).one()
+                point = Point(center.latitude, center.longitude) if center.latitude else None
             if pause:
                 time.sleep(pause)
             conn.execute(

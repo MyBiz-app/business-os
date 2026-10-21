@@ -3579,6 +3579,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/geo/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Cities Public
+         * @description The same city list for a form anyone can open (a business's inquiry form).
+         */
+        get: operations["list_cities_public"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff": {
         parameters: {
             query?: never;
@@ -12647,6 +12667,10 @@ export interface components {
             };
             /** Home Location Id */
             home_location_id: string | null;
+            /** City Code */
+            city_code: number | null;
+            /** City Name */
+            city_name: string | null;
             /**
              * Created At
              * Format: date-time
@@ -12917,6 +12941,11 @@ export interface components {
              * @description The client's home branch; new clients default to the current branch
              */
             home_location_id?: string | null;
+            /**
+             * City Code
+             * @description The city the client comes from, from the official list
+             */
+            city_code?: number | null;
             /** First Name */
             first_name: string;
             /**
@@ -13024,6 +13053,10 @@ export interface components {
             };
             /** Home Location Id */
             home_location_id: string | null;
+            /** City Code */
+            city_code: number | null;
+            /** City Name */
+            city_name: string | null;
             /**
              * Created At
              * Format: date-time
@@ -13340,6 +13373,11 @@ export interface components {
              * @description The client's home branch; new clients default to the current branch
              */
             home_location_id?: string | null;
+            /**
+             * City Code
+             * @description The city the client comes from, from the official list
+             */
+            city_code?: number | null;
             /** First Name */
             first_name?: string | null;
             /** Status */
@@ -15790,7 +15828,7 @@ export interface components {
              * Code
              * @enum {string}
              */
-            code: "missing_name" | "invalid_email" | "invalid_date" | "invalid_status" | "duplicate";
+            code: "missing_name" | "invalid_email" | "invalid_date" | "invalid_status" | "duplicate" | "unknown_city";
         };
         /** ImportResult */
         ImportResult: {
@@ -15803,7 +15841,7 @@ export interface components {
              * Mapping
              * @description Field for each column, if any
              */
-            mapping: (("first_name" | "last_name" | "full_name" | "email" | "phone" | "date_of_birth" | "notes" | "status") | null)[];
+            mapping: (("first_name" | "last_name" | "full_name" | "email" | "phone" | "date_of_birth" | "notes" | "status" | "city") | null)[];
             /**
              * Examples
              * @description First non-empty value of each column
@@ -15820,6 +15858,16 @@ export interface components {
             duplicates: number;
             /** Invalid */
             invalid: number;
+            /**
+             * Cities Matched
+             * @description New clients whose city was found in the official list
+             */
+            cities_matched: number;
+            /**
+             * Cities Unmatched
+             * @description New clients whose city was not recognized; they are imported without a city
+             */
+            cities_unmatched: number;
             /** Imported */
             imported: boolean;
             /**
@@ -15843,6 +15891,11 @@ export interface components {
             email: string | null;
             /** Phone */
             phone: string | null;
+            /**
+             * City
+             * @description The official city it was matched to
+             */
+            city?: string | null;
         };
         /** Inbox */
         Inbox: {
@@ -15944,6 +15997,11 @@ export interface components {
             phone?: string | null;
             /** Interest */
             interest?: string | null;
+            /**
+             * City Code
+             * @description Where they are from (optional)
+             */
+            city_code?: number | null;
             /** Website */
             website?: string | null;
         };
@@ -16597,6 +16655,28 @@ export interface components {
              * Format: date-time
              */
             stage_changed_at: string;
+            /**
+             * City Code
+             * @description Where the lead is from, from the official list
+             */
+            city_code: number | null;
+            /** City Name */
+            city_name: string | null;
+            /** Street Code */
+            street_code: number | null;
+            /** Street Name */
+            street_name: string | null;
+            /** House Number */
+            house_number: string | null;
+            /** Address Details */
+            address_details: string | null;
+            /** Street Unlisted */
+            street_unlisted: string | null;
+            /**
+             * Address
+             * @description The address as one line of text
+             */
+            address: string | null;
         };
         /** LeadBoard */
         LeadBoard: {
@@ -16626,6 +16706,28 @@ export interface components {
         };
         /** LeadCreate */
         LeadCreate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Last Name */
             last_name?: string | null;
             /** Email */
@@ -16703,6 +16805,28 @@ export interface components {
              * Format: date-time
              */
             stage_changed_at: string;
+            /**
+             * City Code
+             * @description Where the lead is from, from the official list
+             */
+            city_code: number | null;
+            /** City Name */
+            city_name: string | null;
+            /** Street Code */
+            street_code: number | null;
+            /** Street Name */
+            street_name: string | null;
+            /** House Number */
+            house_number: string | null;
+            /** Address Details */
+            address_details: string | null;
+            /** Street Unlisted */
+            street_unlisted: string | null;
+            /**
+             * Address
+             * @description The address as one line of text
+             */
+            address: string | null;
             /** Activities */
             activities: components["schemas"]["Activity"][];
         };
@@ -16718,6 +16842,28 @@ export interface components {
         };
         /** LeadUpdate */
         LeadUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Last Name */
             last_name?: string | null;
             /** Email */
@@ -22647,6 +22793,36 @@ export interface components {
              */
             address_city?: string | null;
             /**
+             * City Code
+             * @description Settings managers only: the legal address's city (official list)
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description Settings managers only
+             */
+            street_code?: number | null;
+            /**
+             * House Number
+             * @description Settings managers only
+             */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Settings managers only
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description Settings managers only
+             */
+            street_unlisted?: string | null;
+            /**
+             * Street Name
+             * @description Settings managers only
+             */
+            street_name?: string | null;
+            /**
              * Employer File Number
              * @description Settings managers only
              */
@@ -22896,6 +23072,28 @@ export interface components {
         };
         /** TenantUpdate */
         TenantUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name?: string | null;
             /** Locale */
@@ -24028,6 +24226,11 @@ export interface components {
             last_name?: string | null;
             /** Phone */
             phone?: string | null;
+            /**
+             * City Code
+             * @description Where the client is from (official list); left out: unchanged
+             */
+            city_code?: number | null;
         };
         /** Decision */
         app__api__freeze_requests__Decision: {
@@ -33030,6 +33233,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Street"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_cities_public: {
+        parameters: {
+            query?: {
+                /** @description Letters from the name; empty: all */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["City"][];
                 };
             };
             /** @description Validation Error */

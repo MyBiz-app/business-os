@@ -5,6 +5,7 @@ floor, entrance). A street missing from the list can be typed instead (`street_u
 kept as typed and stays visible for review. The text is also saved in the older free-text column,
 so everything that still reads that column (reports, messages, documents) keeps working."""
 
+import re
 from typing import Any
 
 from fastapi import HTTPException
@@ -90,6 +91,41 @@ def search_streets(
             },
         ).mappings()
     ]
+
+
+_BRACKETS = re.compile(r"\s*\([^)]*\)")
+
+
+class CityMatcher:
+    """Finds the official city for a name typed in a file (an import): the exact name in Hebrew
+    or English, the name without a bracketed note or after the first " - " ("תל אביב" for
+    "תל אביב - יפו"), else the only city containing the letters. Unclear is not guessed."""
+
+    def __init__(self, session: Session) -> None:
+        self._exact: dict[str, int | None] = {}
+        self._search: list[tuple[str, int]] = []
+        for code, name_he, name_en, search_text in session.execute(
+            text("SELECT code, name_he, name_en, search_text FROM app.geo_cities")
+        ):
+            keys = {normalize_search(name_he), normalize_search(_BRACKETS.sub("", name_he))}
+            keys.add(normalize_search(name_he.split(" - ")[0]))
+            if name_en:
+                keys.add(normalize_search(name_en))
+            for key in keys - {""}:
+                # Two cities with the same key: neither is chosen.
+                self._exact[key] = code if self._exact.get(key, code) == code else None
+            self._search.append((search_text, code))
+
+    def find(self, name: str | None) -> int | None:
+        key = normalize_search(name or "")
+        if not key:
+            return None
+        if key in self._exact:
+            return self._exact[key]
+        if len(key) < 3:
+            return None
+        hits = {code for search_text, code in self._search if key in search_text}
+        return hits.pop() if len(hits) == 1 else None
 
 
 class Resolved(BaseModel):

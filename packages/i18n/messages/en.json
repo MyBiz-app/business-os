@@ -218,7 +218,8 @@
         "employerFileHint": "From the Tax Authority. Needed only for payroll.",
         "licenseNumber": "Licence number",
         "licenseHint": "Only if your type of business needs one. We remind you 60 days before it expires.",
-        "licenseExpires": "Licence expires on"
+        "licenseExpires": "Licence expires on",
+        "legalAddress": "Legal address"
       }
     },
     "clientIdNumber": "Ask clients for an ID number",
@@ -1019,7 +1020,9 @@
         "unsubscribe_link": "Opt-out link",
         "unsubscribe_email": "Opt-out link in an email"
       }
-    }
+    },
+    "city": "City",
+    "cityHint": "Where the client comes from. It helps you see where your clients live."
   },
   "common": {
     "undo": "Undo",
@@ -1107,7 +1110,9 @@
     "backToList": "Choose from the list",
     "noResults": "No results",
     "chooseCity": "Choose a city from the list",
-    "chooseStreet": "Choose a street from the list"
+    "chooseStreet": "Choose a street from the list",
+    "fromCity": "Which city are you from?",
+    "fromCityHint": "Optional. Only the city is saved."
   },
   "branchMap": {
     "title": "Branches map",
@@ -4019,7 +4024,8 @@
       "phone": "Phone",
       "date_of_birth": "Date of birth",
       "notes": "Notes",
-      "status": "Status"
+      "status": "Status",
+      "city": "City"
     },
     "preview": "Preview",
     "rows": "{count, plural, one {# row} other {# rows}} in the file",
@@ -4027,14 +4033,15 @@
     "duplicates": "{count, plural, =0 {No duplicates} one {# already exists} other {# already exist}}",
     "invalid": "{count, plural, =0 {No problems} one {# row with a problem} other {# rows with problems}}",
     "sample": "First new clients",
-    "issues": "Rows that won't be imported",
+    "issues": "Rows to check",
     "issue": "Row {line}: {problem}",
     "problems": {
       "missing_name": "no name",
       "invalid_email": "the email address isn't valid",
       "invalid_date": "the date of birth isn't a valid date",
       "invalid_status": "unknown status (use active, inactive or lead)",
-      "duplicate": "already exists (same email, phone or name)"
+      "duplicate": "already exists (same email, phone or name)",
+      "unknown_city": "the city is not on the official list; the client is imported without a city"
     },
     "source": "Where these clients came from (optional)",
     "sourceNone": "Not specified",
@@ -4050,7 +4057,9 @@
       "generic": "Something went wrong. Try again."
     },
     "viewClients": "See the client list",
-    "importMore": "Import another file"
+    "importMore": "Import another file",
+    "citiesMatched": "{count, plural, =0 {No city recognized} one {# client with a recognized city} other {# clients with a recognized city}}",
+    "citiesUnmatched": "{count, plural, =0 {Every city was recognized} one {# city not recognized} other {# cities not recognized}}"
   },
   "privacy": {
     "title": "Privacy",
@@ -5886,7 +5895,8 @@
     },
     "pipeline": "Lead pipeline",
     "viewShowing": "Showing {view}: {count}",
-    "viewClear": "Show all leads"
+    "viewClear": "Show all leads",
+    "cityHint": "Recommended: it shows where your leads come from."
   },
   "inquiry": {
     "title": "Get in touch · {name}",
@@ -5907,7 +5917,8 @@
       "contact": "We need a phone number or email to get back to you.",
       "too_many_requests": "We've already received a few messages from you. Please try again later.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "city": "Which city are you from? (optional)"
   },
   "billing": {
     "title": "Billing",

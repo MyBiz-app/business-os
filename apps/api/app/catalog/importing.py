@@ -15,7 +15,15 @@ from email_validator import EmailNotValidError, validate_email
 from openpyxl import load_workbook
 
 ImportField = Literal[
-    "first_name", "last_name", "full_name", "email", "phone", "date_of_birth", "notes", "status"
+    "first_name",
+    "last_name",
+    "full_name",
+    "email",
+    "phone",
+    "date_of_birth",
+    "notes",
+    "status",
+    "city",
 ]
 
 MAX_ROWS = 5000
@@ -49,6 +57,8 @@ SYNONYMS: dict[str, ImportField] = {
                           "יום הולדת"),
         "notes": ("notes", "note", "comments", "remarks", "הערות", "הערה"),
         "status": ("status", "סטטוס", "מצב"),
+        "city": ("city", "town", "city of residence", "עיר", "עיר מגורים", "יישוב", "ישוב",
+                 "מקום מגורים"),
     }.items()
     for name in names
 }  # fmt: skip
@@ -197,6 +207,7 @@ def parse_rows(table: list[list[str]], mapping: list[ImportField | None]) -> lis
                 result.errors.append(("date_of_birth", "invalid_date"))
             values["date_of_birth"] = born
         values["notes"] = raw.get("notes", "")[:5000] or None
+        values["city"] = raw.get("city", "")[:100] or None
         values["status"] = "active"
         if raw.get("status"):
             mapped = STATUSES.get(_key(raw["status"]))

@@ -5,6 +5,7 @@ import { Check, Circle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
+import { AddressPicker } from "@/components/address-picker";
 import { Field } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -74,9 +75,22 @@ export function LegalReadiness({ tenant, readiness }: { tenant: Tenant; readines
       <form action={action} className="flex flex-col gap-4 border-t border-border pt-6">
         <FormError message={state.error && tCommon("errors.generic")} />
         <FormNotice message={state.saved ? tCommon("saved") : undefined} />
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-1 text-sm font-medium">{t("form.legalAddress")}</legend>
+          <AddressPicker
+            defaults={{
+              city_code: tenant.city_code,
+              city_name: tenant.address_city,
+              street_code: tenant.street_code,
+              street_name: tenant.street_name,
+              house_number: tenant.house_number,
+              address_details: tenant.address_details,
+              street_unlisted: tenant.street_unlisted,
+            }}
+            legacyText={[tenant.address_line, tenant.address_city].filter(Boolean).join(", ")}
+          />
+        </fieldset>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={t("form.addressLine")} name="address_line" defaultValue={tenant.address_line ?? ""} maxLength={200} autoComplete="street-address" />
-          <Field label={t("form.addressCity")} name="address_city" defaultValue={tenant.address_city ?? ""} maxLength={100} autoComplete="address-level2" />
           <Field label={t("form.employerFile")} hint={t("form.employerFileHint")} name="employer_file_number" defaultValue={tenant.employer_file_number ?? ""} maxLength={20} dir="ltr" autoComplete="off" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

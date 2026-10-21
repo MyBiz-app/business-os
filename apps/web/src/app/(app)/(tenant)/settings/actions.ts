@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { addressFromForm } from "@/lib/address";
 import { apiUpload, unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
 import { getTenant } from "@/lib/tenant";
@@ -123,8 +124,7 @@ export async function updateLegalDetails(_state: FormState, formData: FormData):
       await api.PATCH("/tenants/current", {
         params: scope,
         body: {
-          address_line: value("address_line"),
-          address_city: value("address_city"),
+          ...addressFromForm(formData),
           employer_file_number: value("employer_file_number"),
           business_license_number: value("business_license_number"),
           business_license_expires_on: value("business_license_expires_on") || null,

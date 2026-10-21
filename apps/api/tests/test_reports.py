@@ -2,12 +2,10 @@ import random
 from datetime import date, timedelta
 from uuid import uuid4
 
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from app.geo.geocoder import NoGeocoder
-from app.reports.branch_insights import MIN_CLIENTS_PER_CITY, _city_point
+from app.reports.branch_insights import MIN_CLIENTS_PER_CITY
 from app.seed import seed
 from tests.conftest import AuthHeaders, add_member, local_today
 
@@ -145,10 +143,8 @@ def test_members_at_risk(client: TestClient, engine: Engine, auth: AuthHeaders) 
 
 
 def test_branch_insights_show_client_origins_and_staff_cost(
-    client: TestClient, engine: Engine, auth: AuthHeaders, monkeypatch: pytest.MonkeyPatch
+    client: TestClient, engine: Engine, auth: AuthHeaders
 ) -> None:
-    monkeypatch.setattr("app.reports.branch_insights.get_geocoder", NoGeocoder)
-    _city_point.cache_clear()
     studio = demo(engine, auth)
     end = local_today() - timedelta(days=1)
     start = end - timedelta(days=29)
@@ -193,7 +189,9 @@ def test_branch_insights_show_client_origins_and_staff_cost(
     assert len(visitors) >= MIN_CLIENTS_PER_CITY
     assert mine["origins"][0]["clients"] == len(visitors)
     assert mine["origins"][0]["city_code"] == city
-    assert mine["origins"][0]["latitude"] is None  # no geocoder in tests
+    # The city's center is stored in the city list: no map service is asked.
+    assert mine["origins"][0]["latitude"] is not None
+    assert mine["origins"][0]["longitude"] is not None
     assert (body["staff_cost_period"] is None) == (mine["staff_cost_minor"] is None)
     assert mine["staff_count"] >= 0
 

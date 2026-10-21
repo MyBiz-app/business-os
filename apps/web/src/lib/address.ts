@@ -18,3 +18,11 @@ export function addressFromForm(formData: FormData, prefix = "") {
     address_details: text("address_details"),
   };
 }
+
+/** Only the city of a form that asks for just that (where a client or lead is from): the number
+ * when one was picked, `null` when a saved city was emptied, `{}` when it was left alone. */
+export function cityFromForm(formData: FormData, prefix = ""): { city_code?: number | null } {
+  const raw = String(formData.get(`${prefix}city_code`) ?? "").trim();
+  if (raw) return { city_code: Number(raw) };
+  return formData.get(`${prefix}address_clear`) ? { city_code: null } : {};
+}

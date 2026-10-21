@@ -4,6 +4,7 @@ import type { components } from "@business-os/api-client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { cityFromForm } from "@/lib/address";
 import { ApiError, unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
 
@@ -23,6 +24,7 @@ function readForm(formData: FormData) {
     notes: value("notes"),
     status: (value("status") || "active") as ClientStatus,
     source: (value("source") || null) as ClientSource | null,
+    ...cityFromForm(formData),
     // Only sent when the form shows it (businesses with several branches).
     ...(formData.has("home_location_id") ? { home_location_id: value("home_location_id") || null } : {}),
   };

@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
+import { AddressPicker } from "@/components/address-picker";
 import { Field, TextAreaField } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -33,6 +34,7 @@ export function InquiryForm({ code }: { code: string }) {
         <Field label={t("email")} name="email" type="email" autoComplete="email" dir="ltr" />
       </div>
       <p className="text-xs text-muted">{t("contactHint")}</p>
+      <AddressPicker mode="city" cityLabel={t("city")} citiesUrl="/geo/public/cities" />
       <TextAreaField label={t("interest")} name="interest" maxLength={2000} rows={3} />
       {/* Hidden from people; bots fill it in (see the API). */}
       <div aria-hidden="true" className="absolute -start-[9999px] size-px overflow-hidden">
