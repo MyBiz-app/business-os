@@ -5,8 +5,10 @@ import { View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
+import { AddressPicker } from "@business-os/app-kit/components/address-picker";
 import { BackBar, PillRow } from "@business-os/app-kit/components/rows";
 import { Button, Card, ErrorText, Field, Heading, Screen } from "@business-os/app-kit/components/ui";
+import { EMPTY_ADDRESS } from "@business-os/app-kit/lib/address";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useStaff } from "@/providers/staff-provider";
@@ -26,6 +28,7 @@ export default function NewClient() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [source, setSource] = useState<Source>("walk_in");
+  const [city, setCity] = useState(EMPTY_ADDRESS);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   if (!tenant) return null;
@@ -49,6 +52,7 @@ export default function NewClient() {
             email: email.trim() || null,
             source,
             status: "active",
+            ...(city.cityCode !== null ? { city_code: city.cityCode } : {}),
           },
         }),
       );
@@ -87,6 +91,7 @@ export default function NewClient() {
           autoComplete="email"
           dir="ltr"
         />
+        <AddressPicker palette={palette} value={city} onChange={setCity} cityOnly cityLabel={tClients("city")} cityHint={tClients("cityHint")} />
         <View style={{ gap: 6 }}>
           <Text style={{ color: palette.foreground, fontSize: 14, fontWeight: "600", textAlign: "left" }}>{tClients("source")}</Text>
           <PillRow<Source>

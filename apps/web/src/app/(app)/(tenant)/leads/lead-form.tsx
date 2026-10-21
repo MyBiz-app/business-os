@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { AddressPicker } from "@/components/address-picker";
 import { Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -56,6 +57,21 @@ export function LeadForm({ action, owners, lead, submitLabel, readOnly = false }
           ]}
         />
         <Field label={t("followUp")} name="follow_up_on" type="date" defaultValue={lead?.follow_up_on ?? ""} />
+        <div className="sm:col-span-2">
+          <AddressPicker
+            defaults={{
+              city_code: lead?.city_code,
+              city_name: lead?.city_name,
+              street_code: lead?.street_code,
+              street_name: lead?.street_name,
+              house_number: lead?.house_number,
+              address_details: lead?.address_details,
+              street_unlisted: lead?.street_unlisted,
+            }}
+            cityHint={t("cityHint")}
+            disabled={readOnly}
+          />
+        </div>
         <div className="sm:col-span-2">
           <TextAreaField label={t("interest")} name="interest" maxLength={2000} rows={3} defaultValue={lead?.interest ?? ""} />
         </div>

@@ -13,6 +13,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.bookings import (
@@ -139,6 +140,9 @@ class ProfileUpdate(BaseModel):
     first_name: str = Field(min_length=1, max_length=100)
     last_name: str | None = Field(default=None, max_length=100)
     phone: str | None = Field(default=None, max_length=30)
+    city_code: int | None = Field(
+        default=None, description="Where the client is from (official list); left out: unchanged"
+    )
 
     @field_validator("first_name", "last_name", "phone", mode="before")
     @classmethod
@@ -402,8 +406,16 @@ def update_profile(body: ProfileUpdate, context: ClientDep) -> ClientBusiness:
     db = context.session
     db.execute(
         text("SELECT app.update_my_profile(:first_name, :last_name, :phone)"),
-        body.model_dump(),
+        body.model_dump(include={"first_name", "last_name", "phone"}),
     )
+    if "city_code" in body.model_fields_set:
+        try:
+            with db.begin_nested():
+                db.execute(text("SELECT app.set_my_city(:city)"), {"city": body.city_code})
+        except IntegrityError as error:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="unknown_city"
+            ) from error
     row = (
         db.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": context.client_id})
         .mappings()

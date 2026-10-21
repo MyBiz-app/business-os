@@ -5,8 +5,10 @@ import { View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
+import { AddressPicker } from "@business-os/app-kit/components/address-picker";
 import { BackBar, PillRow } from "@business-os/app-kit/components/rows";
 import { Button, Card, ErrorText, Field, Heading, Screen } from "@business-os/app-kit/components/ui";
+import { addressBody, EMPTY_ADDRESS } from "@business-os/app-kit/lib/address";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useStaff } from "@/providers/staff-provider";
 
@@ -23,6 +25,7 @@ export default function NewLead() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [interest, setInterest] = useState("");
+  const [address, setAddress] = useState(EMPTY_ADDRESS);
   const [source, setSource] = useState<Source>("walk_in");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +49,8 @@ export default function NewLead() {
             email: email.trim() || null,
             interest: interest.trim() || null,
             source,
+            // The city is a soft ask: a lead without one is fine.
+            ...(address.cityCode !== null ? addressBody(address) : {}),
           },
         }),
       );
@@ -83,6 +88,7 @@ export default function NewLead() {
           autoComplete="email"
           dir="ltr"
         />
+        <AddressPicker palette={palette} value={address} onChange={setAddress} cityHint={tLeads("cityHint")} />
         <Field label={tLeads("interest")} palette={palette} value={interest} onChangeText={setInterest} />
         <View style={{ gap: 6 }}>
           <Text style={{ color: palette.foreground, fontSize: 14, fontWeight: "600", textAlign: "left" }}>{tLeads("source")}</Text>

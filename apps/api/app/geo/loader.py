@@ -3,9 +3,14 @@
 Rows are never deleted: addresses already saved point at them. Used by the migration that
 creates the tables and by `python -m app.geo.loader` after a yearly refresh of the snapshot."""
 
-from sqlalchemy import Connection
+import json
+from pathlib import Path
+
+from sqlalchemy import Connection, text
 
 from app.geo.snapshot import cities, read_snapshot, streets
+
+CENTERS = Path(__file__).parent / "data" / "il_city_centers.json"
 
 
 def load_snapshot(connection: Connection) -> tuple[int, int]:
@@ -69,6 +74,24 @@ def load_snapshot(connection: Connection) -> tuple[int, int]:
     return len(data["cities"]), sum(len(rows) for rows in data["streets"].values())
 
 
+def load_centers(connection: Connection) -> int:
+    """Sets the map point of each city from the centers file (scripts/build_geo_centers.py).
+    Returns how many cities got a point."""
+    centers = json.loads(CENTERS.read_text(encoding="utf-8"))
+    connection.execute(
+        text("""
+            UPDATE app.geo_cities c
+            SET latitude = v.latitude, longitude = v.longitude, center_source = v.source
+            FROM (SELECT (r->>0)::int AS code, (r->>1)::float8 AS latitude,
+                         (r->>2)::float8 AS longitude, r->>3 AS source
+                  FROM jsonb_array_elements(CAST(:rows AS jsonb)) r) v
+            WHERE c.code = v.code
+        """),
+        {"rows": json.dumps([[int(code), *row] for code, row in centers.items()])},
+    )
+    return len(centers)
+
+
 if __name__ == "__main__":  # pragma: no cover - run by hand after refreshing the snapshot
     from sqlalchemy import create_engine
 
@@ -76,3 +99,4 @@ if __name__ == "__main__":  # pragma: no cover - run by hand after refreshing th
 
     with create_engine(get_settings().database_url).begin() as conn:
         print("loaded cities and streets:", load_snapshot(conn))
+        print("city centers:", load_centers(conn))

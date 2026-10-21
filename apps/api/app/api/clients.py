@@ -40,7 +40,8 @@ WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 COLUMNS = (
     "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, "
-    "custom_fields, home_location_id, created_at, updated_at, erased_at, "
+    "custom_fields, home_location_id, created_at, updated_at, erased_at, city_code, "
+    "(SELECT c.name_he FROM app.geo_cities c WHERE c.code = app.clients.city_code) AS city_name, "
     "marketing_consent_at IS NOT NULL AS marketing_consent, marketing_consent_at, "
     "marketing_consent_source, marketing_opted_out_at, "
     "(email IS NOT NULL AND app.email_is_suppressed(email)) AS email_suppressed, "
@@ -63,6 +64,9 @@ class ClientFields(BaseModel):
     home_location_id: UUID | None = Field(
         default=None,
         description="The client's home branch; new clients default to the current branch",
+    )
+    city_code: int | None = Field(
+        default=None, description="The city the client comes from, from the official list"
     )
 
     @field_validator(
@@ -103,6 +107,8 @@ class Client(BaseModel):
     source: ClientSource | None
     custom_fields: dict[str, str | int]
     home_location_id: UUID | None
+    city_code: int | None
+    city_name: str | None
     created_at: datetime
     updated_at: datetime
     erased_at: datetime | None = Field(description="Personal data erased on request (privacy)")
@@ -146,6 +152,10 @@ def _email_taken(error: IntegrityError) -> HTTPException | None:
     if "home_location_id" in str(error.orig):
         return HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="unknown_branch"
+        )
+    if "city_code" in str(error.orig):
+        return HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="unknown_city"
         )
     return None
 
@@ -358,11 +368,11 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
                 text(f"""
                     INSERT INTO app.clients
                         (tenant_id, first_name, last_name, email, phone, date_of_birth, notes,
-                         status, source, custom_fields, home_location_id)
+                         status, source, custom_fields, home_location_id, city_code)
                     VALUES
                         (:tenant_id, :first_name, :last_name, :email, :phone, :date_of_birth,
                          :notes, :status, :source, CAST(:custom_fields AS jsonb),
-                         :home_location_id)
+                         :home_location_id, :city_code)
                     RETURNING {COLUMNS}
                 """),
                 {
