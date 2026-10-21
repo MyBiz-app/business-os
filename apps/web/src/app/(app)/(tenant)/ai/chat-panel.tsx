@@ -185,7 +185,9 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
   const suggestions = turns.length === 0 && !busy ? (["s1", "s2", "s3"] as const).map((k) => t(`suggestions.${agent.builtin ? agent.key : "custom"}.${k}` as "suggestions.chief.s1")) : [];
 
   useEffect(() => {
-    end.current?.scrollIntoView({ block: "end", behavior: "smooth" });
+    // Scroll the conversation itself; scrollIntoView would also scroll the whole window.
+    const list = end.current?.parentElement;
+    list?.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
   }, [turns.length, waitingFor]);
 
   function submit(value: string) {

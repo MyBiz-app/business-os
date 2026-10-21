@@ -111,6 +111,16 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   `RouteModal transitionName` (only when the route has no static sibling such as `/clients/join`,
   because a dynamic intercept would also catch those), or open the window from the list page itself
   with `?open=<id>` (`lib/open-window.ts`, `RouteModal closeHref`; see `clients/client-window.tsx`).
+- Where a page starts after a click: `components/navigation-scroll.tsx` (root layout, tested rules in
+  `lib/navigation-scroll.ts`). A new page starts at the top in the same moment its content swaps; an
+  address with `#id` glides to that section below the sticky header (also from another page: the
+  component opens such links itself with `scroll: false`, so Next.js does not jump first); back and
+  forward restore the old position; a window (`dialog.modal-dialog`) over a page keeps the page; a
+  change of the query only is never touched. So a link between two pages needs no `scroll` prop; do
+  not add `scroll={false}` to hide a jump, fix the cause. The one sticky offset is `stickyOffset()`
+  in `lib/scroll-to-section.ts`. Menus mark the current item with `components/ui/glide-pill.tsx`
+  (one marker that glides, 220ms, instant with reduced motion); give the menu `position: relative`
+  and `isolate`, the marked item `aria-current` or `data-pill`, and no background of its own.
 - Route progress bar: `components/ui/route-progress.tsx`, mounted once in the root layout. It shows
   only when a page change takes longer than 300ms. Do not add your own spinner for page changes;
   add a `loading.tsx` with a skeleton of the page's shape instead (`components/layout/page-skeletons.tsx`).

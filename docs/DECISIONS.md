@@ -414,6 +414,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **One switch back:** set the repository variable `CI_FULL` to `true` (GitHub, Settings, Secrets and variables, Actions, Variables) and pull requests run everything again, with the suite in 4 shards. For the end-to-end run after every merge, add `push: branches: [main]` back under `on:` in `e2e.yml`. Both are in the go-live checklist and must be done before go-live.
 - Job names are unchanged; skipped jobs count as passed for branch protection, so no required check blocks a merge.
 
+### One scroll mechanism for the whole site (2026-10-21, CRM Premium slice W1-1, no migration)
+
+- **Owner request (Adir, 2026-10-21):** a click must land exactly where he expects (the top of a new page, the exact section for an anchor), the side menu must follow where he is, and the landing pages must not "get confused" before moving on.
+- **Cause found:** Next.js keeps the scroll position when the first block of the new page is still on screen and otherwise scrolls to the top about 350 ms after the content swapped (measured on the live landing site: the page landed in the middle, then jumped); the team tabs used `scroll: false` between different pages; section links from another page jumped before the content was there.
+- **Decision:** one client component in the root layout owns the scroll after a page change (top, section, back and forward, windows), links to a section of another page are opened by it with `scroll: false`, and menus share one gliding marker. The per-link `scroll={false}` stays for filters on the same page, as the `design-system/no-scroll-jump` rule says.
+
 ## Open
 
 

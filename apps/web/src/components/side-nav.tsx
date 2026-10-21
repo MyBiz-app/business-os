@@ -4,10 +4,12 @@ import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, Chevron
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useId, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 
 import { anchorOf, matchArea, matchQueryChild, pathOf, sectionAnchors } from "@/lib/nav-match";
 import { scrollToSection } from "@/lib/scroll-to-section";
+
+import { GlidePill, useGlide } from "./ui/glide-pill";
 
 import { useScrollSpy } from "./use-scroll-spy";
 
@@ -114,8 +116,31 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
   const anchors = sectionAnchors(current?.children ?? [], pathname);
   const spied = useScrollSpy(anchors);
 
+  // One marker behind the current item that glides to wherever you arrive, and the menu column
+  // scrolls so that item is in view (a button in the dashboard can lead to the end of a long menu).
+  const nav = useRef<HTMLElement>(null);
+  const { box, glide } = useGlide(nav, "a[aria-current]");
+  const shown = useRef<string | null>(null);
+  useEffect(() => {
+    const links = nav.current?.querySelectorAll<HTMLElement>("a[aria-current]");
+    const target = links?.[links.length - 1];
+    const column = nav.current?.closest("aside");
+    const key = target?.getAttribute("href") ?? null;
+    if (!target || !column || key === shown.current) return;
+    shown.current = key;
+    if (column.scrollHeight <= column.clientHeight) return;
+    const room = column.getBoundingClientRect();
+    const spot = target.getBoundingClientRect();
+    if (spot.top >= room.top + 48 && spot.bottom <= room.bottom - 48) return;
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    column.scrollTo({ top: column.scrollTop + (spot.top - room.top) - (room.height - spot.height) / 2, behavior: calm ? "instant" : "smooth" });
+  });
+
   return (
-    <nav aria-label={label ?? t("label")}>
+    <nav ref={nav} aria-label={label ?? t("label")} className="relative isolate">
+      <GlidePill box={box} glide={glide} className="max-md:hidden">
+        <span className="absolute inset-y-2 start-0 w-1 rounded-full bg-electric" />
+      </GlidePill>
       <button
         type="button"
         aria-expanded={open}
@@ -155,7 +180,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                 aria-label={item.locked ? t("lockedItem", { name: item.label }) : undefined}
                 className={`group relative flex items-center gap-3 whitespace-nowrap rounded-xl py-2.5 ps-3 text-sm md:py-2 ${children.length > 0 ? "pe-10" : "pe-3"} font-medium transition-colors duration-200 ${
                   active
-                    ? "bg-primary/20 text-foreground"
+                    ? "text-foreground max-md:bg-primary/20"
                     : inArea
                       ? "text-foreground hover:bg-foreground/5"
                       : item.locked
@@ -163,13 +188,6 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                       : "text-muted hover:bg-foreground/5 hover:text-foreground"
                 }`}
               >
-                {/* Active marker on the inline-start edge (desktop column). */}
-                <span
-                  aria-hidden="true"
-                  className={`absolute inset-y-2 start-0 hidden w-1 rounded-full bg-electric transition-transform duration-300 md:block ${
-                    active ? "scale-y-100" : "scale-y-0"
-                  }`}
-                />
                 <Icon
                   aria-hidden="true"
                   className={`size-[18px] shrink-0 transition-transform duration-200 ${active ? "text-electric" : "group-hover:scale-110"}`}
@@ -212,7 +230,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                           }}
                           aria-current={childActive ? (anchor ? "location" : "page") : undefined}
                           className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors md:py-1.5 duration-200 ${
-                            childActive ? "bg-primary/15 font-semibold text-foreground" : "text-muted hover:bg-foreground/5 hover:text-foreground"
+                            childActive ? "font-semibold text-foreground max-md:bg-primary/15" : "text-muted hover:bg-foreground/5 hover:text-foreground"
                           }`}
                         >
                           <span className="truncate">{child.label}</span>

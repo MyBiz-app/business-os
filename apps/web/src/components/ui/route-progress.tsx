@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { NAVIGATION_START } from "@/components/navigation-scroll";
+
 import { ProgressBar } from "./loading";
 
 /** Only a navigation that takes longer than this shows the bar. */
@@ -46,9 +48,11 @@ export function RouteProgress() {
     }
     document.addEventListener("click", onClick);
     window.addEventListener("popstate", start);
+    window.addEventListener(NAVIGATION_START, start);
     return () => {
       document.removeEventListener("click", onClick);
       window.removeEventListener("popstate", start);
+      window.removeEventListener(NAVIGATION_START, start);
       window.clearTimeout(showTimer.current);
       window.clearTimeout(giveUpTimer.current);
     };
