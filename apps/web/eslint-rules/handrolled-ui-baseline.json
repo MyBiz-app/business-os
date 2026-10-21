@@ -285,20 +285,8 @@
   "src/app/(app)/onboarding/onboarding-form.tsx": [
     "button"
   ],
-  "src/app/(app)/platform/ai/agents-map.tsx": [
-    "button"
-  ],
-  "src/app/(app)/platform/ai/console-chat.tsx": [
-    "button"
-  ],
-  "src/app/(app)/platform/ai/library-panel.tsx": [
-    "button"
-  ],
   "src/app/(app)/platform/ai/page.tsx": [
     "table"
-  ],
-  "src/app/(app)/platform/ai/pause-button.tsx": [
-    "button"
   ],
   "src/app/(app)/platform/ai/reports.tsx": [
     "table"
@@ -309,14 +297,7 @@
   "src/app/(app)/platform/billing/page.tsx": [
     "table"
   ],
-  "src/app/(app)/platform/broadcasts/composer.tsx": [
-    "button"
-  ],
-  "src/app/(app)/platform/businesses/[id]/page.tsx": [
-    "button"
-  ],
   "src/app/(app)/platform/businesses/page.tsx": [
-    "button",
     "table"
   ],
   "src/app/(app)/platform/catalog/page.tsx": [
@@ -334,12 +315,6 @@
   "src/app/(app)/platform/health/page.tsx": [
     "table"
   ],
-  "src/app/(app)/platform/inbox/request-card.tsx": [
-    "button"
-  ],
-  "src/app/(app)/platform/incidents/incident-form.tsx": [
-    "button"
-  ],
   "src/app/(app)/platform/legal/page.tsx": [
     "table"
   ],
@@ -349,14 +324,8 @@
   "src/app/(app)/platform/security/page.tsx": [
     "table"
   ],
-  "src/app/(app)/platform/team/staff-forms.tsx": [
-    "button"
-  ],
   "src/app/(app)/platform/trials/page.tsx": [
     "table"
-  ],
-  "src/app/(app)/platform/website-orders/order-card.tsx": [
-    "button"
   ],
   "src/app/(app)/suspended/page.tsx": [
     "button"

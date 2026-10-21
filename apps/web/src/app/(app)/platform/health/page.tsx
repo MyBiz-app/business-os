@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
+import { StatTile } from "@/components/ui/stat-tile";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.health");
@@ -49,14 +50,11 @@ export default async function PlatformHealthPage() {
 
       <section aria-labelledby="health-queues" className="flex flex-col gap-4">
         <h2 id="health-queues" className="text-lg font-semibold">{t("queues")}</h2>
-        <dl className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-3">
           {facts.map((fact) => (
-            <div key={fact.label} className="card flex flex-col gap-1 p-5">
-              <dt className="text-sm text-muted">{fact.label}</dt>
-              <dd className={`text-2xl font-semibold ${fact.alarm ? "text-danger" : ""}`} dir="ltr">{fact.value}</dd>
-            </div>
+            <StatTile key={fact.label} label={fact.label} value={<span className={fact.alarm ? "text-danger" : undefined} dir="ltr">{fact.value}</span>} />
           ))}
-        </dl>
+        </div>
       </section>
 
       <section aria-labelledby="health-jobs" className="flex flex-col gap-4">
@@ -64,7 +62,7 @@ export default async function PlatformHealthPage() {
         {health.jobs.length === 0 ? (
           <EmptyState variant="list">{t("noJobs")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="health-jobs" className="rounded-2xl border border-border">
+          <ScrollRegion labelledBy="health-jobs" className="card">
             <table className="w-full text-sm">
               <thead className="bg-surface text-muted">
                 <tr>
@@ -106,7 +104,7 @@ export default async function PlatformHealthPage() {
         {health.routes.length === 0 ? (
           <EmptyState variant="list">{t("noRoutes")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="health-routes" className="rounded-2xl border border-border">
+          <ScrollRegion labelledBy="health-routes" className="card">
             <table className="w-full text-sm">
               <thead className="bg-surface text-muted">
                 <tr>
@@ -138,7 +136,7 @@ export default async function PlatformHealthPage() {
         {health.errors.length === 0 ? (
           <EmptyState variant="list">{t("noErrors")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="health-errors" className="rounded-2xl border border-border">
+          <ScrollRegion labelledBy="health-errors" className="card">
             <table className="w-full text-sm">
               <thead className="bg-surface text-muted">
                 <tr>

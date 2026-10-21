@@ -43,13 +43,13 @@ export default async function BroadcastPage({ params }: PageProps<"/platform/bro
           {t("created", { name: item.created_by })} · {when.format(new Date(item.sent_at ?? item.created_at))}
         </span>
       </p>
-      <section aria-labelledby="results-title" className="flex flex-col gap-3 rounded-2xl border border-border p-4">
+      <section aria-labelledby="results-title" className="flex flex-col gap-3 card p-4 sm:p-5">
         <h2 id="results-title" className="font-semibold">
           {t("results.title")}
         </h2>
         <dl className="grid gap-3 sm:grid-cols-3">
           {rows.map(([label, value]) => (
-            <div key={label} className="rounded-xl bg-surface p-3 shadow-sm ring-1 ring-border">
+            <div key={label} className="card p-3">
               <dt className="text-xs text-muted">{label}</dt>
               <dd className="text-2xl font-semibold">{value}</dd>
             </div>

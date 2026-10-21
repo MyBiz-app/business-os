@@ -11,6 +11,7 @@ import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { getPlatformFor } from "@/lib/platform";
+import { StatTile } from "@/components/ui/stat-tile";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.emailHealth");
@@ -35,18 +36,15 @@ export default async function PlatformEmailPage() {
         <p role="status" className="card p-4 text-sm text-danger">{t("webhookClosed")}</p>
       )}
 
-      <dl className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         {[
           { label: t("bounced"), value: board.bounced, alarm: false },
           { label: t("complained"), value: board.complained, alarm: board.complained > 0 },
           { label: t("waiting"), value: board.emails_waiting, alarm: false },
         ].map((fact) => (
-          <div key={fact.label} className="card flex flex-col gap-1 p-5">
-            <dt className="text-sm text-muted">{fact.label}</dt>
-            <dd className={`text-2xl font-semibold ${fact.alarm ? "text-danger" : ""}`} dir="ltr">{number.format(fact.value)}</dd>
-          </div>
+          <StatTile key={fact.label} label={fact.label} value={<span className={fact.alarm ? "text-danger" : undefined} dir="ltr">{number.format(fact.value)}</span>} />
         ))}
-      </dl>
+      </div>
 
       <section aria-labelledby="email-chart" className="card flex flex-col gap-3 p-4">
         <h2 id="email-chart" className="sr-only">{t("chart")}</h2>

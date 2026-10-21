@@ -15,6 +15,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 
 import { extendGrace } from "./actions";
 import { DunningForm } from "./dunning-form";
+import { StatTile } from "@/components/ui/stat-tile";
 
 /** What MyBiz billed businesses, per month and currency. */
 export default async function PlatformBillingPage() {
@@ -77,7 +78,7 @@ export default async function PlatformBillingPage() {
                       <form action={extendGrace.bind(null, row.tenant_id)} className="flex items-end gap-2">
                         <label className="flex flex-col gap-1 text-xs text-muted">
                           {t("overdue.days")}
-                          <input type="number" name="days" min={1} max={90} defaultValue={7} className="w-20 rounded-xl border border-border bg-background px-2 py-1.5 text-sm text-foreground" />
+                          <input type="number" name="days" min={1} max={90} defaultValue={7} className="control w-20 px-2 py-1.5 text-sm" />
                         </label>
                         <SubmitButton className="px-3 py-1.5 text-sm">{t("overdue.extend")}</SubmitButton>
                       </form>
@@ -95,7 +96,7 @@ export default async function PlatformBillingPage() {
       ) : (
         <>
         {summaries.map((summary) => (
-          <dl key={summary.currency} className="grid gap-3 sm:grid-cols-3">
+          <div key={summary.currency} className="grid gap-3 sm:grid-cols-3">
             {(
               [
                 [t("billingStats.lastMonth", { month: formatDay(summary.latest.month, locale, { month: "long" }) }), summary.latest.paid + summary.latest.open],
@@ -103,14 +104,9 @@ export default async function PlatformBillingPage() {
                 [t("billingStats.openTotal"), summary.open],
               ] as const
             ).map(([label, amount]) => (
-              <div key={label} className="flex flex-col gap-1 card p-5">
-                <dt className="text-sm text-muted">{label}</dt>
-                <dd className="text-2xl font-bold tabular-nums">
-                  <bdi>{formatMoney(amount, summary.currency, locale)}</bdi>
-                </dd>
-              </div>
+              <StatTile key={label} label={label} value={<bdi>{formatMoney(amount, summary.currency, locale)}</bdi>} />
             ))}
-          </dl>
+          </div>
         ))}
         <ScrollRegion labelledBy="billing-heading" className="card">
           <table className="w-full text-sm">

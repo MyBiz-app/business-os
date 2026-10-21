@@ -24,6 +24,7 @@ import {
   type LibraryVersion,
 } from "./library-actions";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { Button } from "@/components/ui/button";
 
 type Mode = "note" | "summary" | "link" | "file";
 const COUNTRIES = ["il", "us", "eu", "all"] as const;
@@ -115,13 +116,13 @@ export function LibraryPanel({ agent, canEdit }: { agent: ChatRole; canEdit: boo
       {canEdit && (
         <div className="flex flex-wrap items-center gap-2">
           {(["note", "summary", "link", "file"] as const).map((mode) => (
-            <button key={mode} type="button" onClick={() => { setAdding(mode); setEditing(null); }} className="btn-secondary px-3 py-1.5 text-sm" aria-pressed={adding === mode}>
+            <Button key={mode} onClick={() => { setAdding(mode); setEditing(null); }} aria-pressed={adding === mode}>
               {t(`add.${mode}`)}
-            </button>
+            </Button>
           ))}
-          <button type="button" onClick={readSources} disabled={pending} className="btn-secondary px-3 py-1.5 text-sm">
+          <Button onClick={readSources} disabled={pending}>
             {t("readSources")}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -178,21 +179,21 @@ export function LibraryPanel({ agent, canEdit }: { agent: ChatRole; canEdit: boo
                 <a href={doc.source_url} target="_blank" rel="noopener noreferrer" dir="ltr" className="truncate text-xs underline">{doc.source_url}</a>
               )}
               <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => openHistory(doc)} disabled={pending} className="btn-plain text-sm underline">{t("history")}</button>
+                <Button variant="plain" onClick={() => openHistory(doc)} disabled={pending} className="underline">{t("history")}</Button>
                 {canEdit && (
                   <>
-                    <button type="button" onClick={() => edit(doc)} disabled={pending} className="btn-plain text-sm underline">{t("edit")}</button>
-                    <button type="button" onClick={() => run(() => setLibraryDocumentEnabled(doc.id, !doc.enabled))} disabled={pending} className="btn-plain text-sm underline">
+                    <Button variant="plain" onClick={() => edit(doc)} disabled={pending} className="underline">{t("edit")}</Button>
+                    <Button variant="plain" onClick={() => run(() => setLibraryDocumentEnabled(doc.id, !doc.enabled))} disabled={pending} className="underline">
                       {doc.enabled ? t("switchOff") : t("switchOn")}
-                    </button>
-                    <button
-                      type="button"
+                    </Button>
+                    <Button
+                      variant="plain"
                       onClick={async () => { if (await confirm({ message: t("confirmDelete", { title: doc.title }), confirmLabel: t("delete"), danger: true })) run(() => deleteLibraryDocument(doc.id)); }}
                       disabled={pending}
-                      className="btn-plain text-sm text-danger underline"
+                      className="text-sm text-danger underline"
                     >
                       {t("delete")}
-                    </button>
+                    </Button>
                   </>
                 )}
               </div>
@@ -210,19 +211,19 @@ export function LibraryPanel({ agent, canEdit }: { agent: ChatRole; canEdit: boo
                 <span>{t("version", { n: v.version })}</span>
                 <span className="text-muted">{day.format(new Date(v.created_at))} · {v.created_by}{v.change_note ? ` · ${v.change_note}` : ""}</span>
                 {canEdit && v.version !== history.doc.version && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="plain"
                     onClick={() => run(async () => { const r = await restoreLibraryVersion(history.doc.id, v.version); if (!r.error) setHistory(null); return r; }, t("restored"))}
                     disabled={pending}
-                    className="btn-plain underline"
+                    className="text-sm underline"
                   >
                     {t("restore")}
-                  </button>
+                  </Button>
                 )}
               </li>
             ))}
           </ul>
-          <div><button type="button" onClick={() => setHistory(null)} className="btn-plain text-sm underline">{t("close")}</button></div>
+          <div><Button variant="plain" onClick={() => setHistory(null)} className="underline">{t("close")}</Button></div>
         </section>
       )}
 
@@ -316,8 +317,8 @@ function DocumentForm({ mode, existing, disabled, onSave, onCancel }: { mode: Mo
         </label>
       )}
       <div className="flex gap-2">
-        <button type="submit" disabled={disabled} className="btn-primary px-4 py-2">{t("save")}</button>
-        <button type="button" onClick={onCancel} className="btn-secondary px-4 py-2">{t("cancel")}</button>
+        <Button variant="primary" type="submit" disabled={disabled}>{t("save")}</Button>
+        <Button onClick={onCancel}>{t("cancel")}</Button>
       </div>
     </form>
   );
@@ -342,7 +343,7 @@ function SearchCheck({ agent }: { agent: ChatRole }) {
       >
         <label htmlFor={`library-q-${agent}`} className="sr-only">{t("tryTitle")}</label>
         <input id={`library-q-${agent}`} value={q} onChange={(event) => setQ(event.target.value)} maxLength={300} dir="auto" placeholder={t("tryPlaceholder")} className="control min-w-0 flex-1 px-3 py-2" />
-        <button type="submit" disabled={pending || !q.trim()} className="btn-secondary px-4 py-2">{t("try")}</button>
+        <Button type="submit" disabled={pending || !q.trim()}>{t("try")}</Button>
       </form>
       {hits && (hits.length === 0 ? (
         <p className="text-sm text-muted">{t("tryNothing")}</p>

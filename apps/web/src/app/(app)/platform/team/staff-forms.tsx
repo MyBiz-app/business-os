@@ -9,6 +9,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 
 import { removeStaff, saveStaff, setPaused, type StaffState } from "./actions";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { Button } from "@/components/ui/button";
 
 type Level = "owner" | "manager" | "employee";
 type Permission = "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage" | "incidents.manage";
@@ -82,9 +83,9 @@ function LevelAndPermissions({ actor, level: initialLevel, permissions }: { acto
           <legend className="text-sm font-medium">{t("team.permissions")}</legend>
           <div className="flex flex-wrap gap-2">
             {Object.keys(actor.templates).map((name) => (
-              <button key={name} type="button" onClick={() => applyTemplate(name)} className="btn-secondary px-3 py-1.5 text-sm" title={t(`team.templates.${name as "support"}.hint`)}>
+              <Button key={name} onClick={() => applyTemplate(name)} title={t(`team.templates.${name as "support"}.hint`)}>
                 {t(`team.templates.${name as "support"}.name`)}
-              </button>
+              </Button>
             ))}
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -186,35 +187,32 @@ export function StaffRow({ member, actor, manageable }: { member: Member; actor:
       )}
       {manageable && (
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <button type="button" onClick={() => setEditing((v) => !v)} aria-expanded={editing} className="btn-secondary px-3 py-1.5">
+          <Button onClick={() => setEditing((v) => !v)} aria-expanded={editing}>
             {t("team.level")} · {t("team.permissions")}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             disabled={pending}
             onClick={() =>
               startTransition(async () =>
                 setRowState(await setPaused(member.email, member.level, member.permissions, !member.disabled)),
               )
             }
-            className="btn-secondary px-3 py-1.5"
           >
             {member.disabled ? <Play aria-hidden="true" className="size-4" /> : <Pause aria-hidden="true" className="size-4" />}
             {member.disabled ? t("team.enable") : t("team.disable")}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button variant="plain"
             disabled={pending}
             onClick={async () => {
               if (await confirm({ message: t("team.removeConfirm", { email: member.email }), confirmLabel: t("team.remove"), danger: true })) {
                 startTransition(async () => setRowState(await removeStaff(member.email)));
               }
             }}
-            className="btn-plain flex items-center gap-1 rounded-lg px-3 py-1.5 font-medium text-danger hover:bg-danger/10"
+            className="flex items-center gap-1 text-danger"
           >
             <Trash2 aria-hidden="true" className="size-4" />
             {t("team.remove")}
-          </button>
+          </Button>
         </div>
       )}
       {manageable && editing && (
