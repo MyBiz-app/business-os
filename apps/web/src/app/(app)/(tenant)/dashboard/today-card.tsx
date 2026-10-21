@@ -62,7 +62,7 @@ export async function TodayCard({
         <p key={shift.id} className="flex items-center gap-2 border-t border-border bg-subtle px-4 py-2.5 text-sm sm:px-5">
           <Clock aria-hidden="true" className="size-4 shrink-0 text-primary-ink" />
           <span className="font-medium">
-            {t("myShift", { range: `\u2066${at(shift.starts_at)}–${at(shift.ends_at)}\u2069` })}
+            {t("myShift", { range: `\u2066${at(shift.starts_at)}-${at(shift.ends_at)}\u2069` })}
           </span>
           <span dir="auto" className="truncate text-muted">
             {isolate(shift.location_name)}
