@@ -6,6 +6,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { fixedColors } from "@business-os/app-kit/lib/theme";
 import { useTranslations } from "use-intl";
 
+import { BackBar } from "@business-os/app-kit/components/rows";
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -14,6 +15,7 @@ const ERRORS = ["already_reviewed", "not_reviewable"] as const;
 /** Rate a visit: 1-5 stars and an optional comment. */
 export default function Review() {
   const t = useTranslations("client.review");
+  const tCommon = useTranslations("common");
   const { id, service } = useLocalSearchParams<{ id: string; service?: string }>();
   const { api, scope, business, palette } = useBusiness();
   const [rating, setRating] = useState(0);
@@ -41,6 +43,7 @@ export default function Review() {
 
   return (
     <Screen palette={palette}>
+      <BackBar palette={palette} label={tCommon("goBack")} fallback="/home" />
       <Heading palette={palette}>{service ? t("cardTitle", { service }) : t("title")}</Heading>
       <Card palette={palette}>
         {done ? (
@@ -83,5 +86,5 @@ const local = StyleSheet.create({
   stars: { flexDirection: "row", justifyContent: "center", gap: 6, marginVertical: 8 },
   star: { padding: 2 },
   done: { alignItems: "center", gap: 10, paddingVertical: 16 },
-  thanks: { fontSize: 18, fontWeight: "700", textAlign: "center" },
+  thanks: { fontSize: 17, fontWeight: "600", textAlign: "center" },
 });

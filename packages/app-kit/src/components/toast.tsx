@@ -7,7 +7,7 @@ import { useTranslations } from "use-intl";
 import { useReducedMotion, PressableScale } from "./motion";
 import { Text } from "./text";
 import { tint } from "../lib/brand";
-import { fixedColors } from "../lib/theme";
+import { fixedColors, radius } from "../lib/theme";
 import { useTheme } from "../providers/theme-provider";
 
 export type ToastKind = "success" | "error" | "info";
@@ -130,13 +130,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingStart: 14,
     paddingEnd: 6,
-    borderRadius: 14,
+    borderRadius: radius.control,
     borderWidth: 1,
     boxShadow: "0px 2px 4px rgba(17, 24, 39, 0.08), 0px 10px 28px rgba(17, 24, 39, 0.18)",
   },
-  icon: { width: 22, height: 22, borderRadius: 11, alignItems: "center", justifyContent: "center" },
-  action: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
-  actionLabel: { fontSize: 14, fontWeight: "600" },
+  icon: { width: 22, height: 22, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
+  action: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.sm },
+  actionLabel: { fontSize: 13, fontWeight: "500" },
   message: { flex: 1, fontSize: 15, lineHeight: 21, textAlign: "left" },
   close: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
 });

@@ -6,7 +6,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, Badge } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Field, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, EmptyState, ErrorText, Field, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
@@ -68,9 +68,7 @@ export default function Documents() {
       <Text style={[styles.muted, { color: palette.muted }]}>{t("mineHint")}</Text>
       <ErrorText message={error} palette={palette} />
       {data && data.length === 0 && (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("none")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("none")} icon="document-text-outline" />
       )}
       {data?.map((document) => (
         <Card key={document.id} palette={palette}>

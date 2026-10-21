@@ -78,8 +78,8 @@ export default function AiTeam() {
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 12, opacity: usable ? 1 : 0.6 }}>
                   <AgentFace agent={agent} size={52} />
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={{ color: palette.foreground, fontWeight: "700", fontSize: 17 }}>{agent.name}</Text>
-                    <Text style={{ color: palette.primary, fontWeight: "600" }}>{agent.role_title}</Text>
+                    <Text style={{ color: palette.foreground, fontWeight: "600", fontSize: 17 }}>{agent.name}</Text>
+                    <Text style={{ color: palette.primary, fontWeight: "500" }}>{agent.role_title}</Text>
                     <Text numberOfLines={2} style={{ color: palette.muted }}>
                       {usable ? agent.topic : tTeam(`state.${agent.state}`)}
                     </Text>

@@ -5,8 +5,7 @@ import { View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Badge, ListRow, PillRow, SectionTitle, StatTile, TileGrid } from "@business-os/app-kit/components/rows";
-import { BackBar } from "@business-os/app-kit/components/rows";
+import { BackBar, Badge, ListRow, PillRow, SectionTitle, StatTile, TileGrid } from "@business-os/app-kit/components/rows";
 import { Button, Card, EmptyState, Heading, LoadError, Screen, Skeleton, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -177,7 +176,7 @@ export default function Content() {
               palette={palette}
               title={post.caption || tc("posts.untitled")}
               subtitle={`${tc(`networks.${post.network}` as never)} · ${tc(`kinds.${post.kind}` as never)} · ${day(post.published_at.slice(0, 10))}`}
-              trailing={<Text style={{ color: palette.foreground, fontWeight: "700" }}>{number.format(post.views)}</Text>}
+              trailing={<Text style={{ color: palette.foreground, fontWeight: "600" }}>{number.format(post.views)}</Text>}
             />
           ))}
         </>
@@ -187,14 +186,12 @@ export default function Content() {
         <>
           <SectionTitle title={t("drafts")} palette={palette} />
           {drafts.length === 0 ? (
-            <Card palette={palette}>
-              <Text style={[styles.muted, { color: palette.muted }]}>{t("noDrafts")}</Text>
-            </Card>
+            <EmptyState palette={palette} message={t("noDrafts")} />
           ) : (
             drafts.map((draft) => (
               <Card key={draft.id} palette={palette}>
                 <View style={{ gap: 8 }}>
-                  {draft.network && <Text style={[styles.muted, { color: palette.primary, fontWeight: "700" }]}>{tc(`networks.${draft.network}` as never)}</Text>}
+                  {draft.network && <Text style={[styles.muted, { color: palette.primary, fontWeight: "600" }]}>{tc(`networks.${draft.network}` as never)}</Text>}
                   <Text style={{ color: palette.foreground, textAlign: "left" }}>{draft.body}</Text>
                   {draft.idea && <Text style={[styles.muted, { color: palette.muted }]}>{draft.idea}</Text>}
                   {can("social.manage") && (

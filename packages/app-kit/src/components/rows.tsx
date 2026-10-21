@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { localeDirection, type Locale } from "@business-os/i18n";
+import { type Href, useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "./text";
 import { useLocale } from "use-intl";
@@ -9,6 +10,7 @@ import { tint } from "../lib/brand";
 import { initials } from "../lib/names";
 import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
+import { radius } from "../lib/theme";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -18,14 +20,20 @@ function useBackIcon(): { back: IconName; forward: IconName } {
   return rtl ? { back: "chevron-forward", forward: "chevron-back" } : { back: "chevron-back", forward: "chevron-forward" };
 }
 
-/** The top of a pushed screen: a back link with where it goes back to. */
-export function BackBar({ label, onPress, palette }: { label: string; onPress: () => void; palette: Palette }) {
+/**
+ * The top of a pushed screen: a back link with where it goes back to. Without an `onPress` it goes
+ * back in the history, or to `fallback` when the screen was opened directly (a link, a reload, a
+ * notification) and there is nothing to go back to, so no screen is a dead end.
+ */
+export function BackBar({ label, onPress, fallback, palette }: { label: string; onPress?: () => void; fallback?: Href; palette: Palette }) {
   const { back } = useBackIcon();
+  const router = useRouter();
+  const goBack = () => (router.canGoBack() ? router.back() : router.replace(fallback ?? "/"));
   return (
     <Pressable
       accessibilityRole="link"
       accessibilityLabel={label}
-      onPress={onPress}
+      onPress={onPress ?? goBack}
       hitSlop={8}
       style={({ pressed }) => [local.back, { opacity: pressed ? 0.6 : 1 }]}
     >
@@ -47,7 +55,7 @@ export function Avatar({ name, color, palette, size = 40 }: { name: string; colo
         { width: size, height: size, borderRadius: size / 2, backgroundColor: tint(base, 0.14), borderColor: tint(base, 0.3) },
       ]}
     >
-      <Text style={{ color: palette.foreground, ...font.bold, fontSize: size * 0.36 }}>{initials(name)}</Text>
+      <Text style={{ color: palette.foreground, ...font.semibold, fontSize: size * 0.36 }}>{initials(name)}</Text>
     </View>
   );
 }
@@ -207,25 +215,25 @@ export function TileGrid({ children }: { children: React.ReactNode }) {
 }
 
 const local = StyleSheet.create({
-  back: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", minHeight: 44 },
-  backText: { fontSize: 16, ...font.medium },
+  back: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", minHeight: 44, paddingEnd: 8 },
+  backText: { fontSize: 15, ...font.medium },
   avatar: { alignItems: "center", justifyContent: "center", borderWidth: 1 },
-  badge: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3, alignSelf: "flex-start" },
-  badgeText: { fontSize: 12, ...font.bold },
-  rowBox: { borderWidth: 1, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 12 },
+  badge: { borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 3, alignSelf: "flex-start" },
+  badgeText: { fontSize: 12, ...font.semibold },
+  rowBox: { borderWidth: 1, borderRadius: radius.card, paddingHorizontal: 14, paddingVertical: 12 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 32 },
   rowText: { flex: 1, gap: 2 },
-  rowTitle: { fontSize: 16, ...font.medium, textAlign: "left" },
+  rowTitle: { fontSize: 15, ...font.medium, textAlign: "left" },
   rowSub: { fontSize: 13, ...font.regular, textAlign: "left" },
   section: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  sectionTitle: { fontSize: 20, ...font.bold, textAlign: "left" },
+  sectionTitle: { fontSize: 20, ...font.semibold, textAlign: "left" },
   sectionAction: { fontSize: 15, ...font.medium, paddingVertical: 12, minHeight: 44 },
   pills: { gap: 8, paddingVertical: 2 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  stat: { flexGrow: 1, flexBasis: "45%", borderWidth: 1, borderRadius: 20, padding: 14, gap: 4 },
+  stat: { flexGrow: 1, flexBasis: "45%", borderWidth: 1, borderRadius: radius.card, padding: 14, gap: 4 },
   statLabel: { fontSize: 13, ...font.medium, textAlign: "left" },
-  statValue: { fontSize: 24, ...font.bold, textAlign: "left", fontVariant: ["tabular-nums"] },
-  pill: { minWidth: 56, minHeight: 44, justifyContent: "center", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, borderWidth: 1, alignItems: "center", gap: 2 },
+  statValue: { fontSize: 24, ...font.semibold, textAlign: "left", fontVariant: ["tabular-nums"] },
+  pill: { minWidth: 56, minHeight: 44, justifyContent: "center", paddingHorizontal: 12, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1, alignItems: "center", gap: 2 },
   pillSub: { fontSize: 12, ...font.medium },
-  pillText: { fontSize: 16, ...font.bold },
+  pillText: { fontSize: 15, ...font.semibold },
 });

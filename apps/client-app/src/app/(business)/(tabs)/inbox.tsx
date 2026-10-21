@@ -7,7 +7,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, Badge, ListRow, PillRow } from "@business-os/app-kit/components/rows";
-import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, EmptyState, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { fullName } from "@business-os/app-kit/lib/names";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -92,9 +92,7 @@ export default function Inbox() {
         <View style={{ gap: 8 }}>
           <Text style={[styles.muted, { color: palette.muted }]}>{tMessaging("simulated")}</Text>
           {(data?.messages ?? []).length === 0 ? (
-            <Card palette={palette}>
-              <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : tMessaging("noMessages")}</Text>
-            </Card>
+            <EmptyState palette={palette} message={loading ? "…" : tMessaging("noMessages")} icon="mail-outline" />
           ) : (
             (data?.messages ?? []).map((message) => (
               <ListRow
@@ -122,9 +120,7 @@ export default function Inbox() {
           )}
         </View>
       ) : shown.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("none")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={loading ? "…" : t("none")} icon="mail-outline" />
       ) : (
         <View style={{ gap: 8 }}>
           {shown.map((lead) => {

@@ -1069,6 +1069,7 @@
     "confirmTitle": "בטוחים?",
     "confirmAction": "אישור",
     "closeDialog": "סגירת החלון",
+    "goBack": "חזרה",
     "discardTitle": "לצאת בלי לשמור?",
     "discardBody": "השינויים שלא נשמרו יאבדו.",
     "keepEditing": "להמשיך לערוך",

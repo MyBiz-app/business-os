@@ -15,6 +15,7 @@ import { CancellationPolicyCard } from "@/components/cancellation-policy-card";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 type Profile = components["schemas"]["BusinessProfile"];
 
@@ -176,10 +177,10 @@ export default function Join() {
 
 const local = StyleSheet.create({
   consent: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 44 },
-  box: { width: 26, height: 26, borderRadius: 8, borderWidth: 2, alignItems: "center", justifyContent: "center" },
+  box: { width: 26, height: 26, borderRadius: radius.sm, borderWidth: 2, alignItems: "center", justifyContent: "center" },
   consentText: { flex: 1, fontSize: 15 },
   brand: { flexDirection: "row", alignItems: "center", gap: 12 },
-  logo: { width: 56, height: 56, borderRadius: 14 },
-  name: { fontSize: 22, fontWeight: "700", flexShrink: 1, textAlign: "left" },
-  code: { fontSize: 22, letterSpacing: 4, writingDirection: "ltr", textAlign: "center" },
+  logo: { width: 56, height: 56, borderRadius: radius.control },
+  name: { fontSize: 20, fontWeight: "600", flexShrink: 1, textAlign: "left" },
+  code: { fontSize: 20, letterSpacing: 4, writingDirection: "ltr", textAlign: "center" },
 });

@@ -7,6 +7,7 @@ import { Button, Card, ErrorText, Field, styles } from "@business-os/app-kit/com
 import { tint } from "@business-os/app-kit/lib/brand";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useStaff } from "@/providers/staff-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 const SWATCHES = ["#7c3aed", "#2563eb", "#0891b2", "#16a34a", "#d97706", "#dc2626", "#db2777", "#4f46e5", "#0d9488"];
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -40,7 +41,7 @@ export function BrandColorCard() {
 
   return (
     <Card palette={palette}>
-      <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("colors")}</Text>
+      <Text style={{ color: palette.foreground, fontWeight: "500" }}>{t("colors")}</Text>
       <Text style={[styles.muted, { color: palette.muted }]}>{t("colorsHint")}</Text>
       <View role="radiogroup" aria-label={t("colors")} style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
         {SWATCHES.map((swatch) => {
@@ -55,7 +56,7 @@ export function BrandColorCard() {
               style={{
                 width: 44,
                 height: 44,
-                borderRadius: 22,
+                borderRadius: radius.card,
                 backgroundColor: swatch,
                 borderWidth: 3,
                 borderColor: selected ? palette.foreground : tint(swatch, 0.4),

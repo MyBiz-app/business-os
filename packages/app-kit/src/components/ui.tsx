@@ -14,22 +14,27 @@ import { Text } from "./text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
+import { controlHeight, radius, space } from "@business-os/design-tokens";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
 import { FadeIn, PressableScale, useReducedMotion } from "./motion";
-import { tint } from "../lib/brand";
 import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
 
-/** Soft layered shadows for raised surfaces (same feel as the web app's cards). */
+/**
+ * Depth, as on the web: cards are flat (a surface and a hairline), so they carry no shadow. Only what
+ * floats (a sheet, a toast, a menu) casts one.
+ */
 export const elevation = {
-  card: { boxShadow: "0px 1px 2px rgba(17, 24, 39, 0.05), 0px 4px 16px rgba(17, 24, 39, 0.07)" },
-  raised: { boxShadow: "0px 2px 4px rgba(17, 24, 39, 0.08), 0px 10px 28px rgba(17, 24, 39, 0.14)" },
+  floating: { boxShadow: "0px 1px 3px rgba(24, 24, 27, 0.06), 0px 8px 24px rgba(24, 24, 27, 0.1)" },
 } as const;
 
 type ButtonProps = {
   label: string;
   onPress: () => void;
   palette: Palette;
-  variant?: "primary" | "secondary" | "danger";
+  /** `quiet` is a text-only action for a low-priority step; `danger` is outlined, not filled. */
+  variant?: "primary" | "secondary" | "danger" | "quiet";
   busy?: boolean;
   disabled?: boolean;
   accessibilityLabel?: string;
@@ -37,7 +42,8 @@ type ButtonProps = {
 
 export function Button({ label, onPress, palette, variant = "primary", busy, disabled, accessibilityLabel }: ButtonProps) {
   const primary = variant === "primary";
-  const color = primary ? palette.onPrimary : variant === "danger" ? palette.danger : palette.foreground;
+  const quiet = variant === "quiet";
+  const color = primary ? palette.onPrimary : variant === "danger" ? palette.danger : quiet ? palette.primaryInk : palette.foreground;
   return (
     <PressableScale
       accessibilityRole="button"
@@ -48,8 +54,10 @@ export function Button({ label, onPress, palette, variant = "primary", busy, dis
       style={[
         styles.button,
         primary
-          ? { backgroundColor: palette.primary, boxShadow: `0px 6px 16px ${tint(palette.primary, 0.35)}` }
-          : { borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface },
+          ? { backgroundColor: palette.primary }
+          : quiet
+            ? null
+            : { borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface },
         disabled && { opacity: 0.6 },
       ]}
     >
@@ -112,32 +120,39 @@ export function LoadError({ palette, onRetry }: { palette: Palette; onRetry: () 
   );
 }
 
-/** An empty list, or a spinner while the first load runs; keeps every screen's "nothing here" look the same. */
-export function EmptyState({ palette, message, loading }: { palette: Palette; message: string; loading?: boolean }) {
+type IconName = React.ComponentProps<typeof Ionicons>["name"];
+
+/**
+ * An empty list, or a skeleton while the first load runs; keeps every screen's "nothing here" look the
+ * same: a quiet icon on a subtle disc, what is missing, an optional hint on what to do, and an optional
+ * action (a button the screen passes in).
+ */
+export function EmptyState({
+  palette,
+  message,
+  hint,
+  icon = "file-tray-outline",
+  action,
+  loading,
+}: {
+  palette: Palette;
+  message: string;
+  hint?: string;
+  icon?: IconName;
+  action?: React.ReactNode;
+  loading?: boolean;
+}) {
   if (loading) return <SkeletonCard palette={palette} label={message} />;
   return (
-    <Card palette={palette}>
-      <View style={{ alignItems: "center", gap: 12, paddingVertical: 10 }}>
-        <EmptyIllustration palette={palette} />
-        <Text style={[styles.muted, { color: palette.muted, textAlign: "center" }]}>{message}</Text>
+    <View style={local.empty}>
+      <View aria-hidden style={[local.emptyDisc, { backgroundColor: palette.subtle }]}>
+        <Ionicons name={icon} size={24} color={palette.muted} />
       </View>
-    </Card>
-  );
-}
-
-/** A small drawn picture for empty lists: soft rings around a tile with a few lines, so "nothing here" still looks designed. */
-function EmptyIllustration({ palette }: { palette: Palette }) {
-  return (
-    <View aria-hidden style={{ width: 96, height: 96, alignItems: "center", justifyContent: "center" }}>
-      <View style={{ position: "absolute", width: 96, height: 96, borderRadius: 48, backgroundColor: tint(palette.primary, 0.08) }} />
-      <View style={{ position: "absolute", width: 70, height: 70, borderRadius: 35, backgroundColor: tint(palette.accent, 0.12) }} />
-      <View style={{ width: 44, height: 52, borderRadius: 10, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.border, padding: 8, gap: 6, boxShadow: `0px 6px 14px ${tint(palette.primary, 0.2)}`, transform: [{ rotate: "-6deg" }] }}>
-        <View style={{ height: 5, borderRadius: 3, backgroundColor: palette.primary, width: "70%" }} />
-        <View style={{ height: 5, borderRadius: 3, backgroundColor: tint(palette.muted, 0.35) }} />
-        <View style={{ height: 5, borderRadius: 3, backgroundColor: tint(palette.muted, 0.35), width: "60%" }} />
-      </View>
-      <View style={{ position: "absolute", top: 8, end: 10, width: 10, height: 10, borderRadius: 5, backgroundColor: palette.ai, opacity: 0.8 }} />
-      <View style={{ position: "absolute", bottom: 10, start: 8, width: 7, height: 7, borderRadius: 4, backgroundColor: palette.accent }} />
+      <Text accessibilityRole="header" style={[styles.emptyTitle, { color: palette.foreground }]}>
+        {message}
+      </Text>
+      {hint ? <Text style={[styles.hint, { color: palette.muted, textAlign: "center" }]}>{hint}</Text> : null}
+      {action ? <View style={local.emptyAction}>{action}</View> : null}
     </View>
   );
 }
@@ -160,7 +175,7 @@ export function Skeleton({ palette, width, height = 14 }: { palette: Palette; wi
   return (
     <Animated.View
       aria-hidden
-      style={{ width: width ?? "100%", height, borderRadius: height / 2, backgroundColor: tint(palette.muted, 0.22), opacity: reduced ? 0.7 : pulse }}
+      style={{ width: width ?? "100%", height, borderRadius: Math.min(height / 2, radius.sm), backgroundColor: palette.subtle, opacity: reduced ? 0.7 : pulse }}
     />
   );
 }
@@ -212,7 +227,7 @@ export function Screen({ palette, children, refreshing, onRefresh, footer }: Scr
 
 export function Card({ palette, children }: { palette: Palette; children: React.ReactNode }) {
   return (
-    <View style={[styles.card, elevation.card, { backgroundColor: palette.surface, borderColor: palette.border }]}>
+    <View style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}>
       {children}
     </View>
   );
@@ -232,18 +247,27 @@ export function Heading({ children, palette, level = 1 }: { children: React.Reac
 export const styles = StyleSheet.create({
   screen: { flex: 1 },
   // On a wide browser the content is one centered column, not stretched across the whole window.
-  content: { padding: 20, gap: 16, paddingBottom: 40, width: "100%", maxWidth: 720, alignSelf: "center" },
-  block: { gap: 16 },
-  footer: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12, borderTopWidth: StyleSheet.hairlineWidth, gap: 8 },
-  button: { minHeight: 52, borderRadius: 999, paddingHorizontal: 24, alignItems: "center", justifyContent: "center" },
-  buttonText: { fontSize: 16, ...font.bold },
-  field: { gap: 6 },
-  label: { fontSize: 14, ...font.medium, textAlign: "left" },
-  input: { minHeight: 52, borderWidth: 1, borderRadius: 14, paddingHorizontal: 16, fontSize: 17, ...font.regular },
+  content: { padding: space.lg, gap: space.lg, paddingBottom: space.xxxl + space.sm, width: "100%", maxWidth: 720, alignSelf: "center" },
+  block: { gap: space.lg },
+  footer: { paddingHorizontal: space.lg, paddingTop: space.md, paddingBottom: space.md, borderTopWidth: StyleSheet.hairlineWidth, gap: space.sm },
+  button: { minHeight: controlHeight, borderRadius: radius.control, paddingHorizontal: space.xl, alignItems: "center", justifyContent: "center" },
+  buttonText: { fontSize: 15, ...font.medium },
+  field: { gap: space.xs + 2 },
+  label: { fontSize: 13, ...font.medium, textAlign: "left" },
+  // 17px keeps iOS Safari from zooming the page when a field is focused on the web.
+  input: { minHeight: controlHeight, borderWidth: 1, borderRadius: radius.control, paddingHorizontal: space.md, fontSize: 17, ...font.regular },
   hint: { fontSize: 13, ...font.regular, textAlign: "left" },
-  error: { fontSize: 14, ...font.medium, textAlign: "left" },
-  card: { borderWidth: 1, borderRadius: 20, padding: 18, gap: 10 },
-  h1: { fontSize: 28, lineHeight: 34, ...font.bold, textAlign: "left" },
-  h2: { fontSize: 20, lineHeight: 26, ...font.bold, textAlign: "left" },
+  error: { fontSize: 13, ...font.medium, textAlign: "left" },
+  // A card is a surface with a hairline; no shadow, and no card inside a card.
+  card: { borderWidth: 1, borderRadius: radius.card, padding: space.lg, gap: space.md },
+  h1: { fontSize: 24, lineHeight: 30, ...font.semibold, textAlign: "left" },
+  h2: { fontSize: 17, lineHeight: 24, ...font.semibold, textAlign: "left" },
   muted: { fontSize: 15, ...font.regular, textAlign: "left" },
+  emptyTitle: { fontSize: 17, lineHeight: 24, ...font.semibold, textAlign: "center" },
+});
+
+const local = StyleSheet.create({
+  empty: { alignItems: "center", gap: space.sm, paddingVertical: space.xxxl, paddingHorizontal: space.lg },
+  emptyDisc: { width: 56, height: 56, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", marginBottom: space.xs },
+  emptyAction: { marginTop: space.sm, alignSelf: "stretch", alignItems: "center" },
 });

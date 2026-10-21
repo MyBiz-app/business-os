@@ -1069,6 +1069,7 @@
     "confirmTitle": "Are you sure?",
     "confirmAction": "Confirm",
     "closeDialog": "Close window",
+    "goBack": "Back",
     "discardTitle": "Leave without saving?",
     "discardBody": "Your changes will be lost.",
     "keepEditing": "Keep editing",

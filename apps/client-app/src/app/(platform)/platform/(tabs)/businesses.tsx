@@ -6,7 +6,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, ListRow, PillRow } from "@business-os/app-kit/components/rows";
-import { Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { EmptyState, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { industryName } from "@business-os/app-kit/lib/vertical";
@@ -65,9 +65,7 @@ export default function Businesses() {
         options={(["newest", "name", "clients", "bookings"] as Sort[]).map((value) => ({ value, label: tList(`sorts.${value}`) }))}
       />
       {businesses.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("none")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={loading ? "…" : t("none")} />
       ) : (
         <View style={{ gap: 8 }}>
           {businesses.slice(0, SHOWN).map((business) => (

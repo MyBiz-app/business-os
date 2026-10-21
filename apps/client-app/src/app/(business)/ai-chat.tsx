@@ -15,6 +15,7 @@ import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { AiActionCard } from "@/components/ai-action-card";
 import { type Agent, AgentFace } from "@/components/agent-face";
 import { useStaff } from "@/providers/staff-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 type Conversation = components["schemas"]["app__api__assistant__Conversation"];
 type ChatError = "ai_not_configured" | "ai_busy" | "ai_unavailable" | "ai_limit_reached" | "ai_user_limit_reached" | "ai_daily_pace_reached" | "ai_rate_limited" | "generic";
@@ -139,7 +140,7 @@ export default function AiChat() {
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }} accessible accessibilityRole="header">
               <AgentFace agent={agent} size={44} />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: palette.foreground, fontWeight: "700", fontSize: 18 }}>{agent.name}</Text>
+                <Text style={{ color: palette.foreground, fontWeight: "600", fontSize: 17 }}>{agent.name}</Text>
                 <Text numberOfLines={1} style={{ color: palette.muted }}>
                   {agent.role_title}
                 </Text>
@@ -172,7 +173,7 @@ export default function AiChat() {
                     accessibilityState={{ selected: other.key === agent?.key }}
                     onPress={() => switchTo(other)}
                     style={{
-                      borderRadius: 24,
+                      borderRadius: radius.card,
                       padding: 2,
                       borderWidth: 2,
                       borderColor: other.key === agent?.key ? other.color : "transparent",
@@ -207,7 +208,7 @@ export default function AiChat() {
             {turns.length === 0 && !busy && (
               <View style={{ alignItems: "center", gap: 8, paddingVertical: 24 }}>
                 <AgentFace agent={agent} size={72} />
-                <Text style={{ color: palette.foreground, fontWeight: "700", fontSize: 18, textAlign: "center" }}>
+                <Text style={{ color: palette.foreground, fontWeight: "600", fontSize: 17, textAlign: "center" }}>
                   {tTeam("greeting", { name: agent.name })}
                 </Text>
                 {agent.topic ? <Text style={{ color: palette.muted, textAlign: "center" }}>{agent.topic}</Text> : null}
@@ -216,7 +217,7 @@ export default function AiChat() {
             {turns.map((turn, index) =>
               turn.role === "user" ? (
                 <View key={index} style={{ alignItems: "flex-end" }}>
-                  <View style={{ maxWidth: "85%", backgroundColor: palette.primary, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 }}>
+                  <View style={{ maxWidth: "85%", backgroundColor: palette.primary, borderRadius: radius.card, paddingHorizontal: 14, paddingVertical: 10 }}>
                     <Text accessibilityLabel={`${tAssistant("you")} ${turn.text}`} style={{ color: palette.onPrimary }}>
                       {turn.text}
                     </Text>
@@ -224,7 +225,7 @@ export default function AiChat() {
                 </View>
               ) : (
                 <View key={index} style={{ gap: 8, maxWidth: "92%", alignItems: "flex-start" }}>
-                  <View style={{ backgroundColor: palette.surface, borderColor: palette.border, borderWidth: 1, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 }}>
+                  <View style={{ backgroundColor: palette.surface, borderColor: palette.border, borderWidth: 1, borderRadius: radius.card, paddingHorizontal: 14, paddingVertical: 10 }}>
                     <Text accessibilityLabel={`${agent.name}: ${turn.text || tAssistant("noAnswer")}`} style={{ color: palette.foreground }}>
                       {turn.text || tAssistant("noAnswer")}
                     </Text>
@@ -241,9 +242,9 @@ export default function AiChat() {
                         key={suggestion.agent_key}
                         accessibilityRole="button"
                         onPress={() => void handoff(suggestion.agent_key)}
-                        style={{ borderWidth: 1, borderColor: palette.ai, borderRadius: 14, padding: 12, gap: 2, alignSelf: "stretch" }}
+                        style={{ borderWidth: 1, borderColor: palette.ai, borderRadius: radius.control, padding: 12, gap: 2, alignSelf: "stretch" }}
                       >
-                        <Text style={{ color: palette.foreground, fontWeight: "600" }}>
+                        <Text style={{ color: palette.foreground, fontWeight: "500" }}>
                           {tTeam("handoff", { name: target?.name ?? suggestion.agent_key })}
                         </Text>
                         <Text style={{ color: palette.muted }}>{suggestion.reason}</Text>
@@ -255,7 +256,7 @@ export default function AiChat() {
             )}
             {waitingFor ? (
               <View style={{ alignItems: "flex-end" }}>
-                <View style={{ maxWidth: "85%", backgroundColor: palette.primary, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 }}>
+                <View style={{ maxWidth: "85%", backgroundColor: palette.primary, borderRadius: radius.card, paddingHorizontal: 14, paddingVertical: 10 }}>
                   <Text style={{ color: palette.onPrimary }}>{waitingFor}</Text>
                 </View>
               </View>
@@ -279,7 +280,7 @@ export default function AiChat() {
                     key={suggestion}
                     accessibilityRole="button"
                     onPress={() => void send(suggestion)}
-                    style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8 }}
+                    style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface, borderRadius: radius.card, paddingHorizontal: 14, paddingVertical: 8 }}
                   >
                     <Text style={{ color: palette.foreground }}>{suggestion}</Text>
                   </Pressable>
@@ -304,10 +305,10 @@ export default function AiChat() {
                   borderColor: palette.border,
                   backgroundColor: palette.surface,
                   color: palette.foreground,
-                  borderRadius: 24,
+                  borderRadius: radius.card,
                   paddingHorizontal: 16,
                   paddingVertical: 12,
-                  fontSize: 16,
+                  fontSize: 15,
                 }}
               />
               <Pressable
@@ -316,7 +317,7 @@ export default function AiChat() {
                 accessibilityState={{ disabled: busy || !text.trim() }}
                 disabled={busy || !text.trim()}
                 onPress={() => void send(text)}
-                style={{ width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center", backgroundColor: palette.primary, opacity: busy || !text.trim() ? 0.5 : 1 }}
+                style={{ width: 48, height: 48, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: palette.primary, opacity: busy || !text.trim() ? 0.5 : 1 }}
               >
                 <Ionicons name="send" size={20} color={palette.onPrimary} style={{ transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }] }} />
               </Pressable>

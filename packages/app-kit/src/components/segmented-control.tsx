@@ -3,6 +3,7 @@ import { Text } from "./text";
 
 import { font } from "../lib/typography";
 import { useTheme } from "../providers/theme-provider";
+import { radius } from "../lib/theme";
 
 type Option<T extends string> = { value: T; label: string };
 
@@ -49,6 +50,6 @@ export function SegmentedControl<T extends string>({ label, options, value, onCh
 const styles = StyleSheet.create({
   container: { gap: 8 },
   label: { fontSize: 13, ...font.medium },
-  group: { flexDirection: "row", borderWidth: 1, borderRadius: 999, padding: 3, gap: 3 },
-  option: { flex: 1, alignItems: "center", justifyContent: "center", minHeight: 44, paddingVertical: 8, borderRadius: 999 },
+  group: { flexDirection: "row", borderWidth: 1, borderRadius: radius.pill, padding: 3, gap: 3 },
+  option: { flex: 1, alignItems: "center", justifyContent: "center", minHeight: 44, paddingVertical: 8, borderRadius: radius.pill },
 });

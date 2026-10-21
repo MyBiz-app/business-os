@@ -15,6 +15,7 @@ import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { BookingActions } from "@/components/booking-actions";
 import { addressOf, useLocations } from "@/lib/use-locations";
 import { useBusiness } from "@/providers/business-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 type Booking = components["schemas"]["ClientBooking"];
 type Entitlement = components["schemas"]["Entitlement"];
@@ -295,14 +296,14 @@ export default function Bookings() {
 const local = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8 },
   info: { flex: 1, gap: 2 },
-  name: { fontSize: 16, fontWeight: "600", textAlign: "left" },
-  meta: { fontSize: 14, textAlign: "left" },
-  status: { fontSize: 14, fontWeight: "600" },
+  name: { fontSize: 15, fontWeight: "500", textAlign: "left" },
+  meta: { fontSize: 13, textAlign: "left" },
+  status: { fontSize: 13, fontWeight: "500" },
   buy: { minWidth: 96 },
   upcomingList: { gap: 12 },
-  upcoming: { borderWidth: 1, borderRadius: 20, padding: 14, gap: 12 },
+  upcoming: { borderWidth: 1, borderRadius: radius.card, padding: 14, gap: 12 },
   upcomingHead: { flexDirection: "row", alignItems: "center", gap: 12 },
-  dateBlock: { width: 54, paddingVertical: 8, borderRadius: 14, alignItems: "center" },
-  dateDay: { fontSize: 20, fontWeight: "800" },
-  dateMonth: { fontSize: 12, fontWeight: "600", textTransform: "uppercase" },
+  dateBlock: { width: 54, paddingVertical: 8, borderRadius: radius.control, alignItems: "center" },
+  dateDay: { fontSize: 20, fontWeight: "600" },
+  dateMonth: { fontSize: 12, fontWeight: "500", textTransform: "uppercase" },
 });

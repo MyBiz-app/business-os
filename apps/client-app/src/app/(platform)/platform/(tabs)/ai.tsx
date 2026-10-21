@@ -9,6 +9,7 @@ import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { usePlatform } from "@/providers/platform-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 const ROLES = ["manager", "support", "health", "billing", "growth"] as const;
 type Role = (typeof ROLES)[number];
@@ -113,7 +114,7 @@ export default function Ai() {
             style={{
               alignSelf: turn.role === "user" ? "flex-end" : "flex-start",
               maxWidth: "90%",
-              borderRadius: 16,
+              borderRadius: radius.dialog,
               padding: 12,
               borderWidth: turn.role === "user" ? 0 : 1,
               borderColor: palette.border,

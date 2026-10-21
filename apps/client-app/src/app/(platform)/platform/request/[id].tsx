@@ -7,7 +7,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, BackBar, Badge, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { industryName } from "@business-os/app-kit/lib/vertical";
@@ -55,7 +55,7 @@ export default function RequestScreen() {
     return (
       <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
         <BackBar label={t("back")} palette={palette} onPress={() => router.back()} />
-        {request === null && <Text style={[styles.muted, { color: palette.muted }]}>{tInbox("empty")}</Text>}
+        {request === null && <EmptyState palette={palette} message={tInbox("empty")} icon="mail-outline" />}
       </Screen>
     );
   }
@@ -90,11 +90,11 @@ export default function RequestScreen() {
       </Text>
 
       {request.kind !== "request" && (
-        <Text style={{ color: palette.foreground, fontWeight: "600", textAlign: "left" }}>{tInbox(`setup.${request.kind}`)}</Text>
+        <Text style={{ color: palette.foreground, fontWeight: "500", textAlign: "left" }}>{tInbox(`setup.${request.kind}`)}</Text>
       )}
       {request.message ? (
         <Card palette={palette}>
-          <Text style={{ color: palette.foreground, fontSize: 16, textAlign: "left" }}>{request.message}</Text>
+          <Text style={{ color: palette.foreground, fontSize: 15, textAlign: "left" }}>{request.message}</Text>
         </Card>
       ) : null}
 

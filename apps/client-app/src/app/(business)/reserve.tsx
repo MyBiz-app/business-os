@@ -7,7 +7,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, BackBar, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { fullName } from "@business-os/app-kit/lib/names";
@@ -111,9 +111,7 @@ export default function Reserve() {
       <Heading palette={palette}>{tResources("new")}</Heading>
 
       {services && services.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("none")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("none")} icon="calendar-outline" />
       ) : (
         service && (
           <>
@@ -147,13 +145,11 @@ export default function Reserve() {
             {slots === null ? (
               <Text style={[styles.muted, { color: palette.muted }]}>…</Text>
             ) : slots.length === 0 ? (
-              <Card palette={palette}>
-                <Text style={[styles.muted, { color: palette.muted }]}>{tResources("noSlots")}</Text>
-              </Card>
+              <EmptyState palette={palette} message={tResources("noSlots")} icon="calendar-outline" />
             ) : (
               [...new Set(slots.map((s) => s.room_name))].map((room) => (
                 <View key={room} style={{ gap: 6 }}>
-                  <Text style={{ color: palette.foreground, fontWeight: "700", textAlign: "left" }}>{room}</Text>
+                  <Text style={{ color: palette.foreground, fontWeight: "600", textAlign: "left" }}>{room}</Text>
                   <PillRow
                     label={room}
                     palette={palette}
@@ -167,7 +163,7 @@ export default function Reserve() {
 
             {slot && (
               <Card palette={palette}>
-                <Text style={{ color: palette.foreground, fontWeight: "700", textAlign: "left" }}>
+                <Text style={{ color: palette.foreground, fontWeight: "600", textAlign: "left" }}>
                   {slot.room_name} · {time(slot.starts_at)}-{time(slot.ends_at)} · {formatMoney(slot.price_amount, slot.price_currency, locale)}
                 </Text>
                 <Field

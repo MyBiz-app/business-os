@@ -5,7 +5,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, Badge, ListRow, SectionTitle, StatTile, TileGrid } from "@business-os/app-kit/components/rows";
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Card, EmptyState, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { usePlatform } from "@/providers/platform-provider";
@@ -65,9 +65,7 @@ export default function Health() {
           <View style={{ gap: 8 }}>
             <SectionTitle title={t("jobs")} palette={palette} />
             {health.jobs.length === 0 ? (
-              <Card palette={palette}>
-                <Text style={[styles.muted, { color: palette.muted }]}>{t("noJobs")}</Text>
-              </Card>
+              <EmptyState palette={palette} message={t("noJobs")} icon="pulse-outline" />
             ) : (
               health.jobs.map((job) => {
                 const state = job.late ? "late" : job.last_ok === false ? "failed" : "ok";
@@ -87,9 +85,7 @@ export default function Health() {
           <View style={{ gap: 8 }}>
             <SectionTitle title={t("errors")} palette={palette} />
             {health.errors.length === 0 ? (
-              <Card palette={palette}>
-                <Text style={[styles.muted, { color: palette.muted }]}>{t("noErrors")}</Text>
-              </Card>
+              <EmptyState palette={palette} message={t("noErrors")} icon="pulse-outline" />
             ) : (
               health.errors.slice(0, 10).map((error, index) => (
                 <ListRow

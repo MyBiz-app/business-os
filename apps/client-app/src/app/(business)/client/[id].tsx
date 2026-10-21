@@ -193,7 +193,7 @@ export default function ClientScreen() {
       </Text>
 
       <View accessibilityLiveRegion="polite">
-        {notice ? <Text style={{ color: palette.success, fontWeight: "600" }}>{notice}</Text> : null}
+        {notice ? <Text style={{ color: palette.success, fontWeight: "500" }}>{notice}</Text> : null}
         <ErrorText message={error} palette={palette} />
       </View>
 
@@ -240,7 +240,7 @@ export default function ClientScreen() {
           active.map((plan) => (
             <View key={plan.id} style={{ gap: 2 }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <Text style={{ color: palette.foreground, fontWeight: "600", flex: 1, textAlign: "left" }}>{plan.name}</Text>
+                <Text style={{ color: palette.foreground, fontWeight: "500", flex: 1, textAlign: "left" }}>{plan.name}</Text>
                 <Badge
                   label={tPlans(`states.${plan.state}`)}
                   tone={plan.state === "active" ? "success" : "muted"}
@@ -264,7 +264,7 @@ export default function ClientScreen() {
             <Text style={[styles.muted, { color: palette.muted }]}>{t("noPlans")}</Text>
           ) : (
             <View style={{ gap: 10 }}>
-              <Text style={{ color: palette.foreground, fontWeight: "600" }}>{tPlans("plan")}</Text>
+              <Text style={{ color: palette.foreground, fontWeight: "500" }}>{tPlans("plan")}</Text>
               {plans.map((plan) => {
                 const selected = plan.id === chosen?.id;
                 return (
@@ -280,7 +280,7 @@ export default function ClientScreen() {
                       .join(", ")}
                     trailing={
                       <View style={{ alignItems: "flex-end", gap: 4 }}>
-                        <Text style={{ color: palette.foreground, fontWeight: "700" }}>
+                        <Text style={{ color: palette.foreground, fontWeight: "600" }}>
                           {formatMoney(plan.price_amount, plan.price_currency, locale)}
                         </Text>
                         {selected && <Badge label={t("selected")} tone="primary" palette={palette} />}
@@ -290,7 +290,7 @@ export default function ClientScreen() {
                   />
                 );
               })}
-              <Text style={{ color: palette.foreground, fontWeight: "600" }}>{tPlans("paymentMethod")}</Text>
+              <Text style={{ color: palette.foreground, fontWeight: "500" }}>{tPlans("paymentMethod")}</Text>
               <PillRow<Method>
                 label={tPlans("paymentMethod")}
                 palette={palette}

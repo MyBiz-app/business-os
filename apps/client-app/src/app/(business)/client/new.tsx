@@ -93,7 +93,7 @@ export default function NewClient() {
         />
         <AddressPicker palette={palette} value={city} onChange={setCity} cityOnly cityLabel={tClients("city")} cityHint={tClients("cityHint")} />
         <View style={{ gap: 6 }}>
-          <Text style={{ color: palette.foreground, fontSize: 14, fontWeight: "600", textAlign: "left" }}>{tClients("source")}</Text>
+          <Text style={{ color: palette.foreground, fontSize: 13, fontWeight: "500", textAlign: "left" }}>{tClients("source")}</Text>
           <PillRow<Source>
             label={tClients("source")}
             palette={palette}

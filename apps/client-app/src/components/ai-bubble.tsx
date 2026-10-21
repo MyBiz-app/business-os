@@ -4,6 +4,7 @@ import { Pressable, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
+import { elevation } from "@business-os/app-kit/components/ui";
 import { agentForTab } from "@business-os/app-kit/lib/ai-agents";
 import { useStaff } from "@/providers/staff-provider";
 import { fixedColors } from "@business-os/app-kit/lib/theme";
@@ -38,7 +39,7 @@ export function AiBubble() {
         justifyContent: "center",
         backgroundColor: palette.ai,
         opacity: pressed ? 0.85 : 1,
-        boxShadow: "0px 4px 12px rgba(17, 24, 39, 0.28)",
+        ...elevation.floating,
       })}
     >
       <Ionicons name="sparkles" size={26} color={fixedColors.white} />
