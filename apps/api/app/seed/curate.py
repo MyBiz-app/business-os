@@ -15,12 +15,20 @@ import sys
 
 from sqlalchemy import Connection, text
 
+from app.geo.backfill import locate_branches
 from app.seed.business import seed
 from app.seed.common import DEMOS, profile_id
 from app.seed.guard import refuse_blocked_owner
 from app.seed.profiles import enrich_profiles
 
 RENAMES = {"Iron & Flow": "Adir fitness"}
+# Branches that moved to other cities so the demo map has branches across the country
+# (business, old branch name) -> (new name, new address).
+BRANCH_MOVES = {
+    ("Urban Slice", "רמת גן - מרום נווה"): ("ירושלים - מחנה יהודה", "אגריפס 42, ירושלים"),
+    ("Urban Slice", "חולון - קריית שרת"): ("באר שבע - העיר החדשה", "רגר 12, באר שבע"),
+    ("Studio Bloom", "מודיעין"): ("אשדוד - הרובע", "הרצל 22, אשדוד"),
+}
 
 
 def _owned(conn: Connection, user: object) -> list[tuple[object, str]]:
@@ -39,6 +47,36 @@ def _owned(conn: Connection, user: object) -> list[tuple[object, str]]:
             {"u": user},
         ).all()
     )
+
+
+def move_branches(conn: Connection, owner_email: str) -> int:
+    """Applies `BRANCH_MOVES` to the owner's businesses: the branch takes its new name and
+    address and loses its old point (and city), so the next locating run places it again."""
+    owner = profile_id(conn, owner_email)
+    moved = 0
+    for (business, old), (name, address) in BRANCH_MOVES.items():
+        moved += conn.execute(
+            text("""
+                UPDATE app.locations l SET
+                    name = :name, address = :address, city_code = NULL, street_code = NULL,
+                    house_number = NULL, street_unlisted = NULL, address_details = NULL,
+                    latitude = NULL, longitude = NULL, geocoded_at = NULL
+                FROM app.tenants t
+                WHERE l.tenant_id = t.id AND t.name = :business AND l.name = :old
+                  AND EXISTS (SELECT 1 FROM app.tenant_members m
+                              WHERE m.tenant_id = t.id AND m.role = 'owner' AND m.user_id = :owner)
+            """),
+            {"business": business, "old": old, "name": name, "address": address, "owner": owner},
+        ).rowcount
+    return moved
+
+
+def place_branches(conn: Connection, owner_email: str) -> dict[str, int]:
+    """Moves the demo branches that changed city, then gives every branch without a point its
+    place on the map (one request a second to the map service)."""
+    refuse_blocked_owner(owner_email)
+    moved = move_branches(conn, owner_email)
+    return {"moved": moved, **locate_branches(conn, pause=1.1)}
 
 
 def curate(
@@ -89,4 +127,11 @@ def curate(
         seed(conn, owner_email, months, rng, spec) for spec in specs if spec.name not in first
     ]
     result = enrich_profiles(conn, owner_email)
-    return {"removed": len(remove), "created": len(created), "kept": sorted(first), **result}
+    places = place_branches(conn, owner_email)
+    return {
+        "removed": len(remove),
+        "created": len(created),
+        "kept": sorted(first),
+        **result,
+        "places": places,
+    }

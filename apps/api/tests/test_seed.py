@@ -677,3 +677,62 @@ def test_the_seed_refuses_the_primary_owner_account(
     with pytest.raises(SystemExit):
         refuse_blocked_owner("someone@example.com")
     refuse_blocked_owner("fine@example.com")  # anyone else is allowed
+
+
+class _CityCentres:
+    """A map service that knows streets only on Herzl Street, and every city's centre."""
+
+    def __init__(self) -> None:
+        self.asked: list[dict] = []
+
+    def find(self, *, street: str | None, house_number: str | None, city: str):
+        from app.geo.geocoder import Point
+
+        self.asked.append({"street": street, "house": house_number, "city": city})
+        if street and street != "הרצל":
+            return None
+        return Point(31.0, 34.0)
+
+
+def test_branches_without_a_point_get_their_city_street_and_point(engine: Engine) -> None:
+    from app.geo.backfill import locate_branches, split_address
+
+    assert split_address("הרצל 120, תל אביב (קומה 2)") == ("הרצל", "120", "תל אביב")
+    assert split_address("שדרות רוטשילד 45, תל אביב") == ("שדרות רוטשילד", "45", "תל אביב")
+    assert split_address("חיפה") == (None, None, "חיפה")
+
+    owner = uuid4()
+    email = f"geo-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+        tenant_id = seed(connection, email, 1, random.Random(2))
+        connection.execute(
+            text("UPDATE app.locations SET address = 'הרצל 20, באר שבע' WHERE tenant_id = :t"),
+            {"t": tenant_id},
+        )
+        connection.execute(
+            text("""
+                INSERT INTO app.locations (tenant_id, name, address)
+                VALUES (:t, 'No street match', 'ככה ככה 7, אילת'),
+                       (:t, 'No city', 'שם 3, עיר שאינה קיימת')
+            """),
+            {"t": tenant_id},
+        )
+        fake = _CityCentres()
+        first = locate_branches(connection, geocoder=fake)
+        again = locate_branches(connection, geocoder=fake)
+        rows = connection.execute(
+            text("""
+                SELECT name, city_code IS NOT NULL, latitude IS NOT NULL
+                FROM app.locations WHERE tenant_id = :t ORDER BY name
+            """),
+            {"t": tenant_id},
+        ).all()
+    assert first["located"] >= 1 and first["city_only"] == 1 and first["unplaced"] == 1
+    assert again == {"located": 0, "city_only": 0, "unplaced": 1}  # only the unplaced one is tried
+    by_name = {name: (has_city, has_point) for name, has_city, has_point in rows}
+    assert by_name["No street match"] == (True, True)  # fell back to the city's centre
+    assert by_name["No city"] == (False, False)
