@@ -3,12 +3,13 @@ import { dayOf, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { Linking, View } from "react-native";
+import { font } from "@business-os/app-kit/lib/typography";
 import { ltr } from "@business-os/app-kit/components/ltr";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -20,6 +21,10 @@ import { useStaff } from "@/providers/staff-provider";
 
 type Method = components["schemas"]["Sale"]["method"] & string;
 type Panel = "sell" | "note" | "message" | null | "dependent";
+type Tab = "overview" | "billing" | "visits" | "notes" | "activity";
+const TABS: Tab[] = ["overview", "billing", "visits", "notes", "activity"];
+const RENEW_WITHIN_DAYS = 7;
+const ACTIVITY_SHOWN = 30;
 
 const METHODS: Method[] = ["card", "cash", "transfer", "other"];
 const VISITS_SHOWN = 5;
@@ -39,6 +44,7 @@ export default function ClientScreen() {
   const tStatus = useTranslations("clients.statuses");
   const tMessaging = useTranslations("messaging");
   const tTerms = useTranslations("terms");
+  const tActivity = useTranslations("clients.activity");
   const tDependents = useTranslations("dependents");
   const tQuotes = useTranslations("quotes");
   const locale = useLocale();
@@ -49,6 +55,7 @@ export default function ClientScreen() {
   const [hours, setHours] = useState("");
   const [work, setWork] = useState("");
   const [panel, setPanel] = useState<Panel>(null);
+  const [tab, setTab] = useState<Tab>("overview");
   const [planId, setPlanId] = useState<string | null>(null);
   const [method, setMethod] = useState<Method>("card");
   const [saleKey, setSaleKey] = useState(newIdempotencyKey);
@@ -62,7 +69,7 @@ export default function ClientScreen() {
   const load = useCallback(async () => {
     if (!tenantId) return null;
     const path = { client_id: id };
-    const [client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes] = await Promise.all([
+    const [client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes, events] = await Promise.all([
       api.GET("/clients/{client_id}", { params: { ...scope, path } }).then(unwrap),
       api.GET("/clients/{client_id}/bookings", { params: { ...scope, path } }).then(unwrap),
       api
@@ -91,8 +98,13 @@ export default function ClientScreen() {
         .GET("/quotes", { params: { ...scope, query: { client_id: id } } })
         .then(unwrap)
         .catch(() => []),
+      // One feed of everything that happened with the client (visits, payments, plans, messages, notes).
+      api
+        .GET("/clients/{client_id}/activity", { params: { ...scope, path, query: { limit: ACTIVITY_SHOWN } } })
+        .then(unwrap)
+        .catch(() => []),
     ]);
-    return { client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes };
+    return { client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes, events };
   }, [api, scope, id, tenantId, can, tenant]);
   const { data, loading, reload } = useLoad(load);
 
@@ -135,6 +147,36 @@ export default function ClientScreen() {
   const short = (instant: string) =>
     `${formatDay(dayOf(instant, timeZone), locale, { weekday: "short", day: "numeric", month: "short" })} ${formatTime(instant, locale, timeZone)}`;
   const chosen = plans.find((p) => p.id === planId) ?? plans[0];
+  const current = active.find((e) => e.state === "active") ?? active[0];
+  const today = todayIn(timeZone);
+  const daysLeft = current ? Math.round((Date.parse(current.ends_on) - Date.parse(today)) / 86_400_000) : null;
+  // The one thing to do next: sell a plan to someone without one, renew one that is about to end.
+  const next =
+    can("sales.manage") && (!current || (daysLeft !== null && daysLeft <= RENEW_WITHIN_DAYS))
+      ? { label: current ? t("nextRenew") : t("nextSell"), hint: current ? t("nextRenewHint", { date: formatDay(current.ends_on, locale, { day: "numeric", month: "short" }) }) : t("nextSellHint") }
+      : null;
+  const sentence = (event: (typeof data.events)[number]) => {
+    const title = event.title ?? "";
+    switch (event.kind) {
+      case "booking":
+        return tActivity(`booking.${event.status as "booked" | "checked_in" | "no_show" | "cancelled" | "waitlisted"}`, { title });
+      case "payment":
+        return tActivity(`payment.${event.status as "succeeded" | "failed" | "refunded"}`, {
+          amount: formatMoney(event.amount ?? 0, event.currency ?? tenant.currency, locale),
+        });
+      case "plan":
+        return tActivity(`plan.${event.status as "sold" | "cancelled"}`, { title });
+      case "message":
+        return tActivity("message", { channel: tActivity(`channels.${event.status as "whatsapp" | "sms"}`) });
+      case "note":
+        return tActivity("note");
+      case "lead":
+        return tActivity(`lead.${event.status as "created" | "stage" | "note" | "call" | "message" | "meeting" | "converted"}`, {
+          detail: event.detail ?? "",
+        });
+    }
+  };
+  const activity = data.events;
 
   const sell = () =>
     act(async () => {
@@ -227,6 +269,99 @@ export default function ClientScreen() {
         </View>
       )}
 
+      {current && (
+        <Text style={[styles.muted, { color: palette.foreground }]}>
+          {current.name}
+          {current.credits !== null && current.credits_remaining !== null ? ` · ${t("creditsLeft", { count: current.credits_remaining })}` : ""}
+          {` · ${t("upcomingCount", { count: upcoming.length })}`}
+        </Text>
+      )}
+      {next && (
+        <Card palette={palette}>
+          <Text style={{ color: palette.muted, fontSize: 13, ...font.regular, textAlign: "left" }}>{next.hint}</Text>
+          <Button
+            label={next.label}
+            palette={palette}
+            onPress={() => {
+              setTab("billing");
+              setPanel("sell");
+            }}
+          />
+        </Card>
+      )}
+      <PillRow<Tab>
+        label={t("tabsLabel")}
+        palette={palette}
+        value={tab}
+        onChange={(value) => {
+          setTab(value);
+          setPanel(null);
+          setText("");
+          setError(null);
+        }}
+        options={TABS.map((value) => ({ value, label: t(`tabs.${value}`) }))}
+      />
+
+      {tab === "overview" && (
+        <Card palette={palette}>
+          <SectionTitle title={t("plan")} palette={palette} />
+          {active.length === 0 && <Text style={[styles.muted, { color: palette.muted }]}>{t("noPlan")}</Text>}
+          {active.map((plan) => (
+            <View key={plan.id} style={{ gap: 2 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <Text style={{ color: palette.foreground, ...font.medium, flex: 1, textAlign: "left" }}>{plan.name}</Text>
+                <Badge label={tPlans(`states.${plan.state}`)} tone={plan.state === "active" ? "success" : "muted"} palette={palette} />
+              </View>
+              <Text style={[styles.muted, { color: palette.muted }]}>
+                {tPlans("validityRange", {
+                  from: formatDay(plan.starts_on, locale, { day: "numeric", month: "short" }),
+                  to: formatDay(plan.ends_on, locale, { day: "numeric", month: "short" }),
+                })}
+              </Text>
+            </View>
+          ))}
+        </Card>
+      )}
+      {tab === "overview" && (
+        <>
+      {kind && data.dependentSettings && (
+        <Card palette={palette}>
+          <SectionTitle
+            title={tDependents(`title.${kind}`)}
+            action={can("clients.write") ? tDependents(`add.${kind}`) : undefined}
+            onAction={() => toggle("dependent")}
+            palette={palette}
+          />
+          {data.dependents.length === 0 && (
+            <Text style={[styles.muted, { color: palette.muted }]}>{tDependents(`none.${kind}`)}</Text>
+          )}
+          {data.dependents.map((dependent) => (
+            <ListRow
+              key={dependent.id}
+              palette={palette}
+              title={dependent.name}
+              subtitle={dependent.notes ?? undefined}
+              trailing={!dependent.active ? <Badge label={tDependents("inactive")} palette={palette} /> : undefined}
+            />
+          ))}
+          {panel === "dependent" && (
+            <DependentForm
+              kind={kind}
+              fields={data.dependentSettings.fields}
+              palette={palette}
+              onSave={async (body) => {
+                unwrap(await api.POST("/clients/{client_id}/dependents", { params: { ...scope, path: { client_id: id } }, body }));
+                setPanel(null);
+                await reload();
+              }}
+            />
+          )}
+        </Card>
+      )}
+        </>
+      )}
+      {tab === "billing" && (
+        <>
       <Card palette={palette}>
         <SectionTitle
           title={t("plan")}
@@ -310,42 +445,10 @@ export default function ClientScreen() {
             </View>
           ))}
       </Card>
-
-      {kind && data.dependentSettings && (
-        <Card palette={palette}>
-          <SectionTitle
-            title={tDependents(`title.${kind}`)}
-            action={can("clients.write") ? tDependents(`add.${kind}`) : undefined}
-            onAction={() => toggle("dependent")}
-            palette={palette}
-          />
-          {data.dependents.length === 0 && (
-            <Text style={[styles.muted, { color: palette.muted }]}>{tDependents(`none.${kind}`)}</Text>
-          )}
-          {data.dependents.map((dependent) => (
-            <ListRow
-              key={dependent.id}
-              palette={palette}
-              title={dependent.name}
-              subtitle={dependent.notes ?? undefined}
-              trailing={!dependent.active ? <Badge label={tDependents("inactive")} palette={palette} /> : undefined}
-            />
-          ))}
-          {panel === "dependent" && (
-            <DependentForm
-              kind={kind}
-              fields={data.dependentSettings.fields}
-              palette={palette}
-              onSave={async (body) => {
-                unwrap(await api.POST("/clients/{client_id}/dependents", { params: { ...scope, path: { client_id: id } }, body }));
-                setPanel(null);
-                await reload();
-              }}
-            />
-          )}
-        </Card>
+        </>
       )}
-
+      {tab === "billing" && (
+        <>
       {timeBilling && (
         <Card palette={palette}>
           <SectionTitle title={tTime("title")} palette={palette} />
@@ -378,7 +481,10 @@ export default function ClientScreen() {
           />
         </Card>
       )}
-
+        </>
+      )}
+      {tab === "billing" && (
+        <>
       {(data.quotes.length > 0 || can("sales.manage")) && (
         <View style={{ gap: 8 }}>
           <SectionTitle
@@ -406,7 +512,10 @@ export default function ClientScreen() {
           ))}
         </View>
       )}
-
+        </>
+      )}
+      {tab === "overview" && (
+        <>
       {upcoming.length > 0 && (
         <View style={{ gap: 8 }}>
           <SectionTitle title={t("upcomingTitle")} palette={palette} />
@@ -422,7 +531,10 @@ export default function ClientScreen() {
           ))}
         </View>
       )}
-
+        </>
+      )}
+      {tab === "visits" && (
+        <>
       <View style={{ gap: 8 }}>
         <SectionTitle title={t("visitsTitle")} palette={palette} />
         {past.length === 0 ? (
@@ -445,7 +557,10 @@ export default function ClientScreen() {
           ))
         )}
       </View>
-
+        </>
+      )}
+      {tab === "notes" && (
+        <>
       <Card palette={palette}>
         <SectionTitle
           title={tTerms(`${termsFor(tenant)}.visitNotes`)}
@@ -480,7 +595,10 @@ export default function ClientScreen() {
           ))
         )}
       </Card>
-
+        </>
+      )}
+      {tab === "notes" && (
+        <>
       {messaging && can("clients.write") && client.phone && (
         <Card palette={palette}>
           <SectionTitle title={tMessages("title")} action={t("message")} onAction={() => toggle("message")} palette={palette} />
@@ -503,6 +621,34 @@ export default function ClientScreen() {
           )}
         </Card>
       )}
+        </>
+      )}
+      {tab === "activity" &&
+        (activity.length === 0 ? (
+          <EmptyState palette={palette} message={tActivity("empty")} icon="time-outline" />
+        ) : (
+          <View style={{ gap: 8 }}>
+            {activity.map((event) => {
+              const failed = event.kind === "payment" && event.status === "failed";
+              const bad = failed || (event.kind === "booking" && event.status === "no_show");
+              const good = (event.kind === "booking" && event.status === "checked_in") || (event.kind === "payment" && event.status === "succeeded");
+              return (
+                <ListRow
+                  key={event.id}
+                  palette={palette}
+                  title={sentence(event)}
+                  subtitle={[short(event.occurred_at), event.kind === "note" || event.kind === "message" ? event.detail : null].filter(Boolean).join(" · ")}
+                  leading={
+                    <View
+                      accessible={false}
+                      style={{ width: 4, height: 28, borderRadius: 2, backgroundColor: bad ? palette.danger : good ? palette.success : palette.border }}
+                    />
+                  }
+                />
+              );
+            })}
+          </View>
+        ))}
     </Screen>
   );
 }
