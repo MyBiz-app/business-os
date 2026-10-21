@@ -1041,6 +1041,8 @@
       "generic": "Something went wrong. Please try again.",
       "storage_full": "Your space for files is full. Delete some files or choose a bigger bundle in Billing."
     },
+    "confirmTitle": "Are you sure?",
+    "confirmAction": "Confirm",
     "closeDialog": "Close window",
     "discardTitle": "Leave without saving?",
     "discardBody": "Your changes will be lost.",

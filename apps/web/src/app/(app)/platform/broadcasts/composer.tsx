@@ -20,6 +20,7 @@ import {
   sendTest,
 } from "./actions";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type Kind = BroadcastBody["kind"];
 type Channel = BroadcastBody["channels"][number];
@@ -68,6 +69,7 @@ function Checks<T extends string>({ legend, hint, items, selected, onChange }: {
  * language, and when it goes out. A scheduled message is edited as a draft again. */
 export function Composer({ initial, verticals, modules, businesses, locale }: { initial?: Initial; verticals: Option[]; modules: Option[]; businesses: Option[]; locale: Lang }) {
   const t = useTranslations("platform.broadcasts");
+  const confirm = useConfirm();
   const toast = useToast();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -243,8 +245,8 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
               type="button"
               disabled={pending}
               className="btn-primary px-4 py-2.5"
-              onClick={() => {
-                if (!window.confirm(t("actions.confirm", { count }))) return;
+              onClick={async () => {
+                if (!(await confirm({ message: t("actions.confirm", { count }), confirmLabel: sendNow ? t("actions.send") : t("actions.schedule") }))) return;
                 run(() => scheduleBroadcast(id, body, submitTime), () => {
                   toast("success", t("notices.scheduled"));
                   router.push("/platform/broadcasts");

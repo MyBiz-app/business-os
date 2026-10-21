@@ -14,6 +14,7 @@ import {
   saveIdentity,
 } from "@/app/(app)/(tenant)/identity-actions";
 import { Field, SelectField } from "@/components/form/field";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type IdType = "il_id" | "passport" | "foreign";
 
@@ -21,6 +22,7 @@ type IdType = "il_id" | "passport" | "foreign";
  * saved with the Israeli check digit verified before it leaves the browser. */
 export function IdentityEditor({ subject, initial }: { subject: IdentitySubject; initial?: IdentityView }) {
   const t = useTranslations("identity");
+  const confirm = useConfirm();
   const [view, setView] = useState<IdentityView | null>(initial ?? null);
   const [revealed, setRevealed] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -115,8 +117,8 @@ export function IdentityEditor({ subject, initial }: { subject: IdentitySubject;
               type="button"
               disabled={pending}
               className="btn-link text-sm text-danger underline-offset-4 hover:underline"
-              onClick={() => {
-                if (!window.confirm(t("removeConfirm"))) return;
+              onClick={async () => {
+                if (!(await confirm({ message: t("removeConfirm"), confirmLabel: t("remove"), danger: true }))) return;
                 startTransition(async () => apply(await removeIdentity(subject), () => setRevealed(null)));
               }}
             >

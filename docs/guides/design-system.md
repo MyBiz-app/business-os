@@ -69,9 +69,12 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
 - Loading: every route group has a `loading.tsx` rendering `components/layout/page-skeleton.tsx`
   (marketing, auth, the business area, the platform console, and the signed-in shell). Copy the
   pattern for a heavy page: a `loading.tsx` next to it with a skeleton of its shape.
-- UI kit (`apps/web/src/components/ui`, round 7): `Modal` (a near full-screen window over the page,
-  a sheet on a phone; Esc, X and backdrop close it, `dirty` asks "Leave without saving?", buttons go
-  in `footer`), `CollapsibleSection` (`variant="inline"` is a bare arrow and title for a show-all, an add form or a danger zone; a raw `<details>` is banned by a test except the two popovers; arrow at the start, state remembered with `storageKey`;
+- UI kit (`apps/web/src/components/ui`, round 7): `Modal` (always centered with room around it, a
+  sheet on a phone, `placement="side"` for a record sheet; the page behind does not scroll; Esc, X and
+  backdrop close it, `dirty` asks "Leave without saving?", buttons go in `footer`, `data-autofocus`
+  on a button starts on it), `ConfirmDialog` / `useConfirm()` / `useConfirmedSubmit()` (the question
+  before a delete; never `window.confirm`), the guided `Tour` (`components/tour`: one card that glides
+  between centered and pointing; skipping never moves the page), `CollapsibleSection` (`variant="inline"` is a bare arrow and title for a show-all, an add form or a danger zone; a raw `<details>` is banned by a test except the two popovers; arrow at the start, state remembered with `storageKey`;
   use it instead of a bare `<details>`), `SegmentedControl` (the pill slides) with `ContentSwap`
   (old content fades out in 100ms, new fades in in 150ms), and loading states: `LoadingDots`,
   `ProgressBar`, `PendingContent` (keeps old content dimmed while new data loads, never a blank

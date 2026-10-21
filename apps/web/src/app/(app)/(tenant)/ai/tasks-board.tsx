@@ -9,6 +9,7 @@ import { isolate } from "@/lib/bidi";
 
 import { describeSchedule, type Schedule, weekdayNames } from "./describe-schedule";
 import { deleteTask, runTaskNow, type TaskBoard, type TaskCard, type TaskResult, type TaskRun, taskRuns, updateTask } from "./tasks-actions";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type Translate = ReturnType<typeof useTranslations<"aiTeam">>;
 
@@ -59,6 +60,7 @@ export function TasksBoard({ board, agents, timeZone }: { board: TaskBoard; agen
 
 function TaskRow({ task, agentName, when }: { task: TaskCard; agentName: string; when: (iso: string | null) => string }) {
   const t = useTranslations("aiTeam");
+  const confirm = useConfirm();
   const locale = useLocale();
   const [pending, start] = useTransition();
   const [editing, setEditing] = useState(false);
@@ -143,8 +145,8 @@ function TaskRow({ task, agentName, when }: { task: TaskCard; agentName: string;
         <button
           type="button"
           disabled={pending}
-          onClick={() => {
-            if (window.confirm(t("tasks.confirmDelete"))) act(() => deleteTask(task.id));
+          onClick={async () => {
+            if (await confirm({ message: t("tasks.confirmDelete"), confirmLabel: t("tasks.delete"), danger: true })) act(() => deleteTask(task.id));
           }}
           className="btn-ghost inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-danger"
         >

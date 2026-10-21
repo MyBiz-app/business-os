@@ -9,6 +9,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 
 import { deleteRole, saveRole, type TeamState } from "../actions";
 import { isolate } from "@/lib/bidi";
+import { useConfirmedSubmit } from "@/components/ui/confirm-dialog";
 
 type PermissionKey = "clients_read" | "clients_write" | "clients_privacy" | "catalog_read" | "catalog_write" | "catalog_delete" | "schedule_read"
   | "schedule_write" | "bookings_manage" | "sales_manage" | "reports_read" | "ai_use" | "staff_read"
@@ -25,6 +26,7 @@ type Props = {
 
 export function RoleForm({ role, permissions, grantable }: Props) {
   const t = useTranslations();
+  const confirmDelete = useConfirmedSubmit({ message: role ? t("team.deleteRoleConfirm", { name: isolate(role.name) }) : "", confirmLabel: t("team.deleteRole"), danger: true });
   const [state, action] = useActionState<TeamState, FormData>(saveRole.bind(null, role?.id ?? null), {});
   const [removed, remove] = useActionState<TeamState, FormData>(deleteRole.bind(null, role?.id ?? ""), {});
   const error = state.error ?? removed.error;
@@ -64,9 +66,7 @@ export function RoleForm({ role, permissions, grantable }: Props) {
       {role && (
         <form
           action={remove}
-          onSubmit={(event) => {
-            if (!window.confirm(t("team.deleteRoleConfirm", { name: isolate(role.name) }))) event.preventDefault();
-          }}
+          onSubmit={confirmDelete}
           className="flex items-center gap-3 border-t border-border pt-3"
         >
           <span className="flex-1 text-sm text-muted">{t("team.roleMembers", { count: role.members })}</span>
