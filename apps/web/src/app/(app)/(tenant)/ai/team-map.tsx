@@ -8,6 +8,7 @@ import { CHIEF, connect, connectable, disconnect, setTeam, teamFrame, treeLayout
 
 import { AgentAvatar } from "./agent-avatar";
 import type { Agent } from "./types";
+import { Button } from "@/components/ui/button";
 
 const reducedQuery = "(prefers-reduced-motion: reduce)";
 function useReducedMotion(): boolean {
@@ -221,7 +222,7 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
         const size = compact ? "size-11" : isChief ? "size-24 sm:size-28" : "size-16 sm:size-[4.5rem]";
         const active = selected === agent.key;
         return (
-          <button
+          <Button variant="plain"
             key={agent.key}
             type="button"
             data-agent={agent.key}
@@ -232,7 +233,7 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
             aria-pressed={active}
             aria-label={`${agent.name}, ${agent.role_title}${dim ? `, ${t(`state.${agent.state}`)}` : ""}`}
             title={compact ? `${agent.name} · ${agent.role_title}` : undefined}
-            className={`btn-plain group absolute z-10 flex w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-2xl outline-none ${editing && connectable(agent) ? "cursor-grab touch-none" : ""} ${drag?.key === agent.key && drag.moved ? "!transition-none" : ""} transition-[left,top] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:ring-2 focus-visible:ring-primary`}
+            className={`group absolute z-10 flex w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-2xl outline-none ${editing && connectable(agent) ? "cursor-grab touch-none" : ""} ${drag?.key === agent.key && drag.moved ? "!transition-none" : ""} transition-[left,top] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:ring-2 focus-visible:ring-primary`}
             style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
           >
             <span className={`relative flex ${dim || reduced ? "" : "ai-bob"}`} style={{ animationDelay: `${index * -0.6}s` }}>
@@ -264,7 +265,7 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
                 {agent.role_title}
               </span>
             </span>
-          </button>
+          </Button>
         );
       })}
     </div>

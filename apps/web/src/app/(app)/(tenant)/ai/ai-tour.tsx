@@ -7,6 +7,7 @@ import { Tour, type TourStep } from "@/components/tour/tour";
 
 import { AgentAvatar } from "./agent-avatar";
 import type { Agent } from "./types";
+import { Button } from "@/components/ui/button";
 
 /** The first guide of the AI team. The conversation in it is written in advance: it never calls the
  * model, so it costs no credits, and "Confirm" in it only shows what would happen. */
@@ -83,12 +84,12 @@ function Simulation({ agent }: { agent: Agent }) {
               </p>
             ) : (
               <div className="flex gap-2">
-                <button type="button" onClick={() => setDecision("confirm")} className="btn-primary px-3 py-1.5 text-sm">
+                <Button variant="primary" type="button" onClick={() => setDecision("confirm")}>
                   {tAssistant("confirm")}
-                </button>
-                <button type="button" onClick={() => setDecision("reject")} className="btn-secondary px-3 py-1.5 text-sm font-medium">
+                </Button>
+                <Button type="button" onClick={() => setDecision("reject")} className="font-medium">
                   {tAssistant("reject")}
-                </button>
+                </Button>
               </div>
             )}
           </div>

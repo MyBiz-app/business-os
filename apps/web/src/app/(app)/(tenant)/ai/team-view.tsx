@@ -34,6 +34,8 @@ import { TeamList } from "./team-list";
 import { TeamMap } from "./team-map";
 import { type MeterDetails, UsageMeter } from "./usage-meter";
 import type { Agent, Meter, Team, Upsell } from "./types";
+import { Note } from "@/components/ui/note";
+import { Button } from "@/components/ui/button";
 
 const MAP_WIDE_KEY = "ai-team-map-wide";
 
@@ -251,13 +253,10 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   return (
     <div className="flex flex-col gap-4">
       {demo && (
-        <p role="note" className="flex items-start gap-2 rounded-2xl border border-warning/50 bg-warning/10 p-4 text-sm">
-          <FlaskConical aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          {tAssistant("demoMode")}
-        </p>
+        <Note icon={<FlaskConical />}>{tAssistant("demoMode")}</Note>
       )}
       {!enabled && (
-        <p role="status" className="rounded-2xl border border-dashed border-border p-6 text-muted">
+        <p role="status" className="rounded-xl border border-dashed border-border p-6 text-muted">
           {tAssistant("notConfigured")}
         </p>
       )}
@@ -267,36 +266,36 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         description={t("subtitle")}
         actions={
           <div className="flex items-center gap-2">
-            <button ref={tourHelp} type="button" onClick={() => setTouring(true)} disabled={structuring} className="btn-secondary inline-flex h-11 items-center gap-2 px-4 text-sm">
+            <Button ref={tourHelp} type="button" onClick={() => setTouring(true)} disabled={structuring} className="gap-2">
               <CircleHelp aria-hidden="true" className="size-4" />
               {t("tour.help")}
-            </button>
+            </Button>
             {team.can_manage && (
-              <button type="button" onClick={() => setWizard(true)} disabled={structuring} className="btn-primary inline-flex h-11 items-center gap-2 px-4 text-sm">
+              <Button variant="primary" type="button" onClick={() => setWizard(true)} disabled={structuring} className="gap-2">
                 <UserPlus aria-hidden="true" className="size-4" />
                 {t("wizard.hire")}
-              </button>
+              </Button>
             )}
           </div>
         }
       />
 
       {/* One bar of a fixed height, so nothing jumps when the window changes size or the mode switches. */}
-      <div role="toolbar" data-tour="ai-toolbar" aria-label={t("toolbar")} className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl border border-border bg-surface px-4 py-2">
+      <div role="toolbar" data-tour="ai-toolbar" aria-label={t("toolbar")} className="card flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2">
         {structuring ? (
           <>
             <p className="text-sm font-semibold">{t("structure.title")}</p>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={() => setDraft({ ...draft, pos: {} })} disabled={savingStructure} className="btn-secondary inline-flex h-9 items-center gap-1.5 px-3 text-sm">
+              <Button type="button" onClick={() => setDraft({ ...draft, pos: {} })} disabled={savingStructure} className="h-9 gap-1.5">
                 <RotateCcw aria-hidden="true" className="size-4" />
                 {t("structure.relayout")}
-              </button>
-              <button type="button" onClick={() => setDraft(null)} disabled={savingStructure} className="btn-secondary h-9 px-3 text-sm">
+              </Button>
+              <Button type="button" onClick={() => setDraft(null)} disabled={savingStructure} className="h-9">
                 {t("structure.cancel")}
-              </button>
-              <button type="button" onClick={() => void commitStructure()} disabled={savingStructure} className="btn-primary h-9 px-3 text-sm">
+              </Button>
+              <Button variant="primary" type="button" onClick={() => void commitStructure()} disabled={savingStructure} className="h-9">
                 {savingStructure ? t("structure.saving") : t("structure.save")}
-              </button>
+              </Button>
             </div>
           </>
         ) : (
@@ -309,10 +308,10 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
                 <SegmentedControl label={t("view")} value={view} onChange={setView} options={[{ value: "map", label: t("views.map") }, { value: "structure", label: t("views.structure") }, { value: "list", label: t("views.list") }]} />
               </div>
               {team.can_manage && (
-                <button type="button" onClick={startEditing} className="btn-secondary inline-flex h-9 items-center gap-2 px-3 text-sm">
+                <Button type="button" onClick={startEditing} className="h-9 gap-2">
                   <GitBranch aria-hidden="true" className="size-4" />
                   {t("structure.edit")}
-                </button>
+                </Button>
               )}
             </div>
           </>
@@ -322,17 +321,17 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
       <div className="flex items-start gap-4">
         <div data-tour="ai-map" className={`relative min-w-0 motion-reduce:transition-none transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${wide ? "w-full" : chatOpen ? "hidden w-full lg:block lg:w-72 lg:shrink-0 xl:w-80" : "w-full"}`}>
           {chatOpen && view === "map" && (
-            <button
+            <Button variant="plain"
               type="button"
               onClick={() => changeMapWide(!wide)}
               aria-pressed={wide}
               aria-keyshortcuts="M"
               title={t(wide ? "map.shrink" : "map.expand")}
               aria-label={t(wide ? "map.shrink" : "map.expand")}
-              className="btn-plain absolute end-3 top-3 z-20 hidden rounded-full border border-border bg-background/90 p-2 text-muted shadow-sm backdrop-blur hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary md:block"
+              className="absolute end-3 top-3 z-20 hidden rounded-full border border-border bg-background/90 p-2 text-muted shadow-sm backdrop-blur hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary md:block"
             >
               {wide ? <Minimize2 aria-hidden="true" className="size-4" /> : <Maximize2 aria-hidden="true" className="size-4" />}
-            </button>
+            </Button>
           )}
           {view !== "list" ? (
             <>
@@ -392,10 +391,10 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
       )}
 
       {agent && wide && (
-        <button
+        <Button variant="plain"
           type="button"
           onClick={() => changeMapWide(false)}
-          className="btn-plain ai-panel-in fixed bottom-4 end-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl border border-border bg-background p-3 text-start shadow-lg hover:bg-surface focus-visible:outline-2 focus-visible:outline-primary"
+          className="ai-panel-in fixed bottom-4 end-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl border border-border bg-background p-3 text-start shadow-lg hover:bg-surface focus-visible:outline-2 focus-visible:outline-primary"
         >
           <span className="relative">
             <AgentAvatar agent={agent} className="size-10" />
@@ -409,7 +408,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
               {waitingFor ? t("map.floatingBusy") : t("map.floatingCount", { count: conversation?.turns.length ?? 0 })}
             </span>
           </span>
-        </button>
+        </Button>
       )}
 
       {touring && <AiTour agents={team.agents} canManage={team.can_manage} onClose={endTour} />}
