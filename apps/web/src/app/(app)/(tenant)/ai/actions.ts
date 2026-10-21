@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import type { components } from "@business-os/api-client";
 
-import { ApiError, apiUpload, unwrap } from "@/lib/api";
+import { ApiError, apiFetch, apiUpload, unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
 
 import type { Agent, Team } from "./types";
@@ -170,8 +170,14 @@ export async function saveStructure(body: components["schemas"]["StructureUpdate
   }
 }
 
-/** The first-time guide was finished or skipped: it will not open by itself again for this person. */
+/** The first-time guide was finished or skipped: it will not open by itself again for this person.
+ * Skipping must never take anyone anywhere, so this is a plain request for the signed-in person
+ * (the guide is per person, not per business): no business lookup that could redirect to another
+ * page, and a failure is only a guide that shows once more. */
 export async function markAiTourSeen(): Promise<void> {
-  const { api } = await getTenant();
-  await api.PUT("/me/tours/{key}", { params: { path: { key: "ai_team" } } });
+  try {
+    await apiFetch("/me/tours/ai_team", { method: "PUT" }, "");
+  } catch {
+    // The guide opens again on the next visit; nothing else is lost.
+  }
 }

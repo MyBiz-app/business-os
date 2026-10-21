@@ -682,7 +682,8 @@
       "orders": "Orders",
       "aiTeam": "Team",
       "aiTasks": "Tasks"
-    }
+    },
+    "branchMap": "Branch map"
   },
   "terms": {
     "fitness": {
@@ -1041,6 +1042,8 @@
       "generic": "Something went wrong. Please try again.",
       "storage_full": "Your space for files is full. Delete some files or choose a bigger bundle in Billing."
     },
+    "confirmTitle": "Are you sure?",
+    "confirmAction": "Confirm",
     "closeDialog": "Close window",
     "discardTitle": "Leave without saving?",
     "discardBody": "Your changes will be lost.",
@@ -1154,6 +1157,12 @@
       "moved": "The new point is saved with the branch.",
       "readOnly": "The branch's point on the map.",
       "failed": "The map could not be loaded."
+    },
+    "clientsTitle": "Where your clients come from",
+    "view": {
+      "label": "View",
+      "list": "List",
+      "map": "Map"
     }
   },
   "locations": {

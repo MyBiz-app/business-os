@@ -12,6 +12,7 @@ import { AppHeader } from "@/components/app-header";
 import { avatarSrc } from "@/components/avatar";
 import { PaletteSync } from "@/components/palette";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ConfirmProvider } from "@/components/ui/confirm-dialog";
 import { UserMenu } from "@/components/user-menu";
 import { getApi } from "@/lib/api";
 import { getLocale } from "next-intl/server";
@@ -63,6 +64,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <ScopedMessages scopes={["app"]}>
+    <ConfirmProvider>
     <div className="app-shell flex flex-1 flex-col">
       <PaletteSync palette={me.palette ?? null} colors={me.palette_colors ?? null} />
       <AppHeader>
@@ -87,6 +89,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       <DeviceCheck />
       {announcements.length > 0 && <AnnouncementsPopup items={announcements} />}
     </div>
+    </ConfirmProvider>
     </ScopedMessages>
   );
 }

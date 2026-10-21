@@ -112,7 +112,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
     setTouring(false);
     void markAiTourSeen();
     // The first guide opens by itself, so there is no opener to return to: land on the help button.
-    window.setTimeout(() => tourHelp.current?.focus(), 0);
+    window.setTimeout(() => tourHelp.current?.focus({ preventScroll: true }), 0);
   }
 
   const agent = team.agents.find((a) => a.key === selected) ?? null;

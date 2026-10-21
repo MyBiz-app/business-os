@@ -34,7 +34,7 @@ from app.seed.common import (
     BranchSpec,
     BusinessSpec,
 )
-from app.seed.curate import curate
+from app.seed.curate import curate, place_branches
 from app.seed.demos import seed_demo
 from app.seed.guard import refuse_blocked_owner
 from app.seed.platform import seed_platform
@@ -64,7 +64,7 @@ def main() -> None:
     parser.add_argument(
         "--demo",
         default="studio",
-        choices=sorted([*DEMOS, "profiles"]),
+        choices=sorted([*DEMOS, "profiles", "places"]),
         help="studio: one fitness studio; club: a padel club renting courts by the hour; "
         "pets: a pet grooming salon with owners and their pets; "
         "jobs: an air-conditioning company with on-site jobs at clients' addresses; "
@@ -78,6 +78,7 @@ def main() -> None:
         "curated: reduce the owner's account to three businesses (the Adir fitness gym with "
         "strength, pilates and crossfit branches, Studio Bloom and Urban Slice), removing other "
         "businesses the owner alone owns; "
+        "places: give the demo branches their cities and a point on the map (adds only); "
         "profiles: add logos, portraits and the crossfit branch to the owner's existing demo "
         "businesses (adds only, deletes nothing); "
         "platform: the owner email becomes a platform team owner and the "
@@ -100,6 +101,9 @@ def main() -> None:
     with engine.begin() as conn:
         if args.demo == "curated":
             print(curate(conn, args.owner_email, args.months, random.Random(args.seed)))
+            return
+        if args.demo == "places":
+            print(place_branches(conn, args.owner_email))
             return
         if args.demo == "profiles":
             print(enrich_profiles(conn, args.owner_email))
