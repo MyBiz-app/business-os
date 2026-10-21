@@ -1,26 +1,34 @@
 import type { components } from "@business-os/api-client";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { addDays, dayOf, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
 import { usageWarnings } from "@business-os/i18n/usage";
 import { router } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useState } from "react";
-import { Linking, Pressable, View } from "react-native";
+import { Linking, Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Sheet } from "@business-os/app-kit/components/sheet";
+import { EmptyState, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
+import { formatMoney } from "@business-os/app-kit/lib/money";
+import { font } from "@business-os/app-kit/lib/typography";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { radius } from "@business-os/app-kit/lib/theme";
+import { NeedsYou } from "@/components/needs-you";
 import { useStaff } from "@/providers/staff-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
 type ScheduledSession = components["schemas"]["ScheduledSession"];
 type AttentionList = components["schemas"]["AttentionList"];
+type MetricValue = components["schemas"]["MetricValue"];
 
 const DAYS = 7;
+/** The four numbers of the morning, as on the web; every other number lives in Numbers. */
+const TILES = ["revenue", "active_clients", "attendance", "new_clients"] as const;
+const TILE_DAYS = 30;
 
 function partOfDay(timeZone: string): "morning" | "afternoon" | "evening" {
   const hour = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hourCycle: "h23", timeZone }).format(new Date()));
@@ -31,13 +39,15 @@ function partOfDay(timeZone: string): "morning" | "afternoon" | "evening" {
  * today what needs the owner's attention. */
 export default function Today() {
   const t = useTranslations("business.today");
-  const tTerms = useTranslations("terms");
   const tAi = useTranslations("business.ai");
   const tContent = useTranslations("business.content");
-  const tAttention = useTranslations("dashboard.attention");
   const tUsage = useTranslations("billing.usage");
   const tReserve = useTranslations("business.reserve");
   const tJobs = useTranslations("jobs");
+  const tMetrics = useTranslations("metrics");
+  const tDash = useTranslations("dashboard");
+  const tWaitlist = useTranslations("dashboard.waitlist");
+  const tClients = useTranslations("business.clients");
   const locale = useLocale();
   const { api, scope, tenant, palette, can, branch } = useStaff();
   const { session: auth } = useSession();
@@ -45,11 +55,14 @@ export default function Today() {
   const timeZone = tenant?.time_zone ?? "UTC";
   const today = todayIn(timeZone);
   const [day, setDay] = useState(today);
-  const [open, setOpen] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
   const load = useCallback(async () => {
-    if (!tenantId) return { sessions: [] as ScheduledSession[], attention: [] as AttentionList[], courts: 0, onSite: false, usage: null };
-    const [sessions, attention, courts, onSite, usage] = await Promise.all([
+    if (!tenantId)
+      return { sessions: [] as ScheduledSession[], attention: [] as AttentionList[], courts: 0, onSite: false, usage: null, waitlist: null, metrics: [] as MetricValue[] };
+    // Up to yesterday: today is still going and would make every change look like a drop.
+    const end = addDays(todayIn(timeZone), -1);
+    const [sessions, attention, courts, onSite, usage, waitlist, metrics] = await Promise.all([
       can("schedule.read")
         ? api.GET("/sessions", { params: { ...scope, query: { start: todayIn(timeZone), days: DAYS } } }).then(unwrap)
         : Promise.resolve([] as ScheduledSession[]),
@@ -71,8 +84,17 @@ export default function Today() {
       can("business.settings")
         ? api.GET("/billing/usage", { params: scope }).then(unwrap).catch(() => null)
         : Promise.resolve(null),
+      can("schedule.read")
+        ? api.GET("/waitlist/summary", { params: scope }).then((r) => r.data ?? null).catch(() => null)
+        : Promise.resolve(null),
+      can("reports.read")
+        ? api
+            .GET("/metrics", { params: { ...scope, query: { start: addDays(end, -(TILE_DAYS - 1)), end, keys: [...TILES] } } })
+            .then(unwrap)
+            .catch(() => [] as MetricValue[])
+        : Promise.resolve([] as MetricValue[]),
     ]);
-    return { sessions, attention, courts, onSite, usage };
+    return { sessions, attention, courts, onSite, usage, waitlist, metrics };
   }, [api, scope, tenantId, timeZone, can]);
   const { data, loading, reload } = useLoad(load);
   if (!tenant) return null;
@@ -80,9 +102,18 @@ export default function Today() {
   const all = data?.sessions ?? [];
   const sessions = all.filter((s) => dayOf(s.starts_at, timeZone) === day);
   const mine = sessions.filter((s) => s.instructor_user_id === auth?.user.id);
-  const attention = day === today ? (data?.attention ?? []).filter((list) => list.count > 0) : [];
-  const terms = termsFor(tenant);
-  const short = (value: string) => formatDay(value, locale, { day: "numeric", month: "short" });
+  const attention = (data?.attention ?? []).filter((list) => list.count > 0);
+  const number = new Intl.NumberFormat(locale);
+  const showMetric = (metric: MetricValue) => {
+    if (metric.value === null) return "-";
+    return metric.unit === "money" ? formatMoney(Math.round(metric.value), tenant.currency, locale) : number.format(metric.value);
+  };
+  const change = (metric: MetricValue) => {
+    if (metric.value === null || metric.previous === null || metric.previous === 0) return null;
+    const rounded = Math.round(((metric.value - metric.previous) / Math.abs(metric.previous)) * 100) || 0;
+    const good = metric.higher_is_better ? rounded > 0 : rounded < 0;
+    return { text: `${rounded > 0 ? "+" : ""}${number.format(rounded)}%`, good, flat: rounded === 0 };
+  };
 
   const days = Array.from({ length: DAYS }, (_, i) => addDays(today, i)).map((value) => {
     const count = all.filter((s) => dayOf(s.starts_at, timeZone) === value && s.status !== "cancelled").length;
@@ -140,44 +171,82 @@ export default function Today() {
       );
     });
 
+  const usageNotices = data?.usage
+    ? usageWarnings(data.usage).map(({ key, percent }) => ({
+        text: tUsage(key, { percent }),
+        over: key.startsWith("over"),
+        open: () => void Linking.openURL(`${WEB_URL}/settings/billing`),
+      }))
+    : [];
+  const waiting = data?.waitlist && data.waitlist.waiting > 0
+    ? {
+        count: data.waitlist.waiting,
+        top: data.waitlist.services[0] ? tWaitlist("top", { service: data.waitlist.services[0].name, count: data.waitlist.services[0].waiting }) : undefined,
+      }
+    : null;
+  const metrics = data?.metrics ?? [];
+  const quick = [
+    can("ai.use") && tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")
+      ? { key: "ai", label: tAi("open"), icon: "sparkles-outline" as const, go: () => router.push("/ai") }
+      : null,
+    can("social.read") && tenant.modules.includes("social_studio")
+      ? { key: "content", label: tContent("open"), icon: "images-outline" as const, go: () => router.push("/content") }
+      : null,
+    data?.onSite ? { key: "jobs", label: tJobs("cta"), icon: "construct-outline" as const, go: () => router.push("/jobs") } : null,
+    (data?.courts ?? 0) > 0 ? { key: "reserve", label: tReserve("cta"), icon: "tennisball-outline" as const, go: () => router.push("/reserve") } : null,
+  ].filter((item) => item !== null);
+
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
-      <View style={{ gap: 4 }}>
-        <Text style={[styles.muted, { color: palette.primary }]}>
-          {t("greeting", { part: partOfDay(timeZone) })} ·{" "}
-          {new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone }).format(new Date())}
-        </Text>
-        <Heading palette={palette}>{tenant.name}</Heading>
-        {branch && <Text style={[styles.muted, { color: palette.muted }]}>{branch.name}</Text>}
+      <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
+        <View style={{ flex: 1, gap: 4 }}>
+          <Text style={[styles.muted, { color: palette.primaryInk }]}>
+            {t("greeting", { part: partOfDay(timeZone) })} ·{" "}
+            {new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone }).format(new Date())}
+          </Text>
+          <Heading palette={palette}>{tenant.name}</Heading>
+          {branch && <Text style={[styles.muted, { color: palette.muted }]}>{branch.name}</Text>}
+        </View>
+        {can("clients.read") && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("search")}
+            onPress={() => router.push("/search")}
+            hitSlop={4}
+            style={[local.iconButton, { borderColor: palette.border, backgroundColor: palette.surface }]}
+          >
+            <Ionicons name="search-outline" size={20} color={palette.foreground} />
+          </Pressable>
+        )}
+        {can("clients.write") && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("newTitle")}
+            onPress={() => setCreating(true)}
+            hitSlop={4}
+            style={[local.iconButton, { borderColor: palette.primary, backgroundColor: palette.primary }]}
+          >
+            <Ionicons name="add" size={22} color={palette.onPrimary} />
+          </Pressable>
+        )}
       </View>
 
-      {can("ai.use") && tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro") && (
-        <Button label={tAi("open")} palette={palette} variant="secondary" onPress={() => router.push("/ai")} />
-      )}
-
-      {can("social.read") && tenant.modules.includes("social_studio") && (
-        <Button label={tContent("open")} palette={palette} variant="secondary" onPress={() => router.push("/content")} />
-      )}
-
-      {data?.onSite && <Button label={tJobs("cta")} palette={palette} onPress={() => router.push("/jobs")} />}
-
-      {(data?.courts ?? 0) > 0 && (
-        <Button label={tReserve("cta")} palette={palette} onPress={() => router.push("/reserve")} />
-      )}
+      <NeedsYou lists={attention} usageNotices={usageNotices} waiting={waiting} palette={palette} />
 
       {can("schedule.read") && (
         <View style={{ gap: 10 }}>
-          <SectionTitle title={tTerms(`${terms}.schedule`)} palette={palette} />
+          <SectionTitle title={t("timeline")} palette={palette} />
           <PillRow label={t("days")} options={days} value={day} onChange={setDay} palette={palette} />
         </View>
       )}
 
       {!can("schedule.read") || sessions.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>
-            {loading ? "…" : day === today ? t("none") : t("noneOnDay")}
-          </Text>
-        </Card>
+        <EmptyState
+          palette={palette}
+          loading={loading && !data}
+          message={day === today ? t("none") : t("noneOnDay")}
+          icon="calendar-clear-outline"
+        />
       ) : (
         <View style={{ gap: 10 }}>
           {mine.length > 0 && mine.length !== sessions.length && (
@@ -190,55 +259,86 @@ export default function Today() {
           {list(sessions)}
         </View>
       )}
-      {data?.usage &&
-        usageWarnings(data.usage).map(({ key, percent }) => (
-          <Card key={key} palette={palette}>
-            <Text style={{ color: key.startsWith("over") ? palette.danger : palette.foreground, fontWeight: "500", textAlign: "left" }}>
-              {tUsage(key, { percent })}
-            </Text>
-            <Button
-              label={tUsage("more")}
-              variant="secondary"
-              palette={palette}
-              onPress={() => void Linking.openURL(`${WEB_URL}/settings/billing`)}
-            />
-          </Card>
-        ))}
-      {attention.length > 0 && (
+
+      {metrics.length > 0 && (
         <View style={{ gap: 10 }}>
-          <SectionTitle title={t("attention")} palette={palette} />
-          {attention.map((group) => {
-            const expanded = open === group.kind;
-            return (
-              <Card key={group.kind} palette={palette}>
-                <Pressable
-                  accessibilityRole="button"
-                  aria-expanded={expanded}
-                  accessibilityLabel={`${tAttention(`kinds.${group.kind}`)}, ${group.count}`}
-                  onPress={() => setOpen(expanded ? null : group.kind)}
-                  style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 32 }}
+          <SectionTitle title={t("numbers")} action={tDash("allReports")} onAction={() => router.push("/numbers")} palette={palette} />
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+            {metrics.map((metric) => {
+              const delta = change(metric);
+              const label = tMetrics(metric.key);
+              const value = showMetric(metric);
+              return (
+                <View
+                  key={metric.key}
+                  accessible
+                  accessibilityLabel={[label, value, delta?.text].filter(Boolean).join(", ")}
+                  style={[local.tile, { backgroundColor: palette.surface, borderColor: palette.border }]}
                 >
-                  <Text style={{ color: palette.foreground, fontWeight: "600", flex: 1, textAlign: "left" }}>
-                    {tAttention(`kinds.${group.kind}`)}
-                  </Text>
-                  <Badge label={String(group.count)} tone={group.kind === "leads_due" ? "primary" : "danger"} palette={palette} />
-                  <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={18} color={palette.muted} />
-                </Pressable>
-                {expanded &&
-                  group.items.map((item) => (
-                    <ListRow
-                      key={item.id}
-                      palette={palette}
-                      title={item.name}
-                      subtitle={item.date ? tAttention(`dates.${group.kind}`, { date: short(item.date) }) : tAttention("never")}
-                      onPress={() => router.push(group.kind === "leads_due" ? `/lead/${item.id}` : `/client/${item.id}`)}
-                    />
-                  ))}
-              </Card>
-            );
-          })}
+                  <Text style={{ color: palette.muted, fontSize: 13, ...font.medium, textAlign: "left" }}>{label}</Text>
+                  <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+                    <Text style={{ color: palette.foreground, fontSize: 24, ...font.semibold, textAlign: "left", fontVariant: ["tabular-nums"] }}>
+                      {value}
+                    </Text>
+                    {delta && (
+                      <Text style={{ color: delta.flat ? palette.muted : delta.good ? palette.success : palette.danger, fontSize: 13, ...font.medium }}>
+                        {delta.text}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              );
+            })}
+          </View>
         </View>
       )}
+
+      {quick.length > 0 && (
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          {quick.map((item) => (
+            <Pressable
+              key={item.key}
+              accessibilityRole="button"
+              onPress={item.go}
+              style={[local.chip, { borderColor: palette.border, backgroundColor: palette.surface }]}
+            >
+              <Ionicons name={item.icon} size={18} color={palette.primaryInk} />
+              <Text style={{ color: palette.foreground, fontSize: 15, ...font.medium }}>{item.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+
+      <Sheet visible={creating} onClose={() => setCreating(false)} palette={palette} title={t("newTitle")}>
+        <View style={{ gap: 10 }}>
+          {can("clients.write") && (
+            <ListRow
+              palette={palette}
+              title={tClients("add")}
+              onPress={() => {
+                setCreating(false);
+                router.push("/client/new");
+              }}
+            />
+          )}
+          {tenant.modules.includes("crm") && (
+            <ListRow
+              palette={palette}
+              title={tDash("newLead")}
+              onPress={() => {
+                setCreating(false);
+                router.push("/lead/new");
+              }}
+            />
+          )}
+        </View>
+      </Sheet>
     </Screen>
   );
 }
+
+const local = StyleSheet.create({
+  iconButton: { width: 44, height: 44, borderRadius: radius.pill, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  tile: { flexGrow: 1, flexBasis: "45%", borderWidth: 1, borderRadius: radius.card, padding: 14, gap: 4 },
+  chip: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 44, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1 },
+});
