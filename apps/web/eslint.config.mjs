@@ -39,7 +39,12 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.{ts,tsx}"],
     ignores: ["**/*.test.ts"],
     plugins: { "design-system": designSystem },
-    rules: { "design-system/no-raw-colors": "error", "design-system/no-raw-button": "error", "design-system/no-scroll-jump": "error" },
+    rules: { "design-system/no-raw-colors": "error", "design-system/no-raw-button": "error", "design-system/no-scroll-jump": "error", "design-system/no-handrolled-ui": "error" },
+  },
+  // Stories show text literally; they are examples, not product screens.
+  {
+    files: ["src/**/*.stories.tsx"],
+    rules: { "react/jsx-no-literals": "off" },
   },
   // R4 (dashboard and reports) fixes its own period links; drop this block when it lands.
   {
