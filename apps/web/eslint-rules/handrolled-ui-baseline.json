@@ -455,6 +455,9 @@
   "src/components/branch-map/branch-map.tsx": [
     "button"
   ],
+  "src/components/branch-map/business-map.tsx": [
+    "table"
+  ],
   "src/components/branch-scope-picker.tsx": [
     "button"
   ],
