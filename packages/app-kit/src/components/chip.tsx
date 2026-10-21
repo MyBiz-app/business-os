@@ -2,9 +2,9 @@ import { StyleSheet } from "react-native";
 import { Text } from "./text";
 
 import { PressableScale } from "./motion";
-import { tint } from "../lib/brand";
 import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
+import { radius } from "../lib/theme";
 
 type Props = {
   label: string;
@@ -28,7 +28,7 @@ export function Chip({ label, sublabel, selected, onPress, palette, accessibilit
       style={[
         local.chip,
         selected
-          ? { backgroundColor: palette.primary, borderColor: palette.primary, boxShadow: `0px 4px 12px ${tint(palette.primary, 0.3)}` }
+          ? { backgroundColor: palette.primary, borderColor: palette.primary }
           : { backgroundColor: palette.surface, borderColor: palette.border },
       ]}
     >
@@ -39,7 +39,7 @@ export function Chip({ label, sublabel, selected, onPress, palette, accessibilit
 }
 
 const local = StyleSheet.create({
-  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 10, alignItems: "center", justifyContent: "center", minWidth: 64, minHeight: 44 },
-  label: { fontSize: 15, ...font.bold, fontVariant: ["tabular-nums"] },
-  sub: { fontSize: 11, ...font.medium },
+  chip: { borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 10, alignItems: "center", justifyContent: "center", minWidth: 64, minHeight: 44 },
+  label: { fontSize: 15, ...font.semibold, fontVariant: ["tabular-nums"] },
+  sub: { fontSize: 12, ...font.medium },
 });

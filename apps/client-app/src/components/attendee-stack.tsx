@@ -42,8 +42,8 @@ export function AttendeeStack({ people, booked, capacity, palette }: Props) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 4 },
-  count: { fontSize: 14, fontWeight: "600", fontVariant: ["tabular-nums"], textAlign: "left" },
+  count: { fontSize: 13, fontWeight: "500", fontVariant: ["tabular-nums"], textAlign: "left" },
   stack: { flexDirection: "row", alignItems: "center" },
   ring: { borderWidth: 2, borderRadius: SIZE, overflow: "hidden" },
-  more: { fontSize: 13, fontWeight: "600", marginStart: 6 },
+  more: { fontSize: 13, fontWeight: "500", marginStart: 6 },
 });

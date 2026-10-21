@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { useToast } from "@business-os/app-kit/components/toast";
 import { BackBar, Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { usePlatform } from "@/providers/platform-provider";
@@ -77,15 +77,13 @@ export default function Incidents() {
       <Heading palette={palette}>{t("title")}</Heading>
 
       {open.length === 0 && !loading ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("empty")} icon="checkmark-circle-outline" />
       ) : (
         <View style={{ gap: 8 }}>
           {open.map((incident) => (
             <Card key={incident.id} palette={palette}>
               <Badge label={t(`kinds.${incident.kind}`)} tone="danger" palette={palette} />
-              <Text style={{ color: palette.foreground, fontSize: 16, fontWeight: "600", textAlign: "left" }}>{textOf(incident)}</Text>
+              <Text style={{ color: palette.foreground, fontSize: 15, fontWeight: "500", textAlign: "left" }}>{textOf(incident)}</Text>
               <Text style={[styles.muted, { color: palette.muted }]}>{when.format(new Date(incident.created_at))}</Text>
               <Button
                 label={t("resolve")}

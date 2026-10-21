@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { Chip } from "@business-os/app-kit/components/chip";
 import { RangeSlider } from "@business-os/app-kit/components/range-slider";
+import { BackBar } from "@business-os/app-kit/components/rows";
 import { Button, Card, ErrorText, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -24,6 +25,7 @@ const clock = (minutes: number) => `${String(Math.floor(minutes / 60)).padStart(
 /** Ask to be told when a spot opens: a service, a day, and the whole day or a time range. */
 export default function WaitlistNew() {
   const t = useTranslations("client.waitlist");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const params = useLocalSearchParams<{ service_id?: string; day?: string }>();
@@ -87,6 +89,7 @@ export default function WaitlistNew() {
 
   return (
     <Screen palette={palette}>
+      <BackBar palette={palette} label={tCommon("goBack")} fallback="/waitlist" />
       <Heading palette={palette}>{t("newTitle")}</Heading>
       <Text style={[styles.muted, { color: palette.muted }]}>{t("newBody")}</Text>
 
@@ -187,8 +190,8 @@ const local = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   row: { gap: 8, paddingVertical: 2 },
   stepper: { gap: 6 },
-  stepperLabel: { fontSize: 13, fontWeight: "600", textAlign: "left" },
+  stepperLabel: { fontSize: 13, fontWeight: "500", textAlign: "left" },
   stepperRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  summary: { fontSize: 15, fontWeight: "700", textAlign: "center", fontVariant: ["tabular-nums"], writingDirection: "ltr" },
-  time: { fontSize: 22, fontWeight: "800", fontVariant: ["tabular-nums"] },
+  summary: { fontSize: 15, fontWeight: "600", textAlign: "center", fontVariant: ["tabular-nums"], writingDirection: "ltr" },
+  time: { fontSize: 20, fontWeight: "600", fontVariant: ["tabular-nums"] },
 });

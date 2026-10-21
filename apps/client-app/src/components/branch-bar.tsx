@@ -17,6 +17,7 @@ import {
 } from "@business-os/app-kit/lib/branch-filter";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import type { Location } from "@/lib/use-locations";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 type Props = {
   branches: Location[];
@@ -130,7 +131,7 @@ export function BranchBar({ branches, filter, onChange, palette }: Props) {
 const local = StyleSheet.create({
   wrap: { gap: 8 },
   chips: { gap: 8, paddingVertical: 2 },
-  menu: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12 },
-  menuLabel: { flex: 1, fontSize: 15, fontWeight: "600" },
-  list: { borderWidth: 1, borderRadius: 16, overflow: "hidden" },
+  menu: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: radius.dialog, paddingHorizontal: 14, paddingVertical: 12 },
+  menuLabel: { flex: 1, fontSize: 15, fontWeight: "500" },
+  list: { borderWidth: 1, borderRadius: radius.dialog, overflow: "hidden" },
 });

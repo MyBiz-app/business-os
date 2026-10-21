@@ -107,7 +107,7 @@ export default function Today() {
           onPress={() => router.push(`/session/${session.id}`)}
           leading={
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-              <Text style={{ color: palette.foreground, fontWeight: "700", fontSize: 16, fontVariant: ["tabular-nums"] }}>
+              <Text style={{ color: palette.foreground, fontWeight: "600", fontSize: 15, fontVariant: ["tabular-nums"] }}>
                 {formatTime(session.starts_at, locale, timeZone)}
               </Text>
               <View
@@ -193,7 +193,7 @@ export default function Today() {
       {data?.usage &&
         usageWarnings(data.usage).map(({ key, percent }) => (
           <Card key={key} palette={palette}>
-            <Text style={{ color: key.startsWith("over") ? palette.danger : palette.foreground, fontWeight: "600", textAlign: "left" }}>
+            <Text style={{ color: key.startsWith("over") ? palette.danger : palette.foreground, fontWeight: "500", textAlign: "left" }}>
               {tUsage(key, { percent })}
             </Text>
             <Button
@@ -218,7 +218,7 @@ export default function Today() {
                   onPress={() => setOpen(expanded ? null : group.kind)}
                   style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 32 }}
                 >
-                  <Text style={{ color: palette.foreground, fontWeight: "700", flex: 1, textAlign: "left" }}>
+                  <Text style={{ color: palette.foreground, fontWeight: "600", flex: 1, textAlign: "left" }}>
                     {tAttention(`kinds.${group.kind}`)}
                   </Text>
                   <Badge label={String(group.count)} tone={group.kind === "leads_due" ? "primary" : "danger"} palette={palette} />

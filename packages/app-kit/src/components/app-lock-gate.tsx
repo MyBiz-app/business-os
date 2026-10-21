@@ -13,6 +13,7 @@ import { AuthCard, AuthShell } from "./auth-shell";
 import { DepthLogo } from "./launch-splash";
 import { Text } from "./text";
 import { Button, Heading, styles } from "./ui";
+import { radius } from "../lib/theme";
 
 /** Covers the app with a Face ID / fingerprint prompt when the user turned the lock on in their
  * preferences: at launch, and after the app has been in the background for a while. The session
@@ -131,7 +132,7 @@ export function AppLockGate({ children }: { children: React.ReactNode }) {
             <AuthCard>
               <View style={styles2.who}>
                 <View style={[styles2.avatar, { backgroundColor: tint(palette.primary, 0.16) }]}>
-                  <Text style={{ color: palette.primary, fontSize: 18, fontWeight: "700" }}>{initialOf(identity)}</Text>
+                  <Text style={{ color: palette.primary, fontSize: 17, fontWeight: "600" }}>{initialOf(identity)}</Text>
                 </View>
                 <Text numberOfLines={1} style={[styles.muted, { color: palette.foreground, flexShrink: 1 }]}>{identity}</Text>
               </View>
@@ -156,8 +157,8 @@ export function AppLockGate({ children }: { children: React.ReactNode }) {
 
 const styles2 = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: "rgba(11, 16, 32, 0.55)", justifyContent: "center", padding: 24 },
-  sheet: { borderWidth: 1, borderRadius: 28, padding: 24, gap: 14, maxWidth: 420, width: "100%", alignSelf: "center" },
-  badge: { width: 64, height: 64, borderRadius: 32, alignItems: "center", justifyContent: "center", alignSelf: "center" },
+  sheet: { borderWidth: 1, borderRadius: radius.dialog, padding: 24, gap: 14, maxWidth: 420, width: "100%", alignSelf: "center" },
+  badge: { width: 64, height: 64, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", alignSelf: "center" },
   who: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10 },
-  avatar: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  avatar: { width: 40, height: 40, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
 });

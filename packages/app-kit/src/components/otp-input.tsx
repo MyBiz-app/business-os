@@ -7,6 +7,7 @@ import { tint } from "../lib/brand";
 import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
 import { Text } from "./text";
+import { radius } from "../lib/theme";
 
 /**
  * A one-time code as separate boxes. One hidden input holds the digits, so pasting a whole code
@@ -79,8 +80,8 @@ export function OtpInput({
 
 const styles = StyleSheet.create({
   row: { justifyContent: "center", gap: 8 },
-  box: { width: 46, height: 58, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  digit: { fontSize: 24, ...font.bold },
+  box: { width: 46, height: 58, borderRadius: radius.control, alignItems: "center", justifyContent: "center" },
+  digit: { fontSize: 24, ...font.semibold },
   // Covers the boxes and is invisible, so taps and pastes land on it.
   hidden: { position: "absolute", top: 0, bottom: 0, start: 0, end: 0, opacity: 0.02, fontSize: 1 },
 });

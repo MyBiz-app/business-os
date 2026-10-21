@@ -7,13 +7,14 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Card, EmptyState, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useStaff } from "@/providers/staff-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 type Days = "7" | "30" | "90";
 type Trend = "revenue" | "attendance"; // the metrics the API can chart
@@ -127,9 +128,7 @@ export default function Numbers() {
       />
 
       {data && metrics.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("empty")} icon="stats-chart-outline" />
       ) : (
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
           {metrics.map((metric) => {
@@ -151,7 +150,7 @@ export default function Numbers() {
                   flexGrow: 1,
                   flexBasis: "45%",
                   borderWidth: 1,
-                  borderRadius: 20,
+                  borderRadius: radius.card,
                   padding: 14,
                   gap: 4,
                   backgroundColor: palette.surface,
@@ -159,11 +158,11 @@ export default function Numbers() {
                 }}
               >
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                  <Text style={{ color: palette.muted, fontSize: 13, fontWeight: "600", textAlign: "left" }}>{label}</Text>
+                  <Text style={{ color: palette.muted, fontSize: 13, fontWeight: "500", textAlign: "left" }}>{label}</Text>
                   {go ? <Ionicons name="chevron-forward" size={16} color={palette.muted} style={{ transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }] }} /> : null}
                 </View>
                 <Text
-                  style={{ color: palette.foreground, fontSize: 22, fontWeight: "700", textAlign: "left", fontVariant: ["tabular-nums"] }}
+                  style={{ color: palette.foreground, fontSize: 20, fontWeight: "600", textAlign: "left", fontVariant: ["tabular-nums"] }}
                 >
                   {value}
                 </Text>
@@ -172,7 +171,7 @@ export default function Numbers() {
                     style={{
                       color: delta.flat ? palette.muted : delta.good ? palette.success : palette.danger,
                       fontSize: 13,
-                      fontWeight: "600",
+                      fontWeight: "500",
                       textAlign: "left",
                     }}
                   >

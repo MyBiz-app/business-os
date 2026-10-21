@@ -13,3 +13,6 @@ export function paletteFor(scheme: "light" | "dark", contrast: boolean): Palette
 /** Colors that do not change with the theme or a business's brand (white on a brand fill, the
  * rating star, the warning amber for banners). Everything else comes from the palette. */
 export const fixedColors = { white: "#ffffff", black: "#000000", star: "#f59e0b", amber: "#b45309", toast: "#1c2230", toastInk: "#f4f6fa", toastMuted: "#a9b1c2" } as const;
+
+/** The shared scales, re-exported so a screen imports its colors, corners and spacing from one place. */
+export { controlHeight, motion, radius, space } from "@business-os/design-tokens";

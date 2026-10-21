@@ -1,9 +1,8 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useTranslations } from "use-intl";
 
+import { Sheet } from "@business-os/app-kit/components/sheet";
 import { Text } from "@business-os/app-kit/components/text";
-import { Button, Heading, styles as ui } from "@business-os/app-kit/components/ui";
+import { styles as ui } from "@business-os/app-kit/components/ui";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import { SessionFriends } from "@/components/session-friends";
 
@@ -28,41 +27,16 @@ type Props = {
 export function SessionSheet({ visible, onClose, sessionId, title, when, description, coach, place, booked, social, action, palette }: Props) {
   const t = useTranslations("friends");
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={s.scrim} onPress={onClose} accessibilityLabel={t("close")} />
-      <View style={[s.sheet, { backgroundColor: palette.surface, borderColor: palette.border }]}>
-        <View style={s.head}>
-          <View style={{ flex: 1 }}>
-            <Heading palette={palette} level={2}>
-              {title}
-            </Heading>
-            <Text style={[ui.muted, { color: palette.muted }]}>{when}</Text>
-          </View>
-          <Pressable accessibilityRole="button" accessibilityLabel={t("close")} onPress={onClose} hitSlop={12}>
-            <Ionicons name="close" size={24} color={palette.foreground} />
-          </Pressable>
-        </View>
-        <ScrollView contentContainerStyle={s.body}>
-          {coach ? <Text style={[ui.muted, { color: palette.foreground }]}>{coach}</Text> : null}
-          {place ? <Text style={[ui.muted, { color: palette.muted }]}>{place}</Text> : null}
-          {description ? (
-            <>
-              <Text style={[ui.h2, { color: palette.foreground }]}>{t("aboutClass")}</Text>
-              <Text style={[ui.muted, { color: palette.foreground }]}>{description}</Text>
-            </>
-          ) : null}
-          {social && <SessionFriends sessionId={sessionId} alwaysOpen canInviteFriends={booked} onLeave={onClose} />}
-        </ScrollView>
-        <View style={s.footer}>{action}</View>
-      </View>
-    </Modal>
+    <Sheet visible={visible} onClose={onClose} palette={palette} title={title} subtitle={when} closeLabel={t("close")} footer={action}>
+      {coach ? <Text style={[ui.muted, { color: palette.foreground }]}>{coach}</Text> : null}
+      {place ? <Text style={[ui.muted, { color: palette.muted }]}>{place}</Text> : null}
+      {description ? (
+        <>
+          <Text style={[ui.h2, { color: palette.foreground }]}>{t("aboutClass")}</Text>
+          <Text style={[ui.muted, { color: palette.foreground }]}>{description}</Text>
+        </>
+      ) : null}
+      {social && <SessionFriends sessionId={sessionId} alwaysOpen canInviteFriends={booked} onLeave={onClose} />}
+    </Sheet>
   );
 }
-
-const s = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)" },
-  sheet: { maxHeight: "85%", borderTopLeftRadius: 28, borderTopRightRadius: 28, borderWidth: 1, padding: 20, gap: 12 },
-  head: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
-  body: { gap: 10, paddingBottom: 8 },
-  footer: { gap: 8 },
-});

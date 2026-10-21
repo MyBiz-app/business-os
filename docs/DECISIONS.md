@@ -452,6 +452,14 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Decision (console map):** one read-only SQL function (`app.platform_business_map`) so only totals leave the database; the floor of 5 is enforced inside it (a caller cannot ask for less). A city under 5 is left out whole; an industry under 5 in a city is folded into "mixed". Two layers: businesses (by branch city) and clients' homes (by their city), colored by the leading top-level industry. Permission `businesses.read`.
 - **Found and fixed:** the map never drew in a real build (MapLibre 6 got an empty worker URL, and its stylesheet made the map element `position: relative` with no height, beating the Tailwind classes). The worker file is copied to `public/maplibre/` before dev and build and the library is pointed there (`loadMaplibre()`); the sizing sits on a wrapper element.
 
+### The Expo app on the shared Calm tokens (2026-10-21, CRM Premium slice W5-1, no migration)
+
+- **One source of truth:** `packages/design-tokens` holds the app's palette, type scale, corners, spacing and motion, and a test compares the palette with the web's `globals.css` token by token. The apps' business brand color still replaces `primary` per business.
+- **Three weights, as on the web:** 400 text, 500 labels and buttons, 600 headings; 700 and 800 are gone (Assistant 600 and Plus Jakarta Sans 600 are loaded instead of the 700 files). Old `"600"` labels became `"500"` so they keep the look they had (600 used to map to the medium file).
+- **Body is 15, not 16,** like the web's Calm scale; inputs stay 17 so iOS Safari does not zoom the page on focus.
+- **Cards are flat** (hairline, no shadow); only floating things (sheet, toast, AI bubble) cast one. The primary button lost its glow.
+- **One `Sheet`, one `EmptyState`, `BackBar` with a fallback route,** so a pushed screen is never a dead end. Gradients stay on the sign-in backdrop, the launch splash and the AI team (the brand moments).
+
 ## Open
 
 

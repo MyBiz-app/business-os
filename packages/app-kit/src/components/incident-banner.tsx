@@ -71,6 +71,6 @@ export function IncidentBanner() {
 const styles = StyleSheet.create({
   bar: { borderBottomWidth: 1, paddingHorizontal: 16, paddingVertical: 8, gap: 6 },
   row: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8 },
-  text: { fontSize: 14, flexShrink: 1 },
-  link: { fontSize: 14, fontWeight: "600", textDecorationLine: "underline" },
+  text: { fontSize: 13, flexShrink: 1 },
+  link: { fontSize: 13, fontWeight: "500", textDecorationLine: "underline" },
 });

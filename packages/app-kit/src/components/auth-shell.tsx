@@ -7,6 +7,7 @@ import { elevation } from "./ui";
 import { AuthBackdrop } from "./auth-backdrop";
 import { FadeIn } from "./motion";
 import { ThemeToggle } from "./theme-toggle";
+import { radius } from "../lib/theme";
 
 /** The full-screen frame of the sign-in and lock screens: the branded moving backdrop, content
  * centered (it scrolls only when the keyboard or a large text size needs the room), and the
@@ -38,7 +39,7 @@ export function AuthCard({ children }: { children: React.ReactNode }) {
       index={2}
       style={[
         styles.card,
-        elevation.raised,
+        elevation.floating,
         { backgroundColor: tint(palette.surface, scheme === "dark" ? 0.82 : 0.9), borderColor: tint(palette.border, 0.9) },
       ]}
     >
@@ -54,5 +55,5 @@ const styles = StyleSheet.create({
   content: { flexGrow: 1, justifyContent: "center", padding: 20 },
   corner: { position: "absolute", top: 8, end: 12, zIndex: 2 },
   column: { width: "100%", maxWidth: 440, alignSelf: "center", gap: 20, alignItems: "stretch" },
-  card: { borderWidth: 1, borderRadius: 28, padding: 22, gap: 16 },
+  card: { borderWidth: 1, borderRadius: radius.dialog, padding: 22, gap: 16 },
 });

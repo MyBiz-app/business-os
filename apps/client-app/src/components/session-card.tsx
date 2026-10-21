@@ -7,7 +7,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Chip } from "@business-os/app-kit/components/chip";
-import { Button, elevation } from "@business-os/app-kit/components/ui";
+import { Button } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { confirm } from "@business-os/app-kit/lib/confirm";
 import { InstructorAvatar } from "@/components/instructor-avatar";
@@ -17,6 +17,7 @@ import { forgetSessionPeople, useSessionPeople } from "@/lib/session-people";
 import { fillRatio } from "@/lib/class-filters";
 import { useFriendsEnabled } from "@/lib/use-friend-settings";
 import { useBusiness } from "@/providers/business-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 export type ClientSession = components["schemas"]["ClientSession"];
 type Dependent = components["schemas"]["Dependent"];
@@ -197,7 +198,6 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
     <View
       style={[
         styles.card,
-        elevation.card,
         { backgroundColor: palette.surface, borderColor: mine && !cancelled ? palette.primary : palette.border },
       ]}
     >
@@ -318,20 +318,20 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderRadius: 24, padding: 16, gap: 8 },
+  card: { borderWidth: 1, borderRadius: radius.card, padding: 16, gap: 8 },
   accent: { alignSelf: "stretch", width: 4, borderRadius: 2 },
-  timeChip: { alignSelf: "flex-start", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
+  timeChip: { alignSelf: "flex-start", borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 3 },
   bar: { height: 4, borderRadius: 2, overflow: "hidden", marginTop: 6, marginBottom: 2, maxWidth: 180 },
   barFill: { height: "100%", borderRadius: 2 },
   row: { flexDirection: "row", alignItems: "center", gap: 12 },
   info: { flex: 1, gap: 2, alignItems: "stretch" },
   action: { minWidth: 110 },
-  time: { fontSize: 15, fontWeight: "600", fontVariant: ["tabular-nums"], textAlign: "left", writingDirection: "ltr" },
+  time: { fontSize: 15, fontWeight: "500", fontVariant: ["tabular-nums"], textAlign: "left", writingDirection: "ltr" },
   when: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 6, marginBottom: 4 },
-  day: { fontSize: 14, fontWeight: "600", textAlign: "left" },
-  name: { fontSize: 17, fontWeight: "700", textAlign: "left" },
-  meta: { fontSize: 14, textAlign: "left" },
-  bold: { fontWeight: "600" },
+  day: { fontSize: 13, fontWeight: "500", textAlign: "left" },
+  name: { fontSize: 17, fontWeight: "600", textAlign: "left" },
+  meta: { fontSize: 13, textAlign: "left" },
+  bold: { fontWeight: "500" },
   coach: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
   who: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8 },
   mineRow: { flexDirection: "row", alignItems: "center", gap: 12 },

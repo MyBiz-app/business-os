@@ -3,12 +3,12 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { Image, Linking, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
-import { fixedColors } from "@business-os/app-kit/lib/theme";
+import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { HOME_CARDS, type HomeData } from "@/components/home-cards";
 import { Badge, ListRow } from "@business-os/app-kit/components/rows";
-import { Button, Card, elevation, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -82,7 +82,7 @@ export default function Home() {
         )
       }
     >
-      <View style={[local.hero, elevation.raised, { backgroundColor: palette.primary }]}>
+      <View style={[local.hero, { backgroundColor: palette.primary }]}>
         {/* Soft light circles give the brand color depth. */}
         <View aria-hidden style={[local.orb, local.orbLarge, { backgroundColor: tint(palette.onPrimary, 0.12) }]} />
         <View aria-hidden style={[local.orb, local.orbSmall, { backgroundColor: tint(palette.onPrimary, 0.08) }]} />
@@ -181,12 +181,12 @@ export default function Home() {
 }
 
 const local = StyleSheet.create({
-  hero: { borderRadius: 28, padding: 24, paddingVertical: 32, gap: 6, overflow: "hidden" },
-  orb: { position: "absolute", borderRadius: 999 },
+  hero: { borderRadius: radius.dialog, padding: 24, paddingVertical: 32, gap: 6, overflow: "hidden" },
+  orb: { position: "absolute", borderRadius: radius.pill },
   orbLarge: { width: 220, height: 220, top: -90, end: -60 },
   orbSmall: { width: 120, height: 120, bottom: -50, end: 70 },
-  logo: { width: 48, height: 48, borderRadius: 12, backgroundColor: colors.light.surface },
-  business: { fontSize: 28, fontWeight: "700", textAlign: "left" },
-  greeting: { fontSize: 16, textAlign: "left" },
-  reviewTitle: { fontSize: 17, fontWeight: "700", textAlign: "left" },
+  logo: { width: 48, height: 48, borderRadius: radius.card, backgroundColor: colors.light.surface },
+  business: { fontSize: 30, fontWeight: "600", textAlign: "left" },
+  greeting: { fontSize: 15, textAlign: "left" },
+  reviewTitle: { fontSize: 17, fontWeight: "600", textAlign: "left" },
 });

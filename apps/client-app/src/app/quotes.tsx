@@ -2,11 +2,10 @@ import type { components } from "@business-os/api-client";
 import { router } from "expo-router";
 import { useCallback } from "react";
 import { Linking } from "react-native";
-import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, Badge, ListRow } from "@business-os/app-kit/components/rows";
-import { Card, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { EmptyState, Heading, LoadError, Screen } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -39,9 +38,7 @@ export default function Quotes() {
       </Heading>
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       {data && data.length === 0 && (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("none")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("none")} icon="document-text-outline" />
       )}
       {data?.map((quote) => (
         <ListRow
