@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, IconButton } from "@/components/ui/button";
 import { StatTile } from "@/components/ui/stat-tile";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { DataTable } from "@/components/ui/data-table";
 
 import { RADII_KM, circleRing, type BranchSpot } from "../branch-map/planned-core";
 import { currentTone, followTheme, loadMaplibre, prefersReducedMotion, styleUrl } from "../branch-map/map-core";
@@ -312,26 +313,20 @@ export function InsightsMap({ areas, branches, totals, canOpenClients }: Props) 
 
       {areas.length > 0 && (
         <CollapsibleSection title={t("table.show")}>
-          <table className="w-full text-start text-sm">
-            <thead>
-              <tr className="text-muted">
-                {(["city", "clients", "newClients", "leads", "won"] as const).map((key) => (
-                  <th key={key} scope="col" className="py-1 text-start font-normal">{t(`table.${key}`)}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {areas.slice(0, TABLE_ROWS).map((a) => (
-                <tr key={a.code} className="border-t border-border">
-                  <td dir="auto" className="py-1.5">{a.name}</td>
-                  <td className="py-1.5 tabular-nums">{number.format(a.clients)}</td>
-                  <td className="py-1.5 tabular-nums">{number.format(a.newClients)}</td>
-                  <td className="py-1.5 tabular-nums">{number.format(a.leads)}</td>
-                  <td className="py-1.5 tabular-nums">{number.format(a.leadsWon)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable<Area>
+            bare
+            density="compact"
+            label={t("table.show")}
+            rows={areas.slice(0, TABLE_ROWS)}
+            rowKey={(a) => a.code}
+            columns={[
+              { key: "city", header: t("table.city"), rowHeader: true, cell: (a) => <bdi>{a.name}</bdi> },
+              { key: "clients", header: t("table.clients"), align: "end", cell: (a) => number.format(a.clients) },
+              { key: "newClients", header: t("table.newClients"), align: "end", hideBelow: "sm", cell: (a) => number.format(a.newClients) },
+              { key: "leads", header: t("table.leads"), align: "end", cell: (a) => number.format(a.leads) },
+              { key: "won", header: t("table.won"), align: "end", hideBelow: "sm", cell: (a) => number.format(a.leadsWon) },
+            ]}
+          />
         </CollapsibleSection>
       )}
     </div>

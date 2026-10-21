@@ -195,9 +195,6 @@
   "src/components/image-crop-dialog.tsx": [
     "button"
   ],
-  "src/components/insights-map/insights-map.tsx": [
-    "table"
-  ],
   "src/components/locale-switcher.tsx": [
     "button"
   ],
