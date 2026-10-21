@@ -71,7 +71,7 @@ test("coverage counts who is on at each stretch", () => {
 test("each range keeps at most its number of lanes, in the order picked", () => {
   const ids = ["a", "b", "c", "d", "e", "f", "g", "a"];
   assert.deepEqual(limitLanes(ids, "day"), ["a", "b", "c", "d", "e", "f"]);
-  assert.deepEqual(limitLanes(ids, "week"), ["a", "b", "c"]);
+  assert.deepEqual(limitLanes(ids, "week"), ["a", "b"]);
   assert.deepEqual(limitLanes(ids, "month"), ["a"]);
   assert.ok(isBoardRange("month") && !isBoardRange("year"));
 });

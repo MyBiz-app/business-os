@@ -120,7 +120,7 @@ export function branchColor(index: number): string {
  * side by side: a day has the room for the most, a month shows one. */
 export type BoardRange = "day" | "week" | "month";
 
-export const LANE_LIMIT: Record<BoardRange, number> = { day: 6, week: 3, month: 1 };
+export const LANE_LIMIT: Record<BoardRange, number> = { day: 6, week: 2, month: 1 };
 
 export function isBoardRange(value: unknown): value is BoardRange {
   return value === "day" || value === "week" || value === "month";

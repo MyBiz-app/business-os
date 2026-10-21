@@ -128,10 +128,12 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     ...(canReadPayroll(tenant) || allowed("payroll.propose") ? [{ href: "/team/bonuses", label: sub("bonuses") }] : []),
     { href: "/team/roles", label: sub("roles") },
   ];
+  // The settings page has its own inner menu of topics, so the side menu lists no sub-items for it;
+  // Cmd+K still jumps straight to a topic.
   const settingsChildren: NavChild[] = visibleTopics(topicsFor(tenant.role), solo)
     .map(({ key, href }) => ({ href, label: t(`settings.nav.items.${key}` as "settings.nav.items.business") }));
   if (!solo && canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team", group: g("business"), children: teamChildren });
-  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings", group: g("business"), children: settingsChildren });
+  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings", group: g("business") });
 
   // Items of one section sit together (the sort is stable, so the order inside a section stays).
   const rank = (item: NavItem) => order.findIndex((key) => g(key) === item.group);
@@ -142,7 +144,7 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     .filter((item) => !item.locked)
     .flatMap((item) => [
       { href: item.href, label: item.label },
-      ...(item.children ?? []).filter((child) => !child.locked && child.href !== item.href).map((child) => ({ href: child.href, label: `${item.label} › ${child.label}` })),
+      ...(item.href === "/settings" ? settingsChildren : item.children ?? []).filter((child) => !child.locked && child.href !== item.href).map((child) => ({ href: child.href, label: `${item.label} › ${child.label}` })),
     ]);
 
   // The floating AI chat: for whoever may use the assistant, in a business that has the AI module.
