@@ -74,7 +74,7 @@ with sync_playwright() as p:
     duplicate = owner.get_by_role("region", name="תפקיד חדש")
     duplicate.get_by_label("שם התפקיד").fill("מנהל מסלולים")
     duplicate.get_by_role("button", name="יצירה").click()
-    expect(owner.get_by_text("כבר יש תפקיד בשם הזה.")).to_be_visible()
+    expect(owner.get_by_text("כבר יש תפקיד בשם הזה.").first).to_be_visible()
     print("role created, duplicate name rejected: ok")
 
     # Give it to the coach from the team page.
@@ -106,8 +106,10 @@ with sync_playwright() as p:
     # A role in use cannot be deleted.
     owner.goto(f"{h.BASE}/team/roles")
     h.ready(owner)
-    owner.once("dialog", lambda d: d.accept())
     owner.get_by_role("button", name="מחיקת התפקיד").click()
+    confirm = owner.get_by_role("dialog")
+    expect(confirm).to_be_visible()
+    confirm.get_by_role("button", name="מחיקת התפקיד").click()
     expect(owner.get_by_text("התפקיד הזה עדיין מוקצה")).to_be_visible()
     print("role in use is protected: ok")
     b.close()

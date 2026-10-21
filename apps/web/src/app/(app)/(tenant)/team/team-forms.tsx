@@ -15,6 +15,7 @@ import { CardTransition } from "@/components/ui/page-transition";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { changeRole, inviteMember, removeMember, setBranches, type TeamState } from "./actions";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 const ROLES = ["owner", "manager", "front_desk", "staff"] as const;
 // A branch manager is appointed from the branch's page; here it only shows for someone who is one.
@@ -103,6 +104,7 @@ type Panel = "branches" | "permissions" | "identity" | "role";
  * permissions, ID number, removal) lives in the "..." menu so the row stays calm. */
 export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null, allPermissions, permissions, openHref }: MemberRowProps) {
   const t = useTranslations();
+  const confirm = useConfirm();
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [panel, setPanel] = useState<Panel | null>(null);
@@ -142,9 +144,9 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
                 {!isSelf && !locked && (
                   <MenuItem
                     danger
-                    onClick={() => {
+                    onClick={async () => {
                       close();
-                      if (window.confirm(t("team.removeConfirm", { email }))) (document.getElementById(removeForm) as HTMLFormElement | null)?.requestSubmit();
+                      if (await confirm({ message: t("team.removeConfirm", { email }), confirmLabel: t("team.remove"), danger: true })) (document.getElementById(removeForm) as HTMLFormElement | null)?.requestSubmit();
                     }}
                   >
                     {t("team.remove")}

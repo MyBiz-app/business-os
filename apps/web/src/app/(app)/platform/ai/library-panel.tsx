@@ -23,6 +23,7 @@ import {
   type LibraryHit,
   type LibraryVersion,
 } from "./library-actions";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type Mode = "note" | "summary" | "link" | "file";
 const COUNTRIES = ["il", "us", "eu", "all"] as const;
@@ -30,6 +31,7 @@ const COUNTRIES = ["il", "us", "eu", "all"] as const;
 /** One agent's library: documents, files and notes it can search, with versions. Everyone on the team reads it; changing needs billing.manage. */
 export function LibraryPanel({ agent, canEdit }: { agent: ChatRole; canEdit: boolean }) {
   const t = useTranslations("platform.ai.library");
+  const confirm = useConfirm();
   const locale = useLocale();
   const [docs, setDocs] = useState<LibraryDocument[] | null>(null);
   const [error, setError] = useState<string>();
@@ -185,7 +187,7 @@ export function LibraryPanel({ agent, canEdit }: { agent: ChatRole; canEdit: boo
                     </button>
                     <button
                       type="button"
-                      onClick={() => { if (window.confirm(t("confirmDelete", { title: doc.title }))) run(() => deleteLibraryDocument(doc.id)); }}
+                      onClick={async () => { if (await confirm({ message: t("confirmDelete", { title: doc.title }), confirmLabel: t("delete"), danger: true })) run(() => deleteLibraryDocument(doc.id)); }}
                       disabled={pending}
                       className="btn-plain text-sm text-danger underline"
                     >
