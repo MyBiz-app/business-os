@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BranchMap } from "@/components/branch-map/branch-map";
 import { LinkSegmented } from "@/components/ui/link-segmented";
 import { unwrap } from "@/lib/api";
-import { loadBranchMap } from "@/lib/branch-map";
+import { loadBranchMap, loadClientCities } from "@/lib/branch-map";
 import { canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 import { industryTexts } from "@/lib/verticals";
@@ -29,7 +29,7 @@ export default async function LocationsPage({ searchParams }: PageProps<"/locati
   const mappable = tenant.permissions.includes("reports.read") && locations.some((l) => l.active && l.latitude !== null);
   const { view } = await searchParams;
   const asMap = mappable && view === "map";
-  const branches = asMap ? await loadBranchMap({ api, scope, tenant }) : [];
+  const [branches, clientCities] = asMap ? await Promise.all([loadBranchMap({ api, scope, tenant }), loadClientCities({ api, scope, tenant })]) : [[], null];
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
@@ -59,7 +59,7 @@ export default async function LocationsPage({ searchParams }: PageProps<"/locati
       />
 
       {asMap ? (
-        <BranchMap branches={branches} currency={tenant.currency} openBranch={openBranch} />
+        <BranchMap branches={branches} currency={tenant.currency} openBranch={openBranch} clientCities={clientCities} />
       ) : locations.length === 0 ? (
         <EmptyState variant="list">{t("locations.empty")}</EmptyState>
       ) : (

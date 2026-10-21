@@ -11,7 +11,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
-from app.api.platform import BillingDep, UsageDep, billing_summary, churn
+from app.api.platform import AdminDep, BillingDep, UsageDep, billing_summary, churn
 from app.api.platform_ai import ai_costs
 from app.core.config import get_settings
 
@@ -160,4 +160,79 @@ def email_deliverability(db: UsageDep) -> EmailDeliverability:
             for r in rows[:50]
         ],
         webhook_open=get_settings().email_webhook_secret is not None,
+    )
+
+
+# A city with fewer businesses or people than this is not shown at all (the database enforces the
+# same floor, so a caller cannot ask for less).
+MIN_PER_CITY = 5
+
+
+class MapIndustry(BaseModel):
+    vertical: str | None = Field(description="The industry; none when it is too few to name")
+    total: int
+
+
+class MapCity(BaseModel):
+    city_code: int
+    city_name: str
+    latitude: float
+    longitude: float
+    total: int
+    industries: list[MapIndustry] = Field(description="Largest first; small ones are 'mixed'")
+
+
+class BusinessMap(BaseModel):
+    min_per_city: int
+    businesses: list[MapCity] = Field(description="Cities with an active branch, by business")
+    clients: list[MapCity] = Field(description="Cities clients live in, across all businesses")
+    without_point: int = Field(description="Cities left out for lack of a known centre")
+
+
+@router.get("/business-map")
+def business_map(db: AdminDep) -> BusinessMap:
+    """Where the businesses are and where their clients live, by city, split by industry. Totals
+    only: no names, and no city with fewer than five."""
+    rows = db.execute(
+        text("SELECT * FROM app.platform_business_map(:minimum)"), {"minimum": MIN_PER_CITY}
+    ).mappings()
+    layers: dict[str, dict[int, dict]] = {"businesses": {}, "clients": {}}
+    for row in rows:
+        city = layers[row["layer"]].setdefault(
+            row["city_code"],
+            {
+                "name": row["city_name"],
+                "point": (row["latitude"], row["longitude"]),
+                "industries": [],
+            },
+        )
+        city["industries"].append(MapIndustry(vertical=row["vertical"], total=row["total"]))
+
+    skipped: set[int] = set()
+
+    def cities(layer: str) -> list[MapCity]:
+        found = []
+        for code, city in layers[layer].items():
+            point = city["point"]
+            if point[0] is None or point[1] is None:
+                skipped.add(code)
+                continue
+            industries = sorted(city["industries"], key=lambda i: (-i.total, i.vertical or ""))
+            found.append(
+                MapCity(
+                    city_code=code,
+                    city_name=city["name"],
+                    latitude=point[0],
+                    longitude=point[1],
+                    total=sum(i.total for i in industries),
+                    industries=industries,
+                )
+            )
+        return sorted(found, key=lambda c: (-c.total, c.city_name))
+
+    return BusinessMap(
+        min_per_city=MIN_PER_CITY,
+        businesses=cities("businesses"),
+        clients=cities("clients"),
+        without_point=len(skipped),
     )
