@@ -7678,7 +7678,10 @@
       "clients": "Clients",
       "leads": "Leads",
       "none": "No one matches.",
-      "prompt": "Type at least two letters to search clients and leads."
+      "prompt": "Type at least two letters to search clients, leads, the team, classes and documents.",
+      "staff": "Team",
+      "sessions": "Classes and appointments",
+      "invoices": "Documents"
     }
   },
   "staffApp": {
