@@ -5808,6 +5808,16 @@
           ]
         }
       }
+    },
+    "coverage": {
+      "eyebrow": "All over the country",
+      "title": "MyBiz, from the north to the Negev",
+      "subtitle": "{count, plural, one {# business} other {# businesses}} already run on MyBiz, in cities all around Israel.",
+      "dot": "{city}: {count, plural, one {# business} other {# businesses}}",
+      "hover": "{count, plural, one {# business} other {# businesses}}",
+      "mapLabel": "Map of the cities with MyBiz businesses",
+      "failed": "The map could not load right now.",
+      "privacy": "City totals only. A city shows up once at least five businesses are there, and no business is ever named."
     }
   },
   "appointments": {

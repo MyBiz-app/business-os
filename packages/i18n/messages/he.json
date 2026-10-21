@@ -5808,6 +5808,16 @@
           ]
         }
       }
+    },
+    "coverage": {
+      "eyebrow": "בכל רחבי הארץ",
+      "title": "MyBiz, מהצפון ועד הנגב",
+      "subtitle": "{count, plural, one {עסק אחד} other {# עסקים}} כבר עובדים עם MyBiz, בערים בכל רחבי ישראל.",
+      "dot": "{city}: {count, plural, one {עסק אחד} other {# עסקים}}",
+      "hover": "{count, plural, one {עסק אחד} other {# עסקים}}",
+      "mapLabel": "מפת הערים שיש בהן עסקים של MyBiz",
+      "failed": "המפה לא נטענה כרגע.",
+      "privacy": "סיכומים לפי עיר בלבד. עיר מופיעה רק כשיש בה לפחות חמישה עסקים, ושום עסק לא מוזכר בשמו."
     }
   },
   "appointments": {
