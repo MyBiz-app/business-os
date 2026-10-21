@@ -41,9 +41,11 @@ export function formatTime(instant: string, locale: string, timeZone: string): s
   );
 }
 
-/** Formats a calendar day (no time zone shift: the day is the day). */
+/** Formats a calendar day (no time zone shift: the day is the day). An instant ("2026-09-01T18:34:00Z")
+ * is accepted too and shows its UTC day: callers pass API timestamps straight in, and a time after the
+ * day made the date invalid and crashed the page. Use `dayOf` first when the business's day matters. */
 export function formatDay(day: string, locale: string, options: Intl.DateTimeFormatOptions): string {
-  return new Intl.DateTimeFormat(locale, { ...options, timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
+  return new Intl.DateTimeFormat(locale, { ...options, timeZone: "UTC" }).format(new Date(`${day.slice(0, 10)}T12:00:00Z`));
 }
 
 /** The first day of the month of `day`. */
