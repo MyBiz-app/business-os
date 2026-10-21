@@ -4,7 +4,9 @@ import type { components } from "@business-os/api-client";
 import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 
-import { CheckboxField, Field, SelectField } from "@/components/form/field";
+import { CheckboxField, Field } from "@/components/form/field";
+import { InputRow, SelectRow, SettingsRows, SwitchRow } from "@/components/form/rows";
+import { SaveBar } from "@/components/form/save-bar";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { FileField } from "@/components/form/file-field";
 import { FormError, FormNotice } from "@/components/form/form-message";
@@ -14,6 +16,7 @@ import { brandStyle, DEFAULT_BRAND_COLOR } from "@/lib/brand";
 import type { FormState } from "@/lib/form-state";
 import { locales } from "@/i18n/config";
 
+import { SettingsGroup } from "./settings-group";
 import { type IdentityState, type LogoState, updateBrandColor, updateDetails, updateIdentity, uploadCover, uploadLogo } from "./actions";
 
 type Tenant = components["schemas"]["Tenant"];
@@ -25,141 +28,116 @@ const HORIZON_DAYS = [3, 7, 10, 14, 21, 28];
 export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: string[] }) {
   const t = useTranslations();
   const [state, action] = useActionState<FormState, FormData>(updateDetails, {});
+  const key = [
+    tenant.name,
+    tenant.website_url,
+    tenant.locale,
+    tenant.time_zone,
+    tenant.currency,
+    tenant.cancellation_window_minutes,
+    tenant.booking_requires_plan,
+    tenant.requires_health_declaration,
+    tenant.client_id_number,
+    tenant.online_sales,
+    tenant.require_mfa_for_staff,
+    tenant.resource_payment,
+    tenant.booking_horizon_days,
+    tenant.weekly_release_weekday,
+    tenant.weekly_release_time,
+  ].join("-");
+  // One form, several groups: each group is its own card and its own entry in the room's menu,
+  // and a single bar saves them all.
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-8">
       <FormFeedback state={state} />
-      <div key={`${tenant.name}-${tenant.website_url}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}-${tenant.require_mfa_for_staff}-${tenant.resource_payment}-${tenant.booking_horizon_days}-${tenant.weekly_release_weekday}-${tenant.weekly_release_time}`} className="grid gap-4 sm:grid-cols-2">
-        <div className="sm:col-span-2">
-          <Field label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
-        </div>
-        <div className="sm:col-span-2">
-          <Field label={t("settings.website")} hint={t("settings.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="url" placeholder="www.example.com" defaultValue={tenant.website_url ?? ""} />
-        </div>
-        <SelectField
-          label={t("onboarding.locale")}
-          name="locale"
-          defaultValue={tenant.locale}
-          options={locales.map((value) => ({ value, label: t(`locales.${value}`) }))}
-        />
-        <SelectField
-          label={t("onboarding.currency")}
-          name="currency"
-          defaultValue={tenant.currency}
-          options={CURRENCIES.map((value) => ({ value, label: t(`onboarding.currencies.${value}`) }))}
-        />
-        <div className="sm:col-span-2">
-          <SelectField
-            label={t("onboarding.timeZone")}
-            name="time_zone"
-            dir="ltr"
-            defaultValue={tenant.time_zone}
-            options={timeZones.map((value) => ({ value, label: value.replaceAll("_", " ") }))}
-          />
-        </div>
-        <div className="sm:col-span-2 border-t border-border pt-5">
-          <h4 className="text-sm font-semibold">{t("settings.detailsGroups.booking")}</h4>
-        </div>
-        <div className="sm:col-span-2">
-          <SelectField
-            label={t("settings.cancellationWindow")}
-            name="cancellation_window_minutes"
-            defaultValue={String(tenant.cancellation_window_minutes)}
-            aria-describedby="cancellation-window-hint"
-            options={[
-              ...new Set([...CANCELLATION_WINDOWS, tenant.cancellation_window_minutes]),
-            ]
-              .sort((a, b) => a - b)
-              .map((minutes) => ({
-                value: String(minutes),
-                label:
-                  minutes === 0
-                    ? t("settings.cancellationNone")
-                    : t("settings.cancellationHours", { hours: minutes / 60 }),
-              }))}
-          />
-          <p id="cancellation-window-hint" className="mt-1.5 text-xs text-muted">
-            {t("settings.cancellationWindowHint")}
-          </p>
-        </div>
-        <div className="sm:col-span-2 border-t border-border pt-5">
-          <h4 className="text-sm font-semibold">{t("settings.classRelease")}</h4>
-        </div>
-        <SelectField
-          label={t("settings.bookingHorizon")}
-          name="booking_horizon_days"
-          defaultValue={String(tenant.booking_horizon_days)}
-          options={[...new Set([...HORIZON_DAYS, tenant.booking_horizon_days])]
-            .sort((a, b) => a - b)
-            .map((days) => ({ value: String(days), label: t("settings.bookingHorizonDays", { days }) }))}
-        />
-        <SelectField
-          label={t("settings.releaseWeekday")}
-          name="weekly_release_weekday"
-          defaultValue={tenant.weekly_release_weekday == null ? "" : String(tenant.weekly_release_weekday)}
-          options={[
-            { value: "", label: t("settings.releaseRolling") },
-            ...((["0", "1", "2", "3", "4", "5", "6"]) as const).map((day) => ({ value: day, label: t(`settings.releaseWeekdays.${day}`) })),
-          ]}
-        />
-        <Field
-          label={t("settings.releaseTime")}
-          name="weekly_release_time"
-          type="time"
-          defaultValue={tenant.weekly_release_time?.slice(0, 5) ?? "20:00"}
-          hint={t("settings.classReleaseHint")}
-        />
-        <div className="sm:col-span-2 border-t border-border pt-5">
-          <h4 className="text-sm font-semibold">{t("settings.detailsGroups.clients")}</h4>
-        </div>
-        <div className="sm:col-span-2">
-          <CheckboxField
-            label={t("settings.requirePlan")}
-            name="booking_requires_plan"
-            defaultChecked={tenant.booking_requires_plan}
-          />
-          <p className="mt-1.5 text-xs text-muted">{t("settings.requirePlanHint")}</p>
-        </div>
-        <div className="sm:col-span-2">
-          <CheckboxField
-            label={t("settings.requireHealth")}
-            name="requires_health_declaration"
-            defaultChecked={tenant.requires_health_declaration}
-          />
-          <p className="mt-1.5 text-xs text-muted">{t("settings.requireHealthHint")}</p>
-        </div>
-        <div className="sm:col-span-2">
-          <SelectField
-            label={t("settings.clientIdNumber")}
-            name="client_id_number"
-            defaultValue={tenant.client_id_number}
-            options={(["off", "optional", "required"] as const).map((value) => ({ value, label: t(`settings.clientIdNumbers.${value}`) }))}
-          />
-          <p className="mt-1.5 text-xs text-muted">{t("settings.clientIdNumberHint")}</p>
-        </div>
-        <div className="sm:col-span-2 border-t border-border pt-5">
-          <h4 className="text-sm font-semibold">{t("settings.detailsGroups.sales")}</h4>
-        </div>
-        <div className="sm:col-span-2">
-          <CheckboxField label={t("settings.onlineSales")} name="online_sales" defaultChecked={tenant.online_sales} />
-          <p className="mt-1.5 text-xs text-muted">{t("settings.onlineSalesHint")}</p>
-        </div>
-        <div className="sm:col-span-2">
-          <SelectField
-            label={t("settings.resourcePayment")}
-            name="resource_payment"
-            defaultValue={tenant.resource_payment}
-            options={(["app", "venue"] as const).map((value) => ({ value, label: t(`settings.resourcePayments.${value}`) }))}
-          />
-          <p className="mt-1.5 text-xs text-muted">{t("settings.resourcePaymentHint")}</p>
-        </div>
-        <div className="sm:col-span-2">
-          <CheckboxField label={t("settings.requireMfaForStaff")} name="require_mfa_for_staff" defaultChecked={tenant.require_mfa_for_staff} />
-          <p className="mt-1.5 text-xs text-muted">{t("settings.requireMfaForStaffHint")}</p>
-        </div>
+      <div key={key} className="flex flex-col gap-8">
+        <SettingsGroup id="details" title={t("settings.details")} description={t("settings.detailsHint")}>
+          <SettingsRows>
+            <InputRow label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
+            <InputRow label={t("settings.website")} hint={t("settings.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="url" placeholder="www.example.com" defaultValue={tenant.website_url ?? ""} />
+            <SelectRow
+              label={t("onboarding.locale")}
+              name="locale"
+              defaultValue={tenant.locale}
+              options={locales.map((value) => ({ value, label: t(`locales.${value}`) }))}
+            />
+            <SelectRow
+              label={t("onboarding.currency")}
+              name="currency"
+              defaultValue={tenant.currency}
+              options={CURRENCIES.map((value) => ({ value, label: t(`onboarding.currencies.${value}`) }))}
+            />
+            <SelectRow
+              label={t("onboarding.timeZone")}
+              name="time_zone"
+              dir="ltr"
+              defaultValue={tenant.time_zone}
+              options={timeZones.map((value) => ({ value, label: value.replaceAll("_", " ") }))}
+            />
+          </SettingsRows>
+        </SettingsGroup>
+        <SettingsGroup id="booking-rules" title={t("settings.detailsGroups.booking")}>
+          <SettingsRows>
+            <SelectRow
+              label={t("settings.cancellationWindow")}
+              hint={t("settings.cancellationWindowHint")}
+              name="cancellation_window_minutes"
+              defaultValue={String(tenant.cancellation_window_minutes)}
+              options={[...new Set([...CANCELLATION_WINDOWS, tenant.cancellation_window_minutes])]
+                .sort((a, b) => a - b)
+                .map((minutes) => ({
+                  value: String(minutes),
+                  label: minutes === 0 ? t("settings.cancellationNone") : t("settings.cancellationHours", { hours: minutes / 60 }),
+                }))}
+            />
+            <SelectRow
+              label={t("settings.bookingHorizon")}
+              name="booking_horizon_days"
+              defaultValue={String(tenant.booking_horizon_days)}
+              options={[...new Set([...HORIZON_DAYS, tenant.booking_horizon_days])]
+                .sort((a, b) => a - b)
+                .map((days) => ({ value: String(days), label: t("settings.bookingHorizonDays", { days }) }))}
+            />
+            <SelectRow
+              label={t("settings.releaseWeekday")}
+              name="weekly_release_weekday"
+              defaultValue={tenant.weekly_release_weekday == null ? "" : String(tenant.weekly_release_weekday)}
+              options={[
+                { value: "", label: t("settings.releaseRolling") },
+                ...(["0", "1", "2", "3", "4", "5", "6"] as const).map((day) => ({ value: day, label: t(`settings.releaseWeekdays.${day}`) })),
+              ]}
+            />
+            <InputRow label={t("settings.releaseTime")} hint={t("settings.classReleaseHint")} name="weekly_release_time" type="time" defaultValue={tenant.weekly_release_time?.slice(0, 5) ?? "20:00"} />
+          </SettingsRows>
+        </SettingsGroup>
+        <SettingsGroup id="client-rules" title={t("settings.detailsGroups.clients")}>
+          <SettingsRows>
+            <SwitchRow label={t("settings.requirePlan")} hint={t("settings.requirePlanHint")} name="booking_requires_plan" defaultChecked={tenant.booking_requires_plan} />
+            <SwitchRow label={t("settings.requireHealth")} hint={t("settings.requireHealthHint")} name="requires_health_declaration" defaultChecked={tenant.requires_health_declaration} />
+            <SelectRow
+              label={t("settings.clientIdNumber")}
+              hint={t("settings.clientIdNumberHint")}
+              name="client_id_number"
+              defaultValue={tenant.client_id_number}
+              options={(["off", "optional", "required"] as const).map((value) => ({ value, label: t(`settings.clientIdNumbers.${value}`) }))}
+            />
+          </SettingsRows>
+        </SettingsGroup>
+        <SettingsGroup id="sales-rules" title={t("settings.detailsGroups.sales")}>
+          <SettingsRows>
+            <SwitchRow label={t("settings.onlineSales")} hint={t("settings.onlineSalesHint")} name="online_sales" defaultChecked={tenant.online_sales} />
+            <SelectRow
+              label={t("settings.resourcePayment")}
+              hint={t("settings.resourcePaymentHint")}
+              name="resource_payment"
+              defaultValue={tenant.resource_payment}
+              options={(["app", "venue"] as const).map((value) => ({ value, label: t(`settings.resourcePayments.${value}`) }))}
+            />
+            <SwitchRow label={t("settings.requireMfaForStaff")} hint={t("settings.requireMfaForStaffHint")} name="require_mfa_for_staff" defaultChecked={tenant.require_mfa_for_staff} />
+          </SettingsRows>
+        </SettingsGroup>
       </div>
-      <div>
-        <SubmitButton>{t("common.save")}</SubmitButton>
-      </div>
+      <SaveBar />
     </form>
   );
 }
@@ -277,19 +255,17 @@ export function IdentityForm({ type, number }: { type: string | null; number: st
     <form action={action} className="flex flex-col gap-4">
       <FormError message={state.error && (state.error === "invalid_business_number" ? t("invalidNumber") : tCommon("errors.generic"))} />
       <FormNotice message={state.saved ? tCommon("saved") : undefined} />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <SelectField
+      <SettingsRows>
+        <SelectRow
           label={t("entityType")}
           name="legal_entity_type"
           value={entity}
           onChange={(event) => setEntity(event.target.value)}
           options={[{ value: "", label: t("notSet") }, ...ENTITY_TYPES.map((value) => ({ value, label: t(`types.${value}`) }))]}
         />
-        <Field label={numberLabel} hint={t("numberHint")} name="business_number" defaultValue={number ?? ""} inputMode="numeric" maxLength={24} dir="ltr" autoComplete="off" />
-      </div>
-      <div>
-        <SubmitButton>{tCommon("save")}</SubmitButton>
-      </div>
+        <InputRow label={numberLabel} hint={t("numberHint")} name="business_number" defaultValue={number ?? ""} inputMode="numeric" maxLength={24} dir="ltr" autoComplete="off" />
+      </SettingsRows>
+      <SaveBar />
     </form>
   );
 }

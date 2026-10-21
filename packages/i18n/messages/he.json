@@ -1025,6 +1025,8 @@
     "undo": "בטל",
     "notifications": "הודעות",
     "savedShort": "נשמר",
+    "unsavedChanges": "יש שינויים שלא נשמרו",
+    "discardChanges": "בטל שינויים",
     "dismiss": "סגירת ההודעה",
     "skipToContent": "דלג לתוכן הראשי",
     "loadFailed": "לא הצלחנו לטעון כרגע.",

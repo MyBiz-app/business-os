@@ -2467,3 +2467,24 @@ html[data-motion="reduce"] ::view-transition-new(*) {
     animation: none;
   }
 }
+
+/* The save bar of a settings form (components/form/save-bar.tsx): rises from the bottom edge when a
+   field changes, and settles back when the form is saved or discarded. */
+.save-bar {
+  opacity: 0;
+  transform: translateY(1rem);
+  pointer-events: none;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out;
+}
+.save-bar[data-open] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .save-bar {
+    transition: none;
+  }
+}
