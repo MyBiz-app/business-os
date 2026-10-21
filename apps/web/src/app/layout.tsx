@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { LaunchSplash } from "@/components/launch-splash";
+import { NavigationScroll } from "@/components/navigation-scroll";
 import { clientMessages } from "@/components/scoped-messages";
 import { PaletteScript } from "@/components/palette-script";
 import { SkipLink } from "@/components/skip-link";
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider nonce={nonce}>
           <NextIntlClientProvider messages={messages}>
             <SkipLink />
+            <NavigationScroll />
             <Suspense fallback={null}>
               <RouteProgress />
             </Suspense>

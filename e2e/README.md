@@ -90,3 +90,5 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 `client_account.py <owner email>` (on the accounting demo, `--demo office`): the client app's account round (#98) - a new client sees a bill to pay, a quote to answer and a contract to sign on the home screen and in "In my account", signs the contract, and home stops asking (Hebrew/light, profile in dark).
 
 `csp.py`: loads the marketing and sign-in pages (Hebrew light, English dark) and, with a fresh owner, the CRM pages in a real browser and fails on any Content-Security-Policy violation. `E2E_WEB_URL=http://localhost:3111 python e2e/csp.py --public-only` checks a production build without the database.
+
+`navigation.py <owner email with data> [--landing-only]`: where a page starts after a click (CRM Premium W1-1) - every footer link of the landing site and every side menu item and team tab starts at the top in one move, a link to a section of another page lands it below the sticky header, back returns to where you were, the settings menu lists a topic's sections and follows the scroll, and a window over the client list leaves the list in place. Run it like `crawl.py`.

@@ -5,10 +5,21 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { scrollToSection } from "@/lib/scroll-to-section";
 
+import { GlidePill, useGlide } from "./ui/glide-pill";
+
 import { useScrollSpy } from "./use-scroll-spy";
 
 /** A section of the page (`id`) or, with `href`, a page of its own that opens as a normal link. */
-export type SectionNavItem = { id: string; label: ReactNode; icon?: ReactNode; href?: string; group?: ReactNode; current?: boolean };
+export type SectionNavItem = {
+  id: string;
+  label: ReactNode;
+  icon?: ReactNode;
+  href?: string;
+  group?: ReactNode;
+  current?: boolean;
+  /** A section of the open page listed under its page's item: indented, and the one the marker follows. */
+  nested?: boolean;
+};
 
 /**
  * The inner menu of a long page. A click scrolls smoothly to that section (opening it if it is
@@ -22,7 +33,10 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
   // A click marks its section at once; the scroll spy takes over when the scroll has settled.
   const [clicked, setClicked] = useState<string | null>(null);
   const bar = useRef<HTMLUListElement>(null);
-  const active = clicked ?? spied ?? sections[0] ?? null;
+  // With sections listed under a page's own item, none is marked until one is reached: the page's item is.
+  const active = clicked ?? spied ?? (items.some((item) => item.nested) ? null : (sections[0] ?? null));
+  const sectionRead = items.find((item) => !item.href && item.id === active);
+  const { box, glide } = useGlide(bar, "[data-pill]");
 
   // The clicked item stays marked until the person scrolls on their own; then the scroll spy takes over.
   useEffect(() => {
@@ -59,23 +73,26 @@ export function SectionNav({ items, label }: { items: SectionNavItem[]; label: s
       aria-label={label}
       className="section-nav sticky top-(--sticky-top) z-20 -mx-[var(--swipe-gutter,1rem)] border-b border-border bg-background/95 px-[var(--swipe-gutter,1rem)] backdrop-blur print:hidden lg:top-[calc(var(--sticky-top)+2rem)] lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:backdrop-blur-none"
     >
-      <ul ref={bar} className="flex gap-1 overflow-x-auto py-2 [scrollbar-width:none] lg:flex-col lg:overflow-visible lg:py-0">
+      <ul ref={bar} className="relative isolate flex gap-1 overflow-x-auto py-2 [scrollbar-width:none] lg:flex-col lg:overflow-visible lg:py-0">
+        <GlidePill box={box} glide={glide} />
         {items.map((item, index) => {
           const isCurrent = item.href ? !!item.current : item.id === active;
           const heading = item.group && item.group !== items[index - 1]?.group ? item.group : null;
           const classes = `flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-2 text-sm transition-colors lg:min-h-10 lg:w-full lg:whitespace-normal ${
-            isCurrent ? "bg-primary/10 font-semibold text-foreground" : "text-foreground hover:bg-foreground/5"
-          }`;
+            item.nested ? "lg:ms-4 lg:min-h-9 lg:w-[calc(100%-1rem)] lg:py-1.5 lg:text-[0.8125rem]" : ""
+          } ${isCurrent ? "font-semibold text-foreground" : "text-foreground hover:bg-foreground/5"}`;
+          // The marker rests on the section being read; the page's own item is the fallback (and what a phone shows).
+          const pill = item === sectionRead || (item.href && item.current) || undefined;
           return (
-            <li key={item.id} data-current={isCurrent || undefined} className="lg:w-full">
+            <li key={item.id} data-current={isCurrent || undefined} className={`lg:w-full ${item.nested ? "max-lg:hidden" : ""}`}>
               {heading && <p className="mb-1 mt-4 hidden px-3 text-xs font-semibold uppercase tracking-wide text-muted lg:block">{heading}</p>}
               {item.href ? (
-                <Link href={item.href} aria-current={isCurrent ? "page" : undefined} className={classes}>
+                <Link href={item.href} aria-current={isCurrent ? "page" : undefined} data-pill={pill} className={classes}>
                   {item.icon}
                   <span>{item.label}</span>
                 </Link>
               ) : (
-                <a href={`#${item.id}`} onClick={(event) => go(event, item.id)} aria-current={isCurrent ? "location" : undefined} className={classes}>
+                <a href={`#${item.id}`} onClick={(event) => go(event, item.id)} aria-current={isCurrent ? "location" : undefined} data-pill={pill} className={classes}>
                   {item.icon}
                   <span>{item.label}</span>
                 </a>
