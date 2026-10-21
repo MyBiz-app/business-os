@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, ChevronRight, Clock, FileSignature, FileText, FolderOpen, Globe, Inbox, LayoutDashboard, LayoutGrid, Lock, MapPin, Megaphone, Menu, MessageCircle, Plug, Receipt, ScrollText, Settings, Smartphone, Sparkles, Tags, Target, Truck, TriangleAlert, Users, UsersRound, Wallet } from "lucide-react";
+import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, ChevronRight, Clock, FileSignature, FileText, FolderOpen, Globe, Inbox, LayoutDashboard, LayoutGrid, CirclePlus, Lock, MapPin, Megaphone, Menu, MessageCircle, Plug, Receipt, ScrollText, Settings, Smartphone, Sparkles, Tags, Target, Truck, TriangleAlert, Users, UsersRound, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -43,6 +43,7 @@ const ICONS = {
   files: FolderOpen,
   migration: Truck,
   website: Globe,
+  capabilities: CirclePlus,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;
@@ -184,7 +185,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                     : inArea
                       ? "text-foreground hover:bg-foreground/5"
                       : item.locked
-                      ? "text-muted/80 hover:bg-foreground/5 hover:text-foreground"
+                      ? "text-muted/70 hover:bg-foreground/5 hover:text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground"
                 }`}
               >
@@ -194,7 +195,10 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                 />
                 <span className="truncate">{item.label}</span>
                 {item.locked && (
-                  <Lock aria-hidden="true" className="ms-auto size-3.5 shrink-0 opacity-70" />
+                  <span className="ms-auto flex shrink-0 items-center gap-1 text-xs text-muted/70">
+                    <span className="max-md:hidden">{t("lockedHint")}</span>
+                    <Lock aria-hidden="true" className="size-3.5" />
+                  </span>
                 )}
               </Link>
               {children.length > 0 && (

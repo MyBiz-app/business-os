@@ -266,6 +266,9 @@ class Tenant(BaseModel):
     time_zone: str
     currency: str
     primary_color: str | None
+    created_at: dt.datetime | None = Field(
+        default=None, description="When the business was created (the side menu's 30-day switch)"
+    )
     logo_url: str | None = Field(description="Public path of the logo on this API, if any")
     cover_url: str | None = Field(
         default=None, description="Path of the workspace cover image on this API (members only)"
