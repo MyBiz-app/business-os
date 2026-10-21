@@ -53,45 +53,8 @@
   "src/app/(app)/(tenant)/bills/run-form.tsx": [
     "table"
   ],
-  "src/app/(app)/(tenant)/clients/[id]/addresses-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/dependents-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/health-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/plan-forms.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/plans-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/privacy-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/profile-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/work-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/import/import-form.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/clients/page.tsx": [
-    "button",
     "table"
-  ],
-  "src/app/(app)/(tenant)/content/connect-cards.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/content/csv-button.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/content/filter-bar.tsx": [
-    "button"
   ],
   "src/app/(app)/(tenant)/content/heatmap.tsx": [
     "table"
@@ -117,31 +80,10 @@
   "src/app/(app)/(tenant)/invoices/[id]/invoice-body.tsx": [
     "table"
   ],
-  "src/app/(app)/(tenant)/leads/[id]/lead-body.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/leads/[id]/lead-controls.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/leads/copy-link.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/leads/page.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/leads/stage-filter.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/locations/branch-branding.tsx": [
     "button"
   ],
   "src/app/(app)/(tenant)/locations/location-groups.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/messages/page.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/messages/variable-picker.tsx": [
     "button"
   ],
   "src/app/(app)/(tenant)/migration/follow-up.tsx": [
@@ -218,15 +160,6 @@
   "src/app/(app)/(tenant)/team/time-clock/page.tsx": [
     "table"
   ],
-  "src/app/(app)/(tenant)/website/brief/wizard.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/website/embed-panel.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/website/respond-form.tsx": [
-    "button"
-  ],
   "src/app/(app)/account/profile-form.tsx": [
     "button"
   ],
@@ -242,20 +175,8 @@
   "src/app/(app)/onboarding/onboarding-form.tsx": [
     "button"
   ],
-  "src/app/(app)/platform/ai/agents-map.tsx": [
-    "button"
-  ],
-  "src/app/(app)/platform/ai/console-chat.tsx": [
-    "button"
-  ],
-  "src/app/(app)/platform/ai/library-panel.tsx": [
-    "button"
-  ],
   "src/app/(app)/platform/ai/page.tsx": [
     "table"
-  ],
-  "src/app/(app)/platform/ai/pause-button.tsx": [
-    "button"
   ],
   "src/app/(app)/platform/ai/reports.tsx": [
     "table"
@@ -266,14 +187,7 @@
   "src/app/(app)/platform/billing/page.tsx": [
     "table"
   ],
-  "src/app/(app)/platform/broadcasts/composer.tsx": [
-    "button"
-  ],
-  "src/app/(app)/platform/businesses/[id]/page.tsx": [
-    "button"
-  ],
   "src/app/(app)/platform/businesses/page.tsx": [
-    "button",
     "table"
   ],
   "src/app/(app)/platform/catalog/page.tsx": [
@@ -291,12 +205,6 @@
   "src/app/(app)/platform/health/page.tsx": [
     "table"
   ],
-  "src/app/(app)/platform/inbox/request-card.tsx": [
-    "button"
-  ],
-  "src/app/(app)/platform/incidents/incident-form.tsx": [
-    "button"
-  ],
   "src/app/(app)/platform/legal/page.tsx": [
     "table"
   ],
@@ -306,14 +214,8 @@
   "src/app/(app)/platform/security/page.tsx": [
     "table"
   ],
-  "src/app/(app)/platform/team/staff-forms.tsx": [
-    "button"
-  ],
   "src/app/(app)/platform/trials/page.tsx": [
     "table"
-  ],
-  "src/app/(app)/platform/website-orders/order-card.tsx": [
-    "button"
   ],
   "src/app/(app)/suspended/page.tsx": [
     "button"

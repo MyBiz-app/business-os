@@ -7,6 +7,7 @@ import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type IncidentState, openIncident, resolveIncident } from "./actions";
+import { Button } from "@/components/ui/button";
 
 const KINDS = ["incident", "maintenance", "security"] as const;
 
@@ -21,7 +22,7 @@ export function OpenIncidentForm() {
         await action(data);
         setKey((k) => k + 1);
       }}
-      className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm"
+      className="flex flex-col gap-4 card p-4 sm:p-5"
     >
       <FormError message={state.error ? t(`errors.${state.error as "generic"}`) : undefined} />
       <FormNotice message={state.saved ? t("opened") : undefined} />
@@ -64,9 +65,9 @@ export function ResolveButton({ id }: { id: string }) {
   return (
     <>
       <FormError toastOnly message={state.error ? t(`errors.${state.error as "generic"}`) : undefined} />
-      <button type="button" disabled={pending} onClick={() => start(async () => setState(await resolveIncident(id)))} className="btn-plain btn-secondary px-3 py-1.5 text-sm">
+      <Button disabled={pending} onClick={() => start(async () => setState(await resolveIncident(id)))}>
         {t("resolve")}
-      </button>
+      </Button>
     </>
   );
 }

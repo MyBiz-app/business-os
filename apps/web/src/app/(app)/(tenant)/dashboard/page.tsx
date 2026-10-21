@@ -1,46 +1,35 @@
 import type { components } from "@business-os/api-client";
-import { ArrowDownRight, ArrowRight, ArrowUpRight, Banknote, CalendarCheck, CreditCard, Gauge, Luggage, Minus, UserPlus, Users, UserX } from "lucide-react";
+import { Search } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { Suspense } from "react";
 
-import { AccountStatusSlot } from "./account-status-slot";
-import { AttentionPanel } from "./attention-panel";
-import { WebsiteOfferCard } from "./website-offer-card";
-import { BranchMapCard } from "./branch-map-card";
-import { WaitlistHint } from "./waitlist-hint";
+import { NeedsYou } from "./needs-you";
+import { NewMenu } from "./new-menu";
+import { RotatingCard } from "./rotating-card";
+import { TodayCard } from "./today-card";
 import { usageWarnings } from "@business-os/i18n/usage";
 import { termsOf } from "@business-os/verticals";
 
-import { ColumnChart } from "@/components/charts/column-chart";
-import { GettingStartedCard } from "@/components/getting-started";
 import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { LiveRefresh } from "@/components/live-refresh";
 import { CountUp } from "@/components/motion/count-up";
-import { PendingArea, PeriodPicker, PeriodProvider } from "@/components/period-picker";
+import { ButtonLink } from "@/components/ui/button";
+import { StatTile, type Trend } from "@/components/ui/stat-tile";
 import { unwrap } from "@/lib/api";
-import { addDays, formatDay, formatTime, todayIn } from "@/lib/dates";
-import { formatMoney } from "@/lib/money";
-import { canManageSettings, canReadReports } from "@/lib/permissions";
-import { isSolo, SOLO_DASHBOARD_TILES, SOLO_ATTENTION } from "@/lib/solo";
-import { resolveRange } from "@/lib/range";
-import { getBranches, getTenant } from "@/lib/tenant";
-import { coverSrc } from "@/lib/workspace";
-
 import { isolate } from "@/lib/bidi";
+import { formatDay, todayIn } from "@/lib/dates";
+import { formatMoney } from "@/lib/money";
+import { canManageSettings, canReadReports, canManageBookings, canWriteClients, canWriteSchedule } from "@/lib/permissions";
+import { resolveRange } from "@/lib/range";
+import { isSolo, SOLO_ATTENTION, SOLO_DASHBOARD_TILES } from "@/lib/solo";
+import { getBranches, getTenant } from "@/lib/tenant";
 
 type MetricValue = components["schemas"]["MetricValue"];
 
-const PRESETS = [7, 30, 90] as const;
-const TILES = ["revenue", "active_clients", "attendance", "occupancy", "no_show_rate", "new_clients"] as const;
-const TILE_ICONS = {
-  revenue: Banknote,
-  active_clients: Users,
-  attendance: CalendarCheck,
-  occupancy: Gauge,
-  no_show_rate: UserX,
-  new_clients: UserPlus,
-} as const;
+const PRESETS = [30] as const;
+/** The four numbers of the morning; every other number lives in Reports. */
+const TILES = ["revenue", "active_clients", "attendance", "new_clients"] as const;
 
 /** The part of the day in the business's time zone, for the greeting. */
 function partOfDay(timeZone: string): "morning" | "afternoon" | "evening" | "night" {
@@ -48,63 +37,64 @@ function partOfDay(timeZone: string): "morning" | "afternoon" | "evening" | "nig
   return hour < 5 ? "night" : hour < 12 ? "morning" : hour < 17 ? "afternoon" : hour < 22 ? "evening" : "night";
 }
 
+/** "My Day": the page an owner opens in the morning. Six zones, all in the first screen on a
+ * desktop: the greeting with "+ New" and search, what needs you, today's timeline, four numbers
+ * and one rotating card. An employee gets "my shift and my classes today". */
 export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
   const t = await getTranslations();
   const locale = await getLocale();
   const { me, tenant, api, scope } = await getTenant();
   const query = await searchParams;
   const today = todayIn(tenant.time_zone);
-  // Completed days only for the presets, so the comparison with the previous period is fair.
-  const range = resolveRange(query, today, { presets: PRESETS, fallback: 30 });
-  const { start, end } = range;
+  // Completed days only, so the comparison with the previous period is fair.
+  const { start, end, days } = resolveRange({}, today, { presets: PRESETS, fallback: 30 });
   const reports = canReadReports(tenant);
   const solo = isSolo(tenant);
   const tiles = solo ? SOLO_DASHBOARD_TILES : TILES;
   const branches = reports && !solo ? await getBranches() : [];
-  // "Without team members": clients who are also on the team don't count in the numbers.
-  const excludeStaff = query.staff === "exclude";
-
   const canSeeSchedule = tenant.permissions.includes("schedule.read");
-  const series = (key: "revenue" | "attendance") =>
-    api.GET("/metrics/{key}/series", { params: { ...scope, path: { key }, query: { start: addDays(end, -83), end, grain: "week", exclude_staff: excludeStaff } } }).then(unwrap);
-  // Everything at once: each request waits on the API, none waits on another.
-  const [todays, [metrics, revenue, attendance], billing, setup, websiteOffer] = await Promise.all([
-    canSeeSchedule ? api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }).then(unwrap) : [],
-    reports
-      ? Promise.all([api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...tiles], exclude_staff: excludeStaff } } }).then(unwrap), series("revenue"), series("attendance")])
-      : ([[], [], []] as const),
-    // The MyBiz subscription: remind whoever manages settings before the trial ends or when an
-    // invoice is unpaid.
-    canManageSettings(tenant) ? api.GET("/billing", { params: scope }).then((r) => r.data) : undefined,
-    // The first-steps checklist, for whoever sets the business up, until it's all done.
-    canManageSettings(tenant) ? api.GET("/tenants/current/getting-started", { params: scope }).then((r) => r.data) : undefined,
-    // Once, after the first 30 days, for a business without a website (the person can close it).
-    canManageSettings(tenant) ? api.GET("/website/offer-card", { params: scope }).then((r) => r.data) : undefined,
-  ]);
+  const manager = canManageSettings(tenant);
   const welcome = query.welcome === "1";
+
+  const [todays, shifts, metrics, billing, setup, websiteOffer] = await Promise.all([
+    canSeeSchedule ? api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }).then(unwrap) : [],
+    // An employee's own shift today.
+    !reports && !solo ? api.GET("/shifts", { params: { ...scope, query: { start: today, days: 1, user_id: me.id } } }).then((r) => r.data ?? []) : [],
+    reports ? api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...tiles] } } }).then(unwrap) : [],
+    // The MyBiz subscription: remind whoever manages settings before the trial ends or when an invoice is unpaid.
+    manager ? api.GET("/billing", { params: scope }).then((r) => r.data) : undefined,
+    // The first-steps checklist, for whoever sets the business up, until it's all done.
+    manager ? api.GET("/tenants/current/getting-started", { params: scope }).then((r) => r.data) : undefined,
+    // Once, after the first 30 days, for a business without a website (the person can close it).
+    manager ? api.GET("/website/offer-card", { params: scope }).then((r) => r.data) : undefined,
+  ]);
+
   const billingNotice = !billing
     ? null
     : billing.balance_due > 0
-      ? t("billing.dashboardDue", { amount: formatMoney(billing.balance_due, billing.estimate.currency, locale) })
+      ? { text: t("billing.dashboardDue", { amount: formatMoney(billing.balance_due, billing.estimate.currency, locale) }), due: true }
       : billing.in_trial && !billing.payment_method && billing.trial_days_left <= 7
-        ? t("billing.dashboardTrial", { days: billing.trial_days_left })
+        ? { text: t("billing.dashboardTrial", { days: billing.trial_days_left }), due: false }
         : null;
-
-  // Space and messages: warn from 80% of the bundle (#104). Messages keep going over it; new
-  // files stop.
+  // Space and messages: warn from 80% of the bundle. Messages keep going over it; new files stop.
   const usageNotices = billing ? usageWarnings(billing.usage).map(({ key, percent }) => t(`billing.usage.${key}`, { percent })) : [];
 
   const number = new Intl.NumberFormat(locale);
-  // Rounded, with a sign; never "-0".
   const signed = (value: number) => {
     const rounded = Math.round(value) || 0;
     return `${rounded > 0 ? "+" : ""}${number.format(rounded)}`;
   };
-  const show = (metric: MetricValue, value: number | null) => {
-    if (value === null) return "-";
-    if (metric.unit === "money") return formatMoney(Math.round(value), tenant.currency, locale);
-    if (metric.unit === "percent") return `${number.format(Math.round(value))}%`;
-    return number.format(value);
+  /** The small arrow under a number: the change against the previous period. */
+  const trendOf = (metric: MetricValue): Trend | undefined => {
+    if (metric.value === null || metric.previous === null) return undefined;
+    const delta = metric.value - metric.previous;
+    const label = metric.unit === "percent" ? t("dashboard.points", { value: signed(delta) }) : metric.previous ? `${signed((delta / metric.previous) * 100)}%` : null;
+    if (label === null) return undefined;
+    return {
+      direction: delta > 0 ? "up" : delta < 0 ? "down" : "flat",
+      label,
+      tone: delta === 0 ? "neutral" : delta > 0 === metric.higher_is_better ? "good" : "bad",
+    };
   };
   // Where each tile leads: the same period, already filtered to what the number counts.
   const tileHref = (key: string) => {
@@ -116,296 +106,115 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         return "/clients?status=active";
       case "new_clients":
         return `/clients?${new URLSearchParams({ joined_from: start, joined_to: end })}`;
-      case "no_show_rate":
-        return `/clients?${new URLSearchParams({ no_show_from: start, no_show_to: end })}`;
       case "attendance":
-        return `/schedule?${new URLSearchParams({ view: range.days <= 7 ? "week" : "month", date: end })}`;
-      case "occupancy":
-        return `/reports?${span}&sort=occupancy#by-service`;
+        return `/schedule?${new URLSearchParams({ view: "month", date: end })}`;
       default:
-        return null;
+        return "/reports";
     }
   };
+
+  const term = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.client");
   const mine = todays.filter((session) => session.instructor_user_id === me.id);
-  const sessionList = (sessions: typeof todays) => (
-    <ul className="enter-items flex flex-col gap-2">
-      {sessions.map((session) => {
-        const fill = session.capacity ? Math.min(session.booked / session.capacity, 1) : 0;
-        const color = session.service.color ?? "var(--primary)";
-        return (
-          <li key={session.id}>
-            <Link
-              href={`/schedule/${session.id}`}
-              className="group flex items-center gap-4 rounded-xl border border-transparent px-3 py-2.5 transition-colors hover:border-border hover:bg-background"
-            >
-              <span className="w-12 shrink-0 font-semibold tabular-nums" dir="ltr">
-                {formatTime(session.starts_at, locale, tenant.time_zone)}
-              </span>
-              <span aria-hidden="true" className="h-9 w-1 shrink-0 rounded-full" style={{ backgroundColor: color }} />
-              <span className="flex min-w-0 flex-1 flex-col gap-1.5">
-                <span className={`truncate font-medium ${session.status === "cancelled" ? "text-muted line-through" : ""}`}>
-                  {session.service.name}
-                </span>
-                <span className="text-xs text-muted sm:hidden">
-                  {session.status === "cancelled"
-                  ? t("schedule.cancelled")
-                  : t("schedule.spotsLabel", { booked: session.booked, capacity: session.capacity })}
-                </span>
-                {session.status !== "cancelled" && (
-                  <span aria-hidden="true" className="h-1.5 w-full max-w-48 overflow-hidden rounded-full bg-foreground/8">
-                    <span
-                      className="block h-full rounded-full transition-[width] duration-700"
-                      style={{ width: `${fill * 100}%`, backgroundColor: color }}
-                    />
-                  </span>
-                )}
-              </span>
-              {/* On wide screens the spots sit at the end; on phones, under the name. */}
-              <span className="hidden shrink-0 text-sm text-muted sm:block">
-                {session.status === "cancelled"
-                  ? t("schedule.cancelled")
-                  : t("schedule.spotsLabel", { booked: session.booked, capacity: session.capacity })}
-              </span>
-              <ArrowRight aria-hidden="true" className="size-4 shrink-0 text-muted opacity-0 transition-all group-hover:opacity-100 rtl:rotate-180" />
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
-  );
-  // A weekly bar covers its first day to the sixth after it, never past today.
-  const weekEnd = (bucket: string) => (addDays(bucket, 6) < today ? addDays(bucket, 6) : today);
-  const weekLabel = (bucket: string) => formatDay(bucket, locale, { day: "numeric", month: "numeric" });
+  // An employee (no reports) sees their own classes; everyone else sees the whole day.
+  const timeline = reports || solo ? todays : mine;
+  const timelineTitle = reports || solo ? t("dashboard.today") : t("dashboard.myClassesToday", { count: mine.length });
+  const hello = t(`dashboard.greeting.${partOfDay(tenant.time_zone)}`);
+  const firstName = me.full_name?.trim().split(/\s+/)[0];
+
+  const newItems = [
+    canWriteClients(tenant) && { key: "client", label: term("addClient"), href: "/clients/new" },
+    canWriteClients(tenant) && tenant.modules.includes("crm") && { key: "lead", label: t("dashboard.newLead"), href: "/leads/new" },
+    canWriteSchedule(tenant) && !solo && { key: "session", label: term("newSession"), href: "/schedule/new" },
+    canManageBookings(tenant) && { key: "appointment", label: t("dashboard.newAppointment"), href: "/schedule/appointment" },
+  ].filter((item) => item !== false);
+
+  // An employee's home is their own shift and classes; what needs the owner is the owner's.
+  const showNeeds = reports || solo;
+  const needsHref = (all: boolean) => (all ? "/dashboard?needs=all" : "/dashboard");
+  const showMap = reports && !solo && branches.length > 1;
 
   return (
-    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-5 py-6 sm:py-8">
       <LiveRefresh />
-      <div className="card-accent relative flex flex-wrap items-end justify-between gap-6 overflow-hidden p-0">
-        {tenant.cover_url ? (
-          // The business's own cover image, under a fade that keeps the text readable.
-          // eslint-disable-next-line @next/next/no-img-element -- private image route
-          <img src={coverSrc(tenant.cover_url)} alt="" aria-hidden="true" className="absolute inset-0 size-full object-cover" />
-        ) : null}
-        {tenant.cover_url && (
-          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-surface via-surface/85 to-surface/20 sm:bg-gradient-to-r sm:from-surface sm:via-surface/80 sm:to-transparent rtl:sm:bg-gradient-to-l" />
+      <PageHeader
+        title={firstName ? t("dashboard.hello", { greeting: hello, name: isolate(firstName) }) : hello}
+        description={formatDay(today, locale, { weekday: "long", day: "numeric", month: "long" })}
+        actions={
+          <>
+            {tenant.permissions.includes("clients.read") && (
+              <form role="search" action="/clients" className="relative sm:w-64">
+                <Search aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-3 my-auto size-4 text-muted" />
+                <input type="search" name="q" aria-label={term("searchClients")} placeholder={term("searchClients")} className="control w-full py-2 ps-9 pe-3" />
+              </form>
+            )}
+            {newItems.length > 0 && <NewMenu label={t("dashboard.new")} items={newItems as { key: string; label: string; href: string }[]} />}
+          </>
+        }
+      />
+
+      <div className={`grid items-start gap-5 ${showNeeds ? "lg:grid-cols-2" : "max-w-3xl"}`}>
+        {showNeeds && (
+          <Suspense fallback={null}>
+            <NeedsYou
+              context={{ api, scope, tenant }}
+              only={solo ? SOLO_ATTENTION : undefined}
+              billingNotice={billingNotice}
+              usageNotices={usageNotices}
+              showAll={query.needs === "all"}
+              showAllHref={needsHref(true)}
+              collapseHref={needsHref(false)}
+            />
+          </Suspense>
         )}
-        <div className={`relative flex w-full flex-wrap items-end justify-between gap-6 p-6 sm:p-8 ${tenant.cover_url ? "min-h-56 sm:min-h-64" : ""}`}>
-        <div className="relative flex flex-col gap-2">
-          <p className="text-sm font-medium text-primary-ink">
-            {t(`dashboard.greeting.${partOfDay(tenant.time_zone)}`)} ·{" "}
-            {formatDay(today, locale, { weekday: "long", day: "numeric", month: "long" })}
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t("dashboard.welcome", { name: isolate(tenant.name) })}</h1>
-          <p className="text-muted">
-            {t("dashboard.yourRole", { role: t(`roles.${tenant.role}`) })} · <span dir="ltr" className="break-all">{me.email}</span>
-          </p>
-          {canSeeSchedule && (
-            <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 font-medium shadow-sm ring-1 ring-border">
-                <CalendarCheck aria-hidden="true" className="size-4 text-primary-ink" />
-                {t(`terms.${termsOf(tenant.vertical)}.sessionsToday` as "terms.fitness.sessionsToday", { count: todays.filter((s) => s.status !== "cancelled").length })}
-              </span>
-              <Link href="/schedule" className="inline-flex items-center gap-1 font-medium text-primary-ink underline-offset-4 hover:underline">
-                {t("dashboard.openSchedule")}
-                <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-              </Link>
-            </p>
-          )}
-        </div>
-        </div>
-      </div>
-
-      {setup && welcome && <GettingStartedCard setup={setup} welcome business={tenant.name} />}
-
-      <Suspense fallback={null}>
-        <AccountStatusSlot />
-      </Suspense>
-
-      {(billingNotice || usageNotices.length > 0 || websiteOffer?.show) && (
-      <div className="flex flex-col gap-3">
-      {billingNotice && (
-        <Link
-          href="/settings/billing"
-          className="flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-warning/15"
-        >
-          <CreditCard aria-hidden="true" className="size-5 shrink-0" />
-          <span className="flex-1">{billingNotice}</span>
-          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-        </Link>
-      )}
-      {usageNotices.map((notice) => (
-        <Link
-          key={notice}
-          href="/settings/billing"
-          className="flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-warning/15"
-        >
-          <Luggage aria-hidden="true" className="size-5 shrink-0" />
-          <span className="flex-1">{notice}</span>
-          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-        </Link>
-      ))}
-      {websiteOffer?.show && <WebsiteOfferCard />}
-      </div>
-      )}
-
-      {!solo && mine.length > 0 && (
-        <section aria-labelledby="mine-heading" className="flex flex-col gap-3 card-accent p-6">
-          <h2 id="mine-heading" className="text-lg font-semibold">
-            {t("dashboard.myClassesToday", { count: mine.length })}
-          </h2>
-          {sessionList(mine)}
-        </section>
-      )}
-
-      <AttentionPanel context={{ api, scope }} only={solo ? SOLO_ATTENTION : undefined} />
-      <WaitlistHint context={{ api, scope, tenant }} />
-
-      {canSeeSchedule && <section aria-labelledby="today-heading" className="card flex flex-col gap-3 p-6">
-        <h2 id="today-heading" className="text-lg font-semibold">
-          {t("dashboard.today")}
-        </h2>
-        {todays.length === 0 ? (
-          <p className="text-muted">{t("dashboard.emptyToday")}</p>
-        ) : (
-          <div className="max-h-96 overflow-y-auto">{sessionList(todays)}</div>
+        {canSeeSchedule && (
+          <TodayCard
+            title={timelineTitle}
+            sessions={timeline}
+            shifts={shifts}
+            userId={me.id}
+            timeZone={tenant.time_zone}
+            emptyText={t("dashboard.emptyToday")}
+            scheduleHref={tenant.permissions.includes("schedule.read") ? "/schedule" : null}
+          />
         )}
-      </section>}
-      {setup && !welcome && setup.done < setup.total && <GettingStartedCard setup={setup} welcome={false} business={tenant.name} />}
+      </div>
 
       {reports && (
-        <PeriodProvider>
-        <section aria-labelledby="kpi-heading" className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <section aria-labelledby="kpi-heading" className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 id="kpi-heading" className="text-lg font-semibold">
               {t("dashboard.kpis")}
+              <span className="ms-2 text-sm font-normal text-muted">{t("dashboard.lastDays", { count: days })}</span>
             </h2>
-            <div className="flex flex-wrap items-center gap-3">
-              {!solo && (
-                <Link
-                  scroll={false}
-                  href={{ pathname: "/dashboard", query: { ...query, staff: excludeStaff ? undefined : "exclude" } }}
-                  aria-current={excludeStaff ? "true" : undefined}
-                  className={excludeStaff ? "btn-primary px-3 py-1.5 text-sm" : "btn-secondary px-3 py-1.5 text-sm"}
-                >
-                  {t("dashboard.withoutStaff")}
-                </Link>
-              )}
-              <PeriodPicker presets={PRESETS} value={range.key} from={start} to={end} today={today} />
-            </div>
+            <ButtonLink href={`/reports?${new URLSearchParams({ from: start, to: end })}`} variant="quiet">
+              {t("dashboard.allReports")}
+            </ButtonLink>
           </div>
-          <PendingArea>
-          <ul className={`enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ${solo ? "" : "2xl:grid-cols-6"}`}>
-            {metrics.map((metric) => {
-              const delta =
-                metric.value !== null && metric.previous !== null ? metric.value - metric.previous : null;
-              const better = delta === null || delta === 0 ? null : delta > 0 === metric.higher_is_better;
-              const deltaText =
-                delta === null
-                  ? null
-                  : metric.unit === "percent"
-                    ? t("dashboard.points", { value: signed(delta) })
-                    : metric.previous
-                      ? `${signed((delta / metric.previous) * 100)}%`
-                      : null;
-              const Icon = TILE_ICONS[metric.key as keyof typeof TILE_ICONS] ?? Gauge;
-              const DeltaIcon = delta! > 0 ? ArrowUpRight : delta! < 0 ? ArrowDownRight : Minus;
-              return (
-                <li key={metric.key}>
-                  <Link
-                    href={tileHref(metric.key) ?? "/reports"}
-                    className="group card card-hover flex h-full flex-col gap-3 p-5 outline-offset-2 transition-shadow focus-visible:outline-2 focus-visible:outline-primary"
-                  >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-muted">{t(`metrics.${metric.key}`)}</span>
-                    <span className="icon-tile size-9">
-                      <Icon aria-hidden="true" className="size-[18px]" />
-                    </span>
-                  </span>
-                  <span className="text-3xl font-bold tracking-tight">
-                    {metric.value === null ? (
-                      show(metric, null)
+          <ul className={`enter-items grid grid-cols-2 gap-3 ${solo ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>
+            {metrics.map((metric) => (
+              <li key={metric.key}>
+                <StatTile
+                  label={t(`metrics.${metric.key}`)}
+                  href={tileHref(metric.key)}
+                  trend={trendOf(metric)}
+                  hint={trendOf(metric) ? t("dashboard.vsPrevious") : undefined}
+                  value={
+                    metric.value === null ? (
+                      "-"
                     ) : (
-                      <CountUp
-                        value={metric.value}
-                        kind={metric.unit === "money" ? "money" : metric.unit === "percent" ? "percent" : "count"}
-                        currency={tenant.currency}
-                      />
-                    )}
-                  </span>
-                  {deltaText && (
-                    <span className="flex flex-wrap items-center gap-1.5 text-sm">
-                      <span
-                        className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-semibold ${
-                          better === null ? "bg-foreground/8" : better ? "bg-success/12" : "bg-danger/12"
-                        }`}
-                      >
-                        <DeltaIcon
-                          aria-hidden="true"
-                          className={`size-3.5 ${better === null ? "text-muted" : better ? "text-success-ink" : "text-danger"}`}
-                        />
-                        <span>{deltaText}</span>
-                      </span>
-                      <span className="text-muted">{t("dashboard.vsPrevious")}</span>
-                      <span className="sr-only">
-                        {" "}
-                        ({better === null ? "" : better ? t("dashboard.better") : t("dashboard.worse")})
-                      </span>
-                    </span>
-                  )}
-                  <span className="mt-auto flex items-center gap-1 text-xs font-medium text-primary-ink opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                    {t("dashboard.openDetails")}
-                    <ArrowRight aria-hidden="true" className="size-3.5 rtl:rotate-180" />
-                  </span>
-                  </Link>
-                </li>
-              );
-            })}
+                      <CountUp value={metric.value} kind={metric.unit === "money" ? "money" : metric.unit === "percent" ? "percent" : "count"} currency={tenant.currency} />
+                    )
+                  }
+                />
+              </li>
+            ))}
           </ul>
-          </PendingArea>
         </section>
-        {!solo && <PendingArea>
-        <section aria-labelledby="trends-heading" className="flex flex-col gap-4">
-        <h2 id="trends-heading" className="text-lg font-semibold">
-          {t("dashboard.trends")}
-        </h2>
-        <div className="card grid gap-8 p-6 lg:grid-cols-2">
-          <ColumnChart
-            title={t("dashboard.weeklyRevenue")}
-            unit={{ kind: "money", currency: tenant.currency }}
-            tableLabel={t("dashboard.showTable")}
-            headers={[t("dashboard.weekOf"), t("metrics.revenue")]}
-            columns={revenue.map((point) => ({
-              key: point.bucket,
-              label: weekLabel(point.bucket),
-              value: point.value,
-              display: formatMoney(Math.round(point.value), tenant.currency, locale),
-              href: `/sales?${new URLSearchParams({ from: point.bucket, to: weekEnd(point.bucket) })}`,
-            }))}
-          />
-          <ColumnChart
-            title={t("dashboard.weeklyAttendance")}
-            unit={{ kind: "count" }}
-            tableLabel={t("dashboard.showTable")}
-            headers={[t("dashboard.weekOf"), t("metrics.attendance")]}
-            columns={attendance.map((point) => ({
-              key: point.bucket,
-              label: weekLabel(point.bucket),
-              value: point.value,
-              display: number.format(point.value),
-              href: `/schedule?${new URLSearchParams({ view: "week", date: point.bucket })}`,
-            }))}
-          />
-        </div>
-        </section>
-        </PendingArea>}
-        </PeriodProvider>
       )}
 
-      {reports && !solo && branches.length > 0 && (
-        <Suspense fallback={null}>
-          <BranchMapCard context={{ api, scope, tenant }} />
-        </Suspense>
-      )}
+      <Suspense fallback={null}>
+        <RotatingCard context={{ api, scope, tenant }} setup={setup} welcome={welcome} websiteOffer={!!websiteOffer?.show} showMap={showMap} />
+      </Suspense>
     </Container>
   );
 }

@@ -9,6 +9,7 @@ import { getPlatform } from "@/lib/platform";
 import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { StatTile } from "@/components/ui/stat-tile";
 
 /** The console's home: the platform in numbers, and what's new - each part for whoever may
  * see it. */
@@ -37,7 +38,7 @@ export default async function PlatformPage() {
       <PageHeader title={t("platform.title")} description={t("platform.subtitle")} />
 
       {spend?.over && (
-        <div role="alert" className="flex flex-col gap-1 rounded-lg border border-danger p-4">
+        <div role="alert" className="flex flex-col gap-1 rounded-xl border border-danger/40 bg-danger/10 p-4">
           <h2 className="font-semibold text-danger">{t("platform.aiSpendAlarmTitle")}</h2>
           <p className="text-sm">
             {t("platform.aiSpendAlarm", { spent: number.format(spend.today), limit: number.format(spend.alert_at) })}
@@ -55,16 +56,15 @@ export default async function PlatformPage() {
               ["aiCredits30d", businesses.reduce((sum, b) => sum + b.ai_credits_30d, 0)],
             ] as const
           ).map(([key, value]) => (
-            <li key={key} className="flex flex-col gap-1 card p-4">
-              <span className="text-sm text-muted">{t(`platform.${key}`)}</span>
-              <span className="text-3xl font-semibold">{number.format(value)}</span>
+            <li key={key}>
+              <StatTile label={t(`platform.${key}`)} value={number.format(value)} />
             </li>
           ))}
         </ul>
       )}
 
       {usage && (
-        <section className="card p-6">
+        <section className="card p-4 sm:p-5">
           <ColumnChart
             title={t("platform.aiCreditsPerDay")}
             unit={{ kind: "count" }}
@@ -82,7 +82,7 @@ export default async function PlatformPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {businesses && (
-          <section aria-labelledby="new-businesses" className="card flex flex-col gap-3 p-6">
+          <section aria-labelledby="new-businesses" className="card flex flex-col gap-3 p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <h2 id="new-businesses" className="font-semibold">
                 {t("platform.newestBusinesses")}
@@ -107,7 +107,7 @@ export default async function PlatformPage() {
           </section>
         )}
         {leads && (
-          <section aria-labelledby="new-requests" className="card flex flex-col gap-3 p-6">
+          <section aria-labelledby="new-requests" className="card flex flex-col gap-3 p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <h2 id="new-requests" className="font-semibold">
                 {t("platform.latestRequests")}

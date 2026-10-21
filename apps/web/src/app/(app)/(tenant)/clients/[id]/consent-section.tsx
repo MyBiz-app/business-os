@@ -6,10 +6,11 @@ import { useActionState } from "react";
 import { FormError } from "@/components/form/form-message";
 import { SelectField } from "@/components/form/field";
 import { SubmitButton } from "@/components/form/submit-button";
-import { Pill } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
 import type { FormState } from "@/lib/form-state";
 
 import { setMarketingConsent } from "./consent-actions";
+import { Card } from "@/components/ui/card";
 
 type ConsentSource = "app_join" | "app_profile" | "desk_signed" | "desk_verbal" | "desk_other" | "unsubscribe_link" | "unsubscribe_email";
 
@@ -44,12 +45,12 @@ export function ConsentSection({
   const [state, action] = useActionState<FormState, FormData>(setMarketingConsent.bind(null, clientId, !consent), {});
 
   return (
-    <section aria-labelledby="consent-heading" className="flex flex-col gap-3 card p-6">
+    <Card as="section" aria-labelledby="consent-heading" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="consent-heading" className="text-lg font-semibold">
           {t("title")}
         </h2>
-        <Pill tone={consent ? "success" : "muted"}>{consent ? t("on") : t("off")}</Pill>
+        <Badge tone={consent ? "success" : "neutral"} dot>{consent ? t("on") : t("off")}</Badge>
       </div>
       <p className="text-sm text-muted">{t("hint")}</p>
       {optedOut && <p className="text-sm">{t("optedOut")}</p>}
@@ -88,6 +89,6 @@ export function ConsentSection({
           </ul>
         </div>
       )}
-    </section>
+    </Card>
   );
 }

@@ -3,6 +3,7 @@
 import { Check, ChevronDown, Columns3 } from "lucide-react";
 import { useCallback, useId, useRef, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { useDismiss } from "@/components/use-dismiss";
 
 type Props = {
@@ -27,9 +28,9 @@ export function StageFilter({ stages, selected, label, allLabel, countLabel }: P
   return (
     <div ref={root} className="relative flex flex-col gap-1.5 text-sm font-medium">
       <span id={`${panelId}-label`}>{label}</span>
-      <button
+      <Button
         ref={button}
-        type="button"
+        variant="plain"
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={panelId}
@@ -42,7 +43,7 @@ export function StageFilter({ stages, selected, label, allLabel, countLabel }: P
           {summary}
         </span>
         <ChevronDown aria-hidden="true" className="size-4 text-muted" />
-      </button>
+      </Button>
       <fieldset
         id={panelId}
         data-open={open}
@@ -52,7 +53,7 @@ export function StageFilter({ stages, selected, label, allLabel, countLabel }: P
         {stages.map(({ value, label: text }) => (
           <label
             key={value}
-            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-normal transition-colors hover:bg-foreground/5 has-[:focus-visible]:bg-foreground/5"
+            className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-normal transition-colors hover:bg-subtle has-[:focus-visible]:bg-subtle"
           >
             <input type="checkbox" name="stage" value={value} defaultChecked={selected.includes(value)} className="peer sr-only" />
             <span

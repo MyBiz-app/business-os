@@ -143,7 +143,7 @@ export function BusinessMap({ layers, categories, minPerCity }: Props) {
         <p className="text-sm text-muted">{t("privacy", { min: minPerCity })}</p>
       </div>
 
-      <div className="relative isolate h-[60vh] min-h-[24rem] overflow-hidden rounded-2xl border border-border bg-surface">
+      <div className="relative isolate h-[60vh] min-h-[24rem] overflow-hidden card">
         {/* MapLibre's own stylesheet makes the map element `position: relative`, so the sizing is on a wrapper. */}
         <div className="absolute inset-0">
           <div ref={container} className="size-full" role="region" aria-label={t("mapLabel")} />

@@ -616,6 +616,19 @@
     "waitlist": {
       "waiting": "{count, plural, one {אדם אחד מחכה למקום} other {# אנשים מחכים למקום}}",
       "top": "הכי מבוקש: {service} ({count})"
+    },
+    "hello": "{greeting}, {name}",
+    "new": "חדש",
+    "newLead": "ליד חדש",
+    "newAppointment": "תור חדש",
+    "allReports": "כל הדוחות",
+    "myShift": "המשמרת שלך היום: {range}",
+    "yours": "שלך",
+    "needs": {
+      "title": "דורש אותך",
+      "showAll": "הצג הכל ({count})",
+      "showLess": "הצג פחות",
+      "clear": "שום דבר לא מחכה לך כרגע."
     }
   },
   "roles": {
@@ -1022,7 +1035,9 @@
       }
     },
     "city": "עיר",
-    "cityHint": "מאיפה הלקוח מגיע. עוזר לראות איפה הלקוחות שלכם גרים."
+    "cityHint": "מאיפה הלקוח מגיע. עוזר לראות איפה הלקוחות שלכם גרים.",
+    "clearFilters": "ניקוי הסינון",
+    "glance": "במבט מהיר"
   },
   "common": {
     "undo": "בטל",

@@ -8,6 +8,8 @@ import { whatsappLink } from "@/lib/whatsapp";
 
 import { sendDirect } from "./actions";
 import { DirectMessageForm } from "./direct-message";
+import { Card } from "@/components/ui/card";
+import { ButtonLink } from "@/components/ui/button";
 
 type Props = {
   target: { client_id?: string; lead_id?: string };
@@ -31,16 +33,16 @@ export async function MessagesSection({ target, phone, path, context, locked = f
   const canSend = enabled && !locked && canWriteClients(tenant) && !!phone;
 
   return (
-    <section aria-labelledby="messages-heading" className="card flex flex-col gap-4 p-6">
+    <Card as="section" aria-labelledby="messages-heading" className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="messages-heading" className="flex items-center gap-2 text-lg font-semibold">
           <MessageCircle aria-hidden="true" className="size-5 text-primary-ink" />
           {t("sectionTitle")}
         </h2>
         {link && !locked && (
-          <a href={link} target="_blank" rel="noreferrer" className="btn-secondary px-3 py-2 text-sm">
+          <ButtonLink href={link} target="_blank" rel="noreferrer" variant="secondary">
             {t("openWhatsApp")}
-          </a>
+          </ButtonLink>
         )}
       </div>
       {canSend && <DirectMessageForm action={sendDirect.bind(null, target, path)} />}
@@ -50,7 +52,7 @@ export async function MessagesSection({ target, phone, path, context, locked = f
         ) : (
           <ol className="flex flex-col gap-2">
             {log.map((message) => (
-              <li key={message.id} className="flex flex-col gap-1 rounded-xl bg-success/10 p-3">
+              <li key={message.id} className="flex flex-col gap-1 rounded-xl bg-success-soft p-3">
                 <p dir="auto" className="whitespace-pre-wrap text-sm">{message.body}</p>
                 <p className="text-xs text-muted">
                   <time dateTime={message.created_at}>{when.format(new Date(message.created_at))}</time> ·{" "}
@@ -60,6 +62,6 @@ export async function MessagesSection({ target, phone, path, context, locked = f
             ))}
           </ol>
         ))}
-    </section>
+    </Card>
   );
 }

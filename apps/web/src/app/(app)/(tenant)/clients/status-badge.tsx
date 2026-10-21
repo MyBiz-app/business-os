@@ -1,14 +1,18 @@
 import { getTranslations } from "next-intl/server";
 
-import { Pill, type Tone } from "@/components/pill";
+import { Badge, type BadgeTone } from "@/components/ui/badge";
 
-const TONE: Record<"active" | "lead" | "inactive", Tone> = {
+const TONE: Record<"active" | "lead" | "inactive", BadgeTone> = {
   active: "success",
   lead: "warning",
-  inactive: "muted",
+  inactive: "neutral",
 };
 
 export async function StatusBadge({ status }: { status: keyof typeof TONE }) {
   const t = await getTranslations("clients.statuses");
-  return <Pill tone={TONE[status]}>{t(status)}</Pill>;
+  return (
+    <Badge tone={TONE[status]} dot>
+      {t(status)}
+    </Badge>
+  );
 }

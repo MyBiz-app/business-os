@@ -7,6 +7,7 @@ import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { getPlatformFor } from "@/lib/platform";
+import { StatTile } from "@/components/ui/stat-tile";
 
 const DAYS = 30;
 type StepKey = "started" | "account" | "industry" | "business" | "base" | "extras" | "services" | "summary" | "completed";
@@ -33,7 +34,7 @@ export default async function PlatformGrowthPage() {
     <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("hint", { days: DAYS })} />
 
-      <section aria-labelledby="growth-funnel" className="card flex flex-col gap-4 p-6">
+      <section aria-labelledby="growth-funnel" className="card flex flex-col gap-4 p-4 sm:p-5">
         <h2 id="growth-funnel" className="text-lg font-semibold">{t("funnel")}</h2>
         <p className="text-sm text-muted">{t("funnelHint")}</p>
         <ol className="flex flex-col gap-2">
@@ -59,17 +60,11 @@ export default async function PlatformGrowthPage() {
 
       <section aria-labelledby="growth-active" className="flex flex-col gap-4">
         <h2 id="growth-active" className="text-lg font-semibold">{t("active")}</h2>
-        <dl className="grid gap-3 sm:grid-cols-2">
-          <div className="flex flex-col gap-1 card p-5">
-            <dt className="text-sm text-muted">{t("activeToday")}</dt>
-            <dd className="text-2xl font-bold tabular-nums">{number.format(today?.active_day ?? 0)}</dd>
-          </div>
-          <div className="flex flex-col gap-1 card p-5">
-            <dt className="text-sm text-muted">{t("activeWeek")}</dt>
-            <dd className="text-2xl font-bold tabular-nums">{number.format(today?.active_week ?? 0)}</dd>
-          </div>
-        </dl>
-        <div className="card p-6">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <StatTile label={t("activeToday")} value={number.format(today?.active_day ?? 0)} />
+          <StatTile label={t("activeWeek")} value={number.format(today?.active_week ?? 0)} />
+        </div>
+        <div className="card p-4 sm:p-5">
           <ColumnChart
             title={t("activePerDay")}
             unit={{ kind: "count" }}

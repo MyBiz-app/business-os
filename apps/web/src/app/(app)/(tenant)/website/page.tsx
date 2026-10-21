@@ -1,10 +1,8 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Lock } from "lucide-react";
-import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -16,6 +14,9 @@ import { EmbedPanel } from "./embed-panel";
 import { InsightsPanel } from "./insights-panel";
 import { RespondForm } from "./respond-form";
 import { SitePreview } from "./site-preview";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
 
 const STAGES = ["briefing", "received", "building", "review", "live"] as const;
 
@@ -39,15 +40,15 @@ export default async function WebsitePage() {
       <PageHeader title={t("title")} description={t("subtitle")} />
 
       {!state.with_system && (
-        <section className="card flex flex-col gap-3 p-6" aria-labelledby="site-system">
+        <Card as="section" aria-labelledby="site-system" className="flex flex-col gap-3">
           <h2 id="site-system" className="text-lg font-semibold">{t("system.title")}</h2>
           <p className="text-sm text-muted">{t("system.body")}</p>
           <AddSystemForm label={t("system.add")} />
-        </section>
+        </Card>
       )}
 
       {!order && (
-        <section className="card grid gap-6 p-6 md:grid-cols-2" aria-labelledby="site-offer">
+        <Card as="section" aria-labelledby="site-offer" className="grid gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-4">
             <p className="flex items-center gap-2 text-xs font-semibold text-primary-ink">
               <Lock aria-hidden="true" className="size-4" />
@@ -59,22 +60,22 @@ export default async function WebsitePage() {
               {t("offer.price", { setup: price(state.price.setup), monthly: price(state.price.monthly) })}
             </p>
             <p className="text-xs text-muted">{t("offer.nothingCharged")}</p>
-            <Link href="/website/brief" className="btn-plain btn-primary w-fit px-4 py-2.5">{t("offer.start")}</Link>
+            <ButtonLink href="/website/brief" variant="primary" className="w-fit">{t("offer.start")}</ButtonLink>
           </div>
           <SitePreview name={tenant.name} color={tenant.primary_color ?? null} vertical={termsOf(tenant.vertical)} />
-        </section>
+        </Card>
       )}
 
       {order && (
         <>
-          <section className="card flex flex-col gap-5 p-6" aria-labelledby="site-status">
+          <Card as="section" aria-labelledby="site-status" className="flex flex-col gap-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 id="site-status" className="text-lg font-semibold">{t("status.title")}</h2>
-              <Pill tone={order.stage === "live" ? "success" : order.stage === "briefing" ? "muted" : "primary"}>{t(`stages.${order.stage}`)}</Pill>
+              <Badge tone={order.stage === "live" ? "success" : order.stage === "briefing" ? "neutral" : "primary"} dot>{t(`stages.${order.stage}`)}</Badge>
             </div>
             <ol className="grid gap-2 sm:grid-cols-5">
               {STAGES.map((stage, index) => (
-                <li key={stage} aria-current={index === stageIndex ? "step" : undefined} className={`rounded-xl border px-3 py-2 text-sm ${index <= stageIndex ? "border-primary bg-primary/10 font-medium" : "border-border text-muted"}`}>
+                <li key={stage} aria-current={index === stageIndex ? "step" : undefined} className={`rounded-xl border px-3 py-2 text-sm ${index <= stageIndex ? "border-primary bg-primary-subtle font-medium" : "border-border text-muted"}`}>
                   {t(`stages.${stage}`)}
                 </li>
               ))}
@@ -99,21 +100,21 @@ export default async function WebsitePage() {
               </div>
             )}
             {order.stage === "live" && order.site_url && (
-              <a href={order.site_url} target="_blank" rel="noopener noreferrer" dir="ltr" className="btn-plain btn-primary w-fit px-4 py-2.5">{t("status.open")}</a>
+              <ButtonLink href={order.site_url} target="_blank" rel="noopener noreferrer" dir="ltr" variant="primary" className="w-fit">{t("status.open")}</ButtonLink>
             )}
             {editable && (
-              <Link href="/website/brief" className="btn-plain btn-secondary w-fit px-4 py-2.5">
+              <ButtonLink href="/website/brief" variant="secondary" className="w-fit">
                 {order.stage === "briefing" ? t("status.continue") : t("status.edit")}
-              </Link>
+              </ButtonLink>
             )}
-          </section>
+          </Card>
 
           {order.stage === "review" && (
-            <section className="card flex flex-col gap-3 p-6" aria-labelledby="site-review">
+            <Card as="section" aria-labelledby="site-review" className="flex flex-col gap-3">
               <h2 id="site-review" className="text-lg font-semibold">{t("review.title")}</h2>
               <p className="text-sm text-muted">{t("review.body")}</p>
               {order.approved_at ? <p className="text-sm font-medium">{t("review.approved")}</p> : <RespondForm />}
-            </section>
+            </Card>
           )}
         </>
       )}

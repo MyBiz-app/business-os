@@ -31,7 +31,7 @@ export async function MarketReports() {
   const stamp = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const percent = new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 1 });
 
-  if (reports.length === 0) return <p className="card p-5 text-sm text-muted">{t("empty")}</p>;
+  if (reports.length === 0) return <p className="card p-4 sm:p-5 text-sm text-muted">{t("empty")}</p>;
   return (
     <div className="flex flex-col gap-3">
       {reports.map((report) => {
