@@ -920,7 +920,8 @@
       "membership": "Plans and visits",
       "paperwork": "Quotes and documents",
       "talk": "Notes and messages",
-      "privacy": "Consent and privacy"
+      "privacy": "Consent and privacy",
+      "activity": "Activity"
     },
     "joinedChip": "Joined {range}",
     "noShowChip": "Missed a class {range}",
@@ -1041,7 +1042,49 @@
     "cityHint": "Where the client comes from. It helps you see where your clients live.",
     "clearFilters": "Clear filters",
     "glance": "At a glance",
-    "cityChip": "City: {city}"
+    "cityChip": "City: {city}",
+    "activity": {
+      "title": "Everything that happened",
+      "empty": "Nothing has happened yet. Bookings, payments, plans, notes and messages will show here.",
+      "latest": "Showing the latest {count} events.",
+      "booking": {
+        "booked": "Booked {title}",
+        "checked_in": "Visited {title}",
+        "no_show": "Missed {title}",
+        "cancelled": "Cancelled {title}",
+        "waitlisted": "Joined the waitlist for {title}"
+      },
+      "payment": {
+        "succeeded": "Paid {amount}",
+        "failed": "Payment of {amount} failed",
+        "refunded": "Refunded {amount}"
+      },
+      "paymentFor": "for {title}",
+      "plan": {
+        "sold": "Plan sold: {title}",
+        "cancelled": "Plan cancelled: {title}"
+      },
+      "message": "Message sent by {channel}",
+      "note": "Note added",
+      "lead": {
+        "created": "Came in as a lead",
+        "stage": "Lead moved to {detail}",
+        "note": "Lead note",
+        "call": "Call with the lead",
+        "message": "Message to the lead",
+        "meeting": "Meeting with the lead",
+        "converted": "Became a client"
+      },
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "sms": "SMS"
+      }
+    },
+    "nextAction": {
+      "sell": "Sell a plan",
+      "renew": "Renew plan",
+      "book": "Book a session"
+    }
   },
   "common": {
     "undo": "Undo",

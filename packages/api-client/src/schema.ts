@@ -2351,6 +2351,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients/{client_id}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Activity
+         * @description Newest first. Page with `limit` and `offset`.
+         */
+        get: operations["client_activity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}/notes": {
         parameters: {
             query?: never;
@@ -10445,6 +10465,51 @@ export interface components {
              * @description Businesses with any activity in the 7 days up to it
              */
             active_week: number;
+        };
+        /** ActivityEvent */
+        ActivityEvent: {
+            /**
+             * Id
+             * @description Unique within the feed: `<kind>:<row id>[/<part>]`
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "booking" | "payment" | "plan" | "message" | "note" | "lead";
+            /**
+             * Status
+             * @description Booking status, payment status, plan event (sold, cancelled), message channel, lead event (created, stage, note, ...)
+             */
+            status: string | null;
+            /**
+             * Title
+             * @description Service, plan or message text; null for a bare event
+             */
+            title: string | null;
+            /**
+             * Detail
+             * @description Note text, lead stage or message body
+             */
+            detail: string | null;
+            /**
+             * Amount
+             * @description Minor units, for payments and plan sales
+             */
+            amount: number | null;
+            /** Currency */
+            currency: string | null;
+            /**
+             * Ref Id
+             * @description The booking, payment, plan, message or note
+             */
+            ref_id: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
         };
         /** Address */
         Address: {
@@ -30369,6 +30434,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlatformCapability"][];
+                };
+            };
+        };
+    };
+    client_activity: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityEvent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
