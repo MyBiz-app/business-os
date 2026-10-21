@@ -44,6 +44,7 @@ export default function ClientScreen() {
   const tStatus = useTranslations("clients.statuses");
   const tMessaging = useTranslations("messaging");
   const tTerms = useTranslations("terms");
+  const tActivity = useTranslations("clients.activity");
   const tDependents = useTranslations("dependents");
   const tQuotes = useTranslations("quotes");
   const locale = useLocale();
@@ -68,7 +69,7 @@ export default function ClientScreen() {
   const load = useCallback(async () => {
     if (!tenantId) return null;
     const path = { client_id: id };
-    const [client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes] = await Promise.all([
+    const [client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes, events] = await Promise.all([
       api.GET("/clients/{client_id}", { params: { ...scope, path } }).then(unwrap),
       api.GET("/clients/{client_id}/bookings", { params: { ...scope, path } }).then(unwrap),
       api
@@ -97,8 +98,13 @@ export default function ClientScreen() {
         .GET("/quotes", { params: { ...scope, query: { client_id: id } } })
         .then(unwrap)
         .catch(() => []),
+      // One feed of everything that happened with the client (visits, payments, plans, messages, notes).
+      api
+        .GET("/clients/{client_id}/activity", { params: { ...scope, path, query: { limit: ACTIVITY_SHOWN } } })
+        .then(unwrap)
+        .catch(() => []),
     ]);
-    return { client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes };
+    return { client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes, events };
   }, [api, scope, id, tenantId, can, tenant]);
   const { data, loading, reload } = useLoad(load);
 
@@ -149,21 +155,28 @@ export default function ClientScreen() {
     can("sales.manage") && (!current || (daysLeft !== null && daysLeft <= RENEW_WITHIN_DAYS))
       ? { label: current ? t("nextRenew") : t("nextSell"), hint: current ? t("nextRenewHint", { date: formatDay(current.ends_on, locale, { day: "numeric", month: "short" }) }) : t("nextSellHint") }
       : null;
-  // Everything that happened with this person, newest first, from the bookings, notes and plans already loaded.
-  const activity = [
-    ...bookings
-      .filter((b) => b.status !== "booked" || Date.parse(b.starts_at) <= now)
-      .map((b) => ({
-        id: `b-${b.id}`,
-        at: b.starts_at,
-        text: t(`activity.${b.status === "checked_in" ? "visit" : b.status}`, { service: b.service_name }),
-        tone: b.status === "checked_in" ? ("success" as const) : b.status === "no_show" ? ("danger" as const) : ("muted" as const),
-      })),
-    ...notes.map((n) => ({ id: `n-${n.id}`, at: n.created_at, text: t("activity.note", { text: n.body }), tone: "muted" as const })),
-    ...entitlements.map((e) => ({ id: `e-${e.id}`, at: e.created_at, text: t("activity.plan", { plan: e.name }), tone: "primary" as const })),
-  ]
-    .sort((a, b) => b.at.localeCompare(a.at))
-    .slice(0, ACTIVITY_SHOWN);
+  const sentence = (event: (typeof data.events)[number]) => {
+    const title = event.title ?? "";
+    switch (event.kind) {
+      case "booking":
+        return tActivity(`booking.${event.status as "booked" | "checked_in" | "no_show" | "cancelled" | "waitlisted"}`, { title });
+      case "payment":
+        return tActivity(`payment.${event.status as "succeeded" | "failed" | "refunded"}`, {
+          amount: formatMoney(event.amount ?? 0, event.currency ?? tenant.currency, locale),
+        });
+      case "plan":
+        return tActivity(`plan.${event.status as "sold" | "cancelled"}`, { title });
+      case "message":
+        return tActivity("message", { channel: tActivity(`channels.${event.status as "whatsapp" | "sms"}`) });
+      case "note":
+        return tActivity("note");
+      case "lead":
+        return tActivity(`lead.${event.status as "created" | "stage" | "note" | "call" | "message" | "meeting" | "converted"}`, {
+          detail: event.detail ?? "",
+        });
+    }
+  };
+  const activity = data.events;
 
   const sell = () =>
     act(async () => {
@@ -612,18 +625,28 @@ export default function ClientScreen() {
       )}
       {tab === "activity" &&
         (activity.length === 0 ? (
-          <EmptyState palette={palette} message={t("activityEmpty")} icon="time-outline" />
+          <EmptyState palette={palette} message={tActivity("empty")} icon="time-outline" />
         ) : (
           <View style={{ gap: 8 }}>
-            {activity.map((item) => (
-              <ListRow
-                key={item.id}
-                palette={palette}
-                title={item.text}
-                subtitle={short(item.at)}
-                leading={<View accessible={false} style={{ width: 4, height: 28, borderRadius: 2, backgroundColor: item.tone === "muted" ? palette.border : palette[item.tone] }} />}
-              />
-            ))}
+            {activity.map((event) => {
+              const failed = event.kind === "payment" && event.status === "failed";
+              const bad = failed || (event.kind === "booking" && event.status === "no_show");
+              const good = (event.kind === "booking" && event.status === "checked_in") || (event.kind === "payment" && event.status === "succeeded");
+              return (
+                <ListRow
+                  key={event.id}
+                  palette={palette}
+                  title={sentence(event)}
+                  subtitle={[short(event.occurred_at), event.kind === "note" || event.kind === "message" ? event.detail : null].filter(Boolean).join(" · ")}
+                  leading={
+                    <View
+                      accessible={false}
+                      style={{ width: 4, height: 28, borderRadius: 2, backgroundColor: bad ? palette.danger : good ? palette.success : palette.border }}
+                    />
+                  }
+                />
+              );
+            })}
           </View>
         ))}
     </Screen>
