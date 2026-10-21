@@ -48,6 +48,56 @@ class SearchResults(BaseModel):
     items: list[SearchHit] = Field(description="At most five per kind, grouped by kind")
 
 
+# The queries are constants: only bound parameters carry what the person typed.
+CLIENT_QUERY = (
+    """
+    SELECT id, trim(first_name || ' ' || coalesce(last_name, '')) AS title,
+           coalesce(email, phone) AS subtitle, status AS tag
+    FROM app.clients
+    """
+    + VISIBLE_CLIENTS
+    + """
+      AND erased_at IS NULL
+      AND id IN (SELECT app.search_client_ids(:pattern))
+    ORDER BY first_name, last_name NULLS FIRST, id
+    LIMIT :limit
+    """
+)
+
+# A member kept to some branches finds themselves and the people at their branches only, like the
+# team page.
+STAFF_QUERY = """
+    SELECT m.user_id AS id, coalesce(nullif(u.full_name, ''), u.email) AS title,
+           coalesce(m.job_title, u.email) AS subtitle, m.role AS tag
+    FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
+    WHERE m.tenant_id = app.current_tenant_id()
+      AND (u.full_name ILIKE :pattern OR u.email ILIKE :pattern OR m.job_title ILIKE :pattern)
+"""
+STAFF_QUERY_AT_BRANCHES = (
+    STAFF_QUERY
+    + """
+      AND (m.user_id = app.current_user_id() OR m.location_ids && CAST(:branches AS uuid[]))
+"""
+)
+STAFF_ORDER = " ORDER BY title, m.user_id LIMIT :limit"
+
+# A document filed under a client follows that client's branch, so a member kept to some branches
+# never finds another branch's invoices.
+INVOICE_QUERY = """
+    SELECT id, client_name AS title, client_email AS subtitle, kind AS tag, number,
+           issued_at AS at
+    FROM app.issued_documents
+    WHERE (client_name ILIKE :pattern OR number = CAST(:number AS integer))
+"""
+INVOICE_QUERY_AT_BRANCHES = (
+    INVOICE_QUERY
+    + "  AND (client_id IS NULL OR client_id IN (SELECT id FROM app.clients "
+    + VISIBLE_CLIENTS
+    + "))\n"
+)
+INVOICE_ORDER = " ORDER BY issued_at DESC, id DESC LIMIT :limit"
+
+
 def _pattern(search: str) -> str:
     escaped = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     return f"%{escaped}%"
@@ -55,16 +105,7 @@ def _pattern(search: str) -> str:
 
 def _clients(context: TenantContext, pattern: str) -> list[SearchHit]:
     rows = context.session.execute(
-        text(f"""
-            SELECT id, trim(first_name || ' ' || coalesce(last_name, '')) AS title,
-                   coalesce(email, phone) AS subtitle, status AS tag
-            FROM app.clients
-            {VISIBLE_CLIENTS}
-              AND erased_at IS NULL
-              AND id IN (SELECT app.search_client_ids(:pattern))
-            ORDER BY first_name, last_name NULLS FIRST, id
-            LIMIT :limit
-        """),
+        text(CLIENT_QUERY),
         {"pattern": pattern, "limit": PER_KIND},
     ).mappings()
     return [SearchHit(kind="client", **row) for row in rows]
@@ -90,26 +131,12 @@ def _leads(context: TenantContext, pattern: str) -> list[SearchHit]:
 def _staff(context: TenantContext, pattern: str) -> list[SearchHit]:
     # A member kept to some branches finds themselves and the people at their branches only,
     # like the team page.
-    narrowed = ""
+    query = STAFF_QUERY
     params: dict[str, object] = {"pattern": pattern, "limit": PER_KIND}
     if context.branches is not None:
-        narrowed = """AND (m.user_id = app.current_user_id()
-                           OR m.location_ids && CAST(:branches AS uuid[]))"""
+        query = STAFF_QUERY_AT_BRANCHES
         params["branches"] = [str(b) for b in context.branches]
-    rows = context.session.execute(
-        text(f"""
-            SELECT m.user_id AS id, coalesce(nullif(u.full_name, ''), u.email) AS title,
-                   coalesce(m.job_title, u.email) AS subtitle, m.role AS tag
-            FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
-            WHERE m.tenant_id = app.current_tenant_id()
-              AND (u.full_name ILIKE :pattern OR u.email ILIKE :pattern
-                   OR m.job_title ILIKE :pattern)
-              {narrowed}
-            ORDER BY title, m.user_id
-            LIMIT :limit
-        """),
-        params,
-    ).mappings()
+    rows = context.session.execute(text(query + STAFF_ORDER), params).mappings()
     return [SearchHit(kind="staff", **row) for row in rows]
 
 
@@ -142,27 +169,13 @@ def _sessions(context: TenantContext, pattern: str) -> list[SearchHit]:
 def _invoices(context: TenantContext, search: str, pattern: str) -> list[SearchHit]:
     # A document filed under a client follows that client's branch, so a member kept to some
     # branches never finds another branch's invoices.
-    narrowed = ""
+    query = INVOICE_QUERY
     params: dict[str, object] = {"pattern": pattern, "number": None, "limit": PER_KIND}
     if context.branches is not None:
-        narrowed = (
-            "AND (client_id IS NULL OR client_id IN "
-            f"(SELECT id FROM app.clients {VISIBLE_CLIENTS}))"
-        )
+        query = INVOICE_QUERY_AT_BRANCHES
     if search.isascii() and search.isdigit() and len(search) <= 9:
         params["number"] = int(search)
-    rows = context.session.execute(
-        text(f"""
-            SELECT id, client_name AS title, client_email AS subtitle, kind AS tag, number,
-                   issued_at AS at
-            FROM app.issued_documents
-            WHERE (client_name ILIKE :pattern OR number = CAST(:number AS integer))
-              {narrowed}
-            ORDER BY issued_at DESC, id DESC
-            LIMIT :limit
-        """),
-        params,
-    ).mappings()
+    rows = context.session.execute(text(query + INVOICE_ORDER), params).mappings()
     return [SearchHit(kind="invoice", **row) for row in rows]
 
 
