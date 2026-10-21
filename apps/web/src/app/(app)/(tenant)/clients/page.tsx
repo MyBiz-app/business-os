@@ -11,7 +11,7 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { CardTransition } from "@/components/ui/page-transition";
 
 import { addMeAsClient } from "./actions";
@@ -19,6 +19,8 @@ import { StatusBadge } from "./status-badge";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/empty-state";
+import { ColumnPicker, HIDDEN_COLUMNS_PARAM, hiddenColumns } from "@/components/column-picker";
+import { SavedViews } from "@/components/saved-views";
 import { openedId, withOpen } from "@/lib/open-window";
 
 import { ClientWindow } from "./client-window";
@@ -30,6 +32,8 @@ const PLANS = ["valid", "none"] as const;
 type PlanFilter = (typeof PLANS)[number];
 const ABSENCES = [14, 30, 60] as const;
 const STAFF = ["only", "exclude"] as const;
+/** Columns a person can hide (the name always shows). */
+const OPTIONAL_COLUMNS = ["phone", "email", "plan", "lastVisit", "status"];
 
 export default async function ClientsPage({ searchParams }: PageProps<"/clients">) {
   const t = await getTranslations();
@@ -43,6 +47,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
   const absent = ABSENCES.find((d) => String(d) === params.absent);
   const staff = STAFF.find((v) => v === params.staff);
   const page = Math.max(1, Number(params.page) || 1);
+  const hidden = hiddenColumns(params[HIDDEN_COLUMNS_PARAM], OPTIONAL_COLUMNS);
   // Date filters that come from the dashboard tiles ("new clients", "no-shows").
   const day = (value: unknown) => (isDay(value) ? value : undefined);
   const joined = { from: day(params.joined_from), to: day(params.joined_to) };
@@ -91,6 +96,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     if (plan) query.set("plan", plan);
     if (staff) query.set("staff", staff);
     if (absent) query.set("absent", String(absent));
+    if (hidden.length) query.set(HIDDEN_COLUMNS_PARAM, hidden.join(","));
     for (const [key, value] of Object.entries(dateFilters)) if (value && !keys.includes(key)) query.set(key, value);
     return query.size ? `/clients?${query}` : "/clients";
   };
@@ -101,6 +107,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     if (plan) query.set("plan", plan);
     if (staff) query.set("staff", staff);
     if (absent) query.set("absent", String(absent));
+    if (hidden.length) query.set(HIDDEN_COLUMNS_PARAM, hidden.join(","));
     for (const [key, value] of Object.entries(dateFilters)) if (value) query.set(key, value);
     query.set("page", String(target));
     return `/clients?${query}`;
@@ -143,6 +150,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
       />
 
       <form role="search" className="flex flex-wrap items-end gap-3">
+        {hidden.length > 0 && <input type="hidden" name={HIDDEN_COLUMNS_PARAM} value={hidden.join(",")} />}
         {Object.entries(dateFilters).map(([key, value]) => (value ? <input key={key} type="hidden" name={key} value={value} /> : null))}
         <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-medium">
           {t("clients.search")}
@@ -205,6 +213,17 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
         <Button type="submit" variant="secondary">
           {t("clients.search")}
         </Button>
+        <SavedViews storageKey={`views:${tenant.id}:clients`} basePath="/clients" />
+        <ColumnPicker
+          hidden={hidden}
+          columns={[
+            { key: "phone", label: t("clients.phone") },
+            { key: "email", label: t("clients.email") },
+            { key: "plan", label: t("clients.list.plan") },
+            { key: "lastVisit", label: t("clients.list.lastVisit") },
+            { key: "status", label: t("clients.status") },
+          ]}
+        />
       </form>
 
       {dateChips.length > 0 && (
@@ -249,7 +268,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           labelledBy="clients-heading"
           rows={result.items}
           rowKey={(client) => client.id}
-          columns={[
+          columns={([
             {
               key: "name",
               header: t("clients.name"),
@@ -297,7 +316,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
               cell: (client) => (client.last_visit ? sinceVisit(client.last_visit) : <span className="text-muted">{t("clients.list.never")}</span>),
             },
             { key: "status", header: t("clients.status"), cell: (client) => <StatusBadge status={client.status} /> },
-          ]}
+          ] satisfies DataTableColumn<(typeof result.items)[number]>[]).filter((column) => !hidden.includes(column.key))}
         />
       )}
 
