@@ -8,6 +8,7 @@ import { useLocale } from "use-intl";
 import { tint } from "../lib/brand";
 import type { Palette } from "../lib/theme";
 import { font } from "../lib/typography";
+import { radius } from "../lib/theme";
 
 type IconBase = ComponentProps<typeof Ionicons>["name"] extends infer N
   ? N extends `${infer Base}-outline`
@@ -30,7 +31,7 @@ export const tabIcon = (base: IconBase, palette: Palette) =>
         style={{
           minWidth: 56,
           height: 32,
-          borderRadius: 16,
+          borderRadius: radius.dialog,
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: focused ? tint(palette.primary, 0.14) : "transparent",

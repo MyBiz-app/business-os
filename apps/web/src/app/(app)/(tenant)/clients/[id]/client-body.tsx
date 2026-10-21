@@ -1,4 +1,4 @@
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { CalendarPlus, Mail, MapPin, MessageCircle, Phone, RefreshCw, Tag } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,7 +14,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { RecordLayout, type RecordTab } from "@/components/record-layout";
 import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
-import { formatTime } from "@/lib/dates";
+import { formatTime, todayIn } from "@/lib/dates";
 import { canSell, canWriteClients } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -23,6 +23,7 @@ import { vertical } from "@business-os/verticals";
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
+import { ActivitySection } from "./activity-section";
 import { AddressesSection } from "./addresses-section";
 import { ConsentSection } from "./consent-section";
 import { DependentsSection } from "./dependents-section";
@@ -79,10 +80,33 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
     await api.GET("/clients/{client_id}/bookings", { params: { ...scope, path: { client_id: id } } }),
   );
   const { upcoming, past } = splitByNow(bookings);
+  // The one thing to do next: sell a plan, renew one that is ending (both for those who sell), or
+  // book a visit for a client with nothing coming up.
+  async function findNextAction(): Promise<"sell" | "renew" | "book" | null> {
+    if (erased) return null;
+    const selling = canSell(tenant);
+    const plans = selling
+      ? unwrap(await api.GET("/clients/{client_id}/entitlements", { params: { ...scope, path: { client_id: id } } }))
+      : [];
+    const live = plans.filter((plan) => ["active", "upcoming", "frozen"].includes(plan.state));
+    if (selling && live.length === 0) return "sell";
+    const soon = new Date(`${todayIn(tenant.time_zone)}T00:00:00Z`);
+    soon.setUTCDate(soon.getUTCDate() + 7);
+    const ending = live.some(
+      (plan) =>
+        plan.state === "active" &&
+        (Date.parse(`${plan.ends_on}T00:00:00Z`) <= soon.getTime() ||
+          (plan.kind === "punch_card" && plan.credits_remaining !== null && plan.credits_remaining <= 1)),
+    );
+    if (selling && ending) return "renew";
+    if (canWriteClients(tenant) && upcoming.every((b) => b.status !== "booked")) return "book";
+    return null;
+  }
   // Visits given back to this client (an exception, so it is counted): only for those who sell.
   const waivers = canSell(tenant)
     ? unwrap(await api.GET("/clients/{client_id}/waivers", { params: { ...scope, path: { client_id: id } } }))
     : null;
+  const nextAction = await findNextAction();
   const consentEvents = unwrap(
     await api.GET("/clients/{client_id}/consent-events", { params: { ...scope, path: { client_id: id } } }),
   );
@@ -254,6 +278,11 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
         </>
       ),
     },
+    {
+      id: "activity",
+      label: t("nav.activity"),
+      content: <ActivitySection clientId={client.id} context={context} />,
+    },
     ...(showPrivacy
       ? [
           {
@@ -356,7 +385,18 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
           </>
         }
         actions={
-          !erased && (client.phone || client.email) ? (
+          <>
+            {nextAction === "book" ? (
+              <ButtonLink href="/schedule" variant="primary">
+                <CalendarPlus aria-hidden="true" className="size-4" /> {t("nextAction.book")}
+              </ButtonLink>
+            ) : nextAction ? (
+              <ButtonLink href="#membership" variant="primary">
+                {nextAction === "sell" ? <Tag aria-hidden="true" className="size-4" /> : <RefreshCw aria-hidden="true" className="size-4" />}{" "}
+                {t(`nextAction.${nextAction}`)}
+              </ButtonLink>
+            ) : null}
+            {!erased && (client.phone || client.email) ? (
             <nav aria-label={t("profile.contact")} className="flex flex-wrap items-center gap-2">
               {client.phone && (
                 <ButtonLink href={`tel:${client.phone}`} variant="secondary">
@@ -374,7 +414,8 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
                 </ButtonLink>
               )}
             </nav>
-          ) : undefined
+            ) : null}
+          </>
         }
         stats={stats}
       />

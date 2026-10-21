@@ -5,7 +5,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, BackBar, Badge, ListRow } from "@business-os/app-kit/components/rows";
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Card, EmptyState, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -48,9 +48,7 @@ export default function Debts() {
       {back}
       <Heading palette={palette}>{t("title")}</Heading>
       {(data ?? []).length === 0 && !loading ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("empty")} icon="checkmark-circle-outline" />
       ) : (
         <View style={{ gap: 8 }}>
           {(data ?? []).map((row) => (

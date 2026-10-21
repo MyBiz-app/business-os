@@ -170,15 +170,15 @@ export default function QuoteScreen() {
                   </Text>
                 )}
               </View>
-              <Text style={{ color: palette.foreground, fontWeight: "600", fontVariant: ["tabular-nums"] }}>
+              <Text style={{ color: palette.foreground, fontWeight: "500", fontVariant: ["tabular-nums"] }}>
                 {money(Math.round(quantity * line.unit_price))}
               </Text>
             </View>
           );
         })}
         <View style={{ flexDirection: "row", justifyContent: "space-between", borderTopWidth: 1, borderColor: palette.border, paddingTop: 8 }}>
-          <Text style={{ color: palette.foreground, fontWeight: "700" }}>{tQuotes("total")}</Text>
-          <Text style={{ color: palette.foreground, fontWeight: "700", fontVariant: ["tabular-nums"] }}>{money(quote.total)}</Text>
+          <Text style={{ color: palette.foreground, fontWeight: "600" }}>{tQuotes("total")}</Text>
+          <Text style={{ color: palette.foreground, fontWeight: "600", fontVariant: ["tabular-nums"] }}>{money(quote.total)}</Text>
         </View>
         {quote.deposit_percent > 0 && (
           <Text style={[styles.muted, { color: palette.muted }]}>

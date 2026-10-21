@@ -88,7 +88,7 @@ export default function Me() {
         <Text style={[styles.muted, { color: palette.muted, writingDirection: "ltr" }]}>
           {session?.user.email}
         </Text>
-        {tenant && <Text style={{ color: palette.foreground, fontWeight: "600" }}>{tenant.name}</Text>}
+        {tenant && <Text style={{ color: palette.foreground, fontWeight: "500" }}>{tenant.name}</Text>}
         {tenant && (
           <Text style={[styles.muted, { color: palette.muted }]}>
             {t("role", { role: tenant.custom_role_name ?? tRoles(tenant.role as "owner") })}
@@ -161,7 +161,7 @@ export default function Me() {
 
       {branches.length > 1 && (
         <Card palette={palette}>
-          <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("branch")}</Text>
+          <Text style={{ color: palette.foreground, fontWeight: "500" }}>{t("branch")}</Text>
           {[{ id: null, name: t("allBranches") }, ...branches].map((option) => (
             <View key={option.id ?? "all"}>
               <Button
@@ -179,7 +179,7 @@ export default function Me() {
 
       {tenant?.role === "owner" && (
         <Card palette={palette}>
-          <Text style={{ color: palette.danger, fontWeight: "600" }}>{tClosure("title")}</Text>
+          <Text style={{ color: palette.danger, fontWeight: "500" }}>{tClosure("title")}</Text>
           <Text style={[styles.muted, { color: palette.muted }]}>{tClosure("intro", { days: 90 })}</Text>
           <Field
             label={tClosure("confirmLabel", { name: tenant.name })}

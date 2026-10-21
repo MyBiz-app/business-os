@@ -29,7 +29,7 @@ same value in several files, it should become a token here first.
 | Any text the user sees (Hebrew / English) | `packages/i18n/messages/he.json`, `en.json` | No text is hard-coded in components. |
 | Module prices and presets | `apps/api/app/commerce/modules.py` | The pricing page and sign-up read them from the API. |
 | Marketing page sections (hero, features, branches, safety, FAQ, CTA) | `apps/web/src/components/marketing/sections.tsx` and the page files under `app/(marketing)/` | Each section is a component; pages compose them. |
-| Mobile apps' colors and spacing | `packages/app-kit/src/lib/theme.ts` | Shared by the client, business and team apps. |
+| Mobile app's colors, corners, type scale and spacing | `packages/design-tokens/src/index.ts` (re-exported by `packages/app-kit/src/lib/theme.ts`) | The Expo app is one app (clients, business, MyBiz team). The palette is the web's Calm palette; `packages/design-tokens/test` compares it with `globals.css`, so change both together. |
 
 ## Rules that keep it modular
 
@@ -90,6 +90,16 @@ page Foundations). Quiet: hierarchy by size, not weight; hairlines instead of he
 - **Navigation**: the side menu and the top bar are light by default (`.nav-light`, the page's own surface); a
   person can still pick the dark (charcoal) column in light mode (`nav_tone` cookie, `.nav-dark`).
 - The marketing site (`.mk`) restores its rounder cards (20px), fields (12px) and soft card shadow.
+
+### Calm in the Expo app (W5-1)
+
+The app speaks the same language as the web. Shared pieces (`packages/app-kit/src/components`): `Button` (primary, secondary,
+danger, quiet; 44px tall, 10px corners, no glow), `Field`, `Card` (flat, hairline, no card inside a card), `Heading`,
+`EmptyState` (a quiet icon, what is missing, an optional hint and action: use it instead of grey text),
+`Skeleton`, `Sheet` (the one bottom sheet: scrim and sheet animate separately, Esc / back / scrim / close button all
+close it), `BackBar` (a back link; without `onPress` it goes back in history or to its `fallback` route when opened
+directly, so no pushed screen is a dead end). Depth: cards carry no shadow; only what floats (`elevation.floating`: sheet,
+toast, the AI bubble) does.
 
 ## Components
 
@@ -235,7 +245,12 @@ The team list opens a person's card as a window over the list with `?open=<userI
 - `design-system/no-raw-button`: a `<button>` needs `btn-primary`, `btn-secondary`, `btn-ghost`,
   `btn-danger`, `btn-link`, `btn-icon`, `btn-plain` or `control` in its `className`.
 
-For the Expo apps, `no-restricted-syntax` in `apps/client-app/eslint.config.js` and
+For the Expo app, `packages/app-kit/test/support.mjs` (run by `pnpm --filter client-app test` and `app-kit test`) fails on a
+font size outside 12 / 13 / 15 / 17 / 20 / 24 / 30, a font weight of 700 or more, or a numeric corner of 8 or more: use
+`radius.control` (10), `radius.card` (12), `radius.dialog` (16) or `radius.pill`, and `space` for the 4px grid, all from
+`@business-os/app-kit/lib/theme`. Weights are 400 text, 500 labels, 600 headings.
+
+For the Expo app, `no-restricted-syntax` in `apps/client-app/eslint.config.js` and
 `packages/app-kit/eslint.config.js` bans hex literals outside `lib/theme.ts` and `lib/brand.ts`.
 Colors that never change with theme or brand (white on a brand fill, the rating star) are
 `fixedColors` in `theme.ts`. Allowed: the launch splash and the brand color swatches (their colors are the content).

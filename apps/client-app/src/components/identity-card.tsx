@@ -98,7 +98,7 @@ export function IdentityCard({ palette, calls, intro }: { palette: Palette; call
       {data.present ? (
         <>
           <Text style={{ color: palette.muted }}>{t(`types.${data.id_type ?? "il_id"}`)}</Text>
-          <Text accessibilityLiveRegion="polite" style={{ color: palette.foreground, fontSize: 18, writingDirection: "ltr" }}>
+          <Text accessibilityLiveRegion="polite" style={{ color: palette.foreground, fontSize: 17, writingDirection: "ltr" }}>
             {shown ?? maskedId(data.last4 ?? "")}
           </Text>
           <Button label={shown ? t("hide") : t("show")} variant="secondary" palette={palette} onPress={() => void toggle()} />

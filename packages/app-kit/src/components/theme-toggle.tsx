@@ -5,6 +5,7 @@ import { useTranslations } from "use-intl";
 import { PressableScale } from "./motion";
 import { tint } from "../lib/brand";
 import { useTheme } from "../providers/theme-provider";
+import { radius } from "../lib/theme";
 
 /** One-tap sun/moon switch between light and dark (it overrides "follow the system"). */
 export function ThemeToggle() {
@@ -24,5 +25,5 @@ export function ThemeToggle() {
 }
 
 const styles = StyleSheet.create({
-  button: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  button: { width: 48, height: 48, borderRadius: radius.pill, borderWidth: 1, alignItems: "center", justifyContent: "center" },
 });

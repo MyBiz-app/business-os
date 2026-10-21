@@ -22,6 +22,7 @@ from app.api import resources as resources_api
 from app.api import schedule as schedule_api
 from app.api import time_billing as time_api
 from app.api.pagination import Page
+from app.reports.map_insights import areas_for_ai
 from app.reports.metrics import METRICS, compute, members_at_risk, previous_period
 
 # --- Read tools ------------------------------------------------------------------------------
@@ -256,6 +257,13 @@ def client_sources(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         {"start": start, "end": end},
     ).mappings()
     return {"period": f"{start} to {end}", "sources": [dict(r) for r in rows]}
+
+
+def map_areas(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    start, end = _date(args["start_date"], "start_date"), _date(args["end_date"], "end_date")
+    if end < start or (end - start).days > 366:
+        raise ToolError("the period must be 1 to 366 days, start before end")
+    return {"period": f"{start} to {end}", **areas_for_ai(ctx.tenant.session, start, end)}
 
 
 def inactive_members(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:

@@ -15,6 +15,7 @@ import { unwrap } from "@business-os/app-kit/lib/api";
 import { Button, Card, EmptyState, Heading, Screen } from "@business-os/app-kit/components/ui";
 import { useBusiness } from "@/providers/business-provider";
 import { useInbox } from "@/providers/inbox-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 type Notification = components["schemas"]["Notification"];
 const PAGE = 50; // the API's default page size
@@ -121,9 +122,9 @@ const local = StyleSheet.create({
   row: { flexDirection: "row", gap: 10, paddingVertical: 12, alignItems: "flex-start" },
   dot: { width: 8, height: 8, borderRadius: 4, marginTop: 7 },
   group: { gap: 8 },
-  icon: { width: 36, height: 36, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  icon: { width: 36, height: 36, borderRadius: radius.card, alignItems: "center", justifyContent: "center" },
   info: { flex: 1, gap: 2 },
   text: { fontSize: 15, textAlign: "left" },
-  bold: { fontWeight: "600" },
+  bold: { fontWeight: "500" },
   meta: { fontSize: 13, textAlign: "left" },
 });

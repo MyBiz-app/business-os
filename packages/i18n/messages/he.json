@@ -920,7 +920,8 @@
       "membership": "מנויים וביקורים",
       "paperwork": "הצעות ומסמכים",
       "talk": "הערות והודעות",
-      "privacy": "הסכמות ופרטיות"
+      "privacy": "הסכמות ופרטיות",
+      "activity": "פעילות"
     },
     "joinedChip": "הצטרפו {range}",
     "noShowChip": "לא הגיעו {range}",
@@ -1041,7 +1042,49 @@
     "cityHint": "מאיפה הלקוח מגיע. עוזר לראות איפה הלקוחות שלכם גרים.",
     "clearFilters": "ניקוי הסינון",
     "glance": "במבט מהיר",
-    "cityChip": "עיר: {city}"
+    "cityChip": "עיר: {city}",
+    "activity": {
+      "title": "כל מה שקרה",
+      "empty": "עוד לא קרה כלום. הזמנות, תשלומים, מנויים, הערות והודעות יופיעו כאן.",
+      "latest": "מוצגים {count} האירועים האחרונים.",
+      "booking": {
+        "booked": "הוזמן ל{title}",
+        "checked_in": "הגיע ל{title}",
+        "no_show": "לא הגיע ל{title}",
+        "cancelled": "ביטל את {title}",
+        "waitlisted": "נכנס לרשימת ההמתנה של {title}"
+      },
+      "payment": {
+        "succeeded": "שילם {amount}",
+        "failed": "התשלום על {amount} נכשל",
+        "refunded": "הוחזרו {amount}"
+      },
+      "paymentFor": "עבור {title}",
+      "plan": {
+        "sold": "נמכר מנוי: {title}",
+        "cancelled": "המנוי בוטל: {title}"
+      },
+      "message": "נשלחה הודעה ב{channel}",
+      "note": "נוספה הערה",
+      "lead": {
+        "created": "הגיע כליד",
+        "stage": "הליד עבר ל{detail}",
+        "note": "הערה על הליד",
+        "call": "שיחה עם הליד",
+        "message": "הודעה לליד",
+        "meeting": "פגישה עם הליד",
+        "converted": "הפך ללקוח"
+      },
+      "channels": {
+        "whatsapp": "וואטסאפ",
+        "sms": "SMS"
+      }
+    },
+    "nextAction": {
+      "sell": "למכור מנוי",
+      "renew": "לחדש מנוי",
+      "book": "לקבוע תור"
+    }
   },
   "common": {
     "undo": "בטל",
@@ -1069,6 +1112,7 @@
     "confirmTitle": "בטוחים?",
     "confirmAction": "אישור",
     "closeDialog": "סגירת החלון",
+    "goBack": "חזרה",
     "discardTitle": "לצאת בלי לשמור?",
     "discardBody": "השינויים שלא נשמרו יאבדו.",
     "keepEditing": "להמשיך לערוך",
@@ -5820,6 +5864,16 @@
           ]
         }
       }
+    },
+    "coverage": {
+      "eyebrow": "בכל רחבי הארץ",
+      "title": "MyBiz, מהצפון ועד הנגב",
+      "subtitle": "{count, plural, one {עסק אחד} other {# עסקים}} כבר עובדים עם MyBiz, בערים בכל רחבי ישראל.",
+      "dot": "{city}: {count, plural, one {עסק אחד} other {# עסקים}}",
+      "hover": "{count, plural, one {עסק אחד} other {# עסקים}}",
+      "mapLabel": "מפת הערים שיש בהן עסקים של MyBiz",
+      "failed": "המפה לא נטענה כרגע.",
+      "privacy": "סיכומים לפי עיר בלבד. עיר מופיעה רק כשיש בה לפחות חמישה עסקים, ושום עסק לא מוזכר בשמו."
     }
   },
   "appointments": {
@@ -11057,6 +11111,7 @@
       "whiteSpots": "כתמים לבנים",
       "whiteSpotsHint": "ערים עם לידים ובלי סניף בטווח {km} ק״מ"
     },
+    "askAnalyst": "שאלו את האנליסט על המפה",
     "layers": {
       "label": "שכבות המפה",
       "branches": "סניפים",

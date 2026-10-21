@@ -7,6 +7,7 @@ import { Chip } from "./chip";
 import { Text } from "./text";
 import type { CalendarView } from "../lib/calendar-range";
 import type { Palette } from "../lib/theme";
+import { radius } from "../lib/theme";
 
 const ITEM = 56;
 const GAP = 8;
@@ -164,7 +165,7 @@ export function MonthGrid({ selected, today, marked, closed, onPick, palette }: 
                 <Text
                   style={{
                     color: isSelected ? palette.onPrimary : closed.has(d) ? palette.muted : palette.foreground,
-                    fontWeight: "600",
+                    fontWeight: "500",
                   }}
                 >
                   {formatDay(d, locale, { day: "numeric" })}
@@ -191,14 +192,14 @@ export function weekDays(day: string): string[] {
 }
 
 const local = StyleSheet.create({
-  day: { width: ITEM, minHeight: 76, paddingVertical: 8, borderRadius: 28, borderWidth: 1, alignItems: "center", justifyContent: "center", gap: 2 },
+  day: { width: ITEM, minHeight: 76, paddingVertical: 8, borderRadius: radius.dialog, borderWidth: 1, alignItems: "center", justifyContent: "center", gap: 2 },
   daySelected: { minHeight: 84 },
-  weekday: { fontSize: 12, fontWeight: "600" },
-  date: { fontSize: 18, fontWeight: "700" },
+  weekday: { fontSize: 12, fontWeight: "500" },
+  date: { fontSize: 17, fontWeight: "600" },
   dot: { width: 5, height: 5, borderRadius: 3 },
   switch: { flexDirection: "row", gap: 8 },
   month: { gap: 6 },
   weekRow: { flexDirection: "row" },
-  head: { flex: 1, textAlign: "center", fontSize: 12, fontWeight: "600" },
-  cell: { flex: 1, aspectRatio: 1, borderRadius: 14, alignItems: "center", justifyContent: "center", gap: 2 },
+  head: { flex: 1, textAlign: "center", fontSize: 12, fontWeight: "500" },
+  cell: { flex: 1, aspectRatio: 1, borderRadius: radius.control, alignItems: "center", justifyContent: "center", gap: 2 },
 });

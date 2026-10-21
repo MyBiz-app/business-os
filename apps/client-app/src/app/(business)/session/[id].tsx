@@ -7,7 +7,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { useToast } from "@business-os/app-kit/components/toast";
 import { confirm } from "@business-os/app-kit/lib/confirm";
@@ -252,7 +252,7 @@ export default function SessionScreen() {
       {session.booking_mode === "resource" && session.price_amount != null && (
         <Card palette={palette}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-            <Text style={{ color: palette.foreground, fontWeight: "700", fontSize: 18 }}>
+            <Text style={{ color: palette.foreground, fontWeight: "600", fontSize: 17 }}>
               {formatMoney(session.price_amount, session.price_currency ?? tenant!.currency, locale)}
             </Text>
             <Badge label={session.paid ? tResources("paid") : tResources("notPaid")} tone={session.paid ? "success" : "danger"} palette={palette} />
@@ -287,7 +287,7 @@ export default function SessionScreen() {
       )}
 
       <View accessibilityLiveRegion="polite">
-        {notice && <Text style={{ color: palette.success, fontWeight: "600" }}>{notice}</Text>}
+        {notice && <Text style={{ color: palette.success, fontWeight: "500" }}>{notice}</Text>}
         <ErrorText message={error} palette={palette} />
       </View>
 
@@ -326,7 +326,7 @@ export default function SessionScreen() {
               </View>
               {picking && (
                 <View style={{ gap: 8 }}>
-                  <Text style={{ color: palette.foreground, fontWeight: "700", textAlign: "left" }}>
+                  <Text style={{ color: palette.foreground, fontWeight: "600", textAlign: "left" }}>
                     {tDependents("who")} · {[picking.client.first_name, picking.client.last_name].filter(Boolean).join(" ")}
                   </Text>
                   {picking.choices.length === 0 ? (
@@ -430,9 +430,7 @@ export default function SessionScreen() {
 
       <SectionTitle title={t("roster")} palette={palette} />
       {coming.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("empty")} />
       ) : (
         coming.map((booking) => {
           const tone = TONE[booking.status as keyof typeof TONE] ?? "muted";
@@ -445,7 +443,7 @@ export default function SessionScreen() {
                   <Text
                     accessibilityRole="link"
                     onPress={() => router.push(`/client/${booking.client_id}`)}
-                    style={{ color: palette.foreground, fontWeight: "700", fontSize: 16 }}
+                    style={{ color: palette.foreground, fontWeight: "600", fontSize: 15 }}
                   >
                     {booking.dependent_name ? `${booking.dependent_name} · ${booking.client_name}` : booking.client_name}
                   </Text>

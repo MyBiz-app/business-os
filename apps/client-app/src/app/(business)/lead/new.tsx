@@ -91,7 +91,7 @@ export default function NewLead() {
         <AddressPicker palette={palette} value={address} onChange={setAddress} cityHint={tLeads("cityHint")} />
         <Field label={tLeads("interest")} palette={palette} value={interest} onChangeText={setInterest} />
         <View style={{ gap: 6 }}>
-          <Text style={{ color: palette.foreground, fontSize: 14, fontWeight: "600", textAlign: "left" }}>{tLeads("source")}</Text>
+          <Text style={{ color: palette.foreground, fontSize: 13, fontWeight: "500", textAlign: "left" }}>{tLeads("source")}</Text>
           <PillRow<Source>
             label={tLeads("source")}
             palette={palette}

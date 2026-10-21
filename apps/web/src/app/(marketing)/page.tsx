@@ -12,6 +12,7 @@ import {
 import {
   AboutTeaser,
   BentoFeatures,
+  CoverageSection,
   DemoSection,
   FactsStrip,
   PricingTeaser,
@@ -217,6 +218,8 @@ export default async function Home() {
       <BranchesSection />
 
       <IndustryCards />
+
+      <CoverageSection />
 
       <PricingTeaser />
       <WebsitesTeaser />

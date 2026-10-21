@@ -31,7 +31,7 @@ export function AiMeter({ meter, palette }: { meter: AiMeterData; palette: Palet
   return (
     <View style={{ gap: 6 }} accessible accessibilityRole="progressbar" accessibilityLabel={`${headline}. ${detail}`} accessibilityValue={{ min: 0, max: 100, now: Math.round(shown) }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-        <Text style={{ color: palette.foreground, fontWeight: "700" }}>{headline}</Text>
+        <Text style={{ color: palette.foreground, fontWeight: "600" }}>{headline}</Text>
         <Text style={[styles.muted, { color: palette.muted }]}>{detail}</Text>
       </View>
       <View style={{ height: 10, borderRadius: 5, backgroundColor: palette.border }}>

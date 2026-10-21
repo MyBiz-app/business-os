@@ -6,7 +6,8 @@ import { View, StyleSheet } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Button, Card, ErrorText, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { BackBar } from "@business-os/app-kit/components/rows";
+import { Button, Card, EmptyState, ErrorText, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -17,6 +18,7 @@ type Entry = components["schemas"]["MyWaitlistEntry"];
 /** The client's waitlists: ranges and days they asked for, places on classes, and spots to take now. */
 export default function Waitlist() {
   const t = useTranslations("client.waitlist");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const [busy, setBusy] = useState<string | null>(null);
@@ -68,10 +70,11 @@ export default function Waitlist() {
 
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
+      <BackBar palette={palette} label={tCommon("goBack")} fallback="/bookings" />
       <Heading palette={palette}>{t("title")}</Heading>
       {loadError !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       <ErrorText message={error} palette={palette} />
-      {data && data.length === 0 && <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>}
+      {data && data.length === 0 && <EmptyState palette={palette} message={t("empty")} icon="hourglass-outline" />}
       {data?.map((entry) => (
         <Card key={entry.id} palette={palette}>
           <Text style={[local.name, { color: palette.foreground }]}>{entry.service_name}</Text>
@@ -96,7 +99,7 @@ export default function Waitlist() {
 }
 
 const local = StyleSheet.create({
-  name: { fontSize: 17, fontWeight: "700", textAlign: "left" },
-  offer: { fontSize: 15, fontWeight: "700", textAlign: "left" },
+  name: { fontSize: 17, fontWeight: "600", textAlign: "left" },
+  offer: { fontSize: 15, fontWeight: "600", textAlign: "left" },
   actions: { gap: 8 },
 });

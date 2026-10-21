@@ -5,12 +5,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
-import { fixedColors } from "@business-os/app-kit/lib/theme";
+import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Chip } from "@business-os/app-kit/components/chip";
 import { PressableScale } from "@business-os/app-kit/components/motion";
-import { Button, Card, ErrorText, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
+import { BackBar } from "@business-os/app-kit/components/rows";
+import { Button, Card, EmptyState, ErrorText, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
@@ -30,6 +31,7 @@ const KNOWN = ["slot_taken", "outside_hours", "length_not_offered", "health_decl
 /** Reserve a court or room by the hour: what → how long → day → court and time → pay. */
 export default function Court() {
   const t = useTranslations("client.court");
+  const tCommon = useTranslations("common");
   const tWaitlist = useTranslations("client.waitlist");
   const tAppointment = useTranslations("client.appointment");
   const locale = useLocale();
@@ -175,14 +177,13 @@ export default function Court() {
 
   return (
     <Screen palette={palette}>
+      <BackBar palette={palette} label={tCommon("goBack")} fallback="/home" />
       <Heading palette={palette}>{t("title")}</Heading>
 
       {!services ? (
         <ActivityIndicator color={palette.primary} />
       ) : services.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("none")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("none")} />
       ) : (
         services.length > 1 && (
           <>
@@ -199,7 +200,6 @@ export default function Court() {
                     onPress={() => choose(item)}
                     style={[
                       local.service,
-                      elevation.card,
                       { backgroundColor: selected ? tint(item.color ?? palette.primary, 0.12) : palette.surface, borderColor: selected ? palette.primary : palette.border },
                     ]}
                   >
@@ -299,7 +299,6 @@ export default function Court() {
                         onPress={() => setSlot(item)}
                         style={[
                           local.service,
-                          elevation.card,
                           { backgroundColor: selected ? tint(palette.primary, 0.12) : palette.surface, borderColor: selected ? palette.primary : palette.border },
                         ]}
                       >
@@ -371,7 +370,7 @@ export default function Court() {
                 <Text style={[local.serviceName, { color: palette.foreground }]}>
                   {slot.room_name} · {time(slot.starts_at)}-{time(slot.ends_at)}
                 </Text>
-                <Text style={{ color: palette.foreground, fontSize: 24, fontWeight: "800", textAlign: "left" }}>
+                <Text style={{ color: palette.foreground, fontSize: 24, fontWeight: "600", textAlign: "left" }}>
                   {formatMoney(slot.price_amount, slot.price_currency, locale)}
                 </Text>
                 <Text style={[styles.muted, { color: palette.muted }]}>{inApp ? t("simulated") : t("venueHint")}</Text>
@@ -395,20 +394,20 @@ export default function Court() {
 }
 
 const local = StyleSheet.create({
-  step: { fontSize: 17, fontWeight: "700", textAlign: "left" },
+  step: { fontSize: 17, fontWeight: "600", textAlign: "left" },
   list: { gap: 10 },
-  service: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderRadius: 18, padding: 14 },
+  service: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderRadius: radius.card, padding: 14 },
   accent: { width: 4, alignSelf: "stretch", borderRadius: 2 },
   serviceInfo: { flex: 1, gap: 2 },
-  serviceName: { fontSize: 16, fontWeight: "700", textAlign: "left" },
+  serviceName: { fontSize: 15, fontWeight: "600", textAlign: "left" },
   row: { gap: 8, paddingVertical: 2 },
-  label: { fontSize: 13, fontWeight: "600", textAlign: "left" },
+  label: { fontSize: 13, fontWeight: "500", textAlign: "left" },
   toggle: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 8, minHeight: 44 },
-  toggleText: { fontSize: 15, fontWeight: "700" },
+  toggleText: { fontSize: 15, fontWeight: "600" },
   court: { gap: 8, paddingVertical: 6 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   done: { alignItems: "center", gap: 12, paddingVertical: 32 },
-  check: { width: 92, height: 92, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  doneTitle: { fontSize: 26, fontWeight: "800" },
+  check: { width: 92, height: 92, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
+  doneTitle: { fontSize: 24, fontWeight: "600" },
   center: { textAlign: "center" },
 });

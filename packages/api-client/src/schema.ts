@@ -2373,6 +2373,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients/{client_id}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Activity
+         * @description Newest first. Page with `limit` and `offset`.
+         */
+        get: operations["client_activity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}/notes": {
         parameters: {
             query?: never;
@@ -3613,6 +3633,27 @@ export interface paths {
          * @description The same city list for a form anyone can open (a business's inquiry form).
          */
         get: operations["list_cities_public"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/geo/coverage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coverage
+         * @description Where MyBiz businesses are, for the landing page: city names and counts only. A city
+         *     with fewer than five businesses is not listed (the database enforces it); no one is named.
+         */
+        get: operations["coverage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10447,6 +10488,51 @@ export interface components {
              */
             active_week: number;
         };
+        /** ActivityEvent */
+        ActivityEvent: {
+            /**
+             * Id
+             * @description Unique within the feed: `<kind>:<row id>[/<part>]`
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "booking" | "payment" | "plan" | "message" | "note" | "lead";
+            /**
+             * Status
+             * @description Booking status, payment status, plan event (sold, cancelled), message channel, lead event (created, stage, note, ...)
+             */
+            status: string | null;
+            /**
+             * Title
+             * @description Service, plan or message text; null for a bare event
+             */
+            title: string | null;
+            /**
+             * Detail
+             * @description Note text, lead stage or message body
+             */
+            detail: string | null;
+            /**
+             * Amount
+             * @description Minor units, for payments and plan sales
+             */
+            amount: number | null;
+            /** Currency */
+            currency: string | null;
+            /**
+             * Ref Id
+             * @description The booking, payment, plan, message or note
+             */
+            ref_id: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+        };
         /** Address */
         Address: {
             /**
@@ -14160,6 +14246,32 @@ export interface components {
              * @description Added to the pay; negative takes away
              */
             amount_minor: number;
+        };
+        /** Coverage */
+        Coverage: {
+            /**
+             * Cities
+             * @description Only cities with at least five businesses
+             */
+            cities: components["schemas"]["CoverageCity"][];
+            /**
+             * Businesses
+             * @description Businesses in those cities
+             */
+            businesses: number;
+        };
+        /** CoverageCity */
+        CoverageCity: {
+            /** Name He */
+            name_he: string;
+            /** Name En */
+            name_en: string | null;
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+            /** Businesses */
+            businesses: number;
         };
         /** CoverageGap */
         CoverageGap: {
@@ -30429,6 +30541,46 @@ export interface operations {
             };
         };
     };
+    client_activity: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityEvent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_notes: {
         parameters: {
             query?: never;
@@ -33583,6 +33735,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    coverage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Coverage"];
                 };
             };
         };

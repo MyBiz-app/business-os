@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { Avatar, Badge, ListRow } from "@business-os/app-kit/components/rows";
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Card, EmptyState, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { usePlatform } from "@/providers/platform-provider";
@@ -60,9 +60,7 @@ export default function Inbox() {
         onChange={setFilter}
       />
       {requests.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("empty")} icon="mail-outline" />
       ) : (
         <View style={{ gap: 8 }}>
           {requests.slice(0, 50).map((request) => (

@@ -5,12 +5,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Linking, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
-import { fixedColors } from "@business-os/app-kit/lib/theme";
+import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Chip } from "@business-os/app-kit/components/chip";
 import { PressableScale } from "@business-os/app-kit/components/motion";
-import { Button, Card, ErrorText, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
+import { BackBar } from "@business-os/app-kit/components/rows";
+import { Button, Card, ErrorText, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { calendarLink } from "@business-os/app-kit/lib/client-home";
@@ -42,6 +43,7 @@ const ME = "me";
 /** Book a personal appointment: service → staff → day → time. */
 export default function Appointment() {
   const t = useTranslations("client.appointment");
+  const tCommon = useTranslations("common");
   const tWaitlist = useTranslations("client.waitlist");
   const tDependents = useTranslations("dependents");
   const tJobs = useTranslations("jobs");
@@ -180,6 +182,7 @@ export default function Appointment() {
 
   return (
     <Screen palette={palette}>
+      <BackBar palette={palette} label={tCommon("goBack")} fallback="/home" />
       <Heading palette={palette}>{t("title")}</Heading>
 
       <StepTitle palette={palette} n={1} label={t("service")} />
@@ -198,7 +201,6 @@ export default function Appointment() {
                 onPress={() => setService(item)}
                 style={[
                   local.service,
-                  elevation.card,
                   { backgroundColor: selected ? tint(item.color ?? palette.primary, 0.12) : palette.surface, borderColor: selected ? palette.primary : palette.border },
                 ]}
               >
@@ -369,20 +371,20 @@ function StepTitle({ n, label, palette }: { n: number; label: string; palette: P
 
 const local = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  step: { fontSize: 17, fontWeight: "700", textAlign: "left" },
+  step: { fontSize: 17, fontWeight: "600", textAlign: "left" },
   stepRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  stepNo: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  stepNoText: { fontSize: 14, fontWeight: "800" },
+  stepNo: { width: 28, height: 28, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
+  stepNoText: { fontSize: 13, fontWeight: "600" },
   list: { gap: 10 },
-  service: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderRadius: 18, padding: 14 },
+  service: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderRadius: radius.card, padding: 14 },
   accent: { width: 4, alignSelf: "stretch", borderRadius: 2 },
   serviceInfo: { flex: 1, gap: 2 },
-  serviceName: { fontSize: 16, fontWeight: "700", textAlign: "left" },
+  serviceName: { fontSize: 15, fontWeight: "600", textAlign: "left" },
   row: { gap: 8, paddingVertical: 2 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   done: { alignItems: "center", gap: 12, paddingVertical: 32 },
-  check: { width: 92, height: 92, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  doneTitle: { fontSize: 26, fontWeight: "800" },
+  check: { width: 92, height: 92, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
+  doneTitle: { fontSize: 24, fontWeight: "600" },
   center: { textAlign: "center" },
-  summaryTitle: { fontSize: 17, fontWeight: "700", textAlign: "left" },
+  summaryTitle: { fontSize: 17, fontWeight: "600", textAlign: "left" },
 });

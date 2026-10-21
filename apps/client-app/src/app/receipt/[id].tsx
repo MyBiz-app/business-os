@@ -1,11 +1,12 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
-import { fixedColors } from "@business-os/app-kit/lib/theme";
+import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { BackBar } from "@business-os/app-kit/components/rows";
+import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -15,6 +16,7 @@ import { useBusiness } from "@/providers/business-provider";
 /** One of the client's receipts, as a document. */
 export default function Receipt() {
   const t = useTranslations("receipts");
+  const tCommon = useTranslations("common");
   const tScreen = useTranslations("client.receipt");
   const locale = useLocale();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -33,6 +35,7 @@ export default function Receipt() {
 
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
+      <BackBar palette={palette} label={tCommon("goBack")} fallback="/bookings" />
       <Heading palette={palette}>{tScreen("title")}</Heading>
       {receipt && (
         <Card palette={palette}>
@@ -53,7 +56,6 @@ export default function Receipt() {
           </View>
         </Card>
       )}
-      <Button label={tScreen("back")} variant="secondary" palette={palette} onPress={() => (router.canGoBack() ? router.back() : router.replace("/bookings"))} />
     </Screen>
   );
 }
@@ -68,11 +70,11 @@ function Line({ label, value, palette }: { label: string; value: string; palette
 }
 
 const local = StyleSheet.create({
-  sample: { fontSize: 13, fontWeight: "600", borderRadius: 10, padding: 10, textAlign: "center", overflow: "hidden" },
-  business: { fontSize: 22, fontWeight: "800", textAlign: "left" },
+  sample: { fontSize: 13, fontWeight: "500", borderRadius: radius.control, padding: 10, textAlign: "center", overflow: "hidden" },
+  business: { fontSize: 20, fontWeight: "600", textAlign: "left" },
   divider: { height: 1, marginVertical: 4 },
   line: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 },
-  value: { fontSize: 15, fontWeight: "600", flexShrink: 1, textAlign: "right" },
-  totalLabel: { fontSize: 17, fontWeight: "700" },
-  total: { fontSize: 22, fontWeight: "800", fontVariant: ["tabular-nums"] },
+  value: { fontSize: 15, fontWeight: "500", flexShrink: 1, textAlign: "right" },
+  totalLabel: { fontSize: 17, fontWeight: "600" },
+  total: { fontSize: 20, fontWeight: "600", fontVariant: ["tabular-nums"] },
 });

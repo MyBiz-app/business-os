@@ -23,7 +23,7 @@ export function AgentFace({ agent, size = 40 }: { agent: Pick<Agent, "name" | "c
         backgroundColor: agent.color,
       }}
     >
-      <Text style={{ color: fixedColors.white, fontWeight: "700", fontSize: size * 0.42 }}>{initialOf(agent.name)}</Text>
+      <Text style={{ color: fixedColors.white, fontWeight: "600", fontSize: size * 0.42 }}>{initialOf(agent.name)}</Text>
       <AuthImage
         path={agent.avatar_url}
         style={{ position: "absolute", width: size, height: size, borderRadius: size / 2 }}

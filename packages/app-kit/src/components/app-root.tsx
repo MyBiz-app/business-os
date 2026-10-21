@@ -1,5 +1,5 @@
-import { Assistant_400Regular, Assistant_500Medium, Assistant_700Bold } from "@expo-google-fonts/assistant";
-import { PlusJakartaSans_700Bold } from "@expo-google-fonts/plus-jakarta-sans";
+import { Assistant_400Regular, Assistant_500Medium, Assistant_600SemiBold } from "@expo-google-fonts/assistant";
+import { PlusJakartaSans_600SemiBold } from "@expo-google-fonts/plus-jakarta-sans";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -37,8 +37,8 @@ export function AppRoot({ Provider }: { Provider: ComponentType<{ children: Reac
   useFonts({
     [fontFamily.regular]: Assistant_400Regular,
     [fontFamily.medium]: Assistant_500Medium,
-    [fontFamily.bold]: Assistant_700Bold,
-    [displayFontFamily.bold]: PlusJakartaSans_700Bold,
+    [fontFamily.semibold]: Assistant_600SemiBold,
+    [displayFontFamily.semibold]: PlusJakartaSans_600SemiBold,
   });
   return (
     <ThemeProvider>

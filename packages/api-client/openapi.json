@@ -12328,6 +12328,116 @@
         ]
       }
     },
+    "/clients/{client_id}/activity": {
+      "get": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Client Activity",
+        "description": "Newest first. Page with `limit` and `offset`.",
+        "operationId": "client_activity",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityEvent"
+                  },
+                  "title": "Response Client Activity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/clients/{client_id}/notes": {
       "get": {
         "tags": [
@@ -19227,6 +19337,28 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/geo/coverage": {
+      "get": {
+        "tags": [
+          "geo"
+        ],
+        "summary": "Coverage",
+        "description": "Where MyBiz businesses are, for the landing page: city names and counts only. A city\nwith fewer than five businesses is not listed (the database enforces it); no one is named.",
+        "operationId": "coverage",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Coverage"
                 }
               }
             }
@@ -48260,6 +48392,117 @@
         ],
         "title": "ActivityDay"
       },
+      "ActivityEvent": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique within the feed: `<kind>:<row id>[/<part>]`"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "booking",
+              "payment",
+              "plan",
+              "message",
+              "note",
+              "lead"
+            ],
+            "title": "Kind"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status",
+            "description": "Booking status, payment status, plan event (sold, cancelled), message channel, lead event (created, stage, note, ...)"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Service, plan or message text; null for a bare event"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail",
+            "description": "Note text, lead stage or message body"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount",
+            "description": "Minor units, for payments and plan sales"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "ref_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Id",
+            "description": "The booking, payment, plan, message or note"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "title",
+          "detail",
+          "amount",
+          "currency",
+          "ref_id",
+          "occurred_at"
+        ],
+        "title": "ActivityEvent"
+      },
       "Address": {
         "properties": {
           "id": {
@@ -58048,6 +58291,69 @@
           "amount_minor"
         ],
         "title": "CorrectionItem"
+      },
+      "Coverage": {
+        "properties": {
+          "cities": {
+            "items": {
+              "$ref": "#/components/schemas/CoverageCity"
+            },
+            "type": "array",
+            "title": "Cities",
+            "description": "Only cities with at least five businesses"
+          },
+          "businesses": {
+            "type": "integer",
+            "title": "Businesses",
+            "description": "Businesses in those cities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cities",
+          "businesses"
+        ],
+        "title": "Coverage"
+      },
+      "CoverageCity": {
+        "properties": {
+          "name_he": {
+            "type": "string",
+            "title": "Name He"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "businesses": {
+            "type": "integer",
+            "title": "Businesses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name_he",
+          "name_en",
+          "latitude",
+          "longitude",
+          "businesses"
+        ],
+        "title": "CoverageCity"
       },
       "CoverageGap": {
         "properties": {

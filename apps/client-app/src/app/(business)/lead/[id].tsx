@@ -139,7 +139,7 @@ export default function LeadScreen() {
       </Text>
 
       <View accessibilityLiveRegion="polite">
-        {notice ? <Text style={{ color: palette.success, fontWeight: "600" }}>{notice}</Text> : null}
+        {notice ? <Text style={{ color: palette.success, fontWeight: "500" }}>{notice}</Text> : null}
         <ErrorText message={error} palette={palette} />
       </View>
 
@@ -175,13 +175,13 @@ export default function LeadScreen() {
 
       {lead.client_id ? (
         <Card palette={palette}>
-          <Text style={{ color: palette.foreground, fontWeight: "600" }}>{tLeads("isClient")}</Text>
+          <Text style={{ color: palette.foreground, fontWeight: "500" }}>{tLeads("isClient")}</Text>
           <Button label={tLeads("openClient")} palette={palette} onPress={() => router.push(`/client/${lead.client_id}`)} />
         </Card>
       ) : (
         write && (
           <Card palette={palette}>
-            <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("stage")}</Text>
+            <Text style={{ color: palette.foreground, fontWeight: "500" }}>{t("stage")}</Text>
             <PillRow<Stage>
               label={t("stage")}
               palette={palette}
@@ -226,7 +226,7 @@ export default function LeadScreen() {
 
       {panel === "log" && (
         <Card palette={palette}>
-          <Text style={{ color: palette.foreground, fontWeight: "600" }}>{tLeads("activityKind")}</Text>
+          <Text style={{ color: palette.foreground, fontWeight: "500" }}>{tLeads("activityKind")}</Text>
           <PillRow<Kind>
             label={tLeads("activityKind")}
             palette={palette}

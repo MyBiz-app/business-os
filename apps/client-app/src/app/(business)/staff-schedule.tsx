@@ -182,7 +182,7 @@ export default function MySchedule() {
           <SectionTitle title={t("swap.incoming")} palette={palette} />
           {incoming.map((swap) => (
             <Card key={swap.id} palette={palette}>
-              <Text style={{ color: palette.foreground, fontWeight: "600" }}>
+              <Text style={{ color: palette.foreground, fontWeight: "500" }}>
                 {t("swap.incomingText", { from: swap.from_user_name, when: swapWhen(swap) })}
               </Text>
               {swap.note && <Text style={{ color: palette.muted }}>{swap.note}</Text>}
@@ -206,7 +206,7 @@ export default function MySchedule() {
         <>
           <SectionTitle title={t("swap.title")} palette={palette} />
           <Card palette={palette}>
-            <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("swap.pick")}</Text>
+            <Text style={{ color: palette.foreground, fontWeight: "500" }}>{t("swap.pick")}</Text>
             {colleagues.length === 0 && <Text style={{ color: palette.muted }}>{t("swap.none")}</Text>}
             {colleagues.map((person) => (
               <ListRow
@@ -231,7 +231,7 @@ export default function MySchedule() {
           {mine.map((swap) => (
             <Card key={swap.id} palette={palette}>
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ color: palette.foreground, fontWeight: "600", flexShrink: 1 }}>{t("swap.to", { name: swap.to_user_name })}</Text>
+                <Text style={{ color: palette.foreground, fontWeight: "500", flexShrink: 1 }}>{t("swap.to", { name: swap.to_user_name })}</Text>
                 <Badge label={t(`swap.status.${swap.status}`)} tone={SWAP_TONES[swap.status]} palette={palette} />
               </View>
               <Text style={{ color: palette.muted }}>{swapWhen(swap)}</Text>
@@ -258,7 +258,7 @@ export default function MySchedule() {
         requests.map((request) => (
           <Card key={request.id} palette={palette}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <Text style={{ color: palette.foreground, fontWeight: "600" }}>
+              <Text style={{ color: palette.foreground, fontWeight: "500" }}>
                 {request.starts_on === request.ends_on
                   ? dayLabel(request.starts_on)
                   : t("dates", { from: dayLabel(request.starts_on), to: dayLabel(request.ends_on) })}
