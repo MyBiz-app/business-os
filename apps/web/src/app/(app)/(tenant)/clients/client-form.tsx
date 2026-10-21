@@ -2,7 +2,6 @@
 
 import type { components } from "@business-os/api-client";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useActionState } from "react";
 
 import { AddressPicker } from "@/components/address-picker";
@@ -12,6 +11,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 import { ModalMarker } from "@/components/ui/route-modal";
 
 import type { ClientFormState } from "./actions";
+import { ButtonLink } from "@/components/ui/button";
 
 type Client = components["schemas"]["Client"];
 
@@ -57,9 +57,9 @@ export function ClientForm({ action, client, submitLabel, readOnly = false, bran
       {!readOnly && (
         <div className="form-actions flex items-center gap-4">
           <SubmitButton>{submitLabel}</SubmitButton>
-          <Link href="/clients" className="text-sm text-muted underline-offset-4 hover:underline">
+          <ButtonLink href="/clients" variant="quiet">
             {t("cancel")}
-          </Link>
+          </ButtonLink>
         </div>
       )}
     </form>

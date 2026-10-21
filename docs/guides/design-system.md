@@ -110,6 +110,10 @@ page Foundations). Quiet: hierarchy by size, not weight; hairlines instead of he
     and follows the reading direction (`bottom-start` aligns to the right edge in Hebrew). A click outside and Esc close it;
     the arrow keys move in a menu. Use these for every new menu; the older hand-made ones (`user-menu.tsx`, `more-menu.tsx`)
     move over in the page passes.
+  - `RecordLayout` and `RecordHeader` (W3-5): the Record page template. The header (`components/layout/record-header.tsx`:
+    picture, name, status badge, one quiet line, actions, a thin line of numbers) sits over underline tabs
+    (`components/record-layout.tsx`: every tab stays mounted, `#tab` in the address opens it) with an optional `aside` column
+    of fixed facts on wide screens. Clients and leads use it; staff, quotes and the like move over in their group's pass.
   - Already there, reuse: `Modal`, `ConfirmDialog`, `Sheet` (`placement="side"`), `Tour`, `SegmentedControl`, `Pill`,
     `SummaryTiles`. `DataTable` comes in W4-1.
 - Buttons: `btn-primary`, `btn-secondary`, `btn-danger` (visible buttons), `btn-ghost` (quiet

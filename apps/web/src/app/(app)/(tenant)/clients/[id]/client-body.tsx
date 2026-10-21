@@ -1,4 +1,4 @@
-import { CalendarCheck, CalendarClock, History, Mail, MapPin, MessageCircle, Phone, Star, UserX } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,10 +6,13 @@ import { notFound } from "next/navigation";
 import { AiScreen } from "../../ai-bubble/screen-context";
 import { Avatar } from "@/components/avatar";
 import { BackLink } from "@/components/back-link";
-import { Pill, type Tone } from "@/components/pill";
-import { RecordLayout } from "@/components/record-layout";
+import { Ltr } from "@/components/bidi";
+import { RecordHeader, type RecordStat } from "@/components/layout/record-header";
+import { Badge, type BadgeTone } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
+import { RecordLayout, type RecordTab } from "@/components/record-layout";
 import { ReviewsSummary } from "@/components/reviews-summary";
-import type { SectionNavItem } from "@/components/section-nav";
 import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
 import { canSell, canWriteClients } from "@/lib/permissions";
@@ -36,12 +39,12 @@ import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
 const RECENT = 8; // past visits shown before "show the whole history"
-const STATUS_TONE: Record<"booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled", Tone> = {
+const STATUS_TONE: Record<"booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled", BadgeTone> = {
   booked: "primary",
   waitlisted: "warning",
   checked_in: "success",
   no_show: "danger",
-  cancelled: "muted",
+  cancelled: "neutral",
 };
 
 function splitByNow<T extends { starts_at: string }>(bookings: T[]) {
@@ -110,12 +113,12 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
               <span dir="ltr">{formatTime(booking.starts_at, locale, tenant.time_zone)}</span>
             </span>
           </Link>
-          <Pill tone={booking.session_status === "cancelled" ? "muted" : STATUS_TONE[booking.status]}>
+          <Badge tone={booking.session_status === "cancelled" ? "neutral" : STATUS_TONE[booking.status]}>
             {booking.session_status === "cancelled"
               ? tBookings("sessionCancelled")
               : tBookings(`statuses.${booking.status}`)}
             {booking.late_cancel && ` · ${tBookings("lateCancel")}`}
-          </Pill>
+          </Badge>
         </li>
       ))}
     </ul>
@@ -128,120 +131,36 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
   const noShows = past.filter((b) => b.status === "no_show").length;
   const lastVisit = attended[0];
   const number = new Intl.NumberFormat(locale);
-  type Stat = { key: "visits" | "lastVisit" | "upcoming" | "noShows" | "rating"; Icon: typeof Star; value: string };
-  const stats: Stat[] = [
-    { key: "visits", Icon: CalendarCheck, value: number.format(attended.length) },
+  const stats: RecordStat[] = [
+    { key: "visits", label: t("profile.stats.visits"), value: number.format(attended.length) },
     {
       key: "lastVisit",
-      Icon: History,
+      label: t("profile.stats.lastVisit"),
       value: lastVisit
         ? new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: tenant.time_zone }).format(new Date(lastVisit.starts_at))
         : t("profile.never"),
     },
-    { key: "upcoming", Icon: CalendarClock, value: number.format(upcoming.filter((b) => b.status === "booked").length) },
-    { key: "noShows", Icon: UserX, value: number.format(noShows) },
+    { key: "upcoming", label: t("profile.stats.upcoming"), value: number.format(upcoming.filter((b) => b.status === "booked").length) },
+    { key: "noShows", label: t("profile.stats.noShows"), value: number.format(noShows) },
     ...(reviews.count > 0 && reviews.average !== null
-      ? [{ key: "rating" as const, Icon: Star, value: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reviews.average) }]
+      ? [{ key: "rating", label: t("profile.stats.rating"), value: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reviews.average) }]
       : []),
   ];
   // Time and monthly billing (#45): for industries that bill by time (their pack says so).
   const workSections = vertical(tenant.vertical)?.timeBilling ?? false;
   const whatsapp = client.phone ? whatsappLink(client.phone, tenant.time_zone) : null;
-
-  // The inner menu of the card, in the order the sections follow.
+  const tConsent = await getTranslations("clients.consent");
   const showPrivacy = !erased || reviews.count > 0;
-  const menu: SectionNavItem[] = [
-    { id: "details", label: t("nav.details") },
-    { id: "membership", label: t("nav.membership") },
-    { id: "paperwork", label: t("nav.paperwork") },
-    { id: "talk", label: t("nav.talk") },
-    ...(showPrivacy ? [{ id: "privacy", label: t("nav.privacy") }] : []),
-  ];
 
-  return (
-    <div className="flex flex-1 flex-col gap-6">
-      <AiScreen label={tBubble("screenClient", { name })} />
-      {!inModal && (
-        <BackLink href="/clients" label={t("back")} />
-      )}
-
-      <header className="card-accent flex flex-col gap-5 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-4">
-            <Avatar id={client.id} name={name} size="lg" />
-            <div className="flex min-w-0 flex-col gap-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 dir="auto" className="truncate text-3xl font-extrabold tracking-tight">{name}</h1>
-                <StatusBadge status={client.status} />
-                {client.is_staff && <Pill tone="primary">{t("staffBadge")}</Pill>}
-              </div>
-              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
-                <span>{t("joined", { date: joined })}</span>
-                {home && (
-                  <span className="flex items-center gap-1">
-                    <MapPin aria-hidden="true" className="size-3.5" />
-                    <UserText>{home.name}</UserText>
-                  </span>
-                )}
-              </p>
-            </div>
-          </div>
-          {!erased && (client.phone || client.email) && (
-            <nav aria-label={t("profile.contact")} className="flex flex-wrap gap-2">
-              {client.phone && (
-                <a href={`tel:${client.phone}`} className="btn-secondary px-3 py-2 text-sm">
-                  <Phone aria-hidden="true" className="size-4" /> {t("profile.call")}
-                </a>
-              )}
-              {whatsapp && (
-                <a href={whatsapp} target="_blank" rel="noreferrer" className="btn-secondary px-3 py-2 text-sm">
-                  <MessageCircle aria-hidden="true" className="size-4" /> WhatsApp
-                </a>
-              )}
-              {client.email && (
-                <a href={`mailto:${client.email}`} className="btn-secondary px-3 py-2 text-sm">
-                  <Mail aria-hidden="true" className="size-4" /> {t("profile.email")}
-                </a>
-              )}
-            </nav>
-          )}
-        </div>
-        {!erased && client.email_suppressed && (
-          <p role="status" className="rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-muted">
-            {t("profile.emailUnreachable")}
-          </p>
-        )}
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {stats.map(({ key, Icon, value }) => (
-            <li key={key} className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3">
-              <span aria-hidden="true" className="icon-tile size-9">
-                <Icon className="size-4" />
-              </span>
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-xs text-muted">{t(`profile.stats.${key}`)}</span>
-                <span className="truncate text-lg font-bold">{value}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </header>
-
-      {client.erased_at && (
-        <p role="status" className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">
-          {tPrivacy("erasedOn", {
-            date: new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: tenant.time_zone }).format(
-              new Date(client.erased_at),
-            ),
-          })}
-        </p>
-      )}
-
-      <RecordLayout items={menu} label={t("nav.label")} menu={!inModal}>
-        <div id="details" className="flex flex-col gap-6">
-          <section aria-labelledby="details-heading" className="card p-6">
-            <h2 id="details-heading" className="mb-4 text-lg font-semibold">
-              {t("details")}
-            </h2>
+  // The tabs of the card, in the order a person works through it.
+  const tabs: RecordTab[] = [
+    {
+      id: "details",
+      label: t("nav.details"),
+      content: (
+        <>
+          <Card as="section" aria-labelledby="details-heading">
+            <CardHeader title={t("details")} titleId="details-heading" />
             <ClientForm
               action={updateClient.bind(null, client.id)}
               client={client}
@@ -249,25 +168,30 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
               readOnly={!writable}
               branches={branches}
             />
-          </section>
+          </Card>
 
           <DependentsSection clientId={client.id} context={context} locked={erased} />
 
           <AddressesSection clientId={client.id} context={context} locked={erased} />
 
           <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
-        </div>
-
-        <div id="membership" className="flex flex-col gap-6">
+        </>
+      ),
+    },
+    {
+      id: "membership",
+      label: t("nav.membership"),
+      content: (
+        <>
           <PlansSection clientId={client.id} context={context} locked={erased} />
 
-          <section aria-labelledby="bookings-heading" className="flex flex-col gap-4 card p-6">
+          <Card as="section" aria-labelledby="bookings-heading" className="flex flex-col gap-4">
             <h2 id="bookings-heading" className="text-lg font-semibold">
               {tBookings("title")}
             </h2>
             {bookings.length === 0 && <p className="text-sm text-muted">{tBookings("noneYet")}</p>}
             {waivers && waivers.items.length > 0 && (
-              <CollapsibleSection variant="inline" className="rounded-xl bg-primary/5 p-3 text-sm" triggerClassName="font-medium text-primary-ink" title={tBookings("waive.thisYear", { count: waivers.this_year })}>
+              <CollapsibleSection variant="inline" className="rounded-xl bg-primary-subtle p-3 text-sm" triggerClassName="font-medium text-primary-ink" title={tBookings("waive.thisYear", { count: waivers.this_year })}>
                 <ul className="flex flex-col gap-1 text-muted">
                   {waivers.items.map((item) => (
                     <li key={item.booking_id}>
@@ -296,18 +220,28 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
                 )}
               </div>
             )}
-          </section>
-        </div>
-
-        <div id="paperwork" className="flex flex-col gap-6">
+          </Card>
+        </>
+      ),
+    },
+    {
+      id: "paperwork",
+      label: t("nav.paperwork"),
+      content: (
+        <>
           <QuotesSection clientId={client.id} context={context} locked={erased} />
 
           {workSections && <TimeSection clientId={client.id} context={context} locked={erased} />}
 
           <DocumentsSection clientId={client.id} context={context} locked={erased} />
-        </div>
-
-        <div id="talk" className="flex flex-col gap-6">
+        </>
+      ),
+    },
+    {
+      id: "talk",
+      label: t("nav.talk"),
+      content: (
+        <>
           <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
 
           <MessagesSection
@@ -317,31 +251,151 @@ export async function ClientBody({ id, inModal = false }: { id: string; inModal?
             context={context}
             locked={erased}
           />
-        </div>
+        </>
+      ),
+    },
+    ...(showPrivacy
+      ? [
+          {
+            id: "privacy",
+            label: t("nav.privacy"),
+            content: (
+              <>
+                {!erased && <ConsentSection clientId={client.id} consent={client.marketing_consent} optedOut={client.marketing_opted_out_at != null} events={consentEvents} canWrite={canWriteClients(tenant)} />}
 
-        {showPrivacy && (
-          <div id="privacy" className="flex flex-col gap-6">
-            {!erased && <ConsentSection clientId={client.id} consent={client.marketing_consent} optedOut={client.marketing_opted_out_at != null} events={consentEvents} canWrite={canWriteClients(tenant)} />}
+                {!erased && tenant.client_id_number !== "off" && <IdentitySection clientId={client.id} />}
 
-            {!erased && tenant.client_id_number !== "off" && <IdentitySection clientId={client.id} />}
+                {!erased && tenant.requires_health_declaration && <HealthSection clientId={client.id} context={context} />}
 
-            {!erased && tenant.requires_health_declaration && <HealthSection clientId={client.id} context={context} />}
+                {reviews.count > 0 && (
+                  <ReviewsSummary
+                    summary={reviews}
+                    locale={locale}
+                    timeZone={tenant.time_zone}
+                    title={tReviews("clientTitle")}
+                    withClients={false}
+                    withGroups={false}
+                  />
+                )}
 
-            {reviews.count > 0 && (
-              <ReviewsSummary
-                summary={reviews}
-                locale={locale}
-                timeZone={tenant.time_zone}
-                title={tReviews("clientTitle")}
-                withClients={false}
-                withGroups={false}
-              />
-            )}
+                {!erased && tenant.permissions.includes("clients.privacy") && <PrivacySection clientId={client.id} name={name} />}
+              </>
+            ),
+          },
+        ]
+      : []),
+  ];
 
-            {!erased && tenant.permissions.includes("clients.privacy") && <PrivacySection clientId={client.id} name={name} />}
+  // Fixed facts at a glance, beside the tabs on a wide page (a window over the list has no room for it).
+  const aside = inModal ? undefined : (
+    <Card as="section" aria-labelledby="glance-heading">
+      <CardHeader title={t("glance")} titleId="glance-heading" className="mb-3" />
+      <dl className="flex flex-col gap-3 text-sm">
+        {!erased && client.phone && (
+          <div className="flex flex-col gap-0.5">
+            <dt className="text-xs text-muted">{t("phone")}</dt>
+            <dd>
+              <Ltr>{client.phone}</Ltr>
+            </dd>
           </div>
         )}
-      </RecordLayout>
+        {!erased && client.email && (
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <dt className="text-xs text-muted">{t("email")}</dt>
+            <dd className="truncate">
+              <Ltr>{client.email}</Ltr>
+            </dd>
+          </div>
+        )}
+        {home && (
+          <div className="flex flex-col gap-0.5">
+            <dt className="text-xs text-muted">{t("homeBranch")}</dt>
+            <dd>
+              <UserText>{home.name}</UserText>
+            </dd>
+          </div>
+        )}
+        {!erased && (
+          <div className="flex flex-col gap-1">
+            <dt className="text-xs text-muted">{tConsent("title")}</dt>
+            <dd>
+              <Badge tone={client.marketing_consent ? "success" : "neutral"} dot>
+                {client.marketing_consent ? tConsent("on") : tConsent("off")}
+              </Badge>
+            </dd>
+          </div>
+        )}
+      </dl>
+    </Card>
+  );
+
+  return (
+    <div className="flex flex-1 flex-col gap-6">
+      <AiScreen label={tBubble("screenClient", { name })} />
+      {!inModal && <BackLink href="/clients" label={t("back")} />}
+
+      <RecordHeader
+        avatar={<Avatar id={client.id} name={name} size="lg" />}
+        name={name}
+        inModal={inModal}
+        badges={
+          <>
+            <StatusBadge status={client.status} />
+            {client.is_staff && <Badge tone="primary">{t("staffBadge")}</Badge>}
+          </>
+        }
+        subtitle={
+          <>
+            <span>{t("joined", { date: joined })}</span>
+            {home && (
+              <span className="flex items-center gap-1">
+                <MapPin aria-hidden="true" className="size-3.5" />
+                <UserText>{home.name}</UserText>
+              </span>
+            )}
+          </>
+        }
+        actions={
+          !erased && (client.phone || client.email) ? (
+            <nav aria-label={t("profile.contact")} className="flex flex-wrap items-center gap-2">
+              {client.phone && (
+                <ButtonLink href={`tel:${client.phone}`} variant="secondary">
+                  <Phone aria-hidden="true" className="size-4" /> {t("profile.call")}
+                </ButtonLink>
+              )}
+              {whatsapp && (
+                <ButtonLink href={whatsapp} target="_blank" rel="noreferrer" variant="secondary">
+                  <MessageCircle aria-hidden="true" className="size-4" /> WhatsApp
+                </ButtonLink>
+              )}
+              {client.email && (
+                <ButtonLink href={`mailto:${client.email}`} variant="secondary">
+                  <Mail aria-hidden="true" className="size-4" /> {t("profile.email")}
+                </ButtonLink>
+              )}
+            </nav>
+          ) : undefined
+        }
+        stats={stats}
+      />
+
+      {!erased && client.email_suppressed && (
+        <p role="status" className="rounded-xl border border-border bg-warning-soft px-4 py-3 text-sm">
+          {t("profile.emailUnreachable")}
+        </p>
+      )}
+
+      {client.erased_at && (
+        <p role="status" className="rounded-xl border border-border bg-surface px-4 py-3 text-sm">
+          {tPrivacy("erasedOn", {
+            date: new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: tenant.time_zone }).format(
+              new Date(client.erased_at),
+            ),
+          })}
+        </p>
+      )}
+
+      <RecordLayout tabs={tabs} label={t("nav.label")} aside={aside} />
     </div>
   );
 }

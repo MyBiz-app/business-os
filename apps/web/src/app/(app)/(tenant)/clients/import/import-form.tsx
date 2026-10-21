@@ -1,12 +1,13 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useId, useState, useTransition } from "react";
 
 import { FileField } from "@/components/form/file-field";
 
 import { runImport, type ImportField, type ImportResult, type ImportState } from "./actions";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 const FIELDS: ImportField[] = [
   "first_name",
@@ -71,16 +72,12 @@ export function ImportForm() {
           <p className="text-sm text-muted">{t("doneSkipped", { count: result.duplicates + result.invalid })}</p>
         )}
         <div className="flex flex-wrap gap-4">
-          <Link href="/clients" className="text-primary-ink underline-offset-4 hover:underline">
+          <ButtonLink href="/clients" variant="primary">
             {t("viewClients")}
-          </Link>
-          <button
-            type="button"
-            onClick={() => choose(null)}
-            className="btn-link text-primary-ink underline-offset-4 hover:underline"
-          >
+          </ButtonLink>
+          <Button variant="secondary" onClick={() => choose(null)}>
             {t("importMore")}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -88,7 +85,7 @@ export function ImportForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="flex flex-col gap-3 card p-6">
+      <Card as="section" className="flex flex-col gap-3">
         <FileField
           label={t("file")}
           hint={t("fileHint")}
@@ -101,15 +98,15 @@ export function ImportForm() {
           </p>
         )}
         {error && (
-          <p role="alert" className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger">
+          <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
             {t(`errors.${error}`)}
           </p>
         )}
-      </section>
+      </Card>
 
       {result && file && (
         <>
-          <section aria-labelledby="columns-heading" className="flex flex-col gap-4 card p-6">
+          <Card as="section" aria-labelledby="columns-heading" className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <h2 id="columns-heading" className="text-lg font-semibold">
                 {t("columns")}
@@ -146,9 +143,9 @@ export function ImportForm() {
                 </li>
               ))}
             </ul>
-          </section>
+          </Card>
 
-          <section aria-labelledby="preview-heading" className="flex flex-col gap-4 card p-6">
+          <Card as="section" aria-labelledby="preview-heading" className="flex flex-col gap-4">
             <h2 id="preview-heading" className="text-lg font-semibold">
               {t("preview")}
             </h2>
@@ -203,17 +200,11 @@ export function ImportForm() {
               </select>
             </div>
             <div>
-              <button
-                type="button"
-                disabled={pending || result.ready === 0}
-                aria-busy={pending}
-                onClick={() => send(file, result.mapping, true)}
-                className="btn-primary px-4 py-2.5"
-              >
+              <Button variant="primary" disabled={result.ready === 0} pending={pending} onClick={() => send(file, result.mapping, true)}>
                 {t("import", { count: result.ready })}
-              </button>
+              </Button>
             </div>
-          </section>
+          </Card>
         </>
       )}
     </div>

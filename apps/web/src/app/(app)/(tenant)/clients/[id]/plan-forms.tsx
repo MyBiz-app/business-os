@@ -9,6 +9,7 @@ import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import type { PlanFormState } from "./plan-actions";
+import { Button } from "@/components/ui/button";
 
 type Action = (state: PlanFormState, formData: FormData) => Promise<PlanFormState>;
 
@@ -121,9 +122,9 @@ export function EndFreezeButton({ action }: { action: (state: PlanFormState) => 
   return (
     <form action={formAction} className="inline-flex flex-col gap-1">
       <Feedback state={state} savedMessage={t("endEarlyDone")} />
-      <button type="submit" className="btn-link text-start text-sm text-primary-ink underline-offset-4 hover:underline">
+      <Button type="submit" variant="quiet" className="text-primary-ink">
         {t("endEarly")}
-      </button>
+      </Button>
     </form>
   );
 }

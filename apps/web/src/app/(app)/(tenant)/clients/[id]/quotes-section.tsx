@@ -2,12 +2,15 @@ import { FileSignature, Plus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-import { Pill } from "@/components/pill";
+import { badgeToneOf } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import type { getTenant } from "@/lib/tenant";
 
 import { STATUS_TONE } from "../../quotes/status";
+import { Card } from "@/components/ui/card";
+import { ButtonLink } from "@/components/ui/button";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 
@@ -21,16 +24,16 @@ export async function QuotesSection({ clientId, context, locked }: { clientId: s
   const locale = await getLocale();
 
   return (
-    <section aria-labelledby="quotes-heading" className="flex flex-col gap-3 card p-6">
+    <Card as="section" aria-labelledby="quotes-heading" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="quotes-heading" className="flex items-center gap-2 text-lg font-semibold">
           <FileSignature aria-hidden="true" className="size-5 text-primary-ink" />
           {t("title")}
         </h2>
         {canSell && (
-          <Link href={`/quotes/new?client=${clientId}`} className="btn-secondary px-3 py-1.5 text-sm">
+          <ButtonLink href={`/quotes/new?client=${clientId}`} variant="secondary">
             <Plus aria-hidden="true" className="size-4" /> {t("new")}
-          </Link>
+          </ButtonLink>
         )}
       </div>
       {quotes.length === 0 ? (
@@ -43,13 +46,13 @@ export async function QuotesSection({ clientId, context, locked }: { clientId: s
                 <span dir="auto">#{quote.number} · {quote.title}</span>
                 <span className="flex items-center gap-2 text-sm">
                   <span className="tabular-nums">{formatMoney(quote.total, quote.currency, locale)}</span>
-                  <Pill tone={STATUS_TONE[quote.status]}>{t(`statuses.${quote.status}`)}</Pill>
+                  <Badge tone={badgeToneOf(STATUS_TONE[quote.status])}>{t(`statuses.${quote.status}`)}</Badge>
                 </span>
               </Link>
             </li>
           ))}
         </ul>
       )}
-    </section>
+    </Card>
   );
 }

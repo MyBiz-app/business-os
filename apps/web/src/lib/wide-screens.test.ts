@@ -42,8 +42,8 @@ describe("wide-screen policy", () => {
     assert.ok(!read("app/(app)/(tenant)/clients/[id]/client-body.tsx").includes("min-[120rem]:grid-cols"));
   });
 
-  it("adds columns to the staff card from 1920px and keeps six dashboard tiles in a row", () => {
+  it("adds columns to the staff card from 1920px and keeps the four dashboard numbers in one row", () => {
     assert.ok(read("app/(app)/(tenant)/team/[userId]/card-sections.tsx").includes("min-[120rem]:grid-cols-3"));
-    assert.ok(read("app/(app)/(tenant)/dashboard/page.tsx").includes("2xl:grid-cols-6"));
+    assert.ok(read("app/(app)/(tenant)/dashboard/page.tsx").includes("lg:grid-cols-4"));
   });
 });
