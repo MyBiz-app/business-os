@@ -4,6 +4,7 @@ node_modules/
 
 # Build output
 apps/web/public/maplibre/
+apps/client-app/public/maplibre/
 .next/
 out/
 dist/

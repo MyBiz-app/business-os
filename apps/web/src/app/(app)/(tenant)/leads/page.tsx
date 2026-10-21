@@ -18,7 +18,9 @@ import { canWriteClients } from "@/lib/permissions";
 import { getCrm } from "./crm";
 import { CopyLink } from "./copy-link";
 import { SOURCES } from "./sources";
+import { BoardProvider, DraggableCard, StageDrop } from "./board";
 import { StageFilter } from "./stage-filter";
+import { SavedViews } from "@/components/saved-views";
 
 type Lead = components["schemas"]["Lead"];
 type Stage = Lead["stage"];
@@ -79,6 +81,8 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
     query.set("pages", String(pages + 1));
     return `/leads?${query}`;
   })();
+  const canMove = canWriteClients(tenant);
+  const stageOptions = STAGES.map((value) => ({ value, label: t(`stages.${value}`) }));
   const inquiryLink = `${await siteOrigin()}/inquiry/${tenant.join_code}`;
   const rate = board.conversion_rate === null ? "-" : `${Math.round(board.conversion_rate * 100)}%`;
   const tiles = [
@@ -147,6 +151,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
           <Button type="submit" variant="secondary">
             {t("filter")}
           </Button>
+          <SavedViews storageKey={`views:${tenant.id}:leads`} basePath="/leads" />
         </form>
         <CopyLink link={inquiryLink} label={t("inquiryLink")} copy={t("copy")} copied={t("copied")} />
       </div>
@@ -163,13 +168,14 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
       )}
 
       {/* Scrolls sideways on narrow screens; focusable so keyboard users can scroll it too. */}
+      <BoardProvider>
       <div role="region" aria-label={t("pipeline")} tabIndex={0} className="overflow-x-auto pb-2">
         <div className="grid auto-cols-[15rem] grid-flow-col gap-3 lg:auto-cols-fr">
           {shownStages.map((stage) => {
             const leads = board.items.filter((lead) => lead.stage === stage);
             const headingId = `stage-${stage}`;
             return (
-              <section key={stage} aria-labelledby={headingId} className="flex flex-col gap-2 rounded-xl bg-subtle p-2">
+              <StageDrop key={stage} stage={stage} canMove={canMove} aria-labelledby={headingId} className="flex flex-col gap-2 rounded-xl bg-subtle p-2 transition-shadow">
                 <div className="flex items-center justify-between px-2 pt-1">
                   <h2 id={headingId} className="flex items-center gap-2 text-sm font-semibold">
                     <span aria-hidden="true" className={`size-2 rounded-full ${STAGE_BAR[stage]}`} />
@@ -188,6 +194,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
                       const due = lead.follow_up_on && !["won", "lost"].includes(stage) && lead.follow_up_on <= today;
                       return (
                         <li key={lead.id}>
+<DraggableCard leadId={lead.id} stage={stage} stages={stageOptions} canMove={canMove} name={name}>
 <CardTransition name={`lead-${lead.id}`}>
                           <Link
                             href={`/leads/${lead.id}`}
@@ -213,16 +220,18 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
                             </span>
                           </Link>
 </CardTransition>
+</DraggableCard>
                         </li>
                       );
                     })}
                   </ol>
                 )}
-              </section>
+              </StageDrop>
             );
           })}
         </div>
       </div>
+      </BoardProvider>
     </Container>
   );
 }

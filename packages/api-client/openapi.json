@@ -1730,6 +1730,24 @@
             "description": "only: team members who are also clients; exclude: leave them out"
           },
           {
+            "name": "city_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Living in this city: the city on the record, else the latest address",
+              "title": "City Code"
+            },
+            "description": "Living in this city: the city on the record, else the latest address"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -35331,6 +35349,98 @@
         }
       }
     },
+    "/metrics/map-insights": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Map Insights By City",
+        "description": "Clients and leads by city, for the insights map. Inside the business there is no minimum\ncount. Only for someone who works in every branch (clients belong to the whole business).",
+        "operationId": "map_insights_by_city",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date",
+              "title": "Start"
+            },
+            "description": "First local date"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Last local date (inclusive)",
+              "title": "End"
+            },
+            "description": "Last local date (inclusive)"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapInsightsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/reviews": {
       "get": {
         "tags": [
@@ -66689,6 +66799,73 @@
         ],
         "title": "LoginDevice"
       },
+      "MapAreaOut": {
+        "properties": {
+          "city_code": {
+            "type": "integer",
+            "title": "City Code"
+          },
+          "city_name": {
+            "type": "string",
+            "title": "City Name"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "The city's centre; none when it is not known"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "clients": {
+            "type": "integer",
+            "title": "Clients",
+            "description": "Clients living there now"
+          },
+          "new_clients": {
+            "type": "integer",
+            "title": "New Clients",
+            "description": "Of them, joined in the period"
+          },
+          "leads": {
+            "type": "integer",
+            "title": "Leads",
+            "description": "Leads from there that arrived in the period"
+          },
+          "leads_won": {
+            "type": "integer",
+            "title": "Leads Won",
+            "description": "Of those leads, the ones won"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_code",
+          "city_name",
+          "latitude",
+          "longitude",
+          "clients",
+          "new_clients",
+          "leads",
+          "leads_won"
+        ],
+        "title": "MapAreaOut"
+      },
       "MapCity": {
         "properties": {
           "city_code": {
@@ -66756,6 +66933,44 @@
           "total"
         ],
         "title": "MapIndustry"
+      },
+      "MapInsightsOut": {
+        "properties": {
+          "clients_total": {
+            "type": "integer",
+            "title": "Clients Total"
+          },
+          "clients_without_city": {
+            "type": "integer",
+            "title": "Clients Without City"
+          },
+          "leads_total": {
+            "type": "integer",
+            "title": "Leads Total",
+            "description": "Leads that arrived in the period"
+          },
+          "leads_without_city": {
+            "type": "integer",
+            "title": "Leads Without City"
+          },
+          "areas": {
+            "items": {
+              "$ref": "#/components/schemas/MapAreaOut"
+            },
+            "type": "array",
+            "title": "Areas",
+            "description": "Every city with a client or a lead, no minimum; counts only, no people"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clients_total",
+          "clients_without_city",
+          "leads_total",
+          "leads_without_city",
+          "areas"
+        ],
+        "title": "MapInsightsOut"
       },
       "MarkRead": {
         "properties": {

@@ -697,7 +697,8 @@
       "aiTeam": "Team",
       "aiTasks": "Tasks"
     },
-    "branchMap": "Branch map"
+    "branchMap": "Branch map",
+    "insightsMap": "Insights map"
   },
   "terms": {
     "fitness": {
@@ -1037,7 +1038,8 @@
     "city": "City",
     "cityHint": "Where the client comes from. It helps you see where your clients live.",
     "clearFilters": "Clear filters",
-    "glance": "At a glance"
+    "glance": "At a glance",
+    "cityChip": "City: {city}"
   },
   "common": {
     "undo": "Undo",
@@ -1940,6 +1942,14 @@
       }
     },
     "homeCards": {
+      "nearMe": "Branch near me",
+      "nearMeDenied": "Location is off for this app, so we can't find the nearest branch.",
+      "nearMeUnavailable": "Couldn't find where you are right now.",
+      "nearestAway": "Nearest, {distance} away",
+      "away": "{distance} away",
+      "meters": "{value} m",
+      "kilometers": "{value} km",
+      "mapLabel": "Map of the branches",
       "nothingBooked": "Nothing booked yet.",
       "bookNow": "Book now",
       "navigate": "Navigate",
@@ -5974,7 +5984,9 @@
     "pipeline": "Lead pipeline",
     "viewShowing": "Showing {view}: {count}",
     "viewClear": "Show all leads",
-    "cityHint": "Recommended: it shows where your leads come from."
+    "cityHint": "Recommended: it shows where your leads come from.",
+    "moveTo": "Move {name} to another stage",
+    "moveFailed": "Could not move the lead. Try again."
   },
   "inquiry": {
     "title": "Get in touch · {name}",
@@ -11030,5 +11042,85 @@
       "recorded": "If you do not come, it is noted but does not count as a visit you used."
     },
     "limit": "After {n} missed visits in a month, booking from the app is paused until you contact the business."
+  },
+  "insightsMap": {
+    "title": "Insights map",
+    "subtitle": "Where your clients and leads are, {from} to {to}. Counts only, no names.",
+    "mapLabel": "Map of where clients and leads are",
+    "failed": "The map could not be loaded. Try again in a moment.",
+    "empty": "Nothing to show yet: add a city to your clients, leads or branches and they appear here.",
+    "branchOnly": "The map covers the whole business, so it is for people who work in every branch.",
+    "cards": {
+      "label": "Numbers beside the map",
+      "clients": "Clients",
+      "leads": "New leads",
+      "withoutCity": "{count} with no city",
+      "within": "Within {km} km of a branch",
+      "withinHint": "{count, plural, one {# client} other {# clients}}",
+      "noBranch": "Add a branch with a point on the map",
+      "whiteSpots": "White spots",
+      "whiteSpotsHint": "Cities with leads and no branch within {km} km"
+    },
+    "layers": {
+      "label": "Map layers",
+      "branches": "Branches",
+      "clients": "Clients",
+      "leads": "Leads",
+      "reach": "Reach"
+    },
+    "reach": {
+      "branch": "Around",
+      "all": "All branches",
+      "ring": "{km} km"
+    },
+    "legend": {
+      "label": "Legend",
+      "clients": "Clients (size = how many)",
+      "leads": "Leads",
+      "branches": "Branches"
+    },
+    "panel": {
+      "close": "Close",
+      "clients": "{count, plural, one {# client} other {# clients}}, {fresh} new in the period",
+      "leads": "{count, plural, one {# lead} other {# leads}}, {won} won",
+      "open": "Open these clients"
+    },
+    "top": {
+      "title": "Top cities by clients",
+      "empty": "No clients with a city yet.",
+      "row": "{count} ({share})"
+    },
+    "white": {
+      "title": "White spots",
+      "hint": "Leads from cities with no branch within {km} km.",
+      "empty": "Every city with leads has a branch nearby.",
+      "row": "{leads, plural, one {# lead} other {# leads}}"
+    },
+    "conversion": {
+      "title": "Leads won by city",
+      "empty": "No leads in this period.",
+      "row": "{won} of {leads} ({rate})"
+    },
+    "table": {
+      "show": "Show as a table",
+      "city": "City",
+      "clients": "Clients",
+      "newClients": "New clients",
+      "leads": "Leads",
+      "won": "Leads won"
+    }
+  },
+  "tableViews": {
+    "saved": "Saved views",
+    "save": "Save this view",
+    "name": "View name",
+    "namePlaceholder": "For example: absent for 30 days",
+    "saveButton": "Save",
+    "none": "No saved views yet. Set the filters you want and save them here.",
+    "remove": "Delete view {name}",
+    "columns": "Columns",
+    "columnsLabel": "Choose columns",
+    "reset": "Show all columns",
+    "devicenote": "Views are saved on this device."
   }
 }
