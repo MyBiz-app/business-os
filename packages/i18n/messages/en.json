@@ -1107,11 +1107,7 @@
     "backToList": "Choose from the list",
     "noResults": "No results",
     "chooseCity": "Choose a city from the list",
-    "chooseStreet": "Choose a street from the list",
-    "reminder": {
-      "text": "Complete your home address: city, street and house number.",
-      "action": "Fill in the address"
-    }
+    "chooseStreet": "Choose a street from the list"
   },
   "branchMap": {
     "title": "Branches map",
@@ -10188,13 +10184,16 @@
       "factorLabel": "Authenticator {number}",
       "requiredTeam": "Everyone on the MyBiz team must use two-step sign-in. Turn it on to continue.",
       "requiredBusiness": "This business requires two-step sign-in. Turn it on to continue.",
-      "warning": "Two-step sign-in is off for your account. We strongly recommend turning it on: without it, anyone who learns your password can reach your business data.",
-      "warningAcknowledged": "Two-step sign-in is still off. Turn it on to protect your business.",
       "riskTitle": "Working without two-step sign-in",
-      "riskBody": "Two-step sign-in is your choice, but we strongly recommend it. Without it, anyone who learns your password can see client data, pay details and settings, and act in your name. By continuing without it you confirm that you understand this risk and that keeping your account secure is your responsibility.",
-      "riskConfirm": "I understand the risk, continue without it",
+      "riskBody": "Two-step sign-in is your choice, but we strongly recommend it. Without it, anyone who learns your password can see client data, ID numbers, pay details and settings, export data and act in your name. By continuing without it you confirm that you have read this warning, that you understand the risk, and that keeping your password safe is your responsibility. We keep a record of this confirmation (date and time, address and browser). You can turn on two-step sign-in at any time under My account, Security.",
+      "riskConfirm": "Continue without two-step sign-in",
       "riskDone": "Saved. You can turn on two-step sign-in at any time.",
-      "requiredAck": "To continue, turn on two-step sign-in or confirm that you understand the risk of working without it."
+      "riskCheck": "I have read the warning and understand the risk",
+      "riskEnableInstead": "Turn it on instead",
+      "riskActionHint": "This action needs two-step sign-in, or your confirmation that you understand the risk of working without it. After confirming, repeat the action.",
+      "riskDecline": "I don't want two-step sign-in",
+      "riskError": "Saving the confirmation failed. Try again.",
+      "riskChosen": "You chose to work without two-step sign-in. You can turn it on at any time."
     },
     "challenge": {
       "title": "Enter your code",
@@ -10231,9 +10230,31 @@
       "when": "When"
     }
   },
-  "noticeStack": {
-    "summary": "{count, plural, one {# thing is waiting for you} other {# things are waiting for you}}",
-    "toggle": "Things waiting for you"
+  "accountStatus": {
+    "dotLabel": "{count, plural, one {# thing to complete in your account} other {# things to complete in your account}}",
+    "menuTitle": "Account status",
+    "cardTitle": "{count, plural, one {One thing worth completing} other {# things worth completing}}",
+    "cardHint": "Only you see this. Take care of it now or later.",
+    "close": "Close",
+    "error": "Something went wrong. Try again.",
+    "mfa": {
+      "title": "Two-step sign-in is off",
+      "text": "A code from your phone on top of your password keeps your business safe even if the password leaks.",
+      "enable": "Turn on now (2 minutes)",
+      "snooze": "Remind me in a week",
+      "decline": "I don't want two-step sign-in"
+    },
+    "mfaRequired": {
+      "title": "Turn on two-step sign-in",
+      "text": "Everyone on the MyBiz team must use two-step sign-in.",
+      "enable": "Turn on now"
+    },
+    "address": {
+      "title": "Add your home address",
+      "text": "Optional. Your business may need it for payroll forms (Form 101).",
+      "fill": "Fill in",
+      "skip": "Skip"
+    }
   },
   "legalUpdate": {
     "title": "We updated our terms",

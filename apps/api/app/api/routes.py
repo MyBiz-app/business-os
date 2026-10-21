@@ -278,6 +278,7 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
                        (city_code IS NOT NULL AND (street_code IS NOT NULL
                                                    OR street_unlisted IS NOT NULL)
                         AND house_number IS NOT NULL) AS address_complete,
+                       address_reminder_skipped_at IS NOT NULL AS address_reminder_skipped,
                        marketing_consent_at IS NOT NULL AS marketing_consent, palette,
                        CASE WHEN palette_background IS NULL THEN NULL
                             ELSE jsonb_build_object('background', palette_background,

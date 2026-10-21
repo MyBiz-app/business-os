@@ -162,6 +162,7 @@ ROUTERS: list[APIRouter] = [
     people.router,
     devices.router,
     devices.policy_router,
+    devices.reminders_router,
     push_tokens.router,
     tours.router,
     broadcasts.router,

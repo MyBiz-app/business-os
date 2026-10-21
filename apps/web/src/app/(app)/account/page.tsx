@@ -95,7 +95,7 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
             <SecuritySettings
               factors={(factorList?.totp ?? []).map((f) => ({ id: f.id, createdAt: f.created_at }))}
               devices={(devices ?? []).map((d) => ({ id: d.id, label: d.label, lastSeenAt: d.last_seen_at, current: d.current }))}
-              required={mfa === "required" ? (me.platform_admin ? "team" : "business") : mfa === "ack" ? "ack" : null}
+              required={mfa === "required" ? (me.platform_admin ? "team" : "business") : null}
               riskOptional={!me.platform_admin && Boolean(policy?.mfa_enforced)}
               riskAcknowledged={policy?.mfa_risk_acknowledged ?? false}
             />

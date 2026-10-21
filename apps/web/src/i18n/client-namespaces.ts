@@ -29,6 +29,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "settings"
   ],
   "tenant": [
+    "accountStatus",
     "address",
     "aiBubble",
     "aiTeam",
@@ -78,6 +79,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "resources",
     "roles",
     "schedule",
+    "security",
     "services",
     "settings",
     "shiftSwapQueue",
@@ -115,6 +117,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
   "app": [
     "accessibility",
     "account",
+    "accountStatus",
     "address",
     "aiBubble",
     "aiTeam",
@@ -130,7 +133,6 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "locales",
     "modules",
     "nav",
-    "noticeStack",
     "onboarding",
     "platform",
     "security",
@@ -144,6 +146,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
   "root": [
     "accessibility",
     "account",
+    "accountStatus",
     "address",
     "app",
     "appearance",
@@ -161,11 +164,11 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "marketing",
     "modules",
     "nav",
-    "noticeStack",
     "period",
     "permissions",
     "platform",
     "quotes",
+    "security",
     "settings",
     "start",
     "team",

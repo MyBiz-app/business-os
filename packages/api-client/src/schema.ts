@@ -3886,7 +3886,8 @@ export interface paths {
         };
         /**
          * Security Policy
-         * @description What the apps tell people about two-step sign-in (the banner for owners and managers).
+         * @description What the apps tell people about two-step sign-in (the account status of owners and
+         *     managers).
          */
         get: operations["security_policy"];
         put?: never;
@@ -3909,9 +3910,52 @@ export interface paths {
         /**
          * Acknowledge Mfa Risk
          * @description The person read the warning about working without two-step sign-in and understands the
-         *     risk. Kept with the time and address, and shown in the audit log of their businesses.
+         *     risk. Kept with the time, address, browser, version of the text and screen, and shown in the
+         *     audit log of their businesses. The apps then stop reminding them.
          */
         post: operations["acknowledge_mfa_risk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/reminders/mfa/snooze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Snooze Mfa Reminder
+         * @description "Remind me in a week": the account status leaves two-step sign-in out for seven days.
+         *     Sensitive actions still ask for the code or the confirmed warning.
+         */
+        post: operations["snooze_mfa_reminder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/reminders/address/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Skip Address Reminder
+         * @description The home address is optional: "skip" stops the reminder. It can be filled in at any time
+         *     in the account settings, and is asked for again only where it is needed (form 101).
+         */
+        post: operations["skip_address_reminder"];
         delete?: never;
         options?: never;
         head?: never;
@@ -17260,6 +17304,12 @@ export interface components {
              */
             address_complete: boolean;
             /**
+             * Address Reminder Skipped
+             * @description The person chose to skip the home address reminder
+             * @default false
+             */
+            address_reminder_skipped: boolean;
+            /**
              * Email Roster
              * @description Email the person when their roster is published
              * @default true
@@ -20596,6 +20646,16 @@ export interface components {
             /** Latest */
             latest: components["schemas"]["ReviewItem"][];
         };
+        /** RiskAcknowledgement */
+        RiskAcknowledgement: {
+            /**
+             * Source
+             * @description Where the person confirmed: security settings, the "I don't want two-step sign-in" choice, or the window of a refused sensitive action
+             * @default settings
+             * @enum {string}
+             */
+            source: "settings" | "opt_out" | "sensitive_action";
+        };
         /** RoleFields */
         RoleFields: {
             /** Name */
@@ -21255,9 +21315,14 @@ export interface components {
             mfa_required_now: boolean;
             /**
              * Mfa Risk Acknowledged
-             * @description The person confirmed they understand the risk of working without a code
+             * @description The person confirmed they understand the risk of working without a code (also their answer "I don't want two-step sign-in": no more reminders)
              */
             mfa_risk_acknowledged: boolean;
+            /**
+             * Mfa Reminder Snoozed Until
+             * @description "Remind me in a week": no reminder before this time
+             */
+            mfa_reminder_snoozed_until?: string | null;
         };
         /** SeenTours */
         SeenTours: {
@@ -33704,6 +33769,55 @@ export interface operations {
         };
     };
     acknowledge_mfa_risk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RiskAcknowledgement"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    snooze_mfa_reminder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    skip_address_reminder: {
         parameters: {
             query?: never;
             header?: never;

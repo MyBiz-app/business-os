@@ -20414,7 +20414,7 @@
           "account"
         ],
         "summary": "Security Policy",
-        "description": "What the apps tell people about two-step sign-in (the banner for owners and managers).",
+        "description": "What the apps tell people about two-step sign-in (the account status of owners and\nmanagers).",
         "operationId": "security_policy",
         "responses": {
           "200": {
@@ -20441,8 +20441,75 @@
           "account"
         ],
         "summary": "Acknowledge Mfa Risk",
-        "description": "The person read the warning about working without two-step sign-in and understands the\nrisk. Kept with the time and address, and shown in the audit log of their businesses.",
+        "description": "The person read the warning about working without two-step sign-in and understands the\nrisk. Kept with the time, address, browser, version of the text and screen, and shown in the\naudit log of their businesses. The apps then stop reminding them.",
         "operationId": "acknowledge_mfa_risk",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RiskAcknowledgement"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/me/reminders/mfa/snooze": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Snooze Mfa Reminder",
+        "description": "\"Remind me in a week\": the account status leaves two-step sign-in out for seven days.\nSensitive actions still ask for the code or the confirmed warning.",
+        "operationId": "snooze_mfa_reminder",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/me/reminders/address/skip": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Skip Address Reminder",
+        "description": "The home address is optional: \"skip\" stops the reminder. It can be filled in at any time\nin the account settings, and is asked for again only where it is needed (form 101).",
+        "operationId": "skip_address_reminder",
         "responses": {
           "204": {
             "description": "Successful Response"
@@ -66153,6 +66220,12 @@
             "description": "City, street and house number are all filled in",
             "default": false
           },
+          "address_reminder_skipped": {
+            "type": "boolean",
+            "title": "Address Reminder Skipped",
+            "description": "The person chose to skip the home address reminder",
+            "default": false
+          },
           "email_roster": {
             "type": "boolean",
             "title": "Email Roster",
@@ -74444,6 +74517,23 @@
         ],
         "title": "ReviewSummary"
       },
+      "RiskAcknowledgement": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "settings",
+              "opt_out",
+              "sensitive_action"
+            ],
+            "title": "Source",
+            "description": "Where the person confirmed: security settings, the \"I don't want two-step sign-in\" choice, or the window of a refused sensitive action",
+            "default": "settings"
+          }
+        },
+        "type": "object",
+        "title": "RiskAcknowledgement"
+      },
       "RoleFields": {
         "properties": {
           "name": {
@@ -76149,7 +76239,20 @@
           "mfa_risk_acknowledged": {
             "type": "boolean",
             "title": "Mfa Risk Acknowledged",
-            "description": "The person confirmed they understand the risk of working without a code"
+            "description": "The person confirmed they understand the risk of working without a code (also their answer \"I don't want two-step sign-in\": no more reminders)"
+          },
+          "mfa_reminder_snoozed_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mfa Reminder Snoozed Until",
+            "description": "\"Remind me in a week\": no reminder before this time"
           }
         },
         "type": "object",

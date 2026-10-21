@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { AccountStatusSlot } from "./account-status-slot";
 import { AttentionPanel } from "./attention-panel";
 import { WebsiteOfferCard } from "./website-offer-card";
 import { BranchMapCard } from "./branch-map-card";
@@ -215,6 +216,10 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       </div>
 
       {setup && welcome && <GettingStartedCard setup={setup} welcome business={tenant.name} />}
+
+      <Suspense fallback={null}>
+        <AccountStatusSlot />
+      </Suspense>
 
       {(billingNotice || usageNotices.length > 0 || websiteOffer?.show) && (
       <div className="flex flex-col gap-3">
