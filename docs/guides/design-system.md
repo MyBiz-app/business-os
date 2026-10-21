@@ -118,7 +118,9 @@ page Foundations). Quiet: hierarchy by size, not weight; hairlines instead of he
   `btn-icon` (icon only; also give it an `aria-label`), `btn-plain` (a card, chip or row that is a
   button). Inputs and selects use `control`.
 - Loading: every route group has a `loading.tsx` rendering `components/layout/page-skeleton.tsx`
-  (marketing, auth, the business area, the platform console, and the signed-in shell). Copy the
+  (auth, the business area, the platform console, and the signed-in shell). The landing site has none
+  on purpose: the old page stays until the next one is ready and then the page and footer cross-fade
+  once (180ms), so a click never shows a skeleton in between. Copy the
   pattern for a heavy page: a `loading.tsx` next to it with a skeleton of its shape.
 - UI kit (`apps/web/src/components/ui`, round 7): `Modal` (always centered with room around it, a
   sheet on a phone, `placement="side"` for a record sheet; the page behind does not scroll; Esc, X and

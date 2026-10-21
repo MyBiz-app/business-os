@@ -53,6 +53,24 @@ export function NavigationScroll() {
       window.dispatchEvent(new Event(NAVIGATION_START));
       startTransition(() => router.push(url.pathname + url.search + url.hash, { scroll: false }));
     };
+    // A link to a section of the page the person is already on glides there, like every other anchor
+    // (bubbling phase: a link with its own handler, such as the section menu, has already dealt with it).
+    const onSamePageAnchor = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = (event.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!link || (link.target && link.target !== "_self") || link.hasAttribute("download")) return;
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || url.search !== window.location.search) return;
+      const id = decodeURIComponent(url.hash.slice(1));
+      if (!id || !document.getElementById(id)) return;
+      event.preventDefault();
+      try {
+        window.history.pushState(null, "", url.hash);
+      } catch {
+        // Not critical: the page still scrolls.
+      }
+      scrollToSection(id);
+    };
     let frame = 0;
     const remember = () => {
       cancelAnimationFrame(frame);
@@ -61,11 +79,13 @@ export function NavigationScroll() {
     window.addEventListener("popstate", onPop);
     document.addEventListener("click", onClick, true);
     document.addEventListener("click", onAnchorLink, true);
+    document.addEventListener("click", onSamePageAnchor);
     window.addEventListener("scroll", remember, { passive: true });
     return () => {
       window.removeEventListener("popstate", onPop);
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("click", onAnchorLink, true);
+      document.removeEventListener("click", onSamePageAnchor);
       window.removeEventListener("scroll", remember);
       cancelAnimationFrame(frame);
     };
