@@ -13,6 +13,7 @@ import { openedId, withOpen } from "@/lib/open-window";
 import { TeamTabs } from "./team-tabs";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { Button } from "@/components/ui/button";
 
 export default async function TeamPage({ searchParams }: PageProps<"/team">) {
   const query = await searchParams;
@@ -87,9 +88,9 @@ export default async function TeamPage({ searchParams }: PageProps<"/team">) {
                 </span>
                 {(isOwner || invitation.role !== "owner") && (
                   <form action={revokeInvitation.bind(null, invitation.id)}>
-                    <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
+                    <Button variant="plain" type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
                       {t("team.revoke")}
-                    </button>
+                    </Button>
                   </form>
                 )}
               </li>

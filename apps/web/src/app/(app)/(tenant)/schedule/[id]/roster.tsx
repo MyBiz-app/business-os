@@ -18,6 +18,7 @@ import {
 } from "../actions";
 import { OverCapacityButton } from "./over-capacity-button";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Button } from "@/components/ui/button";
 
 // Who may add a client to a full class (the API enforces the same list).
 const OVER_CAPACITY_ROLES = ["owner", "manager", "branch_manager"];
@@ -168,21 +169,22 @@ export async function Roster({ session, context, manageable, search, error }: Pr
                   <input name="reason" required minLength={3} maxLength={300} className="control w-full px-3 py-2" placeholder={t("waive.placeholder")} />
                 </label>
                 <p className="text-xs text-muted">{t("waive.note")}</p>
-                <button type="submit" className="btn-primary px-3 py-1.5 text-xs font-medium">
+                <Button variant="primary" type="submit" className="text-xs">
                   {t("waive.confirm")}
-                </button>
+                </Button>
               </form>
             </details>
           )}
           {NEXT_ACTIONS[booking.status].map((next) => (
             <form key={next} action={setBookingStatus.bind(null, session.id, booking.id, next)}>
-              <button
+              <Button
                 type="submit"
+                variant="secondary"
                 aria-label={`${t(`actions.${next}`)} - ${booking.dependent_name ?? booking.client_name}`}
-                className={`btn-secondary px-2.5 py-1 text-xs font-medium ${next === "cancelled" ? "text-danger" : ""}`}
+                className={`text-xs ${next === "cancelled" ? "text-danger" : ""}`}
               >
                 {t(`actions.${next}`)}
-              </button>
+              </Button>
             </form>
           ))}
         </div>
@@ -223,15 +225,15 @@ export async function Roster({ session, context, manageable, search, error }: Pr
               placeholder={t("searchPlaceholder")}
               className="min-w-0 flex-1 control px-3 py-2"
             />
-            <button type="submit" className="btn-secondary px-3 py-2 text-sm">
+            <Button variant="secondary" type="submit">
               {t("search")}
-            </button>
+            </Button>
           </form>
           {!perDependent && (
             <form action={bookMyself.bind(null, session.id)}>
-              <button type="submit" className="btn-secondary px-3 py-1.5 text-sm">
+              <Button variant="secondary" type="submit">
                 {full ? t("addMeToWaitlist") : t("addMe")}
-              </button>
+              </Button>
             </form>
           )}
           {search && (
@@ -254,13 +256,14 @@ export async function Roster({ session, context, manageable, search, error }: Pr
                       <div className="flex flex-wrap gap-2">
                         {choices.map((choice) => (
                           <form key={choice.id ?? "none"} action={bookClient.bind(null, session.id, client.id, choice.id)}>
-                            <button
+                            <Button
+                              variant="primary"
                               type="submit"
                               aria-label={`${label} - ${tDependents("bookFor", { dependent: choice.name, owner: name })}`}
-                              className="btn-primary px-3 py-1 text-xs"
+                              className="text-xs"
                             >
                               <span dir="auto">{choice.name}</span>
-                            </button>
+                            </Button>
                           </form>
                         ))}
                       </div>
@@ -276,13 +279,14 @@ export async function Roster({ session, context, manageable, search, error }: Pr
                           />
                         )}
                         <form action={bookClient.bind(null, session.id, client.id, undefined)}>
-                          <button
+                          <Button
+                            variant="primary"
                             type="submit"
                             aria-label={`${label} - ${name}`}
-                            className="btn-primary px-3 py-1 text-xs"
+                            className="text-xs"
                           >
                             {label}
-                          </button>
+                          </Button>
                         </form>
                       </div>
                     )}

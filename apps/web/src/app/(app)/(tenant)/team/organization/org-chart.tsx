@@ -10,6 +10,7 @@ import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { saveOrganization, type TeamState } from "../actions";
+import { Button } from "@/components/ui/button";
 
 export type OrgPerson = {
   id: string;
@@ -64,11 +65,11 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
   const renderLeaf = (node: OrgPerson, index: number) => (
     <li key={node.id} className="org-leaf">
       {index > 0 && <span aria-hidden="true" className="block h-2 w-px bg-foreground/20" />}
-      <button
-        type="button"
+      <Button
+        variant="plain"
         onClick={() => setSelected(node.id === selected ? null : node.id)}
         aria-pressed={node.id === selected}
-        className={`btn-plain flex w-48 items-center gap-2.5 rounded-xl border bg-surface px-2.5 py-2 text-start shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
+        className={`flex w-48 items-center gap-2.5 rounded-xl border bg-surface px-2.5 py-2 text-start shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
           node.id === selected ? "border-primary ring-2 ring-primary/25" : "border-border"
         }`}
       >
@@ -81,7 +82,7 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
             {node.title ?? node.role}
           </span>
         </span>
-      </button>
+      </Button>
     </li>
   );
 
@@ -92,11 +93,11 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
     return (
       <li key={node.id}>
         <div className="flex flex-col items-center">
-          <button
-            type="button"
+          <Button
+            variant="plain"
             onClick={() => setSelected(node.id === selected ? null : node.id)}
             aria-pressed={node.id === selected}
-            className={`btn-plain flex w-48 flex-col items-center gap-2 rounded-2xl border bg-surface px-3 pb-3 pt-4 text-center shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
+            className={`flex w-48 flex-col items-center gap-2 rounded-2xl border bg-surface px-3 pb-3 pt-4 text-center shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
               node.id === selected ? "border-primary ring-2 ring-primary/25" : "border-border"
             }`}
           >
@@ -115,21 +116,21 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
                 <span className="truncate">{node.branches.join(", ")}</span>
               </span>
             )}
-          </button>
+          </Button>
           {reports.length > 0 && (
-            <button
-              type="button"
+            <Button
+              variant="plain"
               onClick={() => toggle(node.id)}
               aria-expanded={open}
               aria-label={open ? t("fold", { name: node.name }) : t("unfold", { name: node.name })}
-              className="btn-plain relative z-10 -mt-3 flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted shadow-sm hover:text-foreground"
+              className="relative z-10 -mt-3 flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted shadow-sm hover:text-foreground"
             >
               {reports.length}
               <ChevronDown
                 aria-hidden="true"
                 className={`size-3 transition-transform motion-reduce:transition-none ${open ? "" : "-rotate-90 rtl:rotate-90"}`}
               />
-            </button>
+            </Button>
           )}
         </div>
         {reports.length > 0 && open && (stack ? <ul className="org-stack">{reports.map(renderLeaf)}</ul> : <ul>{reports.map(renderNode)}</ul>)}
@@ -155,9 +156,9 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
                 {person.title ? `${person.title} · ${person.role}` : person.role}
               </span>
             </div>
-            <button type="button" onClick={() => setSelected(null)} className="btn-ghost size-8 shrink-0" aria-label={t("close")}>
+            <Button variant="quiet" onClick={() => setSelected(null)} className="size-8 shrink-0" aria-label={t("close")}>
               <X aria-hidden="true" className="size-4" />
-            </button>
+            </Button>
           </div>
           <ul className="flex flex-col gap-2 text-sm">
             <li className="flex items-center gap-2">

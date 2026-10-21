@@ -50,20 +50,8 @@
   "src/app/(app)/(tenant)/ai/usage-meter.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/bills/page.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/bills/run-form.tsx": [
     "table"
-  ],
-  "src/app/(app)/(tenant)/catalog/codes-tab.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/catalog/delete-button.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/catalog/promos/promo-actions-bar.tsx": [
-    "button"
   ],
   "src/app/(app)/(tenant)/clients/[id]/addresses-section.tsx": [
     "button"
@@ -129,9 +117,6 @@
   "src/app/(app)/(tenant)/invoices/[id]/invoice-body.tsx": [
     "table"
   ],
-  "src/app/(app)/(tenant)/invoices/document-form.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/leads/[id]/lead-body.tsx": [
     "button"
   ],
@@ -165,15 +150,8 @@
   "src/app/(app)/(tenant)/migration/migration-hub.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/quotes/[id]/copy-link.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/quotes/[id]/quote-body.tsx": [
-    "button",
     "table"
-  ],
-  "src/app/(app)/(tenant)/quotes/quote-form.tsx": [
-    "button"
   ],
   "src/app/(app)/(tenant)/receipts/[id]/receipt-body.tsx": [
     "table"
@@ -195,39 +173,6 @@
   ],
   "src/app/(app)/(tenant)/sales/page.tsx": [
     "table"
-  ],
-  "src/app/(app)/(tenant)/schedule/[id]/job-panel.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/[id]/over-capacity-button.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/[id]/roster.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/[id]/session-body.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/[id]/session-status-button.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/appointment/appointment-body.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/closed/page.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/copy-week.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/publish-week.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/save-default.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/schedule/waitlist/page.tsx": [
-    "button"
   ],
   "src/app/(app)/(tenant)/settings/ai-connections/page.tsx": [
     "button"
@@ -264,69 +209,14 @@
   "src/app/(app)/(tenant)/settings/support-section.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/team/[userId]/ai-member-form.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/[userId]/card-sections.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/[userId]/payroll/payroll-file.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/bonuses/bonus-form.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/bonuses/bonus-list.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/organization/org-chart.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/page.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/team/payroll/annual/page.tsx": [
     "table"
   ],
-  "src/app/(app)/(tenant)/team/payroll/run-board.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/roles/role-form.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/shift-swaps/decision-form.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/shifts/coverage-settings.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/shifts/publish-bar.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/shifts/save-default.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/team/shifts/shift-board.tsx": [
-    "button",
     "table"
-  ],
-  "src/app/(app)/(tenant)/team/shifts/station-settings.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/team-forms.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/time-clock/[userId]/entry-forms.tsx": [
-    "button"
   ],
   "src/app/(app)/(tenant)/team/time-clock/page.tsx": [
     "table"
-  ],
-  "src/app/(app)/(tenant)/team/time-clock/rules-form.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/team/time-off/decision-form.tsx": [
-    "button"
   ],
   "src/app/(app)/(tenant)/website/brief/wizard.tsx": [
     "button"
@@ -486,10 +376,10 @@
   "src/components/branch-map/branch-map.tsx": [
     "button"
   ],
-  "src/components/branch-scope-picker.tsx": [
-    "button"
+  "src/components/branch-map/business-map.tsx": [
+    "table"
   ],
-  "src/components/calendar-board/time-grid.tsx": [
+  "src/components/branch-scope-picker.tsx": [
     "button"
   ],
   "src/components/charts/column-chart.tsx": [
