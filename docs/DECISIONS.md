@@ -431,6 +431,13 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **One deviation from the Figma values:** text on the night-mode blue button is charcoal, not white (white on #3B82F6 is 3.7:1, below AA).
 - The marketing site keeps its own rounder shapes and soft card shadow (`.mk`).
 
+### Shared React components, Storybook and a shrinking lint baseline (2026-10-21, CRM Premium slice W3-1, no migration)
+
+- **Owner approval:** the approved CRM Premium plan (Adir, 2026-10-21 09:24 and 09:48), section 5.4 and 5.7: components built once, Storybook yes, Chromatic no.
+- **Decision:** `Button`, `Card`, `Tabs`, `Badge`, `StatTile`, `Popover` and `Menu` live in `components/ui` and wrap the existing Calm utilities (`btn-*`, `card`), so nothing is restyled twice; text comes in as props. One positioning method for every floating panel: a native top-layer `popover="manual"` element placed by `lib/popover-position.ts`.
+- **Storybook (free) is the live catalog** (`pnpm --filter web storybook`, built in CI so a broken story fails the pull request). Chromatic is not used: `e2e/screen_sweep.py` already compares whole pages.
+- **Lint ratchet:** `design-system/no-handrolled-ui` forbids a bare `<button>` or `<table>` in new code. The 192 files that already use them are listed in `eslint-rules/handrolled-ui-baseline.json`; the list can only shrink (a test fails when a listed file no longer needs its entry), so the page passes (W3-5) remove entries and nothing new slips in.
+
 ## Open
 
 

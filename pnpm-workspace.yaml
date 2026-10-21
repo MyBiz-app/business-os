@@ -12,6 +12,8 @@ allowBuilds:
   "@parcel/watcher": false
   "@swc/core": false
   sharp: false
+  # Storybook's dev server; the platform binary ships as its own package, the install script is only a check.
+  esbuild: false
   # Downloads the Supabase CLI binary.
   supabase: true
   unrs-resolver: false
