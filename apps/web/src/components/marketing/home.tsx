@@ -4,11 +4,13 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { Section } from "@/components/layout/section";
+import { CoverageMap } from "@/components/marketing/coverage-map";
 import { DemoStage } from "@/components/marketing/demo-stage";
 import { MiniLoop } from "@/components/marketing/mini-loops";
 import { PricingCalculator } from "@/components/marketing/pricing-calculator";
 import { Reveal } from "@/components/marketing/reveal";
 import { FEATURES, SectionHeading } from "@/components/marketing/sections";
+import { loadCoverage } from "@/lib/site-coverage";
 import { loadCatalog } from "@/lib/pricing";
 import { formatMoney } from "@/lib/money";
 
@@ -238,6 +240,29 @@ export async function DemoSection() {
       <Reveal className="mx-auto w-full max-w-6xl">
         <DemoStage />
       </Reveal>
+    </Section>
+  );
+}
+
+/** "MyBiz across the country": the cities with at least five businesses, counts only. Draws
+ * nothing until there is such a city, so the page never shows an empty or made-up map. */
+export async function CoverageSection() {
+  const coverage = await loadCoverage();
+  if (!coverage || coverage.cities.length === 0) return null;
+  const t = await getTranslations("marketing.coverage");
+  const locale = await getLocale();
+  const cities = coverage.cities.map((c) => ({
+    name: locale === "he" ? c.name_he : (c.name_en ?? c.name_he),
+    latitude: c.latitude,
+    longitude: c.longitude,
+    businesses: c.businesses,
+  }));
+  return (
+    <Section aria-labelledby="coverage-heading" innerClassName="flex flex-col gap-10">
+      <Reveal>
+        <SectionHeading id="coverage-heading" eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle", { count: coverage.businesses })} />
+      </Reveal>
+      <CoverageMap cities={cities} />
     </Section>
   );
 }

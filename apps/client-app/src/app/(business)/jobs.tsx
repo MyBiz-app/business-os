@@ -8,7 +8,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, Badge, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, EmptyState, ErrorText, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { googleMapsLink, wazeLink } from "@business-os/app-kit/lib/maps";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -82,9 +82,7 @@ export default function Jobs() {
       )}
       <ErrorText message={error} palette={palette} />
       {jobs && jobs.length === 0 && (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("none")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("none")} icon="briefcase-outline" />
       )}
       {jobs?.map((job, index) => {
         const step = STEPS.indexOf(job.job_status);
@@ -100,7 +98,7 @@ export default function Jobs() {
               )}
             </View>
             {job.client_name ? (
-              <Text style={{ color: palette.foreground, fontWeight: "700", textAlign: "left" }}>{job.client_name}</Text>
+              <Text style={{ color: palette.foreground, fontWeight: "600", textAlign: "left" }}>{job.client_name}</Text>
             ) : null}
             {job.address ? (
               <View style={{ flexDirection: "row", gap: 6, alignItems: "flex-start" }}>

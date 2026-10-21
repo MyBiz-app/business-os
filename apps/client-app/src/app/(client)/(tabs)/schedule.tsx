@@ -15,7 +15,7 @@ import { PressableScale } from "@business-os/app-kit/components/motion";
 import { BranchBar } from "@/components/branch-bar";
 import { Availability } from "@/components/availability";
 import { type ClientSession, SessionCard } from "@/components/session-card";
-import { Button, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
+import { Button, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { scheduleViewFor, termsFor } from "@business-os/app-kit/lib/vertical";
@@ -24,6 +24,7 @@ import { useDependents } from "@/lib/use-dependents";
 import { useLocations } from "@/lib/use-locations";
 import { useScheduleWindow } from "@/lib/use-schedule-window";
 import { useBusiness } from "@/providers/business-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 /** The class schedule: a day strip centred on the chosen day, drilling up to a week and a month. */
 export default function Schedule() {
@@ -132,7 +133,7 @@ export default function Schedule() {
         <PressableScale
           accessibilityRole="button"
           onPress={() => router.push("/appointment")}
-          style={[local.cta, elevation.raised, { backgroundColor: palette.primary }]}
+          style={[local.cta, { backgroundColor: palette.primary }]}
         >
           <Ionicons name="calendar-number-outline" size={28} color={palette.onPrimary} />
           <View style={local.ctaText}>
@@ -332,14 +333,14 @@ export default function Schedule() {
 
 const local = StyleSheet.create({
   bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  monthTitle: { fontSize: 18, fontWeight: "700" },
-  weekHead: { fontSize: 15, fontWeight: "700", marginTop: 4 },
+  monthTitle: { fontSize: 17, fontWeight: "600" },
+  weekHead: { fontSize: 15, fontWeight: "600", marginTop: 4 },
   list: { gap: 12 },
   filters: { gap: 8 },
   chips: { gap: 8, paddingVertical: 2 },
-  release: { borderWidth: 1, borderRadius: 20, padding: 14, gap: 10 },
-  cta: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 24, padding: 18 },
+  release: { borderWidth: 1, borderRadius: radius.card, padding: 14, gap: 10 },
+  cta: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: radius.card, padding: 18 },
   ctaText: { flex: 1, gap: 2 },
-  ctaTitle: { fontSize: 18, fontWeight: "800", textAlign: "left" },
-  ctaSub: { fontSize: 14, textAlign: "left" }, // full opacity: it sits on the brand color
+  ctaTitle: { fontSize: 17, fontWeight: "600", textAlign: "left" },
+  ctaSub: { fontSize: 13, textAlign: "left" }, // full opacity: it sits on the brand color
 });

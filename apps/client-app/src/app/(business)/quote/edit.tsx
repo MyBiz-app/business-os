@@ -187,15 +187,15 @@ export default function EditQuote() {
                 hitSlop={8}
                 style={{ alignSelf: "flex-start", minHeight: 32, justifyContent: "center" }}
               >
-                <Text style={{ color: palette.danger, fontWeight: "600" }}>{tQuotes("removeLine", { number: index + 1 })}</Text>
+                <Text style={{ color: palette.danger, fontWeight: "500" }}>{tQuotes("removeLine", { number: index + 1 })}</Text>
               </Pressable>
             )}
           </View>
         ))}
         <Button label={tQuotes("addLine")} variant="secondary" palette={palette} onPress={() => setLines((current) => [...current, EMPTY])} />
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ color: palette.foreground, fontWeight: "700" }}>{tQuotes("total")}</Text>
-          <Text style={{ color: palette.foreground, fontWeight: "700", fontVariant: ["tabular-nums"] }}>
+          <Text style={{ color: palette.foreground, fontWeight: "600" }}>{tQuotes("total")}</Text>
+          <Text style={{ color: palette.foreground, fontWeight: "600", fontVariant: ["tabular-nums"] }}>
             {formatMoney(Math.round(total), currency, locale)}
           </Text>
         </View>
@@ -209,7 +209,7 @@ export default function EditQuote() {
         inputMode="numeric"
         hint={tQuotes("depositHint")}
       />
-      <Text style={{ color: palette.foreground, fontWeight: "600" }}>{tQuotes("validUntilField")}</Text>
+      <Text style={{ color: palette.foreground, fontWeight: "500" }}>{tQuotes("validUntilField")}</Text>
       <PillRow
         label={tQuotes("validUntilField")}
         palette={palette}

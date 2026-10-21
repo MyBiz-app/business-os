@@ -4,11 +4,12 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Animated, Linking, Platform, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
-import { fixedColors } from "@business-os/app-kit/lib/theme";
+import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { useReducedMotion } from "@business-os/app-kit/components/motion";
-import { Button, Card, ErrorText, Field, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
+import { BackBar } from "@business-os/app-kit/components/rows";
+import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -26,6 +27,7 @@ const PROCESSING_MS = 1400;
  * own secure page instead (the checkout's pay_url). */
 export default function Pay() {
   const t = useTranslations("client.pay");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { api, scope, business, palette } = useBusiness();
@@ -141,6 +143,7 @@ export default function Pay() {
 
   return (
     <Screen palette={palette}>
+      <BackBar palette={palette} label={tCommon("goBack")} fallback="/bookings" />
       <Heading palette={palette}>{t("title")}</Heading>
       {checkout?.simulated && (
         <View style={[local.banner, { backgroundColor: tint(palette.warning, 0.12), borderColor: tint(palette.warning, 0.4) }]}>
@@ -153,7 +156,7 @@ export default function Pay() {
       <View
         accessible
         accessibilityLabel={`${t("testCard")}: 4242 4242 4242 4242`}
-        style={[local.card, elevation.raised, { backgroundColor: palette.primary }]}
+        style={[local.card, { backgroundColor: palette.primary }]}
       >
         <View aria-hidden style={[local.cardOrb, { backgroundColor: tint(palette.onPrimary, 0.14) }]} />
         <View style={local.cardTop}>
@@ -256,26 +259,26 @@ export default function Pay() {
 }
 
 const local = StyleSheet.create({
-  banner: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: 14, padding: 12 },
-  bannerText: { flex: 1, fontSize: 14, fontWeight: "600", textAlign: "left" },
-  card: { borderRadius: 22, padding: 22, gap: 18, overflow: "hidden", aspectRatio: 1.6 },
-  cardOrb: { position: "absolute", width: 240, height: 240, borderRadius: 999, top: -110, end: -70 },
+  banner: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: radius.control, padding: 12 },
+  bannerText: { flex: 1, fontSize: 13, fontWeight: "500", textAlign: "left" },
+  card: { borderRadius: radius.card, padding: 22, gap: 18, overflow: "hidden", aspectRatio: 1.6 },
+  cardOrb: { position: "absolute", width: 240, height: 240, borderRadius: radius.pill, top: -110, end: -70 },
   cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  cardLabel: { fontSize: 14, fontWeight: "600" },
-  cardBadge: { fontSize: 11, fontWeight: "800", borderWidth: 1, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, letterSpacing: 1 },
+  cardLabel: { fontSize: 13, fontWeight: "500" },
+  cardBadge: { fontSize: 12, fontWeight: "600", borderWidth: 1, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, letterSpacing: 1 },
   chip: { width: 44, height: 32, borderRadius: 7 },
-  cardNumber: { fontSize: 21, fontWeight: "700", letterSpacing: 1.5, writingDirection: "ltr", fontVariant: ["tabular-nums"] },
+  cardNumber: { fontSize: 20, fontWeight: "600", letterSpacing: 1.5, writingDirection: "ltr", fontVariant: ["tabular-nums"] },
   line: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 },
-  value: { fontSize: 16, fontWeight: "600" },
+  value: { fontSize: 15, fontWeight: "500" },
   divider: { height: 1 },
-  totalLabel: { fontSize: 17, fontWeight: "700" },
-  total: { fontSize: 24, fontWeight: "800", fontVariant: ["tabular-nums"] },
+  totalLabel: { fontSize: 17, fontWeight: "600" },
+  total: { fontSize: 24, fontWeight: "600", fontVariant: ["tabular-nums"] },
   processing: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, minHeight: 48 },
   secure: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
   secureText: { fontSize: 13 },
   done: { alignItems: "center", gap: 12, paddingVertical: 32 },
-  check: { width: 96, height: 96, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  doneTitle: { fontSize: 26, fontWeight: "800" },
+  check: { width: 96, height: 96, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
+  doneTitle: { fontSize: 24, fontWeight: "600" },
   center: { textAlign: "center" },
-  receiptNumber: { fontSize: 15, fontWeight: "600" },
+  receiptNumber: { fontSize: 15, fontWeight: "500" },
 });

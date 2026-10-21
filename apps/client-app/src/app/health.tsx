@@ -1,12 +1,12 @@
 import type { components } from "@business-os/api-client";
-import { router } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { BackBar } from "@business-os/app-kit/components/rows";
+import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
@@ -17,6 +17,7 @@ type Answer = "yes" | "no";
 /** The business's health declaration: yes/no questions, the statement, and a typed signature. */
 export default function Health() {
   const t = useTranslations("client.health");
+  const tCommon = useTranslations("common");
   const tHealth = useTranslations("health");
   const locale = useLocale() === "en" ? "en" : "he";
   const { api, scope, business, palette } = useBusiness();
@@ -71,9 +72,10 @@ export default function Health() {
 
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload().then(() => setSaved(null))}>
+      <BackBar palette={palette} label={tCommon("goBack")} fallback="/home" />
       <Heading palette={palette}>{t("title")}</Heading>
 
-      {!loading && !form && <Text style={[styles.muted, { color: palette.muted }]}>{t("noForm")}</Text>}
+      {!loading && !form && <EmptyState palette={palette} message={t("noForm")} icon="pulse-outline" />}
 
       {current && !showForm && health && (
         <Card palette={palette}>
@@ -126,7 +128,7 @@ export default function Health() {
                 accepted && { backgroundColor: palette.primary },
               ]}
             >
-              {accepted && <Text style={{ color: palette.onPrimary, fontWeight: "700" }}>✓</Text>}
+              {accepted && <Text style={{ color: palette.onPrimary, fontWeight: "600" }}>✓</Text>}
             </View>
             <Text style={[local.checkLabel, { color: palette.foreground }]}>{t("accept")}</Text>
           </Pressable>
@@ -143,8 +145,6 @@ export default function Health() {
           <Button label={t("sign")} palette={palette} busy={busy} onPress={() => void submit()} />
         </>
       )}
-
-      <Button label={t("back")} variant="secondary" palette={palette} onPress={() => router.back()} />
     </Screen>
   );
 }
@@ -152,5 +152,5 @@ export default function Health() {
 const local = StyleSheet.create({
   check: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 44 },
   box: { width: 26, height: 26, borderRadius: 6, borderWidth: 2, alignItems: "center", justifyContent: "center" },
-  checkLabel: { flex: 1, fontSize: 16, textAlign: "left" },
+  checkLabel: { flex: 1, fontSize: 15, textAlign: "left" },
 });

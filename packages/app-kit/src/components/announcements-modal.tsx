@@ -9,7 +9,7 @@ import { useSession } from "../providers/session-provider";
 import { useTheme } from "../providers/theme-provider";
 import { Text } from "./text";
 import { Button, Heading, styles } from "./ui";
-import { fixedColors } from "../lib/theme";
+import { fixedColors, radius } from "../lib/theme";
 
 type Item = { id: string; subject: string; body: string; ctaLabel: string; ctaUrl: string; imageUrl: string };
 
@@ -99,6 +99,6 @@ export function AnnouncementsModal() {
 
 const styles2 = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: tint(fixedColors.black, 0.5), alignItems: "center", justifyContent: "center", padding: 20 },
-  sheet: { width: "100%", maxWidth: 420, borderRadius: 20, borderWidth: 1, padding: 20, gap: 12 },
-  image: { width: "100%", height: 160, borderRadius: 12 },
+  sheet: { width: "100%", maxWidth: 420, borderRadius: radius.card, borderWidth: 1, padding: 20, gap: 12 },
+  image: { width: "100%", height: 160, borderRadius: radius.card },
 });

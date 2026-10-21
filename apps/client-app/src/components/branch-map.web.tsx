@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { hasPoint } from "@business-os/app-kit/lib/distance";
+import { radius } from "@business-os/app-kit/lib/theme";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 import type { Location } from "@/lib/use-locations";
 
@@ -73,7 +74,7 @@ export function BranchMap({ locations, selectedId, onSelect }: { locations: Loca
 
   if (!hasPins) return null;
   return (
-    <View accessibilityLabel={t("mapLabel")} style={{ height: 220, borderRadius: 16, overflow: "hidden", backgroundColor: palette.border }}>
+    <View accessibilityLabel={t("mapLabel")} style={{ height: 220, borderRadius: radius.card, overflow: "hidden", backgroundColor: palette.border }}>
       <div ref={host} style={{ width: "100%", height: "100%" }} />
     </View>
   );

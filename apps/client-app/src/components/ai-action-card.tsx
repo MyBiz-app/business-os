@@ -79,8 +79,8 @@ export function AiActionCard({
   return (
     <Card palette={palette}>
       <View style={{ gap: 8 }}>
-        <Text style={[styles.muted, { color: palette.ai, fontWeight: "700" }]}>{t("needsConfirmation")}</Text>
-        <Text style={{ color: palette.foreground, fontWeight: "600", fontSize: 16 }}>{summary}</Text>
+        <Text style={[styles.muted, { color: palette.ai, fontWeight: "600" }]}>{t("needsConfirmation")}</Text>
+        <Text style={{ color: palette.foreground, fontWeight: "500", fontSize: 15 }}>{summary}</Text>
         {when ? <Text style={[styles.muted, { color: palette.muted }]}>{when}</Text> : null}
         {p.full ? <Text style={[styles.muted, { color: palette.muted }]}>{t("fullWaitlist")}</Text> : null}
         {waiting ? (
@@ -89,7 +89,7 @@ export function AiActionCard({
             <Button label={t("reject")} palette={palette} variant="secondary" disabled={busy} onPress={() => onDecide(action.id, "reject")} />
           </View>
         ) : (
-          <Text accessibilityRole="text" style={{ color: palette[TONE[action.status]], fontWeight: "600" }}>
+          <Text accessibilityRole="text" style={{ color: palette[TONE[action.status]], fontWeight: "500" }}>
             {t(`statuses.${action.status}`)}
           </Text>
         )}

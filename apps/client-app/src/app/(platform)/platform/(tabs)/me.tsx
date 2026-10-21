@@ -23,12 +23,12 @@ export default function Me() {
       <Heading palette={palette}>{t("title")}</Heading>
       <Card palette={palette}>
         <Text style={[styles.muted, { color: palette.muted, writingDirection: "ltr" }]}>{session?.user.email}</Text>
-        {staff && <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("level", { level: tLevels(staff.level) })}</Text>}
+        {staff && <Text style={{ color: palette.foreground, fontWeight: "500" }}>{t("level", { level: tLevels(staff.level) })}</Text>}
       </Card>
 
       {staff && staff.permissions.length > 0 && (
         <Card palette={palette}>
-          <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("permissions")}</Text>
+          <Text style={{ color: palette.foreground, fontWeight: "500" }}>{t("permissions")}</Text>
           {staff.permissions.map((permission) => (
             <Text key={permission} style={[styles.muted, { color: palette.muted }]}>
               {tPermissions(`${permission.replace(".", "_") as "businesses_read"}.name`)}

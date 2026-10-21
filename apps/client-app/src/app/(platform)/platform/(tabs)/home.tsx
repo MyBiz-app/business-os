@@ -5,7 +5,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, Badge, ListRow, SectionTitle, StatTile, TileGrid } from "@business-os/app-kit/components/rows";
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Card, EmptyState, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -80,14 +80,14 @@ export default function Home() {
 
       {month && (
         <Card palette={palette}>
-          <Text style={{ color: palette.muted, fontSize: 14, fontWeight: "600", textAlign: "left" }}>
+          <Text style={{ color: palette.muted, fontSize: 13, fontWeight: "500", textAlign: "left" }}>
             {t("billing", {
               month: new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(
                 new Date(`${month.month}T12:00:00Z`),
               ),
             })}
           </Text>
-          <Text style={{ color: palette.foreground, fontSize: 24, fontWeight: "700", textAlign: "left" }}>
+          <Text style={{ color: palette.foreground, fontSize: 24, fontWeight: "600", textAlign: "left" }}>
             {formatMoney(month.paid + month.open, month.currency, locale)}
           </Text>
           <Text style={[styles.muted, { color: palette.muted }]}>
@@ -133,9 +133,7 @@ export default function Home() {
       )}
 
       {open.length === 0 && fresh.length === 0 && !loading ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("nothing")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("nothing")} />
       ) : null}
 
       {open.length > 0 && (

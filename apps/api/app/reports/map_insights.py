@@ -114,3 +114,62 @@ def map_insights(db: Session, start: dt.date, end: dt.date) -> MapInsights:
         leads_without_city=totals.leads - sum(a.leads for a in areas),
         areas=areas,
     )
+
+
+# What leaves the business for the AI: a count under this is never shown (the cross-business rule).
+AI_MIN_COUNT = 5
+AI_MAX_AREAS = 15
+
+
+def branch_city_codes(db: Session) -> set[int]:
+    rows = db.execute(
+        text("SELECT DISTINCT city_code FROM app.locations WHERE city_code IS NOT NULL")
+    ).all()
+    return {row.city_code for row in rows}
+
+
+def areas_for_ai(db: Session, start: dt.date, end: dt.date) -> dict:
+    """The map as the AI may see it: counts only, no names of people, no addresses, no ids. A
+    count under AI_MIN_COUNT is left out, and a city where both counts are small is not listed;
+    the small cities are only added up when together they reach the minimum."""
+    found = map_insights(db, start, end)
+    branches = branch_city_codes(db)
+    shown: list[dict] = []
+    rest_clients = rest_leads = 0
+    for area in found.areas:
+        clients = area.clients if area.clients >= AI_MIN_COUNT else None
+        leads = area.leads if area.leads >= AI_MIN_COUNT else None
+        if clients is None and leads is None:
+            rest_clients += area.clients
+            rest_leads += area.leads
+            continue
+        row: dict = {
+            "city": area.city_name,
+            "has_branch_in_city": area.city_code in branches,
+            "clients": clients,
+            "new_clients": area.new_clients if clients is not None else None,
+            "leads": leads,
+            "leads_won": area.leads_won if leads is not None else None,
+            "lead_conversion_percent": (
+                round(100 * area.leads_won / area.leads) if leads is not None else None
+            ),
+        }
+        shown.append(row)
+    # Only the biggest cities go to the model; what is cut joins the "other" totals.
+    for row in shown[AI_MAX_AREAS:]:
+        rest_clients += row["clients"] or 0
+        rest_leads += row["leads"] or 0
+    shown = shown[:AI_MAX_AREAS]
+    return {
+        "areas": shown,
+        "other_cities": {
+            "clients": rest_clients if rest_clients >= AI_MIN_COUNT else None,
+            "leads": rest_leads if rest_leads >= AI_MIN_COUNT else None,
+        },
+        "clients_total": found.clients_total,
+        "leads_total": found.leads_total,
+        "note": (
+            f"Counts under {AI_MIN_COUNT} are hidden (null). Leads are those that arrived in the "
+            "period; clients are everyone now. Suggest, never act."
+        ),
+    }

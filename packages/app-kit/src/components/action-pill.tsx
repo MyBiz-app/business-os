@@ -6,6 +6,7 @@ import { tint } from "../lib/brand";
 import type { Palette } from "../lib/theme";
 import { PressableScale } from "./motion";
 import { Text } from "./text";
+import { radius } from "../lib/theme";
 
 /** A small rounded action with an icon ("Navigate", "Add to calendar", "Cancel"). */
 export function ActionPill({
@@ -40,6 +41,6 @@ export function ActionPill({
 }
 
 const local = StyleSheet.create({
-  pill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, minHeight: 44, borderRadius: 999 },
-  label: { fontSize: 14, fontWeight: "600" },
+  pill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, minHeight: 44, borderRadius: radius.pill },
+  label: { fontSize: 13, fontWeight: "500" },
 });

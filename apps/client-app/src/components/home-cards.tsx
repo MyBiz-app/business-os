@@ -9,7 +9,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { ActionPill } from "@business-os/app-kit/components/action-pill";
 import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Text } from "@business-os/app-kit/components/text";
-import { Card, elevation, styles } from "@business-os/app-kit/components/ui";
+import { Card, EmptyState, styles } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { byDistance, distanceLabel, hasPoint } from "@business-os/app-kit/lib/distance";
 import { lastVisit, nextBooking, type HomeCard } from "@business-os/app-kit/lib/client-home";
@@ -25,6 +25,7 @@ import { useDependents } from "@/lib/use-dependents";
 import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { useInbox } from "@/providers/inbox-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 type Booking = components["schemas"]["ClientBooking"];
 type Session = components["schemas"]["ClientSession"];
@@ -86,7 +87,7 @@ function NextBookingBody({ booking, data, locale }: { booking: Booking; data: Ho
   const day = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: business.time_zone });
   const place = [session?.location_name, session?.room_name].filter(Boolean).join(" · ");
   return (
-    <View style={[local.next, elevation.raised, { backgroundColor: palette.surface, borderColor: palette.border }]}>
+    <View style={[local.next, { backgroundColor: palette.surface, borderColor: palette.border }]}>
       <View aria-hidden style={[local.orb, { backgroundColor: tint(color, 0.14) }]} />
       <View style={local.nextHead}>
         <View style={[local.nextAccent, { backgroundColor: color }]} />
@@ -292,9 +293,7 @@ function Updates() {
   return (
     <Section title={t("updates")} action={items.length > 0 ? t("seeAll") : undefined} onAction={() => router.navigate("/updates")}>
       {items.length === 0 ? (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("noUpdates")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={t("noUpdates")} />
       ) : (
         <Card palette={palette}>
           {items.map((n, index) => (
@@ -390,16 +389,16 @@ const local = StyleSheet.create({
   section: { gap: 8 },
   grow: { flex: 1, gap: 2 },
   line: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 8 },
-  lineTitle: { fontSize: 15, fontWeight: "600", textAlign: "left" },
-  lineMeta: { fontSize: 14, textAlign: "left" },
+  lineTitle: { fontSize: 15, fontWeight: "500", textAlign: "left" },
+  lineMeta: { fontSize: 13, textAlign: "left" },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   tiles: { gap: 8 },
   tileBox: { width: "100%" },
-  tileIcon: { width: 36, height: 36, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  next: { borderWidth: 1, borderRadius: 24, padding: 18, gap: 14, overflow: "hidden" },
-  orb: { position: "absolute", width: 180, height: 180, borderRadius: 999, top: -80, end: -50 },
+  tileIcon: { width: 36, height: 36, borderRadius: radius.card, alignItems: "center", justifyContent: "center" },
+  next: { borderWidth: 1, borderRadius: radius.card, padding: 18, gap: 14, overflow: "hidden" },
+  orb: { position: "absolute", width: 180, height: 180, borderRadius: radius.pill, top: -80, end: -50 },
   nextHead: { flexDirection: "row", gap: 12 },
   nextAccent: { width: 5, borderRadius: 3 },
-  nextTitle: { fontSize: 22, fontWeight: "800", textAlign: "left" },
+  nextTitle: { fontSize: 20, fontWeight: "600", textAlign: "left" },
   nextMeta: { fontSize: 15, textAlign: "left" },
 });

@@ -57,7 +57,7 @@ export default function TimeClock() {
       <Card palette={palette}>
         {open ? (
           <>
-            <Text style={{ color: palette.foreground, fontSize: 18, fontWeight: "600" }}>
+            <Text style={{ color: palette.foreground, fontSize: 17, fontWeight: "500" }}>
               {t("clockedIn", { time: formatTime(open.clock_in, locale, timeZone) })}
             </Text>
             <Text style={{ color: palette.muted }}>{open.location_name}</Text>

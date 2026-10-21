@@ -5,7 +5,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, ListRow } from "@business-os/app-kit/components/rows";
-import { Card, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { EmptyState, Heading, LoadError, Screen } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -34,9 +34,7 @@ export default function Receipts() {
       <Heading palette={palette}>{tProfile("receipts")}</Heading>
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       {data && data.length === 0 && (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.muted }]}>{tProfile("noReceipts")}</Text>
-        </Card>
+        <EmptyState palette={palette} message={tProfile("noReceipts")} icon="receipt-outline" />
       )}
       {data?.map((receipt) => (
         <ListRow
@@ -44,7 +42,7 @@ export default function Receipts() {
           palette={palette}
           title={receipt.description}
           subtitle={`${t("short", { number: receipt.number })} · ${date.format(new Date(receipt.issued_at))}`}
-          trailing={<Text style={{ color: palette.foreground, fontWeight: "700" }}>{formatMoney(receipt.amount, receipt.currency, locale)}</Text>}
+          trailing={<Text style={{ color: palette.foreground, fontWeight: "600" }}>{formatMoney(receipt.amount, receipt.currency, locale)}</Text>}
           onPress={() => router.push(`/receipt/${receipt.id}`)}
         />
       ))}

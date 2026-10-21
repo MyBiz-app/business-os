@@ -8,10 +8,11 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { Chip } from "@business-os/app-kit/components/chip";
 import { PressableScale } from "@business-os/app-kit/components/motion";
-import { styles } from "@business-os/app-kit/components/ui";
+import { EmptyState, styles } from "@business-os/app-kit/components/ui";
 import { courtGrid, clockOf, staffRows } from "@/lib/availability";
 import { rentalLengths } from "@/lib/court-search";
 import { useBusiness } from "@/providers/business-provider";
+import { radius } from "@business-os/app-kit/lib/theme";
 
 type Court = components["schemas"]["ResourceService"];
 type CourtSlot = components["schemas"]["ResourceSlot"];
@@ -35,7 +36,7 @@ export function Availability({ kind, days, courts, visits }: { kind: "courts" | 
           ))}
         </ScrollView>
       )}
-      {days.length === 0 && <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>}
+      {days.length === 0 && <EmptyState palette={palette} message={t("empty")} icon="calendar-outline" />}
       {days.map((day) => (
         <DayAvailability key={`${kind}-${pick.id}-${day}`} kind={kind} day={day} serviceId={pick.id} court={kind === "courts" ? (pick as Court) : null} />
       ))}
@@ -155,12 +156,12 @@ const local = StyleSheet.create({
   block: { gap: 8 },
   chips: { gap: 8, paddingVertical: 2 },
   day: { gap: 8 },
-  head: { fontSize: 15, fontWeight: "700", marginTop: 4 },
-  staff: { fontSize: 14, fontWeight: "600" },
+  head: { fontSize: 15, fontWeight: "600", marginTop: 4 },
+  staff: { fontSize: 13, fontWeight: "500" },
   table: { gap: 6 },
   tableRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  nameCell: { width: 84, fontSize: 13, fontWeight: "600" },
+  nameCell: { width: 84, fontSize: 13, fontWeight: "500" },
   hour: { width: 56, fontSize: 12, textAlign: "center" },
-  cell: { width: 56, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-  cellText: { fontSize: 12, fontWeight: "700" },
+  cell: { width: 56, height: 36, borderRadius: radius.control, alignItems: "center", justifyContent: "center" },
+  cellText: { fontSize: 12, fontWeight: "600" },
 });

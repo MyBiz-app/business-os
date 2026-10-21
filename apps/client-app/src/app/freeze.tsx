@@ -336,8 +336,8 @@ const PROBLEMS: Record<string, "freeze_requests_off" | "not_freezable" | "too_sh
 const local = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8, flexWrap: "wrap" },
   info: { flex: 1, gap: 2, minWidth: 160 },
-  name: { fontSize: 16, fontWeight: "600", textAlign: "left" },
-  meta: { fontSize: 14, textAlign: "left" },
+  name: { fontSize: 15, fontWeight: "500", textAlign: "left" },
+  meta: { fontSize: 13, textAlign: "left" },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   monthBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
 });

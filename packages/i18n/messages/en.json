@@ -1112,6 +1112,7 @@
     "confirmTitle": "Are you sure?",
     "confirmAction": "Confirm",
     "closeDialog": "Close window",
+    "goBack": "Back",
     "discardTitle": "Leave without saving?",
     "discardBody": "Your changes will be lost.",
     "keepEditing": "Keep editing",
@@ -5863,6 +5864,16 @@
           ]
         }
       }
+    },
+    "coverage": {
+      "eyebrow": "All over the country",
+      "title": "MyBiz, from the north to the Negev",
+      "subtitle": "{count, plural, one {# business} other {# businesses}} already run on MyBiz, in cities all around Israel.",
+      "dot": "{city}: {count, plural, one {# business} other {# businesses}}",
+      "hover": "{count, plural, one {# business} other {# businesses}}",
+      "mapLabel": "Map of the cities with MyBiz businesses",
+      "failed": "The map could not load right now.",
+      "privacy": "City totals only. A city shows up once at least five businesses are there, and no business is ever named."
     }
   },
   "appointments": {
@@ -11100,6 +11111,7 @@
       "whiteSpots": "White spots",
       "whiteSpotsHint": "Cities with leads and no branch within {km} km"
     },
+    "askAnalyst": "Ask the data analyst about this map",
     "layers": {
       "label": "Map layers",
       "branches": "Branches",
