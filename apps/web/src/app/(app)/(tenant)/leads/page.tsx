@@ -1,5 +1,5 @@
 import type { components } from "@business-os/api-client";
-import { CalendarClock, Plus, Target } from "lucide-react";
+import { CalendarClock, Plus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -7,7 +7,9 @@ import { Avatar } from "@/components/avatar";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { CardTransition } from "@/components/ui/page-transition";
-import { SummaryTiles } from "@/components/ui/summary-tiles";
+import { Badge } from "@/components/ui/badge";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { StatTile } from "@/components/ui/stat-tile";
 import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
 import { siteOrigin } from "@/lib/origin";
@@ -89,32 +91,31 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader
-        title={
-          <span className="flex items-center gap-3">
-            <span className="icon-tile size-11">
-              <Target aria-hidden="true" className="size-5" />
-            </span>
-            {t("title")}
-          </span>
-        }
+        title={t("title")}
         description={t("subtitle")}
         actions={
           canWriteClients(tenant) && (
-            <Link href="/leads/new" className="btn-primary px-4 py-2.5">
+            <ButtonLink href="/leads/new" variant="primary">
               <Plus aria-hidden="true" className="size-4" />
               {t("new")}
-            </Link>
+            </ButtonLink>
           )
         }
       />
 
-      <SummaryTiles label={t("stats.label")} tiles={tiles} />
+      <ul aria-label={t("stats.label")} className="enter-items grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {tiles.map((tile) => (
+          <li key={tile.key}>
+            <StatTile label={tile.label} value={tile.value} href={tile.href} active={tile.active} />
+          </li>
+        ))}
+      </ul>
       {view && (
         <p className="flex flex-wrap items-center gap-3 text-sm text-muted">
           {t("viewShowing", { view: t(`stats.${view === "due" ? "followUps" : view}`), count: board.items.length })}
-          <Link href="/leads" scroll={false} className="btn-link underline-offset-4 hover:underline">
+          <ButtonLink href="/leads" scroll={false} variant="quiet">
             {t("viewClear")}
-          </Link>
+          </ButtonLink>
         </p>
       )}
 
@@ -143,9 +144,9 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
             allLabel={t("allStages")}
             countLabel={t("stagesShown", { shown: shownStages.length, total: STAGES.length })}
           />
-          <button type="submit" className="btn-secondary px-4 py-2">
+          <Button type="submit" variant="secondary">
             {t("filter")}
-          </button>
+          </Button>
         </form>
         <CopyLink link={inquiryLink} label={t("inquiryLink")} copy={t("copy")} copied={t("copied")} />
       </div>
@@ -154,9 +155,9 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
         <p role="status" className="flex flex-wrap items-center gap-3 text-sm text-muted">
           {t("truncated", { shown: all.items.length, total: all.total })}
           {pages < MAX_PAGES && (
-            <Link href={moreHref} scroll={false} className="btn-secondary px-3 py-1.5">
+            <ButtonLink href={moreHref} scroll={false} variant="secondary">
               {t("showMore")}
-            </Link>
+            </ButtonLink>
           )}
         </p>
       )}
@@ -168,15 +169,13 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
             const leads = board.items.filter((lead) => lead.stage === stage);
             const headingId = `stage-${stage}`;
             return (
-              <section key={stage} aria-labelledby={headingId} className="flex flex-col gap-2 rounded-2xl bg-foreground/[0.03] p-2">
+              <section key={stage} aria-labelledby={headingId} className="flex flex-col gap-2 rounded-xl bg-subtle p-2">
                 <div className="flex items-center justify-between px-2 pt-1">
                   <h2 id={headingId} className="flex items-center gap-2 text-sm font-semibold">
                     <span aria-hidden="true" className={`size-2 rounded-full ${STAGE_BAR[stage]}`} />
                     {t(`stages.${stage}`)}
                   </h2>
-                  <span className="rounded-full bg-surface px-2 text-xs font-medium tabular-nums ring-1 ring-border">
-                    {leads.length}
-                  </span>
+                  <Badge className="bg-surface tabular-nums ring-1 ring-border">{leads.length}</Badge>
                 </div>
                 {leads.length === 0 ? (
                   <p className="rounded-xl border border-dashed border-border px-3 py-6 text-center text-xs text-muted">
@@ -203,12 +202,12 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
                               <span dir="auto" className="line-clamp-2 text-xs text-muted">{lead.interest}</span>
                             )}
                             <span className="flex flex-wrap items-center gap-1.5 text-xs">
-                              <span className="rounded-full bg-foreground/5 px-2 py-0.5">{t(`sources.${lead.source}`)}</span>
+                              <Badge>{t(`sources.${lead.source}`)}</Badge>
                               {lead.follow_up_on && !["won", "lost"].includes(stage) && (
-                                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ${due ? "bg-danger/10 font-semibold" : "bg-foreground/5"}`}>
+                                <Badge tone={due ? "danger" : "neutral"}>
                                   <CalendarClock aria-hidden="true" className="size-3" />
                                   {due ? t("due") : formatDay(lead.follow_up_on, locale, { day: "numeric", month: "short" })}
-                                </span>
+                                </Badge>
                               )}
                               {lead.owner_name && <span className="ms-auto truncate text-muted">{lead.owner_name}</span>}
                             </span>

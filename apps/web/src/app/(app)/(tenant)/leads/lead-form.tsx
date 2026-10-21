@@ -2,7 +2,6 @@
 
 import type { components } from "@business-os/api-client";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useActionState } from "react";
 
 import { AddressPicker } from "@/components/address-picker";
@@ -13,6 +12,7 @@ import { ModalMarker } from "@/components/ui/route-modal";
 import type { FormState } from "@/lib/form-state";
 
 import { SOURCES } from "./sources";
+import { ButtonLink } from "@/components/ui/button";
 
 type Lead = components["schemas"]["Lead"];
 type Owner = components["schemas"]["LeadOwner"];
@@ -80,9 +80,9 @@ export function LeadForm({ action, owners, lead, submitLabel, readOnly = false }
         <div className="form-actions flex items-center gap-4">
           <SubmitButton>{submitLabel}</SubmitButton>
           {!lead && (
-            <Link href="/leads" className="text-sm text-muted underline-offset-4 hover:underline">
+            <ButtonLink href="/leads" variant="quiet">
               {t("cancel")}
-            </Link>
+            </ButtonLink>
           )}
         </div>
       )}

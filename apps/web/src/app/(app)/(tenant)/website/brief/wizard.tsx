@@ -11,6 +11,7 @@ import { useToast } from "@/components/toast/toaster";
 
 import { saveBrief, submitBrief, uploadSiteImage } from "../actions";
 import type { Draft } from "./draft";
+import { Button, IconButton, buttonClass } from "@/components/ui/button";
 
 type Brief = Draft;
 
@@ -166,7 +167,7 @@ export function WebsiteWizard({ initial, folderId, withSystem, brandColor, fileN
             <p className="text-sm font-medium">{t("steps.branding.logo")}</p>
             <div className="flex flex-wrap items-center gap-3">
               <input ref={logo} type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" id="site-logo" onChange={(event) => addImages(event.target.files, "logo")} />
-              <label htmlFor="site-logo" className="btn-plain btn-secondary inline-flex cursor-pointer items-center gap-2 px-3 py-2 text-sm">
+              <label htmlFor="site-logo" className={buttonClass("secondary", "md", "cursor-pointer")}>
                 <ImagePlus aria-hidden="true" className="size-4" />
                 {brief.logo_file_id ? t("steps.branding.replaceLogo") : t("steps.branding.uploadLogo")}
               </label>
@@ -189,9 +190,9 @@ export function WebsiteWizard({ initial, folderId, withSystem, brandColor, fileN
                   />
                 ))}
                 {(colors.length ? colors : [brandColor]).length < 4 && (
-                  <button type="button" className="btn-plain btn-secondary px-3 py-2 text-sm" onClick={() => set({ colors: [...(colors.length ? colors : [brandColor]), brandColor] })}>
+                  <Button variant="secondary" onClick={() => set({ colors: [...(colors.length ? colors : [brandColor]), brandColor] })}>
                     {t("steps.branding.addColor")}
-                  </button>
+                  </Button>
                 )}
               </div>
             )}
@@ -216,7 +217,7 @@ export function WebsiteWizard({ initial, folderId, withSystem, brandColor, fileN
       {step === 5 && (
         <div className="flex flex-col gap-4">
           <input ref={upload} type="file" multiple accept="image/png,image/jpeg,image/webp" className="sr-only" id="site-images" onChange={(event) => addImages(event.target.files, "image")} />
-          <label htmlFor="site-images" aria-disabled={uploading || brief.images.length >= 20} className="btn-plain btn-secondary inline-flex w-fit cursor-pointer items-center gap-2 px-3 py-2 text-sm">
+          <label htmlFor="site-images" aria-disabled={uploading || brief.images.length >= 20} className={buttonClass("secondary", "md", "w-fit cursor-pointer")}>
             <ImagePlus aria-hidden="true" className="size-4" />
             {uploading ? t("steps.images.uploading") : t("steps.images.upload")}
           </label>
@@ -227,9 +228,9 @@ export function WebsiteWizard({ initial, folderId, withSystem, brandColor, fileN
                 <div className="w-full sm:w-72">
                   <Field label={t("steps.images.note")} maxLength={200} value={image.note ?? ""} onChange={(event) => set({ images: brief.images.map((item, i) => (i === index ? { ...item, note: event.target.value } : item)) })} />
                 </div>
-                <button type="button" aria-label={t("steps.images.remove")} className="btn-plain btn-secondary p-2" onClick={() => set({ images: brief.images.filter((_, i) => i !== index) })}>
+                <IconButton variant="secondary" label={t("steps.images.remove")} onClick={() => set({ images: brief.images.filter((_, i) => i !== index) })}>
                   <X aria-hidden="true" className="size-4" />
-                </button>
+                </IconButton>
               </li>
             ))}
           </ul>
@@ -306,21 +307,21 @@ export function WebsiteWizard({ initial, folderId, withSystem, brandColor, fileN
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-        <button type="button" disabled={busy || step === 0} className="btn-plain btn-secondary inline-flex items-center gap-2 px-4 py-2.5" onClick={() => go(step - 1)}>
+        <Button variant="secondary" disabled={busy || step === 0} onClick={() => go(step - 1)}>
           <ArrowLeft aria-hidden="true" className="size-4 rtl:-scale-x-100" />
           {t("back")}
-        </button>
+        </Button>
         <span className="text-xs text-muted">{t("autosave")}</span>
         {last ? (
-          <button type="button" disabled={busy || missing.length > 0} className="btn-plain btn-primary inline-flex items-center gap-2 px-4 py-2.5" onClick={send}>
+          <Button variant="primary" disabled={busy || missing.length > 0} onClick={send}>
             <Send aria-hidden="true" className="size-4 rtl:-scale-x-100" />
             {t("send")}
-          </button>
+          </Button>
         ) : (
-          <button type="button" disabled={busy || uploading} className="btn-plain btn-primary inline-flex items-center gap-2 px-4 py-2.5" onClick={() => go(step + 1)}>
+          <Button variant="primary" disabled={busy || uploading} onClick={() => go(step + 1)}>
             {step === STEPS.length - 1 ? t("toSummary") : t("next")}
             <ArrowRight aria-hidden="true" className="size-4 rtl:-scale-x-100" />
-          </button>
+          </Button>
         )}
       </div>
     </div>

@@ -1022,7 +1022,9 @@
       }
     },
     "city": "City",
-    "cityHint": "Where the client comes from. It helps you see where your clients live."
+    "cityHint": "Where the client comes from. It helps you see where your clients live.",
+    "clearFilters": "Clear filters",
+    "glance": "At a glance"
   },
   "common": {
     "undo": "Undo",

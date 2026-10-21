@@ -9,7 +9,8 @@ import { formatDay, isDay, todayIn } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
-import { Pill } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { CardTransition } from "@/components/ui/page-transition";
 
 import { addMeAsClient } from "./actions";
@@ -106,6 +107,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
   };
 
   const opened = openedId(params);
+  const filtered = Boolean(search || status || plan || absent || staff || dateChips.length > 0);
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader
@@ -115,26 +117,26 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
         actions={
           <>
             {tenant.modules.includes("client_app") && (
-              <Link href="/clients/join" className="btn-secondary px-4 py-2.5">
+              <ButtonLink href="/clients/join" variant="secondary">
                 {t("join.inviteToApp")}
-              </Link>
+              </ButtonLink>
             )}
             {canWriteClients(tenant) && (
               <form action={addMeAsClient}>
-                <button type="submit" className="btn-secondary px-4 py-2.5">
+                <Button type="submit" variant="secondary">
                   {t("clients.addMe")}
-                </button>
+                </Button>
               </form>
             )}
             {canWriteClients(tenant) && (
-              <Link href="/clients/import" className="btn-secondary px-4 py-2.5">
+              <ButtonLink href="/clients/import" variant="secondary">
                 {t("clientImport.button")}
-              </Link>
+              </ButtonLink>
             )}
             {canWriteClients(tenant) && (
-              <Link href="/clients/new" className="btn-primary px-4 py-2.5">
+              <ButtonLink href="/clients/new" variant="primary">
                 {term("addClient")}
-              </Link>
+              </ButtonLink>
             )}
           </>
         }
@@ -200,9 +202,9 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
             ))}
           </select>
         </label>
-        <button type="submit" className="btn-secondary px-4 py-2">
+        <Button type="submit" variant="secondary">
           {t("clients.search")}
-        </button>
+        </Button>
       </form>
 
       {dateChips.length > 0 && (
@@ -212,7 +214,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
               <Link
                 href={withoutKeys(chip.keys)}
                 scroll={false}
-                className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary-ink transition-colors hover:bg-primary/15"
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary-subtle px-3 py-1 text-sm font-medium text-primary-ink transition-colors hover:bg-primary/20"
               >
                 {chip.text}
                 <X aria-hidden="true" className="size-3.5" />
@@ -224,13 +226,28 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
       )}
 
       {result.items.length === 0 ? (
-        <EmptyState variant="people">
-          {search || status || plan || absent || staff || dateChips.length > 0 ? term("noResults") : term("noClients")}
+        <EmptyState
+          variant="people"
+          action={
+            filtered ? (
+              <ButtonLink href="/clients" variant="secondary">
+                {t("clients.clearFilters")}
+              </ButtonLink>
+            ) : (
+              canWriteClients(tenant) && (
+                <ButtonLink href="/clients/new" variant="primary">
+                  {term("addClient")}
+                </ButtonLink>
+              )
+            )
+          }
+        >
+          {filtered ? term("noResults") : term("noClients")}
         </EmptyState>
       ) : (
-        <ScrollRegion labelledBy="clients-heading" className="rounded-2xl border border-border">
+        <ScrollRegion labelledBy="clients-heading" className="card">
           <table className="w-full text-start text-sm">
-            <thead className="bg-surface text-muted">
+            <thead className="bg-subtle text-muted">
               <tr>
                 <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.name")}</th>
                 <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.phone")}</th>
@@ -242,7 +259,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
             </thead>
             <tbody>
               {result.items.map((client) => (
-                <tr key={client.id} className="border-t border-border transition-colors hover:bg-primary/4">
+                <tr key={client.id} className="border-t border-border transition-colors hover:bg-subtle">
                   <td className="px-4 py-2.5">
                     <CardTransition name={`client-${client.id}`}>
                     <Link scroll={false} href={withOpen("/clients", params, client.id)} className="group flex items-center gap-3 font-medium">
@@ -250,7 +267,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                       <span dir="auto" className="text-primary-ink underline-offset-4 group-hover:underline">
                         {[client.first_name, client.last_name].filter(Boolean).join(" ")}
                       </span>
-                      {client.is_staff && <Pill tone="primary">{t("clients.staffBadge")}</Pill>}
+                      {client.is_staff && <Badge tone="primary">{t("clients.staffBadge")}</Badge>}
                     </Link>
                     </CardTransition>
                   </td>
@@ -283,9 +300,9 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
 
       {pages > 1 && (
         <nav aria-label={t("clients.total", { count: result.total })} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link scroll={false} href={pageHref(page - 1)} className="text-primary-ink">{t("clients.previous")}</Link> : <span />}
+          {page > 1 ? <ButtonLink scroll={false} href={pageHref(page - 1)} variant="quiet">{t("clients.previous")}</ButtonLink> : <span />}
           <span className="text-muted">{t("clients.pageOf", { page, pages })}</span>
-          {page < pages ? <Link scroll={false} href={pageHref(page + 1)} className="text-primary-ink">{t("clients.next")}</Link> : <span />}
+          {page < pages ? <ButtonLink scroll={false} href={pageHref(page + 1)} variant="quiet">{t("clients.next")}</ButtonLink> : <span />}
         </nav>
       )}
       {opened && <ClientWindow id={opened} closeHref={withOpen("/clients", params, null)} />}

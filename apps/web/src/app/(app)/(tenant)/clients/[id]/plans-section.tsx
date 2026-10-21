@@ -1,7 +1,8 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-import { Pill, type Tone } from "@/components/pill";
+import { badgeToneOf, type Tone } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
 import { todayIn } from "@/lib/dates";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
@@ -18,6 +19,8 @@ import {
 } from "./plan-actions";
 import { EndFreezeButton, FreezeForm, RequestDecision, SellPlanForm } from "./plan-forms";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const TONE: Record<string, Tone> = {
   active: "success",
@@ -68,13 +71,13 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
   const formatDate = (day: string) => date.format(new Date(`${day}T12:00:00Z`));
 
   return (
-    <section aria-labelledby="plans-heading" className="flex flex-col gap-4 card p-6">
+    <Card as="section" aria-labelledby="plans-heading" className="flex flex-col gap-4">
       <h2 id="plans-heading" className="text-lg font-semibold">
         {t("clientPlans")}
       </h2>
 
       {selling && requests.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-xl bg-primary/5 p-4">
+        <div className="flex flex-col gap-2 rounded-xl bg-primary-subtle p-4">
           <h3 className="font-semibold">{t("requestsTitle")}</h3>
           <ul className="flex flex-col divide-y divide-border">
             {requests.map((request) => (
@@ -122,7 +125,7 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="flex items-center gap-2">
                     <span className="font-semibold">{entitlement.name}</span>
-                    <Pill tone={TONE[entitlement.state]}>{t(`states.${entitlement.state}`)}</Pill>
+                    <Badge tone={badgeToneOf(TONE[entitlement.state])}>{t(`states.${entitlement.state}`)}</Badge>
                   </span>
                   <span className="flex items-center gap-3 text-sm">
                     {entitlement.receipt_id && (
@@ -181,9 +184,9 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
                       <span className="flex-1 text-sm text-muted">{entitlement.kind === "punch_card" ? t("punchNoFreeze") : ""}</span>
                     )}
                     <form action={cancelEntitlement.bind(null, clientId, entitlement.id)}>
-                      <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
+                      <Button type="submit" variant="quiet" className="text-danger">
                         {t("cancelPlan")}
-                      </button>
+                      </Button>
                     </form>
                   </div>
                 )}
@@ -207,6 +210,6 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
           />
         </div>
       )}
-    </section>
+    </Card>
   );
 }

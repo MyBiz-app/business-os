@@ -1,4 +1,4 @@
-import { FlaskConical, MessageCircle, Trash2 } from "lucide-react";
+import { FlaskConical, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
@@ -13,6 +13,8 @@ import { deleteTemplate } from "./actions";
 import { Composer } from "./composer";
 import { TemplateForm } from "./templates";
 import { isolate } from "@/lib/bidi";
+import { Card } from "@/components/ui/card";
+import { IconButton } from "@/components/ui/button";
 
 const SUGGESTIONS = ["reminder", "comeback", "offer", "holiday"] as const;
 
@@ -36,14 +38,7 @@ export default async function MessagesPage() {
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader
-        title={
-          <span className="flex items-center gap-3">
-            <span className="icon-tile size-11">
-              <MessageCircle aria-hidden="true" className="size-5" />
-            </span>
-            {t("title")}
-          </span>
-        }
+        title={t("title")}
         description={t("subtitle")}
       />
 
@@ -51,7 +46,7 @@ export default async function MessagesPage() {
 
       <div className={`grid items-start gap-6 ${writable ? "xl:grid-cols-[1.6fr_1fr]" : ""}`}>
         {writable && (
-          <section aria-labelledby="compose-heading" className="card flex flex-col gap-4 p-6">
+          <Card as="section" aria-labelledby="compose-heading" className="flex flex-col gap-4">
             <h2 id="compose-heading" className="text-lg font-semibold">{t("compose")}</h2>
             <Composer
               audiences={audiences}
@@ -63,30 +58,26 @@ export default async function MessagesPage() {
               branches={branches.map((branch) => ({ id: branch.id, name: branch.name }))}
               groups={groups}
             />
-          </section>
+          </Card>
         )}
 
-        <section aria-labelledby="templates-heading" className="card flex flex-col gap-4 p-6">
+        <Card as="section" aria-labelledby="templates-heading" className="flex flex-col gap-4">
           <h2 id="templates-heading" className="text-lg font-semibold">{t("myTemplates")}</h2>
           {templates.length === 0 ? (
             <p className="text-sm text-muted">{t("noTemplates")}</p>
           ) : (
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col divide-y divide-border">
               {templates.map((template) => (
-                <li key={template.id} className="flex items-start justify-between gap-2 rounded-xl border border-border p-3">
+                <li key={template.id} className="flex items-start justify-between gap-2 py-3 first:pt-0 last:pb-0">
                   <span className="flex min-w-0 flex-col gap-0.5">
                     <span className="font-medium">{template.name}</span>
                     <span dir="auto" className="line-clamp-2 text-xs text-muted">{template.body}</span>
                   </span>
                   {writable && (
                     <form action={deleteTemplate.bind(null, template.id)}>
-                      <button
-                        type="submit"
-                        aria-label={t("deleteTemplate", { name: isolate(template.name) })}
-                        className="btn-icon rounded-lg p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger"
-                      >
+                      <IconButton type="submit" label={t("deleteTemplate", { name: isolate(template.name) })} className="hover:text-danger">
                         <Trash2 aria-hidden="true" className="size-4" />
-                      </button>
+                      </IconButton>
                     </form>
                   )}
                 </li>
@@ -98,17 +89,17 @@ export default async function MessagesPage() {
               <TemplateForm />
             </div>
           )}
-        </section>
+        </Card>
       </div>
 
-      <section aria-labelledby="history-heading" className="card flex flex-col gap-4 p-6">
+      <Card as="section" aria-labelledby="history-heading" className="flex flex-col gap-4">
         <h2 id="history-heading" className="text-lg font-semibold">{t("history")}</h2>
         {campaigns.length === 0 ? (
           <p className="text-sm text-muted">{t("noCampaigns")}</p>
         ) : (
-          <ol className="enter-items flex flex-col gap-3">
+          <ol className="enter-items flex flex-col divide-y divide-border">
             {campaigns.map((campaign) => (
-              <li key={campaign.id} className="flex flex-col gap-1.5 rounded-xl border border-border p-3">
+              <li key={campaign.id} className="flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0">
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
                   <span className="font-medium text-foreground">
                     {t(`audiences.${campaign.audience}`)} · {campaign.channels.map((c) => t(`channels.${c}`)).join(", ")}
@@ -125,7 +116,7 @@ export default async function MessagesPage() {
             ))}
           </ol>
         )}
-      </section>
+      </Card>
     </Container>
   );
 }

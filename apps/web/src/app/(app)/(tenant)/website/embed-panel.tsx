@@ -3,6 +3,8 @@
 import { Check, Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type Snippet = { key: "form" | "booking"; code: string };
 
@@ -18,7 +20,7 @@ export function EmbedPanel({ contactUrl, bookingUrl, inquiriesEnabled }: { conta
     { key: "booking", code: `<a href="${bookingUrl}" style="display:inline-block;padding:12px 20px;border-radius:12px;background:black;color:white;font-family:sans-serif;text-decoration:none">${t("bookingLabel")}</a>` },
   ];
   return (
-    <section className="card flex flex-col gap-4 p-6" aria-labelledby="site-embed">
+    <Card as="section" aria-labelledby="site-embed" className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h2 id="site-embed" className="text-lg font-semibold">{t("title")}</h2>
         <p className="text-sm text-muted">{t("body")}</p>
@@ -28,9 +30,8 @@ export function EmbedPanel({ contactUrl, bookingUrl, inquiriesEnabled }: { conta
         <div key={key} className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-sm font-semibold">{t(`${key}.title`)}</h3>
-            <button
-              type="button"
-              className="btn-secondary px-3 py-1.5 text-sm"
+            <Button
+              variant="secondary"
               onClick={async () => {
                 await navigator.clipboard.writeText(code).catch(() => undefined);
                 setCopied(key);
@@ -39,12 +40,12 @@ export function EmbedPanel({ contactUrl, bookingUrl, inquiriesEnabled }: { conta
             >
               {copied === key ? <Check aria-hidden="true" className="size-4" /> : <Copy aria-hidden="true" className="size-4" />}
               <span aria-live="polite">{copied === key ? t("copied") : t("copy")}</span>
-            </button>
+            </Button>
           </div>
           <p className="text-xs text-muted">{t(`${key}.hint`)}</p>
           <pre dir="ltr" className="control overflow-x-auto whitespace-pre-wrap break-all p-3 text-xs">{code}</pre>
         </div>
       ))}
-    </section>
+    </Card>
   );
 }

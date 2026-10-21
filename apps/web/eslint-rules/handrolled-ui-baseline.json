@@ -65,45 +65,8 @@
   "src/app/(app)/(tenant)/catalog/promos/promo-actions-bar.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/clients/[id]/addresses-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/dependents-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/health-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/plan-forms.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/plans-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/privacy-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/profile-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/[id]/work-section.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/clients/import/import-form.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/clients/page.tsx": [
-    "button",
     "table"
-  ],
-  "src/app/(app)/(tenant)/content/connect-cards.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/content/csv-button.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/content/filter-bar.tsx": [
-    "button"
   ],
   "src/app/(app)/(tenant)/content/heatmap.tsx": [
     "table"
@@ -132,31 +95,10 @@
   "src/app/(app)/(tenant)/invoices/document-form.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/leads/[id]/lead-body.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/leads/[id]/lead-controls.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/leads/copy-link.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/leads/page.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/leads/stage-filter.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/locations/branch-branding.tsx": [
     "button"
   ],
   "src/app/(app)/(tenant)/locations/location-groups.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/messages/page.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/messages/variable-picker.tsx": [
     "button"
   ],
   "src/app/(app)/(tenant)/migration/follow-up.tsx": [
@@ -326,15 +268,6 @@
     "button"
   ],
   "src/app/(app)/(tenant)/team/time-off/decision-form.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/website/brief/wizard.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/website/embed-panel.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/website/respond-form.tsx": [
     "button"
   ],
   "src/app/(app)/account/profile-form.tsx": [
