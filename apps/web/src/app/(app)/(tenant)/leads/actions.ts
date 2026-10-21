@@ -116,3 +116,15 @@ export async function deleteLead(leadId: string): Promise<void> {
   refresh();
   redirect("/leads");
 }
+
+/** Moves a lead to another stage straight from the board (a drag or the card's menu). */
+export async function moveLeadStage(leadId: string, stage: Stage): Promise<FormState> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(await api.POST("/leads/{lead_id}/stage", { params: { ...scope, path: { lead_id: leadId } }, body: { stage } }));
+  } catch (error) {
+    return errorState(error);
+  }
+  refresh(leadId);
+  return { saved: true };
+}
