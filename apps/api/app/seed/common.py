@@ -255,8 +255,8 @@ URBAN_SLICE = BusinessSpec(
     billing_name="אורבן סלייס בע״מ",
     branches=(
         BranchSpec("תל אביב - פלורנטין", "וולפסון 18, תל אביב"),
-        BranchSpec("רמת גן - מרום נווה", "הרא״ה 210, רמת גן"),
-        BranchSpec("חולון - קריית שרת", "גולדה מאיר 5, חולון"),
+        BranchSpec("ירושלים - מחנה יהודה", "אגריפס 42, ירושלים"),
+        BranchSpec("באר שבע - העיר החדשה", "רגר 12, באר שבע"),
         BranchSpec("כפר סבא - הירוקה", "ויצמן 140, כפר סבא"),
     ),
     clients=380,
@@ -283,7 +283,7 @@ STUDIO_BLOOM = BusinessSpec(
     branches=(
         BranchSpec("תל אביב - בזל", "בזל 12, תל אביב"),
         BranchSpec("הרצליה - מרכז", "סוקולוב 60, הרצליה"),
-        BranchSpec("מודיעין", "עמק דותן 4, מודיעין"),
+        BranchSpec("אשדוד - הרובע", "הרצל 22, אשדוד"),
     ),
     clients=300,
     staff_per_branch=3,

@@ -682,7 +682,8 @@
       "orders": "Orders",
       "aiTeam": "Team",
       "aiTasks": "Tasks"
-    }
+    },
+    "branchMap": "Branch map"
   },
   "terms": {
     "fitness": {
@@ -1154,6 +1155,12 @@
       "moved": "The new point is saved with the branch.",
       "readOnly": "The branch's point on the map.",
       "failed": "The map could not be loaded."
+    },
+    "clientsTitle": "Where your clients come from",
+    "view": {
+      "label": "View",
+      "list": "List",
+      "map": "Map"
     }
   },
   "locations": {
