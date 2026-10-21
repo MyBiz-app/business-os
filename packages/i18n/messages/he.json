@@ -920,7 +920,8 @@
       "membership": "מנויים וביקורים",
       "paperwork": "הצעות ומסמכים",
       "talk": "הערות והודעות",
-      "privacy": "הסכמות ופרטיות"
+      "privacy": "הסכמות ופרטיות",
+      "activity": "פעילות"
     },
     "joinedChip": "הצטרפו {range}",
     "noShowChip": "לא הגיעו {range}",
@@ -1041,7 +1042,49 @@
     "cityHint": "מאיפה הלקוח מגיע. עוזר לראות איפה הלקוחות שלכם גרים.",
     "clearFilters": "ניקוי הסינון",
     "glance": "במבט מהיר",
-    "cityChip": "עיר: {city}"
+    "cityChip": "עיר: {city}",
+    "activity": {
+      "title": "כל מה שקרה",
+      "empty": "עוד לא קרה כלום. הזמנות, תשלומים, מנויים, הערות והודעות יופיעו כאן.",
+      "latest": "מוצגים {count} האירועים האחרונים.",
+      "booking": {
+        "booked": "הוזמן ל{title}",
+        "checked_in": "הגיע ל{title}",
+        "no_show": "לא הגיע ל{title}",
+        "cancelled": "ביטל את {title}",
+        "waitlisted": "נכנס לרשימת ההמתנה של {title}"
+      },
+      "payment": {
+        "succeeded": "שילם {amount}",
+        "failed": "התשלום על {amount} נכשל",
+        "refunded": "הוחזרו {amount}"
+      },
+      "paymentFor": "עבור {title}",
+      "plan": {
+        "sold": "נמכר מנוי: {title}",
+        "cancelled": "המנוי בוטל: {title}"
+      },
+      "message": "נשלחה הודעה ב{channel}",
+      "note": "נוספה הערה",
+      "lead": {
+        "created": "הגיע כליד",
+        "stage": "הליד עבר ל{detail}",
+        "note": "הערה על הליד",
+        "call": "שיחה עם הליד",
+        "message": "הודעה לליד",
+        "meeting": "פגישה עם הליד",
+        "converted": "הפך ללקוח"
+      },
+      "channels": {
+        "whatsapp": "וואטסאפ",
+        "sms": "SMS"
+      }
+    },
+    "nextAction": {
+      "sell": "למכור מנוי",
+      "renew": "לחדש מנוי",
+      "book": "לקבוע תור"
+    }
   },
   "common": {
     "undo": "בטל",
