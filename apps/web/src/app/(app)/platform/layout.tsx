@@ -12,6 +12,7 @@ export default async function PlatformLayout({ children }: LayoutProps<"/platfor
   const items: (NavItem & { show: boolean })[] = [
     { href: "/platform", label: t("nav.overview"), icon: "dashboard", show: true },
     { href: "/platform/businesses", label: t("nav.businesses"), icon: "businesses", show: can("businesses.read") },
+    { href: "/platform/map", label: t("nav.map"), icon: "locations", show: can("businesses.read") },
     { href: "/platform/trials", label: t("nav.trials"), icon: "businesses", show: can("businesses.read") },
     { href: "/platform/inbox", label: t("nav.inbox"), icon: "inbox", show: can("inbox.manage") },
     { href: "/platform/broadcasts", label: t("nav.broadcasts"), icon: "broadcasts", show: can("broadcasts.manage") },

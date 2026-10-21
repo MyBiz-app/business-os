@@ -152,3 +152,8 @@ fetches tiles itself, so `connect-src` and `img-src` in `apps/web/src/lib/csp.ts
 (`MAP_ORIGIN`) and `worker-src` allows blobs. To switch provider (for example MapTiler, free up
 to 100,000 loads a month), change the two style URLs in `components/branch-map/map-core.ts` and
 `MAP_ORIGIN`.
+
+MapLibre 6 starts its worker from a file next to its own script, which a bundler cannot give it, so
+`scripts/copy-maplibre-worker.mjs` (run by `dev` and `build`) copies the worker to
+`apps/web/public/maplibre/` and `loadMaplibre()` in `map-core.ts` points the library there. Load
+the library only through `loadMaplibre()`.

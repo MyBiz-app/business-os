@@ -6,7 +6,7 @@ import type { Map as MapLibreMap, Marker } from "maplibre-gl";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
-import { currentTone, followTheme, styleUrl } from "./map-core";
+import { currentTone, followTheme, loadMaplibre, styleUrl } from "./map-core";
 
 type Props = {
   latitude: number | null;
@@ -32,7 +32,7 @@ export function PinPicker({ latitude, longitude, readOnly = false }: Props) {
     let marker: Marker | null = null;
     (async () => {
       try {
-        const maplibre = await import("maplibre-gl");
+        const maplibre = await loadMaplibre();
         if (cancelled || !container.current) return;
         map = new maplibre.Map({
           container: container.current,
@@ -64,7 +64,10 @@ export function PinPicker({ latitude, longitude, readOnly = false }: Props) {
   return (
     <div className="flex flex-col gap-2">
       <div className="relative h-56 overflow-hidden rounded-xl border border-border">
-        <div ref={container} className="absolute inset-0" role="region" aria-label={t("label")} />
+        {/* MapLibre's own stylesheet makes the map element `position: relative`, so the sizing is on a wrapper. */}
+        <div className="absolute inset-0">
+          <div ref={container} className="size-full" role="region" aria-label={t("label")} />
+        </div>
         {failed && <p className="absolute inset-0 flex items-center justify-center p-4 text-center text-sm text-muted">{t("failed")}</p>}
       </div>
       <p className="text-sm text-muted">{readOnly ? t("readOnly") : moved ? t("moved") : t("hint")}</p>
