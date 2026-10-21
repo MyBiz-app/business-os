@@ -19,8 +19,8 @@
     "brand:sync": "pnpm --filter @business-os/brand brand:sync"
   },
   "devDependencies": {
-    "supabase": "2.119.0",
-    "turbo": "2.11.6"
+    "supabase": "2.121.0",
+    "turbo": "2.11.8"
   },
   "packageManager": "pnpm@12.8.1",
   "engines": {
