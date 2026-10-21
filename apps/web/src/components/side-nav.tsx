@@ -185,7 +185,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                     : inArea
                       ? "text-foreground hover:bg-foreground/5"
                       : item.locked
-                      ? "text-muted/70 hover:bg-foreground/5 hover:text-foreground"
+                      ? "text-muted/90 hover:bg-foreground/5 hover:text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground"
                 }`}
               >
@@ -195,7 +195,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                 />
                 <span className="truncate">{item.label}</span>
                 {item.locked && (
-                  <span className="ms-auto flex shrink-0 items-center gap-1 text-xs text-muted/70">
+                  <span className="ms-auto flex shrink-0 items-center gap-1 text-xs text-muted/90">
                     <span className="max-md:hidden">{t("lockedHint")}</span>
                     <Lock aria-hidden="true" className="size-3.5" />
                   </span>

@@ -60,10 +60,11 @@ export function Sheet({ visible, onClose, palette, title, subtitle, children, fo
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <View style={s.root}>
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: tint(fixedColors.black, 0.45), opacity: progress }]}>
-          <Pressable style={s.fill} onPress={onClose} accessibilityLabel={label} />
+          <Pressable aria-hidden tabIndex={-1} style={s.fill} onPress={onClose} />
         </Animated.View>
         <Animated.View
           accessibilityViewIsModal
+          accessibilityLabel={title}
           style={[
             s.sheet,
             elevation.floating,
