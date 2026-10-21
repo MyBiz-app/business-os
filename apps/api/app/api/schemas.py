@@ -1,12 +1,13 @@
 import datetime as dt
 from datetime import date, datetime
-from typing import Literal
+from typing import Annotated, Literal
 from uuid import UUID
 from zoneinfo import available_timezones
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, BeforeValidator, Field, field_validator, model_validator
 
 from app.catalog.verticals import VERTICAL_PACKS
+from app.core.website import normalize_website
 
 LegalEntityType = Literal[
     "company", "licensed_dealer", "exempt_dealer", "nonprofit", "partnership", "other"
@@ -20,6 +21,9 @@ class Membership(BaseModel):
     tenant_id: UUID
     tenant_name: str
     role: Role
+    client_app: bool = Field(
+        default=False, description="The business offers the client app (the member's client area)"
+    )
 
 
 class SupportAccess(BaseModel):
@@ -28,7 +32,12 @@ class SupportAccess(BaseModel):
     expires_at: datetime
 
 
-Palette = Literal["mybiz", "ocean", "forest", "custom"]
+def _legacy_palette(value: object) -> object:
+    """The default palette was stored as `mybiz` before the product name became configurable."""
+    return "brand" if value == "mybiz" else value
+
+
+Palette = Annotated[Literal["brand", "ocean", "forest", "custom"], BeforeValidator(_legacy_palette)]
 
 
 class PaletteColors(BaseModel):
@@ -56,6 +65,15 @@ class Me(BaseModel):
     address_line: str | None = None
     city: str | None = None
     postal_code: str | None = None
+    city_code: int | None = Field(default=None, description="Home city, from the official list")
+    street_code: int | None = None
+    house_number: str | None = None
+    address_details: str | None = None
+    street_unlisted: str | None = None
+    street_name: str | None = Field(default=None, description="The home street's name")
+    address_complete: bool = Field(
+        default=False, description="City, street and house number are all filled in"
+    )
     email_roster: bool = Field(
         default=True, description="Email the person when their roster is published"
     )
@@ -67,7 +85,7 @@ class Me(BaseModel):
         description="Legal documents whose current version the person has not accepted yet",
     )
     palette: Palette | None = Field(
-        default=None, description="The person's color palette (none: the MyBiz default)"
+        default=None, description="The person's color palette (none: the brand default)"
     )
     palette_colors: PaletteColors | None = Field(
         default=None,
@@ -85,6 +103,10 @@ class Me(BaseModel):
     )
 
 
+BusinessSize = Literal["solo", "small", "medium", "network"]
+ProductTrack = Literal["full", "website_only"]
+
+
 class TenantCreate(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     vertical: str
@@ -97,6 +119,14 @@ class TenantCreate(BaseModel):
     accepted_legal: dict[str, str] | None = Field(
         default=None,
         description="Legal documents accepted at sign-up (document -> version)",
+    )
+    product_track: ProductTrack | None = Field(
+        default=None,
+        description="website_only: the business ordered a website and has no system modules yet;"
+        " left out means the full system",
+    )
+    business_size: BusinessSize | None = Field(
+        default=None, description="How big the business said it is at sign-up"
     )
 
     @field_validator("name")
@@ -120,6 +150,9 @@ class TenantCreate(BaseModel):
         if value not in available_timezones():
             raise ValueError("unknown time zone")
         return value
+
+
+WaitlistModeSetting = Literal["off", "auto", "first_come", "manual"]
 
 
 class TenantUpdate(BaseModel):
@@ -152,17 +185,26 @@ class TenantUpdate(BaseModel):
     )
     network_scope: Literal["network", "branch"] | None = None
     client_id_number: Literal["off", "optional", "required"] | None = None
+    waitlist_enabled: bool | None = None
+    waitlist_class_mode: WaitlistModeSetting | None = None
+    waitlist_appointment_mode: WaitlistModeSetting | None = None
+    waitlist_resource_mode: WaitlistModeSetting | None = None
+    waitlist_auto_hours: int | None = Field(default=None, ge=0, le=72)
     shifts_publish_auto: bool | None = None
     shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
     shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
     shifts_publish_day: int | None = Field(default=None, ge=1, le=28)
     shifts_publish_time: dt.time | None = None
     legal_entity_type: LegalEntityType | None = None
+    business_size: BusinessSize | None = None
     business_number: str | None = Field(
         default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
     )
     address_line: str | None = Field(default=None, max_length=200)
     address_city: str | None = Field(default=None, max_length=100)
+    website_url: str | None = Field(
+        default=None, max_length=300, description="The business's website; empty clears it"
+    )
     employer_file_number: str | None = Field(
         default=None, pattern=r"^[0-9A-Za-z/-]{2,20}$", description="Deductions file (תיק ניכויים)"
     )
@@ -182,6 +224,11 @@ class TenantUpdate(BaseModel):
         if isinstance(value, str):
             return value.strip() or None
         return value
+
+    @field_validator("website_url", mode="before")
+    @classmethod
+    def clean_website(cls, value: object) -> object:
+        return normalize_website(value) if isinstance(value, str) else value
 
     @field_validator("business_number", "employer_file_number", mode="before")
     @classmethod
@@ -225,6 +272,15 @@ class Tenant(BaseModel):
     business_number: str | None = Field(
         default=None, description="Shown only to people who manage the business's settings"
     )
+    website_url: str | None = Field(
+        default=None, description="The business's website (its branches may have their own)"
+    )
+    product_track: ProductTrack = Field(
+        default="full", description="website_only: a business that ordered a website only"
+    )
+    business_size: BusinessSize | None = Field(
+        default=None, description="solo, small (2-5), medium (6-20) or network; null if not given"
+    )
     address_line: str | None = Field(default=None, description="Settings managers only")
     address_city: str | None = Field(default=None, description="Settings managers only")
     employer_file_number: str | None = Field(default=None, description="Settings managers only")
@@ -250,12 +306,29 @@ class Tenant(BaseModel):
     require_mfa_for_staff: bool = Field(
         default=False, description="Every team member must sign in with an authenticator code"
     )
+    billing_state: Literal["active", "read_only"] = Field(
+        default="active",
+        description="read_only: an unpaid MyBiz invoice; everything is visible, nothing changes",
+    )
     network_scope: Literal["network", "branch"] = Field(
         default="network",
         description="network: clients shared by all branches; branch: each branch keeps its own",
     )
     client_id_number: Literal["off", "optional", "required"] = Field(
         default="off", description="Whether the business asks its clients for an ID number"
+    )
+    waitlist_enabled: bool = Field(default=True, description="The business keeps waitlists")
+    waitlist_class_mode: WaitlistModeSetting = Field(
+        default="auto", description="What happens when a spot in a class opens"
+    )
+    waitlist_appointment_mode: WaitlistModeSetting = Field(
+        default="off", description="What happens when a personal appointment time opens"
+    )
+    waitlist_resource_mode: WaitlistModeSetting = Field(
+        default="off", description="What happens when a court or room time opens"
+    )
+    waitlist_auto_hours: int = Field(
+        default=3, description="Automatic sign-up stops this many hours before a class starts"
     )
     resource_payment: Literal["app", "venue"] = Field(
         default="app",

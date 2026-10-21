@@ -1,4 +1,4 @@
-"""Emailing staff their newly published shifts (the notify-shifts job; see app/jobs.py).
+"""Emailing staff their newly published shifts (the notify-shifts job; see app/jobs/).
 
 A published shift is emailed once, to the person it belongs to, in one message per person and
 business; manual and scheduled publishing look the same here. People can turn the emails off
@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
-from app.messaging.contact_emails import resolve_email, sender_name
+from app.messaging.contact_emails import resolve_email, sender_name, website_of
 from app.messaging.email import (
     EMAIL_DETAILS,
     MESSAGES_DIR,
@@ -85,6 +85,7 @@ def _deliver(
                     kind="roster",
                     reply_to=resolve_email(conn, tenant_id, "reply_to", location_id),
                     from_name=sender_name(conn, tenant_id, location_id),
+                    website=website_of(conn, tenant_id, location_id),
                 )
             )
         except Exception as error:  # a provider error must not stop the batch

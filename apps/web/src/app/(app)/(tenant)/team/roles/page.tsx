@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { PermissionList } from "@/components/permission-list";
@@ -8,8 +7,10 @@ import { canManageTeam } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 import { RoleForm } from "./role-form";
+import { TeamTabs } from "../team-tabs";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 export default async function RolesPage() {
   const t = await getTranslations("team");
@@ -19,10 +20,8 @@ export default async function RolesPage() {
   const roles = unwrap(await api.GET("/roles", { params: scope }));
 
   return (
-    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/team" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-        {t("title")}
-      </Link>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <TeamTabs active="roles" tenant={tenant} />
       <PageHeader title={t("rolesTitle")} description={t("rolesSubtitle")} />
       <section aria-labelledby="system-roles-heading" className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
@@ -32,12 +31,9 @@ export default async function RolesPage() {
           <p className="text-sm text-muted">{t("systemRolesHint")}</p>
         </div>
         {roles.system.map((role) => (
-          <details key={role.key} className="card group p-5">
-            <summary className="cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden">{tRoles(role.key)}</summary>
-            <div className="mt-3">
-              <PermissionList all={roles.permissions} allowed={role.permissions} />
-            </div>
-          </details>
+          <CollapsibleSection key={role.key} title={tRoles(role.key)} storageKey={`roles-${role.key}`}>
+            <PermissionList all={roles.permissions} allowed={role.permissions} />
+          </CollapsibleSection>
         ))}
       </section>
       <section aria-labelledby="custom-roles-heading" className="flex flex-col gap-3">

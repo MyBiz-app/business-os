@@ -169,7 +169,7 @@ export async function PricingTeaser() {
             <PricingCalculator catalog={catalog} compact />
           </Reveal>
         )}
-        <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink">
+        <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink max-md:min-h-11">
           {t("seeAll")}
           <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
         </Link>
@@ -191,7 +191,7 @@ export async function AboutTeaser() {
           {t("title")}
         </h2>
         <p className="text-lg text-muted">{t("intro")}</p>
-        <Link href="/about" className="group inline-flex items-center gap-1 font-semibold text-primary-ink">
+        <Link href="/about" className="group inline-flex items-center gap-1 font-semibold text-primary-ink max-md:min-h-11">
           {th("more")}
           <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
         </Link>
@@ -209,6 +209,20 @@ export async function AboutTeaser() {
           </li>
         ))}
       </ul>
+    </Section>
+  );
+}
+
+/** A short pointer from the home page to the websites page. */
+export async function WebsitesTeaser() {
+  const t = await getTranslations("marketing.home.websitesTeaser");
+  return (
+    <Section aria-labelledby="websites-teaser-heading" tone="muted" spacing="compact" innerClassName="flex flex-col items-center gap-3 text-center">
+      <Reveal className="flex flex-col items-center gap-3">
+        <h2 id="websites-teaser-heading" className="text-3xl font-extrabold tracking-tight sm:text-4xl">{t("title")}</h2>
+        <p className="max-w-xl text-lg text-muted">{t("text")}</p>
+        <Link href="/websites" className="btn-secondary rounded-full px-6 py-2.5">{t("link")}</Link>
+      </Reveal>
     </Section>
   );
 }

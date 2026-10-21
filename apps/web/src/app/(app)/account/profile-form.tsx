@@ -4,6 +4,7 @@ import { ImageUp, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useRef, useState } from "react";
 
+import { type AddressDefaults, AddressPicker } from "@/components/address-picker";
 import { Avatar } from "@/components/avatar";
 import { ImageCropDialog } from "@/components/image-crop-dialog";
 import { CheckboxField, Field } from "@/components/form/field";
@@ -21,10 +22,11 @@ type Details = {
   birthDate: string | null;
   addressLine: string | null;
   city: string | null;
+  address: AddressDefaults;
   postalCode: string | null;
 };
 
-export function ProfileForm({ name, email, phone, birthDate, addressLine, city, postalCode }: Details) {
+export function ProfileForm({ name, email, phone, birthDate, addressLine, city, address, postalCode }: Details) {
   const t = useTranslations();
   const [state, action] = useActionState<FormState, FormData>(saveProfile, {});
   return (
@@ -39,11 +41,10 @@ export function ProfileForm({ name, email, phone, birthDate, addressLine, city, 
         <Field label={t("account.birthDate")} hint={t("account.birthDateHint")} name="birth_date" type="date" defaultValue={birthDate ?? ""} max={new Date().toISOString().slice(0, 10)} autoComplete="bday" dir="ltr" />
       </div>
       <fieldset className="flex flex-col gap-4">
-        <legend className="mb-1 text-sm font-medium">{t("account.detailsTitle")}</legend>
+        <legend className="mb-1 text-sm font-medium">{t("account.addressTitle")}</legend>
         <p className="-mt-2 text-xs text-muted">{t("account.addressHint")}</p>
-        <Field label={t("account.addressLine")} name="address_line" defaultValue={addressLine ?? ""} maxLength={200} autoComplete="street-address" dir="auto" />
+        <AddressPicker defaults={address} legacyText={[addressLine, city].filter(Boolean).join(", ") || null} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={t("account.city")} name="city" defaultValue={city ?? ""} maxLength={100} autoComplete="address-level2" dir="auto" />
           <Field label={t("account.postalCode")} name="postal_code" defaultValue={postalCode ?? ""} maxLength={20} autoComplete="postal-code" dir="ltr" />
         </div>
       </fieldset>

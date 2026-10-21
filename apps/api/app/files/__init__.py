@@ -7,6 +7,7 @@ they are stored, so neither the database nor the object store holds their readab
 parts of the system (payroll, document templates, the migration hub) add their files with
 `store_file`."""
 
+import re
 from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime
@@ -59,6 +60,14 @@ SYSTEM_FOLDERS: tuple[dict, ...] = (
         "name": "Imports",
         "read": "files.manage",
         "write": None,
+        "retain": False,
+        "sensitive": False,
+    },
+    {
+        "key": "website",
+        "name": "Website",
+        "read": "business.settings",
+        "write": "business.settings",
         "retain": False,
         "sensitive": False,
     },
@@ -209,6 +218,39 @@ def store_file(
         .one()
     )
     return dict(row)
+
+
+def safe_name(text_: str | None) -> str:
+    """A person's or document's name as part of a file name: letters, digits, dot and dash."""
+    return re.sub(r"[^\w.-]+", "-", text_ or "").strip("-")
+
+
+def keep_copy(
+    db: Session,
+    tenant_id: UUID,
+    folder_key: str,
+    *,
+    name: str,
+    content: bytes,
+    content_type: str = "application/pdf",
+    owner_user_id: UUID | None = None,
+) -> dict | None:
+    """Files a copy of a document the system just produced (payslip, signed form, invoice) in one
+    of the system folders. The document itself is already safe in its own table, so a full or
+    unreachable storage never fails the action that made it: the copy is skipped (None)."""
+    try:
+        with db.begin_nested():
+            return store_file(
+                db,
+                tenant_id,
+                system_folder_id(db, tenant_id, folder_key),
+                name=name,
+                content=content,
+                content_type=content_type,
+                owner_user_id=owner_user_id,
+            )
+    except HTTPException:
+        return None
 
 
 FILE_COLUMNS = """id, folder_id, name, content_type, size, encrypted, owner_user_id, location_id,

@@ -11,11 +11,27 @@ GLOBAL_TABLES = {
     "platform_audit",
     "platform_ai_settings",
     "platform_ai_conversations",
+    "platform_ai_agents",
+    "platform_kb_documents",  # the console agents' libraries; no API access at all
+    "platform_kb_versions",
+    "platform_kb_chunks",
+    "platform_ai_reports",
     "push_tokens",
+    "user_tours",
     "login_devices",
     "legal_acceptances",
+    "mfa_risk_acknowledgements",
     "job_runs",
     "announcement_views",
+    "email_suppressions",  # bounced addresses; read through SECURITY DEFINER functions
+    "vat_rates",  # dated VAT rates, the same for every business; read-only for the API
+    "dunning_settings",  # MyBiz's collection steps; read-only for the API
+    "platform_series",  # MyBiz's invoice counter; system only
+    "dunning_events",  # reminders sent per MyBiz invoice; system only
+    "platform_incidents",
+    "geo_cities",  # the official city list, the same for every business; read-only for the API
+    "geo_streets",  # the official street list; read-only for the API
+    "mcp_clients",  # AI apps that registered to ask for access; the API reads and adds rows
     "payroll_rates",  # law-driven rates, the same for every business; read-only for the API
 }
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
@@ -26,6 +42,8 @@ PLATFORM_TABLES = {
     "platform_ai_pauses",
     "announcements",
     "announcement_deliveries",
+    "platform_business_notes",
+    "platform_business_cards",
 }
 
 
@@ -59,7 +77,19 @@ def test_every_table_has_row_level_security(engine: Engine) -> None:
     assert [name for name, scoped in tenant_tables if not scoped] == []
     assert {name for name, _, has_tenant, _ in tables if not has_tenant} <= GLOBAL_TABLES
     # MyBiz's own tables stay unreachable from the API role.
-    own = tuple(sorted(PLATFORM_TABLES | {"platform_staff", "job_runs", "announcement_views"}))
+    own_extra = {
+        "platform_staff",
+        "job_runs",
+        "announcement_views",
+        "platform_incidents",
+        "email_suppressions",
+        "platform_ai_agents",
+        "platform_kb_documents",
+        "platform_kb_versions",
+        "platform_kb_chunks",
+        "platform_ai_reports",
+    }
+    own = tuple(sorted(PLATFORM_TABLES | own_extra))
     reachable = _query(
         engine,
         f"""
@@ -120,6 +150,7 @@ def test_api_sends_security_headers(client: TestClient) -> None:
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["X-Frame-Options"] == "DENY"
     assert response.headers["Referrer-Policy"] == "no-referrer"
+    assert response.headers["Cache-Control"] == "no-store"
 
 
 # Foreign keys that only record who did something. Nothing filters on them and a person is
@@ -146,6 +177,8 @@ UNINDEXED_USER_KEYS = {
     ("payments", "created_by"),
     ("pending_actions", "decided_by"),
     ("pending_actions", "requested_by"),
+    ("freeze_requests", "decided_by"),
+    ("bookings", "waived_by"),
     ("quotes", "created_by"),
     ("reviews", "staff_user_id"),
     ("shifts", "created_by"),

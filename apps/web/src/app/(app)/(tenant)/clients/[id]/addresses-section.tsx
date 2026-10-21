@@ -9,6 +9,7 @@ import type { getTenant } from "@/lib/tenant";
 
 import { setAddressActive } from "./addresses-actions";
 import { AddressForm } from "./addresses-forms";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 
@@ -55,25 +56,21 @@ export async function AddressesSection({ clientId, context, locked }: { clientId
             </div>
             {address.notes && <p dir="auto" className="text-sm text-muted">{address.notes}</p>}
             {writable && (
-              <details>
-                <summary className="cursor-pointer text-sm text-primary-ink">{t("edit")}</summary>
+              <CollapsibleSection variant="inline" title={t("edit")}>
                 <div className="pt-3">
                   <AddressForm clientId={clientId} address={address} />
                 </div>
-              </details>
+              </CollapsibleSection>
             )}
           </li>
         ))}
       </ul>
       {writable && (
-        <details className="rounded-xl bg-foreground/[0.03] p-3">
-          <summary className="flex cursor-pointer items-center gap-1 text-sm font-medium text-primary-ink">
-            <Plus aria-hidden="true" className="size-4" /> {t("add")}
-          </summary>
+        <CollapsibleSection variant="inline" className="rounded-xl bg-foreground/[0.03] p-3" triggerClassName="font-medium text-primary-ink" title={<><Plus aria-hidden="true" className="size-4" /> {t("add")}</>}>
           <div className="pt-3">
             <AddressForm clientId={clientId} />
           </div>
-        </details>
+        </CollapsibleSection>
       )}
     </section>
   );

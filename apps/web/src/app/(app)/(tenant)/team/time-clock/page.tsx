@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
-import { BackLink } from "@/components/back-link";
+import { TeamTabs } from "../team-tabs";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { unwrap } from "@/lib/api";
@@ -12,6 +12,7 @@ import { hm } from "@/lib/time-clock";
 import { getTenantFor } from "@/lib/tenant";
 
 import { RulesForm } from "./rules-form";
+import { EmptyState } from "@/components/empty-state";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("timeClock");
@@ -37,20 +38,20 @@ export default async function TimeClockPage({ searchParams }: PageProps<"/team/t
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <BackLink href="/team" label={t("back")} />
+      <TeamTabs active="timeClock" tenant={tenant} />
       <PageHeader title={t("title")} description={t("subtitle")} />
       <nav aria-label={t("month")} className="flex items-center gap-3">
-        <Link href={step(-1)} className="btn-secondary px-3 py-2 text-sm">
+        <Link scroll={false} href={step(-1)} className="btn-secondary px-3 py-2 text-sm">
           {t("previous")}
         </Link>
         <h2 className="text-lg font-semibold">{label}</h2>
-        <Link href={step(1)} className="btn-secondary px-3 py-2 text-sm">
+        <Link scroll={false} href={step(1)} className="btn-secondary px-3 py-2 text-sm">
           {t("next")}
         </Link>
       </nav>
 
       {overview.people.length === 0 ? (
-        <p className="card p-5 text-sm text-muted">{t("empty")}</p>
+        <EmptyState variant="people">{t("empty")}</EmptyState>
       ) : (
         <div className="card overflow-x-auto">
           <table className="w-full min-w-[40rem] text-sm">

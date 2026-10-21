@@ -8,6 +8,7 @@ and English one above the other. The look comes from apps/api/app/messaging/emai
 the same shell the API's own emails use. {{ ... }} are Supabase template variables."""
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -20,7 +21,8 @@ layout = importlib.util.module_from_spec(spec)
 sys.modules["email_layout"] = layout
 spec.loader.exec_module(layout)
 
-BRAND = "MyBiz"  # packages/i18n/brand.json (checked by apps/api/tests/test_auth_settings.py)
+BRAND = json.loads((ROOT / "packages/i18n/brand.json").read_text("utf-8"))["name"]
+WRITTEN = "MyBiz"  # the product name as the texts below spell it; build() swaps in BRAND
 CONFIRM = "{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type="
 CODE = "{{ .Token }}"
 
@@ -215,12 +217,11 @@ def build() -> dict[str, tuple[str, str]]:
     }
     out = {}
     for name, (subject, preheader, he, en) in templates.items():
-        out[name] = (
-            subject,
-            layout.shell(
-                [he, en], subject=subject, preheader=preheader, brand=BRAND, footer=FOOTER, kind=name
-            ),
+        subject, preheader = (text.replace(WRITTEN, BRAND) for text in (subject, preheader))
+        document = layout.shell(
+            [he, en], subject=subject, preheader=preheader, brand=BRAND, footer=FOOTER, kind=name
         )
+        out[name] = (subject, document.replace(WRITTEN, BRAND))
     return out
 
 

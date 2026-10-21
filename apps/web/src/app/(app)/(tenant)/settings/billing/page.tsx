@@ -1,4 +1,4 @@
-import { CreditCard, FlaskConical, Luggage, Receipt, Sparkles } from "lucide-react";
+import { FlaskConical, Sparkles } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -12,30 +12,34 @@ import { formatMoney } from "@/lib/money";
 import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
-import { addTestCard, payInvoice, removeCard } from "./actions";
+import { addTestCard, endPause, payInvoice, removeCard, resumeSubscription } from "./actions";
 import { AiSpend } from "./ai-spend";
+import { AiUsers } from "./ai-users";
 import { DetailsForm } from "./details-form";
-import { Container } from "@/components/layout/container";
-import { PageHeader } from "@/components/layout/page-header";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Note } from "@/components/ui/note";
+import { TopicHeader } from "../topic-header";
 import { Ltr } from "@/components/bidi";
 import { ScrollRegion } from "@/components/scroll-region";
 
 const TRIAL_DAYS = 14;
 const BRANDS = ["visa", "mastercard", "amex"] as const;
 
-export default async function BillingPage() {
+export default async function BillingPage({ searchParams }: PageProps<"/settings/billing">) {
+  const cancelled = (await searchParams).cancelled === "1";
   const t = await getTranslations("billing");
   const tModules = await getTranslations("modules");
-  const tSettings = await getTranslations("settings");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenant();
   if (!canManageSettings(tenant)) redirect("/dashboard");
   const billing = unwrap(await api.GET("/billing", { params: scope }));
   // Only people who manage the AI team see the spend controls (403 for the rest).
   const aiSpend = (await api.GET("/ai/spend", { params: scope })).data;
+  const aiUsers = aiSpend ? (await api.GET("/ai/usage/breakdown", { params: scope })).data : undefined;
   const money = (amount: number, currency = billing.estimate.currency) => formatMoney(amount, currency, locale);
   const day = (value: string) => formatDay(value, locale, { day: "numeric", month: "long", year: "numeric" });
   const method = billing.payment_method;
+  const collection = billing.collection;
   const usage = billing.usage;
   const number = new Intl.NumberFormat(locale);
   const bytes = (value: number) =>
@@ -52,26 +56,10 @@ export default async function BillingPage() {
   ];
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/settings" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-        {tSettings("title")}
-      </Link>
-      <PageHeader
-        title={
-          <span className="flex items-center gap-3">
-            <span className="icon-tile size-11 shrink-0">
-              <CreditCard aria-hidden="true" className="size-5" />
-            </span>
-            {t("title")}
-          </span>
-        }
-        description={t("subtitle")}
-      />
+    <div className="form-columns">
+      <TopicHeader title={t("title")} description={t("subtitle")} />
 
-      <p role="note" className="flex items-center gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
-        <FlaskConical aria-hidden="true" className="size-4 shrink-0" />
-        {t("simulated")}
-      </p>
+      <Note icon={<FlaskConical />}>{t("simulated")}</Note>
 
       <section aria-labelledby="status-heading" className="card-accent flex flex-col gap-4 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -85,6 +73,31 @@ export default async function BillingPage() {
               : t("nextInvoice", { date: day(billing.next_invoice_on) })}
           </span>
         </div>
+        <dl className="grid gap-3 sm:grid-cols-3">
+          <div className="flex flex-col gap-0.5 rounded-xl bg-foreground/5 px-4 py-3">
+            <dt className="text-xs text-muted">{t("summary.plan")}</dt>
+            <dd className="text-xl font-bold tabular-nums">
+              <bdi>{money(billing.estimate.total)}</bdi>
+              <span className="ms-1 text-sm font-medium text-muted">{t("summary.perMonth")}</span>
+            </dd>
+          </div>
+          <div className="flex flex-col gap-0.5 rounded-xl bg-foreground/5 px-4 py-3">
+            <dt className="text-xs text-muted">{t("summary.nextPayment")}</dt>
+            <dd className="text-xl font-bold">{day(billing.next_invoice_on)}</dd>
+          </div>
+          <div className="flex flex-col gap-0.5 rounded-xl bg-foreground/5 px-4 py-3">
+            <dt className="text-xs text-muted">{t("summary.method")}</dt>
+            <dd className="text-xl font-bold">
+              {method ? (
+                <bdi>
+                  {t(`brands.${method.brand}`)} ••{method.last4}
+                </bdi>
+              ) : (
+                <span className="text-base font-medium text-muted">{t("summary.noMethod")}</span>
+              )}
+            </dd>
+          </div>
+        </dl>
         {billing.in_trial && (
           <div
             role="progressbar"
@@ -105,16 +118,96 @@ export default async function BillingPage() {
             {t("balanceDue", { amount: money(billing.balance_due) })}
           </p>
         )}
+        {collection.state === "read_only" && collection.suspend_on && (
+          <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-2 text-sm font-medium">
+            {t("collection.readOnly", { date: day(collection.suspend_on) })}
+          </p>
+        )}
+        {collection.state === "active" && collection.read_only_on && !collection.grace_until && (
+          <p role="status" className="rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
+            {t("collection.overdue", { date: day(collection.read_only_on) })}
+          </p>
+        )}
+        {collection.grace_until && new Date(collection.grace_until) > new Date() && (
+          <p role="status" className="rounded-xl border border-border px-4 py-2 text-sm">
+            {t("collection.grace", { date: day(collection.grace_until) })}
+          </p>
+        )}
       </section>
 
-      <section aria-labelledby="usage-heading" className="card flex flex-col gap-4 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="usage-heading" className="flex items-center gap-2 text-lg font-semibold">
-            <Luggage aria-hidden="true" className="size-5 text-primary-ink" />
-            {t("usage.title", { pack: t(`usage.packs.${usage.pack ?? "included"}`) })}
-          </h2>
-          <span className="text-sm text-muted">{t("usage.since", { date: day(usage.month_start) })}</span>
+      <CollapsibleSection
+        title={t("plan")}
+        defaultOpen
+        storageKey="billing-plan-v2"
+        actions={
+          <Link href="/settings/modules" className="text-sm text-primary-ink underline-offset-4 hover:underline">
+            {t("changeModules")}
+          </Link>
+        }
+      >
+        <div className="flex flex-col gap-4">
+        <ul className="flex flex-col divide-y divide-border text-sm">
+          {estimateLines.map((line) => (
+            <li key={line.key} className="flex items-center justify-between gap-3 py-2">
+              <span>{line.label}</span>
+              <bdi className="tabular-nums">{money(line.amount)}</bdi>
+            </li>
+          ))}
+        </ul>
+        <p className="flex items-baseline justify-between gap-3 border-t border-border pt-3">
+          <span className="font-semibold">{t("perMonth")}</span>
+          <bdi className="text-2xl font-bold tabular-nums">{money(billing.estimate.total)}</bdi>
+        </p>
         </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection title={t("paymentMethod")} storageKey="billing-method-v2">
+        <div className="flex flex-col gap-4">
+        {method ? (
+          <>
+            <div
+              dir="ltr"
+              className="relative flex aspect-[1.7] max-w-xs flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-black p-5 text-white shadow-lg"
+            >
+              <span aria-hidden="true" className="absolute -end-10 -top-10 size-36 rounded-full bg-white/10" />
+              <span className="flex items-center justify-between">
+                <span className="text-sm font-semibold uppercase tracking-wide">{t(`brands.${method.brand}`)}</span>
+                {method.simulated && (
+                  <span className="rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-background">{t("testCard")}</span>
+                )}
+              </span>
+              <span className="font-mono text-lg tracking-widest">•••• •••• •••• {method.last4}</span>
+              <span className="text-xs opacity-80">{method.exp}</span>
+            </div>
+            <form action={removeCard}>
+              <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
+                {t("removeCard")}
+              </button>
+            </form>
+          </>
+        ) : (
+          <form action={addTestCard} className="flex flex-col gap-3">
+            <p className="text-sm text-muted">{t("noCard")}</p>
+            <SelectField
+              label={t("brand")}
+              name="brand"
+              defaultValue="visa"
+              options={BRANDS.map((brand) => ({ value: brand, label: t(`brands.${brand}`) }))}
+            />
+            <div>
+              <SubmitButton>{t("addTestCard")}</SubmitButton>
+            </div>
+          </form>
+        )}
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        title={t("usage.title", { pack: t(`usage.packs.${usage.pack ?? "included"}`) })}
+        description={t("usage.since", { date: day(usage.month_start) })}
+        storageKey="billing-usage-v2"
+      >
+        <div className="flex flex-col gap-4">
         <Meter
           label={t("usage.messages")}
           used={usage.messages}
@@ -140,87 +233,17 @@ export default async function BillingPage() {
             {t("usage.more")}
           </Link>
         )}
-      </section>
+        </div>
+      </CollapsibleSection>
 
       {aiSpend && <AiSpend spend={aiSpend} />}
+      {aiUsers && <AiUsers breakdown={aiUsers} />}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <section aria-labelledby="plan-heading" className="card flex flex-col gap-4 p-6">
-          <div className="flex items-center justify-between gap-3">
-            <h2 id="plan-heading" className="text-lg font-semibold">{t("plan")}</h2>
-            <Link href="/settings/modules" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-              {t("changeModules")}
-            </Link>
-          </div>
-          <ul className="flex flex-col divide-y divide-border text-sm">
-            {estimateLines.map((line) => (
-              <li key={line.key} className="flex items-center justify-between gap-3 py-2">
-                <span>{line.label}</span>
-                <bdi className="tabular-nums">{money(line.amount)}</bdi>
-              </li>
-            ))}
-          </ul>
-          <p className="flex items-baseline justify-between gap-3 border-t border-border pt-3">
-            <span className="font-semibold">{t("perMonth")}</span>
-            <bdi className="text-2xl font-bold tabular-nums">{money(billing.estimate.total)}</bdi>
-          </p>
-        </section>
-
-        <section aria-labelledby="method-heading" className="card flex flex-col gap-4 p-6">
-          <h2 id="method-heading" className="text-lg font-semibold">{t("paymentMethod")}</h2>
-          {method ? (
-            <>
-              <div
-                dir="ltr"
-                className="relative flex aspect-[1.7] max-w-xs flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-black p-5 text-white shadow-lg"
-              >
-                <span aria-hidden="true" className="absolute -end-10 -top-10 size-36 rounded-full bg-white/10" />
-                <span className="flex items-center justify-between">
-                  <span className="text-sm font-semibold uppercase tracking-wide">{t(`brands.${method.brand}`)}</span>
-                  {method.simulated && (
-                    <span className="rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-background">{t("testCard")}</span>
-                  )}
-                </span>
-                <span className="font-mono text-lg tracking-widest">•••• •••• •••• {method.last4}</span>
-                <span className="text-xs opacity-80">{method.exp}</span>
-              </div>
-              <form action={removeCard}>
-                <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
-                  {t("removeCard")}
-                </button>
-              </form>
-            </>
-          ) : (
-            <form action={addTestCard} className="flex flex-col gap-3">
-              <p className="text-sm text-muted">{t("noCard")}</p>
-              <SelectField
-                label={t("brand")}
-                name="brand"
-                defaultValue="visa"
-                options={BRANDS.map((brand) => ({ value: brand, label: t(`brands.${brand}`) }))}
-              />
-              <div>
-                <SubmitButton>{t("addTestCard")}</SubmitButton>
-              </div>
-            </form>
-          )}
-        </section>
-      </div>
-
-      <section aria-labelledby="details-heading" className="card flex flex-col gap-4 p-6">
-        <h2 id="details-heading" className="text-lg font-semibold">{t("details")}</h2>
-        <DetailsForm details={billing.details} />
-      </section>
-
-      <section aria-labelledby="invoices-heading" className="card flex flex-col gap-4 p-6">
-        <h2 id="invoices-heading" className="flex items-center gap-2 text-lg font-semibold">
-          <Receipt aria-hidden="true" className="size-5 text-primary-ink" />
-          {t("invoices")}
-        </h2>
+      <CollapsibleSection title={t("invoices")} storageKey="billing-invoices-v2">
         {billing.invoices.length === 0 ? (
           <p className="text-sm text-muted">{t("noInvoices")}</p>
         ) : (
-          <ScrollRegion labelledBy="invoices-heading">
+          <ScrollRegion label={t("invoices")}>
             <table className="w-full text-sm">
               <thead className="text-muted">
                 <tr className="border-b border-border">
@@ -269,8 +292,52 @@ export default async function BillingPage() {
             </table>
           </ScrollRegion>
         )}
-      </section>
-    </Container>
+      </CollapsibleSection>
+
+      <CollapsibleSection title={t("details")} storageKey="billing-details-v2">
+        <DetailsForm details={billing.details} />
+      </CollapsibleSection>
+
+      <CollapsibleSection title={t("subscription.title")} storageKey="billing-subscription-v2">
+        <div className="flex flex-col gap-4">
+        {cancelled ? <p className="text-sm font-medium text-success-ink" role="status">{t("cancelFlow.done", { date: collection.cancel_at ? day(collection.cancel_at) : "" })}</p> : null}
+        {collection.cancel_at ? (
+          <>
+            <p className="text-sm">{t("subscription.cancelling", { date: day(collection.cancel_at) })}</p>
+            {collection.refund_minor ? (
+              <p className="text-sm text-muted">{t("subscription.refund", { amount: money(collection.refund_minor, collection.currency ?? undefined) })}</p>
+            ) : null}
+            <form action={resumeSubscription}>
+              <SubmitButton>{t("subscription.resume")}</SubmitButton>
+            </form>
+          </>
+        ) : (
+          <>
+            {collection.paused_until ? (
+              <>
+                <p className="text-sm">{t("subscription.paused", { date: day(collection.paused_until) })}</p>
+                <form action={endPause}>
+                  <SubmitButton>{t("subscription.endPause")}</SubmitButton>
+                </form>
+              </>
+            ) : null}
+            <p className="text-sm text-muted">{t("subscription.hint")}</p>
+            {tenant.role === "owner" ? (
+              <div>
+                <Link href="/settings/billing/cancel" className="btn-link font-medium text-danger underline-offset-4 hover:underline">
+                  {t("subscription.cancelStart")}
+                </Link>
+              </div>
+            ) : null}
+            <Link href="/legal/cancellation" target="_blank" className="text-sm text-primary-ink underline underline-offset-4">
+              {t("subscription.policy")}
+            </Link>
+          </>
+        )}
+        </div>
+      </CollapsibleSection>
+
+    </div>
   );
 }
 

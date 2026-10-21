@@ -22,6 +22,7 @@ export async function MarketingFooter() {
       title: t("footer.product"),
       links: [
         { href: "/features", label: t("nav.features") },
+        { href: "/websites", label: t("nav.websites") },
         { href: "/pricing", label: t("nav.pricing") },
         { href: "/login", label: t("nav.login") },
         { href: "/start", label: t("nav.start") },
@@ -50,6 +51,7 @@ export async function MarketingFooter() {
       links: [
         { href: "/legal/terms", label: t("footer.terms") },
         { href: "/legal/privacy", label: t("footer.privacy") },
+        { href: "/legal/cancellation", label: t("footer.cancellation") },
         { href: "/legal/dpa", label: t("footer.dpa") },
         { href: "/legal/subprocessors", label: t("footer.subprocessors") },
         { href: "/legal/accessibility", label: t("footer.accessibility") },
@@ -70,7 +72,7 @@ export async function MarketingFooter() {
             <ul aria-label={t("footer.social")} className="mt-2 flex flex-wrap gap-2">
               {social.map(({ key, label, url }) => (
                 <li key={key}>
-                  <a href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="flex size-9 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-electric hover:text-white">
+                  <a href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="flex size-11 items-center justify-center rounded-full md:size-9 border border-white/20 text-white/80 transition-colors hover:border-electric hover:text-white">
                     <SocialIcon name={key} className="size-4" />
                   </a>
                 </li>

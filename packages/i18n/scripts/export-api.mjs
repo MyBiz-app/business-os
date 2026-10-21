@@ -1,4 +1,4 @@
-// Copies the translations the API itself renders (emails, module names, default branch names, sample businesses, WhatsApp AI replies) into the API package,
+// Copies the translations the API itself renders (emails, module names, default branch names, sample businesses, WhatsApp AI replies, the cancellation policy text) into the API package,
 // because the API's container image is built from apps/api alone. The copy is checked in;
 // test/messages.test.mjs fails when it is out of date.
 //
@@ -17,12 +17,15 @@ export function apiMessages(locale) {
   return {
     email: all.email,
     securityEmail: all.security.email,
+    dunningEmail: all.billing.dunningEmail,
+    cancellationEmail: all.billing.cancellationEmail,
     pdfDocuments: { ...all.pdfDocuments, methods: all.receipts.methods },
     modules: { names: all.modules.names },
     locations: { mainBranch: all.locations.mainBranch, branchNumber: all.locations.branchNumber },
     samples: all.samples,
     bills: all.bills,
     whatsappAi: all.whatsappAi,
+    cancellationPolicy: all.cancellationPolicy,
     verticals: Object.fromEntries(Object.entries(all.verticals).map(([key, texts]) => [key, { name: texts.name }])),
   };
 }

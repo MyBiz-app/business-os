@@ -93,8 +93,9 @@ with sync_playwright() as p:
     member.get_by_label("הקוד בן 6 הספרות").fill(h.otp(member_email))
     # Filling the last digit signs in on its own.
     member.wait_for_url("**/join**")
+    h.accept_legal(member)
     member.get_by_label("שם פרטי").fill("נועה")
-    member.get_by_role("button", name="הצטרפות למספרת דנה").click(); member.wait_for_url("**/home")
+    member.get_by_role("button", name="הצטרפות למספרת דנה").click(); member.get_by_role("button", name="להמשך", exact=True).click(); member.wait_for_url("**/home")
     member.goto(f"{h.APP}/schedule")
     member.get_by_role("button", name=re.compile("קביעת תור")).first.click(timeout=30000)
     member.wait_for_url("**/appointment")

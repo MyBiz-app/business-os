@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import QRCode from "qrcode";
 
 import { siteOrigin } from "@/lib/origin";
 import { getTenantFor } from "@/lib/tenant";
+import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -19,9 +19,7 @@ export default async function JoinCodePage() {
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/clients" className="text-sm text-primary-ink underline-offset-4 hover:underline print:hidden">
-        {term("back")}
-      </Link>
+      <BackLink href="/clients" label={term("back")} />
       <PageHeader title={t("inviteToApp")} description={t("staffHint")} />
 
       <section className="flex flex-col items-center gap-5 card p-8 text-center">

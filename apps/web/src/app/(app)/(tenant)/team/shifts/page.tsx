@@ -5,7 +5,6 @@ import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
 import { avatarSrc } from "@/components/avatar";
-import { BackLink } from "@/components/back-link";
 import { LiveRefresh } from "@/components/live-refresh";
 import { OpeningHoursList } from "@/components/opening-hours";
 import { unwrap } from "@/lib/api";
@@ -27,8 +26,9 @@ import { PublishBar } from "./publish-bar";
 import { PublishSettings } from "./publish-settings";
 import { SaveShiftsDefault } from "./save-default";
 import { StationSettings } from "./station-settings";
-import { Segmented } from "./segmented";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { type BoardGap, type BoardPerson, type BoardShift, type BoardStation, type BoardTemplate, type Editing, ShiftBoard } from "./shift-board";
+import { TeamTabs } from "../team-tabs";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -56,8 +56,8 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
       branches.map(async (b) => ({ branch: b, hours: (await api.GET("/locations/{location_id}/hours", { params: { ...scope, path: { location_id: b.id } } })).data?.intervals ?? [] })),
     );
     return (
-      <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-        <BackLink href="/team" label={t("team.title")} />
+      <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+        <TeamTabs active="shifts" tenant={tenant} />
         <PageHeader title={t("shifts.soloTitle")} description={t("shifts.soloSubtitle")} />
         {hours.map(({ branch, hours }) => (
           <section key={branch.id} className="card flex flex-col gap-4 p-6">
@@ -74,7 +74,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           </section>
         ))}
         <div className="grid gap-4 sm:grid-cols-2">
-          <Link href={`/team/${me.id}/hours`} className="card card-hover flex items-center gap-3 p-5">
+          <Link href={`/team/${me.id}?tab=availability`} className="card card-hover flex items-center gap-3 p-5">
             <Clock aria-hidden="true" className="size-5 text-primary-ink" />
             <span className="flex flex-col">
               <span className="font-semibold">{t("shifts.soloAvailability")}</span>
@@ -222,42 +222,46 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
   const branchList = branches.map((b) => ({ ...b, color: colorOf.get(b.id) ?? "" }));
 
   return (
-    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-5 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <LiveRefresh />
-      <BackLink href="/team" label={t("team.title")} />
+      <TeamTabs active="shifts" tenant={tenant} />
       <PageHeader title={t("shifts.title")} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav aria-label={t("shifts.navigate")} className="flex items-center gap-1.5">
-          <Link href={href({ date: stepWindow(range, win, -1) })} aria-label={t(`shifts.previous.${range}`)} className="btn-secondary size-9">
+          <Link scroll={false} href={href({ date: stepWindow(range, win, -1) })} aria-label={t(`shifts.previous.${range}`)} className="btn-secondary size-9">
             <ChevronsLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
           </Link>
           {(range === "week" || range === "custom") && (
-            <Link href={href({ date: addDays(anchor, -1) })} aria-label={t("shifts.previous.day")} className="btn-secondary size-9">
+            <Link scroll={false} href={href({ date: addDays(anchor, -1) })} aria-label={t("shifts.previous.day")} className="btn-secondary size-9">
               <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
             </Link>
           )}
-          <Link href={href({ date: today })} aria-current={showToday ? undefined : "date"} className={`${showToday ? "btn-secondary" : "btn-primary"} px-3 py-2 text-sm`}>
+          <Link scroll={false} href={href({ date: today })} aria-current={showToday ? undefined : "date"} className={`${showToday ? "btn-secondary" : "btn-primary"} px-3 py-2 text-sm`}>
             {t("shifts.today")}
           </Link>
           {(range === "week" || range === "custom") && (
-            <Link href={href({ date: addDays(anchor, 1) })} aria-label={t("shifts.next.day")} className="btn-secondary size-9">
+            <Link scroll={false} href={href({ date: addDays(anchor, 1) })} aria-label={t("shifts.next.day")} className="btn-secondary size-9">
               <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
             </Link>
           )}
-          <Link href={href({ date: stepWindow(range, win, 1) })} aria-label={t(`shifts.next.${range}`)} className="btn-secondary size-9">
+          <Link scroll={false} href={href({ date: stepWindow(range, win, 1) })} aria-label={t(`shifts.next.${range}`)} className="btn-secondary size-9">
             <ChevronsRight aria-hidden="true" className="size-4 rtl:rotate-180" />
           </Link>
           <span className="ms-2 text-lg font-semibold">{rangeLabel}</span>
         </nav>
         <div className="flex flex-wrap items-center gap-2">
-          <Segmented
+          <LinkSegmented
             label={t("shifts.rangeLabel")}
-            items={RANGES.map((r) => ({ key: r, label: t(`shifts.ranges.${r}`), href: href({ range: r }), active: r === range }))}
+            loadingLabel={t("common.loading")}
+            active={range}
+            options={RANGES.map((r) => ({ key: r, label: t(`shifts.ranges.${r}`), href: href({ range: r }) }))}
           />
-          <Segmented
+          <LinkSegmented
             label={t("shifts.viewLabel")}
-            items={(["people", "branches"] as const).map((v) => ({ key: v, label: t(`shifts.views.${v}`), href: href({ view: v }), active: v === view }))}
+            loadingLabel={t("common.loading")}
+            active={view}
+            options={(["people", "branches"] as const).map((v) => ({ key: v, label: t(`shifts.views.${v}`), href: href({ view: v }) }))}
           />
         </div>
       </div>
@@ -269,7 +273,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
             const next = on ? shown.filter((id) => id !== b.id) : [...shown, b.id];
             const nextIds = view === "branches" ? next.slice(-limit) : next;
             return (
-              <Link
+              <Link scroll={false}
                 key={b.id}
                 href={href({ b: nextIds.length === 0 || nextIds.length === branches.length ? (savedBranches.length ? "all" : undefined) : nextIds.join(",") })}
                 aria-current={on ? "true" : undefined}
@@ -327,10 +331,20 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         />
       )}
       {editing && canEdit && <EditFromUrl key={`${editing.shift?.id ?? "new"}-${editing.day}-${editing.locationId ?? ""}`} editing={editing} people={people} branches={branchList} templates={templates} stations={stations} closeHref={href({ edit: undefined, add: undefined })} away={away} />}
-      {canEdit && <StationSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, stations: stations.filter((x) => x.locationId === b.id) }))} />}
-      {canEdit && <CoverageSettings weekdays={weekdays} branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, rules: ruleSets.find((r) => r.id === b.id)?.rules ?? [] }))} />}
-      {canManageSettings(tenant) && <PublishSettings auto={tenant.shifts_publish_auto} cadence={tenant.shifts_publish_cadence} weekday={tenant.shifts_publish_weekday} day={tenant.shifts_publish_day} time={publishTime} weekdays={weekdays} />}
-      {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
+      {(canEdit || canManageSettings(tenant)) && (
+        <section aria-labelledby="shift-settings-heading" className="flex flex-col gap-3 pt-4">
+          <div className="flex flex-col gap-1">
+            <h2 id="shift-settings-heading" className="text-lg font-semibold">
+              {t("shifts.settingsTitle")}
+            </h2>
+            <p className="text-sm text-muted">{t("shifts.settingsHint")}</p>
+          </div>
+        {canEdit && <StationSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, stations: stations.filter((x) => x.locationId === b.id) }))} />}
+        {canEdit && <CoverageSettings weekdays={weekdays} branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, rules: ruleSets.find((r) => r.id === b.id)?.rules ?? [] }))} />}
+        {canManageSettings(tenant) && <PublishSettings auto={tenant.shifts_publish_auto} cadence={tenant.shifts_publish_cadence} weekday={tenant.shifts_publish_weekday} day={tenant.shifts_publish_day} time={publishTime} weekdays={weekdays} />}
+        {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
+        </section>
+      )}
     </Container>
   );
 }

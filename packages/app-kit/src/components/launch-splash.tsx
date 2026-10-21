@@ -147,7 +147,7 @@ export function DepthLogo({ size = 1, still = false }: { size?: number; still?: 
         <View style={{ width: TILE, height: TILE, transform: [{ scale: size }], transformOrigin: "top left" }}>
           <LogoMark />
         </View>
-        <View pointerEvents="none" style={{ position: "absolute", top: 0, bottom: 0, start: 0, end: 0, borderRadius: 22 * size, overflow: "hidden" }}>
+        <View style={{ pointerEvents: "none", position: "absolute", top: 0, bottom: 0, start: 0, end: 0, borderRadius: 22 * size, overflow: "hidden" }}>
           <Animated.View
             style={{
               position: "absolute",
@@ -198,7 +198,7 @@ export function LaunchSplash() {
 
   if (!visible) return null;
   return (
-    <Animated.View pointerEvents="none" style={[styles.layer, { backgroundColor: palette.background, opacity: fade }]}>
+    <Animated.View style={[styles.layer, { pointerEvents: "none" }, { backgroundColor: palette.background, opacity: fade }]}>
       <AuthBackdrop />
       <Animated.View
         style={{

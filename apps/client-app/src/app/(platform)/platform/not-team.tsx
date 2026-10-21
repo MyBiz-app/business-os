@@ -5,16 +5,18 @@ import { Text } from "@business-os/app-kit/components/text";
 import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 import { AreaSwitcher } from "@/components/area-switcher";
+import { usePlatform } from "@/providers/platform-provider";
 
 /** Shown when the account is not (or no longer) on the MyBiz team; other areas stay reachable. */
 export default function NotTeam() {
   const t = useTranslations("staffApp.notStaff");
   const { palette } = useTheme();
+  const { mfaRequired } = usePlatform();
   return (
     <Screen palette={palette}>
-      <Heading palette={palette}>{t("title")}</Heading>
+      <Heading palette={palette}>{t(mfaRequired ? "mfaTitle" : "title")}</Heading>
       <Card palette={palette}>
-        <Text style={[styles.muted, { color: palette.muted }]}>{t("text")}</Text>
+        <Text style={[styles.muted, { color: palette.muted }]}>{t(mfaRequired ? "mfaText" : "text")}</Text>
       </Card>
       <AreaSwitcher palette={palette} />
       <PreferencesCard palette={palette} signOutVariant="danger" />

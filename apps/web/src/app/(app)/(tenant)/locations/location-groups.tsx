@@ -8,6 +8,7 @@ import { Field } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
 import type { FormState } from "@/lib/form-state";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Action = (state: FormState, formData: FormData) => Promise<FormState>;
 
@@ -33,7 +34,7 @@ function GroupForm({
   const [state, formAction] = useActionState(action, {});
   const [selected, setSelected] = useState<string[]>(group?.location_ids ?? []);
   return (
-    <form action={formAction} className="flex flex-col gap-3 rounded-xl border border-border p-4">
+    <form action={formAction} className="flex flex-col gap-3">
       <FormFeedback state={state} />
       <Field label={t("name")} name="name" defaultValue={group?.name ?? ""} maxLength={60} required />
       <BranchScopePicker branches={branches} groups={[]} value={selected} onChange={setSelected} name="location_id" branchesOnly legend={t("branches")} />
@@ -52,31 +53,29 @@ function GroupForm({
 export function LocationGroups({ branches, groups, saveGroup, removeGroup }: Props) {
   const t = useTranslations("locations.groups");
   return (
-    <section className="card flex flex-col gap-4 p-5" aria-labelledby="location-groups-heading">
+    <section className="flex flex-col gap-3 border-t border-border pt-6" aria-labelledby="location-groups-heading">
       <div className="flex flex-col gap-1">
-        <h2 id="location-groups-heading" className="text-lg font-semibold">
+        <h3 id="location-groups-heading" className="font-semibold">
           {t("title")}
-        </h2>
+        </h3>
         <p className="text-sm text-muted">{t("hint")}</p>
       </div>
       {groups.length === 0 && <p className="text-sm text-muted">{t("empty")}</p>}
       {groups.map((group) => (
-        <GroupForm
-          key={`${group.id}-${group.name}-${group.location_ids.join()}`}
-          branches={branches}
-          group={group}
-          action={saveGroup.bind(null, group.id)}
-          onDelete={() => {
-            if (window.confirm(t("confirmDelete", { name: group.name }))) void removeGroup(group.id);
-          }}
-        />
+        <CollapsibleSection key={`${group.id}-${group.name}-${group.location_ids.join()}`} variant="inline" title={<span dir="auto">{group.name}</span>}>
+          <GroupForm
+            branches={branches}
+            group={group}
+            action={saveGroup.bind(null, group.id)}
+            onDelete={() => {
+              if (window.confirm(t("confirmDelete", { name: group.name }))) void removeGroup(group.id);
+            }}
+          />
+        </CollapsibleSection>
       ))}
-      <details className="rounded-xl">
-        <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("new")}</summary>
-        <div className="mt-3">
-          <GroupForm branches={branches} group={null} action={saveGroup.bind(null, null)} />
-        </div>
-      </details>
+      <CollapsibleSection variant="inline" title={t("new")} storageKey="location-groups-new">
+        <GroupForm branches={branches} group={null} action={saveGroup.bind(null, null)} />
+      </CollapsibleSection>
     </section>
   );
 }

@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
+import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { ScrollRegion } from "@/components/scroll-region";
@@ -31,6 +32,7 @@ export default async function OrdersPage({ searchParams }: PageProps<"/sales/ord
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <BackLink href="/sales" label={t("orders.back")} />
       <PageHeader titleId="orders-heading" title={t("orders.title")} description={t("orders.subtitle")} />
       {items.length === 0 ? (
         <EmptyState variant="list">{t("orders.empty")}</EmptyState>
@@ -71,7 +73,7 @@ export default async function OrdersPage({ searchParams }: PageProps<"/sales/ord
           </ScrollRegion>
           <p className="text-sm text-muted">{t("orders.showing", { shown: items.length, total })}</p>
           {total > items.length && shown < MAX && (
-            <Link href={`/sales/orders?shown=${shown + STEP}`} className="btn-secondary self-start px-4 py-2 text-sm">
+            <Link scroll={false} href={`/sales/orders?shown=${shown + STEP}`} className="btn-secondary self-start px-4 py-2 text-sm">
               {t("orders.more")}
             </Link>
           )}

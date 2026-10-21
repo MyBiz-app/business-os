@@ -55,13 +55,14 @@ with sync_playwright() as p:
     page.get_by_label("הקוד בן 6 הספרות").fill(h.otp(client_email))
     # Filling the last digit signs in on its own.
     page.wait_for_url("**/join")
+    h.accept_legal(page)
     scan(page, "join")
     page.get_by_label("קוד הצטרפות").fill(code)
     page.get_by_role("button", name="המשך").click()
     page.get_by_label("שם פרטי").fill("דנה")
     page.get_by_label("שם משפחה").fill("כהן")
     scan(page, "join-confirm")
-    page.get_by_role("button", name=f"הצטרפות ל{name}").click(); page.wait_for_url("**/home")
+    page.get_by_role("button", name=f"הצטרפות ל{name}").click(); page.get_by_role("button", name="להמשך", exact=True).click(); page.wait_for_url("**/home")
     h.app_ready(page)
     assert page.get_by_text("היי דנה").is_visible(), "the greeting uses the name given at join"
     print(f"1. joined {name}: ok")

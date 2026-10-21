@@ -46,7 +46,7 @@ def test_alert_skips_a_channel_that_is_off(engine: Engine) -> None:
 
 def test_a_failing_job_alerts_once(engine: Engine, monkeypatch: pytest.MonkeyPatch) -> None:
     alerts: list[str] = []
-    monkeypatch.setattr(jobs, "notify_team", lambda _e, title, _b: alerts.append(title))
+    monkeypatch.setattr(jobs.runner, "notify_team", lambda _e, title, _b: alerts.append(title))
 
     def boom(_conn) -> None:
         raise RuntimeError("provider down")
@@ -95,6 +95,7 @@ def test_health_page_data(client: TestClient, engine: Engine, auth: AuthHeaders)
         by_job["purge-expired"]["last_ok"] is False and by_job["purge-expired"]["failures_24h"] == 1
     )
     assert body["database_bytes"] > 0
+    assert body["files_bytes"] >= 0
     assert any(route["route"] == "GET /platform/me" for route in body["routes"])
 
 

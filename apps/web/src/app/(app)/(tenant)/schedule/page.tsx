@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { termsOf } from "@business-os/verticals";
@@ -18,7 +18,12 @@ import { CopyWeek } from "./copy-week";
 import { PublishWeek } from "./publish-week";
 import { SaveDefault } from "./save-default";
 import { Container } from "@/components/layout/container";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
+import { MoreMenu } from "@/components/more-menu";
+import { openedId } from "@/lib/open-window";
+
+import { SessionWindow } from "./session-window";
 
 export default async function SchedulePage({ searchParams }: PageProps<"/schedule">) {
   const t = await getTranslations("schedule");
@@ -45,7 +50,9 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const asked = explicit ? known(String(query.branches).split(",")) : branch ? [] : known(tenant.schedule_default_branches ?? []);
   let laneIds = limitLanes(asked, view);
   // Nothing picked and no menu branch: all of them side by side when they fit (a month: the first).
-  if (laneIds.length === 0 && !branch && branches.length > 1 && (view === "month" || branches.length <= LANE_LIMIT[view])) {
+  // A week with more than two branches opens as one merged column (branch tags on each class): three lanes cut the class names short.
+  const fits = view === "week" ? branches.length <= 2 : branches.length <= LANE_LIMIT[view];
+  if (laneIds.length === 0 && !branch && branches.length > 1 && (view === "month" || fits)) {
     laneIds = limitLanes(branches.map((b) => b.id), view);
   }
   const multi = laneIds.length > 0;
@@ -73,7 +80,18 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const avatarOf = new Map(team.map((m) => [m.user_id, avatarSrc(m.user_id, m.avatar_url)]));
 
   const mergedBranches = !multi && shown.length > 1;
-  const events: GridEvent[] = sessions.map((session) => {
+  // From the reports: one service or one instructor only.
+  const serviceId = typeof query.service === "string" ? query.service : null;
+  const instructorId = typeof query.instructor === "string" ? query.instructor : null;
+  const shownSessions = sessions.filter(
+    (session) => (!serviceId || session.service.id === serviceId) && (!instructorId || session.instructor_user_id === instructorId),
+  );
+  const filterName = serviceId
+    ? sessions.find((session) => session.service.id === serviceId)?.service.name
+    : instructorId
+      ? team.find((member) => member.user_id === instructorId)?.full_name
+      : null;
+  const events: GridEvent[] = shownSessions.map((session) => {
     const location = session.location_id ?? null;
     const day = dayOf(session.starts_at, tenant.time_zone);
     const startsAt = minutesIn(session.starts_at, tenant.time_zone);
@@ -92,7 +110,12 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         ? t("cancelled")
         : session.booking_mode === "appointment"
           ? (session.appointment_client ?? null)
-          : t("spotsLabel", { booked: session.booked, capacity: session.capacity }),
+          : [
+              t("spotsLabel", { booked: session.booked, capacity: session.capacity }),
+              session.waitlisted + session.waiting_requests > 0 ? t("waitingLabel", { count: session.waitlisted + session.waiting_requests }) : null,
+            ]
+              .filter(Boolean)
+              .join(" · "),
       color: session.service.color ?? "var(--primary)",
       branch: mergedBranches && location ? { name: nameOf.get(location) ?? "", color: colorOf.get(location) ?? "var(--primary)" } : null,
       cancelled,
@@ -146,9 +169,10 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
       : view === "week"
         ? `${formatDay(days[0], locale, { day: "numeric", month: "short" })} - ${formatDay(days[6], locale, { day: "numeric", month: "short", year: "numeric" })}`
         : formatDay(monthStart(anchor), locale, { month: "long", year: "numeric" });
+  const openedSession = openedId(query);
   const link = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams();
-    const merged = { view: isBoardRange(query.view) ? query.view : null, date: anchor === today ? null : anchor, branches: explicit ? String(query.branches) : null, ...changes };
+    const merged = { view: isBoardRange(query.view) ? query.view : null, date: anchor === today ? null : anchor, branches: explicit ? String(query.branches) : null, service: serviceId, instructor: instructorId, ...changes };
     for (const [key, value] of Object.entries(merged)) if (value) next.set(key, value);
     const text = next.toString();
     return text ? `/schedule?${text}` : "/schedule";
@@ -170,10 +194,10 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const next = view === "month" ? addMonths(anchor, 1) : addDays(start, branchStep);
   const stepName = t(view === "day" ? "stepDay" : view === "week" ? "stepWeek" : "stepMonth");
   const includesToday = days.includes(today) && (view !== "month" || today.startsWith(anchor.slice(0, 7)));
-  const customized = isBoardRange(query.view) || explicit || isDay(query.date) || isDay(query.week);
+  const customized = isBoardRange(query.view) || explicit || serviceId !== null || instructorId !== null || isDay(query.date) || isDay(query.week);
 
   return (
-    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-5 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <LiveRefresh />
       <PageHeader
         title={term("schedule")}
@@ -185,13 +209,22 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         }
         actions={
           <>
-          {canWriteSchedule(tenant) && (
-            <Link href="/schedule/closed" className="btn-ghost px-3 py-2 text-sm">
-              {t("closedDays")}
-            </Link>
+          {(canWriteSchedule(tenant) || tenant.waitlist_enabled) && (
+            <MoreMenu label={t("moreActions")}>
+              {canWriteSchedule(tenant) && (
+                <Link href="/schedule/closed" className="btn-ghost justify-start px-3 py-2 text-sm">
+                  {t("closedDays")}
+                </Link>
+              )}
+              {tenant.waitlist_enabled && (
+                <Link href="/schedule/waitlist" className="btn-ghost justify-start px-3 py-2 text-sm">
+                  {t("waitlists")}
+                </Link>
+              )}
+              {canWriteSchedule(tenant) && <PublishWeek />}
+              {canWriteSchedule(tenant) && view === "week" && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
+            </MoreMenu>
           )}
-          {canWriteSchedule(tenant) && <PublishWeek />}
-          {canWriteSchedule(tenant) && view === "week" && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
           {tenant.permissions.includes("bookings.manage") && (
             <Link href={`/schedule/appointment?date=${start > today ? start : today}`} className="btn-secondary px-4 py-2.5 text-sm">
               {tAppointments("new")}
@@ -209,12 +242,12 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav aria-label={term("schedule")} className="flex flex-wrap items-center gap-1.5">
           {view === "day" && (
-            <Link href={link({ date: addDays(start, -7) })} aria-label={t("previousWeek")} title={t("previousWeek")} className="btn-secondary h-9 gap-1 px-2 text-sm">
+            <Link scroll={false} href={link({ date: addDays(start, -7) })} aria-label={t("previousWeek")} title={t("previousWeek")} className="btn-secondary h-9 gap-1 px-2 text-sm">
               <ChevronsLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
               <span className="hidden sm:inline">{t("stepWeek")}</span>
             </Link>
           )}
-          <Link
+          <Link scroll={false}
             href={link({ date: prev })}
             aria-label={view === "day" ? t("previousDay") : view === "week" ? t("previousWeek") : t("previousMonth")}
             className="btn-secondary h-9 gap-1 px-2 text-sm"
@@ -222,10 +255,10 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{stepName}</span>
           </Link>
-          <Link href={link({ date: null })} aria-current={includesToday ? "date" : undefined} className="btn-secondary h-9 px-3 text-sm font-semibold">
+          <Link scroll={false} href={link({ date: null })} aria-current={includesToday ? "date" : undefined} className="btn-secondary h-9 px-3 text-sm font-semibold">
             {t("today")}
           </Link>
-          <Link
+          <Link scroll={false}
             href={link({ date: next })}
             aria-label={view === "day" ? t("nextDay") : view === "week" ? t("nextWeek") : t("nextMonth")}
             className="btn-secondary h-9 gap-1 px-2 text-sm"
@@ -234,25 +267,34 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
           </Link>
           {view === "day" && (
-            <Link href={link({ date: addDays(start, 7) })} aria-label={t("nextWeek")} title={t("nextWeek")} className="btn-secondary h-9 gap-1 px-2 text-sm">
+            <Link scroll={false} href={link({ date: addDays(start, 7) })} aria-label={t("nextWeek")} title={t("nextWeek")} className="btn-secondary h-9 gap-1 px-2 text-sm">
               <span className="hidden sm:inline">{t("stepWeek")}</span>
               <ChevronsRight aria-hidden="true" className="size-4 rtl:rotate-180" />
             </Link>
           )}
           <DateJump value={anchor} href={link({ date: "__day__" })} label={t("goToDate")} />
-          <div role="group" aria-label={t("view")} className="order-last flex w-full rounded-xl border border-border bg-surface p-0.5 text-sm sm:order-none sm:ms-1 sm:w-auto">
-            {(["day", "week", "month"] as const).map((option) => (
-              <Link
-                key={option}
-                href={viewLink(option)}
-                aria-current={view === option ? "page" : undefined}
-                className={`flex-1 rounded-lg px-3 py-1.5 text-center font-medium transition-colors sm:flex-none ${view === option ? "bg-primary/12 text-primary-ink" : "text-muted hover:text-foreground"}`}
-              >
-                {t(option === "day" ? "dayView" : option === "week" ? "weekView" : "monthView")}
-              </Link>
-            ))}
-          </div>
+          <LinkSegmented
+            label={t("view")}
+            loadingLabel={tAll("common.loading")}
+            active={view}
+            options={(["day", "week", "month"] as const).map((option) => ({
+              key: option,
+              label: t(option === "day" ? "dayView" : option === "week" ? "weekView" : "monthView"),
+              href: viewLink(option),
+            }))}
+          />
         </nav>
+        {(serviceId || instructorId) && (
+          <Link
+            href={link({ service: null, instructor: null })}
+            scroll={false}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary-ink transition-colors hover:bg-primary/15"
+          >
+            <bdi>{filterName ?? t("filtered")}</bdi>
+            <X aria-hidden="true" className="size-3.5" />
+            <span className="sr-only">{t("removeFilter")}</span>
+          </Link>
+        )}
         {customized && (
           <Link href="/schedule" className="text-sm text-muted underline-offset-4 hover:text-foreground hover:underline">
             {t("resetView")}
@@ -274,7 +316,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                 </>
               );
               return href ? (
-                <Link key={b.id} href={href} aria-current={on ? "true" : undefined} className={className}>
+                <Link key={b.id} scroll={false} href={href} aria-current={on ? "true" : undefined} className={className}>
                   {content}
                 </Link>
               ) : (
@@ -296,7 +338,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           <ul className="grid grid-cols-7 gap-1.5">
             {days.map((day) => (
               <li key={day}>
-                <Link
+                <Link scroll={false}
                   href={link({ view: "day", date: day })}
                   aria-current={day === today ? "date" : undefined}
                   className={`flex flex-col items-center rounded-xl border py-1.5 text-xs transition-colors ${day === today ? "border-primary bg-primary text-on-primary" : "border-border bg-surface hover:bg-foreground/5"}`}
@@ -317,7 +359,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           month={anchor.slice(0, 7)}
           today={today}
           locale={locale}
-          events={events}
+          events={events.map((event) => ({ ...event, href: link({ open: event.id }) }))}
           closed={closed}
           labels={{ closed: t("closedDay"), more: t.raw("more") as string, empty: term("noSessions") }}
           dayHref={link({ view: "day", date: "__day__" })}
@@ -327,7 +369,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           days={days}
           timeZone={tenant.time_zone}
           locale={locale}
-          events={events}
+          events={events.map((event) => ({ ...event, href: link({ open: event.id }) }))}
           shifts={gridShifts}
           lanes={lanes}
           closed={closed}
@@ -337,6 +379,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         />
       )}
       {gridShifts.length > 0 && <p className="text-xs text-muted">{t("shiftsLegend")}</p>}
+      {openedSession && <SessionWindow id={openedSession} closeHref={link({})} />}
     </Container>
   );
 }

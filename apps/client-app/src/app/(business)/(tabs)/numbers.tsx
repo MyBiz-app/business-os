@@ -1,13 +1,15 @@
 import { addDays, formatDay, todayIn } from "@business-os/i18n/dates";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
-import { View } from "react-native";
+import { I18nManager, Linking, Pressable, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
+import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -16,6 +18,16 @@ import { useStaff } from "@/providers/staff-provider";
 type Days = "7" | "30" | "90";
 type Trend = "revenue" | "attendance"; // the metrics the API can chart
 const KEYS = ["revenue", "active_clients", "attendance", "occupancy", "no_show_rate", "new_clients"] as const;
+/** Where tapping a number leads, as on the web dashboard: the clients list narrowed to what the
+ * number counts, the week's schedule, or (for money and occupancy) the web report. */
+const GO = {
+  revenue: { web: "/sales" },
+  active_clients: { clients: "valid" },
+  new_clients: { clients: "new" },
+  attendance: { today: true },
+  occupancy: { web: "/reports" },
+  no_show_rate: { clients: "absent" },
+} as const;
 const AT_RISK_DAYS = 14; // same window as the reports page and the clients filter
 const AT_RISK_SHOWN = 5;
 
@@ -26,7 +38,7 @@ export default function Numbers() {
   const tMetrics = useTranslations("metrics");
   const tReports = useTranslations("reports");
   const locale = useLocale();
-  const { api, scope, tenant, palette, branch, branches } = useStaff();
+  const { api, scope, tenant, palette, branch, branches, can } = useStaff();
   const [days, setDays] = useState<Days>("30");
   const [trend, setTrend] = useState<Trend>("revenue");
   const [allAtRisk, setAllAtRisk] = useState(false);
@@ -86,6 +98,16 @@ export default function Numbers() {
   const day = (value: string) => formatDay(value, locale, { day: "numeric", month: "short" });
   const atRisk = data?.atRisk ?? [];
   const shownAtRisk = allAtRisk ? atRisk : atRisk.slice(0, AT_RISK_SHOWN);
+  const open = (key: (typeof KEYS)[number]) => {
+    const target: Record<string, string | boolean> = GO[key];
+    if (typeof target.web === "string") void Linking.openURL(`${WEB_URL}${target.web}`);
+    else if (target.today) router.push("/today");
+    else if (typeof target.clients === "string") router.push({
+        pathname: "/clients",
+        // "New" carries the period on screen, so the list matches the number tapped.
+        params: target.clients === "new" && data ? { filter: "new", from: data.period.start, to: data.period.end } : { filter: target.clients },
+      });
+  };
   const trendUnit = trend === "revenue" ? "money" : "count";
 
   return (
@@ -114,10 +136,16 @@ export default function Numbers() {
             const delta = change(metric);
             const label = tMetrics(metric.key);
             const value = show(metric.unit, metric.value);
+            const key = metric.key as (typeof KEYS)[number];
+            // The client lists need the clients permission; the rest are open to whoever sees this screen.
+            const go = !("clients" in GO[key]) || can("clients.read");
             return (
-              <View
+              <Pressable
                 key={metric.key}
+                role={go ? "link" : undefined}
                 accessible
+                disabled={!go}
+                onPress={() => open(key)}
                 accessibilityLabel={[label, value, delta && t("vsBefore", { change: delta.text })].filter(Boolean).join(", ")}
                 style={{
                   flexGrow: 1,
@@ -130,7 +158,10 @@ export default function Numbers() {
                   borderColor: palette.border,
                 }}
               >
-                <Text style={{ color: palette.muted, fontSize: 13, fontWeight: "600", textAlign: "left" }}>{label}</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                  <Text style={{ color: palette.muted, fontSize: 13, fontWeight: "600", textAlign: "left" }}>{label}</Text>
+                  {go ? <Ionicons name="chevron-forward" size={16} color={palette.muted} style={{ transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }] }} /> : null}
+                </View>
                 <Text
                   style={{ color: palette.foreground, fontSize: 22, fontWeight: "700", textAlign: "left", fontVariant: ["tabular-nums"] }}
                 >
@@ -148,7 +179,7 @@ export default function Numbers() {
                     {t("vsBefore", { change: delta.text })}
                   </Text>
                 )}
-              </View>
+              </Pressable>
             );
           })}
         </View>

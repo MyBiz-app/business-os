@@ -36,6 +36,15 @@ click.
 Check: the project shows "healthy" and the pooler string connects (`psql "<string>" -c "select 1"`
 from your machine).
 
+**Connection budget (GL18).** Each API worker keeps up to `API_DB_POOL_SIZE` (5) plus
+`API_DB_MAX_OVERFLOW` (10) connections, so the API service can open at most
+`WEB_CONCURRENCY` (2) x 15 = **30** connections. The two cron jobs each open a few more while they
+run (one worker, same pool settings, so up to 15 each): worst case 30 + 15 + 15 = **60**. Compare
+that with the limit for your Supabase compute size (Settings, Database, "Connection pooling" shows
+the pooler's client limit; the direct-connection limit is on the compute page) and keep the worst
+case at or below about 60% of it. Before adding a second API instance or raising `WEB_CONCURRENCY`,
+redo the sum: instances x workers x 15, plus the crons.
+
 ## 2. Render Blueprint (API Starter about $7, two cron jobs about $7 each)
 
 [`render.production.yaml`](../../render.production.yaml) defines the API web service
@@ -96,7 +105,6 @@ log shows the migration finishing before the service goes live.
 | `API_SECRETS_KEY`, `API_SECRETS_KEYS`, `API_ID_HASH_KEY` | Render (API and both jobs) | see section 0 and [key-rotation.md](../runbooks/key-rotation.md); set `API_SECRETS_KEYS` to the same single key at first |
 | `API_INTERNAL_TOKEN` | Render and Vercel | the same value in both |
 | `API_WEB_URL`, `API_API_URL`, `API_CORS_ORIGINS` | Render | the public addresses; the origins as a JSON list, no localhost |
-| `API_MFA_REQUIRED_FROM` | Render | a date 14 days after go-live (`YYYY-MM-DD`) |
 | `API_ANTHROPIC_API_KEY`, `API_SUPABASE_URL`, `API_SUPABASE_SERVICE_KEY`, `API_SENTRY_DSN` | Render, optional | when the feature is wanted (see the go-live checklist) |
 | `WEB_ALLOW_INDEXING`, `WEB_HSTS_INCLUDE_SUBDOMAINS` | Vercel | section 3 |
 | `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` | EAS environment `production` | section 7 |
@@ -127,7 +135,7 @@ Full guide: [releases.md](releases.md).
 EAS **environment** `production`. In expo.dev, Project, Environment variables, create the three
 `EXPO_PUBLIC_*` variables there with the production addresses (the publishable key is public by
 design; no secret goes in an app). Android needs no paid account; iOS needs the Apple Developer
-program (about $99 a year), see [../mobile-builds.md](../mobile-builds.md).
+program (about $99 a year), see [../mobile-builds.md](../guides/mobile-builds.md).
 
 ## 8. Who can reach what
 

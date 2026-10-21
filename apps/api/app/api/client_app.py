@@ -22,13 +22,16 @@ from app.api.bookings import (
     lock_session,
     place_booking,
 )
+from app.api.cancellation import ensure_within_no_show_limit
+from app.api.clients import join_as_member, member_join_code
+from app.api.closed_days import ClosedDay
 from app.api.common import blank_to_none, not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
 from app.api.health import ensure_may_book
 from app.api.pagination import FullPageDep
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
-from app.api.schedule import ClosedDay, JobStatus, ServiceSummary
+from app.api.schedule_models import JobStatus, ServiceSummary
 from app.api.settings import IMAGE_RESPONSES, image_response
 from app.catalog.verticals import CATALOG
 from app.legal.documents import check_versions, record_acceptance
@@ -54,6 +57,7 @@ class BusinessProfile(BaseModel):
     primary_color: str | None
     logo_url: str | None
     client_app: bool = Field(description="Whether the business offers the client app")
+    website_url: str | None = Field(default=None, description="The business's website, if any")
     inquiries: bool = Field(
         default=False, description="Whether its public inquiry form is open (CRM module)"
     )
@@ -66,12 +70,22 @@ class ClientBusiness(BaseModel):
     locale: Literal["he", "en"]
     primary_color: str | None
     logo_url: str | None
+    website_url: str | None = Field(default=None, description="The business's website, if any")
     time_zone: str
     currency: str
     cancellation_window_minutes: int
     online_sales: bool = Field(description="The client can buy plans in the app")
     resource_payment: Literal["app", "venue"] = Field(
         default="app", description="Reservations: paid in the app when booking, or at the venue"
+    )
+    waitlist_class: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for classes (off: none)"
+    )
+    waitlist_appointment: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for personal appointments"
+    )
+    waitlist_resource: Literal["off", "auto", "first_come", "manual"] = Field(
+        default="off", description="The business's waitlist for courts and rooms"
     )
     dependents: Literal["pet", "child"] | None = Field(
         default=None, description="The industry keeps the client's pets / children (#43)"
@@ -100,6 +114,13 @@ class ClientLocation(BaseModel):
         default=None,
         description="The branch's confirmed main email, else the business's; none if neither set",
     )
+    website_url: str | None = Field(
+        default=None, description="The branch's website, else the business's; none if neither set"
+    )
+    latitude: float | None = Field(
+        default=None, description="The branch's point on the map, for navigation links"
+    )
+    longitude: float | None = None
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
@@ -195,7 +216,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
     row = (
         session.execute(
             text(f"""
-                SELECT t.id, t.name, t.locale, t.primary_color, t.client_app,
+                SELECT t.id, t.name, t.locale, t.primary_color, t.client_app, t.website_url,
                        {LOGO_URL.format(t="t")} AS logo_url,
                        app.accepts_inquiries(:code) AS inquiries
                 FROM app.business_by_join_code(:code) t
@@ -212,7 +233,12 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
-           t.cancellation_window_minutes, t.online_sales, t.resource_payment,
+           t.cancellation_window_minutes, t.online_sales, t.resource_payment, t.website_url,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_class_mode ELSE 'off' END AS waitlist_class,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_appointment_mode ELSE 'off' END
+               AS waitlist_appointment,
+           CASE WHEN t.waitlist_enabled THEN t.waitlist_resource_mode ELSE 'off' END
+               AS waitlist_resource,
            {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
@@ -232,7 +258,9 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
     """The business's branches with their addresses (the home screen's business details)."""
     rows = context.session.execute(
         text("""
-            SELECT l.id, l.name, l.address, l.kind,
+            SELECT l.id, l.name, l.address, l.kind, l.latitude, l.longitude,
+                   coalesce(l.website_url, (SELECT website_url FROM app.tenants
+                                            WHERE id = l.tenant_id)) AS website_url,
                    coalesce(
                        (SELECT c.email FROM app.contact_emails c
                         WHERE c.tenant_id = l.tenant_id AND c.location_id = l.id
@@ -245,6 +273,15 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
         """)
     ).mappings()
     return [ClientLocation.model_validate(dict(row)) for row in rows]
+
+
+def _joined_business(session: Session, client_id: UUID | None) -> ClientBusiness:
+    row = (
+        session.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": client_id})
+        .mappings()
+        .one()
+    )
+    return _business(row)
 
 
 @router.post("/businesses", status_code=status.HTTP_201_CREATED)
@@ -264,14 +301,31 @@ def join_business(
     ).scalar()
     if client_id is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="unknown_code")
-    row = (
-        session.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": client_id})
-        .mappings()
-        .one()
-    )
+    joined = _joined_business(session, client_id)
     if body.accepted_legal:
-        record_acceptance(session, request, user.id, body.accepted_legal, "client_join", row["id"])
-    return _business(row)
+        record_acceptance(session, request, user.id, body.accepted_legal, "client_join", joined.id)
+    return joined
+
+
+class MemberJoinRequest(BaseModel):
+    tenant_id: UUID
+
+
+@router.post("/businesses/self", status_code=status.HTTP_201_CREATED)
+def join_own_business(
+    body: MemberJoinRequest, user: UserDep, session: SessionDep
+) -> ClientBusiness:
+    """ "Sign up as a client too": a team member joins their own business without a code (R36)."""
+    ensure_profile(session, user.id, user.email)
+    code = member_join_code(session, body.tenant_id)
+    if code is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_a_team_member")
+    offers_app = session.execute(
+        text("SELECT client_app FROM app.business_by_join_code(:code)"), {"code": code}
+    ).scalar()
+    if offers_app is False:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
+    return _joined_business(session, join_as_member(session, body.tenant_id))
 
 
 CLIENT_SESSION_SELECT = """
@@ -470,6 +524,7 @@ def book_session(
     if starts_at >= release.opens_before(time_zone):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_released")
     ensure_may_book(context.session, context.tenant_id, context.client_id)
+    ensure_within_no_show_limit(context.session, context.client_id)
     requires_plan = context.session.execute(
         text("SELECT booking_requires_plan FROM app.tenants WHERE id = :id"),
         {"id": context.tenant_id},
@@ -507,11 +562,15 @@ def my_bookings(context: ClientDep) -> list[ClientBooking]:
             SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
                    s.status AS session_status, b.status, b.late_cancel,
                    d.name AS dependent_name,
-                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating
+                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating,
+                   CASE WHEN b.status IN ('booked', 'waitlisted') THEN
+                       s.starts_at - make_interval(mins => ct.free_minutes)
+                   END AS free_cancel_until
             FROM app.bookings b
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
             LEFT JOIN app.dependents d ON d.id = b.dependent_id
+            CROSS JOIN LATERAL app.cancellation_terms(b.session_id, b.entitlement_id) ct
             WHERE b.client_id = app.current_client_id()
             ORDER BY s.starts_at DESC
             LIMIT 200

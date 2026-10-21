@@ -1,26 +1,21 @@
 "use client";
 
 import type { components } from "@business-os/api-client";
-import { categories, childrenOf, vertical as findVertical } from "@business-os/verticals";
+import { BRAND } from "@business-os/i18n/brand";
+import { vertical as findVertical } from "@business-os/verticals";
 import { ArrowLeft, ArrowRight, Check, ShieldCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { oauthSignIn } from "@/app/(auth)/actions";
+import { reportSignupStep } from "./actions";
 import { Container } from "@/components/layout/container";
-import { PROVIDER_MARKS } from "@/components/auth/provider-marks";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { OfferPicture } from "@/components/modules/offer-picture";
-import { VerticalIcon } from "@/components/vertical-icon";
 import type { ProviderButton } from "@/lib/auth-providers";
 import { formatMoney } from "@/lib/money";
 import {
-  businessNumberOk,
-  companyPrefixWarning,
-  ENTITY_TYPES,
-  type EntityType,
   chooseTier,
   CLIENT_SIZES,
   coreTier,
@@ -34,6 +29,8 @@ import {
   type Offer,
   priceLines,
   type SignupPlan,
+  type SiteFees,
+  normalizeWebsiteUrl,
   tierOf,
   tierPrice,
   withLocations,
@@ -43,24 +40,26 @@ import { isolate } from "@/lib/bidi";
 import { industryTexts } from "@/lib/verticals";
 
 import { AddOnRail, Cart, SummaryLines } from "./cart";
+import { AccountStep, BusinessStep, IndustryStep, PathStep, SiteStep } from "./steps";
+import type { Draft } from "./wizard-types";
 import {
   BoardingPass,
-  ChoiceGroup,
   Confetti,
     OFFER_ICON,
   StepHeading,
-  Stepper,
-  TextInput,
   TierCard,
 } from "./journey-pieces";
 
-type Catalog = components["schemas"]["Catalog"];
 
-type Step = "account" | "industry" | "business" | "base" | Offer | "summary";
+const SIGNUP_VISIT_KEY = `${BRAND.app.storagePrefix}-signup-visit`;
+
+type Catalog = components["schemas"]["Catalog"] & { website?: SiteFees };
+
+type Step = "path" | "account" | "industry" | "business" | "base" | Offer | "site" | "summary";
 const GROUPS = [
-  { key: "business", steps: ["account", "industry", "business"] },
+  { key: "business", steps: ["path", "account", "industry", "business"] },
   { key: "plan", steps: ["base"] },
-  { key: "extras", steps: ["client_app", "ai", "crm", "whatsapp"] },
+  { key: "extras", steps: ["client_app", "ai", "crm", "whatsapp", "site"] },
   { key: "services", steps: ["pack", "support", "setup"] },
   { key: "summary", steps: ["summary"] },
 ] as const;
@@ -77,8 +76,6 @@ function StepDot({ done, current, index }: { done: boolean; current: boolean; in
     </span>
   );
 }
-
-type Draft = Omit<SignupPlan, "vertical"> & { vertical: string | null };
 
 type Props = {
   catalogs: Partial<Record<Currency, Catalog>>;
@@ -103,12 +100,13 @@ type Props = {
 export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, providers, signedIn, returnTo, fromCalc = false }: Props) {
   const t = useTranslations("start");
   const tModules = useTranslations("modules");
-  const tAuth = useTranslations("auth.oauth");
   const { text } = industryTexts(useTranslations());
   const locale = useLocale();
   const router = useRouter();
-  const steps: Step[] = [...(providers.some((button) => button.live) && !signedIn ? (["account"] as const) : []), "industry", "business", "base", ...OFFERS, "summary"];
-  const [stepIndex, setStepIndex] = useState(steps[0] === "account" ? 0 : initial.vertical ? 1 : 0);
+  // Links that preselect an industry or come from the calculator already know the answer.
+  const asksPath = !initial.vertical && !fromCalc;
+  const steps: Step[] = [...(asksPath ? (["path"] as const) : []), ...(providers.some((button) => button.live) && !signedIn ? (["account"] as const) : []), "industry", "business", "base", ...OFFERS.slice(0, 4), "site", ...OFFERS.slice(4), "summary"];
+  const [stepIndex, setStepIndex] = useState(steps.indexOf("account") >= 0 || asksPath ? 0 : initial.vertical ? 1 : 0);
   // The category whose kinds of business are shown in the industry step (null: all categories).
   const [category, setCategory] = useState<string | null>(findVertical(initial.vertical)?.category ?? null);
   const [draft, setDraft] = useState<Draft>(initial);
@@ -119,6 +117,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const [termsError, setTermsError] = useState(false);
   // Add-ons the person said "no thanks" to, so Continue reads as a choice, not a skip.
   const [declined, setDeclined] = useState<Offer[]>([]);
+  const [siteTouched, setSiteTouched] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   const tierList = useRef<HTMLUListElement>(null);
   const termsBox = useRef<HTMLInputElement>(null);
@@ -135,6 +134,23 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     if (moved.current) heading.current?.focus();
     moved.current = true;
   }, [stepIndex, category]);
+
+  // Tell MyBiz which step this visit reached (a random id for the tab, no personal data), so the
+  // console shows where people stop. The add-on screens count as one "extras" step.
+  useEffect(() => {
+    try {
+      let visit = sessionStorage.getItem(SIGNUP_VISIT_KEY);
+      if (!visit) {
+        visit = crypto.randomUUID();
+        sessionStorage.setItem(SIGNUP_VISIT_KEY, visit);
+        void reportSignupStep(visit, "signup_started");
+      }
+      const group = step === "site" ? "extras" : (OFFERS as readonly string[]).includes(step) ? (["pack", "support", "setup"].includes(step) ? "services" : "extras") : step === "path" ? "account" : step;
+      void reportSignupStep(visit, "signup_step", group as Parameters<typeof reportSignupStep>[2]);
+    } catch {
+      // Storage can be blocked; the sign-up works the same without the beacon.
+    }
+  }, [step]);
 
   // On a phone the choices swipe sideways: open each screen on the chosen (or suggested) one.
   useEffect(() => {
@@ -154,14 +170,21 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const goTo = (target: Step) => go(steps.indexOf(target));
-  const next = () => go(stepIndex + 1);
+  const next = () => {
+    // "I have a website" needs its address before moving on.
+    if (step === "site" && draft.site === "have" && !normalizeWebsiteUrl(draft.websiteUrl ?? "")) {
+      setSiteTouched(true);
+      return;
+    }
+    go(stepIndex + 1);
+  };
   const back = () => go(stepIndex - 1);
 
-  const label = (key: "core" | ModuleKey) => (key === "core" ? tModules("core") : tModules(`names.${key}`));
+  const label = (key: "core" | "website" | ModuleKey) => (key === "core" ? tModules("core") : key === "website" ? t("site.cartLine") : tModules(`names.${key}`));
   const offerName = (offer: Offer) => t(`offers.${offer}.eyebrow`);
   const tierName = (offer: Offer, tier: string) => t(`offers.${offer}.plans.${tier}.name` as "offers.ai.plans.basic.name");
   const announce = (message: "cart.addedNotice" | "cart.removedNotice", name: string, modules: SignupPlan["modules"]) => {
-    const newTotal = priceLines(catalog, { clients: draft.clients, modules }).total;
+    const newTotal = priceLines(catalog, { clients: draft.clients, modules, site: draft.site }).total;
     setNotice(t(message, { name, total: money(newTotal) }));
   };
   const setTier = (offer: Offer, tier: string | null) => {
@@ -171,7 +194,12 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     setDeclined((list) => (tier ? list.filter((item) => item !== offer) : [...new Set([...list, offer])]));
     announce(chosen ? "cart.addedNotice" : "cart.removedNotice", chosen ? `${offerName(offer)} · ${tierName(offer, chosen)}` : offerName(offer), modules);
   };
-  const removeModule = (key: ModuleKey) => {
+  const removeModule = (key: ModuleKey | "website") => {
+    if (key === "website") {
+      setDraft({ ...draft, site: "none" });
+      setNotice(t("cart.removedNotice", { name: label(key), total: money(priceLines(catalog, { clients: draft.clients, modules: draft.modules }).total) }));
+      return;
+    }
     const modules = { ...draft.modules };
     delete modules[key];
     const kept = withoutOrphans(modules, catalog);
@@ -210,17 +238,20 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
       return;
     }
     if (!draft.vertical) return;
-    const plan: SignupPlan = { ...draft, vertical: draft.vertical, name: draft.name.trim() };
+    const websiteUrl = draft.site === "have" ? normalizeWebsiteUrl(draft.websiteUrl ?? "") : null;
+    const plan: SignupPlan = { ...draft, vertical: draft.vertical, name: draft.name.trim(), websiteUrl: websiteUrl ?? undefined };
     const target = `/start/finish?p=${encodePlan(plan)}`;
     router.push(signedIn ? target : `/signup?next=${encodeURIComponent(target)}`);
   };
   const chosenKind = findVertical(draft.vertical);
-  const addOnLabels = lines.filter((line) => line.key !== "core" && line.key !== "extra_location").map((line) => label(line.key));
+  const addOnLabels = lines.filter((line) => line.key !== "core" && line.key !== "extra_location" && line.key !== "website").map((line) => label(line.key));
   const passDetails = [
     ...(draft.entityType ? [{ label: t("summary.passEntity"), value: t(`business.entity.types.${draft.entityType}`) }] : []),
     ...(draft.businessNumber ? [{ label: t("summary.passNumber"), value: draft.businessNumber }] : []),
     ...(chosenKind ? [{ label: t("summary.passCategory"), value: text(chosenKind.category, "name") }] : []),
     { label: t("summary.passSize"), value: t("summary.passSizeValue", { staff: draft.staff, locations: draft.locations }) },
+    ...(draft.site === "build" ? [{ label: t("summary.passWebsite"), value: t("summary.passWebsiteBuild") }] : []),
+    ...(draft.site === "have" && normalizeWebsiteUrl(draft.websiteUrl ?? "") ? [{ label: t("summary.passWebsite"), value: draft.websiteUrl!.trim() }] : []),
     { label: t("summary.passAddons"), value: addOnLabels.length > 0 ? addOnLabels.join(", ") : t("summary.passNoAddons") },
   ];
   const loginHref = draft.vertical
@@ -233,210 +264,43 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   // ---- The steps --------------------------------------------------------------------------
 
   let content: ReactNode;
-  if (step === "account") {
+  if (step === "path") {
     content = (
-      <>
-        <StepHeading eyebrow={t("account.eyebrow")} title={<h1 {...headingProps}>{t("account.title")}</h1>} subtitle={t("account.subtitle")} />
-        <div className="card flex max-w-md flex-col gap-3 p-6">
-          {providers.map(({ provider, live }) => {
-            const label = (
-              <>
-                {PROVIDER_MARKS[provider]()}
-                {tAuth(provider)}
-                {!live && <span className="rounded-full border border-border px-2 py-0.5 text-xs font-medium text-muted">{tAuth("soon")}</span>}
-              </>
-            );
-            const classes = "btn-secondary flex w-full items-center justify-center gap-3 px-4 py-3 text-base";
-            return live ? (
-              <form key={provider} action={oauthSignIn}>
-                <input type="hidden" name="provider" value={provider} />
-                <input type="hidden" name="next" value={returnTo} />
-                <button type="submit" className={classes}>{label}</button>
-              </form>
-            ) : (
-              <button key={provider} type="button" disabled aria-disabled="true" className={`btn-plain ${classes} opacity-60`}>{label}</button>
-            );
-          })}
-          <p className="flex items-center gap-3 text-xs text-muted before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
-            {tAuth("or")}
-          </p>
-          <button type="button" onClick={() => goTo(initial.vertical ? "business" : "industry")} className="btn-primary px-4 py-3">
-            {t("account.email")}
-          </button>
-          <p className="text-center text-sm text-muted">
-            {t("account.haveAccount")}{" "}
-            <Link href={`/login?next=${encodeURIComponent(returnTo)}`} className="font-semibold text-primary-ink underline-offset-4 hover:underline">
-              {t("account.login")}
-            </Link>
-          </p>
-        </div>
-      </>
+      <PathStep
+        draft={draft}
+        headingProps={headingProps}
+        onChoose={(track) => {
+          update({ track });
+          next();
+        }}
+      />
     );
+  } else if (step === "account") {
+    content = <AccountStep providers={providers} returnTo={returnTo} headingProps={headingProps} onEmail={() => goTo(initial.vertical ? "business" : "industry")} />;
   } else if (step === "industry") {
-    const choose = (vertical: string) => {
-      update({ vertical });
-      goTo("business");
-    };
-    const kinds = category ? childrenOf(category) : [];
-    const card = (key: string, chosen: boolean, onClick: () => void, label: string, hint: string) => {
-      const { icon, color } = findVertical(key)!;
-      return (
-        <button
-          type="button"
-          aria-pressed={chosen}
-          onClick={onClick}
-          className={`btn-plain card card-hover flex w-full items-center gap-4 p-5 text-start ${chosen ? "ring-2 ring-primary" : ""}`}
-        >
-          <span aria-hidden="true" className={`flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-md ${color}`}>
-            <VerticalIcon icon={icon} className="size-7" />
-          </span>
-          <span className="flex flex-col gap-0.5">
-            <span className="text-lg font-bold">{label}</span>
-            <span className="text-sm text-muted">{hint}</span>
-          </span>
-        </button>
-      );
-    };
-    content = category ? (
-      <>
-        <StepHeading
-          eyebrow={
-            <button type="button" onClick={() => setCategory(null)} className="btn-link text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
-              {t("industry.allIndustries")}
-            </button>
-          }
-          title={<h1 {...headingProps}>{t("industry.kindTitle", { name: text(category, "name") })}</h1>}
-          subtitle={t("industry.kindSubtitle")}
-        />
-        <ul className="enter-items grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {kinds.map(({ key }) => (
-            <li key={key}>{card(key, draft.vertical === key, () => choose(key), text(key, "name"), text(key, "tagline"))}</li>
-          ))}
-          <li>
-            {card(category, draft.vertical === category, () => choose(category), t("industry.otherKind", { name: text(category, "name") }), text(category, "tagline"))}
-          </li>
-        </ul>
-      </>
-    ) : (
-      <>
-        <StepHeading eyebrow={null} title={<h1 {...headingProps}>{t("industry.title")}</h1>} subtitle={t("industry.subtitle")} />
-        <ul className="enter-items grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {categories()
-            .filter((c) => c.status !== "planned")
-            .map(({ key, children }) => (
-              <li key={key}>
-                {card(
-                  key,
-                  findVertical(draft.vertical)?.category === key,
-                  () => {
-                    if (children.length > 0) setCategory(key);
-                    else choose(key);
-                  },
-                  text(key, "name"),
-                  text(key, "tagline"),
-                )}
-              </li>
-            ))}
-        </ul>
-        <p className="text-sm text-muted">
-          {t("industry.missing")}{" "}
-          <Link href="/industries" className="font-semibold text-primary-ink underline-offset-4 hover:underline">
-            {t("industry.seeAll")}
-          </Link>
-        </p>
-      </>
+    content = (
+      <IndustryStep
+        draft={draft}
+        category={category}
+        setCategory={setCategory}
+        headingProps={headingProps}
+        onChoose={(vertical) => {
+          update({ vertical });
+          goTo("business");
+        }}
+      />
     );
   } else if (step === "business") {
     content = (
-      <>
-        <StepHeading
-          eyebrow={null}
-          title={<h1 {...headingProps}>{t("business.title", { yours: draft.vertical ? text(draft.vertical, "yours") : t("business.yoursGeneric") })}</h1>}
-          subtitle={t("business.subtitle")}
-        />
-        <form
-          id="business-form"
-          className="flex flex-col gap-6"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setNumberTouched(true);
-            if (draft.name.trim() && businessNumberOk(draft.currency, draft.businessNumber ?? "") && (draft.currency !== "ILS" || draft.entityType)) {
-              if (fromCalc) goTo("summary");
-              else next();
-            }
-          }}
-        >
-          <TextInput
-            label={t("business.name")}
-            value={draft.name}
-            placeholder={t("business.namePlaceholder", { example: draft.vertical ? text(draft.vertical, "example") : t("business.exampleGeneric") })}
-            onChange={(name) => update({ name })}
-          />
-          <ChoiceGroup
-            legend={draft.currency === "ILS" ? t("business.entity.legend") : t("business.entity.legendOptional")}
-            hint={draft.entityType ? t(`business.entity.hints.${draft.entityType}`) : t("business.entity.hint")}
-            options={ENTITY_TYPES.map((value) => ({ value, label: t(`business.entity.types.${value}`) }))}
-            value={draft.entityType ?? ""}
-            onChange={(entityType) => update({ entityType: entityType as EntityType })}
-            columns="grid-cols-2 sm:grid-cols-3"
-          />
-          {numberTouched && draft.currency === "ILS" && !draft.entityType && (
-            <p role="alert" className="text-sm text-danger">
-              {t("business.entity.required")}
-            </p>
-          )}
-          <TextInput
-            label={draft.currency === "ILS" ? t("business.number") : t("business.numberOptional")}
-            value={draft.businessNumber ?? ""}
-            placeholder={t("business.numberPlaceholder")}
-            onChange={(businessNumber) => update({ businessNumber })}
-            inputMode="numeric"
-            required={draft.currency === "ILS"}
-            error={numberTouched && !businessNumberOk(draft.currency, draft.businessNumber ?? "") ? t("business.numberInvalid") : undefined}
-            hint={draft.currency === "ILS" ? t("business.numberHint") : undefined}
-          />
-          {companyPrefixWarning(draft.currency, draft.entityType, draft.businessNumber ?? "") && (
-            <p role="status" className="rounded-xl bg-warning/10 px-4 py-3 text-sm">
-              {t("business.entity.prefixWarning")}
-            </p>
-          )}
-          <ChoiceGroup
-            legend={t("business.size")}
-            hint={t("business.sizeHint")}
-            options={CLIENT_SIZES.map((size) => ({ value: String(size), label: t(`business.sizes.${size}`) }))}
-            value={String(CLIENT_SIZES.find((size) => draft.clients <= size) ?? 1500)}
-            onChange={(value) => update({ clients: Number(value) })}
-            columns="grid-cols-2 sm:grid-cols-4"
-          />
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Stepper
-              label={t("business.staff")}
-              value={draft.staff}
-              min={1}
-              max={200}
-              onChange={(staff) => update({ staff })}
-              decrease={t("business.decrease", { label: t("business.staff") })}
-              increase={t("business.increase", { label: t("business.staff") })}
-            />
-            <Stepper
-              label={t("business.locations")}
-              value={draft.locations}
-              min={1}
-              max={51}
-              onChange={(locations) => update({ locations })}
-              decrease={t("business.decrease", { label: t("business.locations") })}
-              increase={t("business.increase", { label: t("business.locations") })}
-            />
-          </div>
-          <ChoiceGroup
-            legend={t("business.currency")}
-            options={CURRENCIES.filter((code) => catalogs[code]).map((code) => ({ value: code, label: t(`business.currencies.${code}`) }))}
-            value={draft.currency}
-            onChange={(value) => update({ currency: value as Currency })}
-            columns="grid-cols-3"
-          />
-        </form>
-      </>
+      <BusinessStep
+        draft={draft}
+        catalogCurrencies={CURRENCIES.filter((code) => catalogs[code])}
+        update={update}
+        numberTouched={numberTouched}
+        setNumberTouched={setNumberTouched}
+        headingProps={headingProps}
+        onContinue={() => (fromCalc ? goTo("summary") : next())}
+      />
     );
   } else if (step === "base") {
     const extra = draft.modules.extra_location ?? 0;
@@ -492,6 +356,8 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         </div>
       </>
     );
+  } else if (step === "site") {
+    content = <SiteStep draft={draft} update={update} touched={siteTouched} price={catalog.website?.withSystem} headingProps={headingProps} />;
   } else if ((OFFERS as readonly string[]).includes(step)) {
     const offer = step as Offer;
     const tiers = OFFER_TIERS[offer];
@@ -671,6 +537,11 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             </li>
           ))}
         </ul>
+        <p className="text-sm text-muted">
+          <Link href="/legal/cancellation" target="_blank" className="font-semibold text-primary-ink underline underline-offset-4">
+            {t("summary.cancellationLink")}
+          </Link>
+        </p>
       </>
     );
   }
@@ -679,7 +550,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
 
   const groupIndex = GROUPS.findIndex((group) => (group.steps as readonly string[]).includes(step));
   const isOffer = (OFFERS as readonly string[]).includes(step);
-  const showContinue = step === "business" || step === "base";
+  const showContinue = step === "business" || step === "base" || step === "site";
 
   const decided = isOffer && (tierOf(step as Offer, draft.modules) !== null || declined.includes(step as Offer) || OFFER_TIERS[step as Offer].some((tier) => tier.modules.length === 0));
   const arrow = <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />;

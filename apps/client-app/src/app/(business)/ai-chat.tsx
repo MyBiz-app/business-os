@@ -17,9 +17,9 @@ import { type Agent, AgentFace } from "@/components/agent-face";
 import { useStaff } from "@/providers/staff-provider";
 
 type Conversation = components["schemas"]["app__api__assistant__Conversation"];
-type ChatError = "ai_not_configured" | "ai_busy" | "ai_unavailable" | "ai_limit_reached" | "ai_rate_limited" | "generic";
+type ChatError = "ai_not_configured" | "ai_busy" | "ai_unavailable" | "ai_limit_reached" | "ai_user_limit_reached" | "ai_daily_pace_reached" | "ai_rate_limited" | "generic";
 
-const KNOWN: readonly string[] = ["ai_not_configured", "ai_busy", "ai_unavailable", "ai_limit_reached", "ai_rate_limited"];
+const KNOWN: readonly string[] = ["ai_not_configured", "ai_busy", "ai_unavailable", "ai_limit_reached", "ai_user_limit_reached", "ai_daily_pace_reached", "ai_rate_limited"];
 const chatError = (error: unknown): ChatError =>
   error instanceof ApiError && error.detail && KNOWN.includes(error.detail) ? (error.detail as ChatError) : "generic";
 

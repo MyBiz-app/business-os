@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CardTransition } from "@/components/ui/page-transition";
 import { addDays, formatDay } from "@/lib/dates";
 
 import type { GridEvent } from "./time-grid";
@@ -49,6 +50,7 @@ export function MonthGrid({ start, days, month, today, locale, events, closed, l
             >
               <div className="flex items-center justify-between gap-1">
                 <Link
+                  scroll={false}
                   href={dayHref.replace("__day__", day)}
                   aria-current={isToday ? "date" : undefined}
                   className={`flex size-7 items-center justify-center rounded-full text-sm font-semibold tabular-nums transition-colors ${isToday ? "bg-primary text-on-primary" : "hover:bg-foreground/8"}`}
@@ -64,6 +66,7 @@ export function MonthGrid({ start, days, month, today, locale, events, closed, l
               <ul className="flex flex-col gap-0.5">
                 {own.slice(0, CHIPS).map((event) => (
                   <li key={event.id}>
+                    <CardTransition name={`session-${event.id}`}>
                     <Link
                       href={event.href}
                       title={`${event.time} · ${event.title}`}
@@ -77,11 +80,12 @@ export function MonthGrid({ start, days, month, today, locale, events, closed, l
                         {event.title}
                       </span>
                     </Link>
+                    </CardTransition>
                   </li>
                 ))}
               </ul>
               {own.length > CHIPS && (
-                <Link href={dayHref.replace("__day__", day)} className="px-1 text-[0.6875rem] font-semibold text-muted hover:text-primary-ink">
+                <Link scroll={false} href={dayHref.replace("__day__", day)} className="px-1 text-[0.6875rem] font-semibold text-muted hover:text-primary-ink">
                   {labels.more.replace("{count}", String(own.length - CHIPS))}
                 </Link>
               )}

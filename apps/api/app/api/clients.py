@@ -13,6 +13,7 @@ from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clau
 from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
 from app.api.pagination import PageDep
 from app.catalog.verticals import VERTICAL_PACKS, VerticalPack, clean_client_fields
+from app.core import events
 from app.core.permissions import Permission
 from app.messaging.consent import request_origin
 
@@ -41,7 +42,10 @@ COLUMNS = (
     "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, "
     "custom_fields, home_location_id, created_at, updated_at, erased_at, "
     "marketing_consent_at IS NOT NULL AS marketing_consent, marketing_consent_at, "
-    "marketing_consent_source, marketing_opted_out_at"
+    "marketing_consent_source, marketing_opted_out_at, "
+    "(email IS NOT NULL AND app.email_is_suppressed(email)) AS email_suppressed, "
+    "(user_id IS NOT NULL AND EXISTS (SELECT 1 FROM app.tenant_members m "
+    "WHERE m.tenant_id = app.clients.tenant_id AND m.user_id = app.clients.user_id)) AS is_staff"
 )
 
 
@@ -114,6 +118,12 @@ class Client(BaseModel):
     )
     marketing_opted_out_at: datetime | None = Field(
         default=None, description="Stopped ads with the opt-out link; only the client can undo it"
+    )
+    email_suppressed: bool = Field(
+        default=False, description="The address bounced or reported spam: no emails are sent to it"
+    )
+    is_staff: bool = Field(
+        default=False, description="Also a team member of this business (shown as a badge)"
     )
 
 
@@ -225,6 +235,20 @@ def list_clients(
     absent_days: Annotated[
         int | None, Query(ge=1, le=365, description="No check-in in this many days")
     ] = None,
+    joined_from: Annotated[
+        date | None, Query(description="Joined on or after this day (business time zone)")
+    ] = None,
+    joined_to: Annotated[
+        date | None, Query(description="Joined on or before this day (business time zone)")
+    ] = None,
+    no_show_from: Annotated[
+        date | None, Query(description="With no_show_to: missed a class in this range")
+    ] = None,
+    no_show_to: Annotated[date | None, Query()] = None,
+    staff: Annotated[
+        Literal["only", "exclude"] | None,
+        Query(description="only: team members who are also clients; exclude: leave them out"),
+    ] = None,
 ) -> ClientPage:
     # RLS limits rows to the current tenant; the filters below narrow further.
     # The current branch's clients, and those without a home branch (they belong to all).
@@ -247,6 +271,10 @@ def list_clients(
     if client_status:
         where += " AND status = :status"
         params["status"] = client_status
+    if staff:
+        where += f""" AND {"" if staff == "only" else "NOT "}(user_id IS NOT NULL AND EXISTS (
+            SELECT 1 FROM app.tenant_members m
+            WHERE m.tenant_id = app.clients.tenant_id AND m.user_id = app.clients.user_id))"""
     if plan:
         # "Today" in the business's time zone, like everywhere plans are checked.
         valid = """EXISTS (
@@ -262,6 +290,30 @@ def list_clients(
               AND s.starts_at > now() - make_interval(days => :absent_days)
         )"""
         params["absent_days"] = absent_days
+    if joined_from or joined_to:
+        # The day the client was added, in the business's time zone.
+        day = (
+            "(created_at AT TIME ZONE "
+            "(SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()))::date"
+        )
+        if joined_from:
+            where += f" AND {day} >= :joined_from"
+            params["joined_from"] = joined_from
+        if joined_to:
+            where += f" AND {day} <= :joined_to"
+            params["joined_to"] = joined_to
+    if no_show_from or no_show_to:
+        where += """ AND EXISTS (
+            SELECT 1 FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id
+            JOIN app.tenants t ON t.id = s.tenant_id
+            WHERE b.client_id = app.clients.id AND b.status = 'no_show'
+              AND (CAST(:no_show_from AS date) IS NULL
+                   OR (s.starts_at AT TIME ZONE t.time_zone)::date >= :no_show_from)
+              AND (CAST(:no_show_to AS date) IS NULL
+                   OR (s.starts_at AT TIME ZONE t.time_zone)::date <= :no_show_to)
+        )"""
+        params["no_show_from"] = no_show_from
+        params["no_show_to"] = no_show_to
 
     session = context.session
     total = session.execute(text(f"SELECT count(*) FROM app.clients {where}"), params).scalar_one()
@@ -325,7 +377,43 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
     except IntegrityError as error:
         raise _email_taken(error) or error from error
     _join_home_branch(context.session, row["id"], row["home_location_id"])
+    events.record(context.session, "first_client", once=True)
     return Client.model_validate(dict(row))
+
+
+def member_join_code(session: Session, tenant_id: UUID) -> str | None:
+    """The join code of a business the signed-in user is a team member of, else None."""
+    return session.execute(
+        text("""
+            SELECT t.join_code FROM app.tenants t
+            JOIN app.tenant_members m ON m.tenant_id = t.id
+            WHERE t.id = :tenant_id AND m.user_id = app.current_user_id()
+        """),
+        {"tenant_id": tenant_id},
+    ).scalar()
+
+
+def join_as_member(session: Session, tenant_id: UUID) -> UUID | None:
+    """Gives the signed-in team member a client card of their own business (R36).
+
+    Goes through the same function as joining with the code, so a card already linked to the
+    user, or an unlinked one with the same email, is reused and nothing is duplicated. None
+    when the user is not on this business's team."""
+    code = member_join_code(session, tenant_id)
+    if code is None:
+        return None
+    return session.execute(text("SELECT app.join_business(:code)"), {"code": code}).scalar()
+
+
+@router.post("/me", status_code=status.HTTP_201_CREATED)
+def add_me_as_client(context: WriteDep) -> Client:
+    """ "Add me": the signed-in team member becomes a client of this business (an owner can book
+    a table for themselves, a coach can join a class)."""
+    client_id = join_as_member(context.session, context.tenant_id)
+    if client_id is None:
+        # Platform staff and support sessions have no card to add.
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_team_member")
+    return get_client(client_id, context)
 
 
 @router.get("/{client_id}/branches")
@@ -408,6 +496,7 @@ def set_client_marketing_consent(
     """Record that the client agreed to (or stopped) marketing messages, e.g. at the desk. An
     agreement needs a source; a client who stopped ads with the opt-out link agrees again only
     by their own choice, so the desk records it with a source too."""
+    _client_row(context, client_id)
     ensure_not_erased(context.session, client_id)
     if body.consent and body.source is None:
         raise HTTPException(
@@ -430,6 +519,7 @@ def set_client_marketing_consent(
 @router.get("/{client_id}/consent-events")
 def client_consent_events(client_id: UUID, context: ReadDep) -> list[ConsentEvent]:
     """The trail of this client's marketing consent, newest first."""
+    _client_row(context, client_id)
     rows = context.session.execute(
         text("""
             SELECT e.id, e.action, e.source, e.created_at,

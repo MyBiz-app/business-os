@@ -2,9 +2,12 @@ import random
 from datetime import date, timedelta
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
+from app.geo.geocoder import NoGeocoder
+from app.reports.branch_insights import MIN_CLIENTS_PER_CITY, _city_point
 from app.seed import seed
 from tests.conftest import AuthHeaders, add_member, local_today
 
@@ -139,3 +142,121 @@ def test_members_at_risk(client: TestClient, engine: Engine, auth: AuthHeaders) 
             assert ends < local_today() + timedelta(days=14)
     bad = client.get("/metrics/members-at-risk", params={"days": 3}, headers=studio["headers"])
     assert bad.status_code == 422
+
+
+def test_branch_insights_show_client_origins_and_staff_cost(
+    client: TestClient, engine: Engine, auth: AuthHeaders, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("app.reports.branch_insights.get_geocoder", NoGeocoder)
+    _city_point.cache_clear()
+    studio = demo(engine, auth)
+    end = local_today() - timedelta(days=1)
+    start = end - timedelta(days=29)
+    with engine.begin() as connection:
+        branch = connection.execute(
+            text("SELECT id FROM app.locations WHERE tenant_id = :t ORDER BY created_at LIMIT 1"),
+            {"t": studio["tenant_id"]},
+        ).scalar_one()
+        city = connection.execute(
+            text("SELECT code FROM app.geo_cities ORDER BY code LIMIT 1")
+        ).scalar_one()
+        visitors = (
+            connection.execute(
+                text("""
+                SELECT DISTINCT b.client_id FROM app.bookings b
+                JOIN app.sessions s ON s.id = b.session_id
+                WHERE s.location_id = :l AND b.status IN ('booked', 'checked_in', 'no_show')
+                  AND s.starts_at::date BETWEEN :s AND :e
+            """),
+                {"l": branch, "s": start, "e": end},
+            )
+            .scalars()
+            .all()
+        )
+        for client_id in visitors:
+            connection.execute(
+                text("""
+                    INSERT INTO app.client_addresses
+                        (tenant_id, client_id, street, city, city_code)
+                    VALUES (:t, :c, 'x', 'x', :city)
+                """),
+                {"t": studio["tenant_id"], "c": client_id, "city": city},
+            )
+
+    response = client.get(
+        "/metrics/branch-insights", params={"start": start, "end": end}, headers=studio["headers"]
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    mine = next(b for b in body["branches"] if b["location_id"] == str(branch))
+    assert len(visitors) >= MIN_CLIENTS_PER_CITY
+    assert mine["origins"][0]["clients"] == len(visitors)
+    assert mine["origins"][0]["city_code"] == city
+    assert mine["origins"][0]["latitude"] is None  # no geocoder in tests
+    assert (body["staff_cost_period"] is None) == (mine["staff_cost_minor"] is None)
+    assert mine["staff_count"] >= 0
+
+    # A city with fewer clients than the minimum is not shown: one client could be recognised.
+    with engine.begin() as connection:
+        connection.execute(
+            text("""
+                DELETE FROM app.client_addresses WHERE client_id IN (
+                    SELECT client_id FROM app.client_addresses ORDER BY client_id
+                    OFFSET :keep)
+            """),
+            {"keep": MIN_CLIENTS_PER_CITY - 1},
+        )
+    hidden = client.get(
+        "/metrics/branch-insights", params={"start": start, "end": end}, headers=studio["headers"]
+    ).json()
+    assert next(b for b in hidden["branches"] if b["location_id"] == str(branch))["origins"] == []
+
+
+def test_reports_can_leave_out_clients_who_are_team_members(
+    client: TestClient, engine: Engine, auth: AuthHeaders
+) -> None:
+    studio = demo(engine, auth)
+    period = {"start": local_today() - timedelta(days=60), "end": local_today() - timedelta(days=1)}
+    with engine.begin() as connection:
+        # The most active client is also on the team.
+        top = connection.execute(
+            text("""
+                SELECT b.client_id FROM app.bookings b WHERE b.status = 'checked_in'
+                GROUP BY b.client_id ORDER BY count(*) DESC LIMIT 1
+            """)
+        ).scalar_one()
+        connection.execute(
+            text("""
+                UPDATE app.clients SET user_id = (
+                    SELECT user_id FROM app.tenant_members WHERE role = 'owner' LIMIT 1)
+                WHERE id = :id
+            """),
+            {"id": top},
+        )
+    headers = studio["headers"]
+    leave_out = {"exclude_staff": "true"}
+
+    def attended(dimension: str, **extra: str) -> int:
+        rows = client.get(
+            f"/metrics/breakdown/{dimension}", params={**period, **extra}, headers=headers
+        ).json()
+        return sum(r["attended"] for r in rows)
+
+    for dimension in ("service", "time_slot", "branch"):
+        assert attended(dimension, **leave_out) < attended(dimension)
+
+    def branch_attendance(**extra: str) -> float:
+        rows = client.get(
+            "/metrics/branches", params={**period, "keys": "attendance", **extra}, headers=headers
+        ).json()
+        return sum(b["metrics"][0]["value"] or 0 for b in rows)
+
+    assert branch_attendance(**leave_out) < branch_attendance()
+
+    def at_risk(**extra: str) -> set[str]:
+        rows = client.get("/metrics/members-at-risk", params=extra, headers=headers).json()
+        return {m["client_id"] for m in rows}
+
+    assert str(top) not in at_risk(**leave_out)
+    assert at_risk(**leave_out) <= at_risk()

@@ -42,14 +42,14 @@ with sync_playwright() as p:
     owner.get_by_role("button", name="יצירת העסק").click()
     owner.wait_for_url("**/dashboard")
 
-    owner.goto(f"{h.BASE}/settings"); h.ready(owner)
+    owner.goto(f"{h.BASE}/settings/business"); h.ready(owner)
     expect(owner.get_by_label("לקוחות צריכים הצהרת בריאות כדי להירשם באפליקציה")).to_be_checked()
 
     owner.goto(f"{h.BASE}/services/new"); h.ready(owner)
     owner.get_by_label("שם").fill("פילאטיס")
     owner.get_by_label("משך (בדקות)").fill("55")
     owner.get_by_label("משתתפים בכל מפגש").fill("8")
-    owner.get_by_role("button", name="יצירה").click(); owner.wait_for_url("**/services")
+    owner.get_by_role("button", name="יצירה").click(); owner.wait_for_url(re.compile(r".*/catalog\?tab=services"))
     owner.goto(f"{h.BASE}/schedule/new"); h.ready(owner)
     owner.get_by_label("תאריך", exact=True).fill(tomorrow)
     owner.get_by_label("שעת התחלה").fill("18:00")
@@ -80,10 +80,11 @@ with sync_playwright() as p:
     member.get_by_label("הקוד בן 6 הספרות").fill(h.otp(member_email))
     # Filling the last digit signs in on its own.
     member.wait_for_url("**/join")
+    h.accept_legal(member)
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
     member.get_by_label("שם פרטי").fill("נועה")
-    member.get_by_role("button", name="הצטרפות לסטודיו בריאות").click(); member.wait_for_url("**/home")
+    member.get_by_role("button", name="הצטרפות לסטודיו בריאות").click(); member.get_by_role("button", name="להמשך", exact=True).click(); member.wait_for_url("**/home")
     expect(member.get_by_text("לפני הביקור הראשון, יש למלא הצהרת בריאות קצרה.")).to_be_visible()
 
     member.goto(f"{h.APP}/schedule")

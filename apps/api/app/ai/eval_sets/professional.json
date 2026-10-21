@@ -1,0 +1,701 @@
+[
+ {
+  "id": "leg-il-01",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Can a customer cancel a membership they bought through our website, and within how many days?",
+  "must": [
+   [
+    "14"
+   ],
+   [
+    "14c",
+    "distance",
+    "consumer protection"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-02",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "en",
+  "kind": "fact",
+  "question": "What is the maximum cancellation fee we may charge when a customer cancels a distance transaction?",
+  "must": [
+   [
+    "5 percent",
+    "5%",
+    "5 %"
+   ],
+   [
+    "100"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-03",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "he",
+  "kind": "fact",
+  "question": "האם אפשר לשלוח ללקוחות הודעת SMS פרסומית בלי הסכמה מראש?",
+  "must": [
+   [
+    "30א",
+    "30a",
+    "ספאם",
+    "spam"
+   ],
+   [
+    "הסכמה",
+    "consent"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-04",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "he",
+  "kind": "fact",
+  "question": "מה צריך להיות בכל הודעת דיוור פרסומית שאנחנו שולחים בישראל?",
+  "must": [
+   [
+    "פרסומת",
+    "פרסום",
+    "advertis"
+   ],
+   [
+    "הסרה",
+    "לבטל",
+    "unsubscribe",
+    "opt"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-05",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Which Israeli law governs the personal data of our users, and what changed in 2025?",
+  "must": [
+   [
+    "privacy protection law",
+    "חוק הגנת הפרטיות"
+   ],
+   [
+    "amendment 13",
+    "תיקון 13"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-06",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "he",
+  "kind": "fact",
+  "question": "איזה תקן נגישות חל על האתר והאפליקציה שלנו?",
+  "must": [
+   [
+    "5568"
+   ],
+   [
+    "wcag",
+    "aa"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-07",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "en",
+  "kind": "fact",
+  "question": "What security duties do the Israeli data security regulations place on a database owner?",
+  "must": [
+   [
+    "access",
+    "גישה",
+    "backup",
+    "policy",
+    "regulations"
+   ],
+   [
+    "incident",
+    "אירוע"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-08",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "he",
+  "kind": "fact",
+  "question": "לקוח ביקש לראות איזה מידע שמור עליו אצלנו. האם אנחנו חייבים לאפשר?",
+  "must": [
+   [
+    "עיון",
+    "inspect"
+   ],
+   [
+    "לתקן",
+    "תיקון",
+    "correct"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-09",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Can a court cancel an unfair term in our terms of service?",
+  "must": [
+   [
+    "standard contract",
+    "חוזים אחידים"
+   ],
+   [
+    "unfair",
+    "cancel",
+    "tribunal",
+    "change"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-10",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "en",
+  "kind": "draft",
+  "question": "Draft three questions we should ask our Israeli lawyer before we launch our privacy policy.",
+  "must": [
+   [
+    "lawyer",
+    "עורך דין"
+   ],
+   [
+    "privacy",
+    "פרטיות"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-01",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Does the CCPA apply to a small business with a few hundred California customers?",
+  "must": [
+   [
+    "threshold",
+    "revenue",
+    "100,000"
+   ],
+   [
+    "california"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-02",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "What does CAN-SPAM require in every marketing email?",
+  "must": [
+   [
+    "postal address",
+    "physical"
+   ],
+   [
+    "opt out",
+    "unsubscribe",
+    "opt-out"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-03",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "How fast must we honour an unsubscribe request under CAN-SPAM?",
+  "must": [
+   [
+    "10 business days",
+    "ten business days",
+    "10 days"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-04",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Can we send marketing text messages to our clients, and what consent do we need?",
+  "must": [
+   [
+    "tcpa"
+   ],
+   [
+    "written",
+    "express"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-05",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "During which hours may we call or text customers for marketing?",
+  "must": [
+   [
+    "8"
+   ],
+   [
+    "9"
+   ],
+   [
+    "local",
+    "recipient"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-06",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Does the ADA apply to our website, and which standard should we follow?",
+  "must": [
+   [
+    "title iii",
+    "public accommodation"
+   ],
+   [
+    "wcag"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-07",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Which privacy law restricts collecting data from children?",
+  "must": [
+   [
+    "coppa"
+   ],
+   [
+    "13"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-08",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Can we publish customer reviews we wrote ourselves to look more popular?",
+  "must": [
+   [
+    "ftc"
+   ],
+   [
+    "fake",
+    "deceptive",
+    "prohibit",
+    "disclos"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-09",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Does every US state have the same privacy rules as California?",
+  "must": [
+   [
+    "state",
+    "states"
+   ],
+   [
+    "different",
+    "vary",
+    "differ",
+    "not the same",
+    "other states"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-10",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "draft",
+  "question": "Draft three questions we should ask a US lawyer before we market to customers in several states.",
+  "must": [
+   [
+    "lawyer",
+    "attorney"
+   ],
+   [
+    "state",
+    "states"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-01",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "he",
+  "kind": "fact",
+  "question": "מה שיעור המע\"מ בישראל היום?",
+  "must": [
+   [
+    "18"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-02",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "he",
+  "kind": "fact",
+  "question": "מה ההבדל בין עוסק פטור לעוסק מורשה?",
+  "must": [
+   [
+    "פטור"
+   ],
+   [
+    "מע\"מ",
+    "מעמ",
+    "vat"
+   ],
+   [
+    "מורשה"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-03",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "en",
+  "kind": "fact",
+  "question": "What is the Israeli corporate tax rate?",
+  "must": [
+   [
+    "23"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-04",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "en",
+  "kind": "fact",
+  "question": "What is an allocation number on an Israeli invoice and why does it matter?",
+  "must": [
+   [
+    "allocation",
+    "הקצאה"
+   ],
+   [
+    "deduct",
+    "vat",
+    "customer"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-05",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "he",
+  "kind": "fact",
+  "question": "כמה שנים צריך לשמור ספרים ומסמכים?",
+  "must": [
+   [
+    "7",
+    "שבע",
+    "seven"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-06",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "en",
+  "kind": "fact",
+  "question": "How often does a licensed dealer report and pay VAT in Israel?",
+  "must": [
+   [
+    "monthly",
+    "bi-monthly",
+    "two months",
+    "every two months",
+    "חודש"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-07",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "he",
+  "kind": "fact",
+  "question": "מה המעסיק מנכה מכל תלוש שכר ומה הוא משלם בנוסף?",
+  "must": [
+   [
+    "ביטוח לאומי",
+    "national insurance"
+   ],
+   [
+    "מס הכנסה",
+    "income tax"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-08",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "en",
+  "kind": "draft",
+  "question": "Prepare a list of documents we should gather for our accountant before the annual report.",
+  "must": [
+   [
+    "accountant",
+    "רואה חשבון"
+   ],
+   [
+    "invoices",
+    "receipts",
+    "books",
+    "documents",
+    "חשבוני"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-01",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "What is the federal corporate income tax rate?",
+  "must": [
+   [
+    "21"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-02",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Which form does an employer file every quarter for payroll taxes?",
+  "must": [
+   [
+    "941"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-03",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "When must we give employees their W-2?",
+  "must": [
+   [
+    "january 31",
+    "jan 31",
+    "31 january"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-04",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "How is a freelancer paid for services reported to the IRS?",
+  "must": [
+   [
+    "1099"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-05",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "Do we have to collect sales tax in a state where we have no office?",
+  "must": [
+   [
+    "wayfair",
+    "economic nexus",
+    "nexus"
+   ],
+   [
+    "threshold",
+    "state"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-06",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "What is the self-employment tax rate?",
+  "must": [
+   [
+    "15.3"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-07",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "fact",
+  "question": "How often do self-employed people pay estimated tax?",
+  "must": [
+   [
+    "quarter"
+   ],
+   [
+    "1040-es",
+    "estimated"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-08",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "draft",
+  "question": "Prepare questions for our CPA about sales tax on our software subscriptions in different states.",
+  "must": [
+   [
+    "cpa",
+    "accountant"
+   ],
+   [
+    "state",
+    "states"
+   ]
+  ]
+ },
+ {
+  "id": "leg-il-11",
+  "agent": "legal",
+  "country": "IL",
+  "lang": "en",
+  "kind": "limit",
+  "question": "Will we win in court if a customer sues us over a cancelled membership? Give me the odds.",
+  "must": [
+   [
+    "lawyer",
+    "עורך דין",
+    "cannot predict",
+    "can't predict",
+    "not possible to predict",
+    "no way to"
+   ]
+  ]
+ },
+ {
+  "id": "leg-us-11",
+  "agent": "legal",
+  "country": "US",
+  "lang": "en",
+  "kind": "limit",
+  "question": "What are the data protection rules in France for our French customers?",
+  "must": [
+   [
+    "did not find",
+    "not in the library",
+    "no library",
+    "not covered",
+    "only israel",
+    "israel and the united states",
+    "do not have"
+   ]
+  ]
+ },
+ {
+  "id": "acc-il-09",
+  "agent": "accountant",
+  "country": "IL",
+  "lang": "he",
+  "kind": "limit",
+  "question": "תגיד לי בדיוק כמה מס אני אשלם השנה על הרווח שלי.",
+  "must": [
+   [
+    "רואה חשבון",
+    "accountant",
+    "נתונים",
+    "לא ניתן",
+    "אי אפשר"
+   ]
+  ]
+ },
+ {
+  "id": "acc-us-09",
+  "agent": "accountant",
+  "country": "US",
+  "lang": "en",
+  "kind": "limit",
+  "question": "What are the exact tax brackets for the current year? Give me the numbers.",
+  "must": [
+   [
+    "irs",
+    "check",
+    "current",
+    "did not find",
+    "not in the library"
+   ]
+  ]
+ }
+]

@@ -15,7 +15,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "verticals:export": "pnpm --filter @business-os/verticals export",
-    "vertical:new": "pnpm --filter @business-os/verticals new"
+    "vertical:new": "pnpm --filter @business-os/verticals new",
+    "brand:sync": "pnpm --filter @business-os/brand brand:sync"
   },
   "devDependencies": {
     "supabase": "2.119.0",

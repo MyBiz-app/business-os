@@ -29,6 +29,7 @@ import { Reveal } from "@/components/marketing/reveal";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { VerticalIcon } from "@/components/vertical-icon";
 import { industryTexts } from "@/lib/verticals";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 export const FEATURES = [
   { key: "schedule", Icon: CalendarDays },
@@ -166,15 +167,9 @@ export async function Faq() {
       <Reveal delay={80}>
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
           {items.map((item) => (
-            <details key={item.q} className="card group p-5 open:shadow-md">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
-                {item.q}
-                <span aria-hidden="true" className="text-xl text-primary-ink transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 text-muted">{item.a}</p>
-            </details>
+            <CollapsibleSection key={item.q} title={item.q}>
+              <p className="text-muted">{item.a}</p>
+            </CollapsibleSection>
           ))}
         </div>
       </Reveal>
@@ -253,7 +248,7 @@ export async function AddOnsStrip() {
           ))}
         </ul>
       </Reveal>
-      <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink">
+      <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink max-md:min-h-11">
         {t("cta")}
         <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
       </Link>

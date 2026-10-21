@@ -13,6 +13,7 @@ from app.api.billing import Invoice, SettingsDep, _invoice
 from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
 from app.api.receipts import Receipt, _one
+from app.core.audit import record
 from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.documents import brand, render
@@ -151,6 +152,16 @@ def platform_invoice_pdf(db: Session, invoice: Invoice) -> bytes:
             "client_tax_id": invoice.billing.tax_id,
             "client_email": invoice.billing.billing_email,
             "lines": lines,
+            "vat": (
+                {
+                    "subtotal_label": t["subtotal"],
+                    "subtotal": money(invoice.subtotal),
+                    "label": render.fill(t["vat"], rate=f"{invoice.vat_rate_bp / 100:g}"),
+                    "amount": money(invoice.vat_amount),
+                }
+                if invoice.vat_rate_bp
+                else None
+            ),
             "total": money(invoice.total),
             "status_label": t["status"][invoice.status] if invoice.status != "open" else None,
             "paid": paid,
@@ -166,12 +177,19 @@ def load_module_names(lang: str) -> dict[str, str]:
 @router.get("/receipt/{receipt_id}.pdf", response_class=Response, responses=PDF_RESPONSES)
 def receipt_file(receipt_id: UUID, context: ReadDep) -> Response:
     receipt = _one(context.session, receipt_id)
+    record(context.session, "export.receipt_pdf", entity_type="receipt", entity_id=receipt_id)
     return _pdf(receipt_pdf(context.session, receipt), f"receipt-{receipt.number}")
 
 
 @router.get("/platform_invoice/{invoice_id}.pdf", response_class=Response, responses=PDF_RESPONSES)
 def platform_invoice_file(invoice_id: UUID, context: SettingsDep) -> Response:
     invoice = _invoice(context.session, invoice_id)
+    record(
+        context.session,
+        "export.platform_invoice_pdf",
+        entity_type="platform_invoice",
+        entity_id=invoice_id,
+    )
     return _pdf(platform_invoice_pdf(context.session, invoice), f"invoice-{invoice.number}")
 
 

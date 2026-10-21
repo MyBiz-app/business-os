@@ -5,6 +5,14 @@
     "announcements": {
       "label": "Message from {brand}",
       "close": "Close"
+    },
+    "incidentBanner": {
+      "kinds": {
+        "incident": "Incident",
+        "maintenance": "Planned maintenance",
+        "security": "Security notice"
+      },
+      "status": "Status page"
     }
   },
   "errorPages": {
@@ -43,6 +51,14 @@
     }
   },
   "settings": {
+    "solo": {
+      "title": "Growing?",
+      "subtitle": "The menu is simple for now: no team, shifts, payroll or branches. They open by themselves when you add a first employee or a second branch, or with one click here.",
+      "firstEmployee": "Add a first employee",
+      "secondBranch": "Add a second branch",
+      "showAll": "I grew, show everything",
+      "done": "Everything is open"
+    },
     "language": "Language",
     "theme": "Theme",
     "themeLight": "Light",
@@ -80,6 +96,8 @@
     "modulesHint": "Turn features on or off and see the monthly price.",
     "requireHealth": "Clients need a health declaration to book in the app",
     "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book.",
+    "website": "Business website",
+    "websiteHint": "Shown to clients in the app, on the join page, in emails and on invoices. Branches can have their own.",
     "onlineSales": "Clients can buy plans in the app",
     "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged.",
     "billingLink": "MyBiz billing",
@@ -213,7 +231,185 @@
     "requireMfaForStaff": "Require two-step sign-in for the whole team",
     "requireMfaForStaffHint": "Every team member must enter an authenticator code after their password before they can work in this business. Clients are not affected.",
     "auditLink": "Audit log",
-    "auditHint": "Who changed roles, team, settings and exports."
+    "auditHint": "Who changed roles, team, settings and exports.",
+    "detailsGroups": {
+      "booking": "Booking and cancellation",
+      "clients": "Clients",
+      "sales": "Sales and security"
+    },
+    "detailsHint": "Name, language, currency, time zone and booking rules.",
+    "nav": {
+      "label": "Settings topics",
+      "back": "All settings",
+      "groups": {
+        "business": "Business",
+        "look": "Look and feel",
+        "plan": "Plan and billing",
+        "connections": "Connections",
+        "security": "Security",
+        "data": "Data and privacy",
+        "help": "Help"
+      },
+      "items": {
+        "business": "Business details",
+        "branding": "Branding",
+        "modules": "Modules and plan",
+        "billing": "Billing and subscription",
+        "integrations": "Integrations",
+        "audit": "Activity log",
+        "data": "Export and close",
+        "help": "Support",
+        "aiConnections": "AI connections",
+        "bookings": "Bookings and waitlists",
+        "memberships": "Memberships and freezes"
+      },
+      "hints": {
+        "business": "Details, legal identity, legal readiness and your business emails.",
+        "branding": "Name, color, logo and cover, with a live preview.",
+        "data": "Download your business data, or close the business.",
+        "help": "Let our team look at your account, or write to us.",
+        "aiConnections": "Connect Claude or ChatGPT to your business, and approve what they ask to change.",
+        "bookings": "What happens when a class, an appointment or a court is full.",
+        "memberships": "Whether clients can ask to freeze from the app, and the rules."
+      }
+    },
+    "branding": {
+      "nameTitle": "Display name",
+      "name": "Business name",
+      "nameHint": "Shown to your clients in the app and on documents.",
+      "custom": "Custom color",
+      "presets": {
+        "blue": "Blue",
+        "purple": "Purple",
+        "teal": "Teal",
+        "green": "Green",
+        "orange": "Orange",
+        "red": "Red",
+        "pink": "Pink",
+        "slate": "Slate"
+      },
+      "check": {
+        "good": "This color reads well in light and dark mode.",
+        "adjusted": "Readable, but a little faint on one theme. Small text and links use an automatically adjusted shade there.",
+        "weak": "This color is hard to read on one of the themes. We adjust the shade for text automatically, but a stronger color will look better."
+      },
+      "preview": {
+        "title": "How it looks",
+        "tabs": {
+          "app": "Client app",
+          "receipt": "Receipt",
+          "join": "Join page"
+        },
+        "greeting": "Hi, Dana",
+        "next": "Your next class",
+        "nextItem": "Tomorrow, 18:00",
+        "chipOne": "Classes",
+        "chipTwo": "My plan",
+        "chipThree": "Shop",
+        "receipt": "Receipt",
+        "receiptNumber": "No. 1042",
+        "receiptItem": "Monthly plan",
+        "receiptVat": "VAT",
+        "receiptTotal": "Total",
+        "joinTitle": "Join {name}",
+        "joinHint": "Enter your join code to see classes and book.",
+        "joinButton": "Join"
+      },
+      "presetsLabel": "Ready-made colors"
+    },
+    "waitlist": {
+      "title": "Waitlists",
+      "subtitle": "What happens when a spot opens in a class, an appointment or a court that was full.",
+      "enabled": "Keep waitlists",
+      "enabledHint": "Off: a full class cannot be joined and nobody can ask to be told about a free spot.",
+      "classes": "Classes",
+      "appointments": "Personal appointments",
+      "resources": "Courts and rooms",
+      "modes": {
+        "off": "Off",
+        "auto": "Sign in automatically",
+        "first_come": "First to take it",
+        "manual": "Team decides"
+      },
+      "modeHints": {
+        "off": "No waitlist for this kind.",
+        "auto": "The first in line is signed in and told. For requests for a range of hours or a whole day, it works as first to take it.",
+        "first_come": "Everyone waiting is told right away, and whoever takes the spot first gets it.",
+        "manual": "Nobody is told. The team sees the free spot and the waiting list and lets someone in."
+      },
+      "autoHours": "Stop signing in automatically before the class",
+      "hoursBefore": "{hours, plural, =0 {Never stop} one {# hour before} other {# hours before}}",
+      "autoHoursHint": "Closer to the class than this, a free spot is offered to everyone waiting instead, so nobody is signed in without knowing.",
+      "save": "Save",
+      "perService": "A service that works differently",
+      "perServiceHint": "Choose a mode for one service. The business setting applies to the others.",
+      "followBusiness": "Same as the business"
+    },
+    "freezeRules": {
+      "title": "Freezing a membership",
+      "intro": "Clients can ask to freeze a membership from the app. You approve each request, or let some reasons be approved automatically.",
+      "allow": "Let clients ask to freeze in the app",
+      "minDays": "Shortest freeze (days)",
+      "maxDays": "Longest freeze (days)",
+      "bank": "Freeze days per client per year",
+      "bankHint": "Leave empty for no limit. Clients see how many days are left.",
+      "notice": "Notice before the freeze (days)",
+      "fee": "Freeze fee",
+      "feeHint": "Added to the next charge. Leave 0 for no fee.",
+      "billingMode": "Renewing memberships",
+      "billingModes": {
+        "defer": "Move the next charge by the frozen days",
+        "credit": "Credit the frozen days on the next charge"
+      },
+      "billingHint": "Prepaid memberships always get their end date extended by the frozen days.",
+      "autoApprove": "Approve these reasons automatically",
+      "autoApproveHint": "A request for one of these takes effect at once, without a manager.",
+      "save": "Save",
+      "saved": "Saved."
+    },
+    "cancellation": {
+      "title": "Cancellations",
+      "subtitle": "How long before a visit clients may cancel for free, and what happens when they cancel late or do not come.",
+      "confirm": "These are the usual terms for a business like yours. Check them and save once so they are yours.",
+      "group": "Free cancellation before a class",
+      "personal": "Free cancellation before a personal session or appointment",
+      "resource": "Free cancellation before a court or room",
+      "lateOutcome": "A late cancellation",
+      "noShowOutcome": "A client who does not come",
+      "outcomes": {
+        "counts": "Counts as a used visit",
+        "recorded": "Only noted, not counted"
+      },
+      "limit": "Pause app booking after repeated no-shows",
+      "limitCount": "No-shows in 30 days",
+      "limitHint": "Off by default. Staff can still book the client.",
+      "durations": {
+        "anytime": "Up to the start",
+        "minutes": "{count, plural, one {# minute} other {# minutes}} before",
+        "hours": "{count, plural, one {# hour} other {# hours}} before",
+        "days": "{count, plural, one {# day} other {# days}} before"
+      },
+      "live": {
+        "counts": "A client who cancels less than {time} loses the visit: it counts as used.",
+        "recorded": "A client who cancels less than {time} is noted as late, but keeps the visit."
+      },
+      "liveOthers": "(Personal sessions: {personal}. Courts and rooms: {resource}.)",
+      "liveNoShow": {
+        "counts": "A client who does not come loses the visit.",
+        "recorded": "A client who does not come is noted, but keeps the visit."
+      },
+      "suggested": "Suggested for your kind of business: {group} before a class, {personal} before a personal session.",
+      "feeNote": "A fee for late cancellations is built but stays off until online payments are on.",
+      "lawNote": "This is about cancelling a visit. Ending the membership itself follows consumer protection law (gyms have special rules); we recommend checking with a lawyer.",
+      "save": "Save",
+      "confirmSave": "Confirm and save",
+      "perService": "A service with its own terms",
+      "perServiceHint": "For example a personal session that needs a day's notice while classes need six hours.",
+      "perPlan": "A plan with its own terms",
+      "perPlanHint": "For example a VIP membership with cancellation up to an hour before. The plan wins over the service.",
+      "followBusiness": "Follow the business",
+      "saveRow": "Save"
+    }
   },
   "locales": {
     "he": "עברית",
@@ -347,19 +543,38 @@
     "planTitle": "Your plan",
     "planHint": "We picked what fits your answers. Change anything; you can also change it later in Settings."
   },
+  "period": {
+    "label": "Period",
+    "loading": "Loading the numbers",
+    "lastDays": "Last {count} days",
+    "custom": "Range...",
+    "customLabel": "{from} - {to}",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "invalid": "Pick a start day that is not after the end day, and no later than today.",
+    "thisMonth": "This month",
+    "lastMonth": "Last month",
+    "yearToDate": "Year to date",
+    "month": "Calendar month"
+  },
   "dashboard": {
     "welcome": "Welcome to {name}",
     "yourRole": "Your role: {role}",
     "today": "Today",
     "emptyToday": "Your schedule, clients and sales will appear here.",
     "business": "Business",
+    "openDetails": "Open the details",
     "kpis": "Key numbers",
+    "withoutStaff": "Without team members",
     "period": "Period",
     "lastDays": "Last {count} days",
     "vsPrevious": "vs. the previous period",
     "points": "{value} pts",
     "better": "better",
     "worse": "worse",
+    "trends": "Trends",
     "weeklyRevenue": "Revenue per week",
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
@@ -383,17 +598,23 @@
         "inactive": "Haven't come in lately",
         "leads_due": "Leads to call back",
         "health_review": "Health declarations to review",
-        "license_expiring": "Business licence about to expire"
+        "license_expiring": "Business licence about to expire",
+        "freeze_requests": "Freeze requests to decide"
       },
       "dates": {
         "plan_ending": "until {date}",
         "inactive": "last visit {date}",
         "leads_due": "since {date}",
         "health_review": "signed {date}",
-        "license_expiring": "expires {date}"
+        "license_expiring": "expires {date}",
+        "freeze_requests": "from {date}"
       },
       "never": "no visit yet",
       "all": "See all {count}"
+    },
+    "waitlist": {
+      "waiting": "{count, plural, one {# person is waiting for a spot} other {# people are waiting for a spot}}",
+      "top": "Most wanted: {service} ({count})"
     }
   },
   "roles": {
@@ -440,7 +661,28 @@
     "migration": "Move to MyBiz",
     "invoices": "Invoices",
     "sidebarLight": "Use a light sidebar",
-    "sidebarDark": "Use a dark sidebar"
+    "sidebarDark": "Use a dark sidebar",
+    "quotesEvents": "Quotes and events",
+    "catalog": "Catalog",
+    "website": "My website",
+    "expand": "Open {name} menu",
+    "collapse": "Close {name} menu",
+    "sub": {
+      "people": "People",
+      "organization": "Organization",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "shiftSwaps": "Shift swaps",
+      "timeClock": "Time clock",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "roles": "Roles",
+      "clientList": "List",
+      "clientImport": "Import",
+      "orders": "Orders",
+      "aiTeam": "Team",
+      "aiTasks": "Tasks"
+    }
   },
   "terms": {
     "fitness": {
@@ -654,6 +896,18 @@
     }
   },
   "clients": {
+    "nav": {
+      "label": "Client sections",
+      "details": "Details",
+      "membership": "Plans and visits",
+      "paperwork": "Quotes and documents",
+      "talk": "Notes and messages",
+      "privacy": "Consent and privacy"
+    },
+    "joinedChip": "Joined {range}",
+    "noShowChip": "Missed a class {range}",
+    "activeFilters": "Active filters",
+    "removeFilter": "Remove this filter",
     "firstName": "First name",
     "lastName": "Last name",
     "name": "Name",
@@ -704,10 +958,20 @@
     },
     "absentFilter": "Last visit",
     "absentAny": "Any time",
+    "staffFilter": "Team members",
+    "staffAny": "Everyone",
+    "staffOptions": {
+      "only": "Team members only",
+      "exclude": "Without team members"
+    },
+    "staffBadge": "Team",
+    "addMe": "Add me",
     "absentDays": "Not in {days} days",
+    "newClients": "New",
     "homeBranch": "Home branch",
     "allBranches": "All branches",
     "profile": {
+      "emailUnreachable": "This email address bounced or reported spam, so no emails are sent to it. Update the address to reach the client by email.",
       "contact": "Contact",
       "call": "Call",
       "email": "Email",
@@ -757,6 +1021,9 @@
     }
   },
   "common": {
+    "undo": "Undo",
+    "notifications": "Notifications",
+    "savedShort": "Saved",
     "dismiss": "Close notification",
     "skipToContent": "Skip to main content",
     "loadFailed": "Couldn't load this right now.",
@@ -774,10 +1041,16 @@
       "generic": "Something went wrong. Please try again.",
       "storage_full": "Your space for files is full. Delete some files or choose a bigger bundle in Billing."
     },
+    "closeDialog": "Close window",
+    "discardTitle": "Leave without saving?",
+    "discardBody": "Your changes will be lost.",
+    "keepEditing": "Keep editing",
+    "discard": "Leave without saving",
     "loading": "Loading…",
     "chooseFile": "Choose a file",
     "noFile": "No file chosen",
-    "edit": "Edit"
+    "edit": "Edit",
+    "close": "Close"
   },
   "services": {
     "title": "Services",
@@ -812,9 +1085,81 @@
     "stats": {
       "sessions": "{count, plural, =0 {No sessions in 30 days} one {One session in 30 days} other {# sessions in 30 days}}",
       "occupancy": "{value} full"
+    },
+    "created": "Service created."
+  },
+  "address": {
+    "city": "City",
+    "cityPlaceholder": "Start typing a city",
+    "street": "Street",
+    "streetPlaceholder": "Start typing a street",
+    "streetNeedsCity": "Choose a city first",
+    "houseNumber": "House number",
+    "details": "Apartment, floor, entrance",
+    "optional": "optional",
+    "unlisted": "My street is not on the list",
+    "unlistedStreet": "Street name",
+    "unlistedNote": "The street will be flagged for review and added to the list.",
+    "current": "Saved address: {address}. Choosing from the list replaces it.",
+    "backToList": "Choose from the list",
+    "noResults": "No results",
+    "chooseCity": "Choose a city from the list",
+    "chooseStreet": "Choose a street from the list",
+    "reminder": {
+      "text": "Complete your home address: city, street and house number.",
+      "action": "Fill in the address"
+    }
+  },
+  "branchMap": {
+    "title": "Branches map",
+    "subtitle": "Where your branches are, sized by the numbers of the last 30 days. Pick one to fly to its street.",
+    "mapLabel": "Map of the branches",
+    "failed": "The map could not be loaded. Try again in a moment.",
+    "colorByLabel": "Color and size by",
+    "colorBy": {
+      "revenue": "Revenue",
+      "clients": "Clients",
+      "occupancy": "Occupancy"
+    },
+    "hover": {
+      "clients": "Active clients: {value}",
+      "revenue": "Revenue: {value}",
+      "occupancy": "Occupancy: {value}"
+    },
+    "panel": {
+      "revenue": "Revenue",
+      "clients": "Active clients",
+      "bookings": "Sessions held",
+      "occupancy": "Average occupancy",
+      "staffCost": "Expenses: team cost (gross pay), {month}",
+      "staffCostHint": "Gross pay only, from the latest payroll month, split by where people clocked in. It is the only expense we track: employer contributions and other expenses are not included, because there is no expense ledger yet",
+      "staffCount": "Team members",
+      "origins": "Where clients come from",
+      "originsEmpty": "No client addresses yet for the people who came in the last 30 days.",
+      "originRow": "{city}: {count}",
+      "trend": "Revenue per day, last 30 days",
+      "report": "Branch report",
+      "schedule": "Branch schedule"
+    },
+    "originsLayer": "Show where clients come from",
+    "originPoint": "{city}: {count} clients",
+    "close": "Close",
+    "openFull": "Open the full map",
+    "empty": "No branch has a point on the map yet. Add the address of a branch and it appears here.",
+    "emptyLink": "To the branches",
+    "pin": {
+      "label": "The branch's point on the map",
+      "none": "The point on the map appears after you save an address.",
+      "hint": "Drag the pin if the point is not exactly right, then save.",
+      "moved": "The new point is saved with the branch.",
+      "readOnly": "The branch's point on the map.",
+      "failed": "The map could not be loaded."
     }
   },
   "locations": {
+    "settingsTitle": "Branch settings",
+    "settingsHint": "Client policy and branch groups",
+    "detailsTitle": "Branch details",
     "manager": {
       "title": "Branch manager",
       "subtitle": "Who runs this branch. They get manager rights here only: staff, shifts, bookings and clients of this branch.",
@@ -830,6 +1175,8 @@
     "empty": "No locations yet.",
     "name": "Name",
     "address": "Address",
+    "website": "Branch website",
+    "websiteHint": "Leave empty to use the business website.",
     "active": "Open",
     "rooms": "Rooms",
     "kind": "Branch type",
@@ -896,6 +1243,22 @@
     }
   },
   "team": {
+    "tabsLabel": "Team sections",
+    "tabs": {
+      "members": "People",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "timeClock": "Time clock",
+      "swaps": "Swaps",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "organization": "Structure",
+      "roles": "Roles"
+    },
+    "inviteButton": "Invite someone",
+    "moreActions": "More actions for {name}",
+    "changeRole": "Change role",
+    "branchesMenu": "Branches",
     "title": "Team",
     "subtitle": "People who work in the business and what they can do.",
     "members": "Members",
@@ -971,6 +1334,8 @@
     "signup": "Create an account"
   },
   "schedule": {
+    "filtered": "Filtered",
+    "removeFilter": "Remove the filter",
     "title": "Schedule",
     "thisWeek": "This week",
     "previousWeek": "Previous week",
@@ -980,6 +1345,7 @@
     "cancelled": "Cancelled",
     "spots": "{booked}/{capacity}",
     "spotsLabel": "{booked} of {capacity} booked",
+    "waitingLabel": "{count} waiting",
     "service": "Service",
     "date": "Date",
     "startTime": "Start time",
@@ -1010,6 +1376,8 @@
     "details": "Session details",
     "cancelSession": "Cancel this session",
     "restoreSession": "Restore this session",
+    "cancelledToast": "Session cancelled",
+    "restoredToast": "Session restored",
     "series": "Part of a weekly series. Changes here apply to this session only.",
     "back": "Back to schedule",
     "needService": "Add a service first, then you can schedule it.",
@@ -1028,6 +1396,7 @@
     "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
     "copyWeekError": "Couldn't copy the week. Try again.",
     "closedDays": "Closed days",
+    "moreActions": "More",
     "closedDay": "Closed",
     "grid": "Calendar grid, scrollable",
     "closeDay": "Close a day",
@@ -1074,7 +1443,8 @@
     "publishWeekHint": "Opens the next week of classes for clients now, ahead of the scheduled release.",
     "publishWeekDone": "The schedule is open for clients until {date}.",
     "publishWeekAlready": "The next week is already published.",
-    "publishWeekError": "Couldn't publish the week. Try again."
+    "publishWeekError": "Couldn't publish the week. Try again.",
+    "waitlists": "Waitlists"
   },
   "bookings": {
     "title": "Bookings",
@@ -1084,12 +1454,21 @@
     "empty": "No one is booked yet.",
     "cancelledCount": "{count, plural, one {# cancellation} other {# cancellations}}",
     "searchLabel": "Find a client to book",
+    "addMe": "Add me to this class",
+    "addMeToWaitlist": "Add me to the waitlist",
     "searchPlaceholder": "Search by name, email or phone",
     "search": "Search",
     "results": "Search results",
     "noMatches": "No matching active clients who aren't already booked.",
     "book": "Book",
     "addToWaitlist": "Add to waitlist",
+    "overCapacity": "Over capacity",
+    "addOverCapacity": "Add over capacity",
+    "overCapacityTitle": "This class is full",
+    "overCapacityBody": "The class is full ({booked} of {capacity}). Adding {name} goes over the capacity you set. Add anyway?",
+    "overCapacityNote": "{count, plural, one {# over the capacity} other {# over the capacity}}",
+    "overCapacitySince": "Added over capacity",
+    "keepOnWaitlist": "Add to waitlist instead",
     "lateCancel": "Late cancel",
     "sessionCancelled": "Session cancelled",
     "noneYet": "No bookings yet.",
@@ -1116,12 +1495,24 @@
       "not_found": "The booking was not found. Refresh and try again.",
       "generic": "Something went wrong. Try again.",
       "dependent_required": "Choose who comes.",
-      "unknown_dependent": "That one isn't on this client's card any more."
+      "unknown_dependent": "That one isn't on this client's card any more.",
+      "nothing_to_return": "There is nothing to give back for this booking."
     },
     "noPlan": "No plan",
-    "showAll": "Show the whole history ({count})"
+    "showAll": "Show the whole history ({count})",
+    "waived": "Visit given back",
+    "notCounted": "Not counted",
+    "waive": {
+      "button": "Give the visit back",
+      "reason": "Reason (required)",
+      "placeholder": "For example illness or a family emergency",
+      "note": "The client keeps the visit and is told. Who and when are saved.",
+      "confirm": "Give back",
+      "thisYear": "{count, plural, one {# visit given back this year} other {# visits given back this year}}"
+    }
   },
   "areas": {
+    "joinError": "Could not open the client area. Try again.",
     "switch": "Switch area",
     "current": "Current",
     "client": "Member",
@@ -1175,6 +1566,9 @@
       "emailNotAllowed": "We can't send email to this address yet. Try another address or contact support.",
       "genericWithCode": "Something went wrong sending the code ({code}). Try again."
     },
+    "cancellationPolicy": {
+      "title": "Cancellation policy"
+    },
     "join": {
       "title": "Join a business",
       "subtitle": "Enter the code the business gave you (it's on their sign or QR code).",
@@ -1183,6 +1577,7 @@
       "preview": "You're joining this business. They'll see your name and email, and you'll be able to book with them.",
       "joinButton": "Join {name}",
       "otherCode": "Use a different code",
+      "visitSite": "Visit the business website",
       "back": "Back",
       "unknownCode": "We couldn't find a business with that code.",
       "generic": "Something went wrong. Try again.",
@@ -1191,6 +1586,9 @@
       "lastName": "Last name",
       "nameRequired": "Please enter your first name, so the business knows who you are.",
       "marketing": "Send me offers and news from this business (optional). You can change this any time in your profile.",
+      "joinedTitle": "Welcome to {name}",
+      "joinedBody": "You joined. Before your first booking, here are the business's rules for cancelling.",
+      "toHome": "Continue",
       "legal": "By joining you agree to the business's terms of use and the privacy policy, which you can read on our website."
     },
     "home": {
@@ -1318,6 +1716,8 @@
       "not_found": "This booking no longer exists. Pull down to refresh.",
       "generic": "Something went wrong. Try again.",
       "no_valid_plan": "You need a valid membership or punch card to book. Ask the business.",
+      "period_quota_reached": "You used all the visits your plan allows in this period.",
+      "no_show_limit": "Booking in the app is paused because of missed sessions. Contact the business.",
       "health_declaration_required": "Please fill in the health declaration before booking.",
       "health_declaration_review": "The business needs to approve your health declaration before you can book.",
       "dependent_required": "Choose who's coming.",
@@ -1362,7 +1762,12 @@
         "health_approved": "The business approved your health declaration. You can book now.",
         "health_rejected": "The business couldn't approve your health declaration. Please contact them.",
         "session_reminder": "Reminder: you're booked into {service} today, {when}.",
-        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking."
+        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking.",
+        "waitlist_spot_open": "A spot opened for {service}, {when}. Open the app to take it.",
+        "waitlist_spot_taken": "The spot for {service}, {when} was taken. You stay on the list.",
+        "freeze_approved": "Your freeze of {plan} was approved: {from} - {date}.",
+        "freeze_rejected": "Your freeze request for {plan} wasn't approved.",
+        "credit_returned": "The business gave you back your visit for {service}, {when}."
       }
     },
     "pay": {
@@ -1407,6 +1812,8 @@
         "slot_taken": "That time was just taken. Choose another.",
         "outside_hours": "That time is no longer available. Choose another.",
         "no_valid_plan": "You need a valid plan to book.",
+        "period_quota_reached": "You used all the visits your plan allows in this period.",
+        "no_show_limit": "Booking in the app is paused because of missed sessions. Contact the business.",
         "health_declaration_required": "Please fill in the health declaration before booking.",
         "health_declaration_review": "Your health declaration is waiting for review.",
         "generic": "Something went wrong. Please try again.",
@@ -1486,6 +1893,9 @@
       "nothingBooked": "Nothing booked yet.",
       "bookNow": "Book now",
       "navigate": "Navigate",
+      "navigateWaze": "Navigate with Waze",
+      "navigateGoogle": "Navigate with Google Maps",
+      "website": "Website",
       "addToCalendar": "Add to calendar",
       "cancelFailed": "The cancellation didn't go through. Try again.",
       "membership": "Your plan",
@@ -1515,7 +1925,92 @@
         "week": "This week",
         "earlier": "Earlier"
       }
-    }
+    },
+    "waitlist": {
+      "title": "My waitlists",
+      "empty": "You are not waiting for anything. Ask to be told when a time opens up.",
+      "add": "Tell me when something opens",
+      "leave": "Leave the list",
+      "take": "Take it now",
+      "position": "Place {position} in the queue",
+      "spotOpen": "A spot opened: {day}, {time}",
+      "rangeAt": "{day}, {from}-{to}",
+      "slotAt": "{day}, {time}",
+      "dayAt": "{day}, any time",
+      "newTitle": "Tell me when a time opens",
+      "newBody": "We will send you an update as soon as a time matches. The first to take it gets it.",
+      "service": "Service",
+      "day": "Day",
+      "when": "When",
+      "allDay": "Any time that day",
+      "range": "A time range",
+      "from": "From",
+      "to": "Until",
+      "earlier": "{what}: 30 minutes earlier",
+      "later": "{what}: 30 minutes later",
+      "submit": "Add me to the list",
+      "withWhom": "With whom",
+      "anyone": "Anyone",
+      "branch": "Branch",
+      "anyBranch": "Any branch",
+      "notifyMe": "Tell me if a time opens",
+      "errors": {
+        "generic": "Something went wrong. Try again.",
+        "waitlist_off": "This business does not use a waitlist for this.",
+        "already_waiting": "You are already waiting for this.",
+        "in_the_past": "Pick a day that has not passed.",
+        "too_many": "You can wait for up to 5 things at once.",
+        "on_site": "Visits at your address cannot have a waitlist.",
+        "spot_taken": "Someone was faster. You stay on the list.",
+        "payment_required": "This spot needs payment in the app."
+      }
+    },
+    "freeze": {
+      "title": "Freeze my plan",
+      "request": "Freeze",
+      "backTo": "My bookings",
+      "off": "This business doesn't take freeze requests in the app. Ask the front desk.",
+      "pickStart": "Tap the first day of the freeze",
+      "pickEnd": "Now tap the last day",
+      "range": "{from} - {to} · {days, plural, one {# day} other {# days}}",
+      "reason": "Reason",
+      "note": "Note (optional)",
+      "bank": "{remaining, plural, one {# freeze day left this year} other {# freeze days left this year}} of {total}",
+      "whatHappens": "What will happen",
+      "newEnd": "Your plan will be valid until {date}.",
+      "shift": "Your next charge moves from {from} to {to}.",
+      "credit": "You'll get a credit of {amount} on your next charge.",
+      "fee": "A freeze fee of {amount} is added to your next charge.",
+      "nextAmount": "Your next charge will be {amount}.",
+      "auto": "This reason is approved right away.",
+      "manual": "The business will review your request and let you know.",
+      "send": "Send request",
+      "sendNow": "Freeze now",
+      "sent": "Your request was sent. You'll get an update when the business decides.",
+      "done": "Done. Your plan is frozen.",
+      "myRequests": "My requests",
+      "withdraw": "Withdraw",
+      "backEarly": "I'm back early",
+      "backEarlyTitle": "End the freeze now?",
+      "backEarlyMessage": "Your plan opens again today, and the dates and next charge go back by the unused days.",
+      "backEarlyDone": "Welcome back! Your plan is active again.",
+      "paper": "A paper (optional)",
+      "paperHint": "A medical note or a call-up paper, as a photo. Only the business sees it.",
+      "paperGallery": "Choose a photo",
+      "paperCamera": "Take a photo",
+      "paperRemove": "Remove",
+      "paperFailed": "We couldn't upload the photo. Try again.",
+      "paperPermission": "Allow access to your photos or camera to attach a paper.",
+      "paperAttached": "paper attached",
+      "frozenRange": "Frozen {from} - {to}",
+      "keep": "Keep frozen"
+    },
+    "cancelLateQuota": "This is a late cancellation. The visit still counts, out of your {count, plural, one {# visit} other {# visits}} {unit, select, week {this week} other {this month}} ({used} used). Cancel anyway?",
+    "cancelLateCard": "This is a late cancellation. It will still use one entry of your {plan}. Cancel anyway?",
+    "cancelLateCounts": "This is a late cancellation. The visit counts as used. Cancel anyway?",
+    "cancelLateRecorded": "This is a late cancellation. It will be noted, but you keep the visit. Cancel anyway?",
+    "freeCancelUntil": "Free cancellation until {when}",
+    "cancelLateSoon": "Cancelling now counts as late"
   },
   "join": {
     "inviteToApp": "Invite to the app",
@@ -1528,7 +2023,8 @@
     "title": "Join {name}",
     "body": "Book appointments and sessions, join waitlists and manage your bookings in the app.",
     "openApp": "Open in the app",
-    "openInBrowser": "Open in the browser, no install"
+    "openInBrowser": "Open in the browser, no install",
+    "visitSite": "Visit the business website"
   },
   "plans": {
     "title": "Plans",
@@ -1589,13 +2085,60 @@
       "generic": "Something went wrong. Try again.",
       "not_active": "This plan is no longer active.",
       "outside_validity": "The freeze must start while the plan is valid.",
-      "overlapping_freeze": "That overlaps an existing freeze."
+      "overlapping_freeze": "That overlaps an existing freeze.",
+      "not_a_membership": "Only memberships can be frozen.",
+      "request_not_pending": "This request was already decided.",
+      "not_freezable": "This plan can't be frozen now.",
+      "freeze_over": "That freeze is already over."
     },
     "validityRange": "Valid {from} - {to}",
     "paymentMethod": "Payment method",
     "stats": {
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
       "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
+    },
+    "created": "Plan created.",
+    "cycle": "Billing cycle",
+    "cycles": {
+      "none": "Paid in advance, no renewal",
+      "monthly": "Monthly",
+      "quarterly": "Every 3 months",
+      "yearly": "Yearly",
+      "custom": "Every N days"
+    },
+    "cycleDays": "Days in a cycle",
+    "cycleHint": "The membership is valid for one cycle at a time.",
+    "autoRenew": "Renews automatically",
+    "autoRenewHint": "Charged at the start of each cycle. Payments are simulated until a payment provider is connected.",
+    "renews": "Renews {date} · {amount}",
+    "renewsOff": "Next billing {date}",
+    "freezeShifted": "Next charge moved by {days, plural, one {# day} other {# days}}",
+    "freezeCredit": "Credit {amount}",
+    "freezeFee": "Fee {amount}",
+    "punchNoFreeze": "Punch cards can't be frozen.",
+    "endEarly": "Client is back",
+    "endEarlyDone": "The freeze ended. Dates and the next charge were updated.",
+    "requestsTitle": "Freeze requests",
+    "requestLine": "{from} - {to} · {days, plural, one {# day} other {# days}} · {reason}",
+    "approve": "Approve",
+    "approvePartial": "Approve until",
+    "reject": "Decline",
+    "decisionNote": "Message to the client (optional)",
+    "decided": "Done.",
+    "requestsRequestedBy": "Requested by the client in the app",
+    "requestPaper": "Open the attached paper",
+    "autoApproved": "Approved automatically",
+    "quota": "Visits limit",
+    "quotas": {
+      "none": "No limit",
+      "week": "Per week",
+      "month": "Per month"
+    },
+    "quotaVisits": "Visits allowed",
+    "quotaHint": "For example 2 visits per week. A late cancellation can use one up, as the cancellation policy says.",
+    "quotaShort": {
+      "week": "{count, plural, one {# visit} other {# visits}} per week",
+      "month": "{count, plural, one {# visit} other {# visits}} per month"
     }
   },
   "metrics": {
@@ -1634,6 +2177,8 @@
     "bookPreview": "Book {client} into {service}",
     "publishPreview": "Publish on {network} ({account}): {text}",
     "cancelPreview": "Cancel {client}'s booking for {service}",
+    "sendMessagePreview": "Send {client} a message: {body}",
+    "giveBackPreview": "Give {client} back the visit for {service} ({reason})",
     "fullWaitlist": "It's full, so this will add them to the waitlist.",
     "confirm": "Confirm",
     "reject": "Don't do it",
@@ -1648,6 +2193,8 @@
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
+      "ai_user_limit_reached": "You've reached your personal AI limit for this month.",
+      "ai_daily_pace_reached": "You've used your share of the AI for today. It opens again tomorrow.",
       "ai_rate_limited": "You're sending questions too fast. Wait a minute and try again.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
@@ -1660,17 +2207,100 @@
     "firstRun": "First run: {when}",
     "upTo": "Up to {credits} credits per run, read-only; anything it proposes waits for your approval."
   },
+  "tour": {
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip the guide",
+    "done": "Done",
+    "progress": "Step {current} of {total}"
+  },
   "aiTeam": {
+    "tour": {
+      "help": "Guide",
+      "team": {
+        "title": "Meet your team",
+        "body": "Every agent has a job of its own. The chief knows who to send you to, so you can always start with it."
+      },
+      "talk": {
+        "title": "How to talk to them",
+        "body": "Click an agent on the map to open a chat. On every other screen a round button sits in the corner: click it to talk to the agent that fits the screen, or press and hold to see the whole team. Ask in plain words, for example \"Who didn't show up this week?\".",
+        "appBody": "In the app, open the AI team from the menu and tap an agent to talk. Ask in plain words, for example \"Who didn't show up this week?\"."
+      },
+      "approvals": {
+        "title": "What they do alone, and what waits for you",
+        "body": "Reading, searching and summing up they do on their own. Anything sensitive, like messaging your clients or changing something in the system, waits for your approval on a card, and the system checks it again before it happens. Try it on this example:"
+      },
+      "usage": {
+        "title": "How much AI was used",
+        "body": "Every chat uses credits from your monthly plan. The bar above the map shows how much of what is included has been used so far."
+      },
+      "hire": {
+        "title": "Hire an agent of your own",
+        "body": "Use \"Hire an agent\" to set up a new one: a name, a job, a way of speaking, the branches it knows and who may use it.",
+        "bodyMember": "Owners and managers can hire an agent of their own: a name, a job, a way of speaking, the branches it knows and who may use it."
+      },
+      "spots": {
+        "map": {
+          "title": "The map",
+          "body": "Click an agent to talk to it. On a wide screen you can also switch to a list."
+        },
+        "toolbar": {
+          "title": "The toolbar",
+          "body": "Switch between the map and the list here. Whoever may edit the team also changes its structure from here."
+        },
+        "meter": {
+          "title": "The usage meter",
+          "body": "This is how many of this month's credits have been used."
+        }
+      },
+      "simulation": {
+        "label": "Example chat, nothing is sent",
+        "question": "Who didn't show up this week?",
+        "answer": "{name}: three clients booked and didn't come this week: Dana Cohen, Yossi Levi and Michal Barak. Want me to send them a reminder with a link to book a new class?",
+        "card": "Send a reminder to 3 clients",
+        "confirmed": "In this example nothing was sent. In a real chat the message goes out only after you confirm.",
+        "rejected": "In this example nothing was sent. In a real chat the request would simply be dropped."
+      }
+    },
     "title": "AI team",
     "subtitle": "Your agents, each with a job. Pick one to talk, or ask the chief and it will point you to the right one.",
     "mapLabel": "The AI team",
+    "toolbar": "AI team tools",
     "listLabel": "AI agents",
     "view": "View",
     "views": {
       "map": "Map",
       "list": "List"
     },
-    "usage": "{used} of {included} AI credits used this month",
+    "meter": {
+      "business": "{percent}% of this month's AI used",
+      "person": "{percent}% of your daily AI allowance used",
+      "reach": "At this pace the month's AI runs out on {date}",
+      "left": "About {count, plural, one {# question} other {# questions}} left this month",
+      "leftToday": "About {count, plural, one {# question} other {# questions}} left for you today",
+      "noPace": "No daily limit for you",
+      "paceMark": "Where an even pace would be today",
+      "openWindow": "Open the AI usage window",
+      "windowTitle": "AI usage",
+      "windowSubtitle": "{used} of {included} credits used this month",
+      "byDay": "Credits per day",
+      "byPerson": "By person",
+      "byAgent": "By agent",
+      "byKind": "Questions and tasks",
+      "kind": {
+        "asked": "Questions people asked",
+        "scheduled": "Tasks that ran by themselves"
+      },
+      "none": "Nothing used yet this month.",
+      "unknownPerson": "Someone who left or is unknown",
+      "aiUsers": "{count} of {allowed} people have access to the AI team",
+      "alertWarn": "The month's AI is almost used up. You can turn on pay-as-you-go or move to AI Pro.",
+      "alertOver": "The month's AI is used up. New questions wait until next month unless you turn on pay-as-you-go or move to AI Pro.",
+      "enablePayg": "Turn on pay-as-you-go",
+      "upgrade": "Upgrade to AI Pro",
+      "limitPerson": "Limit a person",
+      "buyUser": "Add an AI user"
+    },
     "state": {
       "active": "Available",
       "locked": "Locked: not in your plan",
@@ -1838,7 +2468,8 @@
         "agent_unavailable": "The agent is not available",
         "business_closed": "The business is closed",
         "generic": "Something went wrong",
-        "ai_user_limit_reached": "The AI limit set for this person was reached"
+        "ai_user_limit_reached": "The AI limit set for this person was reached",
+        "ai_daily_pace_reached": "The person reached their daily AI pace"
       },
       "credits": "{credits} credits",
       "frequency": {
@@ -2060,7 +2691,7 @@
     "structure": {
       "edit": "Edit structure",
       "title": "Team structure",
-      "hint": "Drag the circle above an agent onto the agent it reports to. Click a line to remove it. Drag an agent into a team frame to add it. You can also use the lists below.",
+      "hint": "Drag a dot on the rim of an agent's picture onto another agent to connect them: the bottom dot is for the agents under it, the top dot for its manager. Click a line to remove it. Drag an agent into a team frame to add it. You can also use the lists below.",
       "relayout": "Tidy up",
       "cancel": "Cancel",
       "save": "Save",
@@ -2084,6 +2715,8 @@
       "agentsLabel": "Agents and where they stand",
       "removeLine": "Remove the line: {name} goes back under the chief",
       "handle": "Drag onto the agent that {name} reports to",
+      "portTop": "Top dot of {name}: attach the agent {name} reports to",
+      "portBottom": "Bottom dot of {name}: drag onto an agent that reports to {name}",
       "errors": {
         "locked_agent": "A locked agent cannot be connected. Add its module to the plan first.",
         "cycle": "Agents cannot report to each other in a loop.",
@@ -2092,6 +2725,8 @@
     }
   },
   "aiBubble": {
+    "levelWarn": "The month's AI is almost used up",
+    "levelOver": "The month's AI is used up",
     "open": "Ask {name} or the AI team",
     "close": "Close the chat",
     "openFull": "Open in the full team",
@@ -2131,7 +2766,8 @@
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
       "noPack": "Included amount",
-      "social_studio": "Content studio"
+      "social_studio": "Content studio",
+      "payroll": "Payroll"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -2155,7 +2791,8 @@
       "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
       "noSupport": "Email and help center, an answer by the next business day.",
       "noPack": "2 GB for files and 200 messages a month.",
-      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post."
+      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post.",
+      "payroll": "Monthly payroll runs, payslips, Form 101 and the bank transfer file, for up to 10 staff."
     },
     "followsBranches": "Follows your active branches",
     "supportTier": "Support",
@@ -2216,7 +2853,17 @@
       "integrations": "Integrations",
       "broadcasts": "Broadcasts",
       "ai": "AI",
-      "health": "System health"
+      "health": "System health",
+      "incidents": "Incident banners",
+      "growth": "Growth",
+      "websiteOrders": "Website orders",
+      "churn": "Churn",
+      "metrics": "SaaS numbers",
+      "email": "Email delivery",
+      "catalog": "Catalog and prices",
+      "trials": "Trials ending",
+      "security": "Security center",
+      "legal": "Legal center"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -2258,6 +2905,10 @@
       "broadcasts_manage": {
         "name": "Broadcasts",
         "hint": "Send messages and pop-ups to MyBiz users."
+      },
+      "incidents_manage": {
+        "name": "Incident banners",
+        "hint": "Open and resolve the banner shown on every page when something is wrong."
       }
     },
     "you": "You · {level}",
@@ -2272,6 +2923,12 @@
       "level": "Level",
       "permissions": "Permissions",
       "allPermissions": "All permissions",
+      "templates": {
+        "support": {
+          "name": "Support worker",
+          "hint": "Reads businesses, answers the inbox and handles incident banners."
+        }
+      },
       "save": "Save",
       "added": "Saved.",
       "remove": "Remove",
@@ -2399,7 +3056,7 @@
       "simulated": "Simulated",
       "live": "Live",
       "businesses": "{count, plural, one {# business} other {# businesses}}",
-      "howTo": "A new provider is one class registered in the API (see docs/integrations.md); the default changes with API_<SERVICE>_PROVIDER.",
+      "howTo": "A new provider is one class registered in the API (see docs/guides/integrations.md); the default changes with API_<SERVICE>_PROVIDER.",
       "capabilities": {
         "email": "Email",
         "ai": "AI assistant",
@@ -2603,6 +3260,202 @@
       "readOnly": "You can look but not change: this needs the billing permission.",
       "team": "MyBiz AI team",
       "teamHint": "Helpers for the MyBiz team. They read across businesses with your permissions, write drafts for you to review and send, and every lookup is written to the audit log.",
+      "history": "History",
+      "newChat": "Start a new conversation",
+      "noHistory": "No earlier conversations",
+      "untitled": "Untitled",
+      "question": "Ask a question",
+      "send": "Send",
+      "thinking": "Thinking...",
+      "errors": {
+        "generic": "Something went wrong. Try again.",
+        "forbidden": "You don't have permission for this.",
+        "model_not_available": "That model is not available.",
+        "model_wrong_tier": "That model belongs to another tier.",
+        "reason_required": "Write a reason.",
+        "ai_paused": "AI is stopped right now.",
+        "conversation_limit": "This conversation reached its limit. Start a new one.",
+        "ai_busy": "The AI is busy. Try again in a moment.",
+        "ai_unavailable": "The AI is not answering right now.",
+        "ai_not_configured": "AI is not set up on this server.",
+        "agent_disabled": "This agent is switched off.",
+        "agent_not_ready": "This agent cannot be asked yet.",
+        "webSearch": "The web search settings were not saved."
+      },
+      "connectors": {
+        "title": "AI connectors",
+        "hint": "Which businesses connected Claude or ChatGPT, how much they use it, and what became of the changes the apps proposed.",
+        "limit": "Daily limit: {count} calls per business.",
+        "empty": "No business has connected an AI app yet.",
+        "columns": {
+          "business": "Business",
+          "apps": "Apps",
+          "calls": "Calls",
+          "proposed": "Proposed",
+          "executed": "Approved",
+          "rejected": "Rejected",
+          "waiting": "Waiting",
+          "last": "Last call"
+        }
+      },
+      "agents": {
+        "manager": {
+          "name": "Dana",
+          "title": "CEO",
+          "topic": "Answers any question and points you to the right specialist."
+        },
+        "support": {
+          "name": "Noa",
+          "title": "Support",
+          "topic": "Reads the inbox and drafts replies."
+        },
+        "health": {
+          "name": "Omer",
+          "title": "Business health",
+          "topic": "Who is at risk of leaving, who has not started."
+        },
+        "billing": {
+          "name": "Yael",
+          "title": "CFO",
+          "topic": "Invoices, overdue amounts, unusual AI use."
+        },
+        "growth": {
+          "name": "Eitan",
+          "title": "Growth",
+          "topic": "Follow-ups to leads and announcements, as drafts."
+        },
+        "legal": {
+          "name": "Ron",
+          "title": "Legal adviser",
+          "topic": "Terms, privacy and messaging rules, as drafts for your lawyer."
+        },
+        "accountant": {
+          "name": "Tal",
+          "title": "Accountant",
+          "topic": "VAT, invoice numbering and year-end preparation, as drafts."
+        },
+        "market": {
+          "name": "Shir",
+          "title": "Market researcher",
+          "topic": "Compares our prices with competitors every month."
+        },
+        "security": {
+          "name": "Gal",
+          "title": "Security",
+          "topic": "Summarises scan results and ranks what to fix."
+        },
+        "product": {
+          "name": "Lior",
+          "title": "Product manager",
+          "topic": "Collects feature requests and suggests priorities.",
+          "weekly": "Weekly report: group the open requests and cancellation reasons into themes, say what changed, and give the three things to build or fix next."
+        },
+        "success": {
+          "name": "Maya",
+          "title": "Customer success",
+          "topic": "Finds businesses in danger and drafts a personal message.",
+          "weekly": "Weekly report: which businesses are at risk, ranked by urgency, which new businesses have not started, and who I should contact first."
+        },
+        "marketing": {
+          "name": "Ori",
+          "title": "MyBiz marketing",
+          "topic": "Landing page text, posts and SEO, as drafts.",
+          "weekly": "Weekly report: a short marketing plan for this week: three post ideas and one landing page improvement, based on the signup funnel and the industry catalog."
+        }
+      },
+      "mapLabel": "MyBiz AI team",
+      "agentSettings": "Agent settings",
+      "agentEnabled": "The agent is switched on",
+      "agentNameHe": "Name in Hebrew",
+      "agentNameEn": "Name in English",
+      "agentPortrait": "Portrait address",
+      "agentPortraitHint": "An https link to a picture. Empty: a colour and the first letter.",
+      "agentInstructions": "Extra instructions",
+      "agentInstructionsHint": "Always added to what the agent is told, for every question. For example: \"We refund by card only.\"",
+      "agentState": {
+        "soon": "coming soon",
+        "off": "switched off",
+        "soonHint": "This agent is on the map but cannot be asked yet. It joins in a later update.",
+        "offHint": "This agent is switched off. Turn it on in the agent settings."
+      },
+      "library": {
+        "title": "Library",
+        "hint": "What this agent can look up: laws, rules, guides and the team's own notes. The agent searches here before it answers, and names the document it used. Notes and approved summaries are always given to it. Text of an official source can be copyrighted: check the licence before uploading.",
+        "loading": "Loading...",
+        "empty": "The library is empty.",
+        "add": {
+          "note": "Add a note",
+          "summary": "Add an approved summary",
+          "link": "Add a link",
+          "file": "Upload a file"
+        },
+        "readSources": "Read the sources",
+        "reading": "Reading the sources: {done} done, {remaining} left...",
+        "readDone": "Done: {updated} updated, {unchanged} unchanged, {failed} could not be read.",
+        "kind": {
+          "file": "File",
+          "link": "Link",
+          "note": "Note",
+          "summary": "Approved summary"
+        },
+        "country": {
+          "il": "Israel",
+          "us": "United States",
+          "eu": "European Union",
+          "all": "Everywhere"
+        },
+        "noText": "no text yet",
+        "pieces": "{count, plural, one {1 piece} other {# pieces}} the agent can find",
+        "version": "version {n}",
+        "reviewed": "last checked {date}",
+        "neverReviewed": "never checked",
+        "off": "switched off",
+        "history": "History",
+        "historyOf": "Versions of {title}",
+        "restore": "Bring back",
+        "restored": "The version is back as a new version.",
+        "close": "Close",
+        "edit": "Edit",
+        "editing": "Edit the document",
+        "switchOff": "Switch off",
+        "switchOn": "Switch on",
+        "delete": "Delete",
+        "confirmDelete": "Delete \"{title}\" and all its versions?",
+        "save": "Save",
+        "saved": "Saved.",
+        "cancel": "Cancel",
+        "fields": {
+          "title": "Title",
+          "body": "Text",
+          "noteHint": "The agent always gets this, in every question. For example: \"We refund by card only.\"",
+          "summaryHint": "A short text that a lawyer or accountant approved. The agent always gets it.",
+          "bodyHint": "The agent searches this text. Every change is saved as a new version.",
+          "url": "Address of the source",
+          "org": "Who published it",
+          "country": "Country",
+          "reviewed": "Last checked",
+          "file": "File",
+          "fileHint": "Text, Markdown, HTML, Word or PDF, up to 10 MB.",
+          "changeNote": "What changed (optional)"
+        },
+        "tryTitle": "Check the library",
+        "tryPlaceholder": "A question, to see what the agent would find",
+        "try": "Search",
+        "tryNothing": "Nothing found for this question.",
+        "errors": {
+          "generic": "Something went wrong. Try again.",
+          "forbidden": "You are not allowed to do this.",
+          "body_required": "A note needs its text.",
+          "kind_cannot_change": "The kind of a document cannot change.",
+          "unsupported_file": "This kind of file is not supported.",
+          "empty_file": "The file has no text.",
+          "file_too_long": "The text is too long.",
+          "unreadable_file": "The file could not be read.",
+          "file_too_large": "The file is larger than 10 MB.",
+          "no_source": "This document has no source link to read.",
+          "not_found": "The document was not found."
+        }
+      },
       "assistantRole": "Helper",
       "roles": {
         "manager": "Manager",
@@ -2618,21 +3471,33 @@
         "billing": "Invoices, overdue amounts, unusual AI use.",
         "growth": "Follow-ups to leads and announcements, as drafts."
       },
-      "question": "Ask a question",
-      "send": "Send",
-      "thinking": "Thinking...",
-      "errors": {
-        "generic": "Something went wrong. Try again.",
-        "forbidden": "You don't have permission for this.",
-        "model_not_available": "That model is not available.",
-        "model_wrong_tier": "That model belongs to another tier.",
-        "reason_required": "Write a reason.",
-        "ai_paused": "AI is stopped right now.",
-        "conversation_limit": "This conversation reached its limit. Start a new one.",
-        "ai_busy": "The AI is busy. Try again in a moment.",
-        "ai_unavailable": "The AI is not answering right now.",
-        "ai_not_configured": "AI is not set up on this server."
-      }
+      "webSearch": {
+        "title": "Web search",
+        "hint": "Lets the market researcher read competitors' public pricing pages. It costs about $10 per 1,000 searches, so it is off until you switch it on, and it stops at the monthly limit.",
+        "enabled": "Allow web search",
+        "limit": "Searches allowed per month",
+        "used": "Used this month: {count}",
+        "forbidden": "You need billing permission to change this."
+      },
+      "reports": {
+        "title": "Saved reports",
+        "hint": "Price comparisons the market researcher saved. Every price has a link and the date it was read. A price change is always your decision.",
+        "empty": "No reports yet. Ask the market researcher for one.",
+        "summary": "Summary",
+        "item": "Item",
+        "ours": "Us",
+        "cheapest": "Cheapest",
+        "gap": "Gap",
+        "pricier": "We are dearer",
+        "competitor": "Competitor",
+        "source": "Source",
+        "checked": "Read on",
+        "by": "By",
+        "open": "Show details",
+        "close": "Hide details",
+        "dearer": "{count} items where we are dearer than the cheapest competitor"
+      },
+      "weeklyReport": "Weekly report"
     },
     "health": {
       "title": "System health",
@@ -2654,6 +3519,7 @@
       "messagesFailed": "Messages failed (24h)",
       "emailsWaiting": "Emails waiting",
       "database": "Database size",
+      "files": "Kept files",
       "aiToday": "AI credits today",
       "aiLimit": "of {limit}",
       "release": "Version",
@@ -2671,6 +3537,379 @@
       "path": "Route",
       "business": "Business",
       "noErrors": "No errors since the server started."
+    },
+    "incidents": {
+      "title": "Incident banners",
+      "subtitle": "A bar on top of every page of the web app and the mobile app, until you resolve it. Use it for an outage, planned maintenance or a security event.",
+      "kind": "Type",
+      "kinds": {
+        "incident": "Incident",
+        "maintenance": "Planned maintenance",
+        "security": "Security event"
+      },
+      "language": {
+        "he": "Hebrew text",
+        "en": "English text"
+      },
+      "titleField": "Title",
+      "bodyField": "Details (optional)",
+      "statusUrl": "Status page address (optional)",
+      "open": "Show the banner",
+      "opened": "The banner is live",
+      "resolve": "Resolve",
+      "resolved": "Resolved",
+      "openNow": "Open",
+      "empty": "No banners yet. All is well.",
+      "errors": {
+        "generic": "Could not save. Check that a title is filled in and try again.",
+        "forbidden": "You are not allowed to do this."
+      }
+    },
+    "growth": {
+      "title": "Growth",
+      "hint": "Where sign-ups stop, how many businesses are active and who uses the most. The last {days} days.",
+      "funnel": "Sign-up funnel",
+      "funnelHint": "People who reached each step of the sign-up. A visit counts once per step; \"Finished\" counts businesses created.",
+      "steps": {
+        "started": "Started",
+        "account": "Account",
+        "industry": "Industry",
+        "business": "Business",
+        "base": "Plan",
+        "extras": "Add-ons",
+        "services": "Services",
+        "summary": "Summary",
+        "completed": "Finished"
+      },
+      "lost": "{count} stopped here",
+      "active": "Active businesses",
+      "activeToday": "Active today",
+      "activeWeek": "Active in the last 7 days",
+      "activePerDay": "Active businesses per day",
+      "showTable": "Show as a table",
+      "consumers": "Biggest users",
+      "consumersHint": "Messages and AI credits in the last {days} days, space as kept now.",
+      "columns": {
+        "business": "Business",
+        "messages": "Messages",
+        "storage": "Space",
+        "ai": "AI credits"
+      }
+    },
+    "overdue": {
+      "title": "Businesses with unpaid invoices",
+      "hint": "The oldest first. A grace extension lifts read-only or suspension right away and holds off the next one.",
+      "empty": "No business has an unpaid invoice.",
+      "business": "Business",
+      "owner": "Owner",
+      "open": "Open",
+      "since": "Oldest invoice",
+      "state": "State",
+      "action": "Action",
+      "states": {
+        "active": "Active",
+        "read_only": "Read-only",
+        "suspended": "Suspended"
+      },
+      "grace": "Extend by days",
+      "extend": "Extend",
+      "graceUntil": "Grace until {date}",
+      "days": "Days"
+    },
+    "dunning": {
+      "title": "Collection steps",
+      "hint": "What happens to a business with an unpaid invoice. Days count from the day the invoice is issued.",
+      "enabled": "Run the collection steps",
+      "reminderDays": "Email reminders on these days (comma separated)",
+      "readOnlyAfter": "Read-only after (days)",
+      "suspendAfter": "Suspended after (days)",
+      "save": "Save",
+      "saved": "Saved",
+      "invalid": "Check the numbers: suspension must come after read-only."
+    },
+    "websites": {
+      "title": "Website orders",
+      "hint": "Landing page orders by stage, from the brief to live. Every order has a ready-made prompt for Claude Code.",
+      "empty": "There are no website orders yet.",
+      "changesAsked": "Changes asked",
+      "prompt": "Claude Code prompt and files",
+      "copy": "Copy the prompt",
+      "copied": "Copied",
+      "files": "Download the files (ZIP)",
+      "stage": "Stage",
+      "siteUrl": "Site address",
+      "message": "Message to the customer",
+      "notes": "Internal notes",
+      "save": "Save",
+      "writing": "The business is still writing the brief.",
+      "stages": {
+        "briefing": "Brief in progress",
+        "received": "Received",
+        "building": "Building",
+        "review": "With the customer for approval",
+        "live": "Live"
+      }
+    },
+    "churn": {
+      "title": "Churn",
+      "hint": "Businesses that cancelled or paused their MyBiz subscription, and why.",
+      "chart": "Cancellations per month",
+      "month": "Month",
+      "cancelled": "Cancelled",
+      "paused": "Paused",
+      "resumed": "Took it back",
+      "rate": "Churn",
+      "reasonsTitle": "Why they left",
+      "noReason": "No reason given",
+      "reasons": {
+        "too_expensive": "It costs too much",
+        "missing_feature": "Something is missing",
+        "not_using": "Not using it",
+        "switched": "Moved to another system",
+        "other": "Something else"
+      },
+      "listTitle": "Cancellations and pauses",
+      "empty": "Nobody has cancelled or paused in the last 12 months.",
+      "business": "Business",
+      "owner": "Owner",
+      "outcome": "What",
+      "outcomes": {
+        "cancelled": "Cancelled",
+        "paused": "Paused"
+      },
+      "when": "When",
+      "ends": "Ends",
+      "refund": "Refund (recorded)",
+      "note": "Note",
+      "back": "Taken back"
+    },
+    "metrics": {
+      "title": "SaaS numbers",
+      "hint": "Recurring revenue, churn and the AI margin. Money is shown per currency and is never converted.",
+      "empty": "No invoices yet.",
+      "currency": "{currency}",
+      "mrr": "Monthly recurring revenue (MRR)",
+      "mrrMonth": "Billed in {month}, the latest invoiced month",
+      "arr": "Annual recurring revenue (ARR)",
+      "arrNote": "MRR times twelve",
+      "arpu": "Revenue per business (ARPU)",
+      "arpuNote": "MRR divided by invoiced businesses",
+      "chart": "Billed per month ({currency})",
+      "month": "Month",
+      "invoices": "Invoices",
+      "paid": "Paid",
+      "open": "Open",
+      "billed": "Billed",
+      "churn": "Churn",
+      "churnRate": "Churn in {month}",
+      "cancelled": "Cancelled",
+      "paying": "Paying at the month start",
+      "ai": "AI margin",
+      "aiHint": "Businesses billed in USD, model cost of the last {days} days against the monthly price of their AI modules.",
+      "aiRevenue": "AI revenue per month",
+      "aiCost": "AI model cost",
+      "aiMargin": "AI margin"
+    },
+    "emailHealth": {
+      "title": "Email delivery",
+      "hint": "Addresses that bounced or marked a message as spam. They are never mailed again.",
+      "webhookClosed": "The provider's bounce webhook is switched off, so bounces are not recorded.",
+      "bounced": "Hard bounces, last 12 months",
+      "complained": "Spam complaints, last 12 months",
+      "waiting": "Emails waiting to be sent",
+      "chart": "Blocked addresses per month",
+      "month": "Month",
+      "blocked": "Blocked",
+      "recent": "Latest blocked addresses",
+      "address": "Address",
+      "reason": "Reason",
+      "when": "Date",
+      "reasons": {
+        "bounced": "Bounced",
+        "complained": "Spam complaint"
+      },
+      "empty": "No blocked addresses."
+    },
+    "catalog": {
+      "title": "Catalog and prices",
+      "hint": "Every industry, module and price in one place, read-only. Prices are set in code; ask the developers to change them.",
+      "industries": "Industries",
+      "empty": "No industries.",
+      "status": {
+        "live": "Open",
+        "beta": "Beta",
+        "planned": "Coming soon"
+      },
+      "requests": "{count, plural, =0 {No one asked yet} one {# request} other {# requests}}",
+      "requestsHint": "Site requests that named this industry (among the latest 300)",
+      "core": "Core price by active clients",
+      "tier": "Active clients",
+      "tierUpTo": "Up to {count}",
+      "tierOver": "Over {count} (a floor, quoted by hand)",
+      "modules": "Modules",
+      "placeholder": "These prices are placeholders from the spec, for modelling only.",
+      "module": "Module",
+      "notes": "Notes",
+      "or": "or",
+      "once": "One-time",
+      "perUnit": "Per unit",
+      "oneOf": "One of its group ({group})",
+      "soon": "Coming soon",
+      "credits": "{count} AI credits a month",
+      "users": "{count} AI users",
+      "needs": "Needs {list}"
+    },
+    "card": {
+      "title": "Business 360",
+      "intro": "Everything we know about this business in one place. Notes and tags are internal and never shown to the business.",
+      "tags": "Tags",
+      "tagsHint": "Separated by commas, up to 12, for example vip, partner, needs-help.",
+      "accountOwner": "Account owner",
+      "accountOwnerHint": "The MyBiz team member who looks after this business (their sign-in email). Leave empty for none.",
+      "save": "Save",
+      "saved": "Saved.",
+      "notes": "Internal notes",
+      "noteLabel": "New note",
+      "notePlaceholder": "Who you spoke to and what they want.",
+      "addNote": "Add note",
+      "noteAdded": "Note added.",
+      "noNotes": "No notes yet.",
+      "timeline": "Timeline",
+      "noTimeline": "Nothing yet.",
+      "by": "by {who}",
+      "errors": {
+        "invalid_tags": "Use up to 12 tags of at most 30 characters.",
+        "unknown_account_owner": "That email is not an active member of the MyBiz team.",
+        "invalid_note": "The note must have 1 to 2000 characters.",
+        "forbidden": "You don't have permission for this.",
+        "not_found": "Not found.",
+        "generic": "Something went wrong. Please try again."
+      },
+      "events": {
+        "signup": "Signed up",
+        "trial_ends": "Free trial ends",
+        "closed": "Closed the business",
+        "invoice": "Invoice {number} · {amount} · {status}",
+        "invoiceStatus": {
+          "open": "open",
+          "paid": "paid",
+          "void": "credited"
+        },
+        "request": "Contact request ({status})",
+        "requestFromBusiness": "Request from the business ({status})",
+        "requestStatus": {
+          "new": "new",
+          "in_progress": "in progress",
+          "done": "done"
+        },
+        "note": "Note",
+        "changes": {
+          "trial_extended": "Trial extended by {days} days",
+          "modules_changed": "Plan changed",
+          "invoice_voided": "Invoice credited",
+          "card_updated": "Tags or account owner changed"
+        }
+      }
+    },
+    "trials": {
+      "title": "Trials ending",
+      "hint": "Businesses whose free trial ends soon, or ended in the last three days. This is the moment they decide whether to pay.",
+      "range": "Show the next {days} days",
+      "empty": "No trials ending in this period.",
+      "business": "Business",
+      "owner": "Owner",
+      "ends": "Trial ends",
+      "clients": "Active clients",
+      "card": "Card",
+      "accountOwner": "Account owner",
+      "actions": "Actions",
+      "cardYes": "On file",
+      "cardNo": "None",
+      "endsOn": "{date}",
+      "ended": "Ended {date}",
+      "message": "Write to the owner",
+      "open": "Open the card",
+      "extend": "Extend",
+      "extendDays": "Days",
+      "extendDone": "The trial now ends on {date}."
+    },
+    "security": {
+      "title": "Security center",
+      "hint": "Two-step sign-in of business owners, the MyBiz team's visits inside businesses and what the security agent found.",
+      "owners": "Owners",
+      "withMfa": "With two-step sign-in",
+      "acknowledged": "Confirmed the risk",
+      "exposed": "Without protection",
+      "unknown": "Unknown here",
+      "unknownNote": "This environment can't read the sign-in provider, so two-step sign-in can't be counted.",
+      "businesses": "Businesses",
+      "requiring": "Businesses requiring two-step sign-in of their team",
+      "ownersTitle": "Owners",
+      "ownersHint": "Owners without two-step sign-in come first. Without it, sensitive actions stay blocked until the owner confirms they understand the risk (warning of {version}).",
+      "ownersEmpty": "No business owners yet.",
+      "owner": "Owner",
+      "business": "Business",
+      "protection": "Two-step sign-in",
+      "on": "On",
+      "off": "Off",
+      "confirmed": "Confirmed {date}",
+      "notConfirmed": "Not confirmed",
+      "visitsTitle": "MyBiz team inside businesses",
+      "visitsHint": "Every visit is also shown to the business owner in the business audit log. Last {days} days.",
+      "visitsEmpty": "The team did not enter any business in this period.",
+      "member": "Team member",
+      "views": "Views",
+      "changes": "Changes",
+      "lastVisit": "Last visit",
+      "findingsTitle": "Security agent findings",
+      "findingsHint": "Saved reports of the security agent, newest first.",
+      "findingsEmpty": "The security agent has not saved a report yet.",
+      "by": "by"
+    },
+    "legal": {
+      "title": "Legal center",
+      "hint": "The current version of each legal document, who accepted it, and the privacy requests.",
+      "documentsTitle": "Document versions",
+      "document": "Document",
+      "version": "Current version",
+      "accepted": "Accepted",
+      "eligible": "Have to accept",
+      "documents": {
+        "terms": "Terms of use",
+        "privacy": "Privacy policy",
+        "dpa": "Data processing terms"
+      },
+      "acceptancesTitle": "Latest acceptances",
+      "acceptancesHint": "Each row is a record: who accepted which version, when and where from. Last {days} days.",
+      "acceptancesEmpty": "No one accepted a document in this period.",
+      "person": "Person",
+      "business": "Business",
+      "when": "When",
+      "context": "Where",
+      "contexts": {
+        "signup": "Sign-up",
+        "client_join": "Joining a business",
+        "reaccept": "New version"
+      },
+      "privacyTitle": "Privacy requests",
+      "privacyHint": "Exports, erasures and closures of the last 12 months. Client details are never shown here.",
+      "privacyEmpty": "No privacy requests in the last 12 months.",
+      "kind": "Request",
+      "kinds": {
+        "business_export": "Business data export",
+        "client_export": "Client data export",
+        "client_erasure": "Client erasure",
+        "business_closure": "Business closure"
+      },
+      "status": "Status",
+      "statuses": {
+        "building": "Building",
+        "ready": "Ready",
+        "failed": "Failed",
+        "done": "Done",
+        "waiting": "Waiting for deletion"
+      },
+      "deleteAfter": "Deleted on {date}"
     }
   },
   "permissions": {
@@ -2823,6 +4062,7 @@
   },
   "reports": {
     "title": "Reports",
+    "withoutStaff": "Without team members",
     "intro": "Which services, staff and hours work best, and which clients need attention.",
     "period": "Period",
     "lastDays": "Last {count} days",
@@ -2894,7 +4134,12 @@
       "session_reminder": "Today: {service} at {when}",
       "plan_ending": "Your plan ends on {date}",
       "friend_request": "{friend} wants to be your friend",
-      "class_invite": "{friend} invited you: {service} on {when}"
+      "class_invite": "{friend} invited you: {service} on {when}",
+      "waitlist_spot_open": "A spot opened: {service} on {when}",
+      "waitlist_spot_taken": "Someone was quicker: {service} on {when}",
+      "freeze_approved": "Your freeze was approved: {from} to {date}",
+      "freeze_rejected": "About your freeze request",
+      "credit_returned": "We gave you back your visit: {service} on {when}"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -2908,7 +4153,12 @@
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
       "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking.",
       "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
-      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time."
+      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time.",
+      "waitlist_spot_open": "A spot opened up for {service} on {when}, and whoever takes it first gets it. Open the app to take it.",
+      "waitlist_spot_taken": "Someone took the spot in {service} on {when} just before you. You are still on the waiting list and we will tell you if another one opens.",
+      "freeze_approved": "{business} approved freezing your {plan} from {from} to {date}. Your end date moves by the same number of days.",
+      "freeze_rejected": "{business} couldn't approve freezing your {plan} from {from} to {date}.",
+      "credit_returned": "{business} gave you back your visit for {service} on {when}. It no longer counts as used."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -2939,6 +4189,14 @@
     "leadFollowUp": {
       "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
       "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
+    },
+    "payrollReminder": {
+      "title": "Payroll for {month} is waiting",
+      "body": "{business}: the payroll run for {month} is not approved yet. Open payroll to finish it."
+    },
+    "payslipReady": {
+      "title": "Your payslip is ready",
+      "body": "{business}: your payslip for {month} is in your documents."
     },
     "roster": {
       "subject": "Your new shifts at {business}",
@@ -3036,7 +4294,7 @@
       "other": "Other"
     },
     "print": "Print",
-    "back": "Back to the client",
+    "back": "All sales",
     "thanks": "Thank you!",
     "email": "Email",
     "legalDocument": "Tax document no. {number} was issued by your invoicing provider",
@@ -3056,7 +4314,9 @@
       "menu": "Menu",
       "close": "Close",
       "dashboard": "Go to dashboard",
-      "guide": "Getting started guide"
+      "guide": "Getting started guide",
+      "websites": "Websites",
+      "aiTeam": "AI team"
     },
     "intro": {
       "eyebrow": "Everything in one place",
@@ -3282,6 +4542,8 @@
       "upTo": "Up to {count} active clients",
       "custom": "Over 1,000 active clients",
       "customPrice": "Custom price",
+      "aiAllowance": "Up to {users} AI users, {credits} AI credits a month",
+      "aiExtraUser": "One more AI user: {price} a month",
       "modulesTitle": "Add-ons",
       "presetsTitle": "Recommended plans",
       "presets": {
@@ -3334,7 +4596,7 @@
         "hideDetails": "Hide details",
         "todayTitle": "How much do I pay today? (optional)",
         "todayHint": "Enter what you pay each month now. It stays on this page and is only used for this comparison.",
-        "todayCompare": "Today {today}, with MyBiz {mybiz}",
+        "todayCompare": "Today {today}, with MyBiz {total}",
         "todaySave": "That is {amount} less each month.",
         "todayMore": "MyBiz costs {amount} more each month, for the same list.",
         "tier": {
@@ -3360,7 +4622,9 @@
         "clients": "Your clients' experience",
         "ai": "AI assistant and agents",
         "growth": "Growth and sales"
-      }
+      },
+      "websiteAddon": "Add a website to your plan",
+      "websiteAddonPrice": "With MyBiz: {setup} once and {monthly} a month. Website only: from {alone} once."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -3414,7 +4678,8 @@
       "storeAndroid": "Google Play",
       "comingSoon": "Coming soon",
       "dpa": "Data processing agreement",
-      "subprocessors": "Sub-processors"
+      "subprocessors": "Sub-processors",
+      "cancellation": "Cancellation and refunds"
     },
     "about": {
       "title": "Building the system small businesses deserve",
@@ -3799,7 +5064,8 @@
             ]
           }
         ],
-        "coordinatorLine": "Accessibility coordinator: {name}, {email}."
+        "coordinatorLine": "Accessibility coordinator: {name}, {email}.",
+        "coordinatorPhone": "Phone: {phone}."
       },
       "dpa": {
         "title": "Data processing agreement",
@@ -3906,6 +5172,73 @@
             ]
           }
         ]
+      },
+      "cancellation": {
+        "title": "Cancellation and refunds",
+        "intro": "How to cancel your MyBiz subscription, what you get back, and what happens to your data. This page is about your subscription to MyBiz. How your own clients cancel classes or appointments is set by your business.",
+        "sections": [
+          {
+            "id": "monthly",
+            "title": "Monthly subscription",
+            "p": [
+              "You can cancel at any time from Settings, Billing, with no penalty. The system keeps working until the end of the month you paid for and you are not billed again. There is no refund for part of a month."
+            ]
+          },
+          {
+            "id": "first-14-days",
+            "title": "The first 14 days",
+            "p": [
+              "If you cancel within 14 days of your first payment, you get that payment back in full, no questions asked. This applies once per business."
+            ]
+          },
+          {
+            "id": "pause",
+            "title": "Pause instead of cancelling",
+            "p": [
+              "You can pause the account for 1 to 3 months. Your data is kept, everything is read-only, and you pay a small flat monthly fee instead of your usual price. You can end the pause at any time."
+            ]
+          },
+          {
+            "id": "modules",
+            "title": "Modules and add-ons",
+            "p": [
+              "You can remove a module at any time. It stops at the end of the month and is not billed after that."
+            ]
+          },
+          {
+            "id": "setup",
+            "title": "Setup and website fees",
+            "p": [
+              "One-time fees are refunded as follows:"
+            ],
+            "items": [
+              "Before we started working: in full.",
+              "After the brief was approved and before the first draft: 50%.",
+              "After delivery: no refund."
+            ]
+          },
+          {
+            "id": "data",
+            "title": "Your data",
+            "p": [
+              "You can export all your data at any time. After the subscription ends you have 90 days to come back, and then the business and its data are deleted."
+            ]
+          },
+          {
+            "id": "payments",
+            "title": "How refunds are paid",
+            "p": [
+              "Refunds go back to the card you paid with. While online payments are not yet switched on, refunds are recorded in the system only."
+            ]
+          },
+          {
+            "id": "law",
+            "title": "The law",
+            "p": [
+              "Nothing here limits your rights under consumer protection law. If the law gives you more, the law applies. This text is a draft for review by a lawyer before launch."
+            ]
+          }
+        ]
       }
     },
     "meta": {
@@ -3914,7 +5247,9 @@
       "pricing": "Pricing",
       "about": "About",
       "contact": "Contact",
-      "industries": "Industries"
+      "industries": "Industries",
+      "websites": "Websites",
+      "aiTeam": "AI team · MyBiz"
     },
     "branches": {
       "eyebrow": "Chains and branches",
@@ -4011,6 +5346,334 @@
           "ai": "Ask in plain language and the assistant prepares an action for your approval.",
           "reports": "Revenue and occupancy without opening a spreadsheet."
         }
+      },
+      "websitesTeaser": {
+        "title": "Need a website too?",
+        "text": "We build it for you and wire it into MyBiz.",
+        "link": "See websites"
+      }
+    },
+    "websites": {
+      "title": "Your business's website. Built for you.",
+      "subtitle": "Tell us about your business once. We build the site, and it plugs straight into your MyBiz.",
+      "start": "Get started",
+      "seePrices": "See prices",
+      "showcase": "One site for every kind of business",
+      "showcaseCaption": "Sample sites",
+      "sites": {
+        "barber": {
+          "label": "Barbershop",
+          "name": "Bar & Blade",
+          "line": "A sharp cut, booked in ten seconds",
+          "button": "Book a chair",
+          "items": [
+            "Haircut",
+            "Beard",
+            "Kids"
+          ]
+        },
+        "gym": {
+          "label": "Fitness studio",
+          "name": "Core Studio",
+          "line": "Your first class is on us",
+          "button": "Join a class",
+          "items": [
+            "Pilates",
+            "Strength",
+            "Yoga"
+          ]
+        },
+        "pizza": {
+          "label": "Pizzeria",
+          "name": "Forno",
+          "line": "Hot from the oven, to your door",
+          "button": "Order now",
+          "items": [
+            "Margherita",
+            "Seasonal",
+            "Dessert"
+          ]
+        }
+      },
+      "steps": {
+        "title": "Three steps to a live site.",
+        "items": [
+          {
+            "title": "You tell us",
+            "text": "A short guided form: your goal, your style, your photos. Saved as you go."
+          },
+          {
+            "title": "We build it",
+            "text": "Your site is built to your brief, fast, accessible and ready for search."
+          },
+          {
+            "title": "You are live",
+            "text": "Online and connected to MyBiz: enquiries, bookings and visits in one place."
+          }
+        ]
+      },
+      "combo": {
+        "eyebrow": "Site + system",
+        "title": "A site that talks to your business.",
+        "text": "A visitor fills in the form and the enquiry is already a lead in your CRM, with its source. No copying, nothing lost.",
+        "site": "Your website",
+        "crm": "Your CRM",
+        "name": "Name",
+        "phone": "Phone",
+        "send": "Send",
+        "sent": "Sent",
+        "lead": "New lead",
+        "source": "Source",
+        "fromSite": "Website",
+        "person": "Dana Levi"
+      },
+      "prices": {
+        "title": "Simple prices. Cheaper together.",
+        "subtitle": "Choose a website, a system, or both.",
+        "currency": "Currency",
+        "recommended": "Best value",
+        "once": "one time",
+        "perMonth": "/month",
+        "from": "From",
+        "note": "Monthly price covers hosting, upkeep and small changes. Prices exclude VAT.",
+        "saving": "You save {amount} on the setup",
+        "siteOnly": {
+          "name": "Website only",
+          "text": "A professional site, without the system.",
+          "points": [
+            "Built to your brief",
+            "Mobile, accessible, ready for search",
+            "Contact form to your email"
+          ],
+          "cta": "Order a website"
+        },
+        "systemOnly": {
+          "name": "System only",
+          "text": "Calendar, clients, payments and the AI team.",
+          "points": [
+            "Everything to run the business",
+            "Client app included",
+            "Add a website any time"
+          ],
+          "cta": "See system plans"
+        },
+        "both": {
+          "name": "Site and system",
+          "text": "The site is wired into the system.",
+          "points": [
+            "Enquiries become leads automatically",
+            "Book appointments straight from the site",
+            "Visits and sources in your dashboard"
+          ],
+          "cta": "Start with both"
+        }
+      },
+      "gallery": {
+        "title": "Made for your field",
+        "subtitle": "Three styles, any industry.",
+        "note": "Sample designs. Your site is built to your own brand."
+      },
+      "faq": {
+        "title": "Questions about websites",
+        "items": [
+          {
+            "q": "How long does it take?",
+            "a": "It depends on the content you send. We confirm a date once you submit the brief."
+          },
+          {
+            "q": "Can I use my own domain?",
+            "a": "Yes. Bring a domain you own, buy one, or start on a temporary address."
+          },
+          {
+            "q": "Do I need MyBiz to get a website?",
+            "a": "No. A website alone works, and you can add the system later."
+          },
+          {
+            "q": "Can I ask for changes later?",
+            "a": "Yes. Request a change from your account and the monthly price covers small updates."
+          }
+        ]
+      }
+    },
+    "aiTeam": {
+      "home": {
+        "eyebrow": "A team working for you 24/7",
+        "title": "Nine agents. Each one an expert in their field.",
+        "subtitle": "Chief of staff, secretary, marketing, sales, finance, team, care, data and creative. They prepare the work, and you approve.",
+        "more": "Meet the whole team"
+      },
+      "page": {
+        "eyebrow": "AI team",
+        "title": "A whole team working for you, even at night",
+        "subtitle": "Every agent knows your business, sees only what it needs and proposes actions. Nothing happens without your approval.",
+        "ctaPrimary": "Start free",
+        "ctaSecondary": "See them at work",
+        "teamTitle": "Meet the team",
+        "teamSubtitle": "What each agent does, and what you can ask it.",
+        "exampleLabel": "You can ask",
+        "hireTitle": "Hire your own agent",
+        "hireText": "Need an agent for a field the team does not cover? Give it a name, a role, a face and working rules, and choose what it may see and do. It joins the team like any other agent.",
+        "hirePoints": [
+          "A name, role and face of your choice",
+          "Limited to the branches and topics you pick",
+          "It also waits for your approval before every action"
+        ],
+        "costTitle": "And what does it cost?",
+        "costText": "The team is part of the system. Usage is measured in AI credits: plans of 400 or 1,200 credits a month per business, enough for the conversations, drafts and summaries of a small business.",
+        "costPoints": [
+          "No set-up fee and no commitment",
+          "An alert at 80% of the allowance",
+          "Pause any agent at any moment"
+        ]
+      },
+      "org": {
+        "label": "Team structure",
+        "modeLabel": "Team view",
+        "single": "One business",
+        "network": "Branch network",
+        "chiefNote": "The agents work with the chief of staff, who routes every question to whoever knows it best.",
+        "branchesTitle": "A manager agent for every branch",
+        "branchesNote": "In a network, each branch gets an agent that runs its day and reports to the chief of staff.",
+        "branchManager": "Branch manager",
+        "branches": [
+          {
+            "city": "Tel Aviv",
+            "name": "Dorit"
+          },
+          {
+            "city": "Haifa",
+            "name": "Asaf"
+          },
+          {
+            "city": "Beer Sheva",
+            "name": "Noa"
+          }
+        ]
+      },
+      "sim": {
+        "eyebrow": "At work",
+        "title": "What a morning with the team looks like",
+        "subtitle": "Four short scenes. In each one the agent prepares, and you approve.",
+        "scenesLabel": "Choose a scene",
+        "pause": "Pause the demo",
+        "play": "Play the demo",
+        "waiting": "Waiting for your approval",
+        "approve": "Approve",
+        "decline": "Not now",
+        "note": "A recorded demo. In the product every sensitive action waits for your approval.",
+        "scenes": {
+          "secretary": {
+            "tab": "Shiri",
+            "caption": "Shiri arranges an appointment and reminds the client.",
+            "message": "Dana asked to move her Wednesday appointment. I found Thursday at 10:30 and will prepare a reminder for her.",
+            "card": "Move Dana's appointment to Thursday 10:30 and send a reminder"
+          },
+          "marketing": {
+            "tab": "Lia",
+            "caption": "Lia proposes a campaign for clients who went quiet.",
+            "message": "12 clients have not visited in over 45 days. I drafted a warm message with a free trial class.",
+            "card": "Send the message to 12 clients who went quiet"
+          },
+          "finance": {
+            "tab": "Adam",
+            "caption": "Adam flags an open balance.",
+            "message": "There is an open balance of $480 for 21 days. I prepared a friendly reminder with a payment link.",
+            "card": "Send a payment reminder for $480"
+          },
+          "chief": {
+            "tab": "Adir",
+            "caption": "Adir, the chief of staff, sums up the morning.",
+            "message": "Good morning. 14 appointments today, two clients at risk of leaving, and two actions waiting for you.",
+            "card": "2 actions waiting for your approval"
+          }
+        }
+      },
+      "line": {
+        "label": "Your agent for this field",
+        "more": "Meet the whole team"
+      },
+      "agents": {
+        "chief": {
+          "name": "Adir",
+          "role": "Chief of staff",
+          "does": "Sums up what is urgent today, answers cross-cutting questions and hands you to the right agent.",
+          "examples": [
+            "What is urgent today across all branches?",
+            "Give me a morning summary."
+          ]
+        },
+        "secretary": {
+          "name": "Shiri",
+          "role": "Personal secretary",
+          "does": "Arranges appointments, waiting lists and reminders, and finds free slots.",
+          "examples": [
+            "Move Dana's appointment to Thursday.",
+            "Who is on the waiting list for the 6 PM class?"
+          ]
+        },
+        "marketing": {
+          "name": "Lia",
+          "role": "Marketing and leads",
+          "does": "Tracks leads, wins back clients who went quiet and drafts campaigns.",
+          "examples": [
+            "Who has not visited in over 45 days?",
+            "Draft a win-back message with an offer."
+          ]
+        },
+        "sales": {
+          "name": "Daniel",
+          "role": "Sales",
+          "does": "Watches revenue, renewals and open quotes, and suggests upgrades.",
+          "examples": [
+            "Which plans end this month?",
+            "How many quotes are still open?"
+          ]
+        },
+        "finance": {
+          "name": "Adam",
+          "role": "Finance",
+          "does": "Flags open balances, prepares payment reminders and follows monthly billing.",
+          "examples": [
+            "Who owes us money?",
+            "Prepare a friendly payment reminder."
+          ]
+        },
+        "team": {
+          "name": "Emma",
+          "role": "Team and shifts",
+          "does": "Spots roster gaps, handles swaps and time off, and prepares hours for payroll.",
+          "examples": [
+            "Who is free to cover Saturday?",
+            "How many hours did everyone work this month?"
+          ]
+        },
+        "care": {
+          "name": "Leo",
+          "role": "Customer care",
+          "does": "Answers the inbox and WhatsApp, and follows reviews and clients at risk.",
+          "examples": [
+            "Draft a reply to an unhappy client.",
+            "Who is at risk of leaving?"
+          ]
+        },
+        "analyst": {
+          "name": "Ethan",
+          "role": "Data analyst",
+          "does": "Compares branches and periods, spots anomalies and prepares the weekly report.",
+          "examples": [
+            "Which branch grew the most?",
+            "What changed this week?"
+          ]
+        },
+        "creative": {
+          "name": "Sophie",
+          "role": "Content and creative",
+          "does": "Writes posts, newsletters and story scripts, and advises on social media.",
+          "examples": [
+            "Write a post for the new term.",
+            "What worked for us on Instagram?"
+          ]
+        }
       }
     }
   },
@@ -4077,6 +5740,13 @@
     }
   },
   "leads": {
+    "nav": {
+      "label": "Lead sections",
+      "stage": "Stage",
+      "details": "Details",
+      "activity": "Activity",
+      "messages": "Messages"
+    },
     "truncated": "Showing {shown} of {total} leads.",
     "showMore": "Show more leads",
     "title": "Leads",
@@ -4127,7 +5797,8 @@
       "new30": "New leads (30 days)",
       "won30": "Became clients (30 days)",
       "conversion": "Conversion (90 days)",
-      "followUps": "Follow up today"
+      "followUps": "Follow up today",
+      "label": "Lead numbers"
     },
     "stages": {
       "new": "New",
@@ -4157,7 +5828,9 @@
       "created": "Lead created",
       "converted": "Became a client"
     },
-    "pipeline": "Lead pipeline"
+    "pipeline": "Lead pipeline",
+    "viewShowing": "Showing {view}: {count}",
+    "viewClear": "Show all leads"
   },
   "inquiry": {
     "title": "Get in touch · {name}",
@@ -4268,7 +5941,136 @@
       "alerts": "You passed {percent}% of this month's AI credits.",
       "needModule": "Choose an AI plan to use extra credits."
     },
-    "download": "Download PDF"
+    "download": "Download PDF",
+    "dunningEmail": {
+      "greeting": "Hi,",
+      "footer": "The MyBiz team",
+      "subject": {
+        "reminder": "Your MyBiz invoice is unpaid",
+        "readOnly": "{business} is now read-only",
+        "suspended": "{business} is suspended"
+      },
+      "body": {
+        "reminder": "Your MyBiz invoice no. {number} for {amount} is still unpaid.\n\nYou can pay it under Settings, Billing. If it stays unpaid, {business} becomes read-only on {readOnlyDate}: you will still see everything but won't be able to add or change anything.",
+        "readOnly": "Invoice no. {number} for {amount} is still unpaid, so {business} is read-only: you can see everything but can't add or change anything.\n\nPay the invoice under Settings, Billing to restore full access straight away. Otherwise the business is suspended on {suspendDate}. Your data is safe.",
+        "suspended": "Invoice no. {number} for {amount} is still unpaid, so {business} is suspended and nobody can sign in to it.\n\nPay the invoice to bring it back. Your data is kept and nothing has been deleted."
+      },
+      "details": {
+        "invoice": "Invoice",
+        "amount": "Amount"
+      }
+    },
+    "subtotal": "Total before VAT",
+    "vat": "VAT ({rate}%)",
+    "payNow": "Pay now",
+    "collection": {
+      "overdue": "You have an unpaid invoice. Pay it by {date} or your account turns read-only (you can see everything but not change anything).",
+      "readOnly": "Your account is read-only because an invoice is unpaid. Pay it to restore full access straight away. On {date} the business is suspended.",
+      "grace": "MyBiz gave you extra time to pay, until {date}.",
+      "banner": "This business is read-only because a MyBiz invoice is unpaid. You can see everything, but you can't add or change anything.",
+      "bannerOwner": "Pay the invoice"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "hint": "Cancel anytime. The subscription runs to the end of the period you paid for, nothing is billed after that, and your business and data are kept.",
+      "cancel": "Cancel subscription",
+      "cancelConfirm": "Yes, cancel at the end of the period",
+      "keep": "Keep my subscription",
+      "cancelling": "Your subscription ends on {date}. Until then everything works as usual.",
+      "resume": "Keep my subscription",
+      "ended": "Your subscription has ended. Your business and data are kept; resume to use them again.",
+      "cancelStart": "Cancel or pause the subscription",
+      "policy": "Cancellation policy",
+      "paused": "The account is paused until {date}. Your data is kept and everything is read-only.",
+      "endPause": "End the pause now",
+      "refund": "Your first payment of {amount} is refunded in full under the 14 day policy (recorded; it is paid back to your card once payments are switched on)."
+    },
+    "suspended": {
+      "title": "This business is suspended",
+      "unpaid": "An unpaid MyBiz invoice kept this business from being used. Pay it and everything comes back as it was. Nothing was deleted.",
+      "ended": "The subscription of this business ended. Resume it and everything comes back as it was. Nothing was deleted.",
+      "notOwner": "{name} is suspended. Ask the owner to open this page and settle the subscription.",
+      "owed": "Open invoices: {amount}",
+      "noCard": "Add a payment method under Billing once the business is back, or pay with the test card below.",
+      "addCard": "Add a test card and pay",
+      "resume": "Resume the subscription"
+    },
+    "summary": {
+      "plan": "Plan",
+      "perMonth": "/ month",
+      "nextPayment": "Next payment",
+      "method": "Payment method",
+      "noMethod": "No card yet"
+    },
+    "aiUsers": {
+      "title": "AI users",
+      "intro": "Your plan lets {allowed} people use the AI team. Each extra AI user lets one more person in and adds 150 AI credits to the month, for {price} a month.",
+      "using": "{count} of {allowed} AI users in use",
+      "extra": "Extra AI users",
+      "less": "One fewer",
+      "more": "One more",
+      "cost": "Extra AI users: {amount} a month",
+      "save": "Save",
+      "saved": "Saved",
+      "inUse": "Some of these AI users are in use. Take away someone's AI access first, then lower the number.",
+      "needModule": "Choose an AI plan to add AI users.",
+      "generic": "Could not save. Try again."
+    },
+    "cancelFlow": {
+      "title": "Cancel your subscription",
+      "intro": "We are sorry to see you go. Three short steps and you are done. Nothing happens until you confirm on the last one.",
+      "steps": {
+        "reason": "Why",
+        "offer": "Before you go",
+        "confirm": "Confirm"
+      },
+      "reasonTitle": "Why are you leaving?",
+      "reasonHint": "Optional. It helps us improve.",
+      "reasons": {
+        "too_expensive": "It costs too much",
+        "missing_feature": "Something I need is missing",
+        "not_using": "I am not using it",
+        "switched": "I moved to another system",
+        "other": "Something else"
+      },
+      "noteLabel": "Anything you want to add",
+      "offerTitle": "Before you cancel, two ways to pay less",
+      "offerPauseTitle": "Pause the account",
+      "offerPauseText": "Keep your data and pay only {fee} a month for up to {months} months. The account is read-only while paused.",
+      "offerPauseMonths": "How long",
+      "offerPauseMonthsValue": "{count, plural, one {# month} other {# months}}",
+      "offerPauseCta": "Pause the account",
+      "offerPauseUnavailable": "A pause is not available right now (during the free trial, when a payment is overdue, or after cancelling).",
+      "offerModulesTitle": "Switch off what you do not use",
+      "offerModulesText": "You only pay for the modules that are on. Turn off the ones you do not need.",
+      "offerModulesCta": "Choose modules",
+      "continue": "Continue to cancel",
+      "confirmTitle": "Confirm the cancellation",
+      "confirmEnds": "The subscription ends on {date}. Until then everything works as usual, and you are not billed again.",
+      "confirmRefund": "You get your first payment of {amount} back in full.",
+      "confirmNoRefund": "There is no refund for the current month.",
+      "confirmData": "Your business and data are kept for 90 days after it ends, and you can export them at any time.",
+      "confirmCta": "Yes, cancel the subscription",
+      "back": "Back",
+      "keep": "No, keep my subscription",
+      "done": "The subscription is cancelled. It ends on {date}. We sent a confirmation email."
+    },
+    "cancellationEmail": {
+      "greeting": "Hi,",
+      "footer": "The MyBiz team",
+      "subject": {
+        "cancelled": "Your MyBiz subscription ends on {date}",
+        "paused": "{business} is paused until {date}"
+      },
+      "body": {
+        "cancelled": "We cancelled the MyBiz subscription of {business}. It stays active until {date} and you are not billed again.\n\nYour data is kept for 90 days after that, and you can export it any time. Changed your mind? Sign in and choose Keep my subscription under Settings, Billing.",
+        "paused": "{business} is paused until {date}. Your data is kept and the account is read-only until then.\n\nYou pay a small flat fee while it is paused, and your usual price returns afterwards. You can end the pause any time under Settings, Billing."
+      },
+      "refund": "Your first payment of {refund} is refunded in full under our 14 day policy.",
+      "details": {
+        "date": "Ends on"
+      }
+    }
   },
   "visitNotes": {
     "body": "What was done / worth remembering?",
@@ -4485,12 +6287,32 @@
       "invalid": "Some details aren't valid.",
       "code_taken": "That code already exists.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "new": "New discount code",
+    "removed": "The code was deleted.",
+    "deleteConfirm": "Delete the code {code}?",
+    "usesLabel": "Uses",
+    "givenLabel": "Discount given",
+    "statusLabel": "Status",
+    "activeNow": "Working"
   },
   "start": {
     "meta": {
       "title": "Build your plan",
       "description": "Build your MyBiz plan in two minutes: choose what your business needs, see the price live, and try everything free for 14 days."
+    },
+    "path": {
+      "eyebrow": "Let's begin",
+      "title": "Where is your business today?",
+      "subtitle": "Pick the closest one. You can import your clients and schedule later either way.",
+      "new": {
+        "title": "I'm starting a new business",
+        "hint": "We set up your industry, services and a clean workspace."
+      },
+      "existing": {
+        "title": "I already run a business",
+        "hint": "Bring your clients, memberships and schedule over from your current system."
+      }
     },
     "progress": {
       "label": "Your progress",
@@ -4899,14 +6721,20 @@
       "passSizeValue": "{staff, plural, one {# employee} other {# employees}} · {locations, plural, one {# location} other {# locations}}",
       "passAddons": "Add-ons",
       "passNoAddons": "Core only",
-      "passEntity": "Business type"
+      "passEntity": "Business type",
+      "passWebsite": "Website",
+      "passWebsiteBuild": "MyBiz builds it",
+      "cancellationLink": "Cancel any time. Full refund in the first 14 days. Read the cancellation policy"
     },
     "finish": {
       "title": "Last step: payment details",
       "subtitle": "Add a card for after the trial. Nothing is charged today, and we'll remind you before the first charge.",
+      "sampleData": "Also create a sample business to look around",
+      "sampleDataHint": "A separate business filled with fictitious clients and classes. Close it whenever you like.",
       "card": "Card number",
       "expiry": "Expiry (MM/YY)",
       "cvc": "CVC",
+      "branchAddress": "Main branch address",
       "holder": "Name on card",
       "simulated": "Test mode: the card is filled in for you and nothing is charged.",
       "secure": "Secure, encrypted payment",
@@ -4943,6 +6771,61 @@
       "bestValue": "Best value",
       "noThanks": "No thanks, skip {name}",
       "needsAi": "Includes AI Basic (+{price} a month), since you haven't chosen AI yet"
+    },
+    "site": {
+      "eyebrow": "Website",
+      "title": "Does your business have a website?",
+      "text": "Tell us and we will set things up around it. You can change this any time.",
+      "choices": {
+        "have": {
+          "name": "I have a website",
+          "text": "Paste the address and we will show it to your clients."
+        },
+        "none": {
+          "name": "I do not have one and do not need one",
+          "text": "Nothing to add. You can order a website later."
+        },
+        "build": {
+          "name": "Build me a website",
+          "text": "A branded landing page built for you, using what you already told us."
+        }
+      },
+      "price": "{setup} setup, then {monthly} a month",
+      "address": "Website address",
+      "addressPlaceholder": "www.example.com",
+      "addressInvalid": "That does not look like a web address.",
+      "buildNote": "After you sign up we open a short questionnaire with everything we already know filled in. Nothing is charged before payments open.",
+      "cartLine": "Website built by MyBiz"
+    },
+    "siteOnly": {
+      "eyebrow": "Website only",
+      "title": "A website for your business",
+      "subtitle": "A branded landing page that MyBiz builds for you. You can add the full system at any time, with no new sign-up.",
+      "price": "{setup} setup and {monthly} a month. Nothing is charged before payments open.",
+      "account": {
+        "question": "Do you already have a MyBiz account?",
+        "yes": "Yes, sign in",
+        "yesSignedIn": "Order for my business",
+        "yesText": "You order from inside your CRM, so we do not open a second business.",
+        "no": "No, I am new",
+        "noSignedIn": "Open a new business",
+        "noText": "A short sign-up: business name, email and kind of business."
+      },
+      "form": {
+        "title": "Tell us about your business",
+        "name": "Business name",
+        "kind": "Kind of business",
+        "kindPlaceholder": "Choose...",
+        "email": "Email",
+        "incomplete": "Please fill in every field.",
+        "submit": "Continue",
+        "back": "Back",
+        "note": "Next you create your password, then answer a short questionnaire about the website."
+      },
+      "existing": {
+        "text": "It looks like you already have an account.",
+        "cta": "Sign in to order from your CRM"
+      }
     }
   },
   "gettingStarted": {
@@ -4962,6 +6845,10 @@
         "title": "Set up your services",
         "text": "What you offer, how long it takes and what it costs."
       },
+      "policy": {
+        "title": "Confirm your cancellation policy",
+        "text": "How late a client may cancel for free, already filled in for your kind of business."
+      },
       "schedule": {
         "title": "Build your schedule",
         "text": "Weekly classes or working hours for appointments."
@@ -4977,6 +6864,10 @@
       "card": {
         "title": "Add a card for after the trial",
         "text": "Nothing is charged until the trial ends."
+      },
+      "post": {
+        "title": "Publish your first post",
+        "text": "Share an offer or a hello with your followers."
       }
     },
     "page": {
@@ -4984,7 +6875,7 @@
       "metaDescription": "A step-by-step guide to setting up your business on MyBiz: branding, services, schedule, team, clients and the client app.",
       "eyebrow": "Guide",
       "title": "Your first day with MyBiz",
-      "subtitle": "Six short steps, about 20 minutes, and your business is ready for clients. Each step has a link straight to the right screen.",
+      "subtitle": "Seven short steps, about 20 minutes, and your business is ready for clients. Each step has a link straight to the right screen.",
       "minutes": "~{count} min",
       "openInApp": "Open in MyBiz",
       "sections": [
@@ -5004,6 +6895,15 @@
             "We added starter services for your industry - rename or delete them.",
             "Set the length, price and number of spots for each service.",
             "Create plans: memberships, punch cards or single visits."
+          ]
+        },
+        {
+          "key": "policy",
+          "minutes": 2,
+          "tips": [
+            "The suggested terms are already filled in for your kind of business.",
+            "Choose how early clients cancel for free: a class, a personal session, a court or a room.",
+            "Decide whether a late cancellation or a no-show counts as a used visit."
           ]
         },
         {
@@ -5067,7 +6967,7 @@
   },
   "account": {
     "link": "Settings",
-    "title": "Settings",
+    "title": "My account",
     "subtitle": "Your personal profile and how the app works for you. Only you see these choices.",
     "name": "Full name",
     "nameHint": "Shown on the schedule, in the client app and in reports.",
@@ -5087,8 +6987,13 @@
       "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
       "unsupported_image": "Choose a PNG, JPEG or WebP picture."
     },
+    "nav": {
+      "label": "Profile sections"
+    },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
+    "addressTitle": "Address",
+    "accessibilityTitle": "Accessibility",
     "birthDate": "Date of birth",
     "birthDateHint": "Only you see this.",
     "addressLine": "Street and number",
@@ -5111,6 +7016,7 @@
     }
   },
   "sales": {
+    "removeFilter": "Remove the filter",
     "title": "Sales",
     "subtitle": "Every payment and its receipt, by month.",
     "previous": "Previous month",
@@ -5140,6 +7046,7 @@
       "Sample"
     ],
     "orders": {
+      "back": "All sales",
       "title": "Online orders",
       "subtitle": "Plans clients bought in the app, newest first.",
       "date": "Date",
@@ -5383,7 +7290,10 @@
       "cancelClass": "Cancel class",
       "cancelClassConfirm": "Cancel this class? {count, plural, =0 {Nobody is booked.} one {# booked client will be told.} other {# booked clients will be told.}}",
       "restoreClass": "Restore class",
-      "classRestored": "The class is back on the schedule."
+      "classRestored": "The class is back on the schedule.",
+      "classCancelled": "Class cancelled",
+      "markedCheckedIn": "{name} checked in",
+      "markedNoShow": "{name} marked as no-show"
     },
     "leads": {
       "open": "Open",
@@ -5541,11 +7451,14 @@
       "home": "MyBiz",
       "businesses": "Businesses",
       "inbox": "Inbox",
-      "me": "Me"
+      "me": "Me",
+      "ai": "AI"
     },
     "notStaff": {
       "title": "This app is for the MyBiz team",
       "text": "The email you signed in with isn't on the MyBiz team. If it should be, ask an owner to add it.",
+      "mfaTitle": "Two-step sign-in needed",
+      "mfaText": "You are on the MyBiz team, but the team area needs a two-step sign-in code. Sign in on the website, turn on two-step sign-in under Account > Security, then come back.",
       "signOut": "Sign in with another email"
     },
     "home": {
@@ -5560,7 +7473,14 @@
       "latest": "Open requests",
       "newest": "New this week",
       "billing": "Billing, {month}",
-      "paidOpen": "{paid} paid · {open} open"
+      "paidOpen": "{paid} paid · {open} open",
+      "tools": "More",
+      "health": "System health",
+      "incidents": "Incident banners",
+      "debts": "Unpaid invoices",
+      "banners": "{count, plural, =0 {No open banners} one {# open banner} other {# open banners}}",
+      "debtsCount": "{count, plural, =0 {No unpaid invoices} one {# business owes} other {# businesses owe}}",
+      "alarm": "Something needs a look"
     },
     "businesses": {
       "search": "Search a business",
@@ -5610,6 +7530,24 @@
       "email": "Email",
       "error": "Something went wrong. Try again.",
       "you": "you"
+    },
+    "ai": {
+      "title": "AI helpers",
+      "noPermission": "You don't have the usage permission."
+    },
+    "health": {
+      "back": "Back",
+      "noPermission": "You don't have the usage permission."
+    },
+    "incidents": {
+      "back": "Back",
+      "noPermission": "You don't have the incidents permission.",
+      "newOne": "New banner",
+      "titleHint": "Shown in the current language to everyone"
+    },
+    "debts": {
+      "back": "Back",
+      "noPermission": "You don't have the billing permission."
     }
   },
   "verticals": {
@@ -6299,7 +8237,7 @@
       "inactive": "Not in use",
       "retire": "Stop using",
       "restore": "Use again",
-      "required": "Enter the street and the city.",
+      "required": "Choose the city and street from the list and enter the house number.",
       "saveFailed": "Couldn't save. Try again."
     },
     "myDay": "My jobs",
@@ -6358,6 +8296,7 @@
     "new": "New quote",
     "back": "All quotes",
     "none": "No quotes here yet.",
+    "loadMore": "Load more",
     "noneForClient": "No quotes for this client yet.",
     "filter": "Filter by status",
     "filters": {
@@ -6451,6 +8390,48 @@
       "payTitle": "Payment",
       "payBill": "Pay · {amount}",
       "billThanks": "Paid in full. Thank you!"
+    },
+    "tiles": {
+      "label": "Quote numbers",
+      "draft": "Drafts",
+      "sent": "Waiting for an answer",
+      "accepted": "Accepted",
+      "acceptedMonth": "Accepted this month",
+      "declined": "Declined or expired",
+      "closeRate": "Close rate",
+      "closeRateHint": "{won} of {decided} decided"
+    },
+    "titleEvents": "Quotes and events",
+    "subtitleEvents": "Send a quote, the client accepts it with one tap and pays the deposit. Accepted quotes with a date become events.",
+    "views": {
+      "label": "View",
+      "quotes": "Quotes",
+      "events": "Events"
+    },
+    "eventsMonth": "Events in {month}",
+    "monthPrev": "Previous month",
+    "monthNext": "Next month",
+    "calendar": {
+      "closed": "Closed",
+      "more": "+{count} more",
+      "empty": "No events this month."
+    },
+    "empty": {
+      "title": "Your first quote in three steps",
+      "step1": "Create a quote",
+      "step1Body": "Pick a client, list what is included and the price.",
+      "step2": "Send it by link",
+      "step2Body": "The client opens a private page, no sign-in needed.",
+      "step3": "They accept and pay the deposit",
+      "step3Body": "You see the answer here and the event lands in the calendar.",
+      "first": "Create the first quote",
+      "example": "Try with an example"
+    },
+    "example": {
+      "title": "Example: full-day service",
+      "line1": "Full-day service",
+      "line2": "Travel and set-up",
+      "notes": "This is an example: change the items, prices and terms before you send it."
     }
   },
   "bills": {
@@ -6707,13 +8688,13 @@
     "subtitle": "Light or dark, and the colors you work in. Only you see your choice.",
     "palette": "Colors",
     "palettes": {
-      "mybiz": "MyBiz",
+      "brand": "MyBiz",
       "ocean": "Ocean",
       "forest": "Forest",
       "custom": "My own colors"
     },
     "paletteHints": {
-      "mybiz": "Black, white and deep purple",
+      "brand": "Black, white and deep purple",
       "ocean": "Cool slate and teal",
       "forest": "Soft sage and green",
       "custom": "Pick three colors yourself"
@@ -6745,6 +8726,8 @@
     "cycle": "That would make a loop: this person already manages them."
   },
   "shifts": {
+    "settingsTitle": "Shift settings",
+    "settingsHint": "Rooms, minimum staffing, publishing and planning rhythm.",
     "title": "Shifts",
     "soloTitle": "Hours and availability",
     "soloSubtitle": "You run the business on your own, so there is no shift board. Keep your opening hours and availability up to date.",
@@ -7311,7 +9294,8 @@
       "employees": "Employees",
       "business_docs": "Business documents",
       "imports": "Imports",
-      "general": "General"
+      "general": "General",
+      "website": "Website"
     },
     "count": "{count, plural, =0 {No files} one {# file} other {# files}}",
     "sealed": "Sealed",
@@ -7336,7 +9320,11 @@
     "newFolder": "New folder here",
     "folderName": "Folder name",
     "createFolder": "Create folder",
-    "deleteFolder": "Delete this empty folder"
+    "deleteFolder": "Delete this empty folder",
+    "archivedToast": "{name} archived",
+    "restoredToast": "{name} restored",
+    "rootFolders": "Top-level folders",
+    "subfolders": "Folders inside"
   },
   "payroll": {
     "open": "Payroll file",
@@ -7770,6 +9758,7 @@
       "ai_not_configured": "The AI is not available right now.",
       "ai_limit_reached": "The monthly AI allowance is used up. You can still map the columns by hand.",
       "ai_user_limit_reached": "Your personal AI limit for this month is used up.",
+      "ai_daily_pace_reached": "You used your share of the AI for today. Map the rest by hand or try tomorrow.",
       "ai_busy": "The AI is busy. Try again in a moment.",
       "ai_unavailable": "The AI could not be reached. Try again later.",
       "ai_map_limit": "You used the AI mapping many times in this move. Map the rest by hand.",
@@ -7864,6 +9853,8 @@
     "summary": {
       "gross": "Gross pay",
       "deductions": "Deductions",
+      "employerCost": "Total cost to the employer",
+      "employerCostNote": "Gross pay plus employer pension, severance and insurance",
       "people": "People",
       "vsPrevious": "{percent} against last month",
       "noPrevious": "No earlier month to compare"
@@ -8109,7 +10100,10 @@
     "allocationPending": "Allocation number pending",
     "allocationNumber": "Allocation number",
     "allocationNote": "This invoice is above the allocation threshold. Its allocation number from the tax authority is still to come.",
-    "fingerprint": "Fingerprint of the stored file (sha256):"
+    "fingerprint": "Fingerprint of the stored file (sha256):",
+    "tiles": {
+      "label": "Document numbers"
+    }
   },
   "security": {
     "title": "Account security",
@@ -8134,7 +10128,13 @@
       "factorLabel": "Authenticator {number}",
       "requiredTeam": "Everyone on the MyBiz team must use two-step sign-in. Turn it on to continue.",
       "requiredBusiness": "This business requires two-step sign-in. Turn it on to continue.",
-      "requiredSoon": "Owners and managers will have to use two-step sign-in from {date}. Turn it on now."
+      "warning": "Two-step sign-in is off for your account. We strongly recommend turning it on: without it, anyone who learns your password can reach your business data.",
+      "warningAcknowledged": "Two-step sign-in is still off. Turn it on to protect your business.",
+      "riskTitle": "Working without two-step sign-in",
+      "riskBody": "Two-step sign-in is your choice, but we strongly recommend it. Without it, anyone who learns your password can see client data, pay details and settings, and act in your name. By continuing without it you confirm that you understand this risk and that keeping your account secure is your responsibility.",
+      "riskConfirm": "I understand the risk, continue without it",
+      "riskDone": "Saved. You can turn on two-step sign-in at any time.",
+      "requiredAck": "To continue, turn on two-step sign-in or confirm that you understand the risk of working without it."
     },
     "challenge": {
       "title": "Enter your code",
@@ -8158,6 +10158,7 @@
     "errors": {
       "invalid_code": "The code is wrong or expired. Try the current code from the app.",
       "mfa_required": "This needs two-step sign-in. Turn it on in your account settings.",
+      "mfa_risk_ack_required": "Confirm that you understand the risk of working without two-step sign-in, or turn it on.",
       "needs_recent_code": "Enter a fresh code from the app first.",
       "generic": "Something went wrong. Try again."
     },
@@ -8169,6 +10170,10 @@
       "unknownDevice": "Unknown device",
       "when": "When"
     }
+  },
+  "noticeStack": {
+    "summary": "{count, plural, one {# thing is waiting for you} other {# things are waiting for you}}",
+    "toggle": "Things waiting for you"
   },
   "legalUpdate": {
     "title": "We updated our terms",
@@ -8228,6 +10233,7 @@
       "mfa_team_requirement_set": "Changed the two-step requirement for the team",
       "mfa_enabled": "Turned on two-step sign-in",
       "mfa_disabled": "Turned off two-step sign-in",
+      "mfa_risk_acknowledged": "Confirmed the risk of working without two-step sign-in",
       "login_new_device": "Signed in from a new device",
       "export_audit_log": "Downloaded the audit log",
       "clients_export": "Exported a client's data",
@@ -8238,7 +10244,621 @@
       "support_view": "MyBiz support viewed a page",
       "platform_change": "MyBiz support changed something",
       "tenant_closed": "Closed the business",
-      "tenant_reopened": "Reopened the business"
+      "tenant_reopened": "Reopened the business",
+      "tenant_modules_changed": "Changed the plan modules",
+      "tenant_subscription_canceled": "Cancelled the subscription",
+      "tenant_subscription_resumed": "Resumed the subscription",
+      "export_receipt_pdf": "Downloaded a receipt",
+      "export_platform_invoice_pdf": "Downloaded a MyBiz invoice",
+      "export_issued_document": "Downloaded a tax document"
     }
+  },
+  "staffCard": {
+    "title": "Team member",
+    "open": "Open card",
+    "tabsLabel": "Sections of the card",
+    "details": "Details",
+    "role": "Role",
+    "branches": "Branches",
+    "allBranches": "All branches",
+    "email": "Email",
+    "phone": "Phone",
+    "startedOn": "Started",
+    "hoursThisMonth": "Hours this month",
+    "plannedHours": "Planned: {hours}",
+    "openTimeClock": "Open the time clock",
+    "noClockAccess": "Hours worked show for those who approve time.",
+    "upcomingShifts": "Upcoming shifts",
+    "noShifts": "No shifts in the next {days} days.",
+    "openShifts": "Open the shift board",
+    "classesTaught": "Classes and appointments",
+    "noClasses": "Nothing to teach in the next {days} days.",
+    "openPayRun": "Open the pay run",
+    "aiTitle": "AI team",
+    "aiNotAllowed": "The AI settings could not be loaded.",
+    "aiHint": "Without a personal switch, access follows the role. The owner is not limited.",
+    "ai": {
+      "usedMonth": "Credits this month",
+      "usedToday": "Credits today (pace: {limit})",
+      "access": "Can use the AI team",
+      "accessHint": "{count} of {allowed} people have access under the plan. An extra AI user costs a little more each month.",
+      "monthly": "Personal monthly limit (credits)",
+      "monthlyPlaceholder": "As the business",
+      "daily": "Daily pace (% of the month's AI, usually {default})",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "owner": "The owner always has access to the AI team and no daily pace.",
+      "errors": {
+        "ai_users_full": "The plan's AI users are all taken. Add an extra AI user first.",
+        "owner_always_has_ai": "The owner always has access.",
+        "invalid": "Check the numbers and try again.",
+        "generic": "Something went wrong. Try again."
+      },
+      "buyExtra": "Add an extra AI user"
+    },
+    "openAi": "Open the AI team",
+    "payslipsTitle": "Payslips",
+    "noPayslips": "No payslips filed for this person yet.",
+    "contractTitle": "Contract and employment papers",
+    "noContract": "No papers filed for this person yet. Add them in Files, under Employees.",
+    "openFiles": "Open the files",
+    "download": "Download",
+    "agentsTitle": "AI agents open to this person",
+    "agentsHint": "By the person's role. Change who may use an agent on the AI team page.",
+    "noAgents": "No agent is open to this role.",
+    "agentLocked": "Needs a module the business does not have yet",
+    "openAgents": "Open the AI team page",
+    "permissionsTitle": "Role and permissions",
+    "roleIs": "Role: {role}",
+    "changeRole": "Change the role in the team list",
+    "tabs": {
+      "overview": "Overview",
+      "employment": "Employment and pay",
+      "availability": "Availability",
+      "documents": "Documents",
+      "ai": "AI",
+      "permissions": "Permissions"
+    }
+  },
+  "catalog": {
+    "title": "Catalog",
+    "subtitle": "What you sell: services, memberships and punch cards, and discount codes.",
+    "tabs": {
+      "label": "Catalog sections",
+      "services": "Services",
+      "plans": "Memberships and punch cards",
+      "codes": "Discount codes"
+    },
+    "add": {
+      "services": "Add service",
+      "plans": "Add plan",
+      "codes": "Add code"
+    },
+    "tiles": {
+      "label": "Catalog numbers",
+      "services": {
+        "all": "All services",
+        "active": "Open for booking",
+        "paused": "Hidden"
+      },
+      "plans": {
+        "all": "All plans",
+        "active": "On sale",
+        "paused": "Not on sale"
+      },
+      "codes": {
+        "all": "All codes",
+        "active": "Working now",
+        "paused": "Paused"
+      }
+    },
+    "soldLast30": "{count, plural, =0 {None sold in 30 days} one {One sold in 30 days} other {# sold in 30 days}}",
+    "servicesEmpty": {
+      "title": "No services yet",
+      "body": "A service is what clients book: a class, a personal appointment or a court by the hour. Add your first one and it shows on the schedule and in the client app.",
+      "cta": "Create your first service"
+    },
+    "plansEmpty": {
+      "title": "Nothing here yet",
+      "body": "Memberships and punch cards let clients pay once and come again and again. They are optional: businesses that charge per visit can skip them.",
+      "cta": "Create your first plan"
+    },
+    "codesEmpty": {
+      "title": "No discount codes yet",
+      "body": "A code gives a percent or a fixed amount off a plan. Share it in a message or a post and clients enter it when they buy.",
+      "cta": "Create your first code"
+    }
+  },
+  "mcpConnect": {
+    "title": "Connect an AI app",
+    "body": "{app} asks to read the data of the business you choose, as you and with your permissions.",
+    "reads": [
+      "Clients and their profiles",
+      "The schedule and bookings",
+      "Plans, punch cards and open balances",
+      "Metrics and reports"
+    ],
+    "returns": "The app reads as you. Any change it suggests waits for your approval in MyBiz, under Settings, AI connections. You can disconnect it at any time. After you approve you return to {host}.",
+    "business": "Business",
+    "approve": "Approve the connection",
+    "deny": "Cancel",
+    "invalid": "This connection link is not valid. Start again from the app.",
+    "noBusiness": "You have no business in MyBiz yet. Create one and try again.",
+    "propose": "Also let it suggest changes",
+    "proposeHint": "It can propose bookings and cancellations. Nothing changes until you approve each one in MyBiz."
+  },
+  "website": {
+    "title": "My website",
+    "subtitle": "A branded landing page for your business, built by the MyBiz team and connected to your system.",
+    "wizardTitle": "Tell us about your website",
+    "wizardHint": "Eight short steps. Every step is saved, so you can leave and come back any time.",
+    "stepOf": "Step {current} of {total}",
+    "summaryStep": "Summary and send",
+    "back": "Back",
+    "next": "Next",
+    "toSummary": "To the summary",
+    "send": "Send to MyBiz",
+    "autosave": "Saved automatically",
+    "sent": "Your brief was sent. We will start building your website.",
+    "errors": {
+      "locked": "Building has started, so the brief can no longer change. Tell us what to change.",
+      "invalid": "One of the answers is not valid. Check it and try again.",
+      "generic": "Something went wrong. Try again in a moment.",
+      "storage_full": "There is not enough file space in the business."
+    },
+    "steps": {
+      "goal": {
+        "title": "What is the website for?",
+        "hint": "Pick everything that applies, then the single most important action.",
+        "goals": "The website is meant to",
+        "mainAction": "The most important action on the page",
+        "mainActionHint": "For example: book a free trial class"
+      },
+      "business": {
+        "title": "About the business",
+        "hint": "In your own words. A few short sentences are enough.",
+        "unique": "What makes you special? (three sentences)",
+        "audience": "Who is your audience?",
+        "area": "Which area do you serve?"
+      },
+      "sections": {
+        "title": "What goes on the page?",
+        "hint": "Pick the sections. We will arrange them well.",
+        "legend": "Sections"
+      },
+      "branding": {
+        "title": "Branding",
+        "hint": "Logo, colors and style. What is already set in the system is taken from there.",
+        "logo": "Logo",
+        "uploadLogo": "Upload a logo",
+        "replaceLogo": "Replace the logo",
+        "noLogo": "I do not have a logo",
+        "fromBrand": "Use the business color from the system",
+        "color": "Color {number}",
+        "addColor": "Add a color",
+        "style": "Style",
+        "font": "Font (optional)",
+        "fontHint": "If you have none, we pick one that fits the style"
+      },
+      "motion": {
+        "title": "Motion",
+        "hint": "How much life the page should have.",
+        "legend": "Level of motion"
+      },
+      "images": {
+        "title": "Images",
+        "hint": "Your own photos are the best thing for a website. They are kept in the \"Website\" folder of your files.",
+        "upload": "Upload images",
+        "uploading": "Uploading...",
+        "note": "Note for the image (optional)",
+        "remove": "Remove the image",
+        "noGood": "I do not have good photos",
+        "noGoodHint": "We will add fitting stock photos"
+      },
+      "inspiration": {
+        "title": "Inspiration and texts",
+        "hint": "Sites you like, and who writes the texts.",
+        "sites": "Up to three sites you like",
+        "url": "Site address {number}",
+        "likes": "What do you like about it?",
+        "copy": "The texts"
+      },
+      "domain": {
+        "title": "Domain and languages",
+        "hint": "Where the site lives, in which languages, and when it should be ready.",
+        "legend": "Domain",
+        "name": "Your domain name",
+        "languages": "Website languages",
+        "dueDate": "Target date (optional)"
+      }
+    },
+    "goals": {
+      "leads": "Bring in inquiries",
+      "bookings": "Bring in bookings",
+      "showcase": "Present the business",
+      "sell": "Sell"
+    },
+    "sections": {
+      "hero": {
+        "title": "Hero",
+        "hint": "The main line and the main button"
+      },
+      "services": {
+        "title": "Services and prices",
+        "hint": "Pulled from your catalog"
+      },
+      "gallery": {
+        "title": "Gallery",
+        "hint": "Photos of the business"
+      },
+      "team": {
+        "title": "Team",
+        "hint": "Who we are"
+      },
+      "testimonials": {
+        "title": "Testimonials",
+        "hint": "Pulled from your reviews"
+      },
+      "faq": {
+        "title": "Frequently asked questions",
+        "hint": "Answers to the questions that come back"
+      },
+      "location": {
+        "title": "Location and hours",
+        "hint": "Address, map and opening hours"
+      },
+      "contact": {
+        "title": "Contact",
+        "hint": "An inquiry form that lands in the system"
+      },
+      "booking": {
+        "title": "Book an appointment or class",
+        "hint": "Directly through MyBiz",
+        "needsSystem": "Only for a business that uses the system"
+      },
+      "whatsapp": {
+        "title": "WhatsApp button",
+        "hint": "A chat in one tap"
+      }
+    },
+    "styles": {
+      "clean": {
+        "title": "Modern and clean",
+        "hint": "Lots of air, sharp lines"
+      },
+      "luxury": {
+        "title": "Luxurious",
+        "hint": "Restrained, elegant, careful"
+      },
+      "warm": {
+        "title": "Warm and family-friendly",
+        "hint": "Soft colors and rounded corners"
+      },
+      "vibrant": {
+        "title": "Young and vibrant",
+        "hint": "Strong colors and energy"
+      }
+    },
+    "motions": {
+      "none": {
+        "title": "No motion",
+        "hint": "A quiet, fast page"
+      },
+      "subtle": {
+        "title": "Subtle",
+        "hint": "Soft fades and hover accents"
+      },
+      "rich": {
+        "title": "Rich",
+        "hint": "Scroll animations and transitions between sections"
+      }
+    },
+    "domains": {
+      "have": {
+        "title": "I have a domain",
+        "hint": "We will connect it to the site"
+      },
+      "buy": {
+        "title": "I want to buy one",
+        "hint": "We buy it for you at cost plus 20 shekels a year"
+      },
+      "temporary": {
+        "title": "A temporary address",
+        "hint": "A subdomain until you decide"
+      }
+    },
+    "languages": {
+      "he": "Hebrew",
+      "en": "English"
+    },
+    "copyBy": {
+      "me": "I write them",
+      "you": "Write them for me"
+    },
+    "summary": {
+      "title": "All set?",
+      "hint": "Check your answers and send. You can change them until we start building.",
+      "missing": "To send, you still need:"
+    },
+    "missing": {
+      "goals": "The website's goal",
+      "sections": "Sections on the page",
+      "booking_needs_system": "Booking is only available with the system",
+      "style": "Style",
+      "motion": "Level of motion",
+      "copy_by": "Who writes the texts",
+      "domain": "Domain",
+      "domain_name": "The domain name",
+      "languages": "Languages"
+    },
+    "offer": {
+      "title": "A website for your business, without the headache",
+      "body": "You answer a few questions and we build a designed, branded landing page, with an inquiry form that lands in your system and a visit counter. You approve the site before it goes live.",
+      "price": "One-time setup {setup} and {monthly} a month (hosting, security, upkeep and one small change a month).",
+      "nothingCharged": "Nothing is charged until payments are switched on in the system.",
+      "start": "Start the brief",
+      "locked": "Not ordered yet"
+    },
+    "status": {
+      "title": "Order status",
+      "submitted": "Sent on {date}",
+      "prices": "Price offered: setup {setup} and {monthly} a month",
+      "message": "A message from the MyBiz team",
+      "yourRequest": "What you asked to change",
+      "open": "Open the website",
+      "continue": "Continue the brief",
+      "edit": "Edit the brief"
+    },
+    "stages": {
+      "briefing": "Brief",
+      "received": "Received",
+      "building": "Building",
+      "review": "Your approval",
+      "live": "Live"
+    },
+    "stageHint": {
+      "briefing": "The brief was not sent yet. Continue where you stopped.",
+      "received": "We received your brief. You can edit it until we start building.",
+      "building": "The website is being built. We will update you here when it is ready to view.",
+      "review": "The website is ready to view. Approve it or ask for changes.",
+      "live": "The website is live."
+    },
+    "review": {
+      "title": "The website is ready to view",
+      "body": "Open the link in the message, then approve or ask for changes.",
+      "approve": "Approve the website",
+      "askChanges": "Ask for changes",
+      "changesLabel": "What should change?",
+      "sendChanges": "Send the request",
+      "cancel": "Cancel",
+      "approved": "You approved the website. We are putting it live."
+    },
+    "system": {
+      "title": "Add the system",
+      "body": "Your business is on the website-only track. Add the system (clients, schedule, payments and more) without signing up again. The website price changes to the with-system price.",
+      "add": "Add the system"
+    },
+    "preview": {
+      "tagline": "Your business, online and ready to take bookings",
+      "services": "Services",
+      "contact": "Contact"
+    },
+    "embed": {
+      "title": "Already have a website? Put MyBiz in it",
+      "body": "Copy a snippet into your own website. Inquiries arrive in your system as new leads, and clients book through MyBiz. You do not need to order a website from us for this.",
+      "formOff": "The contact form is off. Turn on the CRM module to let people leave their details.",
+      "formTitle": "Contact form",
+      "bookingLabel": "Book now",
+      "copy": "Copy",
+      "copied": "Copied",
+      "form": {
+        "title": "Contact form",
+        "hint": "A form that sends inquiries to your leads. Paste it where you want the form to appear."
+      },
+      "booking": {
+        "title": "Booking button",
+        "hint": "A button that opens your page in MyBiz, where clients sign up and book."
+      }
+    },
+    "insights": {
+      "title": "Your website, last 30 days",
+      "visits": "Visits",
+      "enquiries": "Inquiries from the form",
+      "noVisits": "No visits counted yet. Visits show up here once people open your website.",
+      "perDay": "Visits per day",
+      "showTable": "Show as a table",
+      "day": "Day",
+      "sources": "Where visitors came from",
+      "source": {
+        "direct": "Direct",
+        "search": "Search",
+        "social": "Social",
+        "other": "Other"
+      },
+      "latest": "Latest inquiries",
+      "noEnquiries": "No inquiries from the form yet."
+    },
+    "dashboardCard": {
+      "title": "Can your clients find you online?",
+      "body": "A website built for your business, connected to your system, bringing inquiries and bookings straight in.",
+      "cta": "See how it works",
+      "dismiss": "Close for good"
+    }
+  },
+  "aiConnections": {
+    "title": "AI connections",
+    "subtitle": "Use your own Claude or ChatGPT with your business. They read as you, with your permissions, and any change they suggest waits here for your approval.",
+    "waitingTitle": "Waiting for your approval",
+    "waitingEmpty": "Nothing is waiting. When an AI app suggests a change, it appears here.",
+    "waitingHint": "Nothing happens until you approve. Everything is checked again at the moment you approve.",
+    "from": "Suggested by {app}",
+    "expires": "Open until {when}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveFor": "Approve: {what}",
+    "rejectFor": "Reject: {what}",
+    "kinds": {
+      "book_client": "Book a client",
+      "cancel_booking": "Cancel a booking",
+      "log_time": "Log time",
+      "bill_month": "Bill a month",
+      "send_message": "Send a message",
+      "give_back_visit": "Give a visit back"
+    },
+    "fields": {
+      "client": "Client",
+      "service": "Class",
+      "starts": "Starts",
+      "dependent": "For",
+      "date": "Date",
+      "hours": "Hours",
+      "description": "Work",
+      "month": "Month",
+      "clients": "Clients",
+      "total": "Total",
+      "body": "Message",
+      "reason": "Reason"
+    },
+    "full": "The class is full: the client joins the waitlist.",
+    "historyTitle": "Recent requests",
+    "status": {
+      "pending": "Waiting",
+      "executed": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "failed": "Could not be done"
+    },
+    "appsTitle": "Connected apps",
+    "appsEmpty": "No AI app is connected yet.",
+    "canPropose": "Reads and suggests changes",
+    "readOnly": "Reads only",
+    "lastUsed": "Last used {when}",
+    "neverUsed": "Not used yet",
+    "calls": "{count} calls",
+    "disconnect": "Disconnect",
+    "disconnectApp": "Disconnect {app}",
+    "howTitle": "How to connect",
+    "howIntro": "The same address works for every AI app. You need a paid Claude or ChatGPT plan that supports custom connectors.",
+    "address": "Connector address",
+    "addressHint": "Paste this address into the AI app.",
+    "claudeTitle": "Claude",
+    "claudeSteps": [
+      "Open Claude and go to Settings, then Connectors.",
+      "Choose Add custom connector.",
+      "Paste the address above, name it MyBiz and add it.",
+      "Sign in to MyBiz when asked, pick your business and approve.",
+      "Ask something like: how many new clients did I get this week?"
+    ],
+    "chatgptTitle": "ChatGPT",
+    "chatgptSteps": [
+      "Open ChatGPT and go to Settings, then Connectors, and turn on Developer mode.",
+      "Choose Create and paste the address above as the connector's address.",
+      "Choose OAuth for sign-in and save.",
+      "Sign in to MyBiz when asked, pick your business and approve.",
+      "Start a chat, add the connector from the tools menu and ask your question."
+    ],
+    "safetyTitle": "What the apps can and cannot do",
+    "safety": [
+      "They see only what you could see in MyBiz, in the business you picked.",
+      "They never change anything themselves: a suggested change waits here until you approve it.",
+      "You can disconnect an app at any moment, and it stops at once.",
+      "Every use is counted, and there is a daily limit per business."
+    ]
+  },
+  "waitlist": {
+    "title": "Waitlists",
+    "subtitle": "Everyone waiting for a class, an appointment or a court. Let someone in when a spot is free, or tell them about it.",
+    "empty": "Nobody is waiting right now.",
+    "filters": {
+      "label": "Filter the waitlists",
+      "day": "Day",
+      "branch": "Branch",
+      "allBranches": "All branches",
+      "service": "Service",
+      "allServices": "All services",
+      "mode": "Mode",
+      "allModes": "All modes",
+      "apply": "Show",
+      "clear": "Clear filters"
+    },
+    "modes": {
+      "off": "Off",
+      "auto": "Sign in automatically",
+      "first_come": "First to take it",
+      "manual": "Team decides"
+    },
+    "kinds": {
+      "session": "Class at {time}",
+      "slot": "Exactly {time}",
+      "range": "Between {from} and {to}",
+      "day": "Any time that day"
+    },
+    "told": "Told about a spot",
+    "openSpot": "Free spot: {when}",
+    "admit": "Let in",
+    "notify": "Tell them",
+    "remove": "Remove",
+    "admitted": "{name} was let in and has been told.",
+    "notified": "{name} was told about the free spot.",
+    "removed": "{name} was taken off the list.",
+    "errors": {
+      "spot_taken": "Someone was faster, the spot is taken.",
+      "no_free_spot": "There is no free spot for this person right now.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "freeze": {
+    "reasons": {
+      "travel": "Travel abroad",
+      "reserve_duty": "Reserve duty",
+      "illness": "Illness or injury",
+      "pregnancy": "Pregnancy",
+      "other": "Other"
+    },
+    "problems": {
+      "freeze_requests_off": "This business doesn't take freeze requests in the app. Ask the front desk.",
+      "not_freezable": "This plan can't be frozen.",
+      "too_short": "The freeze is shorter than the business allows.",
+      "too_long": "The freeze is longer than the business allows.",
+      "notice_required": "Freezes must be requested earlier than that.",
+      "outside_validity": "The freeze must start while the plan is valid.",
+      "overlapping_freeze": "That overlaps an existing freeze.",
+      "overlapping_request": "You already have a request for those days.",
+      "bank_exceeded": "That is more freeze days than you have left this year.",
+      "generic": "Something went wrong. Try again."
+    },
+    "status": {
+      "pending": "Waiting for approval",
+      "approved": "Approved",
+      "rejected": "Declined",
+      "cancelled": "Withdrawn"
+    }
+  },
+  "cancellationPolicy": {
+    "units": {
+      "none": "any time before",
+      "day": "1 day",
+      "days": "{n} days",
+      "hour": "1 hour",
+      "hours": "{n} hours",
+      "minutes": "{n} minutes"
+    },
+    "free": "You can cancel for free up to {time} before the session.",
+    "freeFor": "You can cancel {kind} for free up to {time} before.",
+    "kinds": {
+      "group": "a class",
+      "personal": "a personal session or appointment",
+      "resource": "a court or room"
+    },
+    "late": {
+      "counts": "A later cancellation counts as a visit you used.",
+      "recorded": "A later cancellation is noted but does not count as a visit you used."
+    },
+    "noShow": {
+      "counts": "If you do not come, the visit counts as used.",
+      "recorded": "If you do not come, it is noted but does not count as a visit you used."
+    },
+    "limit": "After {n} missed visits in a month, booking from the app is paused until you contact the business."
   }
 }

@@ -1,4 +1,4 @@
-/** "My own colors" (docs/proposals/profile-crop-and-palette.md): the person picks a background,
+/** "My own colors" (docs/proposals/done/profile-crop-and-palette.md): the person picks a background,
  * a text color and an accent; every color the app needs is derived from them and pushed to a
  * readable contrast, so no choice can make a part of the screen unreadable or invisible.
  * Pure functions, no DOM, so they are tested. */

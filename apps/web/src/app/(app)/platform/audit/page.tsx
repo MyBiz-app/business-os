@@ -38,7 +38,7 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
       .join(" · ");
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader titleId="audit-heading" title={t("audit.title")} description={t("audit.subtitle")} />
       {entries.length === 0 ? (
         <EmptyState variant="list">{t("audit.empty")}</EmptyState>
@@ -78,8 +78,8 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
       )}
       {(page > 1 || entries.length === PAGE_SIZE) && (
         <nav aria-label={t("audit.title")} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={`/platform/audit?page=${page - 1}`} className="text-primary-ink">{t("audit.previous")}</Link> : <span />}
-          {entries.length === PAGE_SIZE ? <Link href={`/platform/audit?page=${page + 1}`} className="text-primary-ink">{t("audit.next")}</Link> : <span />}
+          {page > 1 ? <Link scroll={false} href={`/platform/audit?page=${page - 1}`} className="text-primary-ink">{t("audit.previous")}</Link> : <span />}
+          {entries.length === PAGE_SIZE ? <Link scroll={false} href={`/platform/audit?page=${page + 1}`} className="text-primary-ink">{t("audit.next")}</Link> : <span />}
         </nav>
       )}
     </Container>

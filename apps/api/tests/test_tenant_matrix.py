@@ -27,7 +27,9 @@ PLATFORM_TABLES = {
 # Tenant tables neither the demo data nor `_synthetic_row` can fill (a CHECK constraint needs a
 # real value). Add a row for them in the seed (preferred) or list them here.
 # time_clock_approvals needs a real member and a first-of-month date; the demo data (D1) fills it.
-UNSEEDED: set[str] = {"time_clock_approvals"}
+# waitlist_requests needs a kind that matches its time columns and a future day.
+# subscription_cancellations is written only when an owner cancels or pauses (R33).
+UNSEEDED: set[str] = {"time_clock_approvals", "waitlist_requests", "subscription_cancellations"}
 # Values for columns a CHECK constraint pins down (a synthetic row can't guess them).
 OVERRIDES = {
     "ai_agents": {"builtin_key": "'x'"},
@@ -43,6 +45,7 @@ OVERRIDES = {
     "coverage_rules": {"ends_minute": "60", "min_staff": "1"},
     "document_series": {"kind": "'quote'"},
     "form101_forms": {"tax_year": "2026"},
+    "freeze_requests": {"reason": "'travel'"},
     "import_batch_items": {"entity": "'client'"},
     "invitations": {"role": "'staff'"},
     "issued_documents": {"kind": "'quote'", "language": "'he'", "content_hash": "repeat('a', 64)"},
@@ -56,6 +59,8 @@ OVERRIDES = {
     "payroll_runs": {"period": "date_trunc('month', current_date)::date"},
     "payslip_corrections": {"version": "1", "net": "'{}'::jsonb"},
     "pending_actions": {"risk_level": "'low'"},
+    "product_events": {"event": "'first_client'"},
+    "quota_alerts": {"meter": "'messages'", "threshold": "80"},
     "person_identities": {"user_id": "gen_random_uuid()", "id_type": "'il_id'", "country": "'IL'"},
     "promo_codes": {"amount_off": "1", "code": "'TESTCODE'"},
     "shift_templates": {"ends": "'17:00'", "starts": "'09:00'"},
@@ -63,6 +68,8 @@ OVERRIDES = {
     "social_audience": {"dimension": "'age'"},
     "social_posts": {"kind": "'post'"},
     "tenant_integrations": {"capability": "'payments'", "provider": "'stub'"},
+    "website_orders": {"product": "'landing_only'"},
+    "website_visits_daily": {"source": "'direct'"},
     "whatsapp_conversations": {"phone": "'0501234567'"},
     "whatsapp_inbox": {"from_phone": "'0501234567'"},
     "whatsapp_offers": {"kind": "'book_session'"},

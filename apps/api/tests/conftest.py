@@ -15,6 +15,8 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine, make_url, text
 
+os.environ.setdefault("API_GEOCODER", "none")  # tests never call the map service
+
 from app.core.auth import get_key_source
 from app.core.db import get_engine
 from app.main import create_app
@@ -63,12 +65,13 @@ def engine() -> Iterator[Engine]:
 
 @pytest.fixture(autouse=True)
 def clean_tables(engine: Engine) -> None:
-    """Empties every app table before each test, including tables added later."""
+    """Empties every app table before each test, including tables added later. The city and
+    street lists are reference data loaded by migration 0129 (60k rows) and stay."""
     with engine.begin() as connection:
         tables = connection.execute(
             text(
                 "SELECT string_agg(format('app.%I', tablename), ', ') FROM pg_tables "
-                "WHERE schemaname = 'app'"
+                "WHERE schemaname = 'app' AND tablename NOT LIKE 'geo\\_%'"
             )
         ).scalar_one()
         connection.execute(text(f"TRUNCATE {tables} CASCADE"))
@@ -79,6 +82,10 @@ def clean_tables(engine: Engine) -> None:
                 VALUES ('adire7399@gmail.com', 'primary_owner', 'migration')
             """)
         )
+        # So are the billing settings of migration 0123: VAT, the invoice counter, dunning days.
+        connection.execute(text("INSERT INTO app.vat_rates VALUES ('ILS', '2025-01-01', 1800)"))
+        connection.execute(text("INSERT INTO app.platform_series VALUES ('invoice', 10000)"))
+        connection.execute(text("INSERT INTO app.dunning_settings DEFAULT VALUES"))
 
 
 class StaticKeySource:

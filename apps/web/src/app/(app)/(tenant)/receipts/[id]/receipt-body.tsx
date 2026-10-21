@@ -1,0 +1,102 @@
+import { getLocale, getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+
+import { ApiError, unwrap } from "@/lib/api";
+import { formatMoney } from "@/lib/money";
+import { getTenantFor } from "@/lib/tenant";
+
+/** The receipt, read once per request for the page and the window. */
+export const loadReceipt = cache(async (id: string) => {
+  const { tenant, api, scope } = await getTenantFor("clients.read");
+  try {
+    return { tenant, receipt: unwrap(await api.GET("/receipts/{receipt_id}", { params: { ...scope, path: { receipt_id: id } } })) };
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) notFound();
+    throw error;
+  }
+});
+
+/** A payment's receipt, laid out as a printable document. The page and the window share it. */
+export async function ReceiptBody({ id }: { id: string }) {
+  const t = await getTranslations("receipts");
+  const locale = await getLocale();
+  const { tenant, receipt } = await loadReceipt(id);
+  const issued = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: tenant.time_zone }).format(
+    new Date(receipt.issued_at),
+  );
+  const amount = formatMoney(receipt.amount, receipt.currency, locale);
+
+  return (
+    <article className="card relative flex flex-col gap-8 overflow-hidden p-8 sm:p-10 print:border-0 print:shadow-none">
+      {receipt.simulated && (
+        <p role="note" className="rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-center text-sm font-semibold">
+          {t("sample")}
+        </p>
+      )}
+      {receipt.document_status === "issued" && (
+        <p role="note" className="rounded-xl border border-success/40 bg-success/10 px-4 py-2 text-center text-sm print:hidden">
+          {t("legalDocument", { number: receipt.document_number ?? "" })}
+          {receipt.document_url && (
+            <>
+              {" · "}
+              <a href={receipt.document_url} target="_blank" rel="noreferrer" className="font-semibold text-primary-ink underline-offset-4 hover:underline">
+                {t("openDocument")}
+              </a>
+            </>
+          )}
+        </p>
+      )}
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <p className="text-2xl font-bold" dir="auto">{receipt.business_name}</p>
+          <h2 className="text-lg font-semibold text-muted">{t("title", { number: receipt.number })}</h2>
+        </div>
+        <dl className="grid grid-cols-[auto_auto] gap-x-4 gap-y-1 text-sm">
+          <dt className="text-muted">{t("issuedAt")}</dt>
+          <dd>{issued}</dd>
+          <dt className="text-muted">{t("to")}</dt>
+          <dd dir="auto">{receipt.client_name}</dd>
+          {receipt.client_email && (
+            <>
+              <dt className="sr-only">{t("email")}</dt>
+              <dd className="col-start-2 text-muted" dir="ltr">{receipt.client_email}</dd>
+            </>
+          )}
+        </dl>
+      </header>
+
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-border text-muted">
+            <th scope="col" className="py-2 text-start font-medium">{t("item")}</th>
+            <th scope="col" className="py-2 text-end font-medium">{t("amount")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="border-b border-border">
+            <td className="py-3" dir="auto">{receipt.description}</td>
+            <td className="py-3 text-end tabular-nums">
+              <bdi>{amount}</bdi>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" className="pt-4 text-start text-base font-semibold">{t("total")}</th>
+            <td className="pt-4 text-end text-xl font-bold tabular-nums">
+              <bdi>{amount}</bdi>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-sm text-muted">
+        <span>
+          {t("method")}: {t(`methods.${receipt.method}`)}
+        </span>
+        <span>{t("thanks")}</span>
+      </footer>
+    </article>
+  );
+}

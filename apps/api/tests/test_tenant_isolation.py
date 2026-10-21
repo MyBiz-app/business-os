@@ -102,6 +102,16 @@ def test_restricted_role_survives_commit(engine: Engine) -> None:
         assert session.execute(text("SELECT current_user")).scalar() == "app_api"
 
 
+def test_requests_run_without_jit(engine: Engine) -> None:
+    """Row-level-security functions make plans look expensive; with JIT on, Postgres compiled
+    small queries (0.7 s for a week of the timetable). Every request session, and every new
+    transaction on it, turns it off."""
+    with open_session(engine, uuid4()) as session:
+        assert session.execute(text("SHOW jit")).scalar() == "off"
+        session.commit()
+        assert session.execute(text("SHOW jit")).scalar() == "off"
+
+
 def test_database_isolates_clients(engine: Engine, two_tenants: dict[str, UUID]) -> None:
     with engine.begin() as admin:
         admin.execute(

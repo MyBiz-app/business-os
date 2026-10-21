@@ -25,7 +25,7 @@ export function CopyWeek({ weekStart, nextWeek }: { weekStart: string; nextWeek:
       </button>
       <FormNotice message={state.copied ? t("copyWeekDone", { created: state.copied.created, skipped: state.copied.skipped }) : undefined} />
       {state.copied && (
-        <Link href={`/schedule?week=${nextWeek}`} className="text-sm text-primary-ink underline-offset-4 hover:underline">
+        <Link scroll={false} href={`/schedule?week=${nextWeek}`} className="text-sm text-primary-ink underline-offset-4 hover:underline">
           {t("nextWeek")}
         </Link>
       )}

@@ -15,3 +15,16 @@ allowBuilds:
   # Downloads the Supabase CLI binary.
   supabase: true
   unrs-resolver: false
+
+# Security: patched versions of transitive packages inside the Expo tooling (nightly `pnpm audit`).
+overrides:
+  uuid: ">=11.1.1"
+  decode-uri-component: ">=0.5.0"
+
+# No patched release exists yet for these two; both only run inside Expo's build tooling
+# (@expo/cli dev server, @expo/config-plugins), never in the shipped apps or the API.
+# Remove each line once a patched version is published.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-86w9-cpqp-85rv # node-forge <=1.4.0
+    - GHSA-vfj7-8cjw-p6xm # braces <=3.0.3

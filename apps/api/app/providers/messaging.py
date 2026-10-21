@@ -6,7 +6,7 @@ sent without sending anything.
 
 A provider that also receives messages (a WhatsApp Business account) implements
 `parse_inbound`: the webhook hands it each notification to verify and translate, and the AI
-replies (module `whatsapp_ai`, app/messaging/whatsapp_ai.py) answer them. The simulated provider
+replies (module `whatsapp_ai`, app/messaging/whatsapp_ai/) answer them. The simulated provider
 receives nothing, so the webhook stays closed until a real provider is connected."""
 
 from dataclasses import dataclass

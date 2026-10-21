@@ -106,7 +106,10 @@ def test_invoices_after_the_trial(client: TestClient, studio: dict, engine: Engi
         ("core", 9900),
         ("client_app", 4900),
     ]
-    assert invoice["total"] == 14800 and invoice["simulated"] is True
+    # 18% VAT on top (rate from app.vat_rates), rounded half up.
+    assert invoice["subtotal"] == 14800 and invoice["vat_rate_bp"] == 1800
+    assert invoice["vat_amount"] == 2664 and invoice["total"] == 17464
+    assert invoice["simulated"] is True
 
     # Paying needs a (test) card.
     unpaid = client.post(f"/billing/invoices/{first['id']}/pay", headers=headers)
@@ -133,7 +136,8 @@ def test_one_time_setup_rides_on_the_first_invoice(
         ("core", 9900),
         ("setup_guided", 24900),
     ]
-    assert first["total"] == 9900 + 24900 and second["total"] == 9900
+    assert first["subtotal"] == 9900 + 24900 and second["subtotal"] == 9900
+    assert first["total"] == first["subtotal"] + first["vat_amount"]
 
 
 def test_card_on_file_is_charged_automatically(

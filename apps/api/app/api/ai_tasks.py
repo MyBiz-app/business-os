@@ -2,7 +2,7 @@
 earlier runs went.
 
 A task is created by an agent in a chat, through a card the user confirms (see
-`schedule_task` in app/ai/tools.py); here the owner of a task pauses, resumes, edits the time,
+`schedule_task` in app/ai/tools/); here the owner of a task pauses, resumes, edits the time,
 deletes or runs it. Whoever may manage the AI team (`ai.manage`) also sees and can pause or
 delete everybody's tasks. A task always runs as the person who created it."""
 

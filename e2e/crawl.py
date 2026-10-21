@@ -43,13 +43,13 @@ with psycopg.connect(h.DATABASE_URL) as conn:
 pages = [
     "/dashboard", "/reports", "/ai", "/schedule", "/schedule/new", "/schedule/appointment",
     "/schedule/closed", "/clients", "/clients/new", "/clients/import", "/clients/join", "/leads",
-    "/leads/new", "/messages", "/services", "/services/new", "/plans", "/plans/new", "/locations",
-    "/locations/new", "/team", "/team/roles", "/account", "/settings", "/settings/modules", "/settings/billing",
+    "/leads/new", "/messages", "/catalog", "/catalog?tab=plans", "/catalog?tab=codes", "/catalog/services/new", "/catalog/plans/new", "/catalog/promos/new", "/locations",
+    "/locations/new", "/team", "/team/roles", "/account", "/settings", "/settings/business", "/settings/branding", "/settings/modules", "/settings/billing",
 ]  # fmt: skip
 detail = {
-    "client": "/clients/{}", "lead": "/leads/{}", "location": "/locations/{}", "plan": "/plans/{}",
-    "receipt": "/receipts/{}", "session": "/schedule/{}", "service": "/services/{}",
-    "invoice": "/settings/billing/invoices/{}", "member": "/team/{}/hours",
+    "client": "/clients/{}", "lead": "/leads/{}", "location": "/locations/{}", "plan": "/catalog/plans/{}",
+    "receipt": "/receipts/{}", "session": "/schedule/{}", "service": "/catalog/services/{}",
+    "invoice": "/settings/billing/invoices/{}", "member": "/team/{}",
 }  # fmt: skip
 pages += [path.format(ids[key]) for key, path in detail.items() if ids[key]]
 

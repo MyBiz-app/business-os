@@ -251,7 +251,7 @@ def test_deleting_a_business_removes_its_files_from_storage(
     class Chosen:
         instance = storage
 
-    monkeypatch.setattr(jobs, "choose", lambda *_args, **_kwargs: Chosen())
+    monkeypatch.setattr(jobs.retention, "choose", lambda *_args, **_kwargs: Chosen())
     close(client, studio)
     backdate(engine, studio["tenant_id"], 91)
     with engine.begin() as connection:

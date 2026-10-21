@@ -21,7 +21,9 @@ export default async function PlatformTeamPage() {
   const t = await getTranslations("platform.team");
   const { api, staff, isOwner } = await getPlatformFor("staff.manage");
   const team = unwrap(await api.GET("/platform/staff"));
+  const templates = Object.fromEntries(unwrap(await api.GET("/platform/staff-templates")).map((template) => [template.key, template.permissions]));
   const actor = {
+    templates,
     levels: isOwner ? (["owner", "manager", "employee"] as const) : (["employee"] as const),
     permissions: staff.permissions,
   };
@@ -29,7 +31,7 @@ export default async function PlatformTeamPage() {
     email !== staff.email && level !== "primary_owner" && (isOwner || level === "employee");
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("subtitle")} />
       <p className="flex items-start gap-2 rounded-xl bg-primary/10 px-4 py-3 text-sm">
         <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary-ink" />
@@ -44,7 +46,7 @@ export default async function PlatformTeamPage() {
             <StaffRow
               key={`${member.email}-${member.level}-${member.permissions.join()}-${member.disabled}`}
               member={member}
-              actor={{ levels: [...actor.levels], permissions: actor.permissions }}
+              actor={{ levels: [...actor.levels], permissions: actor.permissions, templates: actor.templates }}
               manageable={manageable(member.level, member.email)}
             />
           ))}
@@ -54,7 +56,7 @@ export default async function PlatformTeamPage() {
         <h2 id="add-heading" className="text-lg font-semibold">
           {t("add")}
         </h2>
-        <AddStaffForm actor={{ levels: [...actor.levels], permissions: actor.permissions }} />
+        <AddStaffForm actor={{ levels: [...actor.levels], permissions: actor.permissions, templates: actor.templates }} />
       </section>
     </Container>
   );

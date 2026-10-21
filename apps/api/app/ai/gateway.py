@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from app.ai.models import MODELS, clean_text, model_for_tier, prices_of
+from app.ai.models import MODELS, clean_text, model_for_tier, prices_of, vendor_enabled
 from app.core.config import get_settings
 
 
@@ -26,6 +26,7 @@ class Usage:
     output_tokens: int = 0
     cache_read_tokens: int = 0
     cache_write_tokens: int = 0
+    web_searches: int = 0  # server-side web searches the model ran (billed per search)
 
 
 @dataclass(frozen=True)
@@ -98,6 +99,9 @@ def stream_response(
     yield StreamEvent("done", response=response)
 
 
+WEB_SEARCH_USD = 0.01  # $10 per 1,000 searches (Anthropic's price list; verify before turning on)
+
+
 def credits(model: str, usage: Usage) -> float:
     """AI credits for a call: one credit is one US cent of model cost. Owners see credits,
     never tokens (spec 03, usage meters)."""
@@ -107,12 +111,14 @@ def credits(model: str, usage: Usage) -> float:
         + usage.output_tokens * price_out
         + usage.cache_read_tokens * price_read
         + usage.cache_write_tokens * price_write
-    ) / 1_000_000
+    ) / 1_000_000 + usage.web_searches * WEB_SEARCH_USD
     return round(dollars * 100, 4)
 
 
 class AnthropicProvider:
     """Claude through the Anthropic API."""
+
+    supports_web_search = True  # the search runs on Anthropic's side (a server tool)
 
     def __init__(
         self,
@@ -163,6 +169,10 @@ class AnthropicProvider:
                 output_tokens=usage.output_tokens,
                 cache_read_tokens=usage.cache_read_input_tokens or 0,
                 cache_write_tokens=usage.cache_creation_input_tokens or 0,
+                web_searches=getattr(
+                    getattr(usage, "server_tool_use", None), "web_search_requests", 0
+                )
+                or 0,
             ),
         )
 
@@ -217,22 +227,35 @@ class AnthropicProvider:
 
 
 def get_provider() -> LLMProvider | None:
-    """The configured provider. Without an API key: demo mode when enabled (a prototype without
-    paid services, decision T53), otherwise None (the assistant is not set up)."""
+    """The configured provider (API_AI_PROVIDER, Anthropic by default). Without its key, or when
+    its vendor is not switched on: demo mode when enabled (a prototype without paid services,
+    decision T53), otherwise None (the assistant is not set up)."""
     settings = get_settings()
-    if settings.anthropic_api_key is None:
+    vendor = settings.ai_provider
+    key = {
+        "anthropic": settings.anthropic_api_key,
+        "openai": settings.openai_api_key,
+        "gemini": settings.gemini_api_key,
+    }.get(vendor)
+    if key is None or not vendor_enabled(vendor):
         if settings.ai_demo:
             from app.ai.demo import DemoProvider
 
             return DemoProvider()
         return None
-    return AnthropicProvider(
-        settings.anthropic_api_key.get_secret_value(),
-        model_for_tier("fast"),
-        model_for_tier("standard"),
-        settings.ai_max_tokens,
-        settings.ai_timeout_seconds,
-    )
+    fast, standard = model_for_tier("fast", vendor), model_for_tier("standard", vendor)
+    if vendor == "anthropic":
+        return AnthropicProvider(
+            key.get_secret_value(),
+            fast,
+            standard,
+            settings.ai_max_tokens,
+            settings.ai_timeout_seconds,
+        )
+    from app.ai.vendors import GeminiProvider, OpenAIProvider
+
+    adapter = OpenAIProvider if vendor == "openai" else GeminiProvider
+    return adapter(key.get_secret_value(), fast, standard, settings.ai_max_tokens)
 
 
 class FallbackProvider:

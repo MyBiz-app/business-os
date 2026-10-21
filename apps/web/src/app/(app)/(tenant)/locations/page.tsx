@@ -14,6 +14,7 @@ import { NetworkPolicy } from "./network-policy";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/empty-state";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 export default async function LocationsPage() {
   const t = await getTranslations();
@@ -28,26 +29,20 @@ export default async function LocationsPage() {
         title={t("locations.title")}
         description={t("locations.subtitle")}
         actions={
-          canWriteCatalog(tenant) && (
-            <Link href="/locations/new" className="btn-primary px-4 py-2.5">
-              {t("locations.add")}
-            </Link>
-          )
+          <>
+            {tenant.permissions.includes("reports.read") && locations.some((l) => l.active && l.latitude !== null) && (
+              <Link href="/locations/map" className="btn-secondary px-4 py-2.5">
+                {t("branchMap.title")}
+              </Link>
+            )}
+            {canWriteCatalog(tenant) && (
+              <Link href="/locations/new" className="btn-primary px-4 py-2.5">
+                {t("locations.add")}
+              </Link>
+            )}
+          </>
         }
       />
-
-      {canManageSettings(tenant) && (
-        <NetworkPolicy action={updateNetworkScope} scope={tenant.network_scope} multiBranch={locations.length > 1} />
-      )}
-
-      {canManageSettings(tenant) && locations.length > 1 && (
-        <LocationGroups
-          branches={locations.map(({ id, name }) => ({ id, name }))}
-          groups={groups}
-          saveGroup={saveLocationGroup}
-          removeGroup={deleteLocationGroup}
-        />
-      )}
 
       {locations.length === 0 ? (
         <EmptyState variant="list">{t("locations.empty")}</EmptyState>
@@ -76,6 +71,22 @@ export default async function LocationsPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {canManageSettings(tenant) && (
+        <CollapsibleSection title={t("locations.settingsTitle")} description={t("locations.settingsHint")} storageKey="locations-settings">
+          <div className="flex flex-col gap-6">
+            <NetworkPolicy action={updateNetworkScope} scope={tenant.network_scope} multiBranch={locations.length > 1} />
+            {locations.length > 1 && (
+              <LocationGroups
+                branches={locations.map(({ id, name }) => ({ id, name }))}
+                groups={groups}
+                saveGroup={saveLocationGroup}
+                removeGroup={deleteLocationGroup}
+              />
+            )}
+          </div>
+        </CollapsibleSection>
       )}
     </Container>
   );

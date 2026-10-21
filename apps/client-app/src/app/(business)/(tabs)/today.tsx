@@ -91,6 +91,7 @@ export default function Today() {
       value,
       label: formatDay(value, locale, { day: "numeric" }),
       sublabel: value === today ? t("title") : formatDay(value, locale, { weekday: "short" }),
+      count,
       accessibilityLabel: `${long}, ${t("sessions", { count })}`,
     };
   });
@@ -123,7 +124,7 @@ export default function Today() {
                 ? session.appointment_client
                 : [
                     t("spots", { booked: session.booked, capacity: session.capacity }),
-                    session.waitlisted > 0 ? t("waitlist", { count: session.waitlisted }) : null,
+                    session.waitlisted + session.waiting_requests > 0 ? t("waitlist", { count: session.waitlisted + session.waiting_requests }) : null,
                   ]
                     .filter(Boolean)
                     .join(" · ")

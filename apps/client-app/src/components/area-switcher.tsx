@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
+import { ErrorText } from "@business-os/app-kit/components/ui";
 import type { Area } from "@business-os/app-kit/lib/areas";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useAreas } from "@/providers/area-provider";
@@ -10,10 +12,20 @@ import { useAreas } from "@/providers/area-provider";
 export function AreaSwitcher({ palette }: { palette: Palette }) {
   const t = useTranslations("areas");
   const { areas, active, switchTo } = useAreas();
+  const [failed, setFailed] = useState(false);
   if (!areas || areas.length < 2) return null;
+  const open = async (key: string) => {
+    setFailed(false);
+    try {
+      await switchTo(key);
+    } catch {
+      setFailed(true);
+    }
+  };
   return (
     <>
       <SectionTitle title={t("switch")} palette={palette} />
+      <ErrorText message={failed ? t("joinError") : null} palette={palette} />
       {areas.map((area) => (
         <ListRow
           key={area.key}
@@ -21,7 +33,7 @@ export function AreaSwitcher({ palette }: { palette: Palette }) {
           title={area.name}
           subtitle={areaLabel(t, area)}
           trailing={area.key === active?.key ? <Badge label={t("current")} tone="primary" palette={palette} /> : null}
-          onPress={() => void switchTo(area.key)}
+          onPress={() => void open(area.key)}
         />
       ))}
     </>

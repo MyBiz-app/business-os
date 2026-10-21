@@ -3,15 +3,18 @@ and MyBiz's own team (migration 0037). Each part needs a console permission; own
 them all. The database functions enforce the same rules."""
 
 import datetime as dt
+import io
 import json
 import logging
 import os
-from collections.abc import Callable
+import zipfile
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
@@ -20,7 +23,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import SessionDep, UserDep
 from app.api.modules import check_selection
 from app.api.pagination import MAX_LIMIT, FullPageDep, Page, PageDep
-from app.core import metrics
+from app.core import events, metrics
 from app.core.config import get_settings
 from app.core.mfa import require_aal2
 from app.jobs import MAX_HOURS
@@ -37,6 +40,7 @@ class PlatformPermission(StrEnum):
     USAGE_READ = "usage.read"
     STAFF_MANAGE = "staff.manage"
     BROADCASTS_MANAGE = "broadcasts.manage"
+    INCIDENTS_MANAGE = "incidents.manage"
 
 
 Level = Literal["primary_owner", "owner", "manager", "employee"]
@@ -65,14 +69,38 @@ AdminDep = Annotated[Session, Depends(require_platform(PlatformPermission.BUSINE
 UsageDep = Annotated[Session, Depends(require_platform(PlatformPermission.USAGE_READ))]
 InboxDep = Annotated[Session, Depends(require_platform(PlatformPermission.INBOX_MANAGE))]
 BillingDep = Annotated[Session, Depends(require_platform(PlatformPermission.BILLING_MANAGE))]
+ActDep = Annotated[Session, Depends(require_platform(PlatformPermission.BUSINESSES_ACT))]
 TeamDep = Annotated[Session, Depends(require_platform(PlatformPermission.STAFF_MANAGE))]
 
+# Ready-made permission sets for the team form: a support worker answers businesses and requests.
+STAFF_TEMPLATES: dict[str, tuple[PlatformPermission, ...]] = {
+    "support": (
+        PlatformPermission.BUSINESSES_READ,
+        PlatformPermission.INBOX_MANAGE,
+        PlatformPermission.INCIDENTS_MANAGE,
+    ),
+}
 
-def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
-    """Calls a console function whose rules raise errors; maps them to HTTP errors."""
+
+def require_owner(session: StaffDep) -> Session:
+    """A MyBiz owner (also the primary one): for pages the console shows only to owners. The
+    database functions behind them enforce it too; this keeps the API in step with the menu."""
+    level = session.execute(text("SELECT level FROM app.platform_me()")).scalar_one_or_none()
+    if level not in ("primary_owner", "owner"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="owners_only")
+    return session
+
+
+OwnerDep = Annotated[Session, Depends(require_owner)]
+
+
+@contextmanager
+def rule_errors(db: Session) -> Iterator[None]:
+    """Runs a block of console function calls in a savepoint; the errors their rules raise become
+    HTTP errors."""
     try:
         with db.begin_nested():
-            return db.execute(text(sql), params).scalar()
+            yield
     except DBAPIError as error:
         code = getattr(error.orig, "sqlstate", None)
         detail = str(getattr(getattr(error.orig, "diag", None), "message_primary", "")) or "error"
@@ -83,6 +111,12 @@ def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
         if code in ("P0001", "23514"):
             raise HTTPException(status_code=422, detail=detail) from error
         raise
+
+
+def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
+    """Calls a console function whose rules raise errors; maps them to HTTP errors."""
+    with rule_errors(db):
+        return db.execute(text(sql), params).scalar()
 
 
 class PlatformBusiness(BaseModel):
@@ -117,6 +151,19 @@ def businesses(db: AdminDep, page: FullPageDep) -> list[PlatformBusiness]:
     return [PlatformBusiness.model_validate(dict(row)) for row in rows]
 
 
+@router.get("/businesses/{tenant_id}")
+def business(tenant_id: UUID, db: AdminDep) -> PlatformBusiness:
+    """One business, for its card (the list is paged, so the card cannot search it)."""
+    row = (
+        db.execute(text("SELECT * FROM app.platform_business(:id)"), {"id": tenant_id})
+        .mappings()
+        .first()
+    )
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+    return PlatformBusiness.model_validate(dict(row))
+
+
 @router.get("/usage")
 def usage(
     db: UsageDep,
@@ -129,6 +176,58 @@ def usage(
         {"tenant_id": tenant_id, "days": days},
     ).mappings()
     return [UsagePoint.model_validate(dict(row)) for row in rows]
+
+
+class FunnelStep(BaseModel):
+    key: str = Field(description="started, a wizard step, or completed")
+    visitors: int
+
+
+@router.get("/funnel")
+def signup_funnel(db: UsageDep, days: Annotated[int, Query(ge=1, le=365)] = 30) -> list[FunnelStep]:
+    """People who reached each step of the sign-up journey, in order, and how many finished."""
+    counts = {
+        (row.event, row.step): row.visitors
+        for row in db.execute(text("SELECT * FROM app.platform_funnel(:days)"), {"days": days})
+    }
+    steps = [("started", counts.get(("signup_started", ""), 0))]
+    steps += [(step, counts.get(("signup_step", step), 0)) for step in events.SIGNUP_STEPS]
+    steps.append(("completed", counts.get(("signup_completed", ""), 0)))
+    return [FunnelStep(key=key, visitors=visitors) for key, visitors in steps]
+
+
+class ActivityDay(BaseModel):
+    day: dt.date
+    active_day: int = Field(description="Businesses with any activity that day")
+    active_week: int = Field(description="Businesses with any activity in the 7 days up to it")
+
+
+@router.get("/activity")
+def activity(db: UsageDep, days: Annotated[int, Query(ge=1, le=90)] = 30) -> list[ActivityDay]:
+    rows = db.execute(text("SELECT * FROM app.platform_activity(:days)"), {"days": days}).mappings()
+    return [ActivityDay.model_validate(dict(row)) for row in rows]
+
+
+class Consumer(BaseModel):
+    tenant_id: UUID
+    name: str
+    messages: float
+    ai_credits: float
+    storage_bytes: int
+
+
+@router.get("/top-consumers")
+def top_consumers(
+    db: UsageDep,
+    days: Annotated[int, Query(ge=1, le=365)] = 30,
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+) -> list[Consumer]:
+    """The businesses using the most messages, space and AI."""
+    rows = db.execute(
+        text("SELECT * FROM app.platform_top_consumers(:days, :limit)"),
+        {"days": days, "limit": limit},
+    ).mappings()
+    return [Consumer.model_validate(dict(row)) for row in rows]
 
 
 class AISpend(BaseModel):
@@ -188,6 +287,9 @@ class SystemHealth(BaseModel):
     messages_failed_24h: int
     emails_waiting: int
     database_bytes: int
+    files_bytes: int = Field(
+        description="All kept files of all businesses (documents, logos, payslips)"
+    )
     ai_credits_today: float
     ai_alert_at: int
     routes: list[RouteTiming] = Field(description="Busiest routes of this API process")
@@ -226,6 +328,9 @@ def system_health(db: UsageDep) -> SystemHealth:
         messages_failed_24h=data["messages_failed_24h"],
         emails_waiting=data["emails_waiting"],
         database_bytes=data["database_bytes"],
+        files_bytes=db.execute(
+            text("SELECT coalesce(sum(app.storage_bytes(t.id)), 0)::bigint FROM app.tenants t")
+        ).scalar_one(),
         ai_credits_today=spent,
         ai_alert_at=get_settings().ai_daily_alert_credits,
         routes=[RouteTiming(**vars(stat)) for stat in metrics.route_stats()],
@@ -341,7 +446,20 @@ class StaffMember(BaseModel):
 class StaffSave(BaseModel):
     level: Literal["owner", "manager", "employee"]
     permissions: list[PlatformPermission] = []
+    template: Literal["support"] | None = Field(
+        default=None, description="Start from a ready-made permission set; added to `permissions`"
+    )
     disabled: bool = False
+
+
+class StaffTemplate(BaseModel):
+    key: str
+    permissions: list[PlatformPermission]
+
+
+@router.get("/staff-templates")
+def staff_templates(db: TeamDep) -> list[StaffTemplate]:
+    return [StaffTemplate(key=k, permissions=list(v)) for k, v in STAFF_TEMPLATES.items()]
 
 
 @router.get("/staff")
@@ -360,7 +478,10 @@ def save_staff(email: EmailStr, body: StaffSave, db: TeamDep) -> list[StaffMembe
         {
             "email": email,
             "level": body.level,
-            "permissions": sorted({p.value for p in body.permissions}),
+            "permissions": sorted(
+                {p.value for p in body.permissions}
+                | {p.value for p in STAFF_TEMPLATES.get(body.template or "", ())}
+            ),
             "disabled": body.disabled,
         },
     )
@@ -383,7 +504,7 @@ class AuditEntry(BaseModel):
 
 
 @router.get("/audit")
-def audit(db: StaffDep, page: PageDep) -> list[AuditEntry]:
+def audit(db: OwnerDep, page: PageDep) -> list[AuditEntry]:
     """What the MyBiz team did, newest first (owners only)."""
     try:
         with db.begin_nested():
@@ -476,3 +597,221 @@ def void_invoice(invoice_id: UUID, body: VoidInvoice, db: BillingDep) -> list[Bi
         {"id": invoice_id, "reason": body.reason},
     )
     return billing_summary(db)
+
+
+# --- Collecting unpaid invoices (GL20) --------------------------------------------------------
+
+
+class OverdueBusiness(BaseModel):
+    tenant_id: UUID
+    name: str
+    owner_email: str | None
+    currency: str
+    open_invoices: int
+    open_amount: int = Field(description="Minor units, VAT included")
+    oldest_issued_at: dt.datetime
+    billing_state: Literal["active", "read_only", "suspended"]
+    grace_until: dt.datetime | None
+
+
+@router.get("/billing/overdue")
+def overdue_businesses(db: BillingDep) -> list[OverdueBusiness]:
+    """Businesses with an unpaid invoice, the oldest first."""
+    rows = db.execute(text("SELECT * FROM app.platform_overdue_businesses()")).mappings()
+    return [OverdueBusiness.model_validate(dict(row)) for row in rows]
+
+
+class Cancellation(BaseModel):
+    id: UUID
+    tenant_id: UUID
+    name: str
+    owner_email: str | None
+    outcome: Literal["cancelled", "paused"]
+    reason: str | None
+    note: str | None
+    created_at: dt.datetime
+    ends_at: dt.datetime | None
+    refund_minor: int = Field(description="Recorded refund of the first payment, minor units")
+    currency: str
+    resumed_at: dt.datetime | None = Field(description="Set when the owner took it back")
+
+
+class ChurnMonth(BaseModel):
+    month: dt.date
+    cancelled: int
+    paused: int
+    resumed: int
+    paying_at_start: int = Field(description="Businesses past their trial at the month's start")
+
+
+@router.get("/billing/cancellations")
+def cancellations(db: BillingDep) -> list[Cancellation]:
+    """The last year's cancellations and pauses with the reasons, newest first."""
+    rows = db.execute(text("SELECT * FROM app.platform_cancellations()")).mappings()
+    return [Cancellation.model_validate(dict(row)) for row in rows]
+
+
+@router.get("/billing/churn")
+def churn(db: BillingDep) -> list[ChurnMonth]:
+    """Per month for the last year: cancellations, pauses and those taken back."""
+    rows = db.execute(text("SELECT * FROM app.platform_churn_months()")).mappings()
+    return [ChurnMonth.model_validate(dict(row)) for row in rows]
+
+
+class GraceExtension(BaseModel):
+    days: int = Field(ge=1, le=90)
+
+
+@router.post("/businesses/{tenant_id}/billing/grace")
+def extend_grace(tenant_id: UUID, body: GraceExtension, db: BillingDep) -> list[OverdueBusiness]:
+    """Gives a business more time to pay: lifts read-only or suspension now and holds off the
+    next one for `days` days (reminders still go out)."""
+    run_rule(
+        db,
+        "SELECT app.platform_extend_grace(:t, :days)",
+        {"t": tenant_id, "days": body.days},
+    )
+    return overdue_businesses(db)
+
+
+class DunningSettings(BaseModel):
+    enabled: bool = Field(description="Off: no reminders, no read-only, no suspension")
+    reminder_days: list[Annotated[int, Field(ge=0, le=60)]] = Field(
+        max_length=6, description="Days after the invoice is issued that a reminder goes out"
+    )
+    read_only_after_days: int = Field(ge=1, le=120)
+    suspend_after_days: int = Field(ge=2, le=180)
+
+
+@router.get("/billing/dunning")
+def get_dunning(db: BillingDep) -> DunningSettings:
+    row = db.execute(text("SELECT * FROM app.dunning_settings")).mappings().one()
+    return DunningSettings.model_validate(dict(row))
+
+
+@router.put("/billing/dunning")
+def set_dunning(body: DunningSettings, db: BillingDep) -> DunningSettings:
+    if body.suspend_after_days <= body.read_only_after_days:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="bad_order")
+    run_rule(
+        db,
+        "SELECT app.platform_dunning_update("
+        ":enabled, CAST(:days AS integer[]), :read_only, :suspend)",
+        {
+            "enabled": body.enabled,
+            "days": sorted(set(body.reminder_days)),
+            "read_only": body.read_only_after_days,
+            "suspend": body.suspend_after_days,
+        },
+    )
+    return get_dunning(db)
+
+
+# --- Website orders (MyBiz Sites, round 7 R24) -------------------------------------------------
+
+WebsiteStage = Literal["briefing", "received", "building", "review", "live"]
+
+
+class WebsiteOrder(BaseModel):
+    id: UUID
+    tenant_id: UUID
+    tenant_name: str
+    product: Literal["landing_only", "landing_with_system"]
+    stage: WebsiteStage
+    brief: dict[str, Any]
+    currency: str
+    setup_price: int | None = Field(description="Minor units")
+    monthly_price: int | None = Field(description="Minor units")
+    site_url: str | None
+    internal_notes: str | None
+    customer_message: str | None
+    change_request: str | None = Field(description="What the business asked to change")
+    contact_email: str | None
+    contact_name: str | None
+    submitted_at: dt.datetime | None
+    approved_at: dt.datetime | None
+    live_at: dt.datetime | None
+    updated_at: dt.datetime
+    prompt: str = Field(description="Ready-made prompt for Claude Code, built from the brief")
+
+
+class WebsiteOrderUpdate(BaseModel):
+    stage: WebsiteStage | None = None
+    site_url: str | None = Field(default=None, max_length=300, description="'' clears it")
+    notes: str | None = Field(default=None, max_length=4000)
+    message: str | None = Field(default=None, max_length=2000, description="To the business")
+
+
+def _website_orders(db: Session) -> list[WebsiteOrder]:
+    from app.websites.prompt import build_prompt
+
+    api_url = get_settings().api_url
+    orders = []
+    for row in db.execute(text("SELECT * FROM app.platform_website_orders()")).mappings():
+        data = dict(row)
+        snapshot = data.pop("snapshot")
+        key = data.pop("tracking_key")
+        prompt = build_prompt(
+            brief=data["brief"],
+            snapshot=snapshot,
+            tracking_key=key,
+            api_url=api_url,
+            with_system=data["product"] == "landing_with_system",
+        )
+        orders.append(
+            WebsiteOrder.model_validate({**data, "currency": data["currency"], "prompt": prompt})
+        )
+    return orders
+
+
+@router.get("/website-orders")
+def website_orders(db: ActDep) -> list[WebsiteOrder]:
+    """The board: every website order that was started, with its brief and the build prompt."""
+    return _website_orders(db)
+
+
+@router.patch("/website-orders/{order_id}")
+def update_website_order(
+    order_id: UUID, body: WebsiteOrderUpdate, db: ActDep
+) -> list[WebsiteOrder]:
+    """Moves an order along the board, sets the site address (it becomes the business's website
+    when the site goes live), internal notes and the message the business sees."""
+    run_rule(
+        db,
+        "SELECT app.platform_website_order_update(:id, :stage, :site_url, :notes, :message)",
+        {
+            "id": order_id,
+            "stage": body.stage,
+            "site_url": body.site_url,
+            "notes": body.notes,
+            "message": body.message,
+        },
+    )
+    return _website_orders(db)
+
+
+@router.get("/website-orders/{order_id}/files.zip")
+def website_order_files(order_id: UUID, db: ActDep) -> Response:
+    """The images and logo the business uploaded, as one ZIP."""
+    from app.files import read_file
+
+    rows = db.execute(
+        text("SELECT * FROM app.platform_website_order_files(:id)"), {"id": order_id}
+    ).mappings()
+    buffer = io.BytesIO()
+    names: set[str] = set()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for row in rows:
+            name = row["name"].replace("/", "_").replace("\\", "_")
+            while name in names:
+                name = f"{len(names)}_{name}"
+            names.add(name)
+            archive.writestr(name, read_file(db, dict(row)))
+    return Response(
+        content=buffer.getvalue(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": 'attachment; filename="website-files.zip"',
+            "Cache-Control": "private, no-store",
+        },
+    )

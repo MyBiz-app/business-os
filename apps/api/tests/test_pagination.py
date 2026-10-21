@@ -62,6 +62,33 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # the twelve console AI agents: a fixed catalog in code
+    "/platform/ai/agents": "fixed list",
+    # the versions of one library document: the SQL returns the latest 100
+    "/platform/ai/library/{doc_id}/versions": "limit in SQL",
+    # the pieces an agent finds for one question: the SQL returns at most 20
+    "/platform/ai/agents/{key}/library/search": "limit in SQL",
+    # the ready-made permission sets of the team form: a fixed list in code
+    "/platform/staff-templates": "fixed list",
+    # waiting requests first, then the latest decided: LIMIT 200 (a business) and 50 (a client)
+    "/freeze-requests": "limit in SQL",
+    "/client/freeze-requests": "limit in SQL",
+    # the SQL returns at most 200 (staff) or 50 (one client: five requests and a few class places)
+    "/waitlist": "limit in SQL",
+    "/client/waitlist": "limit in SQL",
+    # one person's AI connections in one business: at most 20 (the cap when approving)
+    "/mcp-connections": "capped",
+    # the changes AI apps proposed to one person in the last 30 days: the query returns at most 50
+    "/mcp-requests": "capped",
+    # the console's unpaid-invoice list: the function returns at most 500 businesses
+    "/platform/billing/overdue": "capped",
+    "/platform/billing/cancellations": "capped: the last 12 months, at most 500 rows",
+    "/platform/billing/churn": "twelve months",
+    # the SQL function returns at most 5 open banners, or the latest 50
+    "/public/incidents": "limit in SQL",
+    "/platform/incidents": "limit in SQL",
+    # one row per quote status and currency
+    "/quotes/summary": "grouped",
     # a required date window of at most 42 days
     "/sessions": "window",
     "/client/sessions": "window",
@@ -105,10 +132,16 @@ BOUNDED = {
     "/social/accounts": "connected accounts",
     "/social/audience": "one row per network",
     "/platform/staff": "the MyBiz team",
+    "/platform/website-orders": "one order per business, capped at 300 in SQL",
     "/platform/usage": "one row per day, at most 366",
+    "/platform/funnel": "one row per sign-up step, nine",
+    "/platform/activity": "one row per day, at most 90",
     "/platform/billing": "one row per month",
     "/platform/broadcasts": "announcements",
     "/platform/businesses/{tenant_id}/invoices": "one row per month",
+    "/platform/businesses/{tenant_id}/notes": "the last 200 in SQL",
+    "/platform/businesses/{tenant_id}/timeline": "the last 150 in SQL",
+    "/platform/trials-ending": "at most 200 in SQL",
     "/payroll/rates": "one row per rate",
     # the rows of one person
     "/me/devices": "capped in code",

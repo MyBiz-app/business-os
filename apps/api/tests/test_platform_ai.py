@@ -181,7 +181,7 @@ def test_the_console_assistant_offers_only_tools_the_member_may_use(
     )
     assert reply.status_code == 200, reply.text
     offered = [t["name"] for t in provider.calls[0]["tools"]]
-    assert offered == ["open_requests"]
+    assert "open_requests" in offered and "list_businesses" not in offered
     refused = provider.calls[1]["messages"][-1]["content"][0]
     assert refused["is_error"] is True and "not available" in refused["content"]
     last = reply.json()["turns"][-1]
@@ -227,3 +227,136 @@ def test_the_emergency_stop_also_stops_the_console_assistant(
         assert response.status_code == 403 and response.json()["detail"] == "ai_paused"
     finally:
         client.put("/platform/ai/settings", json={"kill_all": False}, headers=headers)
+
+
+def test_the_agents_map_shows_only_agents_the_member_may_ask(
+    client: TestClient, engine: Engine, auth: AuthHeaders, studio: dict
+) -> None:
+    assert client.get("/platform/ai/agents", headers=studio["headers"]).status_code == 403
+    _, _, nobody = staff(engine, auth)
+    keys = [a["key"] for a in client.get("/platform/ai/agents", headers=nobody).json()]
+    assert keys == ["manager"]  # the chief is for the whole team
+    _, _, billing = staff(engine, auth, "billing.manage", "businesses.read")
+    cards = client.get("/platform/ai/agents", headers=billing).json()
+    keys = [a["key"] for a in cards]
+    assert keys[0] == "manager" and "billing" in keys and "legal" in keys
+    assert "support" not in keys and "security" not in keys  # needs inbox / incidents
+    assert next(a for a in cards if a["key"] == "manager")["chief"] is True
+    assert next(a for a in cards if a["key"] == "legal")["ready"] is True
+
+
+def test_an_agent_can_be_renamed_switched_off_and_given_extra_instructions(
+    client: TestClient, engine: Engine, auth: AuthHeaders, use_provider
+) -> None:
+    provider = FakeProvider([says("Done.")])
+    use_provider(provider)
+    _, _, owner = staff(engine, auth, "billing.manage", "businesses.read")
+    _, _, reader = staff(engine, auth, "businesses.read")
+    change = {
+        "enabled": True,
+        "name_he": "Noa",
+        "name_en": "Nora",
+        "instructions": "We refund by card only.",
+        "x": 20,
+        "y": 30,
+        "portrait_url": "https://example.com/nora.png",
+    }
+    assert client.put("/platform/ai/agents/billing", json=change, headers=reader).status_code == 403
+    done = client.put("/platform/ai/agents/billing", json=change, headers=owner)
+    assert done.status_code == 200, done.text
+    card = next(a for a in done.json() if a["key"] == "billing")
+    assert card["name_en"] == "Nora" and card["x"] == 20 and card["instructions"]
+    # Extra instructions are shown only to someone who can change them.
+    seen = client.get("/platform/ai/agents", headers=reader).json()
+    assert all(a["instructions"] is None for a in seen)
+    # They are always added to the agent's prompt.
+    chat = client.post(
+        "/platform/ai/assistant/conversations", json={"role": "billing"}, headers=owner
+    ).json()
+    sent = client.post(
+        f"/platform/ai/assistant/conversations/{chat['id']}/messages",
+        json={"text": "hi"},
+        headers=owner,
+    )
+    assert sent.status_code == 200, sent.text
+    assert "We refund by card only." in provider.calls[0]["system"]
+    assert ("ai.agent", {"agent": "billing", "enabled": True, "has_instructions": True}) in (
+        audit_actions(engine)
+    )
+    # Switched off: no new conversation, and the open one stops too. The chief cannot be off.
+    off = {**change, "enabled": False}
+    client.put("/platform/ai/agents/billing", json=off, headers=owner)
+    again = client.post(
+        "/platform/ai/assistant/conversations", json={"role": "billing"}, headers=owner
+    )
+    assert again.status_code == 409 and again.json()["detail"] == "agent_disabled"
+    stopped = client.post(
+        f"/platform/ai/assistant/conversations/{chat['id']}/messages",
+        json={"text": "hi"},
+        headers=owner,
+    )
+    assert stopped.status_code == 409
+    client.put("/platform/ai/agents/manager", json=off, headers=owner)
+    chief = next(a for a in client.get("/platform/ai/agents", headers=owner).json() if a["chief"])
+    assert chief["enabled"] is True
+
+
+def test_agents_without_permission_or_unknown_cannot_be_asked(
+    client: TestClient, engine: Engine, auth: AuthHeaders
+) -> None:
+    _, _, owner = staff(engine, auth, "billing.manage")
+    _, _, other = staff(engine, auth, "usage.read")
+    denied = client.post(
+        "/platform/ai/assistant/conversations", json={"role": "billing"}, headers=other
+    )
+    assert denied.status_code == 403
+    unknown = client.post(
+        "/platform/ai/assistant/conversations", json={"role": "nobody"}, headers=owner
+    )
+    assert unknown.status_code == 422
+
+
+def test_product_success_and_marketing_agents_are_ready_with_their_own_tools(
+    client: TestClient, engine: Engine, auth: AuthHeaders, use_provider
+) -> None:
+    from app.ai.console import tools_for
+
+    everything = frozenset(
+        {"inbox.manage", "businesses.read", "billing.manage", "usage.read", "businesses.act"}
+    )
+    names = {
+        role: {t.name for t in tools_for(role, everything)}
+        for role in ("product", "success", "marketing")
+    }
+    assert {"open_requests", "churn", "signup_funnel", "industry_catalog"} <= names["product"]
+    assert {"business_health", "business_detail", "churn", "open_requests"} <= names["success"]
+    assert {"price_list", "industry_catalog", "signup_funnel"} <= names["marketing"]
+    assert "price_list" not in names["product"] and "price_list" not in names["success"]
+    assert "churn" not in names["marketing"] and "open_requests" not in names["marketing"]
+
+    provider = FakeProvider([calls("price_list", {}), says("Draft: a landing page text.")])
+    use_provider(provider)
+    _, _, headers = staff(engine, auth, "inbox.manage")
+    chat = client.post(
+        "/platform/ai/assistant/conversations", json={"role": "marketing"}, headers=headers
+    )
+    assert chat.status_code == 201, chat.text
+    reply = client.post(
+        f"/platform/ai/assistant/conversations/{chat.json()['id']}/messages",
+        json={"text": "Write landing page text"},
+        headers=headers,
+    )
+    assert reply.status_code == 200, reply.text
+    assert {t["name"] for t in provider.calls[0]["tools"]} == {
+        "price_list",
+        "industry_catalog",
+        "search_library",
+    }
+    result = provider.calls[1]["messages"][-1]["content"][0]
+    assert "core_by_active_clients" in result["content"] and not result.get("is_error")
+    cards = client.get("/platform/ai/agents", headers=headers).json()
+    ready = {a["key"]: a["ready"] for a in cards}
+    assert ready["product"] and ready["marketing"]
+    _, _, readers = staff(engine, auth, "businesses.read")
+    cards = client.get("/platform/ai/agents", headers=readers).json()
+    assert next(a for a in cards if a["key"] == "success")["ready"] is True

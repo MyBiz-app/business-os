@@ -7,17 +7,18 @@ uses today and later. ([עברית](README.he.md))
 
 | What | Where | When to read it |
 |---|---|---|
-| Product spec (source of truth) | [`spec/v3/spec.en.md`](spec/v3/spec.en.md) · [עברית](spec/v3/spec.he.md) | What MyBiz is, its surfaces, roles, industries, modules, roadmap |
-| Spec as Word files | [`spec/MyBiz-Spec-en.docx`](spec/MyBiz-Spec-en.docx) · [`spec/MyBiz-Spec-he.docx`](spec/MyBiz-Spec-he.docx) | Generated from v3 with `node scripts/spec-to-docx.cjs he\|en` |
-| Detailed design chapters (v2) | [`spec/v2/`](spec/v2/README.md) | Architecture, data model, AI, pricing rules in depth |
-| The original vision (v1) | [`spec/v1/`](spec/v1/) | The owner's first spec, kept for history |
+| Product spec (source of truth) | [`spec/current/`](spec/current/README.md) | The live spec (v4): [English](spec/current/system.en.md) · [עברית](spec/current/system.he.md). Older specs v1-v3 are in [`spec/archive/`](spec/archive/) |
+| Spec as Word files | [`spec/current/MyBiz-Spec-v4-en.docx`](spec/current/MyBiz-Spec-v4-en.docx) · [`spec/current/MyBiz-Spec-v4-he.docx`](spec/current/MyBiz-Spec-v4-he.docx) | Generated from v4 with `node scripts/spec-to-docx.cjs he\|en` |
+| Detailed design chapters (v2) | [`spec/archive/v2/`](spec/archive/v2/README.md) | Architecture, data model, AI, pricing rules in depth |
+| The original vision (v1) | [`spec/archive/v1/`](spec/archive/v1/) | The owner's first spec, kept for history |
 | Decisions | [`DECISIONS.md`](DECISIONS.md) | Why something is the way it is (every decision has an id, e.g. X13) |
 | Status board | [`STATUS.md`](STATUS.md) · [עברית](STATUS.he.md) | What is done, in progress and next; what the owner needs to do |
-| Feature proposals | [`proposals/`](proposals/) | The design of a big feature before it was built (#41-#45, integrations) |
-| Reviews | [`reviews/`](reviews/) | Architecture and security reviews and their follow-ups |
-| Industries | [`verticals.md`](verticals.md) | The category catalog and how to add a category |
-| Design system | [`design-system.md`](design-system.md) | Fonts, colors, buttons, texts, prices: where to change what |
-| Outside services | [`integrations.md`](integrations.md) | How to add or switch a provider (payments, invoices, messages…) |
+| Round plans | [`plans/`](plans/README.md) | The owner-approved spec of each work round (Hebrew), October 2026 onward |
+| Feature proposals | [`proposals/`](proposals/README.md) | `done/`: designs of features that were built (#41-#45, integrations, schedule...); `open/`: not yet decided |
+| Reviews | [`reviews/`](reviews/README.md) | `current/`: the latest scorecard; `archive/`: earlier architecture, security and privacy reviews |
+| Industries | [`guides/verticals.md`](guides/verticals.md) | The category catalog and how to add a category |
+| Design system | [`guides/design-system.md`](guides/design-system.md) | Fonts, colors, buttons, texts, prices: where to change what |
+| Outside services | [`guides/integrations.md`](guides/integrations.md) | How to add or switch a provider (payments, invoices, messages…) |
 | Staging | [`deploy/staging.md`](deploy/staging.md) | Where the test site runs, its secrets and one-time setup |
 
 ## How the system is built
@@ -95,4 +96,4 @@ flowchart LR
 | App stores | Not yet | Apple App Store and Google Play builds (Expo EAS) |
 | Sign-in with Google / Apple | Built; waits for the providers to be turned on in Supabase | - |
 
-Switching any of these is a provider choice, not a rewrite: see [`integrations.md`](integrations.md).
+Switching any of these is a provider choice, not a rewrite: see [`guides/integrations.md`](guides/integrations.md).

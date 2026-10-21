@@ -52,8 +52,9 @@ with sync_playwright() as p:
     member.get_by_label("הקוד בן 6 הספרות").fill(h.otp(member_email))
     # Filling the last digit signs in on its own.
     member.wait_for_url("**/join**")
+    h.accept_legal(member)
     member.get_by_label("שם פרטי").fill("נועה")
-    member.get_by_role("button", name="הצטרפות לסלון רוני").click(); member.wait_for_url("**/home")
+    member.get_by_role("button", name="הצטרפות לסלון רוני").click(); member.get_by_role("button", name="להמשך", exact=True).click(); member.wait_for_url("**/home")
 
     # Yesterday's visit, attended (set up directly in the database).
     with psycopg.connect(h.DATABASE_URL) as conn:

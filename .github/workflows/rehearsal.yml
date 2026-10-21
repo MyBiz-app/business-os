@@ -1,0 +1,150 @@
+name: Go-live rehearsal (CI)
+
+# GL24. Runs the parts of the go-live rehearsal that need no paid service and no secret, on a
+# throwaway Postgres 17 that looks like production: migrations from empty, an encrypted dump and a
+# timed restore (the same scripts as the real backup and drill), a planned database outage with the
+# health check, and a migration step back and forward. It never touches staging or production data.
+# Results are written to the job summary; copy them into docs/reviews/current/go-live-scorecard-2026-10.md.
+# The full end-to-end, accessibility and load runs stay in e2e.yml and the CI job.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/rehearsal.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  rehearsal:
+    name: Rehearse migrate, backup, restore, outage, rollback
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: mirror.gcr.io/library/postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --name rehearsal-db
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      API_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/postgres
+      SRC_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      SCRATCH_ADMIN_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install pg_dump 17 and age
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common age
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Install Python dependencies
+        working-directory: apps/api
+        run: uv sync --locked
+
+      - name: Migrate an empty database to head (timed)
+        working-directory: apps/api
+        run: |
+          start=$(date +%s)
+          uv run alembic upgrade head
+          end=$(date +%s)
+          head="$(psql "$SRC_URL" -Atc 'select version_num from alembic_version')"
+          echo "MIGRATE_SECONDS=$((end - start))" >> "$GITHUB_ENV"
+          echo "HEAD=$head" >> "$GITHUB_ENV"
+
+      - name: One step back and forward again (rollback of the newest migration)
+        working-directory: apps/api
+        run: |
+          uv run alembic downgrade -1
+          uv run alembic upgrade head
+          now="$(psql "$SRC_URL" -Atc 'select version_num from alembic_version')"
+          [ "$now" = "$HEAD" ]
+
+      - name: Encrypted dump, then a timed restore into an empty scratch database
+        run: |
+          set -euo pipefail
+          age-keygen -o "$RUNNER_TEMP/id.txt" 2> "$RUNNER_TEMP/pub.txt"
+          recipient="$(awk '/Public key/ {print $3}' "$RUNNER_TEMP/pub.txt")"
+          dstart=$(date +%s)
+          pg_dump --format=custom --no-owner --no-privileges "$SRC_URL" | age -r "$recipient" -o "$RUNNER_TEMP/mybiz.dump.age"
+          dend=$(date +%s)
+          psql "$SCRATCH_ADMIN_URL" -c 'create database scratch'
+          LOCAL_DUMP="$RUNNER_TEMP/mybiz.dump.age" \
+          AGE_IDENTITY_FILE="$RUNNER_TEMP/id.txt" \
+          TARGET_DATABASE_URL="postgresql://postgres:postgres@localhost:5432/scratch" \
+            scripts/backup/restore-drill.sh | tee restore.txt
+          echo "DUMP_SECONDS=$((dend - dstart))" >> "$GITHUB_ENV"
+          echo "RESTORE_SECONDS=$(sed -n 's/^Restore took \([0-9]*\) seconds.*/\1/p' restore.txt)" >> "$GITHUB_ENV"
+          # Every table has the same number of rows in both databases.
+          dst="postgresql://postgres:postgres@localhost:5432/scratch"
+          q="select format('%I.%I', table_schema, table_name) from information_schema.tables where table_schema in ('public','app') and table_type='BASE TABLE' order by 1"
+          n=0; rows=0
+          for t in $(psql "$SRC_URL" -Atc "$q"); do
+            a="$(psql "$SRC_URL" -Atc "select count(*) from $t")"
+            b="$(psql "$dst" -Atc "select count(*) from $t")"
+            [ "$a" = "$b" ] || { echo "Row count differs in $t: $a vs $b"; exit 1; }
+            n=$((n + 1)); rows=$((rows + a))
+          done
+          [ "$n" -gt 100 ] || { echo "Only $n tables compared"; exit 1; }
+          echo "TABLES=$n" >> "$GITHUB_ENV"
+          echo "ROWS=$rows" >> "$GITHUB_ENV"
+          # The restored copy has the row security policies and the migration head.
+          pol_src="$(psql "$SRC_URL" -Atc 'select count(*) from pg_policies')"
+          pol_dst="$(psql "postgresql://postgres:postgres@localhost:5432/scratch" -Atc 'select count(*) from pg_policies')"
+          echo "POLICIES=$pol_dst" >> "$GITHUB_ENV"
+          [ "$pol_src" = "$pol_dst" ]
+
+      - name: Start the API
+        working-directory: apps/api
+        run: |
+          nohup uv run uvicorn app.main:app --port 8000 > ../../api.log 2>&1 &
+          ../../scripts/release/wait-healthy.sh http://localhost:8000/health/ready 90
+
+      - name: Planned outage (database stopped) and recovery
+        run: |
+          set -u
+          docker stop rehearsal-db
+          sleep 3
+          live="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 http://localhost:8000/health)"
+          ready="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 http://localhost:8000/health/ready)"
+          echo "While the database is down: /health=$live /health/ready=$ready"
+          # Liveness stays up and readiness reports the failure (503), which is what the uptime
+          # monitor alerts on. A 2xx here would mean the monitor could not see the outage.
+          [ "$live" = "200" ] && [ "$ready" = "503" ]
+          start=$(date +%s)
+          docker start rehearsal-db
+          scripts/release/wait-healthy.sh http://localhost:8000/health/ready 120
+          end=$(date +%s)
+          echo "OUTAGE_RECOVERY_SECONDS=$((end - start))" >> "$GITHUB_ENV"
+          echo "OUTAGE_READY_CODE=$ready" >> "$GITHUB_ENV"
+
+      - name: Write the results
+        if: always()
+        run: |
+          {
+            echo "### Go-live rehearsal (CI, throwaway Postgres 17)"
+            echo ""
+            echo "| Step | Result |"
+            echo "|---|---|"
+            echo "| Migrations from empty to head \`${HEAD:-?}\` | ${MIGRATE_SECONDS:-?} s |"
+            echo "| Newest migration down and up again | ${HEAD:+ok} |"
+            echo "| Encrypted dump | ${DUMP_SECONDS:-?} s |"
+            echo "| Restore (decrypt, restore, smoke checks) | ${RESTORE_SECONDS:-?} s; row counts equal in ${TABLES:-?} tables (${ROWS:-?} rows); ${POLICIES:-?} row security policies present |"
+            echo "| Database outage: /health 200, /health/ready | ${OUTAGE_READY_CODE:-?} |"
+            echo "| Recovery after the database came back | ${OUTAGE_RECOVERY_SECONDS:-?} s |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          tail -n 20 api.log || true

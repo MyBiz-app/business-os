@@ -19,9 +19,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
-from app.api.deps import ClientDep, TenantContext, require
-from app.api.schedule import JobStatus
+from app.api.deps import ClientDep, TenantContext, ensure_client_visible, require
+from app.api.schedule_models import JobStatus
 from app.core.permissions import Permission
+from app.geo.addresses import ADDRESS_KEYS, AddressFields, resolve_address
 from app.schedule.scheduling import local_to_utc
 
 router = APIRouter(tags=["jobs"])
@@ -45,12 +46,18 @@ class Address(BaseModel):
     notes: str | None = Field(description="How to get in: gate code, parking")
     active: bool
     created_at: datetime
+    city_code: int | None = Field(description="From the official city list, when chosen there")
+    street_code: int | None
+    house_number: str | None
+    address_details: str | None
+    street_unlisted: str | None
+    street_name: str | None = Field(default=None, description="The chosen street's own name")
 
 
-class AddressCreate(BaseModel):
+class AddressCreate(AddressFields):
     label: str | None = Field(default=None, max_length=40)
-    street: str = Field(min_length=1, max_length=200)
-    city: str = Field(min_length=1, max_length=80)
+    street: str | None = Field(default=None, min_length=1, max_length=200)
+    city: str | None = Field(default=None, min_length=1, max_length=80)
     details: str | None = Field(default=None, max_length=200)
     notes: str | None = Field(default=None, max_length=500)
 
@@ -60,7 +67,7 @@ class AddressCreate(BaseModel):
         return blank_to_none(value)
 
 
-class AddressUpdate(BaseModel):
+class AddressUpdate(AddressFields):
     label: str | None = Field(default=None, max_length=40)
     street: str | None = Field(default=None, min_length=1, max_length=200)
     city: str | None = Field(default=None, min_length=1, max_length=80)
@@ -97,7 +104,12 @@ class Job(BaseModel):
     client_phone: str | None
 
 
-COLUMNS = "id, client_id, label, street, city, details, notes, active, created_at"
+COLUMNS = (
+    "id, client_id, label, street, city, details, notes, active, created_at, "
+    "city_code, street_code, house_number, address_details, street_unlisted, "
+    "(SELECT st.name_he FROM app.geo_streets st WHERE st.city_code = client_addresses.city_code "
+    "AND st.code = client_addresses.street_code) AS street_name"
+)
 
 
 def _unprocessable(detail: str) -> HTTPException:
@@ -115,20 +127,37 @@ def _list(db: Session, client_id: UUID) -> list[Address]:
     return [Address.model_validate(dict(row)) for row in rows]
 
 
+def _structured(db: Session, fields: dict) -> dict:
+    """A chosen city and street (checked against the official lists) as the street and city
+    text that on-site jobs and reports copy."""
+    resolved = resolve_address(db, fields, required=True)
+    line = " ".join(p for p in (resolved.street, resolved.columns["house_number"]) if p)
+    result = {**resolved.columns, "street": line, "city": resolved.city}
+    if resolved.columns["address_details"]:  # "apartment 3, floor 2" is the job's details too
+        result["details"] = fields.get("details") or resolved.columns["address_details"]
+    return result
+
+
 def _create(db: Session, tenant_id: UUID, client_id: UUID, body: AddressCreate) -> Address:
     ensure_not_erased(db, client_id)
-    if body.street is None or body.city is None:
+    values = body.model_dump()
+    if body.address_given():
+        values |= _structured(db, values)
+    elif body.street is None or body.city is None:
         raise _unprocessable("street and city are required")
     try:
         row = (
             db.execute(
                 text(f"""
                     INSERT INTO app.client_addresses
-                        (tenant_id, client_id, label, street, city, details, notes)
-                    VALUES (:tenant_id, :client_id, :label, :street, :city, :details, :notes)
+                        (tenant_id, client_id, label, street, city, details, notes,
+                         city_code, street_code, house_number, address_details, street_unlisted)
+                    VALUES (:tenant_id, :client_id, :label, :street, :city, :details, :notes,
+                            :city_code, :street_code, :house_number, :address_details,
+                            :street_unlisted)
                     RETURNING {COLUMNS}
                 """),
-                {**body.model_dump(), "tenant_id": tenant_id, "client_id": client_id},
+                {**values, "tenant_id": tenant_id, "client_id": client_id},
             )
             .mappings()
             .one()
@@ -143,6 +172,18 @@ def _update(db: Session, address_id: UUID, body: AddressUpdate) -> Address:
     for required in ("street", "city", "active"):
         if required in changes and changes[required] is None:
             del changes[required]
+    if body.address_given():
+        current = (
+            db.execute(
+                text(f"SELECT {', '.join(ADDRESS_KEYS)} FROM app.client_addresses WHERE id = :id"),
+                {"id": address_id},
+            )
+            .mappings()
+            .first()
+        )
+        if current is None:
+            raise not_found()
+        changes |= _structured(db, {**current, **changes})
     if changes:
         row = db.execute(
             text(
@@ -188,11 +229,13 @@ JOB_SELECT = """
 
 @router.get("/clients/{client_id}/addresses")
 def client_addresses(client_id: UUID, context: ReadDep) -> list[Address]:
+    ensure_client_visible(context, client_id)
     return _list(context.session, client_id)
 
 
 @router.post("/clients/{client_id}/addresses", status_code=status.HTTP_201_CREATED)
 def add_address(client_id: UUID, body: AddressCreate, context: WriteDep) -> Address:
+    ensure_client_visible(context, client_id)
     return _create(context.session, context.tenant_id, client_id, body)
 
 

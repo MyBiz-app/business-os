@@ -3,6 +3,7 @@ import { RefreshCw, Star } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Container } from "@/components/layout/container";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
 import { ColumnChart } from "@/components/charts/column-chart";
 import { ConfirmDelete } from "@/components/form/confirm-delete";
@@ -20,6 +21,7 @@ import { Heatmap } from "./heatmap";
 import { LineChart } from "./line-chart";
 import { NetworkIcon } from "./network-icon";
 import { getStudio } from "./studio";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Kpi = components["schemas"]["Kpi"];
 
@@ -33,6 +35,7 @@ function pick<T extends string>(value: string | string[] | undefined, allowed: r
 export default async function ContentPage({ searchParams }: PageProps<"/content">) {
   const t = await getTranslations("content");
   const tDash = await getTranslations("dashboard");
+  const tc = await getTranslations("common");
   const locale = await getLocale();
   const { tenant, api, scope } = await getStudio();
   const canManage = tenant.permissions.includes("social.manage");
@@ -44,10 +47,10 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
   ]);
 
   const notice = <ConnectNotice query={query} canManage={canManage} />;
-  const header = <PageHeader eyebrow={t("subtitle")} title={t("title")} />;
+  const header = <PageHeader title={t("title")} description={t("subtitle")} />;
   if (accounts.length === 0) {
     return (
-      <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8">
+      <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
         {header}
         {notice}
         <ConnectCards networks={providers.networks} canManage={canManage} withDemo={providers.demo_available} />
@@ -128,14 +131,14 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
   const audienceGroups = (["age", "gender", "city"] as const).map((dimension) => ({ dimension, rows: audience.filter((a) => a.dimension === dimension) })).filter((g) => g.rows.length > 0);
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader
-        eyebrow={t("subtitle")}
         title={t("title")}
+        description={t("subtitle")}
         actions={
           <>
             <CsvButton label={t("export.csv")} filename={`content-${from}-${to}.csv`} rows={csv} />
-            <PrintButton label={t("export.print")} />
+            <PrintButton label={t("export.print")} logAs="report_print" />
           </>
         }
       />
@@ -230,13 +233,14 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           <h2 id="top-posts" className="text-lg font-bold">
             {t("posts.title")}
           </h2>
-          <nav aria-label={t("posts.title")} className="flex gap-2 text-sm print:hidden">
-            {(["views", "engagement"] as const).map((value) => (
-              <a key={value} href={sortHref(value)} aria-current={sort === value ? "true" : undefined} className={`rounded-full px-3 py-1 font-medium ring-1 ring-border ${sort === value ? "bg-primary text-on-primary" : "bg-surface"}`}>
-                {t(value === "views" ? "posts.sortViews" : "posts.sortEngagement")}
-              </a>
-            ))}
-          </nav>
+          <div className="print:hidden">
+            <LinkSegmented
+              label={t("posts.title")}
+              loadingLabel={tc("loading")}
+              active={sort}
+              options={(["views", "engagement"] as const).map((value) => ({ key: value, label: t(value === "views" ? "posts.sortViews" : "posts.sortEngagement"), href: sortHref(value) }))}
+            />
+          </div>
         </div>
         {posts.length === 0 ? (
           <p className="text-muted">{t("posts.empty")}</p>
@@ -362,12 +366,11 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             </li>
           ))}
         </ul>
-        <details>
-          <summary className="cursor-pointer text-sm font-semibold text-primary-ink">{t("accounts.addMore")}</summary>
-          <div className="mt-4">
+        <CollapsibleSection variant="inline" triggerClassName="font-semibold text-primary-ink" title={t("accounts.addMore")}>
+          <div>
             <ConnectCards networks={providers.networks} canManage={canManage} withDemo={false} />
           </div>
-        </details>
+        </CollapsibleSection>
       </section>
     </Container>
   );

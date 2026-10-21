@@ -34,6 +34,7 @@ with sync_playwright() as p:
 
     owner.goto(f"{h.BASE}/team")
     h.ready(owner)
+    owner.get_by_role("button", name="הזמנת עובד").click()
     owner.get_by_label("אימייל", exact=True).fill(coach_email)
     owner.get_by_label("תפקיד", exact=True).select_option("staff")
     owner.get_by_role("button", name="יצירת קישור הזמנה").click()
@@ -57,7 +58,7 @@ with sync_playwright() as p:
     expect(nav.get_by_role("link", name="הגדרות")).to_have_count(0)
     coach.goto(f"{h.BASE}/plans/new")
     h.ready(coach)
-    expect(coach).to_have_url(re.compile(r".*/plans$"))  # staff cannot edit plans
+    expect(coach).to_have_url(re.compile(r".*/catalog\?tab=plans$"))  # staff cannot edit plans
     print("coach starts as read-only staff: ok")
 
     # Create a role "מנהל תוכניות" that may edit the catalog.
@@ -79,12 +80,16 @@ with sync_playwright() as p:
     # Give it to the coach from the team page.
     owner.goto(f"{h.BASE}/team")
     h.ready(owner)
-    select = owner.get_by_label(f"תפקיד: {coach_email}")
+    def open_role_window():
+        owner.get_by_role("button", name=f"עוד פעולות עבור {coach_email}").click()
+        owner.get_by_role("menuitem", name="שינוי תפקיד").click()
+        return owner.get_by_label(f"תפקיד: {coach_email}")
+
     with owner.expect_response(lambda r: r.request.method == "POST"):
-        select.select_option(label="מנהל מסלולים")
+        open_role_window().select_option(label="מנהל מסלולים")
     owner.reload()
     h.ready(owner)
-    expect(owner.get_by_label(f"תפקיד: {coach_email}")).to_have_value(re.compile("custom:"))
+    expect(open_role_window()).to_have_value(re.compile("custom:"))
 
     coach.goto(f"{h.BASE}/plans/new")
     h.ready(coach)
@@ -92,7 +97,7 @@ with sync_playwright() as p:
     coach.goto(f"{h.BASE}/dashboard")
     h.ready(coach)
     nav = coach.get_by_role("navigation", name="ניווט ראשי")
-    expect(nav.get_by_role("link", name="מנויים וכרטיסיות")).to_be_visible()
+    expect(nav.get_by_role("link", name="קטלוג")).to_be_visible()
     expect(nav.get_by_role("link", name="לוח שיעורים")).to_have_count(0)  # only what the role gives
     coach.goto(f"{h.BASE}/schedule")  # a direct link to a page the role can't open
     coach.wait_for_url("**/dashboard")

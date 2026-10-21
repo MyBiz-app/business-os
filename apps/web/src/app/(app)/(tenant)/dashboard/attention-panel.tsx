@@ -1,5 +1,5 @@
 import type { components } from "@business-os/api-client";
-import { ArrowRight, BadgeCheck, CalendarX, FileHeart, PhoneCall, UserMinus } from "lucide-react";
+import { ArrowRight, BadgeCheck, CalendarX, FileHeart, PhoneCall, Snowflake, UserMinus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -14,14 +14,15 @@ const KINDS: Record<Kind, { Icon: typeof UserMinus; item: (id: string) => string
   inactive: { Icon: UserMinus, item: (id) => `/clients/${id}`, all: "/reports#at-risk-heading" },
   leads_due: { Icon: PhoneCall, item: (id) => `/leads/${id}`, all: "/leads" },
   health_review: { Icon: FileHeart, item: (id) => `/clients/${id}`, all: "/clients" },
-  license_expiring: { Icon: BadgeCheck, item: () => "/settings#readiness-heading", all: "/settings#readiness-heading" },
+  freeze_requests: { Icon: Snowflake, item: (id) => `/clients/${id}`, all: "/clients" },
+  license_expiring: { Icon: BadgeCheck, item: () => "/settings/business#readiness-heading", all: "/settings/business#readiness-heading" },
 };
 
 /** What needs attention today (GET /attention): only the lists this person may see and that
  * have something in them; nothing at all when everything is in order. */
-export async function AttentionPanel({ context }: { context: Pick<Awaited<ReturnType<typeof getTenant>>, "api" | "scope"> }) {
+export async function AttentionPanel({ context, only }: { context: Pick<Awaited<ReturnType<typeof getTenant>>, "api" | "scope">; only?: readonly Kind[] }) {
   const { api, scope } = context;
-  const lists = unwrap(await api.GET("/attention", { params: scope }));
+  const lists = unwrap(await api.GET("/attention", { params: scope })).filter((list) => !only || only.includes(list.kind));
   if (lists.length === 0) return null;
   const t = await getTranslations("dashboard.attention");
   const locale = await getLocale();

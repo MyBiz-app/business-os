@@ -28,9 +28,12 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}-${tenant.require_mfa_for_staff}-${tenant.resource_payment}-${tenant.booking_horizon_days}-${tenant.weekly_release_weekday}-${tenant.weekly_release_time}`} className="grid gap-4 sm:grid-cols-2">
+      <div key={`${tenant.name}-${tenant.website_url}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}-${tenant.require_mfa_for_staff}-${tenant.resource_payment}-${tenant.booking_horizon_days}-${tenant.weekly_release_weekday}-${tenant.weekly_release_time}`} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
+        </div>
+        <div className="sm:col-span-2">
+          <Field label={t("settings.website")} hint={t("settings.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="url" placeholder="www.example.com" defaultValue={tenant.website_url ?? ""} />
         </div>
         <SelectField
           label={t("onboarding.locale")}
@@ -52,6 +55,9 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
             defaultValue={tenant.time_zone}
             options={timeZones.map((value) => ({ value, label: value.replaceAll("_", " ") }))}
           />
+        </div>
+        <div className="sm:col-span-2 border-t border-border pt-5">
+          <h4 className="text-sm font-semibold">{t("settings.detailsGroups.booking")}</h4>
         </div>
         <div className="sm:col-span-2">
           <SelectField
@@ -75,8 +81,8 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
             {t("settings.cancellationWindowHint")}
           </p>
         </div>
-        <div className="sm:col-span-2">
-          <h3 className="text-sm font-semibold">{t("settings.classRelease")}</h3>
+        <div className="sm:col-span-2 border-t border-border pt-5">
+          <h4 className="text-sm font-semibold">{t("settings.classRelease")}</h4>
         </div>
         <SelectField
           label={t("settings.bookingHorizon")}
@@ -102,6 +108,9 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
           defaultValue={tenant.weekly_release_time?.slice(0, 5) ?? "20:00"}
           hint={t("settings.classReleaseHint")}
         />
+        <div className="sm:col-span-2 border-t border-border pt-5">
+          <h4 className="text-sm font-semibold">{t("settings.detailsGroups.clients")}</h4>
+        </div>
         <div className="sm:col-span-2">
           <CheckboxField
             label={t("settings.requirePlan")}
@@ -127,13 +136,12 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
           />
           <p className="mt-1.5 text-xs text-muted">{t("settings.clientIdNumberHint")}</p>
         </div>
+        <div className="sm:col-span-2 border-t border-border pt-5">
+          <h4 className="text-sm font-semibold">{t("settings.detailsGroups.sales")}</h4>
+        </div>
         <div className="sm:col-span-2">
           <CheckboxField label={t("settings.onlineSales")} name="online_sales" defaultChecked={tenant.online_sales} />
           <p className="mt-1.5 text-xs text-muted">{t("settings.onlineSalesHint")}</p>
-        </div>
-        <div className="sm:col-span-2">
-          <CheckboxField label={t("settings.requireMfaForStaff")} name="require_mfa_for_staff" defaultChecked={tenant.require_mfa_for_staff} />
-          <p className="mt-1.5 text-xs text-muted">{t("settings.requireMfaForStaffHint")}</p>
         </div>
         <div className="sm:col-span-2">
           <SelectField
@@ -143,6 +151,10 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
             options={(["app", "venue"] as const).map((value) => ({ value, label: t(`settings.resourcePayments.${value}`) }))}
           />
           <p className="mt-1.5 text-xs text-muted">{t("settings.resourcePaymentHint")}</p>
+        </div>
+        <div className="sm:col-span-2">
+          <CheckboxField label={t("settings.requireMfaForStaff")} name="require_mfa_for_staff" defaultChecked={tenant.require_mfa_for_staff} />
+          <p className="mt-1.5 text-xs text-muted">{t("settings.requireMfaForStaffHint")}</p>
         </div>
       </div>
       <div>

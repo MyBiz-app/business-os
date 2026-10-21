@@ -11,7 +11,7 @@ import { PricingCalculator } from "@/components/marketing/pricing-calculator";
 import { CtaBand, Faq, PageHero, SectionHeading } from "@/components/marketing/sections";
 import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
 import { ModuleIcon } from "@/components/modules/module-icon";
-import { loadCatalog } from "@/lib/pricing";
+import { loadCatalog, loadSitePrices } from "@/lib/pricing";
 import { formatMoney, toMajor } from "@/lib/money";
 
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
@@ -40,7 +40,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
   const query = await searchParams;
   const requested = typeof query.currency === "string" ? query.currency : "";
   const currency = (CURRENCIES as readonly string[]).includes(requested) ? requested : locale === "he" ? "ILS" : "USD";
-  const catalog = await loadCatalog(currency);
+  const [catalog, sitePrices] = await Promise.all([loadCatalog(currency), loadSitePrices(currency)]);
   const money = (amount: number) => formatMoney(amount, currency, locale);
 
   const base = catalog?.core[0]?.price ?? 0;
@@ -66,7 +66,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
         </ul>
         <nav aria-label={t("currency")} className="mt-2 flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm text-foreground shadow-sm">
           {CURRENCIES.map((code) => (
-            <Link
+            <Link scroll={false}
               key={code}
               href={`/pricing?currency=${code}`}
               aria-current={code === currency ? "page" : undefined}
@@ -217,6 +217,13 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                       ? tModules("descriptions.extra_location", { price: money(module.price) })
                       : tModules(`descriptions.${module.key}` as "descriptions.client_app")}
                   </p>
+                  {module.ai_users_included > 0 && (
+                    <p className="text-sm font-medium">
+                      {t("aiAllowance", { users: module.ai_users_included, credits: module.ai_credits_included })}
+                      <br />
+                      {t("aiExtraUser", { price: money(catalog.ai_extra_user_price) })}
+                    </p>
+                  )}
                   <p className="flex items-baseline gap-1 sm:border-t sm:border-border sm:pt-3">
                     <span className="flex items-center gap-1.5 text-lg font-extrabold sm:text-2xl">
                       +<CurrencyBadge currency={currency} />
@@ -232,6 +239,16 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
           <Container as="p" className="pb-10 text-center text-sm text-muted">{t("note")}</Container>
         </>
       )}
+      <Container className="pb-10">
+        <Link href="/websites" className="card mx-auto flex max-w-3xl flex-col gap-1 p-5 text-center transition-shadow hover:shadow-lg">
+          <span className="font-bold">{t("websiteAddon")}</span>
+          {sitePrices && (
+            <span className="text-sm text-muted">
+              <bdi>{t("websiteAddonPrice", { setup: money(sitePrices.landing_with_system.setup), monthly: money(sitePrices.landing_with_system.monthly), alone: money(sitePrices.landing_only.setup) })}</bdi>
+            </span>
+          )}
+        </Link>
+      </Container>
       <Faq />
       <CtaBand />
     </main>

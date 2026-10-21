@@ -1,7 +1,7 @@
 import type { components } from "@business-os/api-client";
-import { formatDay, todayIn } from "@business-os/i18n/dates";
-import { router } from "expo-router";
-import { useCallback, useState } from "react";
+import { addDays, formatDay, todayIn } from "@business-os/i18n/dates";
+import { router, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
@@ -13,9 +13,10 @@ import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useStaff } from "@/providers/staff-provider";
 
-type Filter = "all" | "valid" | "none" | "absent";
+type Filter = "all" | "valid" | "none" | "absent" | "new";
 const PAGE = 30;
 const ABSENT_DAYS = 14; // same window as the reports page and the dashboard
+const NEW_DAYS = 30; // "New" without a period from the Numbers screen
 
 /** The business's clients: search, quick filters, each one's plan and last visit, and adding one. */
 type ClientItem = components["schemas"]["ClientListItem"];
@@ -27,14 +28,24 @@ export default function Clients() {
   const tTerms = useTranslations("terms");
   const locale = useLocale();
   const { api, scope, tenant, palette, can } = useStaff();
+  const timeZone = tenant?.time_zone ?? "UTC";
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  // A number on the Numbers screen opens this list already narrowed (`?filter=absent`).
+  const { filter: requested, from, to } = useLocalSearchParams<{ filter?: string; from?: string; to?: string }>();
+  useEffect(() => {
+    if (requested === "all" || requested === "valid" || requested === "none" || requested === "absent" || requested === "new")
+      setFilter(requested);
+  }, [requested]);
   // Pages loaded after the first one; cleared whenever the search or filter changes.
   const [more, setMore] = useState<ClientItem[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const tenantId = tenant?.id;
 
+  // "New" is the clients who joined in the period the Numbers screen showed, else the last 30 days.
+  const joinedFrom = filter === "new" ? (from ?? addDays(todayIn(timeZone), -(NEW_DAYS - 1))) : undefined;
+  const joinedTo = filter === "new" ? (to ?? todayIn(timeZone)) : undefined;
   const fetchPage = useCallback(
     async (offset: number) =>
       unwrap(
@@ -45,13 +56,15 @@ export default function Clients() {
               search: query || undefined,
               plan: filter === "valid" || filter === "none" ? filter : undefined,
               absent_days: filter === "absent" ? ABSENT_DAYS : undefined,
+              joined_from: joinedFrom,
+              joined_to: joinedTo,
               limit: PAGE,
               offset,
             },
           },
         }),
       ),
-    [api, scope, query, filter],
+    [api, scope, query, filter, joinedFrom, joinedTo],
   );
   const load = useCallback(async () => {
     setMore([]);
@@ -123,6 +136,7 @@ export default function Clients() {
           { value: "valid", label: tClients("plans.valid") },
           { value: "none", label: tClients("plans.none") },
           { value: "absent", label: tClients("absentDays", { days: ABSENT_DAYS }) },
+          { value: "new", label: tClients("newClients") },
         ]}
       />
       {items.length === 0 ? (

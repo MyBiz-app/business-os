@@ -1,19 +1,22 @@
 import type { components } from "@business-os/api-client";
-import { ArrowRight, BookOpen, Check, CreditCard, Palette, CalendarDays, Sparkles, Tags, Users, UsersRound } from "lucide-react";
+import { ArrowRight, BookOpen, Check, CreditCard, Megaphone, Palette, CalendarDays, ShieldCheck, Sparkles, Tags, Users, UsersRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { isolate } from "@/lib/bidi";
 
 type GettingStarted = components["schemas"]["GettingStarted"];
 export type SetupStep = GettingStarted["steps"][number]["key"];
 
 export const SETUP_STEPS: Record<SetupStep, { href: string; Icon: typeof Palette }> = {
-  branding: { href: "/settings", Icon: Palette },
-  services: { href: "/services", Icon: Tags },
+  branding: { href: "/settings/branding", Icon: Palette },
+  services: { href: "/catalog?tab=services", Icon: Tags },
+  policy: { href: "/settings/bookings", Icon: ShieldCheck },
   schedule: { href: "/schedule", Icon: CalendarDays },
   team: { href: "/team", Icon: UsersRound },
   clients: { href: "/clients", Icon: Users },
   card: { href: "/settings/billing", Icon: CreditCard },
+  post: { href: "/content", Icon: Megaphone },
 };
 
 /** The first-steps checklist on the dashboard, until everything is done. Right after sign-up
@@ -23,7 +26,15 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
   const percent = Math.round((setup.done / setup.total) * 100);
 
   return (
-    <section aria-labelledby="setup-heading" className={`${welcome ? "card-accent" : "card"} flex flex-col gap-5 p-6`}>
+    <CollapsibleSection
+      id="getting-started"
+      storageKey="getting-started"
+      defaultOpen={welcome}
+      title={t("title")}
+      description={t("progress", { done: setup.done, total: setup.total })}
+      className={welcome ? "card-accent" : undefined}
+    >
+      <div className="flex flex-col gap-5">
       {welcome && (
         <div className="flex flex-col gap-2">
           <p className="flex items-center gap-2 text-sm font-semibold text-primary-ink">
@@ -34,16 +45,10 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
           <p className="text-muted">{t("welcomeText")}</p>
         </div>
       )}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="setup-heading" className={welcome ? "sr-only" : "text-lg font-semibold"}>
-          {t("title")}
-        </h2>
-        <p className="text-sm font-medium text-muted">{t("progress", { done: setup.done, total: setup.total })}</p>
-        <Link href="/getting-started" className="flex items-center gap-1.5 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
-          <BookOpen aria-hidden="true" className="size-4" />
-          {t("guide")}
-        </Link>
-      </div>
+      <Link href="/getting-started" className="flex items-center gap-1.5 self-start text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
+        <BookOpen aria-hidden="true" className="size-4" />
+        {t("guide")}
+      </Link>
       <div
         role="progressbar"
         aria-valuenow={percent}
@@ -81,6 +86,7 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
           );
         })}
       </ol>
-    </section>
+      </div>
+    </CollapsibleSection>
   );
 }

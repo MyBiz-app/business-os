@@ -1,9 +1,9 @@
 // The product's name, in one place (decision X21: "MyBiz" for now). Translations write the
 // name as "MyBiz"; withBrand swaps it for BRAND.name, so renaming the product is a change to
-// brand.json (plus the store names in each Expo app's app.json, see docs/design-system.md).
+// brand.json, then `pnpm brand:sync` for the copies the API and the Expo config need (docs/guides/brand-rename.md).
 import brand from "../brand.json";
 
-export const BRAND: { name: string; legal: typeof brand.legal } = brand;
+export const BRAND: typeof brand = brand;
 
 /** Current version of a legal document (also the date of its last change), from brand.json. */
 export function legalVersion(document: keyof typeof brand.legal.versions): string {

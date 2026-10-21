@@ -1,6 +1,6 @@
 name: Background jobs on staging
 
-# Daily system jobs (see apps/api/app/jobs.py). Scheduled runs use the default branch.
+# Daily system jobs (see apps/api/app/jobs/). Scheduled runs use the default branch.
 on:
   schedule:
     - cron: "17 2 * * *"  # 02:17 UTC, early morning in Israel
@@ -46,12 +46,26 @@ jobs:
           API_ENVIRONMENT: staging
         run: uv run python -m app.jobs remind-plans
 
+      - name: Remind owners to approve last month's payroll (1st and 5th of the month)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs remind-payroll
+
       - name: Invoice businesses for MyBiz (simulated charges)
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
           API_ENVIRONMENT: staging
         run: uv run python -m app.jobs bill-businesses
+
+      - name: Remind businesses with unpaid MyBiz invoices; read-only and suspension (simulated)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs dunning
 
       - name: Copy today's reminders to WhatsApp (simulated, messaging module)
         working-directory: apps/api

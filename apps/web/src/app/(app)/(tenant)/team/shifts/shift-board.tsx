@@ -2,12 +2,13 @@
 
 import { AlertTriangle, ArrowRightLeft, BookmarkPlus, Copy, Plane, Plus, ShieldAlert, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 
 import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { Modal } from "@/components/ui/modal";
 import { type AvailabilityWindow, outsideAvailability } from "@/lib/availability";
 import { formatDay } from "@/lib/dates";
 
@@ -162,7 +163,7 @@ export function ShiftBoard(props: {
         )}
       </div>
 
-      <div className="card overflow-x-auto p-0 max-md:hidden">
+      <div className="card relative overflow-x-auto p-0 max-md:hidden">
         <table data-plain className="w-full border-collapse text-sm" style={{ minWidth: `${13 + days.length * (compact ? 6 : 7)}rem` }}>
           <caption className="sr-only">{t("title")}</caption>
           <thead>
@@ -292,7 +293,6 @@ function AwayChip({ reason, label }: { reason: string | null; label: string }) {
 export function ShiftDialog({ editing, people, branches, templates = [], stations = [], away = {}, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; templates?: BoardTemplate[]; stations?: BoardStation[]; away?: Away; onClose: () => void }) {
   const t = useTranslations("shifts");
   const tCommon = useTranslations("common");
-  const dialog = useRef<HTMLDialogElement>(null);
   const { shift } = editing;
   const [state, action] = useActionState<ShiftState, FormData>(saveShift.bind(null, shift?.id ?? null), {});
   const [deleting, startDelete] = useTransition();
@@ -314,38 +314,19 @@ export function ShiftDialog({ editing, people, branches, templates = [], station
   };
 
   useEffect(() => {
-    dialog.current?.showModal();
-  }, []);
-  useEffect(() => {
     if (state.saved) onClose();
   }, [state.saved, onClose]);
 
   return (
-    <dialog
-      ref={dialog}
-      onClose={onClose}
-      onClick={(event) => {
-        if (event.target === dialog.current) dialog.current?.close();
-      }}
-      aria-labelledby="shift-dialog-title"
-      className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-2xl border border-border bg-surface p-0 text-foreground shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm"
-    >
+    <Modal title={shift ? t("editTitle") : t("newTitle")} size="md" onClose={onClose}>
       <form
         action={action}
         onChange={(event) => {
           const form = event.currentTarget;
           setPicked({ userId: String(new FormData(form).get("user_id")), day: String(new FormData(form).get("day")) });
         }}
-        className="flex flex-col gap-4 p-6"
+        className="flex flex-col gap-4"
       >
-        <div className="flex items-start justify-between gap-3">
-          <h2 id="shift-dialog-title" className="text-lg font-semibold">
-            {shift ? t("editTitle") : t("newTitle")}
-          </h2>
-          <button type="button" onClick={() => dialog.current?.close()} aria-label={t("close")} className="btn-ghost size-8">
-            <X aria-hidden="true" className="size-4" />
-          </button>
-        </div>
         <FormError
           message={state.error && (state.error === "shift_overlap" ? t("errors.overlap") : state.error === "invalid" ? t("errors.invalid") : tCommon("errors.generic"))}
         />
@@ -403,14 +384,14 @@ export function ShiftDialog({ editing, people, branches, templates = [], station
             <span />
           )}
           <div className="flex gap-2">
-            <button type="button" onClick={() => dialog.current?.close()} className="btn-ghost px-3 py-2 text-sm">
+            <button type="button" onClick={onClose} className="btn-ghost px-3 py-2 text-sm">
               {tCommon("cancel")}
             </button>
             <SubmitButton className="px-4 py-2 text-sm">{tCommon("save")}</SubmitButton>
           </div>
         </div>
       </form>
-    </dialog>
+    </Modal>
   );
 }
 

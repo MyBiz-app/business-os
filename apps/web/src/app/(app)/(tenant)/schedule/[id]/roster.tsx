@@ -6,9 +6,21 @@ import type { getTenant } from "@/lib/tenant";
 import { Pill, type Tone } from "@/components/pill";
 import { ToastOnChange } from "@/components/toast/toaster";
 import { unwrap } from "@/lib/api";
+import { canSell } from "@/lib/permissions";
 
 import { HEALTH_TONE } from "../../clients/[id]/health-section";
-import { bookClient, setBookingStatus } from "../actions";
+import {
+  bookClient,
+  bookClientOverCapacity,
+  bookMyself,
+  setBookingStatus,
+  waiveBooking,
+} from "../actions";
+import { OverCapacityButton } from "./over-capacity-button";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
+
+// Who may add a client to a full class (the API enforces the same list).
+const OVER_CAPACITY_ROLES = ["owner", "manager", "branch_manager"];
 
 type Booking = components["schemas"]["Booking"];
 type Session = components["schemas"]["ScheduledSession"];
@@ -23,6 +35,7 @@ const ERRORS = [
   "not_found",
   "dependent_required",
   "unknown_dependent",
+  "nothing_to_return",
 ] as const;
 type BookingErrorKey = (typeof ERRORS)[number];
 const isKnownError = (value: string | undefined): value is BookingErrorKey =>
@@ -98,6 +111,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
     })),
   );
   const full = session.booked >= session.capacity;
+  const over = Math.max(0, session.booked - session.capacity);
+  const canOverbook = full && OVER_CAPACITY_ROLES.includes(context.tenant.role);
+  const canWaive = canSell(context.tenant);
 
   const row = (booking: Booking) => (
     <li key={booking.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
@@ -118,7 +134,16 @@ export async function Roster({ session, context, manageable, search, error }: Pr
           {booking.client_name}
         </Link>
         <Pill tone={TONE[booking.status]}>{t(`statuses.${booking.status}`)}</Pill>
+        {booking.over_capacity && booking.status !== "cancelled" && (
+          <Pill tone="warning">{t("overCapacity")}</Pill>
+        )}
         {booking.late_cancel && <span className="text-xs text-danger">{t("lateCancel")}</span>}
+        {booking.waived_at ? (
+          <Pill tone="success">{t("waived")}</Pill>
+        ) : (
+          booking.credit_released &&
+          (booking.late_cancel || booking.status === "no_show") && <span className="text-xs text-muted">{t("notCounted")}</span>
+        )}
         {booking.status !== "cancelled" && showHealth(booking.health_state) && (
           <Pill tone={HEALTH_TONE[booking.health_state]}>{tHealth(`states.${booking.health_state}`)}</Pill>
         )}
@@ -130,7 +155,25 @@ export async function Roster({ session, context, manageable, search, error }: Pr
           ))}
       </div>
       {manageable && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-start gap-2">
+          {canWaive && !booking.credit_released && ((booking.status === "cancelled" && booking.late_cancel) || booking.status === "no_show") && (
+            <details className="group relative">
+              <summary className="btn-secondary cursor-pointer px-2.5 py-1 text-xs font-medium">{t("waive.button")}</summary>
+              <form
+                action={waiveBooking.bind(null, session.id, booking.id)}
+                className="absolute end-0 z-10 mt-1 flex w-72 flex-col gap-2 rounded-xl border border-border bg-surface p-3 shadow-lg"
+              >
+                <label className="flex flex-col gap-1 text-xs font-medium">
+                  {t("waive.reason")}
+                  <input name="reason" required minLength={3} maxLength={300} className="control w-full px-3 py-2" placeholder={t("waive.placeholder")} />
+                </label>
+                <p className="text-xs text-muted">{t("waive.note")}</p>
+                <button type="submit" className="btn-primary px-3 py-1.5 text-xs font-medium">
+                  {t("waive.confirm")}
+                </button>
+              </form>
+            </details>
+          )}
           {NEXT_ACTIONS[booking.status].map((next) => (
             <form key={next} action={setBookingStatus.bind(null, session.id, booking.id, next)}>
               <button
@@ -153,8 +196,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
         <h2 id="roster-heading" className="text-lg font-semibold">
           {t("roster")}
         </h2>
-        <p className="text-sm text-muted">
-          {t("summary", { booked: session.booked, capacity: session.capacity, waitlisted: session.waitlisted })}
+        <p className={`text-sm ${over > 0 ? "font-medium text-warning" : "text-muted"}`}>
+          {t("summary", { booked: session.booked, capacity: session.capacity, waitlisted: session.waitlisted + session.waiting_requests })}
+          {over > 0 && ` · ${t("overCapacityNote", { count: over })}`}
         </p>
       </div>
 
@@ -183,6 +227,13 @@ export async function Roster({ session, context, manageable, search, error }: Pr
               {t("search")}
             </button>
           </form>
+          {!perDependent && (
+            <form action={bookMyself.bind(null, session.id)}>
+              <button type="submit" className="btn-secondary px-3 py-1.5 text-sm">
+                {full ? t("addMeToWaitlist") : t("addMe")}
+              </button>
+            </form>
+          )}
           {search && (
             <ul aria-label={t("results")} className="flex flex-col divide-y divide-border rounded-lg border border-border bg-background">
               {matches.length === 0 && <li className="px-3 py-2 text-sm text-muted">{t("noMatches")}</li>}
@@ -214,15 +265,26 @@ export async function Roster({ session, context, manageable, search, error }: Pr
                         ))}
                       </div>
                     ) : (
-                      <form action={bookClient.bind(null, session.id, client.id, undefined)}>
-                        <button
-                          type="submit"
-                          aria-label={`${label} - ${name}`}
-                          className="btn-primary px-3 py-1 text-xs"
-                        >
-                          {label}
-                        </button>
-                      </form>
+                      <div className="flex flex-wrap gap-2">
+                        {canOverbook && (
+                          <OverCapacityButton
+                            name={name}
+                            booked={session.booked}
+                            capacity={session.capacity}
+                            overAction={bookClientOverCapacity.bind(null, session.id, client.id)}
+                            waitlistAction={bookClient.bind(null, session.id, client.id, undefined)}
+                          />
+                        )}
+                        <form action={bookClient.bind(null, session.id, client.id, undefined)}>
+                          <button
+                            type="submit"
+                            aria-label={`${label} - ${name}`}
+                            className="btn-primary px-3 py-1 text-xs"
+                          >
+                            {label}
+                          </button>
+                        </form>
+                      </div>
                     )}
                   </li>
                 );
@@ -246,10 +308,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
       )}
 
       {cancelled.length > 0 && (
-        <details className="border-t border-border pt-4">
-          <summary className="cursor-pointer text-sm text-muted">{t("cancelledCount", { count: cancelled.length })}</summary>
+        <CollapsibleSection variant="inline" className="border-t border-border pt-4" triggerClassName="text-muted" title={t("cancelledCount", { count: cancelled.length })}>
           <ul className="flex flex-col divide-y divide-border">{cancelled.map(row)}</ul>
-        </details>
+        </CollapsibleSection>
       )}
     </section>
   );

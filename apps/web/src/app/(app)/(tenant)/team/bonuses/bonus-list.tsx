@@ -43,11 +43,11 @@ export function BonusList({
           {t("listTitle")}
         </h2>
         <nav aria-label={t("month")} className="flex gap-3 text-sm">
-          <Link className="text-primary-ink underline-offset-4 hover:underline" href={`/team/bonuses?month=${shift(month, -1)}`}>
+          <Link scroll={false} className="text-primary-ink underline-offset-4 hover:underline" href={`/team/bonuses?month=${shift(month, -1)}`}>
             {shift(month, -1)}
           </Link>
           <bdi>{month}</bdi>
-          <Link className="text-primary-ink underline-offset-4 hover:underline" href={`/team/bonuses?month=${shift(month, 1)}`}>
+          <Link scroll={false} className="text-primary-ink underline-offset-4 hover:underline" href={`/team/bonuses?month=${shift(month, 1)}`}>
             {shift(month, 1)}
           </Link>
         </nav>

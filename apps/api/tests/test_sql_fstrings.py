@@ -32,18 +32,18 @@ ALLOWED = {
     "api/files.py": 5,
     "api/health.py": 4,
     "api/leads.py": 4,
-    "api/locations.py": 4,
+    "api/locations.py": 5,  # the branch INSERT lists keys the code built (R34)
     "api/messaging.py": 2,
-    "api/onsite_jobs.py": 6,
+    "api/onsite_jobs.py": 7,  # the address keys, a constant (R34)
     "api/people.py": 1,
     "api/plans.py": 7,
     "api/privacy.py": 1,
     "api/promo_codes.py": 2,
-    "api/quotes.py": 4,
+    "api/quotes.py": 5,
     "api/receipts.py": 5,
     "api/resources.py": 1,
     "api/reviews.py": 3,
-    "api/routes.py": 1,
+    "api/routes.py": 2,  # the address keys, a constant (R34)
     "api/schedule.py": 3,
     "api/services.py": 4,
     "api/settings.py": 1,
@@ -56,7 +56,7 @@ ALLOWED = {
     "api/time_off_requests.py": 2,
     "core/business_export.py": 1,  # table and column names read from the database catalog
     "files/__init__.py": 1,
-    "reports/metrics.py": 1,
+    "reports/metrics.py": 2,  # the staff filter, a constant fragment (R36)
     "secrets_rotation.py": 2,  # table and column names from the COLUMNS constant
 }
 

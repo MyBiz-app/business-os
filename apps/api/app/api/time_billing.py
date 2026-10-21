@@ -20,7 +20,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
 from app.api.common import ensure_not_erased, not_found, set_clause
-from app.api.deps import TenantContext, require
+from app.api.deps import TenantContext, ensure_client_visible, require
 from app.api.pagination import FullPageDep
 from app.api.quotes import Quote, _load
 from app.core.permissions import Permission
@@ -203,6 +203,7 @@ def delete_time(entry_id: UUID, context: ReadDep) -> None:
 
 @router.get("/clients/{client_id}/retainer")
 def get_retainer(client_id: UUID, context: ReadDep) -> Retainer | None:
+    ensure_client_visible(context, client_id)
     row = (
         context.session.execute(
             text("SELECT * FROM app.retainers WHERE client_id = :id"), {"id": client_id}
@@ -216,6 +217,7 @@ def get_retainer(client_id: UUID, context: ReadDep) -> Retainer | None:
 @router.put("/clients/{client_id}/retainer")
 def set_retainer(client_id: UUID, body: RetainerUpdate, context: SalesDep) -> Retainer:
     db = context.session
+    ensure_client_visible(context, client_id)
     ensure_not_erased(db, client_id)
     try:
         row = (
@@ -370,6 +372,7 @@ def bill_month(client_id: UUID, body: BillRequest, context: SalesDep) -> Quote:
     """Bills a client's month: the retainer fee, and the unbilled billable time of the month
     beyond the minutes it includes at its hourly rate (all of it when there is no fee)."""
     db = context.session
+    ensure_client_visible(context, client_id)
     ensure_not_erased(db, client_id)
     first, last = _month(body.month)
     words = _words(db, context.tenant_id)

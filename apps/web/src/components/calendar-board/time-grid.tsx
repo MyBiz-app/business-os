@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/avatar";
+import { CardTransition } from "@/components/ui/page-transition";
 import { capLanes, coverage, layOut, minutesIn, visibleHours } from "@/lib/calendar";
 import { formatDay, todayIn } from "@/lib/dates";
 
@@ -171,13 +172,18 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
       timeZone: "UTC",
     }).format(new Date(Date.UTC(2000, 0, 1, hour)));
   const minWidth = laned ? (days.length > 1 ? "9rem" : "10rem") : days.length > 1 ? "8.5rem" : "0";
+  // On a phone a laned column (several sessions at the same time) gets more room, so a card keeps its name.
+  const phoneMin = laned ? "14rem" : minWidth;
   const dayHeader = "h-11";
   const nowVisible = (day: string) => now?.day === day && now.minutes >= range.from && now.minutes <= range.to;
 
   return (
     <div className="card overflow-hidden p-0">
       <div ref={scroller} tabIndex={0} role="region" aria-label={labels.grid} className="max-h-[72dvh] overflow-auto overscroll-contain">
-        <div className="grid" style={{ gridTemplateColumns: `3.5rem repeat(${days.length * columns.length}, minmax(${minWidth}, 1fr))` }}>
+        <div
+          className="grid [--col-min:var(--col-min-wide)] max-md:[--col-min:var(--col-min-phone)]"
+          style={{ "--col-min-wide": minWidth, "--col-min-phone": phoneMin, gridTemplateColumns: `3.5rem repeat(${days.length * columns.length}, minmax(var(--col-min), 1fr))` } as React.CSSProperties}
+        >
           {/* Headers stay at the top while the hours scroll: the day, and under it the branch. */}
           <div className="sticky start-0 top-0 z-30 border-b border-border bg-surface" style={{ gridRow: laned ? "span 2" : undefined }} />
           {days.map((day) => {
@@ -281,8 +287,8 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                       const top = y(event.start);
                       const tall = y(event.end) - top;
                       return (
+                        <CardTransition key={event.id} name={`session-${event.id}`}>
                         <Link
-                          key={event.id}
                           href={event.href}
                           className={`group absolute z-[1] flex flex-col overflow-hidden rounded-lg border-s-[3px] px-1.5 py-1 text-xs leading-tight shadow-sm outline-offset-1 transition-[box-shadow,transform] duration-150 hover:z-[5] hover:shadow-md focus-visible:z-[5] ${event.cancelled ? "opacity-55" : ""}`}
                           style={{
@@ -312,6 +318,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                             </span>
                           )}
                         </Link>
+                        </CardTransition>
                       );
                     })}
                     {more.map((block) => {
@@ -324,7 +331,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                       const className = "absolute z-[1] flex items-start justify-center rounded-lg border border-dashed border-border bg-surface pt-1 text-xs font-semibold text-muted";
                       const text = labels.more.replace("{count}", String(block.count));
                       return dayHref ? (
-                        <Link key={block.id} href={dayHref.replace("__day__", day)} className={`${className} hover:border-primary hover:text-primary-ink`} style={style}>
+                        <Link key={block.id} scroll={false} href={dayHref.replace("__day__", day)} className={`${className} hover:border-primary hover:text-primary-ink`} style={style}>
                           {text}
                         </Link>
                       ) : (

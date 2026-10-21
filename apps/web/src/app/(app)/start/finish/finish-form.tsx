@@ -1,10 +1,11 @@
 "use client";
 
 import { CreditCard } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useSyncExternalStore } from "react";
 
-import { Field } from "@/components/form/field";
+import { AddressPicker } from "@/components/address-picker";
+import { CheckboxField, Field } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
@@ -16,8 +17,10 @@ const serverZone = () => "";
 
 /** The card for after the trial. Payments are simulated until a provider is connected, so the
  * test card is filled in and nothing is charged. */
-export function FinishForm({ plan }: { plan: string }) {
+export function FinishForm({ plan, offerSample = false }: { plan: string; offerSample?: boolean }) {
   const t = useTranslations("start.finish");
+  // The official city and street lists are Israel's; elsewhere the address is added in the branch settings.
+  const official = useLocale() === "he";
   const [state, action] = useActionState<FinishState, FormData>(startTrial, {});
   const timeZone = useSyncExternalStore(noSubscribe, browserZone, serverZone);
 
@@ -31,6 +34,18 @@ export function FinishForm({ plan }: { plan: string }) {
         <CreditCard aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
         {t("simulated")}
       </p>
+      {official && (
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-1 text-sm font-medium">{t("branchAddress")}</legend>
+          <AddressPicker required />
+        </fieldset>
+      )}
+      {offerSample && (
+        <div className="flex flex-col gap-1">
+          <CheckboxField label={t("sampleData")} name="sample_data" />
+          <p className="ps-6 text-xs text-muted">{t("sampleDataHint")}</p>
+        </div>
+      )}
       <Field label={t("card")} name="card" defaultValue="4242 4242 4242 4242" dir="ltr" inputMode="numeric" autoComplete="cc-number" readOnly />
       <div className="grid grid-cols-2 gap-4">
         <Field label={t("expiry")} name="expiry" defaultValue="12/30" dir="ltr" autoComplete="cc-exp" readOnly />

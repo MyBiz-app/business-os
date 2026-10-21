@@ -108,6 +108,7 @@ PUBLIC_ROUTES = {
     ("GET", "/health/ready"),
     ("POST", "/webhooks/payments/{provider}/{tenant_id}"),
     ("POST", "/webhooks/whatsapp/{provider}/{tenant_id}"),
+    ("POST", "/webhooks/email/resend"),
     ("GET", "/public/quotes/{token}"),
     ("POST", "/public/quotes/{token}/answer"),
     ("POST", "/public/quotes/{token}/deposit"),
@@ -116,6 +117,10 @@ PUBLIC_ROUTES = {
     ("GET", "/public/files/{token}"),
     ("POST", "/public/businesses/{code}/inquiries"),
     ("GET", "/public/pricing"),
+    ("POST", "/public/accounts/exists"),
+    ("GET", "/public/website-prices"),
+    ("POST", "/public/events"),
+    ("GET", "/public/incidents"),
     ("POST", "/public/contact"),
     ("GET", "/public/announcements/unsubscribe"),
     ("POST", "/public/announcements/unsubscribe"),
@@ -124,6 +129,7 @@ PUBLIC_ROUTES = {
     ("GET", "/public/businesses/{code}"),
     ("GET", "/public/tenants/{tenant_id}/logo"),
     ("GET", "/public/locations/{location_id}/logo"),
+    ("POST", "/public/website-visits"),
 }
 
 

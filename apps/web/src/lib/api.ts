@@ -92,14 +92,16 @@ export async function getApi(): Promise<ApiClient> {
   });
 }
 
-/** The API wants a code this session doesn't have (the MyBiz team, a business that requires it,
- * a sensitive action): off to the account page to turn two-step sign-in on. The account page
+/** The API wants a code this session doesn't have (the MyBiz team, a business that requires it),
+ * or an owner or manager without a code has not yet confirmed the warning before a sensitive
+ * action: off to the account page to turn two-step sign-in on or read the warning. The account page
  * itself is left alone so it can't loop. */
 async function sendToTwoStepSetup(response: Response): Promise<void> {
   const body = (await response.clone().json().catch(() => null)) as { detail?: unknown } | null;
-  if (body?.detail !== "mfa_required") return;
+  const detail = body?.detail;
+  if (detail !== "mfa_required" && detail !== "mfa_risk_ack_required") return;
   if ((await headers()).get("x-pathname")?.startsWith("/account")) return;
-  redirect("/account?mfa=required#security");
+  redirect(detail === "mfa_required" ? "/account?mfa=required#security" : "/account?mfa=ack#security");
 }
 
 /** Returns the response data, or throws ApiError for any non-2xx response. */

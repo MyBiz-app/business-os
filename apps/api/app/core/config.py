@@ -5,6 +5,9 @@ from urllib.parse import urlparse
 from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.core.brand import EMAILS as BRAND_EMAILS
+from app.core.brand import NAME as BRAND_NAME
+
 ENVIRONMENTS = ("local", "test", "staging", "production")
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "host.docker.internal", None}
 
@@ -24,6 +27,8 @@ class Settings(BaseSettings):
 
     # Local defaults match `supabase start`. Other environments set these explicitly.
     database_url: str = "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
+    # Background jobs switch to this role after connecting; empty runs them as the login itself.
+    jobs_db_role: str = "app_jobs"
     jwks_url: str = "http://127.0.0.1:54321/auth/v1/.well-known/jwks.json"
     jwt_audience: str = "authenticated"
 
@@ -32,6 +37,23 @@ class Settings(BaseSettings):
     ai_demo: bool = True
     anthropic_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("API_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY")
+    )
+    # Other vendors (OpenAI, Gemini) are built but off. Switching one on takes all three: the
+    # vendor in API_AI_ENABLED_VENDORS, its key, and API_AI_PROVIDER naming it
+    # (docs/deploy/go-live-checklist.md).
+    ai_provider: str = "anthropic"  # anthropic | openai | gemini
+    ai_enabled_vendors: str = ""  # comma separated extras, e.g. "openai,gemini"
+    openai_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("API_OPENAI_API_KEY", "OPENAI_API_KEY")
+    )
+    gemini_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("API_GEMINI_API_KEY", "GEMINI_API_KEY")
+    )
+    # Search by meaning for the console agents' libraries (slice C3a). Built but off: "voyage" with
+    # a key switches it on. It costs money, so it waits for go-live (go-live-checklist.md).
+    kb_embeddings_provider: str = "off"  # off | voyage
+    voyage_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("API_VOYAGE_API_KEY", "VOYAGE_API_KEY")
     )
     # Everyday questions run on the cheap model; a turn that needs many tool calls escalates to
     # the stronger one (P0-6). Prices live in app/ai/gateway.py.
@@ -61,16 +83,23 @@ class Settings(BaseSettings):
     sentry_traces_sample_rate: float = Field(default=0.0, ge=0.0, le=1.0)
     sentry_release: str | None = None  # defaults to the commit Render deployed (RENDER_GIT_COMMIT)
 
+    # Turning a branch's address into a point on the map (R34): "nominatim" (OpenStreetMap, free,
+    # one request per saved address) or "none". Tests and local work run with "none".
+    geocoder: str = "nominatim"
+    geocoder_user_agent: str = f"{BRAND_NAME} business-os geocoder"
+
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
     email_provider: str = "none"  # none | log | resend | gmail | smtp
     push_provider: str = "expo"  # expo | log | off: push notifications to staff phones
     expo_access_token: SecretStr | None = None  # optional; only if Expo enhanced security is on
     email_api_key: SecretStr | None = None  # Resend API key, or the SMTP (Gmail app) password
-    email_from: str = "MyBiz <no-reply@example.com>"
+    email_from: str = f"{BRAND_NAME} <{BRAND_EMAILS['sender']}>"
+    # Resend's signing secret ("whsec_...") for /webhooks/email/resend (bounces, complaints).
+    email_webhook_secret: SecretStr | None = None
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
     email_smtp_port: int = 465
     email_smtp_user: str | None = None  # defaults to the address in email_from
-    # Outside services (decision X13, docs/integrations.md): the platform's default provider
+    # Outside services (decision X13, docs/guides/integrations.md): the platform's default provider
     # per capability and its settings as a JSON object; a business can connect its own
     # (settings → Integrations) for payments, invoicing and messaging.
     payments_provider: str = "simulated"
@@ -140,6 +169,12 @@ class Settings(BaseSettings):
     # the business ceiling off. Counted in the same store as the address limits.
     tenant_rate_limit_per_minute: int = 600
 
+    # AI connectors (MCP): calls per business in a rolling 24 hours, over every connection (R37a);
+    # 0 turns the ceiling off. How long a token lives.
+    mcp_daily_calls_per_business: int = 600
+    mcp_access_token_minutes: int = 60
+    mcp_refresh_token_days: int = 90
+
     @property
     def rate_limits_on(self) -> bool:
         if self.rate_limits is not None:
@@ -147,9 +182,10 @@ class Settings(BaseSettings):
         return self.environment not in ("local", "test")
 
     # Two-step sign-in (app/core/mfa.py). Off in local development and tests like the rate
-    # limits; on everywhere else unless set. Owners' and managers' sensitive actions need a code
-    # from `mfa_required_from` on (none: from the start), the MyBiz team and businesses that
-    # require it of their team always do.
+    # limits; on everywhere else unless set. The MyBiz team and businesses that require it of
+    # their team always need a code. For owners and managers it is optional: without a code they
+    # confirm a warning first. `mfa_required_from` is no longer read (kept so a deployed
+    # environment that still sets it keeps starting; remove it one release later).
     mfa_enforced: bool | None = None
     mfa_required_from: dt.date | None = None
     # Comma-separated emails of demo owners who may browse staging without a code. Only read on

@@ -24,10 +24,12 @@ from app.api.common import not_found
 from app.api.deps import TenantContext, require
 from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, encode_cursor
 from app.api.pdf import PDF_RESPONSES, _pdf, _watermark
+from app.core.audit import record
 from app.core.legal_readiness import evaluate
 from app.core.permissions import Permission
 from app.documents import issuing, render
 from app.documents.issuing import FIRST_NUMBER, Kind
+from app.files import keep_copy
 
 router = APIRouter(prefix="/issued-documents", tags=["documents"])
 
@@ -139,7 +141,7 @@ def _tenant(db: Session) -> dict[str, Any]:
             text("""
                 SELECT name, locale, time_zone, primary_color, logo, logo_content_type, currency,
                        legal_entity_type, business_number, address_line, address_city,
-                       employer_file_number, business_license_number,
+                       website_url, employer_file_number, business_license_number,
                        business_license_expires_on,
                        (now() AT TIME ZONE time_zone)::date AS today
                 FROM app.tenants WHERE id = app.current_tenant_id()
@@ -222,6 +224,11 @@ def _logo(tenant: dict[str, Any]) -> str | None:
     return None
 
 
+def _site(url: str | None) -> str:
+    """A website for the issuer block of a PDF: without the scheme, as people say it."""
+    return (url or "").removeprefix("https://").removeprefix("http://").rstrip("/")
+
+
 def document_pdf(
     tenant: dict[str, Any], doc: dict[str, Any], *, copy: bool, reference_number: int | None
 ) -> bytes:
@@ -238,6 +245,7 @@ def document_pdf(
     issuer_lines = [
         ", ".join(p for p in (tenant["address_line"], tenant["address_city"]) if p),
         f"{t['businessNumber']} {tenant['business_number']}" if tenant["business_number"] else "",
+        _site(tenant.get("website_url")),
     ]
     show_vat = kind in issuing.VAT_KINDS
     rate = doc["vat_rate_bp"] / 100
@@ -408,6 +416,13 @@ def issue(body: IssueRequest, context: SalesDep) -> IssuedDocument:
             "content_hash": hashlib.sha256(content).hexdigest(),
         },
     )
+    keep_copy(
+        db,
+        context.tenant_id,
+        "business_docs",
+        name=f"{body.kind}-{number}.pdf",
+        content=content,
+    )
     return IssuedDocument.model_validate(_row(db, document_id))
 
 
@@ -474,6 +489,13 @@ def issued_file(
     db = context.session
     doc = _row(db, document_id)
     name = f"{doc['kind'].replace('_', '-')}-{doc['number']}"
+    record(
+        db,
+        "export.issued_document",
+        entity_type="issued_document",
+        entity_id=document_id,
+        copy=copy,
+    )
     if not copy:
         content = db.execute(
             text("SELECT content FROM app.issued_documents WHERE id = :id"), {"id": document_id}

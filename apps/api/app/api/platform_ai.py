@@ -11,9 +11,10 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
-from app.ai import console
+from app.ai import console, console_agents, web_search
 from app.ai import models as ai_models
 from app.ai.gateway import LLMProvider, ProviderBusy, ProviderUnavailable
 from app.api.assistant import ProviderDep, _check_user_rate, _model_calls
@@ -21,6 +22,7 @@ from app.api.common import not_found
 from app.api.deps import UserDep
 from app.api.platform import BillingDep, StaffDep, UsageDep, run_rule
 from app.commerce.modules import MODULES
+from app.core.config import get_settings
 
 router = APIRouter(prefix="/platform/ai", tags=["platform"])
 
@@ -96,6 +98,37 @@ def ai_costs(db: UsageDep, days: Annotated[int, Query(ge=1, le=90)] = 30) -> AIC
     )
 
 
+class ConnectorUse(BaseModel):
+    tenant_id: UUID
+    name: str
+    connections: int = Field(description="AI apps connected now")
+    apps: list[str]
+    calls: int = Field(description="Calls in the window")
+    last_call: dt.datetime | None
+    proposed: int = Field(description="Changes the apps proposed in the window")
+    executed: int
+    rejected: int
+    waiting: int = Field(description="Proposals waiting for approval now")
+
+
+class ConnectorBoard(BaseModel):
+    days: int
+    daily_limit: int = Field(description="Calls per business per rolling 24 hours")
+    businesses: list[ConnectorUse]
+
+
+@router.get("/connectors")
+def ai_connectors(db: UsageDep, days: Annotated[int, Query(ge=1, le=90)] = 30) -> ConnectorBoard:
+    """Who uses the AI connectors (Claude, ChatGPT): per business, the apps, the calls and what
+    became of the changes they proposed."""
+    rows = db.execute(text("SELECT * FROM app.platform_mcp_usage(:d)"), {"d": days}).mappings()
+    return ConnectorBoard(
+        days=days,
+        daily_limit=get_settings().mcp_daily_calls_per_business,
+        businesses=[ConnectorUse.model_validate(dict(r)) for r in rows],
+    )
+
+
 class ModelChoice(BaseModel):
     id: str
     tier: ai_models.Tier
@@ -146,7 +179,10 @@ def _settings(db: Session) -> AISettings:
         defaults=defaults,
         choices=[
             ModelChoice(
-                id=m.id, tier=m.tier, vendor=m.vendor, enabled=m.vendor in ai_models.ENABLED_VENDORS
+                id=m.id,
+                tier=m.tier,
+                vendor=m.vendor,
+                enabled=m.vendor in ai_models.enabled_vendors(),
             )
             for m in ai_models.MODELS.values()
             if m.vendor != "demo"
@@ -174,7 +210,7 @@ def change_ai_settings(body: AISettingsChange, db: BillingDep) -> AISettings:
         if model is None:
             continue
         info = ai_models.MODELS.get(model)
-        if info is None or info.vendor not in ai_models.ENABLED_VENDORS or info.vendor == "demo":
+        if info is None or info.vendor not in ai_models.enabled_vendors() or info.vendor == "demo":
             raise HTTPException(status_code=422, detail="model_not_available")
         if info.tier != tier:
             raise HTTPException(status_code=422, detail="model_wrong_tier")
@@ -207,6 +243,184 @@ def pause_business_ai(tenant_id: UUID, body: PauseChange, db: BillingDep) -> AIS
     return _settings(db)
 
 
+# --- Web search and saved reports -----------------------------------------------------------
+
+
+class WebSearchSettings(BaseModel):
+    enabled: bool
+    monthly_limit: int = Field(description="Searches allowed per calendar month")
+    used_this_month: int
+    cost_per_1000_usd: int = Field(description="Anthropic's price at the last check; verify")
+
+
+class WebSearchChange(BaseModel):
+    enabled: bool
+    monthly_limit: int = Field(ge=0, le=web_search.MAX_MONTHLY_LIMIT)
+
+
+def _web_search(db: Session) -> WebSearchSettings:
+    state = web_search.state(db)
+    return WebSearchSettings(
+        enabled=state.enabled,
+        monthly_limit=state.monthly_limit,
+        used_this_month=state.used_this_month,
+        cost_per_1000_usd=10,
+    )
+
+
+@router.get("/web-search")
+def web_search_settings(db: UsageDep) -> WebSearchSettings:
+    """Web search for console agents: off by default, with a monthly limit on searches."""
+    return _web_search(db)
+
+
+@router.put("/web-search")
+def change_web_search(body: WebSearchChange, db: BillingDep) -> WebSearchSettings:
+    """Switches web search on or off and sets the searches allowed per month. Written to the
+    console audit log. Searches cost money: nothing is searched unless this is on."""
+    run_rule(
+        db,
+        "SELECT app.platform_ai_web_search_set(:enabled, :limit)",
+        {"enabled": body.enabled, "limit": body.monthly_limit},
+    )
+    return _web_search(db)
+
+
+def _read_rows(db: Session, sql: str, params: dict) -> list[dict]:
+    """Rows of a console function, a refused permission as 403."""
+    try:
+        with db.begin_nested():
+            return [dict(r) for r in db.execute(text(sql), params).mappings()]
+    except DBAPIError as error:
+        if getattr(error.orig, "sqlstate", None) == "42501":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="forbidden"
+            ) from error
+        raise
+
+
+class ReportSummary(BaseModel):
+    id: UUID
+    kind: Literal["market", "security"]
+    title: str
+    summary: str
+    created_by: str
+    created_at: dt.datetime
+
+
+class Report(ReportSummary):
+    body: dict = Field(
+        description="The full report: for a market report, the prices with their "
+        "sources and our price against the cheapest competitor"
+    )
+
+
+@router.get("/reports")
+def list_reports(
+    db: StaffDep,
+    kind: Literal["market", "security"] = "market",
+    limit: Annotated[int, Query(ge=1, le=100)] = 30,
+) -> list[ReportSummary]:
+    """Saved reports of one kind, newest first. Needs the console permission of the kind."""
+    rows = _read_rows(db, "SELECT * FROM app.platform_ai_reports(:k, :n)", {"k": kind, "n": limit})
+    return [ReportSummary.model_validate(r) for r in rows]
+
+
+@router.get("/reports/{report_id}")
+def get_report(report_id: UUID, db: StaffDep) -> Report:
+    rows = _read_rows(db, "SELECT * FROM app.platform_ai_report_get(:id)", {"id": report_id})
+    if not rows:
+        raise not_found()
+    return Report.model_validate(rows[0])
+
+
+# --- The agents map -------------------------------------------------------------------------
+
+
+class ConsoleAgentCard(BaseModel):
+    key: console_agents.AgentKey
+    color: str
+    chief: bool
+    ready: bool = Field(description="False until a later slice gives the agent its tools")
+    enabled: bool
+    name_he: str | None = Field(description="The team's own name for the agent, if set")
+    name_en: str | None
+    portrait_url: str | None
+    x: float | None = Field(description="Place on the map in percent, null: automatic")
+    y: float | None
+    instructions: str | None = Field(
+        description="Extra instructions; only shown to a member who can change them"
+    )
+
+
+class ConsoleAgentChange(BaseModel):
+    enabled: bool
+    name_he: str | None = Field(default=None, max_length=60)
+    name_en: str | None = Field(default=None, max_length=60)
+    instructions: str | None = Field(default=None, max_length=console_agents.MAX_INSTRUCTIONS)
+    x: float | None = Field(default=None, ge=0, le=100)
+    y: float | None = Field(default=None, ge=0, le=100)
+    portrait_url: str | None = Field(default=None, max_length=500, pattern=r"^https://\S+$")
+
+
+def _agent_cards(db: Session) -> list[ConsoleAgentCard]:
+    permissions = console.permissions_of(db)
+    changes = console_agents.overrides(db)
+    editor = "billing.manage" in permissions
+    cards = []
+    for agent in console_agents.CATALOG.values():
+        if not console_agents.can_use(agent, permissions):
+            continue
+        change = changes.get(agent.key, console_agents.Override())
+        cards.append(
+            ConsoleAgentCard(
+                key=agent.key,  # type: ignore[arg-type]
+                color=agent.color,
+                chief=agent.key == console_agents.CHIEF,
+                ready=agent.ready,
+                enabled=change.enabled,
+                name_he=change.name_he,
+                name_en=change.name_en,
+                portrait_url=change.portrait_url,
+                x=change.x,
+                y=change.y,
+                instructions=change.instructions if editor else None,
+            )
+        )
+    return cards
+
+
+@router.get("/agents")
+def console_agents_map(db: StaffDep) -> list[ConsoleAgentCard]:
+    """The console's AI agents this team member may ask, for the map: the chief and the
+    specialists, each with the team's changes (name, portrait, place, switched off)."""
+    return _agent_cards(db)
+
+
+@router.put("/agents/{key}")
+def change_console_agent(
+    key: console_agents.AgentKey, body: ConsoleAgentChange, db: BillingDep
+) -> list[ConsoleAgentCard]:
+    """Switches an agent on or off, renames it, sets its portrait and place, and writes the extra
+    instructions it always gets. Written to the console audit log."""
+    run_rule(
+        db,
+        "SELECT app.platform_ai_agent_set(:key, :enabled, :name_he, :name_en, :instructions,"
+        " CAST(:x AS numeric), CAST(:y AS numeric), :portrait)",
+        {
+            "key": key,
+            "enabled": body.enabled if key != console_agents.CHIEF else True,
+            "name_he": body.name_he,
+            "name_en": body.name_en,
+            "instructions": body.instructions,
+            "x": body.x,
+            "y": body.y,
+            "portrait": body.portrait_url,
+        },
+    )
+    return _agent_cards(db)
+
+
 # --- The console assistant ------------------------------------------------------------------
 
 
@@ -217,7 +431,7 @@ class Turn(BaseModel):
 
 class Chat(BaseModel):
     id: UUID
-    role: Literal["manager", "support", "health", "billing", "growth"]
+    role: console_agents.AgentKey
     title: str | None
     turns: list[Turn]
     credits: float
@@ -232,7 +446,7 @@ class ChatSummary(BaseModel):
 
 
 class ChatStart(BaseModel):
-    role: Literal["manager", "support", "health", "billing", "growth"] = "manager"
+    role: console_agents.AgentKey = "manager"
 
 
 class Question(BaseModel):
@@ -263,6 +477,17 @@ def _chat(db: Session, chat_id: UUID) -> Chat:
     )
 
 
+def _check_agent(db: Session, key: str) -> None:
+    """The agent must be one this team member may ask, ready and switched on."""
+    permissions = console.permissions_of(db)
+    change = console_agents.overrides(db).get(key, console_agents.Override())
+    why = console_agents.refusal(console_agents.CATALOG[key], change, permissions)
+    if why == "forbidden":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=why)
+    if why:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=why)
+
+
 def _my_email(db: Session) -> str:
     return db.execute(text("SELECT email FROM app.platform_me()")).scalar_one()
 
@@ -281,6 +506,7 @@ def console_list_chats(db: StaffDep) -> list[ChatSummary]:
 @router.post("/assistant/conversations", status_code=status.HTTP_201_CREATED)
 def console_start_chat(db: StaffDep, body: ChatStart | None = None) -> Chat:
     body = body or ChatStart()
+    _check_agent(db, body.role)
     chat_id = db.execute(
         text("""
             INSERT INTO app.platform_ai_conversations (staff_email, role)
@@ -305,6 +531,7 @@ def console_send_message(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="ai_not_configured"
         )
     chat = _chat(db, chat_id)
+    _check_agent(db, chat.role)
     state = db.execute(text("SELECT * FROM app.ai_platform_state()")).one()
     ai_models.set_overrides(state.model_fast, state.model_standard, state.model_strong)
     if state.paused:

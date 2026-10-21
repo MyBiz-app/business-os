@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { BRAND } from "@business-os/i18n/brand";
+import { useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 
 import { type ToastTone, useToast } from "@/components/toast/toaster";
@@ -25,6 +26,14 @@ export function FormError({ message, toastOnly }: { message?: string; toastOnly?
 
 /** A confirmation, shown as a toast only. */
 export function FormNotice({ message }: { message?: string }) {
+  const marker = useRef<HTMLSpanElement>(null);
+  const { pending } = useFormStatus();
   useToastMessage("success", message);
-  return null;
+  // Tells the form's submit button, which turns into "Saved" for a moment.
+  useEffect(() => {
+    if (message && !pending) marker.current?.closest("form")?.dispatchEvent(new CustomEvent(FORM_SAVED_EVENT));
+  }, [message, pending]);
+  return <span ref={marker} hidden />;
 }
+
+export const FORM_SAVED_EVENT = `${BRAND.app.storagePrefix}:form-saved`;

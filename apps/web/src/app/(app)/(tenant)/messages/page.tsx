@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { Note } from "@/components/ui/note";
 import { unwrap } from "@/lib/api";
 import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
@@ -46,53 +47,24 @@ export default async function MessagesPage() {
         description={t("subtitle")}
       />
 
-      <p role="note" className="flex items-center gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
-        <FlaskConical aria-hidden="true" className="size-4 shrink-0" />
-        {t("simulated")}
-      </p>
+      <Note icon={<FlaskConical />}>{t("simulated")}</Note>
 
-      {writable && (
-        <section aria-labelledby="compose-heading" className="card flex flex-col gap-4 p-6">
-          <h2 id="compose-heading" className="text-lg font-semibold">{t("compose")}</h2>
-          <Composer
-            audiences={audiences}
-            templates={templates}
-            suggestions={SUGGESTIONS.map((key) => ({ name: t(`suggestions.${key}.name`), body: t.raw(`suggestions.${key}.body`) as string }))}
-            businessName={tenant.name}
-            sample={{ ...placeholders.sample, first_name: t("sampleName") }}
-            variableGroups={placeholders.groups}
-            branches={branches.map((branch) => ({ id: branch.id, name: branch.name }))}
-            groups={groups}
-          />
-        </section>
-      )}
-
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <section aria-labelledby="history-heading" className="card flex flex-col gap-4 p-6">
-          <h2 id="history-heading" className="text-lg font-semibold">{t("history")}</h2>
-          {campaigns.length === 0 ? (
-            <p className="text-sm text-muted">{t("noCampaigns")}</p>
-          ) : (
-            <ol className="enter-items flex flex-col gap-3">
-              {campaigns.map((campaign) => (
-                <li key={campaign.id} className="flex flex-col gap-1.5 rounded-xl border border-border p-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-                    <span className="font-medium text-foreground">
-                      {t(`audiences.${campaign.audience}`)} · {campaign.channels.map((c) => t(`channels.${c}`)).join(", ")}
-                    </span>
-                    <time dateTime={campaign.created_at}>{when.format(new Date(campaign.created_at))}</time>
-                  </div>
-                  <p dir="auto" className="line-clamp-3 whitespace-pre-wrap text-sm">{campaign.body}</p>
-                  <p className="text-xs text-muted">
-                    {t("sentTo", { count: campaign.recipients })}
-                    {campaign.location_ids && ` · ${campaign.location_ids.map((id) => branchName.get(id) ?? "").filter(Boolean).join(", ")}`}
-                    {campaign.author_name && ` · ${campaign.author_name}`}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          )}
-        </section>
+      <div className={`grid items-start gap-6 ${writable ? "xl:grid-cols-[1.6fr_1fr]" : ""}`}>
+        {writable && (
+          <section aria-labelledby="compose-heading" className="card flex flex-col gap-4 p-6">
+            <h2 id="compose-heading" className="text-lg font-semibold">{t("compose")}</h2>
+            <Composer
+              audiences={audiences}
+              templates={templates}
+              suggestions={SUGGESTIONS.map((key) => ({ name: t(`suggestions.${key}.name`), body: t.raw(`suggestions.${key}.body`) as string }))}
+              businessName={tenant.name}
+              sample={{ ...placeholders.sample, first_name: t("sampleName") }}
+              variableGroups={placeholders.groups}
+              branches={branches.map((branch) => ({ id: branch.id, name: branch.name }))}
+              groups={groups}
+            />
+          </section>
+        )}
 
         <section aria-labelledby="templates-heading" className="card flex flex-col gap-4 p-6">
           <h2 id="templates-heading" className="text-lg font-semibold">{t("myTemplates")}</h2>
@@ -128,6 +100,32 @@ export default async function MessagesPage() {
           )}
         </section>
       </div>
+
+      <section aria-labelledby="history-heading" className="card flex flex-col gap-4 p-6">
+        <h2 id="history-heading" className="text-lg font-semibold">{t("history")}</h2>
+        {campaigns.length === 0 ? (
+          <p className="text-sm text-muted">{t("noCampaigns")}</p>
+        ) : (
+          <ol className="enter-items flex flex-col gap-3">
+            {campaigns.map((campaign) => (
+              <li key={campaign.id} className="flex flex-col gap-1.5 rounded-xl border border-border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+                  <span className="font-medium text-foreground">
+                    {t(`audiences.${campaign.audience}`)} · {campaign.channels.map((c) => t(`channels.${c}`)).join(", ")}
+                  </span>
+                  <time dateTime={campaign.created_at}>{when.format(new Date(campaign.created_at))}</time>
+                </div>
+                <p dir="auto" className="line-clamp-3 whitespace-pre-wrap text-sm">{campaign.body}</p>
+                <p className="text-xs text-muted">
+                  {t("sentTo", { count: campaign.recipients })}
+                  {campaign.location_ids && ` · ${campaign.location_ids.map((id) => branchName.get(id) ?? "").filter(Boolean).join(", ")}`}
+                  {campaign.author_name && ` · ${campaign.author_name}`}
+                </p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
     </Container>
   );
 }

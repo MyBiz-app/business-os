@@ -3,10 +3,10 @@ name: End-to-end
 # Runs the Definition-of-Done walk-through (e2e/dod.py) against a real local stack: Supabase
 # (Docker), the API with the scripted AI model, the website and the client app on Expo web.
 # It is slow and depends on the clock (some demo flows need sessions today/tomorrow), so it is
-# not a required check on pull requests: it runs after every merge to main and on demand.
+# not a required check on pull requests. FAST MODE (2026-10-19): it no longer runs after every
+# merge to main, only nightly and on demand. To run it after every merge again, add
+# `push: branches: [main]` under `on:` (step in docs/deploy/go-live-checklist.md).
 on:
-  push:
-    branches: [main]
   schedule:
     - cron: "43 1 * * *"  # nightly on main; a failure opens (or updates) an issue, see report-failure
   workflow_dispatch:
@@ -85,6 +85,11 @@ jobs:
         run: |
           uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
             python e2e/round6.py
+
+      - name: Check the wide-screen layouts (phone to ultra-wide)
+        timeout-minutes: 25
+        run: |
+          uv run --with playwright --with "psycopg[binary]" python e2e/wide_screens.py "$ADMIN_EMAIL"
 
       - name: Show the API log
         if: failure()

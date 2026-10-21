@@ -50,7 +50,7 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
   const date = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "2-digit" });
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader titleId="businesses-heading" title={t("platform.businessesTitle")} description={t("platform.subtitle")} />
       <form role="search" className="flex flex-wrap items-end gap-3">
         <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-medium">
@@ -116,9 +116,9 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
       </ScrollRegion>
       {pages > 1 && (
         <nav aria-label={t("platform.list.count", { count: found.length })} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={pageHref(page - 1)} className="text-primary-ink">{t("platform.list.previous")}</Link> : <span />}
+          {page > 1 ? <Link scroll={false} href={pageHref(page - 1)} className="text-primary-ink">{t("platform.list.previous")}</Link> : <span />}
           <span className="text-muted">{t("platform.list.pageOf", { page, pages })}</span>
-          {page < pages ? <Link href={pageHref(page + 1)} className="text-primary-ink">{t("platform.list.next")}</Link> : <span />}
+          {page < pages ? <Link scroll={false} href={pageHref(page + 1)} className="text-primary-ink">{t("platform.list.next")}</Link> : <span />}
         </nav>
       )}
     </Container>

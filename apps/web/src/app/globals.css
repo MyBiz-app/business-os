@@ -141,7 +141,7 @@
   --color-navy: #111827;
   --color-ai: #7c3aed;
   --color-electric: #06b6d4;
-  /* The site's font: set once in app/fonts.ts (see docs/design-system.md). */
+  /* The site's font: set once in app/fonts.ts (see docs/guides/design-system.md). */
   --font-sans: var(--font-main), system-ui, sans-serif;
   --font-display-stack: var(--font-display), var(--font-main), system-ui, sans-serif;
 }
@@ -405,6 +405,10 @@ h3,
     opacity: 0;
     transform: translateY(-4px) scale(0.97);
     pointer-events: none;
+    /* On a phone a hidden panel must not widen the page. */
+    @media (width < 40rem) {
+      display: none;
+    }
   }
   &[data-open="true"] {
     visibility: visible;
@@ -443,6 +447,48 @@ h3,
     border-color: var(--primary);
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 18%, transparent);
   }
+}
+
+/* Touch screens: every button, icon button and field gets a 44px hit area (WCAG 2.5.5), and text
+   fields use 16px type so a phone browser does not zoom the page when one is focused. These are
+   plain (unlayered) rules so they win over the size classes a page puts on a single control. */
+@media (pointer: coarse), (width < 40rem) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger,
+  .btn-icon,
+  .btn-plain {
+    min-block-size: 2.75rem;
+  }
+  .btn-icon {
+    min-inline-size: 2.75rem;
+  }
+  .btn-link {
+    padding-block: 0.5rem;
+  }
+  input.control:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]),
+  select.control,
+  button.control,
+  textarea.control {
+    min-block-size: 2.75rem;
+    font-size: 1rem;
+  }
+  /* A plain text link inside a table cell, list item or paragraph: a taller touch area without
+     moving the text (vertical padding on an inline link does not change the line height). */
+  :where(td, th, dd, li, p) a:not([class*="btn-"], [class*="flex"], [class*="block"], [class*="grid"], [class*="card"], [class*="size-"], [class*="h-"]) {
+    padding-block: 0.75rem;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-inline-size: 1.25rem;
+    min-block-size: 1.25rem;
+  }
+}
+
+/* A select never outgrows the space it is given (its longest option would otherwise set its width). */
+select {
+  max-inline-size: 100%;
 }
 
 /* ---- Layout ----------------------------------------------------------------------------- */
@@ -486,6 +532,58 @@ h3,
 }
 @utility section-y-loose {
   padding-block: clamp(4.5rem, 9vw, 8rem);
+}
+
+/* Sticky chrome. --sticky-top is where the signed-in app header ends; everything that sticks under
+   it (the section bar, filter bars, side columns) starts there, and --section-bar is the extra
+   height of the section menu while it spans the phone width. Anchors use .scroll-anchor so a
+   section heading never lands hidden under them. */
+:root {
+  --sticky-top: 3.5rem;
+  --section-bar: 3.75rem;
+}
+@media (min-width: 48rem) {
+  :root {
+    --sticky-top: 4rem;
+  }
+}
+@media (min-width: 64rem) {
+  :root {
+    --section-bar: 0rem;
+  }
+}
+@utility sticky-below-header {
+  position: sticky;
+  top: calc(var(--sticky-top) + 0.5rem);
+}
+@utility scroll-anchor {
+  scroll-margin-top: calc(var(--sticky-top) + var(--section-bar) + 1rem);
+}
+
+/* Settings and record rooms: one column, in the order the sections are written. A zigzag of two
+   columns put open sections beside closed ones and left holes, so it was dropped (CRM order audit,
+   S1). Only small cards of equal height that never collapse (integrations) use .form-grid, which
+   goes to two columns once the room itself is wide (a container query, so the side menu and the
+   settings menu are accounted for). Long text keeps 44rem. */
+.form-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+@container (min-width: 56rem) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .form-grid > header:first-child,
+  .form-grid > .form-span {
+    grid-column: 1 / -1;
+  }
 }
 
 /* ---- Direction (Hebrew and English mixed) -------------------------------------------------
@@ -1594,16 +1692,454 @@ h1[tabindex="-1"]:focus {
   }
 }
 
-/* Branch picker popover: positioned by script on desktop, a bottom sheet on phones. */
+/* Branch picker popover: anchored to its chip by script (kept in place on scroll and resize); a small centered card over a dimmed page on phones. */
 .scope-popover {
   position: fixed;
   inset: auto;
 }
+.scope-popover::backdrop {
+  background: transparent;
+}
 @media (max-width: 40rem) {
   .scope-popover {
-    inset: auto 0 0 0 !important;
-    width: auto;
-    border-end-start-radius: 0;
-    border-end-end-radius: 0;
+    inset: 0 !important;
+    margin: auto !important;
+    height: fit-content;
+    max-height: calc(100dvh - 2rem);
+    width: min(20rem, calc(100vw - 2rem));
+  }
+  .scope-popover::backdrop {
+    background: color-mix(in srgb, var(--foreground) 45%, transparent);
+  }
+}
+
+/* ---- UI kit (components/ui, segmented-control): window, section, pill, loading ------------- */
+
+.modal-dialog {
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  max-inline-size: none;
+  block-size: 100%;
+  max-block-size: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  animation: modal-fade 200ms var(--ease-out) both;
+}
+.modal-dialog::backdrop {
+  background: color-mix(in oklab, var(--foreground) 45%, transparent);
+  backdrop-filter: blur(6px);
+  animation: modal-fade 200ms var(--ease-out) both;
+}
+.modal-dialog[data-closing] {
+  animation: modal-fade-out 150ms ease-in both;
+}
+.modal-dialog[data-closing]::backdrop {
+  animation: modal-fade-out 150ms ease-in both;
+}
+.modal-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  inline-size: min(100%, 64rem);
+  max-block-size: 90dvh;
+  border-radius: 1.25rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 24px 64px hsl(var(--shadow-color) / 0.35);
+  overflow: hidden;
+  animation: modal-in 200ms var(--ease-out) both;
+}
+.modal-panel[data-size="sm"] {
+  inline-size: min(100%, 28rem);
+}
+.modal-panel[data-size="md"] {
+  inline-size: min(100%, 44rem);
+}
+.modal-dialog[data-closing] .modal-panel {
+  animation: modal-out 150ms ease-in both;
+}
+/* A form's save row inside a window stays at the bottom of the visible area while the fields scroll. */
+.modal-panel .form-actions {
+  position: sticky;
+  bottom: -1.25rem;
+  z-index: 1;
+  margin-inline: -1.25rem;
+  margin-block-end: -1.25rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+/* The same row in a full page sticks to the bottom of the screen, so a long form never hides its save button. */
+/* (:where keeps this weaker than the window rule below.) */
+:where(form) .form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding-block: 0.75rem;
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklab, var(--background) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+@media (min-width: 40rem) {
+  .modal-panel .form-actions {
+    margin-inline: -1.5rem;
+    padding-inline: 1.5rem;
+  }
+}
+.modal-ask {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in oklab, var(--foreground) 40%, transparent);
+}
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes modal-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(8px);
+  }
+}
+@keyframes modal-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+/* A phone: full screen, rising from the bottom. */
+@media (max-width: 40rem) {
+  .modal-dialog {
+    place-items: end stretch;
+  }
+  .modal-panel,
+  .modal-panel[data-size] {
+    inline-size: 100%;
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+    border-radius: 0;
+    border-inline: 0;
+    animation-name: modal-sheet-in;
+  }
+  .modal-dialog[data-closing] .modal-panel {
+    animation-name: modal-sheet-out;
+  }
+}
+@keyframes modal-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes modal-sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.section-chevron {
+  transition: transform 200ms var(--ease-out);
+  transform: rotate(-90deg);
+}
+.section-chevron[data-open] {
+  transform: rotate(0deg);
+}
+[dir="rtl"] .section-chevron:not([data-open]) {
+  transform: rotate(90deg);
+}
+.section-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms var(--ease-out);
+}
+.section-body[data-open] {
+  grid-template-rows: 1fr;
+}
+
+.segmented-pill {
+  position: absolute;
+  inset-block: 0.125rem;
+  border-radius: 0.6rem;
+  background: var(--surface);
+  box-shadow: 0 1px 2px hsl(var(--shadow-color) / 0.18);
+  transition:
+    transform 200ms var(--ease-out),
+    width 200ms var(--ease-out);
+}
+
+.content-swap {
+  animation: content-in 150ms var(--ease-out) both;
+  transition: opacity 100ms ease-out;
+}
+.content-swap[data-leaving] {
+  opacity: 0;
+  animation: none;
+}
+@keyframes content-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.loading-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--primary-ink);
+}
+.loading-dots > span:not(.sr-only) {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: dots 1.1s ease-in-out infinite both;
+}
+.loading-dots > span:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.loading-dots > span:nth-child(4) {
+  animation-delay: 0.3s;
+}
+@keyframes dots {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.75);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.progress-bar {
+  position: relative;
+  block-size: 0.375rem;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--foreground) 10%, transparent);
+  overflow: hidden;
+}
+.progress-bar > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition: inline-size 300ms var(--ease-out);
+}
+.progress-bar[data-indeterminate] > span {
+  position: absolute;
+  inline-size: 40%;
+  animation: progress-slide 1.2s ease-in-out infinite;
+}
+@keyframes progress-slide {
+  from {
+    inset-inline-start: -40%;
+  }
+  to {
+    inset-inline-start: 100%;
+  }
+}
+
+/* The bar across the top of the window during a slow page change (components/ui/route-progress). */
+.route-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+.route-progress .progress-bar {
+  block-size: 0.1875rem;
+  border-radius: 0;
+  background: transparent;
+}
+
+.pending-content {
+  position: relative;
+}
+.pending-content > div {
+  transition: opacity 150ms ease-out;
+}
+.pending-content[data-pending] > div {
+  opacity: 0.45;
+}
+.pending-dots {
+  position: absolute;
+  inset-block-start: 1.5rem;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+}
+
+/* The branches map (R35): a dot per branch, sized and tinted by the chosen number. The color is
+   the brand color mixed toward the muted one, so it follows the palette and dark mode. */
+.branch-dot {
+  --dot-size: 20px;
+  --dot-weight: 60%;
+  position: relative;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+  background: color-mix(in srgb, var(--primary) var(--dot-weight), var(--muted));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+  cursor: pointer;
+  transition:
+    width 500ms var(--ease-out),
+    height 500ms var(--ease-out),
+    background-color 500ms var(--ease-out);
+}
+.origin-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+  background: var(--brand-to);
+  opacity: 0.85;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+  cursor: default;
+}
+.branch-dot[data-selected="true"] {
+  outline: 3px solid var(--primary-ink);
+  outline-offset: 2px;
+}
+.branch-dot[data-live="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid var(--primary);
+  animation: branch-pulse 2.4s ease-out infinite;
+}
+@keyframes branch-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .branch-dot[data-live="true"]::after {
+    animation: none;
+    opacity: 0.5;
+  }
+  .branch-dot {
+    transition: none;
+  }
+}
+
+/* ---- Page transitions (view transitions; see docs/guides/design-system.md) ------------------------ */
+
+/* Clicks go through to the live page while a transition runs. */
+::view-transition {
+  pointer-events: none;
+}
+/* The header of the landing site stays put; only the page between header and footer moves. */
+::view-transition-group(mk-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(mk-header) {
+  display: none;
+}
+::view-transition-new(mk-header) {
+  animation: none;
+}
+/* Everything that is not named below swaps without a crossfade of its own. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise {
+  from {
+    translate: 0 12px;
+  }
+}
+
+/* Landing site: the new page fades in and slides up 12px (250ms); the old one leaves quickly. */
+::view-transition-old(.vt-site-out) {
+  animation: 120ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.vt-site-in) {
+  animation:
+    250ms var(--ease-out) both vt-fade,
+    250ms var(--ease-out) both vt-rise;
+}
+/* CRM: the content area only fades, no movement you notice (150ms). */
+::view-transition-old(.vt-app-out) {
+  animation: 90ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.vt-app-in) {
+  animation: 150ms var(--ease-out) both vt-fade;
+}
+/* A card grows into the window opened from it and shrinks back (shared element). */
+::view-transition-group(.card-window) {
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease-out);
+}
+/* The window carries its own pop-in; with a card to grow from it must not add a second one. */
+.modal-panel[data-morph] {
+  animation: none;
+}
+
+/* Less motion (the browser setting and the accessibility widget): the page simply swaps. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+html[data-motion="reduce"] ::view-transition-group(*),
+html[data-motion="reduce"] ::view-transition-old(*),
+html[data-motion="reduce"] ::view-transition-new(*) {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+/* ---- Guided tour (components/tour): the dimmed page with a clear window around one element ---- */
+
+.tour-hole {
+  position: fixed;
+  border-radius: 1rem;
+  pointer-events: none;
+  outline: 2px solid var(--primary);
+  box-shadow: 0 0 0 100vmax color-mix(in oklab, var(--foreground) 45%, transparent);
+  transition:
+    top 250ms var(--ease-out),
+    left 250ms var(--ease-out),
+    width 250ms var(--ease-out),
+    height 250ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-hole {
+    transition: none;
   }
 }

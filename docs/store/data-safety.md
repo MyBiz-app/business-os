@@ -2,7 +2,7 @@
 
 Derived from what the three apps and the API store today. Re-check it with each release that adds
 a permission or a service. The business is the controller of its clients' data and MyBiz is the
-processor (see `docs/reviews/privacy-2026-10.md`).
+processor (see `docs/reviews/archive/privacy-2026-10.md`).
 
 ## What the apps collect
 
@@ -22,7 +22,7 @@ Not collected: location (the time clock does not read GPS), contacts, microphone
 browsing history. The camera and photos are used only when the person picks a profile picture.
 Face ID / fingerprint unlock happens on the phone: no biometric data leaves it and the app never
 sees it. No tracking and no ads. Sign-in and session tokens are kept in the phone's secure store.
-Crash reports (Sentry) carry no names, messages or ID numbers; see `docs/monitoring.md`.
+Crash reports (Sentry) carry no names, messages or ID numbers; see `docs/guides/monitoring.md`.
 
 ## Google Play: Data safety form
 

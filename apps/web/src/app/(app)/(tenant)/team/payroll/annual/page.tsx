@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 import { getTenantFor } from "@/lib/tenant";
+import { EmptyState } from "@/components/empty-state";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("payRun.annual");
@@ -35,11 +36,11 @@ export default async function AnnualPayrollPage({ searchParams }: PageProps<"/te
       <BackLink href="/team/payroll" label={t("back")} />
       <PageHeader title={t("title")} description={t("subtitle")} />
       <nav aria-label={t("yearNav")} className="flex flex-wrap items-center gap-3">
-        <Link href={`/team/payroll/annual?year=${year - 1}`} className="btn-secondary px-3 py-2 text-sm">
+        <Link scroll={false} href={`/team/payroll/annual?year=${year - 1}`} className="btn-secondary px-3 py-2 text-sm">
           {t("previous")}
         </Link>
         <h2 className="text-lg font-semibold tabular-nums">{year}</h2>
-        <Link href={`/team/payroll/annual?year=${year + 1}`} className="btn-secondary px-3 py-2 text-sm">
+        <Link scroll={false} href={`/team/payroll/annual?year=${year + 1}`} className="btn-secondary px-3 py-2 text-sm">
           {t("next")}
         </Link>
         <a href={`/team/payroll/annual/export?year=${year}&format=xlsx`} download className="btn-secondary ms-auto px-3 py-2 text-sm">
@@ -51,7 +52,7 @@ export default async function AnnualPayrollPage({ searchParams }: PageProps<"/te
         </a>
       </nav>
       {summary.people.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">{t("empty")}</p>
+        <EmptyState variant="chart">{t("empty")}</EmptyState>
       ) : (
         <>
           {summary.draft && <p className="text-sm text-muted">{t("draft")}</p>}

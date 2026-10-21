@@ -1,10 +1,12 @@
 "use client";
 
-import { FlaskConical, GitBranch, LayoutGrid, MessageCircle, Maximize2, Minimize2, Network, UserPlus } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { CircleHelp, FlaskConical, GitBranch, MessageCircle, Maximize2, Minimize2, RotateCcw, UserPlus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { PageHeader } from "@/components/layout/page-header";
+import { SegmentedControl } from "@/components/segmented-control";
 import { type Draft, draftOf, payloadOf } from "@/lib/ai-structure";
 
 import {
@@ -13,6 +15,7 @@ import {
   type Conversation,
   type ConversationSummary,
   decideAction,
+  markAiTourSeen,
   openConversation,
   saveStructure,
   sendMessage,
@@ -23,12 +26,14 @@ import { AgentAvatar } from "./agent-avatar";
 import { AgentEditor } from "./agent-editor";
 import type { RoleOption } from "./agent-fields";
 import { AgentWizard } from "./agent-wizard";
+import { AiTour } from "./ai-tour";
 import { ChatPanel } from "./chat-panel";
 import { type Branch } from "./scope-picker";
 import { StructurePanel } from "./structure-panel";
 import { TeamList } from "./team-list";
 import { TeamMap } from "./team-map";
-import type { Agent, Team, Upsell } from "./types";
+import { type MeterDetails, UsageMeter } from "./usage-meter";
+import type { Agent, Meter, Team, Upsell } from "./types";
 
 const MAP_WIDE_KEY = "ai-team-map-wide";
 
@@ -44,14 +49,18 @@ type Props = {
   timeZone: string;
   /** The business's own roles, for choosing who may use an agent. */
   roles: RoleOption[];
+  /** This person has already finished or skipped the first-time guide. */
+  tourSeen?: boolean;
   /** An agent to open straight away (the floating bubble links here). */
   initialAgent?: string | null;
+  /** The month's AI meter; the details (the usage window) only for those who manage the team. */
+  meter: Meter;
+  meterDetails: MeterDetails | null;
 };
 
-export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone, roles, initialAgent = null }: Props) {
+export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone, roles, tourSeen = true, initialAgent = null, meter, meterDetails }: Props) {
   const t = useTranslations("aiTeam");
   const tAssistant = useTranslations("assistant");
-  const locale = useLocale();
   const [selected, setSelected] = useState<string | null>(null);
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [history, setHistory] = useState<ConversationSummary[]>([]);
@@ -59,6 +68,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   const [view, setView] = useState<"map" | "list">("map");
   const [closedAgent, setClosedAgent] = useState<Agent | null>(null);
   const router = useRouter();
+  const [touring, setTouring] = useState(!tourSeen);
   // The map can take the whole width while a chat stays open, shown as a small floating card.
   const [mapWide, setMapWide] = useState(false);
   const [wizard, setWizard] = useState(false);
@@ -67,6 +77,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   const [error, setError] = useState<ChatError | null>(null);
   // The chat whose last exchange the next new chat carries over (switching agent or branches).
   const carry = useRef<string | null>(null);
+  const tourHelp = useRef<HTMLButtonElement>(null);
 
   // Structure editing: a working copy of the lines, teams and places, saved in one go.
   const saved = useMemo(() => draftOf(team.agents, team.teams ?? []), [team]);
@@ -97,8 +108,14 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
     router.refresh();
   }
 
+  function endTour() {
+    setTouring(false);
+    void markAiTourSeen();
+    // The first guide opens by itself, so there is no opener to return to: land on the help button.
+    window.setTimeout(() => tourHelp.current?.focus(), 0);
+  }
+
   const agent = team.agents.find((a) => a.key === selected) ?? null;
-  const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
 
   async function open(next: Agent) {
     if (next.state !== "active") {
@@ -245,35 +262,65 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         </p>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">{t("usage", { used: number.format(team.credits_used), included: number.format(team.credits_included) })}</p>
-        {team.can_manage && !structuring && (
-          <button type="button" onClick={startEditing} className="btn-secondary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
-            <GitBranch aria-hidden="true" className="size-4" />
-            {t("structure.edit")}
-          </button>
-        )}
-        {team.can_manage && (
-          <button type="button" onClick={() => setWizard(true)} className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
-            <UserPlus aria-hidden="true" className="size-4" />
-            {t("wizard.hire")}
-          </button>
-        )}
-        <div role="group" aria-label={t("view")} className="hidden items-center gap-1 rounded-full border border-border p-1 md:flex">
-          {(["map", "list"] as const).map((mode) => {
-            const Icon = mode === "map" ? Network : LayoutGrid;
-            return (
-              <button key={mode} type="button" aria-pressed={view === mode} onClick={() => setView(mode)} className={`btn-plain inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm ${view === mode ? "bg-primary text-on-primary" : "text-muted hover:text-foreground"}`}>
-                <Icon aria-hidden="true" className="size-4" />
-                {t(`views.${mode}`)}
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <div className="flex items-center gap-2">
+            <button ref={tourHelp} type="button" onClick={() => setTouring(true)} disabled={structuring} className="btn-secondary inline-flex h-11 items-center gap-2 px-4 text-sm">
+              <CircleHelp aria-hidden="true" className="size-4" />
+              {t("tour.help")}
+            </button>
+            {team.can_manage && (
+              <button type="button" onClick={() => setWizard(true)} disabled={structuring} className="btn-primary inline-flex h-11 items-center gap-2 px-4 text-sm">
+                <UserPlus aria-hidden="true" className="size-4" />
+                {t("wizard.hire")}
               </button>
-            );
-          })}
-        </div>
+            )}
+          </div>
+        }
+      />
+
+      {/* One bar of a fixed height, so nothing jumps when the window changes size or the mode switches. */}
+      <div role="toolbar" data-tour="ai-toolbar" aria-label={t("toolbar")} className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl border border-border bg-surface px-4 py-2">
+        {structuring ? (
+          <>
+            <p className="text-sm font-semibold">{t("structure.title")}</p>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => setDraft({ ...draft, pos: {} })} disabled={savingStructure} className="btn-secondary inline-flex h-9 items-center gap-1.5 px-3 text-sm">
+                <RotateCcw aria-hidden="true" className="size-4" />
+                {t("structure.relayout")}
+              </button>
+              <button type="button" onClick={() => setDraft(null)} disabled={savingStructure} className="btn-secondary h-9 px-3 text-sm">
+                {t("structure.cancel")}
+              </button>
+              <button type="button" onClick={() => void commitStructure()} disabled={savingStructure} className="btn-primary h-9 px-3 text-sm">
+                {savingStructure ? t("structure.saving") : t("structure.save")}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div data-tour="ai-usage">
+              <UsageMeter meter={meter} details={meterDetails} />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden md:block">
+                <SegmentedControl label={t("view")} value={view} onChange={setView} options={[{ value: "map", label: t("views.map") }, { value: "list", label: t("views.list") }]} />
+              </div>
+              {team.can_manage && (
+                <button type="button" onClick={startEditing} className="btn-secondary inline-flex h-9 items-center gap-2 px-3 text-sm">
+                  <GitBranch aria-hidden="true" className="size-4" />
+                  {t("structure.edit")}
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex items-start gap-4">
-        <div className={`relative min-w-0 motion-reduce:transition-none transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${wide ? "w-full" : chatOpen ? "hidden w-full lg:block lg:w-72 lg:shrink-0 xl:w-80" : "w-full"}`}>
+        <div data-tour="ai-map" className={`relative min-w-0 motion-reduce:transition-none transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${wide ? "w-full" : chatOpen ? "hidden w-full lg:block lg:w-72 lg:shrink-0 xl:w-80" : "w-full"}`}>
           {chatOpen && view === "map" && (
             <button
               type="button"
@@ -339,12 +386,8 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         <StructurePanel
           agents={team.agents}
           draft={draft}
-          saving={savingStructure}
           error={structureError}
           onChange={setDraft}
-          onRelayout={() => setDraft({ ...draft, pos: {} })}
-          onSave={() => void commitStructure()}
-          onCancel={() => setDraft(null)}
         />
       )}
 
@@ -369,6 +412,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         </button>
       )}
 
+      {touring && <AiTour agents={team.agents} canManage={team.can_manage} onClose={endTour} />}
       {closedAgent && (
         <AgentDialog
           agent={closedAgent}

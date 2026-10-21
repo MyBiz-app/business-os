@@ -5,10 +5,12 @@ Used by the API (client notifications, staff rosters, the welcome email) and by
 supabase/templates/build.py (sign-in, verification and password emails, which Supabase sends).
 Table layout and inline CSS so Gmail, Outlook and phone clients render it the same; a small
 `prefers-color-scheme` block adds a dark version where the client supports it, and the inline
-colors stay readable where it does not. Palette and fonts follow docs/design-system.md."""
+colors stay readable where it does not. Palette and fonts follow docs/guides/design-system.md."""
 
 import html
+import json
 from dataclasses import dataclass
+from pathlib import Path
 
 NAVY = "#111827"
 BLUE = "#2563EB"
@@ -20,7 +22,11 @@ PAGE = "#F3F4F8"
 LINE = "#E5E7EB"
 TINT = "#EEF2FF"
 
-BRAND = "MyBiz"  # packages/i18n/brand.json
+# The name comes from brand.json next to core/brand.py (this file is also loaded on its own by
+# supabase/templates/build.py, so it cannot import the app package).
+BRAND = json.loads((Path(__file__).resolve().parents[1] / "core/brand.json").read_text("utf-8"))[
+    "name"
+]
 
 FONT = "Assistant,'Plus Jakarta Sans','Segoe UI',Arial,Helvetica,sans-serif"
 
@@ -63,6 +69,11 @@ ICONS = {
     "plan_ending": "💳",
     "friend_request": "🤝",
     "class_invite": "💌",
+    "freeze_approved": "❄️",
+    "freeze_rejected": "📋",
+    "waitlist_spot_open": "🎟️",
+    "waitlist_spot_taken": "⏳",
+    "credit_returned": "🎁",
     "roster": "📅",
     "broadcast": "📣",
 }

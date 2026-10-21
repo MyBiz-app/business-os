@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from app.api.bookings import cancel_booking, lock_session
 from app.api.common import not_found
-from app.api.deps import TenantContext, require
+from app.api.deps import TenantContext, ensure_client_visible, require
 from app.core.permissions import Permission
 from app.providers.choice import choose
 
@@ -75,6 +75,7 @@ def _client(db: Session, client_id: UUID, lock: bool = False) -> dict[str, Any]:
 def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
     """Everything the business holds about the client, as one JSON document."""
     db = context.session
+    ensure_client_visible(context, client_id)
     business = db.execute(
         text("SELECT name FROM app.tenants WHERE id = app.current_tenant_id()")
     ).scalar_one()
@@ -213,6 +214,14 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "freeze_requests": _rows(
+            db,
+            """
+            SELECT reason, note, starts_on, ends_on, status, decided_at, created_at
+            FROM app.freeze_requests WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
         "time_entries": _rows(
             db,
             """
@@ -251,6 +260,20 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
         "friends_profile": _rows(
             db,
             "SELECT friend_code, visible, created_at FROM app.client_social WHERE client_id = :id",
+            client_id,
+        ),
+        "waitlist_requests": _rows(
+            db,
+            """
+            SELECT kind, day, from_time, to_time, starts_at, status, created_at
+            FROM app.waitlist_requests WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
+        "waitlist_offers": _rows(
+            db,
+            "SELECT status, offered_at FROM app.waitlist_offers WHERE client_id = :id"
+            " ORDER BY offered_at",
             client_id,
         ),
         "identity_documents": _rows(
@@ -320,6 +343,7 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
     if not body.confirm:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="confirm")
     db = context.session
+    ensure_client_visible(context, client_id)
     client = _client(db, client_id, lock=True)
     if client["erased_at"] is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="already_erased")
@@ -342,6 +366,8 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         text("DELETE FROM app.health_declarations WHERE client_id = :id"), {"id": client_id}
     ).rowcount
     db.execute(text("DELETE FROM app.notifications WHERE client_id = :id"), {"id": client_id})
+    db.execute(text("DELETE FROM app.waitlist_offers WHERE client_id = :id"), {"id": client_id})
+    db.execute(text("DELETE FROM app.waitlist_requests WHERE client_id = :id"), {"id": client_id})
     # Announcement delivery logs, the friends profile, WhatsApp offers and their chats with the
     # in-app AI assistant (a database function: the API role can't delete in those tables).
     db.execute(text("SELECT app.erase_client_traces(:id)"), {"id": client_id})

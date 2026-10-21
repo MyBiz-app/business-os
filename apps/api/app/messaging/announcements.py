@@ -1,4 +1,4 @@
-"""The broadcast center's sender (round 5, M1; the send-announcements job in app/jobs.py).
+"""The broadcast center's sender (round 5, M1; the send-announcements job in app/jobs/).
 
 A due announcement is resolved to one delivery per person and channel, then sent:
 - email through the platform's email provider (a marketing one carries "Ad" in the subject and
@@ -21,7 +21,7 @@ from sqlalchemy import Connection, text
 from app.core.config import get_settings
 from app.core.signed_links import sign
 from app.messaging import email_layout as layout
-from app.messaging.contact_emails import resolve_email, sender_name
+from app.messaging.contact_emails import resolve_email, sender_name, website_of
 from app.messaging.email import Email, Sender, load_messages
 from app.messaging.placeholders import client_values, lead_values, render_placeholders
 from app.messaging.push import PushSender, push_to_user
@@ -64,6 +64,7 @@ def _email(
     messages: dict[str, Any],
     brand: str | None = None,
     reply_to: str | None = None,
+    website: str | None = None,
 ) -> Email:
     """`brand` is the issuing business, when it is not MyBiz itself."""
     broadcast = messages["broadcast"]
@@ -110,7 +111,7 @@ def _email(
         subject=subject,
         preheader=texts["body"].split("\n")[0],
         brand=brand_name,
-        footer=[(lang, brand_name)],
+        footer=[(lang, " · ".join(p for p in (brand_name, website) if p))],
         kind="broadcast",
     )
     return Email(
@@ -123,6 +124,7 @@ def _email(
         reply_to=reply_to,
         from_name=brand,
         list_unsubscribe=link,
+        website=website,
     )
 
 
@@ -288,7 +290,10 @@ def _send_batch(
                     if business
                     else None
                 )
-                sender.send(_email(dict(row), texts, mailbox[lang], business, reply_to))
+                site = (
+                    website_of(conn, announcement["tenant_id"], location_id) if business else None
+                )
+                sender.send(_email(dict(row), texts, mailbox[lang], business, reply_to, site))
                 _finish_delivery(conn, row["id"], "sent")
             elif channel == "push":
                 if push is None or not push_to_user(

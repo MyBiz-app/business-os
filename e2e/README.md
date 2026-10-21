@@ -31,6 +31,8 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 
 `client_import.py` imports a Hebrew Windows-1255 CSV: recognized columns, a column mapped by hand, preview with a duplicate and an invalid row, then the import.
 
+`mfa.py` turns on an authenticator app on the account page with a generated code, then signs in from a new browser with password and code (a wrong code is refused).
+
 `privacy.py` downloads a client's data export, then erases their personal details.
 
 `notifications.py`: the studio books a member and cancels the class; the member sees both under Updates, with an unread badge that clears once read.
@@ -58,6 +60,8 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 `agents.py [platform admin email]`: round 5 on the networks demo - the AI team page with its custom agent and scheduled task, a chat with an agent (scripted model), the content studio on demo accounts, branch groups, and, for a platform admin, the console's broadcast center and AI board.
 
 `round6.py`: round 6 on the curated demo - the time clock with approved hours, the month's payroll run walked to approval with a payslip PDF and export, the "Move to MyBiz" Excel file (check, import, undo) and an issued quote with its PDF.
+
+`wide_screens.py <console owner email>`: the account page and the console at 390, 1440, 1920 and 2560 pixels - no sideways scroll, form rooms stay within the 1600px cap, table pages use the whole screen.
 
 `crawl.py <owner email with data>`: visits every page of the business app on a phone and a wide screen, in Hebrew/light and English/dark, and reports accessibility issues, console errors, overflow and screenshots.
 

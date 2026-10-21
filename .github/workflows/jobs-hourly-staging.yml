@@ -1,6 +1,6 @@
 name: Hourly jobs on staging
 
-# Jobs that must run close to a business's chosen time of day (see apps/api/app/jobs.py).
+# Jobs that must run close to a business's chosen time of day (see apps/api/app/jobs/).
 # Scheduled runs use the default branch.
 on:
   schedule:
@@ -61,3 +61,24 @@ jobs:
           API_SECRETS_KEY: ${{ secrets.STAGING_SECRETS_KEY }}
           API_API_URL: ${{ vars.API_PUBLIC_URL || 'https://business-os-api-staging.onrender.com' }}
         run: uv run python -m app.jobs send-announcements
+
+  notify-payslips:
+    name: Tell staff their payslip is ready (push)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --locked --no-dev
+
+      - name: Send
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs notify-payslips

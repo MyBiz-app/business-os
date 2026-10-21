@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { apiUpload, unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
@@ -23,6 +24,7 @@ export async function updateDetails(_state: FormState, formData: FormData): Prom
           weekly_release_weekday: weekly ? Number(releaseWeekday) : null,
           weekly_release_time: weekly ? value("weekly_release_time") : null,
           name: value("name"),
+          website_url: value("website_url").trim() || null,
           locale: value("locale") === "en" ? "en" : "he",
           time_zone: value("time_zone"),
           currency: value("currency"),
@@ -135,4 +137,48 @@ export async function updateLegalDetails(_state: FormState, formData: FormData):
   revalidatePath("/settings");
   revalidatePath("/dashboard");
   return { saved: true };
+}
+
+export type BrandingState = { error?: NonNullable<FormState["error"]> | "logo_too_large" | "cover_too_large" | "unsupported_image"; saved?: boolean };
+
+/** Everything on the branding page in one save: name, color, logo and cover (R13). */
+export async function saveBranding(_state: BrandingState, formData: FormData): Promise<BrandingState> {
+  const { api, scope, tenant } = await getTenant();
+  const name = String(formData.get("name") ?? "").trim();
+  const color = formData.get("use_default") === "on" ? null : String(formData.get("primary_color") ?? "");
+  try {
+    unwrap(await api.PATCH("/tenants/current", { params: scope, body: { ...(name ? { name } : {}), primary_color: color || null } }));
+  } catch (error) {
+    return errorState(error);
+  }
+
+  const upload = async (path: "/tenants/current/logo" | "/tenants/current/cover", file: FormDataEntryValue | null, tooLarge: BrandingState["error"]) => {
+    if (!(file instanceof File) || file.size === 0) return null;
+    const response = await apiUpload(path, file, tenant.id);
+    if (response.status === 413) return tooLarge;
+    if (response.status === 415) return "unsupported_image" as const;
+    return response.ok ? null : ("generic" as const);
+  };
+  const logoError = await upload("/tenants/current/logo", formData.get("logo"), "logo_too_large");
+  if (logoError) return { error: logoError };
+  const coverError = await upload("/tenants/current/cover", formData.get("cover"), "cover_too_large");
+  if (coverError) return { error: coverError };
+
+  const hasFile = (field: string) => {
+    const file = formData.get(field);
+    return file instanceof File && file.size > 0;
+  };
+  if (formData.get("remove_logo") === "on" && !hasFile("logo")) await api.DELETE("/tenants/current/logo", { params: scope });
+  if (formData.get("remove_cover") === "on" && !hasFile("cover")) await api.DELETE("/tenants/current/cover", { params: scope });
+
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+/** "I grew": ends solo mode, so the team, shifts, payroll and branch areas show up. */
+export async function leaveSoloMode(): Promise<void> {
+  const { api, scope } = await getTenant();
+  unwrap(await api.PATCH("/tenants/current", { params: scope, body: { business_size: "small" } }));
+  revalidatePath("/", "layout");
+  redirect("/dashboard");
 }

@@ -1,69 +1,109 @@
-/* Toasts: confirmations and errors that stay in view wherever the page is scrolled. Built on the
- * shared colour tokens, so light and dark mode follow the theme. */
+/* Toasts: small quiet cards in the bottom corner on the reading-start side (right in Hebrew,
+ * left in English); at the top on a phone. The card is dark in both themes, like Linear and Vercel.
+ * Several toasts stack as a pile that opens on hover or focus. */
 .toaster {
+  --toast-card: oklch(0.22 0.025 265);
+  --toast-card-ink: oklch(0.97 0.005 265);
+  --toast-card-muted: oklch(0.75 0.02 265);
   position: fixed;
-  inset: auto 0 0 0;
+  inset: auto auto 0 0;
   margin: 0;
-  padding: 0 1rem max(1rem, env(safe-area-inset-bottom));
-  width: auto;
+  padding: 0 0 max(1rem, env(safe-area-inset-bottom)) 1rem;
+  padding-inline: 1rem 0;
+  width: min(100%, 26rem);
   height: auto;
   max-height: none;
   overflow: visible;
   border: 0;
   background: transparent;
   color: inherit;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
   pointer-events: none;
 }
-/* On a phone, sit above the accessibility button in the corner. */
-@media (max-width: 40rem) {
-  .toaster {
-    padding-bottom: max(4.75rem, env(safe-area-inset-bottom));
-  }
+[dir="rtl"] .toaster {
+  inset: auto 0 0 auto;
 }
 .toaster:not(:popover-open) {
   display: none;
 }
+/* The pile: every toast in the same cell, the older ones peeking out behind the newest. */
+.toaster-pile {
+  display: grid;
+  align-items: end;
+}
 .toast {
   --toast-tone: var(--success);
+  grid-area: 1 / 1;
   pointer-events: auto;
   position: relative;
   overflow: hidden;
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  width: min(100%, 26rem);
-  padding: 0.75rem 0.75rem 0.75rem 1rem;
-  padding-inline: 1rem 0.5rem;
-  border: 1px solid color-mix(in oklab, var(--toast-tone) 35%, var(--border));
-  border-inline-start: 4px solid var(--toast-tone);
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  padding-inline: 0.75rem 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--toast-card-ink) 12%, var(--toast-card));
   border-radius: 0.875rem;
-  background: color-mix(in oklab, var(--toast-tone) 6%, var(--background));
-  color: var(--foreground);
-  box-shadow: 0 10px 30px -8px rgb(17 24 39 / 0.28), 0 2px 6px rgb(17 24 39 / 0.1);
-  font-size: 0.9375rem;
+  background: var(--toast-card);
+  color: var(--toast-card-ink);
+  box-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.4), 0 2px 6px rgb(0 0 0 / 0.2);
+  font-size: 0.875rem;
   line-height: 1.4;
+  transform-origin: bottom center;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease;
   animation: toast-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .toast[data-tone="error"] {
   --toast-tone: var(--danger);
 }
+.toast[data-tone="info"] {
+  --toast-tone: var(--primary);
+}
 .toast[data-leaving="true"] {
   animation: toast-out 0.18s ease-in forwards;
 }
+.toaster:not(:hover):not(:focus-within) .toast:not(:last-child) {
+  transform: translateY(calc(var(--toast-depth) * -0.5rem)) scale(calc(1 - var(--toast-depth) * 0.05));
+  opacity: calc(1 - var(--toast-depth) * 0.3);
+  pointer-events: none;
+}
+/* Open pile: one under the other. */
+.toaster:hover .toaster-pile,
+.toaster:focus-within .toaster-pile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 .toast-icon {
   flex: none;
-  margin-top: 0.0625rem;
-  color: var(--toast-tone);
+  display: grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 999px;
+  background: var(--toast-tone);
+  color: var(--on-toast-tone, white);
+}
+.toast[data-tone="error"] .toast-icon {
+  --on-toast-tone: var(--on-danger);
 }
 .toast-message {
   flex: 1;
   min-width: 0;
-  padding-block: 0.0625rem;
+  padding-block: 0.25rem;
   overflow-wrap: anywhere;
+}
+.toast-action {
+  flex: none;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+  color: var(--toast-card-ink);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  background: color-mix(in oklab, var(--toast-card-ink) 14%, transparent);
+}
+.toast-action:hover {
+  background: color-mix(in oklab, var(--toast-card-ink) 24%, transparent);
 }
 .toast-close {
   flex: none;
@@ -72,20 +112,21 @@
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 0.5rem;
-  color: var(--muted);
+  color: var(--toast-card-muted);
   cursor: pointer;
 }
 .toast-close:hover {
-  background: color-mix(in oklab, var(--foreground) 8%, transparent);
-  color: var(--foreground);
+  background: color-mix(in oklab, var(--toast-card-ink) 14%, transparent);
+  color: var(--toast-card-ink);
 }
+/* A thin line along the bottom shows the time left. */
 .toast-bar {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: 3px;
+  height: 2px;
   background: var(--toast-tone);
-  opacity: 0.55;
+  opacity: 0.7;
   transform-origin: left center;
   animation: toast-bar var(--toast-ms) linear forwards;
 }
@@ -96,8 +137,31 @@
 .toast:focus-within .toast-bar {
   animation-play-state: paused;
 }
+/* On a phone: top of the screen, under the header, full width. */
+@media (max-width: 40rem) {
+  .toaster,
+  [dir="rtl"] .toaster {
+    inset: 0 0 auto 0;
+    width: auto;
+    padding: max(4rem, calc(env(safe-area-inset-top) + 3.5rem)) 1rem 0;
+  }
+  .toaster-pile {
+    align-items: start;
+  }
+  .toast {
+    transform-origin: top center;
+    animation-name: toast-in-top;
+  }
+  .toaster:not(:hover):not(:focus-within) .toast:not(:last-child) {
+    transform: translateY(calc(var(--toast-depth) * 0.5rem)) scale(calc(1 - var(--toast-depth) * 0.05));
+  }
+}
 @keyframes toast-in {
-  from { opacity: 0; transform: translateY(1rem) scale(0.97); }
+  from { opacity: 0; transform: translateY(0.75rem) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes toast-in-top {
+  from { opacity: 0; transform: translateY(-0.75rem) scale(0.97); }
   to { opacity: 1; transform: none; }
 }
 @keyframes toast-out {
@@ -107,6 +171,6 @@
   to { transform: scaleX(0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .toast, .toast[data-leaving="true"] { animation: none; }
+  .toast, .toast[data-leaving="true"] { animation: none; transition: none; }
   .toast-bar { display: none; }
 }

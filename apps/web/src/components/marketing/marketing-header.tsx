@@ -15,6 +15,8 @@ import { moveFocus, useDismiss } from "@/components/use-dismiss";
 const LINKS = [
   { href: "/features", key: "features" },
   { href: "/industries/fitness", key: "industries", match: "/industries" },
+  { href: "/websites", key: "websites" },
+  { href: "/ai-team", key: "aiTeam" },
   { href: "/pricing", key: "pricing" },
   { href: "/about", key: "about" },
   { href: "/contact", key: "contact" },
@@ -49,9 +51,9 @@ export function MarketingHeader() {
   });
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/80 backdrop-blur-xl" style={{ viewTransitionName: "mk-header" }}>
       <Container className="flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
+        <Link href="/" className="group flex items-center gap-2 py-2 text-lg font-bold max-md:min-h-11">
           <BrandMark className="size-8 drop-shadow-md transition-transform duration-300 group-hover:rotate-12" />
           {tApp("name")}
         </Link>
@@ -75,7 +77,7 @@ export function MarketingHeader() {
           <button
             ref={button}
             type="button"
-            className="btn-icon flex size-10 items-center justify-center rounded-xl border border-border transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5"
+            className="btn-icon flex size-11 items-center justify-center rounded-xl border md:size-10 border-border transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5"
             aria-expanded={open}
             aria-controls="marketing-menu"
             aria-label={open ? t("close") : t("menu")}

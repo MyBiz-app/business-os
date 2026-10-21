@@ -213,3 +213,46 @@ def test_one_busy_business_does_not_block_another(client: TestClient, auth: Auth
     # Nothing is counted for a caller who is not a member (their header proves nothing).
     outsider = auth(uuid4(), tenants[1])
     assert [client.get("/clients", headers=outsider).status_code for _ in range(5)] == [403] * 5
+
+
+def test_uploads_have_their_own_tighter_rule() -> None:
+    from app.core.rate_limit import RULES as APP_RULES
+
+    uploads = next(rule for rule in APP_RULES if rule.name == "uploads")
+    assert uploads.limit < next(rule for rule in APP_RULES if rule.name == "all").limit
+    for path in (
+        "/clients/1/documents",
+        "/locations/1/logo",
+        "/me/avatar",
+        "/tenants/current/logo",
+        "/sessions/1/files",
+        "/sessions/1/files/2",
+        "/clients/import",
+        "/agents/x/avatar",
+    ):
+        assert uploads.pattern.search(path), path
+    for path in ("/clients", "/clients/1/documents-summary", "/profile"):
+        assert not uploads.pattern.search(path), path
+
+    now = [1000.0]
+    app = FastAPI()
+    app.middleware("http")(
+        limiter(
+            MemoryStore(),
+            trust_forwarded=False,
+            rules=(Rule("u", "/", 2, methods=frozenset({"POST"}), pattern=uploads.pattern),),
+            clock=lambda: now[0],
+        )
+    )
+
+    @app.post("/clients/{cid}/documents")
+    def upload(cid: str) -> dict:
+        return {"ok": True}
+
+    @app.post("/clients")
+    def create() -> dict:
+        return {"ok": True}
+
+    client = TestClient(app)
+    assert [client.post("/clients/1/documents").status_code for _ in range(3)] == [200, 200, 429]
+    assert all(client.post("/clients").status_code == 200 for _ in range(5))

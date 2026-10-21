@@ -1,6 +1,6 @@
 """Running the scheduled agent tasks that are due (round 5, A10).
 
-`run_due_tasks` is a background job (app/jobs.py, called every few minutes by the keep-awake
+`run_due_tasks` is a background job (app/jobs/, called every few minutes by the keep-awake
 workflow through POST /internal/jobs/tick, or by a worker once there is one). A task runs as the
 user who approved it, with that user's permissions and branches as they are NOW, never as the
 system: a member who left or lost AI access pauses the task, and an approved action is checked
@@ -113,7 +113,7 @@ def _context(db: Session, tenant_id: UUID, user_id: UUID) -> TenantContext:
     set_tenant(db, tenant_id)
     member = db.execute(
         text("""
-            SELECT m.role, r.permissions AS custom_permissions, m.location_ids
+            SELECT m.role, r.permissions AS custom_permissions, m.location_ids, m.ai_access
             FROM app.tenant_members m
             LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
             WHERE m.tenant_id = app.current_tenant_id() AND m.user_id = app.current_user_id()
@@ -125,7 +125,7 @@ def _context(db: Session, tenant_id: UUID, user_id: UUID) -> TenantContext:
         text("SELECT closed_at IS NOT NULL FROM app.tenants WHERE id = app.current_tenant_id()")
     ).scalar():
         raise Pause("business_closed")
-    permissions = effective_permissions(member.role, member.custom_permissions)
+    permissions = effective_permissions(member.role, member.custom_permissions, member.ai_access)
     if Permission.AI_USE not in permissions:
         raise Pause("permission_lost")
     if not has_module(db, "ai_basic", "ai_pro"):
@@ -166,6 +166,8 @@ def _agent_run(
         raise RunFailed("ai_limit_reached")
     if budget.over_person_limit(db, user_id, member_role_keys(db, ctx.role), month_start):
         raise RunFailed("ai_user_limit_reached")
+    if budget.over_day_pace(db, user_id, ctx.role):
+        raise RunFailed("ai_daily_pace_reached")
     agent_id = None
     if task["agent_key"] not in CATALOG:
         agent_id = db.execute(

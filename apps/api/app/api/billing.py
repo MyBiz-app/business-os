@@ -16,8 +16,10 @@ from app.ai import budget as ai_budget
 from app.api.common import blank_to_none, check_columns, not_found
 from app.api.deps import TenantContext, require
 from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
+from app.commerce import quotas
 from app.commerce.billing import add_months
 from app.commerce.modules import allowance
+from app.commerce.quotas import QuotaAlert
 from app.core.config import get_settings
 from app.core.permissions import Permission
 
@@ -60,7 +62,10 @@ class InvoiceSummary(BaseModel):
     period_start: date
     period_end: date
     currency: str
-    total: int
+    subtotal: int = Field(description="Before VAT, minor units")
+    vat_rate_bp: int = Field(description="VAT rate in basis points (1800 = 18%); 0 for no VAT")
+    vat_amount: int
+    total: int = Field(description="Including VAT")
     status: Literal["open", "paid", "void"]
     issued_at: datetime
     paid_at: datetime | None
@@ -89,6 +94,32 @@ class Usage(BaseModel):
     ai_extra_minor: int = Field(
         default=0, description="Pay-as-you-go: this month's extra AI use, minor units"
     )
+    alerts: list[QuotaAlert] = Field(
+        default_factory=list,
+        description="Marks (80 and 100 percent) the month's messages and space have passed",
+    )
+
+
+class Collection(BaseModel):
+    """Where the subscription stands when an invoice is unpaid or the subscription is ending."""
+
+    state: Literal["active", "read_only", "suspended"] = Field(
+        description="read_only: everything visible, nothing can be changed; suspended: no access"
+    )
+    overdue_since: datetime | None = Field(description="When the oldest unpaid invoice was issued")
+    read_only_on: date | None = Field(description="Null when nothing is overdue or dunning is off")
+    suspend_on: date | None
+    grace_until: datetime | None = Field(description="A grace extension from MyBiz, if any")
+    cancel_at: datetime | None = Field(description="The subscription ends then; the business stays")
+    paused_until: datetime | None = Field(
+        default=None, description="The account is paused (read-only, flat fee) until then"
+    )
+    refund_minor: int | None = Field(
+        default=None,
+        description="The refund the cancellation gets (the first payment inside 14 days), "
+        "recorded only: no card is refunded while payments are off",
+    )
+    currency: str | None = Field(default=None, description="The business's currency")
 
 
 class Billing(BaseModel):
@@ -101,6 +132,7 @@ class Billing(BaseModel):
     details: BillingDetails
     invoices: list[InvoiceSummary]
     balance_due: int = Field(description="Sum of open invoices, minor units")
+    collection: Collection
     usage: Usage
 
 
@@ -139,7 +171,8 @@ def _method(account: dict | None) -> PaymentMethod | None:
 
 
 INVOICE_COLUMNS = (
-    "id, number, period_start, period_end, currency, total, status, issued_at, paid_at"
+    "id, number, period_start, period_end, currency, coalesce(subtotal, total) AS subtotal, "
+    "vat_rate_bp, vat_amount, total, status, issued_at, paid_at"
 )
 
 
@@ -158,10 +191,7 @@ def get_billing(context: SettingsDep) -> Billing:
     while add_months(anchor, months + 1) <= today:
         months += 1
     next_invoice_on = add_months(anchor, months + 1) - timedelta(days=1)
-    rows = db.execute(
-        text(f"SELECT {INVOICE_COLUMNS} FROM app.platform_invoices ORDER BY period_start DESC")
-    ).mappings()
-    invoices = [InvoiceSummary.model_validate(dict(r)) for r in rows]
+    invoices = _invoices(db)
     account = _account(db)
     seconds_left = (tenant.trial_ends_at - now).total_seconds()
     return Billing(
@@ -174,8 +204,52 @@ def get_billing(context: SettingsDep) -> Billing:
         details=_details(account),
         invoices=invoices,
         balance_due=sum(i.total for i in invoices if i.status == "open"),
+        collection=_collection(db, invoices, tenant.time_zone),
         usage=usage(db, today),
     )
+
+
+def _collection(db: Session, invoices: list[InvoiceSummary], time_zone: str) -> Collection:
+    tenant = db.execute(
+        text("""
+            SELECT app.effective_billing_state(tenants) AS state,
+                   billing_grace_until, cancel_at, currency,
+                   CASE WHEN pause_from <= now() AND pause_until > now()
+                        THEN pause_until END AS paused_until,
+                   (SELECT c.refund_minor FROM app.subscription_cancellations c
+                    WHERE c.outcome = 'cancelled' AND c.resumed_at IS NULL
+                      AND tenants.cancel_at IS NOT NULL
+                    ORDER BY c.created_at DESC LIMIT 1) AS refund_minor
+            FROM app.tenants WHERE id = app.current_tenant_id()
+        """)
+    ).one()
+    policy = db.execute(text("SELECT * FROM app.dunning_settings")).mappings().one()
+    open_since = min((i.issued_at for i in invoices if i.status == "open"), default=None)
+    zone = ZoneInfo(time_zone)
+
+    def on(days: int) -> date | None:
+        if open_since is None or not policy["enabled"]:
+            return None
+        return (open_since.astimezone(zone) + timedelta(days=days)).date()
+
+    return Collection(
+        state=tenant.state,
+        overdue_since=open_since,
+        read_only_on=on(policy["read_only_after_days"]),
+        suspend_on=on(policy["suspend_after_days"]),
+        grace_until=tenant.billing_grace_until,
+        cancel_at=tenant.cancel_at,
+        paused_until=tenant.paused_until,
+        refund_minor=tenant.refund_minor or None,
+        currency=tenant.currency,
+    )
+
+
+def _invoices(db: Session) -> list[InvoiceSummary]:
+    rows = db.execute(
+        text(f"SELECT {INVOICE_COLUMNS} FROM app.platform_invoices ORDER BY period_start DESC")
+    ).mappings()
+    return [InvoiceSummary.model_validate(dict(r)) for r in rows]
 
 
 @router.get("/usage")
@@ -205,9 +279,16 @@ def usage(db: Session, today: date) -> Usage:
         """),
         {"start": month_start},
     ).one()
+    quotas.raise_alerts(
+        db,
+        month_start,
+        {"messages": int(row.messages), "storage": int(row.storage)},
+        {"messages": allowed.messages, "storage": allowed.storage_bytes},
+    )
     return Usage(
         pack=pack,  # type: ignore[arg-type]
         month_start=month_start,
+        alerts=quotas.month_alerts(db, month_start),
         messages=int(row.messages),
         messages_included=allowed.messages,
         storage_bytes=int(row.storage),

@@ -83,15 +83,15 @@ export default async function ResourcesPage({ searchParams }: PageProps<"/resour
         description={t("resources.subtitle")}
         actions={
         <nav aria-label={t("resources.dayNav")} className="flex items-center gap-2 text-sm">
-          <Link href={nav(addDays(day, -1))} className="btn-secondary px-3 py-2">
+          <Link scroll={false} href={nav(addDays(day, -1))} className="btn-secondary px-3 py-2">
             {t("resources.previousDay")}
           </Link>
           {day !== today && (
-            <Link href={nav(today)} className="btn-secondary px-3 py-2">
+            <Link scroll={false} href={nav(today)} className="btn-secondary px-3 py-2">
               {t("resources.today")}
             </Link>
           )}
-          <Link href={nav(addDays(day, 1))} className="btn-secondary px-3 py-2">
+          <Link scroll={false} href={nav(addDays(day, 1))} className="btn-secondary px-3 py-2">
             {t("resources.nextDay")}
           </Link>
         </nav>
@@ -194,7 +194,7 @@ export default async function ResourcesPage({ searchParams }: PageProps<"/resour
           {!service ? (
             <p className="text-muted">
               {t("resources.noServices")}{" "}
-              <Link href="/services/new" className="text-primary-ink underline underline-offset-4 hover:no-underline">
+              <Link href="/catalog/services/new" className="text-primary-ink underline underline-offset-4 hover:no-underline">
                 {t("resources.addService")}
               </Link>
             </p>
