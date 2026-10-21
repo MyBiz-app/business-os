@@ -2316,14 +2316,13 @@ html:has(dialog:modal) {
   }
 }
 
-/* Landing site: the new page fades in and slides up 12px (250ms); the old one leaves quickly. */
+/* Landing site: the page and the footer cross-fade as one piece (old 90ms out, new 180ms in), with no
+ * movement; the new page already starts at the top (NavigationScroll). */
 ::view-transition-old(.vt-site-out) {
-  animation: 120ms ease-in both vt-fade reverse;
+  animation: 90ms ease-in both vt-fade reverse;
 }
 ::view-transition-new(.vt-site-in) {
-  animation:
-    250ms var(--ease-out) both vt-fade,
-    250ms var(--ease-out) both vt-rise;
+  animation: 180ms var(--ease-out) both vt-fade;
 }
 /* CRM: the content area only fades, no movement you notice (150ms). */
 ::view-transition-old(.vt-app-out) {
