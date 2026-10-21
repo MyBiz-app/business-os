@@ -235,6 +235,9 @@ export function InsightsMap({ areas, branches, totals, canOpenClients }: Props) 
         />
         <StatTile label={t("cards.whiteSpots")} value={number.format(numbers.whiteSpots.length)} hint={t("cards.whiteSpotsHint", { km: RADII_KM[2] })} />
       </div>
+      <Link href="/ai?agent=analyst" className="self-start text-sm text-primary-ink underline underline-offset-4 hover:no-underline">
+        {t("askAnalyst")}
+      </Link>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex flex-col gap-3">

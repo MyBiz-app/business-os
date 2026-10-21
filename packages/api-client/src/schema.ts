@@ -3599,6 +3599,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/geo/coverage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coverage
+         * @description Where MyBiz businesses are, for the landing page: city names and counts only. A city
+         *     with fewer than five businesses is not listed (the database enforces it); no one is named.
+         */
+        get: operations["coverage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff": {
         parameters: {
             query?: never;
@@ -14138,6 +14159,32 @@ export interface components {
              * @description Added to the pay; negative takes away
              */
             amount_minor: number;
+        };
+        /** Coverage */
+        Coverage: {
+            /**
+             * Cities
+             * @description Only cities with at least five businesses
+             */
+            cities: components["schemas"]["CoverageCity"][];
+            /**
+             * Businesses
+             * @description Businesses in those cities
+             */
+            businesses: number;
+        };
+        /** CoverageCity */
+        CoverageCity: {
+            /** Name He */
+            name_he: string;
+            /** Name En */
+            name_en: string | null;
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+            /** Businesses */
+            businesses: number;
         };
         /** CoverageGap */
         CoverageGap: {
@@ -33480,6 +33527,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    coverage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Coverage"];
                 };
             };
         };
