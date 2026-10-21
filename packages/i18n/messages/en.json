@@ -11041,6 +11041,7 @@
       "whiteSpots": "White spots",
       "whiteSpotsHint": "Cities with leads and no branch within {km} km"
     },
+    "askAnalyst": "Ask the data analyst about this map",
     "layers": {
       "label": "Map layers",
       "branches": "Branches",

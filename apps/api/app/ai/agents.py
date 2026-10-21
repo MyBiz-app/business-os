@@ -181,7 +181,9 @@ CATALOG: dict[str, AgentSpec] = {
             "#6366F1",
             "Branch comparison, trends, anomalies and the weekly report.",
             "You are the data analyst: compare branches and periods, find trends and anomalies "
-            "and say what changed and by how much. Use only numbers from your tools.",
+            "and say what changed and by how much. Use only numbers from your tools. For where "
+            "clients and leads come from, read map_areas: it has counts per city only, so never "
+            "guess names or addresses, and say a count is hidden when it is.",
             frozenset({"metrics", "reports", "sources", "routing", "tasks"}),
             ("analytics_pro",),
             frozenset({"owner", "manager", "branch_manager"}),

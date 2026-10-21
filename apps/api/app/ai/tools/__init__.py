@@ -24,6 +24,7 @@ from app.ai.tools.reading import (
     list_plans,
     list_sessions,
     logged_time,
+    map_areas,
     open_balances,
     suggest_freeze,
 )
@@ -118,6 +119,16 @@ TOOLS: dict[str, Tool] = {
             {"start_date": DATE, "end_date": DATE},
             Permission.REPORTS_READ,
             client_sources,
+        ),
+        Tool(
+            "map_areas",
+            "Where the business's clients and new leads live, city by city: counts only, no "
+            "names or addresses. Counts under 5 are hidden. Shows whether the business has a "
+            "branch in the city and the lead conversion there, to spot places with many leads "
+            "and no branch. Only suggests; nothing changes.",
+            {"start_date": DATE, "end_date": DATE},
+            Permission.REPORTS_READ,
+            map_areas,
         ),
         Tool(
             "inactive_members",
@@ -395,6 +406,7 @@ TOOL_DOMAINS: dict[str, str] = {
     "get_metrics": "metrics",
     "client_sources": "sources",
     "lead_pipeline": "leads",
+    "map_areas": "reports",
     "list_plans": "plans",
     "open_balances": "balances",
     "logged_time": "time",
@@ -416,7 +428,7 @@ TOOL_DOMAINS: dict[str, str] = {
 # Tools whose data has no branch to filter by (leads, for now). Whenever the conversation is
 # narrowed to some branches (a branch-limited user, an agent or a chat with a scope), they are
 # not offered, because their numbers would come from every branch.
-BRANCH_BLIND: frozenset[str] = frozenset({"lead_pipeline"})
+BRANCH_BLIND: frozenset[str] = frozenset({"lead_pipeline", "map_areas"})
 
 
 # What an AI connector (MCP, round 7 R37a) may use: the tools that only read. A test runs every
@@ -433,6 +445,7 @@ MCP_READ_TOOLS: frozenset[str] = frozenset(
         "get_metrics",
         "client_sources",
         "lead_pipeline",
+        "map_areas",
         "list_plans",
         "open_balances",
         "logged_time",
