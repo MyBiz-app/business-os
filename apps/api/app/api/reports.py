@@ -14,6 +14,7 @@ from app.reports.branch_insights import (
     staff_cost_by_branch,
     staff_count_by_branch,
 )
+from app.reports.client_cities import client_cities
 from app.reports.metrics import (
     METRICS,
     Dimension,
@@ -283,4 +284,32 @@ def branch_insights(
             )
             for location_id in ids
         ],
+    )
+
+
+class ClientCityOut(BaseModel):
+    city_code: int
+    city_name: str
+    clients: int
+    latitude: float | None = Field(description="The city's centre; none when it is not known")
+    longitude: float | None
+
+
+class ClientCitiesOut(BaseModel):
+    clients_total: int = Field(description="Clients, without leads and erased people")
+    clients_without_city: int = Field(description="Clients with no saved address in a listed city")
+    cities: list[ClientCityOut] = Field(description="Most clients first; every city, no minimum")
+
+
+@router.get("/client-cities")
+def client_cities_by_city(context: ReportsDep) -> ClientCitiesOut:
+    """Where the business's clients live, by city: the numbers behind the planned-branch map.
+    Only for someone who works in every branch (the clients belong to the whole business)."""
+    if context.branches is not None:
+        raise HTTPException(status_code=403, detail="all_branches_only")
+    found = client_cities(context.session)
+    return ClientCitiesOut(
+        clients_total=found.clients_total,
+        clients_without_city=found.clients_without_city,
+        cities=[ClientCityOut(**vars(city)) for city in found.cities],
     )

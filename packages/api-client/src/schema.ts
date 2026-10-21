@@ -6863,6 +6863,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/metrics/client-cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Cities By City
+         * @description Where the business's clients live, by city: the numbers behind the planned-branch map.
+         *     Only for someone who works in every branch (the clients belong to the whole business).
+         */
+        get: operations["client_cities_by_city"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reviews": {
         parameters: {
             query?: never;
@@ -8810,6 +8831,27 @@ export interface paths {
          * @description Which addresses bounced or complained: they are never mailed again.
          */
         get: operations["email_deliverability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/metrics/business-map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Map
+         * @description Where the businesses are and where their clients live, by city, split by industry. Totals
+         *     only: no names, and no city with fewer than five.
+         */
+        get: operations["business_map"];
         put?: never;
         post?: never;
         delete?: never;
@@ -11871,6 +11913,26 @@ export interface components {
              */
             issued_at: string;
         };
+        /** BusinessMap */
+        BusinessMap: {
+            /** Min Per City */
+            min_per_city: number;
+            /**
+             * Businesses
+             * @description Cities with an active branch, by business
+             */
+            businesses: components["schemas"]["MapCity"][];
+            /**
+             * Clients
+             * @description Cities clients live in, across all businesses
+             */
+            clients: components["schemas"]["MapCity"][];
+            /**
+             * Without Point
+             * @description Cities left out for lack of a known centre
+             */
+            without_point: number;
+        };
         /** BusinessMeter */
         BusinessMeter: {
             /** Used */
@@ -12904,6 +12966,40 @@ export interface components {
             last_name: string | null;
             /** Phone */
             phone: string | null;
+        };
+        /** ClientCitiesOut */
+        ClientCitiesOut: {
+            /**
+             * Clients Total
+             * @description Clients, without leads and erased people
+             */
+            clients_total: number;
+            /**
+             * Clients Without City
+             * @description Clients with no saved address in a listed city
+             */
+            clients_without_city: number;
+            /**
+             * Cities
+             * @description Most clients first; every city, no minimum
+             */
+            cities: components["schemas"]["ClientCityOut"][];
+        };
+        /** ClientCityOut */
+        ClientCityOut: {
+            /** City Code */
+            city_code: number;
+            /** City Name */
+            city_name: string;
+            /** Clients */
+            clients: number;
+            /**
+             * Latitude
+             * @description The city's centre; none when it is not known
+             */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
         };
         /** ClientConsentBody */
         ClientConsentBody: {
@@ -17326,6 +17422,34 @@ export interface components {
              * @description The device that asked
              */
             current: boolean;
+        };
+        /** MapCity */
+        MapCity: {
+            /** City Code */
+            city_code: number;
+            /** City Name */
+            city_name: string;
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
+            /** Total */
+            total: number;
+            /**
+             * Industries
+             * @description Largest first; small ones are 'mixed'
+             */
+            industries: components["schemas"]["MapIndustry"][];
+        };
+        /** MapIndustry */
+        MapIndustry: {
+            /**
+             * Vertical
+             * @description The industry; none when it is too few to name
+             */
+            vertical: string | null;
+            /** Total */
+            total: number;
         };
         /** MarkRead */
         MarkRead: {
@@ -40639,6 +40763,39 @@ export interface operations {
             };
         };
     };
+    client_cities_by_city: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientCitiesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     review_summary: {
         parameters: {
             query?: {
@@ -44454,6 +44611,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EmailDeliverability"];
+                };
+            };
+        };
+    };
+    business_map: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessMap"];
                 };
             };
         };

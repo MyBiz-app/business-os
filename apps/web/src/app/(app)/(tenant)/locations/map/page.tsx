@@ -6,7 +6,7 @@ import { BranchMap } from "@/components/branch-map/branch-map";
 import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { loadBranchMap } from "@/lib/branch-map";
+import { loadBranchMap, loadClientCities } from "@/lib/branch-map";
 import { getTenantFor } from "@/lib/tenant";
 
 import { openBranch } from "../actions";
@@ -15,7 +15,7 @@ export default async function BranchMapPage({ searchParams }: PageProps<"/locati
   const t = await getTranslations("branchMap");
   const tNav = await getTranslations("nav");
   const context = await getTenantFor("reports.read");
-  const branches = await loadBranchMap(context);
+  const [branches, clientCities] = await Promise.all([loadBranchMap(context), loadClientCities(context)]);
   const { branch } = await searchParams;
   const initial = typeof branch === "string" && branches.some((b) => b.id === branch) ? branch : null;
 
@@ -31,7 +31,7 @@ export default async function BranchMapPage({ searchParams }: PageProps<"/locati
           </Link>
         </EmptyState>
       ) : (
-        <BranchMap branches={branches} currency={context.tenant.currency} initialBranch={initial} openBranch={openBranch} />
+        <BranchMap branches={branches} currency={context.tenant.currency} initialBranch={initial} openBranch={openBranch} clientCities={clientCities} />
       )}
     </Container>
   );

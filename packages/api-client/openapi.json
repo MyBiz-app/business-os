@@ -35241,6 +35241,74 @@
         }
       }
     },
+    "/metrics/client-cities": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Client Cities By City",
+        "description": "Where the business's clients live, by city: the numbers behind the planned-branch map.\nOnly for someone who works in every branch (the clients belong to the whole business).",
+        "operationId": "client_cities_by_city",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientCitiesOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/reviews": {
       "get": {
         "tags": [
@@ -42443,6 +42511,33 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/EmailDeliverability"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/metrics/business-map": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Business Map",
+        "description": "Where the businesses are and where their clients live, by city, split by industry. Totals\nonly: no names, and no city with fewer than five.",
+        "operationId": "business_map",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessMap"
                 }
               }
             }
@@ -52080,6 +52175,43 @@
         ],
         "title": "BusinessInvoice"
       },
+      "BusinessMap": {
+        "properties": {
+          "min_per_city": {
+            "type": "integer",
+            "title": "Min Per City"
+          },
+          "businesses": {
+            "items": {
+              "$ref": "#/components/schemas/MapCity"
+            },
+            "type": "array",
+            "title": "Businesses",
+            "description": "Cities with an active branch, by business"
+          },
+          "clients": {
+            "items": {
+              "$ref": "#/components/schemas/MapCity"
+            },
+            "type": "array",
+            "title": "Clients",
+            "description": "Cities clients live in, across all businesses"
+          },
+          "without_point": {
+            "type": "integer",
+            "title": "Without Point",
+            "description": "Cities left out for lack of a known centre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "min_per_city",
+          "businesses",
+          "clients",
+          "without_point"
+        ],
+        "title": "BusinessMap"
+      },
       "BusinessMeter": {
         "properties": {
           "used": {
@@ -54577,6 +54709,83 @@
           "phone"
         ],
         "title": "ClientBusiness"
+      },
+      "ClientCitiesOut": {
+        "properties": {
+          "clients_total": {
+            "type": "integer",
+            "title": "Clients Total",
+            "description": "Clients, without leads and erased people"
+          },
+          "clients_without_city": {
+            "type": "integer",
+            "title": "Clients Without City",
+            "description": "Clients with no saved address in a listed city"
+          },
+          "cities": {
+            "items": {
+              "$ref": "#/components/schemas/ClientCityOut"
+            },
+            "type": "array",
+            "title": "Cities",
+            "description": "Most clients first; every city, no minimum"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clients_total",
+          "clients_without_city",
+          "cities"
+        ],
+        "title": "ClientCitiesOut"
+      },
+      "ClientCityOut": {
+        "properties": {
+          "city_code": {
+            "type": "integer",
+            "title": "City Code"
+          },
+          "city_name": {
+            "type": "string",
+            "title": "City Name"
+          },
+          "clients": {
+            "type": "integer",
+            "title": "Clients"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "The city's centre; none when it is not known"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_code",
+          "city_name",
+          "clients",
+          "latitude",
+          "longitude"
+        ],
+        "title": "ClientCityOut"
       },
       "ClientConsentBody": {
         "properties": {
@@ -66394,6 +66603,74 @@
           "current"
         ],
         "title": "LoginDevice"
+      },
+      "MapCity": {
+        "properties": {
+          "city_code": {
+            "type": "integer",
+            "title": "City Code"
+          },
+          "city_name": {
+            "type": "string",
+            "title": "City Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "industries": {
+            "items": {
+              "$ref": "#/components/schemas/MapIndustry"
+            },
+            "type": "array",
+            "title": "Industries",
+            "description": "Largest first; small ones are 'mixed'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_code",
+          "city_name",
+          "latitude",
+          "longitude",
+          "total",
+          "industries"
+        ],
+        "title": "MapCity"
+      },
+      "MapIndustry": {
+        "properties": {
+          "vertical": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vertical",
+            "description": "The industry; none when it is too few to name"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "vertical",
+          "total"
+        ],
+        "title": "MapIndustry"
       },
       "MarkRead": {
         "properties": {
