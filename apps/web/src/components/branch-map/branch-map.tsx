@@ -11,12 +11,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { SegmentedControl } from "@/components/segmented-control";
 import { formatMoney } from "@/lib/money";
 
-import { currentTone, followTheme, prefersReducedMotion, share, styleUrl } from "./map-core";
+import { currentTone, followTheme, loadMaplibre, prefersReducedMotion, share, styleUrl } from "./map-core";
+import { PlannedBranch } from "./planned-branch";
+import type { ClientCity } from "./planned-core";
 
 export type MapBranch = {
   id: string;
   name: string;
   city: string | null;
+  /** The city's code in the official list (a branch counts as "in" that city). */
+  cityCode: number | null;
   latitude: number;
   longitude: number;
   revenue: number | null;
@@ -38,6 +42,7 @@ export type MapBranch = {
 };
 
 type ColorBy = "revenue" | "clients" | "occupancy";
+type Mode = "branches" | "planned";
 
 const SMALL = 14;
 const BIG = 38;
@@ -52,6 +57,8 @@ type Props = {
   originsOn?: boolean;
   /** Server action: opens the branch's report or schedule (form field `branch_id`, `to`). */
   openBranch?: (formData: FormData) => Promise<void>;
+  /** Where the clients live, by city. Without it there is no "planned branch" mode. */
+  clientCities?: { cities: ClientCity[]; total: number } | null;
 };
 
 function Sparkline({ values }: { values: number[] }) {
@@ -67,7 +74,7 @@ function Sparkline({ values }: { values: number[] }) {
 
 /** The branches on a map: a dot per branch sized by the chosen number, a card on hover and, in
  * the full version, a side panel that the map flies to when a branch is chosen. */
-export function BranchMap({ branches, currency, variant = "full", initialBranch = null, originsOn = false, openBranch }: Props) {
+export function BranchMap({ branches, currency, variant = "full", initialBranch = null, originsOn = false, openBranch, clientCities = null }: Props) {
   const t = useTranslations("branchMap");
   const locale = useLocale();
   const full = variant === "full";
@@ -80,6 +87,8 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
   const [hovered, setHovered] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [showOrigins, setShowOrigins] = useState(originsOn);
+  const [mode, setMode] = useState<Mode>("branches");
+  const planning = full && mode === "planned" && clientCities !== null;
   const originMarkers = useRef<Marker[]>([]);
 
   const number = useMemo(() => new Intl.NumberFormat(locale), [locale]);
@@ -100,7 +109,7 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
     const nodes = markers.current;
     (async () => {
       try {
-        const maplibre = await import("maplibre-gl");
+        const maplibre = await loadMaplibre();
         if (cancelled || !container.current) return;
         const map = new maplibre.Map({
           container: container.current,
@@ -168,21 +177,21 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
   useEffect(() => {
     const map = mapRef.current;
     const branch = branches.find((b) => b.id === selected);
-    if (!ready || !map || !branch) return;
+    if (!ready || !map || !branch || planning) return;
     const to = { center: [branch.longitude, branch.latitude] as [number, number], zoom: 15 };
     if (prefersReducedMotion()) map.jumpTo(to);
     else map.flyTo({ ...to, speed: 0.8, curve: 1.6, essential: false });
-  }, [ready, selected, branches]);
+  }, [ready, selected, branches, planning]);
 
   // "Where clients come from": a dot per city, for the chosen branch (or all of them when none is).
   useEffect(() => {
     for (const marker of originMarkers.current) marker.remove();
     originMarkers.current = [];
     const map = mapRef.current;
-    if (!ready || !map || !showOrigins || !(full || originsOn)) return;
+    if (!ready || !map || !showOrigins || !(full || originsOn) || planning) return;
     let cancelled = false;
     (async () => {
-      const maplibre = await import("maplibre-gl");
+      const maplibre = await loadMaplibre();
       if (cancelled) return;
       const chosen = selected ? branches.filter((b) => b.id === selected) : branches;
       const byCity = new Map<string, { city: string; clients: number; latitude: number; longitude: number }>();
@@ -213,10 +222,14 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
     return () => {
       cancelled = true;
     };
-  }, [ready, showOrigins, selected, branches, full, originsOn, t]);
+  }, [ready, showOrigins, selected, branches, full, originsOn, planning, t]);
 
-  const open = branches.find((b) => b.id === selected) ?? null;
+  const open = planning ? null : (branches.find((b) => b.id === selected) ?? null);
   const peek = branches.find((b) => b.id === hovered) ?? null;
+  const modes: { value: Mode; label: string }[] = [
+    { value: "branches", label: t("mode.branches") },
+    { value: "planned", label: t("mode.planned") },
+  ];
   const toggles: { value: ColorBy; label: string }[] = [
     { value: "revenue", label: t("colorBy.revenue") },
     { value: "clients", label: t("colorBy.clients") },
@@ -225,16 +238,24 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
 
   return (
     <div className={`relative isolate overflow-hidden rounded-2xl border border-border bg-surface ${full ? "h-[70vh] min-h-[28rem]" : "h-64"}`}>
-      <div ref={container} className="absolute inset-0" role="region" aria-label={t("mapLabel")} />
+      {/* MapLibre's own stylesheet makes the map element `position: relative`, so the sizing is on a wrapper. */}
+        <div className="absolute inset-0">
+          <div ref={container} className="size-full" role="region" aria-label={t("mapLabel")} />
+        </div>
       {failed && <p className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-muted">{t("failed")}</p>}
       {full && (
         <div className="absolute start-3 top-3 z-10 max-w-[calc(100%-1.5rem)]">
           <div className="flex flex-col items-start gap-2">
-            <SegmentedControl label={t("colorByLabel")} value={colorBy} options={toggles} onChange={setColorBy} />
-            <label className="card inline-flex items-center gap-2 px-3 py-1.5 text-sm">
-              <input type="checkbox" checked={showOrigins} onChange={(e) => setShowOrigins(e.target.checked)} />
-              {t("originsLayer")}
-            </label>
+            {clientCities && <SegmentedControl label={t("mode.label")} value={mode} options={modes} onChange={setMode} />}
+            {!planning && (
+              <>
+                <SegmentedControl label={t("colorByLabel")} value={colorBy} options={toggles} onChange={setColorBy} />
+                <label className="card inline-flex items-center gap-2 px-3 py-1.5 text-sm">
+                  <input type="checkbox" checked={showOrigins} onChange={(e) => setShowOrigins(e.target.checked)} />
+                  {t("originsLayer")}
+                </label>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -254,6 +275,14 @@ export function BranchMap({ branches, currency, variant = "full", initialBranch 
         >
           {t("openFull")}
         </Link>
+      )}
+      {planning && ready && clientCities && (
+        <PlannedBranch
+          mapRef={mapRef}
+          branches={branches.map((b) => ({ id: b.id, name: b.name, cityCode: b.cityCode, latitude: b.latitude, longitude: b.longitude }))}
+          cities={clientCities.cities}
+          total={clientCities.total}
+        />
       )}
       {full && open && (
         <aside aria-label={open.name} className="absolute inset-y-0 start-0 z-20 flex w-full max-w-sm flex-col gap-4 overflow-y-auto border-e border-border bg-surface p-5 shadow-lg">

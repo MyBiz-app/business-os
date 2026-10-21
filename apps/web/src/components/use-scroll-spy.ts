@@ -25,7 +25,10 @@ export function useScrollSpy(ids: string[]): string | null {
           if (entry.isIntersecting) visible.add(entry.target.id);
           else visible.delete(entry.target.id);
         }
-        const first = list.find((id) => visible.has(id));
+        // A section that holds another visible one gives way to it: the group being read, not its topic.
+        const seen = list.filter((id) => visible.has(id));
+        const holds = (id: string) => seen.some((other) => other !== id && document.getElementById(id)?.contains(document.getElementById(other)));
+        const first = seen.find((id) => !holds(id));
         // Between two sections the last one stays marked.
         if (first) setActive(first);
       },

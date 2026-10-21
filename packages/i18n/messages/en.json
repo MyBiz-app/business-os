@@ -1041,6 +1041,8 @@
     "undo": "Undo",
     "notifications": "Notifications",
     "savedShort": "Saved",
+    "unsavedChanges": "You have unsaved changes",
+    "discardChanges": "Discard changes",
     "dismiss": "Close notification",
     "skipToContent": "Skip to main content",
     "loadFailed": "Couldn't load this right now.",
@@ -1177,6 +1179,29 @@
       "label": "View",
       "list": "List",
       "map": "Map"
+    },
+    "mode": {
+      "label": "Map mode",
+      "branches": "My branches",
+      "planned": "Planned branch"
+    },
+    "planned": {
+      "title": "Planned branch",
+      "help": "Drag the pin, click the map, or move it with the arrow keys (Shift for bigger steps). The numbers use the city each client lives in, not their address.",
+      "pinLabel": "The planned branch",
+      "rangesLabel": "Clients near the pin",
+      "within": "Within {km} km",
+      "nearest": "The nearest branch is <place>{name}</place>, {km} km away.",
+      "noBranch": "No branch has a point on the map yet.",
+      "withoutBranch": "Cities with clients and no branch",
+      "withoutBranchNone": "Every city your clients live in already has a branch.",
+      "cityRow": "{city}: {count} clients",
+      "fromPin": "{km} km from the pin",
+      "fromPinAndBranch": "{pin} km from the pin, {branch} km from the nearest branch",
+      "moveHere": "Move the pin here",
+      "basis": "Based on {count} clients whose city we know.",
+      "notCounted": "{count} more have no city we can place, so they are not counted.",
+      "empty": "No client has a city yet. Choose a city in a client's address and the clients appear here."
     }
   },
   "locations": {
@@ -2887,7 +2912,8 @@
       "catalog": "Catalog and prices",
       "trials": "Trials ending",
       "security": "Security center",
-      "legal": "Legal center"
+      "legal": "Legal center",
+      "map": "Business map"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -3934,6 +3960,33 @@
         "waiting": "Waiting for deletion"
       },
       "deleteAfter": "Deleted on {date}"
+    },
+    "businessMap": {
+      "title": "Business map",
+      "subtitle": "Where the businesses on MyBiz are and where their clients live, by city and industry. Totals only.",
+      "layer": {
+        "label": "Show",
+        "businesses": "Businesses",
+        "clients": "Clients' homes"
+      },
+      "privacy": "A city with fewer than {min} is never shown, and an industry with fewer than {min} in a city is shown as mixed.",
+      "mapLabel": "Map of cities with businesses",
+      "failed": "The map could not be loaded. Try again in a moment.",
+      "emptyBusinesses": "No city has {min} or more businesses yet, so nothing is shown. Cities appear here as more businesses open a branch in them.",
+      "emptyClients": "No city has {min} or more clients yet, so nothing is shown. Cities appear here as clients add the city they live in.",
+      "dot": "{city}: {count}",
+      "hoverBusinesses": "{count} businesses",
+      "hoverClients": "{count} clients",
+      "industryRow": "{industry}: {count}",
+      "mixed": "Mixed",
+      "legend": "Industries",
+      "showTable": "Show as a table",
+      "table": {
+        "city": "City",
+        "total": "Total",
+        "industries": "By industry"
+      },
+      "withoutPoint": "{count, plural, one {One city is left out because its position on the map is not known.} other {# cities are left out because their position on the map is not known.}}"
     }
   },
   "permissions": {

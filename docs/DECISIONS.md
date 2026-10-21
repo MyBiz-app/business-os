@@ -438,6 +438,14 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Storybook (free) is the live catalog** (`pnpm --filter web storybook`, built in CI so a broken story fails the pull request). Chromatic is not used: `e2e/screen_sweep.py` already compares whole pages.
 - **Lint ratchet:** `design-system/no-handrolled-ui` forbids a bare `<button>` or `<table>` in new code. The 192 files that already use them are listed in `eslint-rules/handrolled-ui-baseline.json`; the list can only shrink (a test fails when a listed file no longer needs its entry), so the page passes (W3-5) remove entries and nothing new slips in.
 
+### Planned branch and the console business map (2026-10-21, CRM Premium slice W2-4, migration 0154)
+
+- **Owner request (Adir, 2026-10-21 09:10 to 09:24):** drag a pin and see how many clients live nearby; a map of all businesses in the MyBiz console; full spread inside a business (one far client still counts), a minimum only across businesses; client addresses must not go to an outside service.
+- **Decision (planned branch):** the numbers use the city of the client's latest saved address and the city's centre, never an address. The server sends the counts by city (`GET /metrics/client-cities`, no minimum, only for someone who works in every branch, since clients belong to the whole business) and the browser measures distances, so the numbers move while the pin is dragged. Straight-line distance, not a drive. Clients in a city with no known centre are counted in the total and said to be left out of the rings.
+- **City centres are the stored ones** (W2-5's `geo_cities.latitude/longitude`), so no live lookup and no client address leaves the system.
+- **Decision (console map):** one read-only SQL function (`app.platform_business_map`) so only totals leave the database; the floor of 5 is enforced inside it (a caller cannot ask for less). A city under 5 is left out whole; an industry under 5 in a city is folded into "mixed". Two layers: businesses (by branch city) and clients' homes (by their city), colored by the leading top-level industry. Permission `businesses.read`.
+- **Found and fixed:** the map never drew in a real build (MapLibre 6 got an empty worker URL, and its stylesheet made the map element `position: relative` with no height, beating the Tailwind classes). The worker file is copied to `public/maplibre/` before dev and build and the library is pointed there (`loadMaplibre()`); the sizing sits on a wrapper element.
+
 ## Open
 
 
