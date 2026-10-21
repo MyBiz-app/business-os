@@ -46,7 +46,7 @@ test("brand color check flags colors that cannot be read as they are", async () 
   assert.equal(checkBrandColor("#f97316").level, "adjusted"); // orange is light on white
   for (const color of SAMPLES) {
     const check = checkBrandColor(color);
-    assert.ok(contrastRatio(check.light, "#f8fafc") >= 4.5, `${color} light shade`);
-    assert.ok(contrastRatio(check.dark, "#111827") >= 4.5, `${color} dark shade`);
+    assert.ok(contrastRatio(check.light, "#f7f7f8") >= 4.5, `${color} light shade`);
+    assert.ok(contrastRatio(check.dark, "#1a1a1d") >= 4.5, `${color} dark shade`);
   }
 });

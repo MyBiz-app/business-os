@@ -11,7 +11,7 @@ export function StatusPage({ title, text, detail, children }: { title: string; t
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 end-[10%] -z-10 size-[22rem] rounded-full bg-electric/15 blur-[110px]" />
       <div className="enter flex max-w-md flex-col items-center gap-4">
         <BrandMark className="size-16 drop-shadow-lg" />
-        <h1 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">{title}</h1>
+        <h1 className="text-2xl font-semibold text-balance">{title}</h1>
         <p className="text-lg text-muted text-pretty">{text}</p>
         {detail}
         <div className="mt-2 flex flex-wrap justify-center gap-3">{children}</div>

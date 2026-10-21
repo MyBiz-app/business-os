@@ -139,7 +139,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
   return (
     <nav ref={nav} aria-label={label ?? t("label")} className="relative isolate">
       <GlidePill box={box} glide={glide} className="max-md:hidden">
-        <span className="absolute inset-y-2 start-0 w-1 rounded-full bg-electric" />
+        <span className="absolute inset-y-2 start-0 w-1 rounded-full bg-primary" />
       </GlidePill>
       <button
         type="button"
@@ -148,7 +148,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
         onClick={() => setOpen((value) => !value)}
         className="btn-plain mx-3 mb-3 flex w-[calc(100%-1.5rem)] items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-semibold text-foreground md:hidden"
       >
-        <CurrentIcon aria-hidden="true" className="size-[18px] text-electric" />
+        <CurrentIcon aria-hidden="true" className="size-[18px] text-primary-ink" />
         <span className="flex-1 text-start">{current?.label ?? t("menu")}</span>
         <span className="sr-only">{t("menu")}</span>
         <ChevronDown aria-hidden="true" className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
@@ -180,7 +180,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                 aria-label={item.locked ? t("lockedItem", { name: item.label }) : undefined}
                 className={`group relative flex items-center gap-3 whitespace-nowrap rounded-xl py-2.5 ps-3 text-sm md:py-2 ${children.length > 0 ? "pe-10" : "pe-3"} font-medium transition-colors duration-200 ${
                   active
-                    ? "text-foreground max-md:bg-primary/20"
+                    ? "text-primary-ink max-md:bg-primary-subtle"
                     : inArea
                       ? "text-foreground hover:bg-foreground/5"
                       : item.locked
@@ -190,7 +190,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
               >
                 <Icon
                   aria-hidden="true"
-                  className={`size-[18px] shrink-0 transition-transform duration-200 ${active ? "text-electric" : "group-hover:scale-110"}`}
+                  className={`size-[18px] shrink-0 transition-transform duration-200 ${active ? "text-primary-ink" : "group-hover:scale-110"}`}
                 />
                 <span className="truncate">{item.label}</span>
                 {item.locked && (
@@ -230,7 +230,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                           }}
                           aria-current={childActive ? (anchor ? "location" : "page") : undefined}
                           className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors md:py-1.5 duration-200 ${
-                            childActive ? "font-semibold text-foreground max-md:bg-primary/15" : "text-muted hover:bg-foreground/5 hover:text-foreground"
+                            childActive ? "font-semibold text-primary-ink max-md:bg-primary-subtle" : "text-muted hover:bg-foreground/5 hover:text-foreground"
                           }`}
                         >
                           <span className="truncate">{child.label}</span>

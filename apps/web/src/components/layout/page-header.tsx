@@ -18,10 +18,10 @@ export function PageHeader({ title, description, eyebrow, actions, titleId, clas
     <header className={`flex flex-wrap items-end justify-between gap-x-6 gap-y-4 ${className}`.trim()}>
       <div className="flex min-w-0 max-w-[44rem] flex-col gap-2">
         {eyebrow && <p className="text-sm font-semibold uppercase tracking-wide text-primary-ink">{eyebrow}</p>}
-        <h1 id={titleId} className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
+        <h1 id={titleId} className="text-2xl font-semibold text-balance">
           {title}
         </h1>
-        {description && <p className="text-base text-muted text-pretty sm:text-lg">{description}</p>}
+        {description && <p className="text-sm text-muted text-pretty sm:text-base">{description}</p>}
       </div>
       {actions && <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-center gap-2 *:justify-center sm:flex sm:w-auto sm:flex-wrap">{actions}</div>}
     </header>

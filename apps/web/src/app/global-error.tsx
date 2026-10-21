@@ -34,7 +34,7 @@ export default function GlobalError({
     <html lang={locale} dir={localeDirection[locale]}>
       <head>
         {/* The root layout (and its tokens) failed to load, so this page carries its own light/dark palette. */}
-        <style>{`:root{--bg:#f8fafc;--fg:#111827;--accent:#2563eb}@media (prefers-color-scheme:dark){:root{--bg:#0b1020;--fg:#f1f5f9;--accent:#2563eb}}`}</style>
+        <style>{`:root{--bg:#f7f7f8;--fg:#18181b;--accent:#2563eb}@media (prefers-color-scheme:dark){:root{--bg:#111113;--fg:#f4f4f5;--accent:#2563eb}}`}</style>
       </head>
       <body
         style={{

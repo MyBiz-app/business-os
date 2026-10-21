@@ -10,31 +10,45 @@
 /* Design tokens. Use logical utilities (ms-*, ps-*, start-*, text-start) - never left/right.
  * Surfaces: `background` is the page canvas, `surface` the raised cards on it. Accents are
  * mixed from `primary`, so a business's brand color carries through the whole UI. */
+/* Calm (spec v4 design system, Figma "Calm" foundations): a neutral gray-white page, white
+ * surfaces, hairline borders, one action color and soft status tints. */
 :root {
-  --background: #f8fafc;
-  --foreground: #111827;
+  --background: #f7f7f8;
+  --foreground: #18181b;
   --surface: #ffffff;
-  --border: #e2e8f0;
-  --muted: #52627a;
+  /* A quiet fill inside a surface (table header, hover row, segmented track, inline code). */
+  --subtle: #f2f2f4;
+  --border: #e6e6ea;
+  --muted: #63636e;
   --palette-primary: #2563eb;
   --palette-primary-ink: #1d4ed8;
   --palette-on-primary: #ffffff;
   --primary: var(--palette-primary);
   --primary-ink: var(--palette-primary-ink);
   --on-primary: var(--palette-on-primary);
+  /* The active menu item and selected rows. */
+  --primary-subtle: color-mix(in oklab, var(--primary) 8%, var(--surface));
   /* Bright green for fills and dots; the ink is the AA-safe one for text (5:1 on white and on its tint). */
   --success: #16a34a;
-  --success-ink: #166534;
+  --success-ink: #15803d;
   --danger: #b91c1c;
   --on-danger: #ffffff;
   --warning: #b45309;
-  --shadow-color: 222 30% 18%;
-  --elevation:
-    0 1px 2px hsl(var(--shadow-color) / 0.06),
-    0 2px 6px hsl(var(--shadow-color) / 0.04);
-  --elevation-hover:
-    0 2px 4px hsl(var(--shadow-color) / 0.06),
-    0 10px 24px -6px hsl(var(--shadow-color) / 0.14);
+  /* Status tints: a very light background with the dark ink as text (badges, banners). */
+  --success-soft: #ecfdf3;
+  --warning-soft: #fff7e6;
+  --danger-soft: #fef2f2;
+  --info-soft: #eff6ff;
+  --info-ink: #1d4ed8;
+  --shadow-color: 240 6% 10%;
+  /* Cards are flat (a white surface and a hairline); only what floats casts a shadow. */
+  --elevation: 0 0 #0000;
+  --elevation-hover: 0 1px 3px hsl(var(--shadow-color) / 0.06), 0 8px 24px hsl(var(--shadow-color) / 0.08);
+  --elevation-floating: 0 1px 3px hsl(var(--shadow-color) / 0.06), 0 8px 24px hsl(var(--shadow-color) / 0.1);
+  /* Corners: controls (buttons, fields), cards, windows. */
+  --radius-control: 0.625rem;
+  --radius-card: 0.75rem;
+  --radius-dialog: 1rem;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   /* MyBiz's own brand (logo tile, accents, the call-to-action band) - not a business's color. */
   --brand-from: #2563eb;
@@ -45,23 +59,33 @@
   --brand-ink: #1d4ed8;
 }
 
+/* Night: charcoal, not navy. */
 .dark {
-  --background: #0b1020;
-  --foreground: #f8fafc;
-  --surface: #111827;
-  --border: #263247;
-  --muted: #94a3b8;
+  --background: #111113;
+  --foreground: #f4f4f5;
+  --surface: #1a1a1d;
+  --subtle: #232327;
+  --border: #2e2e33;
+  --muted: #a1a1aa;
   --palette-primary: #3b82f6;
   --palette-primary-ink: #60a5fa;
-  --palette-on-primary: #0b1020;
+  /* Dark text on the lighter night blue: white on it is only 3.7:1. */
+  --palette-on-primary: #111113;
+  --primary-subtle: color-mix(in oklab, var(--primary) 16%, var(--surface));
   --success: #22c55e;
   --success-ink: #4ade80;
   --danger: #f87171;
-  --on-danger: #0b1020;
+  --on-danger: #111113;
   --warning: #fbbf24;
-  --shadow-color: 222 40% 2%;
-  --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
-  --elevation-hover: 0 1px 0 hsl(0 0% 100% / 0.06) inset, 0 12px 28px -8px hsl(var(--shadow-color) / 0.8);
+  --success-soft: #12261a;
+  --warning-soft: #2a2010;
+  --danger-soft: #2a1414;
+  --info-soft: #14203a;
+  --info-ink: #60a5fa;
+  --shadow-color: 240 10% 2%;
+  --elevation: 0 0 #0000;
+  --elevation-hover: 0 1px 3px hsl(var(--shadow-color) / 0.5), 0 8px 24px hsl(var(--shadow-color) / 0.6);
+  --elevation-floating: 0 1px 3px hsl(var(--shadow-color) / 0.5), 0 12px 28px hsl(var(--shadow-color) / 0.7);
 }
 
 /* The person's palette (decision X25): MyBiz (above) is the default; set on <html> as
@@ -109,12 +133,14 @@
   --primary: var(--brand, var(--palette-primary));
   --primary-ink: var(--brand, var(--palette-primary-ink));
   --on-primary: var(--on-brand, var(--palette-on-primary));
+  --primary-subtle: color-mix(in oklab, var(--primary) 8%, var(--surface));
 }
 
 .dark .brand {
   --primary: var(--brand-dark, var(--palette-primary));
   --primary-ink: var(--brand-dark, var(--palette-primary-ink));
   --on-primary: var(--on-brand-dark, var(--palette-on-primary));
+  --primary-subtle: color-mix(in oklab, var(--primary) 16%, var(--surface));
 }
 
 @theme inline {
@@ -126,8 +152,15 @@
   --color-primary: var(--primary);
   --color-primary-ink: var(--primary-ink);
   --color-on-primary: var(--on-primary);
+  --color-subtle: var(--subtle);
+  --color-primary-subtle: var(--primary-subtle);
   --color-success: var(--success);
   --color-success-ink: var(--success-ink);
+  --color-success-soft: var(--success-soft);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger-soft: var(--danger-soft);
+  --color-info-soft: var(--info-soft);
+  --color-info-ink: var(--info-ink);
   --color-danger: var(--danger);
   --color-on-danger: var(--on-danger);
   --color-warning: var(--warning);
@@ -147,11 +180,7 @@
 }
 
 body {
-  background:
-    radial-gradient(1200px 500px at 85% -10%, color-mix(in oklab, var(--primary) 9%, transparent), transparent 70%),
-    radial-gradient(900px 400px at 0% 0%, color-mix(in oklab, var(--primary) 5%, transparent), transparent 70%),
-    var(--background);
-  background-attachment: fixed;
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
 }
@@ -191,7 +220,7 @@ h3,
 /* A raised card. */
 @utility card {
   color: var(--foreground);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-card);
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--elevation);
@@ -210,13 +239,11 @@ h3,
   }
 }
 
-/* An accent surface tinted with the brand color. */
+/* An accent surface tinted with the brand color (flat: no gradient in the product). */
 @utility card-accent {
-  border-radius: 1.25rem;
-  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--border));
-  background:
-    linear-gradient(135deg, color-mix(in oklab, var(--primary) 10%, transparent), transparent 60%),
-    var(--surface);
+  border-radius: var(--radius-card);
+  border: 1px solid color-mix(in oklab, var(--primary) 30%, var(--border));
+  background: var(--primary-subtle);
   box-shadow: var(--elevation);
 }
 
@@ -242,23 +269,13 @@ h3,
   font-weight: 600;
   line-height: 1.25rem;
   color: var(--on-primary);
-  background:
-    linear-gradient(180deg, color-mix(in oklab, white 10%, transparent), transparent),
-    var(--primary);
-  box-shadow:
-    0 1px 0 color-mix(in oklab, white 18%, transparent) inset,
-    0 1px 2px hsl(var(--shadow-color) / 0.18),
-    0 2px 8px -2px color-mix(in oklab, var(--primary) 40%, transparent);
+  /* Calm: one flat action color, no sheen or glow. */
+  background: var(--primary);
   transition:
     transform 120ms var(--ease-out),
-    box-shadow 160ms var(--ease-out),
-    filter 160ms var(--ease-out);
+    background-color 160ms var(--ease-out);
   &:hover:not(:disabled) {
-    filter: brightness(1.08);
-    box-shadow:
-      0 1px 0 color-mix(in oklab, white 18%, transparent) inset,
-      0 1px 2px hsl(var(--shadow-color) / 0.18),
-      0 6px 16px -4px color-mix(in oklab, var(--primary) 50%, transparent);
+    background: color-mix(in oklab, var(--primary) 88%, var(--foreground));
   }
   &:active:not(:disabled) {
     transform: scale(0.97);
@@ -282,14 +299,12 @@ h3,
   background: var(--surface);
   font-weight: 600;
   line-height: 1.25rem;
-  box-shadow: 0 1px 2px hsl(var(--shadow-color) / 0.05);
   transition:
     transform 120ms var(--ease-out),
     border-color 160ms var(--ease-out),
     background-color 160ms var(--ease-out);
   &:hover:not(:disabled) {
-    border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
-    background: color-mix(in oklab, var(--primary) 5%, var(--surface));
+    background: var(--subtle);
   }
   &:active:not(:disabled) {
     transform: scale(0.97);
@@ -390,12 +405,10 @@ h3,
 }
 
 @utility popover {
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
   background: var(--surface);
-  box-shadow:
-    0 1px 2px hsl(var(--shadow-color) / 0.08),
-    0 16px 40px -12px hsl(var(--shadow-color) / 0.35);
+  box-shadow: var(--elevation-floating);
   transition:
     opacity 140ms var(--ease-out),
     transform 160ms var(--ease-out),
@@ -433,7 +446,7 @@ h3,
 
 /* Text inputs, selects and text areas. */
 @utility control {
-  border-radius: 0.75rem;
+  border-radius: var(--radius-control);
   border: 1px solid var(--border);
   background: var(--surface);
   transition:
@@ -814,19 +827,44 @@ html[data-motion="reduce"] *::after {
   scroll-behavior: auto !important;
 }
 
-/* The navigation frame (top bar + side menu): Midnight Navy in light and night mode, one token. */
+/* The dark navigation column a person may still choose in light mode: charcoal, like night mode. */
 :root {
-  --frame: #0f172a;
+  --frame: #18181b;
 }
 
-/* The page behind the cards of the business app and the console: a soft blue-gray in light
- * mode (cards stay white on it); the plain background in night mode. */
+/* The business app and the console speak Calm: the page is the plain gray-white canvas, and the
+ * Tailwind scales are remapped here so every screen follows without touching its classes.
+ * Type: 12 / 13 / 15 (body) / 17 / 20 / 24 / 30; weights 400 for text and 600 for labels and
+ * headings (700 and 800 do not exist in the product); corners 10 / 12 / 16. */
 .app-shell {
-  --page: color-mix(in oklab, var(--background) 92%, #475569);
-  background: var(--page);
-}
-.dark .app-shell {
   --page: var(--background);
+  background: var(--page);
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.125rem;
+  --text-base: 0.9375rem;
+  --text-base--line-height: 1.375rem;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.375rem;
+  --text-4xl: 1.875rem;
+  --text-4xl--line-height: 2.375rem;
+  --font-weight-bold: 600;
+  --font-weight-extrabold: 600;
+  --font-weight-black: 600;
+  --radius-2xl: var(--radius-card);
+  --radius-3xl: var(--radius-dialog);
+}
+/* A heading stands out by its size, not its weight. */
+.app-shell :where(h1, h2, h3) {
+  font-weight: 600;
+  letter-spacing: normal;
 }
 
 /* Data tables in the business app and the console share one look: a quiet header row, a rule
@@ -835,7 +873,7 @@ html[data-motion="reduce"] *::after {
   color: var(--muted);
   font-size: 0.8125rem;
   font-weight: 600;
-  background: color-mix(in oklab, var(--surface) 94%, var(--foreground));
+  background: var(--subtle);
   border-bottom: 1px solid var(--border);
 }
 .app-shell main table:not([data-plain]) tbody tr {
@@ -845,22 +883,32 @@ html[data-motion="reduce"] *::after {
   border-top: 0;
 }
 .app-shell main table:not([data-plain]) tbody tr:hover {
-  background: color-mix(in oklab, var(--surface) 96%, var(--foreground));
+  background: color-mix(in oklab, var(--subtle) 60%, var(--surface));
 }
 
-/* The navigation column: Midnight Navy in light and night mode. Its tokens are redefined so
+/* The navigation column. Calm's default is light: the page's own surface with a hairline, so
+ * everything inside reads with the page's tokens (night mode: the charcoal surface). */
+.nav-light {
+  background: var(--surface);
+  color: var(--foreground);
+  border-inline-end: 1px solid var(--border);
+}
+
+/* The dark column a person may choose instead (light mode only). Its tokens are redefined so
  * everything inside (workspace switcher, menu, badges) reads correctly without its own colors;
- * a business's brand color is lightened toward white so it stays visible on navy. */
+ * a business's brand color is lightened toward white so it stays visible on charcoal. */
 .nav-dark {
   color-scheme: dark;
-  --foreground: #f8fafc;
-  --surface: #172036;
+  --foreground: #f4f4f5;
+  --surface: #232327;
+  --subtle: #2a2a2f;
   --border: rgb(255 255 255 / 0.1);
-  --muted: #a3b2c8;
+  --muted: #a1a1aa;
   --primary: color-mix(in oklab, var(--brand, var(--palette-primary)) 55%, white);
   --primary-ink: var(--primary);
-  --on-primary: #0b1020;
-  --shadow-color: 222 40% 2%;
+  --on-primary: #111113;
+  --primary-subtle: rgb(255 255 255 / 0.08);
+  --shadow-color: 240 10% 2%;
   background: var(--frame);
   color: var(--foreground);
 }
@@ -890,6 +938,15 @@ html[data-motion="reduce"] *::after {
   --brand-strong-from: #1d4ed8;
   --brand-strong-to: #7c3aed;
   --brand-ink: #1d4ed8;
+  /* The marketing site keeps its rounder cards and soft depth (Calm is the product's language). */
+  --elevation:
+    0 1px 2px hsl(var(--shadow-color) / 0.06),
+    0 2px 6px hsl(var(--shadow-color) / 0.04);
+  --elevation-hover:
+    0 2px 4px hsl(var(--shadow-color) / 0.06),
+    0 10px 24px -6px hsl(var(--shadow-color) / 0.14);
+  --radius-card: 1.25rem;
+  --radius-control: 0.75rem;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-main), system-ui, sans-serif;
@@ -1054,13 +1111,6 @@ html[data-contrast="high"].dark .mk {
 [data-paused="true"] .mk-grow,
 [data-paused="true"] .mk-fill {
   animation-play-state: paused;
-}
-
-/* The business app and the console: page titles match the extra-bold, tight titles of the
- * marketing pages and sign-in screens. Not in a layer, so it wins over each page's `font-bold`. */
-:has(> .nav-dark) main h1 {
-  font-weight: 800;
-  letter-spacing: -0.02em;
 }
 
 /* A heading that receives focus from script (the signup wizard moves focus to each step's title)
@@ -1869,10 +1919,10 @@ h1[tabindex="-1"]:focus {
   flex-direction: column;
   inline-size: min(100%, 64rem);
   max-block-size: 100%;
-  border-radius: 1.25rem;
+  border-radius: var(--radius-dialog);
   border: 1px solid var(--border);
   background: var(--surface);
-  box-shadow: 0 24px 64px hsl(var(--shadow-color) / 0.35);
+  box-shadow: 0 24px 64px hsl(var(--shadow-color) / 0.25);
   overflow: hidden;
   animation: modal-in 200ms var(--ease-out) both;
 }
@@ -2040,8 +2090,8 @@ html:has(dialog:modal) {
   top: 0;
   z-index: -1;
   pointer-events: none;
-  border-radius: 0.75rem;
-  background: color-mix(in oklab, var(--primary) 16%, transparent);
+  border-radius: var(--radius-control);
+  background: var(--primary-subtle);
 }
 .glide-pill[data-glide] {
   transition:
