@@ -452,6 +452,13 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Decision (console map):** one read-only SQL function (`app.platform_business_map`) so only totals leave the database; the floor of 5 is enforced inside it (a caller cannot ask for less). A city under 5 is left out whole; an industry under 5 in a city is folded into "mixed". Two layers: businesses (by branch city) and clients' homes (by their city), colored by the leading top-level industry. Permission `businesses.read`.
 - **Found and fixed:** the map never drew in a real build (MapLibre 6 got an empty worker URL, and its stylesheet made the map element `position: relative` with no height, beating the Tailwind classes). The worker file is copied to `public/maplibre/` before dev and build and the library is pointed there (`loadMaplibre()`); the sizing sits on a wrapper element.
 
+### Global search is one API call that re-uses each list's rules (2026-10-21, CRM Premium slice W4-2, no migration)
+
+- **Decision:** `GET /search` runs one small query per kind (clients, leads, team, classes, invoices), each only when the caller holds the permission of that kind's list and with the same branch rule; it does not use a separate search index or copy of the data. Clients and leads use the existing trigram search functions. Rate limit: 90 calls a minute per address, on top of the per-business ceiling.
+- **Why:** a second index would have to repeat every permission and branch rule and could drift from them, which is how a leak starts. The lists already scale (trigram indexes); classes, team and invoices are small per business and bounded by `LIMIT 5`.
+- **Recent records** (the last five opened from the window) live in the browser per business, like saved views; nothing about them is stored on the server.
+- **Revisit** if invoices per business grow past tens of thousands (add a trigram index on client name) or if a later slice needs quotes and receipts in the same box.
+
 ## Open
 
 
