@@ -7367,17 +7367,7 @@
       "nextSellHint": "אין מנוי פעיל.",
       "creditsLeft": "{count, plural, one {נשארה כניסה אחת} other {נשארו # כניסות}}",
       "upcomingCount": "{count, plural, =0 {אין תורים קרובים} one {תור אחד קרוב} other {# תורים קרובים}}",
-      "contact": "יצירת קשר",
-      "activityEmpty": "עוד לא קרה כלום.",
-      "activity": {
-        "visit": "הגיע/ה ל{service}",
-        "booked": "נרשם/ה ל{service}",
-        "no_show": "לא הגיע/ה ל{service}",
-        "cancelled": "ביטל/ה את {service}",
-        "waitlisted": "ממתין/ה ל{service}",
-        "note": "הערה: {text}",
-        "plan": "התחיל מנוי: {plan}"
-      }
+      "contact": "יצירת קשר"
     },
     "numbers": {
       "title": "מספרים מרכזיים",
