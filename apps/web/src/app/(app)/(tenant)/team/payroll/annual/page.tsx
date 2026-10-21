@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import { formatMoney } from "@business-os/i18n/money";
 import { BRAND } from "@business-os/i18n/brand";
 import { Download } from "lucide-react";
@@ -29,8 +30,6 @@ export default async function AnnualPayrollPage({ searchParams }: PageProps<"/te
   const year = Math.min(2100, Math.max(2000, requested));
   const summary = unwrap(await api.GET("/payroll/annual/{year}", { params: { ...scope, path: { year } } }));
   const money = (amount: number) => formatMoney(amount, summary.currency, locale);
-  const columns = ["months", "gross", "tax", "ni", "health", "pension", "net", "employer"] as const;
-
   return (
     <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/team/payroll" label={t("back")} />
@@ -56,58 +55,37 @@ export default async function AnnualPayrollPage({ searchParams }: PageProps<"/te
       ) : (
         <>
           {summary.draft && <p className="text-sm text-muted">{t("draft")}</p>}
-          <div className="card overflow-x-auto">
-            <table className="w-full min-w-[48rem] text-sm">
-              <thead>
-                <tr className="border-b border-border text-start text-muted">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">
-                    {t("person")}
-                  </th>
-                  {columns.map((column) => (
-                    <th key={column} scope="col" className="px-4 py-3 text-end font-medium">
-                      {t(column)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {summary.people.map((person) => (
-                  <tr key={person.user_id} className="border-b border-border last:border-0">
-                    <th scope="row" dir="auto" className="px-4 py-3 text-start font-medium">
-                      {person.full_name}
-                      {person.corrected_months > 0 && (
-                        <span className="ms-2">
-                          <Pill tone="warning">{t("corrected", { count: person.corrected_months })}</Pill>
-                        </span>
-                      )}
-                    </th>
-                    <td className="px-4 py-3 text-end tabular-nums">{person.months}</td>
-                    <td className="px-4 py-3 text-end tabular-nums">
-                      <bdi>{money(person.gross_minor)}</bdi>
-                    </td>
-                    <td className="px-4 py-3 text-end tabular-nums">
-                      <bdi>{money(person.income_tax_minor)}</bdi>
-                    </td>
-                    <td className="px-4 py-3 text-end tabular-nums">
-                      <bdi>{money(person.national_insurance_minor)}</bdi>
-                    </td>
-                    <td className="px-4 py-3 text-end tabular-nums">
-                      <bdi>{money(person.health_minor)}</bdi>
-                    </td>
-                    <td className="px-4 py-3 text-end tabular-nums">
-                      <bdi>{money(person.pension_employee_minor)}</bdi>
-                    </td>
-                    <td className="px-4 py-3 text-end font-semibold tabular-nums">
-                      <bdi>{money(person.net_minor)}</bdi>
-                    </td>
-                    <td className="px-4 py-3 text-end tabular-nums">
-                      <bdi>{money(person.employer_minor)}</bdi>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            label={t("person")}
+            className="[&_table]:min-w-[48rem]"
+            rows={summary.people}
+            rowKey={(person) => person.user_id}
+            columns={[
+              {
+                key: "person",
+                header: t("person"),
+                rowHeader: true,
+                cell: (person) => (
+                  <span dir="auto">
+                    {person.full_name}
+                    {person.corrected_months > 0 && (
+                      <span className="ms-2">
+                        <Pill tone="warning">{t("corrected", { count: person.corrected_months })}</Pill>
+                      </span>
+                    )}
+                  </span>
+                ),
+              },
+              { key: "months", header: t("months"), align: "end", className: "tabular-nums", cell: (person) => person.months },
+              { key: "gross", header: t("gross"), align: "end", className: "tabular-nums", cell: (person) => <bdi>{money(person.gross_minor)}</bdi> },
+              { key: "tax", header: t("tax"), align: "end", className: "tabular-nums", cell: (person) => <bdi>{money(person.income_tax_minor)}</bdi> },
+              { key: "ni", header: t("ni"), align: "end", className: "tabular-nums", cell: (person) => <bdi>{money(person.national_insurance_minor)}</bdi> },
+              { key: "health", header: t("health"), align: "end", className: "tabular-nums", cell: (person) => <bdi>{money(person.health_minor)}</bdi> },
+              { key: "pension", header: t("pension"), align: "end", className: "tabular-nums", cell: (person) => <bdi>{money(person.pension_employee_minor)}</bdi> },
+              { key: "net", header: t("net"), align: "end", className: "font-semibold tabular-nums", cell: (person) => <bdi>{money(person.net_minor)}</bdi> },
+              { key: "employer", header: t("employer"), align: "end", className: "tabular-nums", cell: (person) => <bdi>{money(person.employer_minor)}</bdi> },
+            ]}
+          />
         </>
       )}
     </Container>

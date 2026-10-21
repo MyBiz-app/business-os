@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { components } from "@business-os/api-client";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -12,7 +13,6 @@ import { formatDay, todayIn } from "@/lib/dates";
 import { resolveRange } from "@/lib/range";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
-import { ScrollRegion } from "@/components/scroll-region";
 
 import { BranchComparison } from "./branch-comparison";
 import { BranchLink } from "./branch-link";
@@ -91,41 +91,34 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {rows.length === 0 ? (
         <p className="text-sm text-muted">{t("noSessions")}</p>
       ) : (
-        <ScrollRegion labelledBy={id}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-start text-muted">
-                <th scope="col" className="py-2 pe-4 text-start font-medium">{nameHeader}</th>
-                <th scope="col" className="py-2 pe-4 text-end font-medium">{t("sessions")}</th>
-                <th scope="col" className="py-2 pe-4 text-end font-medium">{t("attended")}</th>
-                <th scope="col" className="py-2 pe-4 text-end font-medium">{t("occupancy")}</th>
-                <th scope="col" className="py-2 text-end font-medium">{t("noShowRate")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.key} className="border-b border-border last:border-0">
-                  <th scope="row" className="py-2 pe-4 text-start font-medium">
-                    {link?.(row) ?? <bdi>{name(row)}</bdi>}
-                  </th>
-                  <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.sessions)}</td>
-                  <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.attended)}</td>
-                  <td className="py-2 pe-4">
-                    <span className="flex items-center justify-end gap-2 tabular-nums">
-                      {row.occupancy !== null && (
-                        <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
-                          <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy)}%` }} />
-                        </span>
-                      )}
-                      {percent(row.occupancy)}
+        <DataTable
+          labelledBy={id}
+          bare
+          density="compact"
+          rows={rows}
+          rowKey={(row) => row.key}
+          columns={[
+            { key: "name", header: nameHeader, rowHeader: true, cell: (row) => link?.(row) ?? <bdi>{name(row)}</bdi> },
+            { key: "sessions", header: t("sessions"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.sessions) },
+            { key: "attended", header: t("attended"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.attended) },
+            {
+              key: "occupancy",
+              header: t("occupancy"),
+              align: "end",
+              cell: (row) => (
+                <span className="flex items-center justify-end gap-2 tabular-nums">
+                  {row.occupancy !== null && (
+                    <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
+                      <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy)}%` }} />
                     </span>
-                  </td>
-                  <td className="py-2 text-end tabular-nums">{percent(row.no_show_rate)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+                  )}
+                  {percent(row.occupancy)}
+                </span>
+              ),
+            },
+            { key: "noShowRate", header: t("noShowRate"), align: "end", className: "tabular-nums", cell: (row) => percent(row.no_show_rate) },
+          ]}
+        />
       )}
     </section>
   );
@@ -171,46 +164,52 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           <h2 id="by-court" className="text-lg font-semibold">
             {t("byCourt")}
           </h2>
-          <ScrollRegion labelledBy="by-court">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-start text-muted">
-                  <th scope="col" className="py-2 pe-4 text-start font-medium">{t("court")}</th>
-                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("reservations")}</th>
-                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("reservedHours")}</th>
-                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("occupancy")}</th>
-                  <th scope="col" className="py-2 text-end font-medium">{t("courtRevenue")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courts.map((row) => (
-                  <tr key={row.room_id} className="border-b border-border last:border-0">
-                    <th scope="row" className="py-2 pe-4 text-start font-medium">
-                      <bdi>{row.room_name}</bdi>
-                      <span className="block text-xs font-normal text-muted">
-                        <bdi>{row.location_name}</bdi>
+          <DataTable
+            labelledBy="by-court"
+            bare
+            density="compact"
+            rows={courts}
+            rowKey={(row) => row.room_id}
+            columns={[
+              {
+                key: "court",
+                header: t("court"),
+                rowHeader: true,
+                cell: (row) => (
+                  <>
+                    <bdi>{row.room_name}</bdi>
+                    <span className="block text-xs font-normal text-muted">
+                      <bdi>{row.location_name}</bdi>
+                    </span>
+                  </>
+                ),
+              },
+              { key: "reservations", header: t("reservations"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.reservations) },
+              {
+                key: "reservedHours",
+                header: t("reservedHours"),
+                align: "end",
+                className: "tabular-nums",
+                cell: (row) => t("hoursOf", { reserved: number.format(row.reserved_hours), open: number.format(row.open_hours) }),
+              },
+              {
+                key: "occupancy",
+                header: t("occupancy"),
+                align: "end",
+                cell: (row) => (
+                  <span className="flex items-center justify-end gap-2 tabular-nums">
+                    {row.occupancy_percent !== null && (
+                      <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
+                        <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy_percent)}%` }} />
                       </span>
-                    </th>
-                    <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.reservations)}</td>
-                    <td className="py-2 pe-4 text-end tabular-nums">
-                      {t("hoursOf", { reserved: number.format(row.reserved_hours), open: number.format(row.open_hours) })}
-                    </td>
-                    <td className="py-2 pe-4">
-                      <span className="flex items-center justify-end gap-2 tabular-nums">
-                        {row.occupancy_percent !== null && (
-                          <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
-                            <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy_percent)}%` }} />
-                          </span>
-                        )}
-                        {percent(row.occupancy_percent)}
-                      </span>
-                    </td>
-                    <td className="py-2 text-end tabular-nums">{formatMoney(row.revenue, row.currency, locale)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+                    )}
+                    {percent(row.occupancy_percent)}
+                  </span>
+                ),
+              },
+              { key: "courtRevenue", header: t("courtRevenue"), align: "end", className: "tabular-nums", cell: (row) => formatMoney(row.revenue, row.currency, locale) },
+            ]}
+          />
         </section>
       )}
       <section aria-labelledby="at-risk-heading" className="flex flex-col gap-3 card p-6">

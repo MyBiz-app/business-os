@@ -53,9 +53,6 @@
   "src/app/(app)/(tenant)/bills/page.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/bills/run-form.tsx": [
-    "table"
-  ],
   "src/app/(app)/(tenant)/catalog/codes-tab.tsx": [
     "button"
   ],
@@ -123,9 +120,6 @@
   "src/app/(app)/(tenant)/reports/busy-hours.tsx": [
     "table"
   ],
-  "src/app/(app)/(tenant)/reports/page.tsx": [
-    "table"
-  ],
   "src/app/(app)/(tenant)/resources/page.tsx": [
     "button"
   ],
@@ -178,8 +172,7 @@
     "table"
   ],
   "src/app/(app)/(tenant)/settings/billing/page.tsx": [
-    "button",
-    "table"
+    "button"
   ],
   "src/app/(app)/(tenant)/settings/branding/branding-editor.tsx": [
     "button"
@@ -216,9 +209,6 @@
   ],
   "src/app/(app)/(tenant)/team/page.tsx": [
     "button"
-  ],
-  "src/app/(app)/(tenant)/team/payroll/annual/page.tsx": [
-    "table"
   ],
   "src/app/(app)/(tenant)/team/payroll/run-board.tsx": [
     "button"

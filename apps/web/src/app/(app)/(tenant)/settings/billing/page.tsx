@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import { FlaskConical, Sparkles } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -20,7 +21,6 @@ import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { Note } from "@/components/ui/note";
 import { TopicHeader } from "../topic-header";
 import { Ltr } from "@/components/bidi";
-import { ScrollRegion } from "@/components/scroll-region";
 
 const TRIAL_DAYS = 14;
 const BRANDS = ["visa", "mastercard", "amex"] as const;
@@ -243,54 +243,56 @@ export default async function BillingPage({ searchParams }: PageProps<"/settings
         {billing.invoices.length === 0 ? (
           <p className="text-sm text-muted">{t("noInvoices")}</p>
         ) : (
-          <ScrollRegion label={t("invoices")}>
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="py-2 text-start font-medium">{t("number")}</th>
-                  <th scope="col" className="py-2 text-start font-medium">{t("period")}</th>
-                  <th scope="col" className="py-2 text-start font-medium">{t("status")}</th>
-                  <th scope="col" className="py-2 text-end font-medium">{t("total")}</th>
-                  <th scope="col" className="py-2"><span className="sr-only">{t("actions")}</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                {billing.invoices.map((invoice) => (
-                  <tr key={invoice.id} className="border-b border-border last:border-0">
-                    <td className="py-3 tabular-nums"><Ltr>{invoice.number}</Ltr></td>
-                    <td className="py-3">
-                      {formatDay(invoice.period_start, locale, { day: "numeric", month: "short" })} -{" "}
-                      {formatDay(invoice.period_end, locale, { day: "numeric", month: "short", year: "numeric" })}
-                    </td>
-                    <td className="py-3">
-                      <Pill tone={invoice.status === "paid" ? "success" : invoice.status === "open" ? "danger" : "muted"}>
-                        {t(`statuses.${invoice.status}`)}
-                      </Pill>
-                    </td>
-                    <td className="py-3 text-end tabular-nums"><bdi>{money(invoice.total, invoice.currency)}</bdi></td>
-                    <td className="py-3 text-end">
-                      <span className="inline-flex items-center gap-3">
-                        {invoice.status === "open" && method && (
-                          <form action={payInvoice.bind(null, invoice.id)}>
-                            <button type="submit" className="btn-link font-semibold text-primary-ink underline-offset-4 hover:underline">
-                              {t("pay")}
-                            </button>
-                          </form>
-                        )}
-                        <Link
-                          href={`/settings/billing/invoices/${invoice.id}`}
-                          className="text-primary-ink underline-offset-4 hover:underline"
-                          aria-label={t("viewInvoice", { number: invoice.number })}
-                        >
-                          {t("view")}
-                        </Link>
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            label={t("invoices")}
+            bare
+            rows={billing.invoices}
+            rowKey={(invoice) => invoice.id}
+            columns={[
+              { key: "number", header: t("number"), className: "tabular-nums", cell: (invoice) => <Ltr>{invoice.number}</Ltr> },
+              {
+                key: "period",
+                header: t("period"),
+                cell: (invoice) => (
+                  <>
+                    {formatDay(invoice.period_start, locale, { day: "numeric", month: "short" })} -{" "}
+                    {formatDay(invoice.period_end, locale, { day: "numeric", month: "short", year: "numeric" })}
+                  </>
+                ),
+              },
+              {
+                key: "status",
+                header: t("status"),
+                cell: (invoice) => (
+                  <Pill tone={invoice.status === "paid" ? "success" : invoice.status === "open" ? "danger" : "muted"}>{t(`statuses.${invoice.status}`)}</Pill>
+                ),
+              },
+              { key: "total", header: t("total"), align: "end", className: "tabular-nums", cell: (invoice) => <bdi>{money(invoice.total, invoice.currency)}</bdi> },
+              {
+                key: "actions",
+                header: <span className="sr-only">{t("actions")}</span>,
+                align: "end",
+                cell: (invoice) => (
+                  <span className="inline-flex items-center gap-3">
+                    {invoice.status === "open" && method && (
+                      <form action={payInvoice.bind(null, invoice.id)}>
+                        <button type="submit" className="btn-link font-semibold text-primary-ink underline-offset-4 hover:underline">
+                          {t("pay")}
+                        </button>
+                      </form>
+                    )}
+                    <Link
+                      href={`/settings/billing/invoices/${invoice.id}`}
+                      className="text-primary-ink underline-offset-4 hover:underline"
+                      aria-label={t("viewInvoice", { number: invoice.number })}
+                    >
+                      {t("view")}
+                    </Link>
+                  </span>
+                ),
+              },
+            ]}
+          />
         )}
       </CollapsibleSection>
 
