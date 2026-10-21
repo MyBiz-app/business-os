@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import { getFormatter, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -6,7 +7,6 @@ import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
 
@@ -46,68 +46,67 @@ export default async function TrialsPage({ searchParams }: PageProps<"/platform/
       {rows.length === 0 ? (
         <EmptyState variant="list">{t("empty")}</EmptyState>
       ) : (
-        <ScrollRegion labelledBy="trials-title" className="card">
+        <>
           <h2 id="trials-title" className="sr-only">
             {t("title")}
           </h2>
-          <table className="w-full text-sm">
-            <thead className="text-muted">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("business")}</th>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("ends")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("clients")}</th>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("card")}</th>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("accountOwner")}</th>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("actions")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => {
-                const ends = new Date(row.trial_ends_at);
-                const date = format.dateTime(ends, { dateStyle: "medium" });
-                return (
-                  <tr key={row.tenant_id} className="border-b border-border align-top last:border-0">
-                    <th scope="row" className="px-4 py-3 text-start font-medium">
-                      <Link href={`/platform/businesses/${row.tenant_id}`} className="underline-offset-4 hover:underline">
-                        <UserText>{row.name}</UserText>
-                      </Link>
-                      {row.owner_email && (
-                        <div className="font-normal text-muted">
-                          <Ltr>{row.owner_email}</Ltr>
-                        </div>
-                      )}
-                    </th>
-                    <td className="px-4 py-3">
-                      <Pill tone={ends < now ? "danger" : "warning"}>
-                        {ends < now ? t("ended", { date }) : t("endsOn", { date })}
-                      </Pill>
-                    </td>
-                    <td className="px-4 py-3 text-end tabular-nums">{format.number(row.active_clients)}</td>
-                    <td className="px-4 py-3">
-                      <Pill tone={row.has_card ? "success" : "muted"}>{row.has_card ? t("cardYes") : t("cardNo")}</Pill>
-                    </td>
-                    <td className="px-4 py-3">{row.account_owner ? <Ltr>{row.account_owner}</Ltr> : "-"}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex flex-wrap gap-3">
-                          {row.owner_email && (
-                            <a href={`mailto:${row.owner_email}`} className="text-primary-ink underline-offset-4 hover:underline">
-                              {t("message")}
-                            </a>
-                          )}
-                          <Link href={`/platform/businesses/${row.tenant_id}`} className="text-primary-ink underline-offset-4 hover:underline">
-                            {t("open")}
-                          </Link>
-                        </div>
-                        {mayExtend && <ExtendForm tenantId={row.tenant_id} />}
+          <DataTable
+            labelledBy="trials-title"
+            rows={rows}
+            rowKey={(row) => row.tenant_id}
+            rowClassName={() => "align-top"}
+            columns={[
+              {
+                key: "business",
+                header: t("business"),
+                rowHeader: true,
+                cell: (row) => (
+                  <>
+                    <Link href={`/platform/businesses/${row.tenant_id}`} className="underline-offset-4 hover:underline">
+                      <UserText>{row.name}</UserText>
+                    </Link>
+                    {row.owner_email && (
+                      <div className="font-normal text-muted">
+                        <Ltr>{row.owner_email}</Ltr>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </ScrollRegion>
+                    )}
+                  </>
+                ),
+              },
+              {
+                key: "ends",
+                header: t("ends"),
+                cell: (row) => {
+                  const ends = new Date(row.trial_ends_at);
+                  const date = format.dateTime(ends, { dateStyle: "medium" });
+                  return <Pill tone={ends < now ? "danger" : "warning"}>{ends < now ? t("ended", { date }) : t("endsOn", { date })}</Pill>;
+                },
+              },
+              { key: "clients", header: t("clients"), align: "end", className: "tabular-nums", cell: (row) => format.number(row.active_clients) },
+              { key: "card", header: t("card"), cell: (row) => <Pill tone={row.has_card ? "success" : "muted"}>{row.has_card ? t("cardYes") : t("cardNo")}</Pill> },
+              { key: "accountOwner", header: t("accountOwner"), cell: (row) => (row.account_owner ? <Ltr>{row.account_owner}</Ltr> : "-") },
+              {
+                key: "actions",
+                header: t("actions"),
+                cell: (row) => (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap gap-3">
+                      {row.owner_email && (
+                        <a href={`mailto:${row.owner_email}`} className="text-primary-ink underline-offset-4 hover:underline">
+                          {t("message")}
+                        </a>
+                      )}
+                      <Link href={`/platform/businesses/${row.tenant_id}`} className="text-primary-ink underline-offset-4 hover:underline">
+                        {t("open")}
+                      </Link>
+                    </div>
+                    {mayExtend && <ExtendForm tenantId={row.tenant_id} />}
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </>
       )}
     </Container>
   );

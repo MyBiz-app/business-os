@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -6,7 +7,6 @@ import { BRAND } from "@business-os/i18n/brand";
 import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
@@ -38,39 +38,42 @@ export default async function OrdersPage({ searchParams }: PageProps<"/sales/ord
         <EmptyState variant="list">{t("orders.empty")}</EmptyState>
       ) : (
         <>
-          <ScrollRegion labelledBy="orders-heading" className="rounded-2xl border border-border">
-            <table className="w-full text-sm">
-              <thead className="bg-surface text-muted">
-                <tr>
-                  {(["date", "client", "item", "status", "amount"] as const).map((key) => (
-                    <th key={key} scope="col" className={`px-4 py-3 font-medium ${key === "amount" ? "text-end" : "text-start"}`}>
-                      {t(`orders.${key}`)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((order) => (
-                  <tr key={order.id} className="border-t border-border transition-colors hover:bg-primary/4">
-                    <td className="whitespace-nowrap px-4 py-2.5">{day(order.created_at)}</td>
-                    <td className="px-4 py-2.5" dir="auto">
-                      <Link href={`/clients/${order.client_id}`} className="underline-offset-4 hover:underline">
-                        {order.client_name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2.5" dir="auto">{order.plan_name}</td>
-                    <td className="px-4 py-2.5">
-                      {t(`orders.statuses.${order.status}`)}
-                      {order.simulated && <span className="text-muted"> · {t("orders.sample")}</span>}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2.5 text-end font-semibold">
-                      <bdi>{formatMoney(order.amount, order.currency, locale)}</bdi>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="orders-heading"
+            rows={items}
+            rowKey={(order) => order.id}
+            columns={[
+              { key: "date", header: t("orders.date"), nowrap: true, cell: (order) => day(order.created_at) },
+              {
+                key: "client",
+                header: t("orders.client"),
+                cell: (order) => (
+                  <Link dir="auto" href={`/clients/${order.client_id}`} className="underline-offset-4 hover:underline">
+                    {order.client_name}
+                  </Link>
+                ),
+              },
+              { key: "item", header: t("orders.item"), cell: (order) => <span dir="auto">{order.plan_name}</span> },
+              {
+                key: "status",
+                header: t("orders.status"),
+                cell: (order) => (
+                  <>
+                    {t(`orders.statuses.${order.status}`)}
+                    {order.simulated && <span className="text-muted"> · {t("orders.sample")}</span>}
+                  </>
+                ),
+              },
+              {
+                key: "amount",
+                header: t("orders.amount"),
+                align: "end",
+                nowrap: true,
+                className: "font-semibold",
+                cell: (order) => <bdi>{formatMoney(order.amount, order.currency, locale)}</bdi>,
+              },
+            ]}
+          />
           <p className="text-sm text-muted">{t("orders.showing", { shown: items.length, total })}</p>
           {total > items.length && shown < MAX && (
             <Link scroll={false} href={`/sales/orders?shown=${shown + STEP}`} className="btn-secondary self-start px-4 py-2 text-sm">

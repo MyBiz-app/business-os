@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { ScrollRegion } from "@/components/scroll-region";
+import { DataTable } from "@/components/ui/data-table";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { unwrap } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
@@ -52,33 +52,33 @@ export async function MarketReports() {
           >
             <div className="flex flex-col gap-4">
               <p className="text-sm" dir="auto">{report.summary}</p>
-              <ScrollRegion labelledBy={`report-${report.id}`} className="rounded-xl border border-border">
-                <table id={`report-${report.id}`} className="w-full text-sm">
-                  <thead className="text-muted">
-                    <tr className="border-b border-border">
-                      <th scope="col" className="px-3 py-2 text-start font-medium">{t("item")}</th>
-                      <th scope="col" className="px-3 py-2 text-end font-medium">{t("ours")}</th>
-                      <th scope="col" className="px-3 py-2 text-end font-medium">{t("cheapest")}</th>
-                      <th scope="col" className="px-3 py-2 text-start font-medium">{t("competitor")}</th>
-                      <th scope="col" className="px-3 py-2 text-end font-medium">{t("gap")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {comparison.map((c) => (
-                      <tr key={`${c.item}-${c.currency}`} className={`border-b border-border last:border-0 ${c.pricier ? "bg-danger/10" : ""}`}>
-                        <td className="px-3 py-2"><bdi>{c.item}</bdi></td>
-                        <td className="px-3 py-2 text-end tabular-nums"><bdi>{formatMoney(c.ours_minor, c.currency, locale)}</bdi></td>
-                        <td className="px-3 py-2 text-end tabular-nums"><bdi>{formatMoney(c.cheapest_minor, c.currency, locale)}</bdi></td>
-                        <td className="px-3 py-2" dir="auto">{c.cheapest_competitor}</td>
-                        <td className={`px-3 py-2 text-end tabular-nums ${c.pricier ? "font-medium text-danger" : ""}`}>
-                          <bdi>{percent.format(c.gap_percent / 100)}</bdi>
-                          {c.pricier && <span className="ms-2 text-xs">{t("pricier")}</span>}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </ScrollRegion>
+              <DataTable
+                labelledBy={`report-${report.id}`}
+                bare
+                className="rounded-xl border border-border"
+                rows={comparison}
+                rowKey={(c) => `${c.item}-${c.currency}`}
+                density="compact"
+                rowClassName={(c) => (c.pricier ? "bg-danger/10" : undefined)}
+                columns={[
+                  { key: "item", header: t("item"), cell: (c) => <bdi>{c.item}</bdi> },
+                  { key: "ours", header: t("ours"), align: "end", className: "tabular-nums", cell: (c) => <bdi>{formatMoney(c.ours_minor, c.currency, locale)}</bdi> },
+                  { key: "cheapest", header: t("cheapest"), align: "end", className: "tabular-nums", cell: (c) => <bdi>{formatMoney(c.cheapest_minor, c.currency, locale)}</bdi> },
+                  { key: "competitor", header: t("competitor"), cell: (c) => <span dir="auto">{c.cheapest_competitor}</span> },
+                  {
+                    key: "gap",
+                    header: t("gap"),
+                    align: "end",
+                    className: "tabular-nums",
+                    cell: (c) => (
+                      <span className={c.pricier ? "font-medium text-danger" : undefined}>
+                        <bdi>{percent.format(c.gap_percent / 100)}</bdi>
+                        {c.pricier && <span className="ms-2 text-xs">{t("pricier")}</span>}
+                      </span>
+                    ),
+                  },
+                ]}
+              />
               <ul className="flex flex-col gap-1 text-sm">
                 {prices.map((p, index) => (
                   <li key={index} className="flex flex-wrap gap-x-3 text-muted">

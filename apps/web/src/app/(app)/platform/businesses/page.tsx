@@ -1,8 +1,8 @@
+import { DataTable } from "@/components/ui/data-table";
 import { isVertical } from "@business-os/verticals";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
 import { industryTexts } from "@/lib/verticals";
@@ -73,48 +73,50 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
         </Button>
       </form>
       <p className="text-sm text-muted" aria-live="polite">{t("platform.list.count", { count: found.length })}</p>
-      <ScrollRegion labelledBy="businesses-heading" className="card">
-        <table className="w-full text-sm">
-          <thead className="bg-surface text-muted">
-            <tr>
-              {(["name", "owner", "modules", "clients", "activeClients", "bookings30d", "aiCredits30d", "created"] as const).map((key) => (
-                <th key={key} scope="col" className="px-3 py-2 text-start font-medium">
-                  {t(`platform.columns.${key}`)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {businesses.map((business) => (
-              <tr key={business.id} className="border-t border-border transition-colors hover:bg-primary/4">
-                <td className="px-3 py-2">
-                  <Link href={`/platform/businesses/${business.id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline" dir="auto">
-                    {business.name}
-                  </Link>
-                  <div className="text-xs text-muted">{isVertical(business.vertical) ? text(business.vertical, "name") : business.vertical}</div>
-                </td>
-                <td className="max-w-56 truncate px-3 py-2" dir="ltr" title={business.owner_email ?? undefined}>
-                  {business.owner_email ?? "-"}
-                </td>
-                <td className="whitespace-nowrap px-3 py-2">
-                  {business.modules.length === 0 ? (
-                    t("platform.coreOnly")
-                  ) : (
-                    <span title={business.modules.map((m) => t(`modules.names.${m as "client_app"}`)).join(", ")}>
-                      {t("platform.list.modulesCount", { count: business.modules.length })}
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-2 tabular-nums">{number.format(business.clients)}</td>
-                <td className="px-3 py-2 tabular-nums">{number.format(business.active_clients)}</td>
-                <td className="px-3 py-2 tabular-nums">{number.format(business.bookings_30d)}</td>
-                <td className="px-3 py-2 tabular-nums">{number.format(business.ai_credits_30d)}</td>
-                <td className="whitespace-nowrap px-3 py-2">{date.format(new Date(business.created_at))}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </ScrollRegion>
+      <DataTable
+        labelledBy="businesses-heading"
+        rows={businesses}
+        rowKey={(business) => business.id}
+        density="compact"
+        columns={[
+          {
+            key: "name",
+            header: t("platform.columns.name"),
+            cell: (business) => (
+              <>
+                <Link href={`/platform/businesses/${business.id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline" dir="auto">
+                  {business.name}
+                </Link>
+                <div className="text-xs text-muted">{isVertical(business.vertical) ? text(business.vertical, "name") : business.vertical}</div>
+              </>
+            ),
+          },
+          {
+            key: "owner",
+            header: t("platform.columns.owner"),
+            className: "max-w-56 truncate",
+            cell: (business) => <bdi dir="ltr" title={business.owner_email ?? undefined}>{business.owner_email ?? "-"}</bdi>,
+          },
+          {
+            key: "modules",
+            header: t("platform.columns.modules"),
+            nowrap: true,
+            cell: (business) =>
+              business.modules.length === 0 ? (
+                t("platform.coreOnly")
+              ) : (
+                <span title={business.modules.map((m) => t(`modules.names.${m as "client_app"}`)).join(", ")}>
+                  {t("platform.list.modulesCount", { count: business.modules.length })}
+                </span>
+              ),
+          },
+          { key: "clients", header: t("platform.columns.clients"), className: "tabular-nums", cell: (business) => number.format(business.clients) },
+          { key: "activeClients", header: t("platform.columns.activeClients"), className: "tabular-nums", cell: (business) => number.format(business.active_clients) },
+          { key: "bookings30d", header: t("platform.columns.bookings30d"), className: "tabular-nums", cell: (business) => number.format(business.bookings_30d) },
+          { key: "aiCredits30d", header: t("platform.columns.aiCredits30d"), className: "tabular-nums", cell: (business) => number.format(business.ai_credits_30d) },
+          { key: "created", header: t("platform.columns.created"), nowrap: true, cell: (business) => date.format(new Date(business.created_at)) },
+        ]}
+      />
       {pages > 1 && (
         <nav aria-label={t("platform.list.count", { count: found.length })} className="flex items-center justify-between text-sm">
           {page > 1 ? <Link scroll={false} href={pageHref(page - 1)} className="text-primary-ink">{t("platform.list.previous")}</Link> : <span />}

@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { Metadata } from "next";
 import { BRAND } from "@business-os/i18n/brand";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -7,7 +8,6 @@ import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatform } from "@/lib/platform";
 
@@ -37,28 +37,17 @@ export default async function PlatformLegalPage() {
 
       <section aria-labelledby="legal-documents" className="flex flex-col gap-3">
         <h2 id="legal-documents" className="text-lg font-semibold">{t("documentsTitle")}</h2>
-        <ScrollRegion labelledBy="legal-documents" className="card">
-          <table className="w-full text-sm">
-            <thead className="text-muted">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("document")}</th>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("version")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("accepted")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("eligible")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {board.documents.map((row) => (
-                <tr key={row.document} className="border-b border-border last:border-0">
-                  <th scope="row" className="px-4 py-3 text-start font-medium">{t(`documents.${row.document}`)}</th>
-                  <td className="px-4 py-3" dir="ltr">{row.version}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{number.format(row.accepted)}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{number.format(row.eligible)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+        <DataTable
+          labelledBy="legal-documents"
+          rows={board.documents}
+          rowKey={(row) => row.document}
+          columns={[
+            { key: "document", header: t("document"), rowHeader: true, cell: (row) => t(`documents.${row.document}`) },
+            { key: "version", header: t("version"), cell: (row) => <bdi dir="ltr">{row.version}</bdi> },
+            { key: "accepted", header: t("accepted"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.accepted) },
+            { key: "eligible", header: t("eligible"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.eligible) },
+          ]}
+        />
       </section>
 
       <section aria-labelledby="legal-acceptances" className="flex flex-col gap-3">
@@ -67,30 +56,26 @@ export default async function PlatformLegalPage() {
         {board.acceptances.length === 0 ? (
           <EmptyState variant="list">{t("acceptancesEmpty")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="legal-acceptances" className="card">
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("person")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("business")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("document")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("context")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("when")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {board.acceptances.map((row, index) => (
-                  <tr key={`${row.email}-${row.document}-${row.version}-${index}`} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3" dir="ltr">{row.email}</td>
-                    <td className="px-4 py-3" dir="auto">{row.business_name ?? "-"}</td>
-                    <td className="px-4 py-3">{t(`documents.${row.document}`)} <span className="text-xs text-muted" dir="ltr">{row.version}</span></td>
-                    <td className="px-4 py-3">{t(`contexts.${row.context}`)}</td>
-                    <td className="px-4 py-3">{stamp.format(new Date(row.accepted_at))}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="legal-acceptances"
+            rows={board.acceptances}
+            rowKey={(row, index) => `${row.email}-${row.document}-${row.version}-${index}`}
+            columns={[
+              { key: "person", header: t("person"), cell: (row) => <bdi dir="ltr">{row.email}</bdi> },
+              { key: "business", header: t("business"), cell: (row) => <span dir="auto">{row.business_name ?? "-"}</span> },
+              {
+                key: "document",
+                header: t("document"),
+                cell: (row) => (
+                  <>
+                    {t(`documents.${row.document}`)} <span className="text-xs text-muted" dir="ltr">{row.version}</span>
+                  </>
+                ),
+              },
+              { key: "context", header: t("context"), cell: (row) => t(`contexts.${row.context}`) },
+              { key: "when", header: t("when"), cell: (row) => stamp.format(new Date(row.accepted_at)) },
+            ]}
+          />
         )}
       </section>
 
@@ -100,33 +85,26 @@ export default async function PlatformLegalPage() {
         {board.privacy_requests.length === 0 ? (
           <EmptyState variant="list">{t("privacyEmpty")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="legal-privacy" className="card">
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("kind")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("business")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("status")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("when")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {board.privacy_requests.map((row, index) => (
-                  <tr key={`${row.business_id}-${row.kind}-${row.occurred_at}-${index}`} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3">{t(`kinds.${row.kind}`)}</td>
-                    <td className="px-4 py-3" dir="auto">{row.business_name}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Pill tone={tone(row.status)}>{t(`statuses.${row.status}`)}</Pill>
-                        {row.delete_after ? <span className="text-xs text-muted">{t("deleteAfter", { date: day.format(new Date(row.delete_after)) })}</span> : null}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">{stamp.format(new Date(row.occurred_at))}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="legal-privacy"
+            rows={board.privacy_requests}
+            rowKey={(row, index) => `${row.business_id}-${row.kind}-${row.occurred_at}-${index}`}
+            columns={[
+              { key: "kind", header: t("kind"), cell: (row) => t(`kinds.${row.kind}`) },
+              { key: "business", header: t("business"), cell: (row) => <span dir="auto">{row.business_name}</span> },
+              {
+                key: "status",
+                header: t("status"),
+                cell: (row) => (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Pill tone={tone(row.status)}>{t(`statuses.${row.status}`)}</Pill>
+                    {row.delete_after ? <span className="text-xs text-muted">{t("deleteAfter", { date: day.format(new Date(row.delete_after)) })}</span> : null}
+                  </div>
+                ),
+              },
+              { key: "when", header: t("when"), cell: (row) => stamp.format(new Date(row.occurred_at)) },
+            ]}
+          />
         )}
       </section>
     </Container>

@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import { ChevronLeft, ChevronRight, Download, Receipt, X } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -8,7 +9,6 @@ import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Ltr } from "@/components/bidi";
 import { PendingArea, PeriodPicker, PeriodProvider } from "@/components/period-picker";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -166,44 +166,37 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
         {receipts.length === 0 ? (
           <EmptyState variant="chart">{t("empty")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="receipts-heading" className="rounded-2xl border border-border">
-            <table className="w-full text-sm">
-              <thead className="bg-surface text-muted">
-                <tr>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("number")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("date")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("client")}</th>
-                  <th scope="col" className="hidden px-4 py-3 text-start font-medium md:table-cell">{t("item")}</th>
-                  <th scope="col" className="hidden px-4 py-3 text-start font-medium sm:table-cell">{t("method")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("amount")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {receipts.map((r) => (
-                  <tr key={r.id} className="border-t border-border transition-colors hover:bg-primary/4">
-                    <td className="px-4 py-2.5">
-                      <CardTransition name={`receipt-${r.id}`}>
-                      <Link href={`/receipts/${r.id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline">
-                        <Ltr>{r.number}</Ltr>
-                      </Link>
-                      </CardTransition>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2.5">{day(r.issued_at)}</td>
-                    <td className="px-4 py-2.5" dir="auto">
-                      <Link href={`/clients/${r.client_id}`} className="underline-offset-4 hover:underline">
-                        {r.client_name}
-                      </Link>
-                    </td>
-                    <td className="hidden px-4 py-2.5 md:table-cell" dir="auto">{r.description}</td>
-                    <td className="hidden px-4 py-2.5 sm:table-cell">{tReceipts(`methods.${r.method}`)}</td>
-                    <td className="whitespace-nowrap px-4 py-2.5 text-end font-semibold">
-                      <bdi>{money(r.amount)}</bdi>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="receipts-heading"
+            rows={receipts}
+            rowKey={(r) => r.id}
+            columns={[
+              {
+                key: "number",
+                header: t("number"),
+                cell: (r) => (
+                  <CardTransition name={`receipt-${r.id}`}>
+                    <Link href={`/receipts/${r.id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline">
+                      <Ltr>{r.number}</Ltr>
+                    </Link>
+                  </CardTransition>
+                ),
+              },
+              { key: "date", header: t("date"), nowrap: true, cell: (r) => day(r.issued_at) },
+              {
+                key: "client",
+                header: t("client"),
+                cell: (r) => (
+                  <Link dir="auto" href={`/clients/${r.client_id}`} className="underline-offset-4 hover:underline">
+                    {r.client_name}
+                  </Link>
+                ),
+              },
+              { key: "item", header: t("item"), hideBelow: "md", cell: (r) => <span dir="auto">{r.description}</span> },
+              { key: "method", header: t("method"), hideBelow: "sm", cell: (r) => tReceipts(`methods.${r.method}`) },
+              { key: "amount", header: t("amount"), align: "end", nowrap: true, className: "font-semibold", cell: (r) => <bdi>{money(r.amount)}</bdi> },
+            ]}
+          />
         )}
       </section>
       </PendingArea>

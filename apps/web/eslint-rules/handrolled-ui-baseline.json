@@ -65,9 +65,6 @@
   "src/app/(app)/(tenant)/catalog/promos/promo-actions-bar.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/clients/page.tsx": [
-    "table"
-  ],
   "src/app/(app)/(tenant)/content/heatmap.tsx": [
     "table"
   ],
@@ -132,12 +129,6 @@
   "src/app/(app)/(tenant)/resources/page.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/sales/orders/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/(tenant)/sales/page.tsx": [
-    "table"
-  ],
   "src/app/(app)/(tenant)/schedule/[id]/job-panel.tsx": [
     "button"
   ],
@@ -175,8 +166,7 @@
     "button"
   ],
   "src/app/(app)/(tenant)/settings/audit/page.tsx": [
-    "button",
-    "table"
+    "button"
   ],
   "src/app/(app)/(tenant)/settings/billing/ai-users.tsx": [
     "button"
@@ -261,9 +251,6 @@
   "src/app/(app)/(tenant)/team/time-clock/[userId]/entry-forms.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/team/time-clock/page.tsx": [
-    "table"
-  ],
   "src/app/(app)/(tenant)/team/time-clock/rules-form.tsx": [
     "button"
   ],
@@ -284,48 +271,6 @@
   ],
   "src/app/(app)/onboarding/onboarding-form.tsx": [
     "button"
-  ],
-  "src/app/(app)/platform/ai/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/ai/reports.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/audit/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/billing/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/businesses/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/catalog/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/churn/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/email/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/growth/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/health/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/legal/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/metrics/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/security/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/trials/page.tsx": [
-    "table"
   ],
   "src/app/(app)/suspended/page.tsx": [
     "button"
