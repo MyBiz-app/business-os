@@ -135,7 +135,8 @@ def test_the_confirmation_keeps_where_it_was_given(
     assert client.post(path, json={"source": "anywhere"}, headers=headers).status_code == 422
     assert client.post(path, json={"source": "opt_out"}, headers=headers).status_code == 204
     # A second confirmation of the same version keeps the first one.
-    assert client.post(path, json={"source": "sensitive_action"}, headers=headers).status_code == 204
+    again = client.post(path, json={"source": "sensitive_action"}, headers=headers)
+    assert again.status_code == 204
     with engine.connect() as connection:
         rows = connection.execute(
             text("""
