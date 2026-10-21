@@ -15,6 +15,7 @@ from app.reports.branch_insights import (
     staff_count_by_branch,
 )
 from app.reports.client_cities import client_cities
+from app.reports.map_insights import map_insights
 from app.reports.metrics import (
     METRICS,
     Dimension,
@@ -312,4 +313,46 @@ def client_cities_by_city(context: ReportsDep) -> ClientCitiesOut:
         clients_total=found.clients_total,
         clients_without_city=found.clients_without_city,
         cities=[ClientCityOut(**vars(city)) for city in found.cities],
+    )
+
+
+class MapAreaOut(BaseModel):
+    city_code: int
+    city_name: str
+    latitude: float | None = Field(description="The city's centre; none when it is not known")
+    longitude: float | None
+    clients: int = Field(description="Clients living there now")
+    new_clients: int = Field(description="Of them, joined in the period")
+    leads: int = Field(description="Leads from there that arrived in the period")
+    leads_won: int = Field(description="Of those leads, the ones won")
+
+
+class MapInsightsOut(BaseModel):
+    clients_total: int
+    clients_without_city: int
+    leads_total: int = Field(description="Leads that arrived in the period")
+    leads_without_city: int
+    areas: list[MapAreaOut] = Field(
+        description="Every city with a client or a lead, no minimum; counts only, no people"
+    )
+
+
+@router.get("/map-insights")
+def map_insights_by_city(
+    context: ReportsDep,
+    start: Annotated[dt.date, Query(description="First local date")],
+    end: Annotated[dt.date, Query(description="Last local date (inclusive)")],
+) -> MapInsightsOut:
+    """Clients and leads by city, for the insights map. Inside the business there is no minimum
+    count. Only for someone who works in every branch (clients belong to the whole business)."""
+    _check_period(start, end)
+    if context.branches is not None:
+        raise HTTPException(status_code=403, detail="all_branches_only")
+    found = map_insights(context.session, start, end)
+    return MapInsightsOut(
+        clients_total=found.clients_total,
+        clients_without_city=found.clients_without_city,
+        leads_total=found.leads_total,
+        leads_without_city=found.leads_without_city,
+        areas=[MapAreaOut(**vars(area)) for area in found.areas],
     )

@@ -1,11 +1,12 @@
 """The planned-branch numbers (clients by city) and the console's map of businesses (W2-4)."""
 
+from datetime import timedelta
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from tests.conftest import STUDIO, AuthHeaders, add_member, make_staff
+from tests.conftest import STUDIO, AuthHeaders, add_member, local_today, make_staff
 
 TEL_AVIV, KIRYAT_SHMONA = 5000, 2800
 
@@ -250,3 +251,112 @@ def test_the_console_map_ignores_closed_businesses_and_cities_without_a_point(
                 text("UPDATE app.geo_cities SET latitude = :a, longitude = :b WHERE code = :c"),
                 {"a": point[0], "b": point[1], "c": unplaced},
             )
+
+
+def add_leads(
+    engine: Engine, tenant_id, city_code: int | None, count: int, stage: str = "new"
+) -> None:
+    with engine.begin() as connection:
+        for i in range(count):
+            connection.execute(
+                text("""
+                    INSERT INTO app.leads (tenant_id, first_name, source, stage, city_code)
+                    VALUES (:t, :n, 'other', :stage, :city)
+                """),
+                {"t": tenant_id, "n": f"L{uuid4().hex[:6]}{i}", "stage": stage, "city": city_code},
+            )
+
+
+PERIOD = {
+    "start": (local_today() - timedelta(days=30)).isoformat(),
+    "end": (local_today() + timedelta(days=1)).isoformat(),
+}
+
+
+def test_map_insights_show_every_city_with_clients_and_leads_and_no_people(
+    client: TestClient, engine: Engine, studio: dict
+) -> None:
+    tenant = studio["tenant_id"]
+    add_clients(engine, tenant, TEL_AVIV, 3)
+    add_clients(engine, tenant, KIRYAT_SHMONA, 1)  # one far client: still there
+    add_clients(engine, tenant, None, 2)
+    add_leads(engine, tenant, KIRYAT_SHMONA, 2)
+    add_leads(engine, tenant, KIRYAT_SHMONA, 1, stage="won")
+    add_leads(engine, tenant, None, 1)
+
+    response = client.get("/metrics/map-insights", params=PERIOD, headers=studio["headers"])
+
+    assert response.status_code == 200
+    body = response.json()
+    areas = {a["city_code"]: a for a in body["areas"]}
+    assert (areas[TEL_AVIV]["clients"], areas[TEL_AVIV]["leads"]) == (3, 0)
+    assert (areas[KIRYAT_SHMONA]["clients"], areas[KIRYAT_SHMONA]["leads"]) == (1, 3)
+    assert areas[KIRYAT_SHMONA]["leads_won"] == 1
+    assert (body["clients_total"], body["clients_without_city"]) == (6, 2)
+    assert (body["leads_total"], body["leads_without_city"]) == (4, 1)
+    assert "first_name" not in str(body)  # counts only, no people
+
+
+def test_map_insights_count_new_clients_and_leads_only_inside_the_period(
+    client: TestClient, engine: Engine, studio: dict
+) -> None:
+    tenant = studio["tenant_id"]
+    add_clients(engine, tenant, TEL_AVIV, 2)
+    add_leads(engine, tenant, TEL_AVIV, 2)
+    past = {"start": "2000-01-01", "end": "2000-01-31"}
+
+    area = client.get("/metrics/map-insights", params=past, headers=studio["headers"]).json()
+
+    assert area["leads_total"] == 0
+    assert [(a["clients"], a["new_clients"], a["leads"]) for a in area["areas"]] == [(2, 0, 0)]
+
+
+def test_map_insights_are_for_reports_readers_who_work_in_every_branch(
+    client: TestClient, engine: Engine, auth: AuthHeaders, studio: dict
+) -> None:
+    coach = auth(studio["coach"], studio["tenant_id"])
+    assert client.get("/metrics/map-insights", params=PERIOD, headers=coach).status_code == 403
+    manager = uuid4()
+    add_member(engine, studio["tenant_id"], manager, "branch_manager")
+    with engine.begin() as connection:
+        connection.execute(
+            text("UPDATE app.tenant_members SET location_ids = :ids WHERE user_id = :u"),
+            {"ids": [studio["location"]["id"]], "u": manager},
+        )
+    answer = client.get(
+        "/metrics/map-insights", params=PERIOD, headers=auth(manager, studio["tenant_id"])
+    )
+    assert answer.status_code == 403 and answer.json()["detail"] == "all_branches_only"
+    bad = client.get(
+        "/metrics/map-insights",
+        params={"start": "2026-02-01", "end": "2026-01-01"},
+        headers=studio["headers"],
+    )
+    assert bad.status_code == 422
+
+
+def test_clients_list_filters_by_city_for_the_map_drill_down(
+    client: TestClient, engine: Engine, studio: dict
+) -> None:
+    add_clients(engine, studio["tenant_id"], TEL_AVIV, 2)
+    (far,) = add_clients(engine, studio["tenant_id"], KIRYAT_SHMONA, 1)
+
+    found = client.get(
+        "/clients", params={"city_code": KIRYAT_SHMONA}, headers=studio["headers"]
+    ).json()
+
+    assert [c["id"] for c in found["items"]] == [far]
+    assert found["total"] == 1
+
+
+def test_map_insights_never_cross_businesses(
+    client: TestClient, engine: Engine, auth: AuthHeaders, studio: dict
+) -> None:
+    add_clients(engine, studio["tenant_id"], TEL_AVIV, 2)
+    other = uuid4()
+    other_tenant = client.post("/tenants", json=STUDIO, headers=auth(other)).json()["id"]
+    add_clients(engine, other_tenant, KIRYAT_SHMONA, 3)
+
+    mine = client.get("/metrics/map-insights", params=PERIOD, headers=studio["headers"]).json()
+
+    assert [a["city_code"] for a in mine["areas"]] == [TEL_AVIV]

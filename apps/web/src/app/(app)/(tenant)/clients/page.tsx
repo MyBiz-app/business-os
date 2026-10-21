@@ -47,6 +47,8 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
   const day = (value: unknown) => (isDay(value) ? value : undefined);
   const joined = { from: day(params.joined_from), to: day(params.joined_to) };
   const noShow = { from: day(params.no_show_from), to: day(params.no_show_to) };
+  // Coming from a city on the insights map.
+  const cityCode = typeof params.city === "string" && /^\d{1,6}$/.test(params.city) ? Number(params.city) : undefined;
 
   const result = unwrap(
     await api.GET("/clients", {
@@ -62,6 +64,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           joined_to: joined.to,
           no_show_from: noShow.from,
           no_show_to: noShow.to,
+          city_code: cityCode,
           limit: PAGE_SIZE,
           offset: (page - 1) * PAGE_SIZE,
         },
@@ -76,13 +79,14 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     return days <= 0 ? t("clients.list.today") : days < 30 ? t("clients.list.daysAgo", { days }) : shortDate(day);
   };
   const pages = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
-  const dateFilters = { joined_from: joined.from, joined_to: joined.to, no_show_from: noShow.from, no_show_to: noShow.to };
+  const dateFilters = { joined_from: joined.from, joined_to: joined.to, no_show_from: noShow.from, no_show_to: noShow.to, city: cityCode === undefined ? undefined : String(cityCode) };
   const rangeText = (range: { from?: string; to?: string }) =>
     [range.from, range.to].map((value) => (value ? formatDay(value, locale, { day: "numeric", month: "short" }) : "...")).join(" - ");
   // What the list is narrowed to by date, each with a link that removes just that filter.
   const dateChips = [
     joined.from || joined.to ? { key: "joined", text: t("clients.joinedChip", { range: rangeText(joined) }), keys: ["joined_from", "joined_to"] } : null,
     noShow.from || noShow.to ? { key: "noShow", text: t("clients.noShowChip", { range: rangeText(noShow) }), keys: ["no_show_from", "no_show_to"] } : null,
+    cityCode !== undefined ? { key: "city", text: t("clients.cityChip", { city: result.items[0]?.city_name ?? String(cityCode) }), keys: ["city"] } : null,
   ].filter((chip) => chip !== null);
   const withoutKeys = (keys: string[]) => {
     const query = new URLSearchParams();
