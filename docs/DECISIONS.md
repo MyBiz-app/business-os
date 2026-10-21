@@ -422,6 +422,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Cause found:** Next.js keeps the scroll position when the first block of the new page is still on screen and otherwise scrolls to the top about 350 ms after the content swapped (measured on the live landing site: the page landed in the middle, then jumped); the team tabs used `scroll: false` between different pages; section links from another page jumped before the content was there.
 - **Decision:** one client component in the root layout owns the scroll after a page change (top, section, back and forward, windows), links to a section of another page are opened by it with `scroll: false`, and menus share one gliding marker. The per-link `scroll={false}` stays for filters on the same page, as the `design-system/no-scroll-jump` rule says.
 
+### Side menu: locked capabilities first, one "Add capabilities" item after 30 days (2026-10-21, CRM Premium slice W3-2, no migration)
+
+- **Owner decision (Adir, 2026-10-21, "go with your recommendation"):** capabilities the business hasn't enabled show in the side menu in soft grey with a lock and "Add", opening their preview. 30 days after the business was created they fold into one "Add capabilities" item that opens `/upgrade`, a page listing every capability that can be added.
+- **Why the creation date:** it is the one date the server already keeps and the browser cannot change, so the switch is the same on every device. The API returns it as `created_at` (additive).
+- **Who sees it:** the grey items follow the existing permission filter; the folded item is shown to people who can manage settings (they are the ones who can add a module).
+
 ### Calm design tokens for the product (2026-10-21, CRM Premium slice W2-2, no migration)
 
 - **Owner approval (Adir, 2026-10-21 09:48):** the Figma "Calm" design (foundations, home, client card, insights map) is the look of the business app and the console.
