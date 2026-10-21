@@ -13,3 +13,13 @@ regexes = ['''sb_publishable_[A-Za-z0-9_-]+''']
 description = "The well-known Supabase local demo JWT (iss supabase-demo), identical on every `supabase start`"
 regexTarget = "match"
 regexes = ['''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIi[A-Za-z0-9_.-]+''']
+
+# Extends the default generic-api-key rule (its own regex and allowlists stay) with one more
+# allowlist: UI storage keys such as storageKey="billing-details-v2" (localStorage names for
+# collapsible sections) are lowercase kebab-case labels, never credentials.
+[[rules]]
+id = "generic-api-key"
+[[rules.allowlists]]
+description = "UI storage keys (storageKey=\"lowercase-kebab-label\")"
+regexTarget = "match"
+regexes = ['''^storageKey=["'][a-z0-9]+(?:-[a-z0-9]+)*["']$''']
