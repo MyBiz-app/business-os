@@ -49,7 +49,11 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
   const candidates: (NavItem & { permission?: string; upgrade?: Upgrade })[] = [
     { href: "/dashboard", group: g("overview"), label: t("nav.dashboard"), icon: "dashboard" },
     { href: "/reports", group: g("overview"), label: t("nav.reports"), icon: "reports", permission: "reports.read",
-      children: solo ? undefined : [{ href: "/reports", label: t("nav.reports") }, { href: "/locations/map", label: t("nav.branchMap") }],
+      children: [
+        { href: "/reports", label: t("nav.reports") },
+        { href: "/reports/map", label: t("nav.insightsMap") },
+        ...(solo ? [] : [{ href: "/locations/map", label: t("nav.branchMap") }]),
+      ],
     },
     {
       href: "/ai", group: g("overview"), label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai",

@@ -6884,6 +6884,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/metrics/map-insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Map Insights By City
+         * @description Clients and leads by city, for the insights map. Inside the business there is no minimum
+         *     count. Only for someone who works in every branch (clients belong to the whole business).
+         */
+        get: operations["map_insights_by_city"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reviews": {
         parameters: {
             query?: never;
@@ -17423,6 +17444,40 @@ export interface components {
              */
             current: boolean;
         };
+        /** MapAreaOut */
+        MapAreaOut: {
+            /** City Code */
+            city_code: number;
+            /** City Name */
+            city_name: string;
+            /**
+             * Latitude
+             * @description The city's centre; none when it is not known
+             */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
+            /**
+             * Clients
+             * @description Clients living there now
+             */
+            clients: number;
+            /**
+             * New Clients
+             * @description Of them, joined in the period
+             */
+            new_clients: number;
+            /**
+             * Leads
+             * @description Leads from there that arrived in the period
+             */
+            leads: number;
+            /**
+             * Leads Won
+             * @description Of those leads, the ones won
+             */
+            leads_won: number;
+        };
         /** MapCity */
         MapCity: {
             /** City Code */
@@ -17450,6 +17505,25 @@ export interface components {
             vertical: string | null;
             /** Total */
             total: number;
+        };
+        /** MapInsightsOut */
+        MapInsightsOut: {
+            /** Clients Total */
+            clients_total: number;
+            /** Clients Without City */
+            clients_without_city: number;
+            /**
+             * Leads Total
+             * @description Leads that arrived in the period
+             */
+            leads_total: number;
+            /** Leads Without City */
+            leads_without_city: number;
+            /**
+             * Areas
+             * @description Every city with a client or a lead, no minimum; counts only, no people
+             */
+            areas: components["schemas"]["MapAreaOut"][];
         };
         /** MarkRead */
         MarkRead: {
@@ -25408,6 +25482,8 @@ export interface operations {
                 no_show_to?: string | null;
                 /** @description only: team members who are also clients; exclude: leave them out */
                 staff?: ("only" | "exclude") | null;
+                /** @description Living in this city: the city on the record, else the latest address */
+                city_code?: number | null;
                 /** @description Rows per page */
                 limit?: number;
                 /** @description Rows to skip */
@@ -40788,6 +40864,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientCitiesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    map_insights_by_city: {
+        parameters: {
+            query: {
+                /** @description First local date */
+                start: string;
+                /** @description Last local date (inclusive) */
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MapInsightsOut"];
                 };
             };
             /** @description Validation Error */
