@@ -5,6 +5,8 @@ import { MapPin } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 
+import { Button } from "@/components/ui/button";
+
 import { loadMaplibre, prefersReducedMotion } from "./map-core";
 import { RADII_KM, circleRing, planBranch, type BranchSpot, type ClientCity, type LngLat } from "./planned-core";
 
@@ -238,9 +240,9 @@ export function PlannedBranch({ mapRef, branches, cities, total }: Props) {
                         {city.nearestBranchKm === null ? t("fromPin", { km: km.format(city.fromPinKm) }) : t("fromPinAndBranch", { pin: km.format(city.fromPinKm), branch: km.format(city.nearestBranchKm) })}
                       </span>
                     </div>
-                    <button type="button" className="btn-secondary shrink-0 px-2.5 py-1 text-xs" onClick={() => moveTo(city)}>
+                    <Button className="shrink-0 px-2.5 py-1 text-xs" onClick={() => moveTo(city)}>
                       {t("moveHere")}
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
