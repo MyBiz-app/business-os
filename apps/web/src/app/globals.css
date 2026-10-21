@@ -1225,131 +1225,250 @@ h1[tabindex="-1"]:focus {
   }
 }
 
-/* The home page opening scene (components/marketing/hero-intro.tsx): six tiles fly in from
- * scattered 3D positions and lock around the mark; then they bob gently. Reduced motion shows the
- * finished scene. */
-.intro-scene {
-  --px: 0;
-  --py: 0;
-  perspective: 1100px;
-  width: min(100%, 34rem);
+/* The home page opening scene (components/marketing/hero-intro.tsx and day-clock.tsx): a 24-hour
+ * dial runs from midnight to the visitor's own time while the business's day happens around it.
+ * DayClock sets --p (the share of the day, 0..1) and --sky (the sky's color at that time). The
+ * dial has no direction: a clock turns clockwise in Hebrew too. Reduced motion stops the pulses. */
+.dc-backdrop {
+  background:
+    radial-gradient(60rem 36rem at 80% -10%, color-mix(in srgb, var(--brand-from) 12%, transparent), transparent 70%),
+    radial-gradient(44rem 30rem at 10% 110%, color-mix(in srgb, var(--brand-to) 12%, transparent), transparent 70%);
 }
-.intro-stage {
-  transform-style: preserve-3d;
-  transform: rotateX(calc(16deg + var(--py) * -7deg)) rotateY(calc(-12deg + var(--px) * 10deg));
-  transition: transform 250ms ease-out;
+.dc-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000, transparent);
 }
-.intro-grid {
-  transform-style: preserve-3d;
+.dc-accent {
+  background: linear-gradient(90deg, var(--brand-from), var(--brand-via), var(--brand-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
-.intro-tile {
-  transform-style: preserve-3d;
-  animation: intro-assemble 1.5s var(--ease-out) both;
-  animation-delay: calc(0.25s + var(--i) * 0.12s);
+.dark .dc-accent {
+  background-image: linear-gradient(90deg, #60a5fa, #a78bfa, #22d3ee);
 }
-.intro-tile-face {
+.dc-live {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--success);
+  animation: dc-live 2s ease-out infinite;
+}
+.dc-dial {
+  position: relative;
+  width: min(100%, 27rem);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  cursor: grab;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.dc-dial:active {
+  cursor: grabbing;
+}
+.dc-dial:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--background),
+    0 0 0 5px var(--primary);
+}
+.dc-sky {
+  position: absolute;
+  inset: -16%;
+  z-index: -1;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sky) 38%, transparent), transparent);
+  filter: blur(20px);
+  pointer-events: none;
+}
+.dark .dc-sky {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sky) 55%, transparent), transparent);
+}
+.dc-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.dc-track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--foreground) 10%, transparent);
+  stroke-width: 3;
+}
+.dc-tick {
+  stroke: color-mix(in srgb, var(--foreground) 16%, transparent);
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+.dc-tick-hour {
+  stroke: color-mix(in srgb, var(--foreground) 38%, transparent);
+  stroke-width: 1;
+}
+.dc-hour {
+  fill: var(--muted);
+  font-size: 7px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+/* The arc of the day so far, on the track (r = 92 of 100, 3 wide). */
+.dc-arc {
+  position: absolute;
+  inset: 3.25%;
+  border-radius: 9999px;
+  background: conic-gradient(
+    color-mix(in srgb, var(--brand-from) 20%, transparent) 0deg,
+    var(--brand-from) calc(var(--p) * 180deg),
+    var(--brand-via) calc(var(--p) * 290deg),
+    var(--brand-to) calc(var(--p) * 360deg),
+    transparent calc(var(--p) * 360deg)
+  );
+  -webkit-mask: radial-gradient(closest-side, transparent 96.3%, #000 96.9%);
+  mask: radial-gradient(closest-side, transparent 96.3%, #000 96.9%);
+  pointer-events: none;
+}
+.dc-mark {
+  fill: var(--surface);
+  stroke: color-mix(in srgb, var(--foreground) 35%, transparent);
+  stroke-width: 1;
+  transition:
+    r 200ms var(--ease-out),
+    fill 200ms var(--ease-out);
+}
+.dc-mark-done {
+  fill: var(--brand-via);
+  stroke: var(--surface);
+}
+.dc-mark-now {
+  fill: var(--brand-to);
+  stroke: var(--surface);
+  stroke-width: 1.4;
+}
+/* The hand: a sun by day and a moon by night, riding the track. */
+.dc-hand {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  transform: rotate(calc(var(--p) * 360deg));
+  pointer-events: none;
+}
+.dc-sun {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: calc(4% - 0.625rem);
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #fff, #fde68a 40%, #f59e0b);
+  box-shadow:
+    0 0 0 4px rgb(245 158 11 / 0.22),
+    0 0 26px 6px rgb(245 158 11 / 0.5);
+}
+.dc-dial[data-day="false"] .dc-sun {
+  background: radial-gradient(circle at 35% 35%, #fff, #e0e7ff 45%, #a5b4fc);
+  box-shadow:
+    0 0 0 4px rgb(129 140 248 / 0.22),
+    0 0 26px 6px rgb(129 140 248 / 0.5);
+}
+.dc-face {
+  position: absolute;
+  inset: 18%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
-  padding: 0.75rem;
-  border-radius: 1rem;
-  border: 1px solid rgb(255 255 255 / 0.16);
-  background: linear-gradient(145deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.04));
-  box-shadow:
-    0 18px 40px -16px rgb(2 6 23 / 0.8),
-    0 1px 0 rgb(255 255 255 / 0.12) inset;
-  backdrop-filter: blur(8px);
-  animation: intro-bob 5s ease-in-out calc(1.9s + var(--i) * 0.3s) infinite;
-}
-.intro-hub {
-  position: relative;
-  display: grid;
-  place-items: center;
-  animation: intro-hub-in 0.9s var(--ease-out) 1.3s both;
-}
-.intro-hub-mark {
-  position: relative;
-  width: 70%;
-  max-width: 4.5rem;
-  filter: drop-shadow(0 10px 24px color-mix(in srgb, var(--brand-via) 60%, transparent));
-}
-.intro-hub-ring {
-  position: absolute;
-  inset: 4%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 7%;
   border-radius: 9999px;
-  border: 1.5px solid color-mix(in srgb, var(--brand-to) 60%, transparent);
-  animation: intro-pulse 2.8s ease-out 2s infinite;
+  text-align: center;
+  background: color-mix(in srgb, var(--surface) 74%, transparent);
+  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+  box-shadow: 0 24px 60px -28px hsl(var(--shadow-color) / 0.45);
+  backdrop-filter: blur(10px);
+  pointer-events: none;
 }
-.intro-hub-ring-2 {
-  animation-delay: 3.4s;
+.dc-event {
+  display: flex;
+  max-width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  margin-top: 0.2rem;
+  animation: dc-pop 320ms var(--ease-out) both;
 }
-.intro-copy {
-  animation: mk-rise 0.8s var(--ease-out) both;
+.dc-event-icon {
+  display: inline-grid;
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-bottom: 0.15rem;
+  place-items: center;
+  border-radius: 0.6rem;
+  color: var(--primary-ink);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
 }
-.intro-cue {
-  animation: intro-cue 1.8s ease-in-out 2.2s infinite;
+.dc-stats {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(8px);
 }
-@keyframes intro-assemble {
+.dc-stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.7rem 0.5rem;
+  text-align: center;
+}
+.dc-stats > div + div {
+  border-inline-start: 1px solid var(--border);
+}
+.dc-stats dd {
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.dc-stats dt {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.dc-cue {
+  animation: dc-cue 1.8s ease-in-out 2.2s infinite;
+}
+@keyframes dc-live {
   from {
-    opacity: 0;
-    transform: translate3d(var(--fx), var(--fy), var(--fz)) rotateX(var(--frx)) rotateY(var(--fry)) rotateZ(var(--frz)) scale(0.6);
-  }
-  35% {
-    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 55%, transparent);
   }
   to {
-    opacity: 1;
-    transform: none;
+    box-shadow: 0 0 0 7px transparent;
   }
 }
-@keyframes intro-hub-in {
+@keyframes dc-pop {
   from {
     opacity: 0;
-    transform: translateZ(-120px) scale(0.3) rotateY(-120deg);
-  }
-  to {
-    opacity: 1;
-    transform: translateZ(40px) scale(1) rotateY(0);
+    transform: translateY(6px) scale(0.98);
   }
 }
-@keyframes intro-bob {
-  50% {
-    transform: translateZ(14px) translateY(-4px);
-  }
-}
-@keyframes intro-pulse {
-  from {
-    opacity: 0.8;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.9);
-  }
-}
-@keyframes intro-cue {
+@keyframes dc-cue {
   50% {
     transform: translateY(5px);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .intro-stage {
+  .dc-live,
+  .dc-event,
+  .dc-cue {
+    animation: none;
+  }
+  .dc-mark {
     transition: none;
-    transform: rotateX(12deg) rotateY(-8deg);
-  }
-  .intro-tile,
-  .intro-hub,
-  .intro-copy {
-    animation: none;
-  }
-  .intro-tile-face,
-  .intro-hub-ring,
-  .intro-cue {
-    animation: none;
-  }
-  .intro-hub-ring {
-    display: none;
   }
 }
 
