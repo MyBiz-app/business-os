@@ -87,8 +87,10 @@ with sync_playwright() as p:
     page.get_by_role("button", name="יצירה").click()
     page.wait_for_url("**/schedule?week=*")
     page.goto(f"{h.BASE}/dashboard"); h.ready(page)
-    mine = page.get_by_role("region", name=re.compile("שלך היום"))  # the industry's word for a session
-    expect(mine.get_by_text("23:30")).to_be_visible()
+    # "Today" lists the whole day; the ones the person teaches carry a "yours" mark.
+    today_card = page.get_by_role("region", name=re.compile("היום"))
+    expect(today_card.get_by_text("23:30")).to_be_visible()
+    expect(today_card.get_by_text("שלך", exact=True)).to_be_visible()
     print("instructor's classes today on the dashboard: ok")
 
     # Close a day (a holiday): its classes are cancelled and the schedule shows it closed.

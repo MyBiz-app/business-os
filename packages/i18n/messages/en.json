@@ -616,6 +616,19 @@
     "waitlist": {
       "waiting": "{count, plural, one {# person is waiting for a spot} other {# people are waiting for a spot}}",
       "top": "Most wanted: {service} ({count})"
+    },
+    "hello": "{greeting}, {name}",
+    "new": "New",
+    "newLead": "New lead",
+    "newAppointment": "New appointment",
+    "allReports": "All reports",
+    "myShift": "Your shift today: {range}",
+    "yours": "Yours",
+    "needs": {
+      "title": "Needs you",
+      "showAll": "Show all ({count})",
+      "showLess": "Show less",
+      "clear": "Nothing needs you right now."
     }
   },
   "roles": {
