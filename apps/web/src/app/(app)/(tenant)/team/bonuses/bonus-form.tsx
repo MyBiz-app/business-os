@@ -8,6 +8,7 @@ import { useState, useTransition } from "react";
 import { Field, SelectField } from "@/components/form/field";
 
 import { type BonusError, type BonusInput, type BonusPreview, addBonus, previewBonus } from "./actions";
+import { Button } from "@/components/ui/button";
 
 const TARGETS = ["employee", "location", "location_group", "managers", "role", "everyone", "manual"] as const;
 const KINDS = ["bonus", "holiday_gift", "expense_refund", "deduction"] as const;
@@ -207,13 +208,13 @@ export function BonusForm({
       )}
 
       <div className="flex flex-wrap gap-2">
-        <button type="submit" className="btn-secondary px-4 py-2" disabled={pending}>
+        <Button variant="secondary" type="submit" disabled={pending}>
           {t("preview")}
-        </button>
+        </Button>
         {preview && (
-          <button type="button" className="btn-primary px-4 py-2" disabled={pending} onClick={() => run("add")}>
+          <Button variant="primary" disabled={pending} onClick={() => run("add")}>
             {canManage ? t("submit", { count: preview.recipients.length }) : t("propose", { count: preview.recipients.length })}
-          </button>
+          </Button>
         )}
       </div>
     </form>

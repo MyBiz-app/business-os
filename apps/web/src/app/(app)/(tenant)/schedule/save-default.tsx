@@ -6,6 +6,7 @@ import { useActionState } from "react";
 
 import { saveScheduleDefault, type DefaultViewState } from "./actions";
 import { FormError, FormNotice } from "@/components/form/form-message";
+import { Button } from "@/components/ui/button";
 
 /** Owners: keeps the current range and branches as the way the schedule opens for the business. */
 export function SaveDefault({ view, branches }: { view: "day" | "week" | "month"; branches: string[] }) {
@@ -14,10 +15,10 @@ export function SaveDefault({ view, branches }: { view: "day" | "week" | "month"
 
   return (
     <form action={action} className="flex items-center gap-2">
-      <button type="submit" disabled={pending} aria-busy={pending} title={t("saveDefaultHint")} className="btn-ghost gap-1.5 px-3 py-1.5 text-sm">
+      <Button variant="quiet" type="submit" disabled={pending} aria-busy={pending} title={t("saveDefaultHint")} className="gap-1.5">
         <Bookmark aria-hidden="true" className="size-4" />
         {t("saveDefault")}
-      </button>
+      </Button>
       <FormNotice message={state.saved ? t("defaultSaved") : undefined} />
       <FormError toastOnly message={state.error ? t("defaultError") : undefined} />
     </form>

@@ -9,6 +9,7 @@ import { CloseDayForm } from "./close-day-form";
 import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { Button } from "@/components/ui/button";
 
 /** Closed days (holidays): close a day, see upcoming closed days, reopen one. */
 export default async function ClosedDaysPage() {
@@ -48,9 +49,9 @@ export default async function ClosedDaysPage() {
                   )}
                 </span>
                 <form action={reopenDay.bind(null, day.id)}>
-                  <button type="submit" className="btn-link text-sm text-primary-ink underline-offset-4 hover:underline">
+                  <Button variant="plain" type="submit" className="btn-link text-sm text-primary-ink underline-offset-4 hover:underline">
                     {t("reopenDay")}
-                  </button>
+                  </Button>
                 </form>
               </li>
             ))}

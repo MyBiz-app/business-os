@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { Field, SelectField } from "@/components/form/field";
 import { IdentityEditor } from "@/components/identity-editor";
 import type { components } from "@business-os/api-client";
+import { Button } from "@/components/ui/button";
 
 import {
   type ComponentInput,
@@ -46,20 +47,20 @@ export function PayrollFile(props: {
     <div className="flex flex-col gap-4">
       <div role="tablist" aria-label={t("tabsLabel")} className="flex flex-wrap gap-1 border-b border-border">
         {TABS.map((key) => (
-          <button
+          <Button
             key={key}
-            type="button"
+            variant="plain"
             role="tab"
             id={`payroll-tab-${key}`}
             aria-selected={tab === key}
             aria-controls={`payroll-panel-${key}`}
             onClick={() => setTab(key)}
-            className={`btn-plain -mb-px border-b-2 px-4 py-2 text-sm font-medium ${
+            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
               tab === key ? "border-primary text-primary-ink" : "border-transparent text-muted hover:text-foreground"
             }`}
           >
             {t(`tabs.${key}`)}
-          </button>
+          </Button>
         ))}
       </div>
       <section role="tabpanel" id={`payroll-panel-${tab}`} aria-labelledby={`payroll-tab-${tab}`} className="card flex flex-col gap-6 p-6">
@@ -102,8 +103,8 @@ function Personal({ userId, name, employment, forms, canManage, thisYear }: Para
           <p className="flex flex-wrap items-center gap-3 text-sm">
             <bdi dir="ltr">{bank ?? `•••${employment.bank_last4}`}</bdi>
             {employment.can_reveal_bank && (
-              <button
-                type="button"
+              <Button
+                variant="plain"
                 className="btn-link text-primary-ink underline-offset-4 hover:underline"
                 disabled={pending}
                 onClick={() =>
@@ -117,7 +118,7 @@ function Personal({ userId, name, employment, forms, canManage, thisYear }: Para
                 }
               >
                 {bank ? t("personal.hide") : t("personal.show")}
-              </button>
+              </Button>
             )}
           </p>
         ) : (
@@ -129,9 +130,8 @@ function Personal({ userId, name, employment, forms, canManage, thisYear }: Para
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold">{t("form101.title")}</h2>
           {canManage && !hasThisYear && (
-            <button
-              type="button"
-              className="btn-secondary px-3 py-1.5 text-sm"
+            <Button
+              variant="secondary"
               disabled={pending}
               onClick={() =>
                 startTransition(async () => {
@@ -141,7 +141,7 @@ function Personal({ userId, name, employment, forms, canManage, thisYear }: Para
               }
             >
               {t("form101.request", { year: thisYear, name })}
-            </button>
+            </Button>
           )}
         </div>
         <p className="text-sm text-muted">{t("form101.hint")}</p>
@@ -188,9 +188,9 @@ function FormRow({ userId, form, canManage }: { userId: string; form: FormSummar
         {submitted && (
           <span className="flex items-center gap-3">
             {canManage && (
-              <button type="button" className="btn-link text-primary-ink underline-offset-4 hover:underline" onClick={() => setEditing(!editing)}>
+              <Button variant="plain" className="btn-link text-primary-ink underline-offset-4 hover:underline" onClick={() => setEditing(!editing)}>
                 {t("form101.adjust")}
-              </button>
+              </Button>
             )}
             <a className="text-primary-ink underline-offset-4 hover:underline" href={`/team/${userId}/payroll/form101/${form.tax_year}/pdf`} download>
               {t("form101.pdf")}
@@ -213,13 +213,13 @@ function FormRow({ userId, form, canManage }: { userId: string; form: FormSummar
           <Field label={t("form101.note")} value={note} maxLength={500} onChange={(event) => setNote(event.target.value)} />
           <ErrorLine error={error} />
           <div className="flex gap-2">
-            <button type="submit" className="btn-primary px-3 py-1.5 text-sm" disabled={pending}>
+            <Button variant="primary" type="submit" disabled={pending}>
               {t("save")}
-            </button>
+            </Button>
             {form.override_points != null && (
-              <button type="button" className="btn-ghost px-3 py-1.5 text-sm" disabled={pending} onClick={() => save(null)}>
+              <Button variant="quiet" disabled={pending} onClick={() => save(null)}>
                 {t("form101.clear")}
-              </button>
+              </Button>
             )}
           </div>
         </form>
@@ -328,9 +328,9 @@ function Terms({ userId, currency, locale, employment, canManage }: Parameters<t
       {saved && <p role="status" className="text-sm text-success-ink">{t("saved")}</p>}
       {canManage && (
         <div>
-          <button type="submit" className="btn-primary px-4 py-2" disabled={pending}>
+          <Button variant="primary" type="submit" disabled={pending}>
             {t("save")}
-          </button>
+          </Button>
         </div>
       )}
     </form>
@@ -435,11 +435,11 @@ function Components({ userId, currency, locale, components: lines, canManage }: 
               </div>
               {canManage && (
                 <span className="flex items-center gap-3">
-                  <button type="button" className="btn-link text-primary-ink underline-offset-4 hover:underline" onClick={() => setEditing(line.id)}>
+                  <Button variant="plain" className="btn-link text-primary-ink underline-offset-4 hover:underline" onClick={() => setEditing(line.id)}>
                     {t("edit")}
-                  </button>
-                  <button
-                    type="button"
+                  </Button>
+                  <Button
+                    variant="plain"
                     className="btn-link text-danger underline-offset-4 hover:underline"
                     disabled={pending}
                     onClick={() =>
@@ -450,7 +450,7 @@ function Components({ userId, currency, locale, components: lines, canManage }: 
                     }
                   >
                     {t("remove")}
-                  </button>
+                  </Button>
                 </span>
               )}
             </li>
@@ -462,9 +462,9 @@ function Components({ userId, currency, locale, components: lines, canManage }: 
           <ComponentForm userId={userId} currency={currency} line={null} onDone={() => setEditing(null)} />
         ) : (
           <div>
-            <button type="button" className="btn-secondary px-3 py-1.5 text-sm" onClick={() => setEditing("new")}>
+            <Button variant="secondary" onClick={() => setEditing("new")}>
               {t("add")}
-            </button>
+            </Button>
           </div>
         ))}
     </>
@@ -568,12 +568,12 @@ function ComponentForm({
       </div>
       <ErrorLine error={error} />
       <div className="flex gap-2">
-        <button type="submit" className="btn-primary px-3 py-1.5 text-sm" disabled={pending}>
+        <Button variant="primary" type="submit" disabled={pending}>
           {t("save")}
-        </button>
-        <button type="button" className="btn-ghost px-3 py-1.5 text-sm" disabled={pending} onClick={onDone}>
+        </Button>
+        <Button variant="quiet" disabled={pending} onClick={onDone}>
           {t("cancel")}
-        </button>
+        </Button>
       </div>
     </form>
   );

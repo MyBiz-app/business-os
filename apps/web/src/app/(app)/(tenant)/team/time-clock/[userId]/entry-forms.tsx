@@ -7,6 +7,7 @@ import { Field, SelectField, type SelectOption } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 
 import { addEntry, type ClockFormState, correctEntry, deleteEntry, setApproval } from "../actions";
+import { Button } from "@/components/ui/button";
 
 function useMessage() {
   const t = useTranslations("timeClock");
@@ -33,12 +34,12 @@ export function EntryForm({ entryId, userId, clockIn, clockOut }: { entryId: str
       </div>
       <Field label={t("reason")} name="reason" maxLength={200} hint={t("reasonHint")} required />
       <div className="flex flex-wrap gap-2">
-        <button type="submit" disabled={pending} className="btn-primary px-4 py-2.5">
+        <Button variant="primary" type="submit" disabled={pending}>
           {t("save")}
-        </button>
-        <button type="submit" formAction={remove} disabled={removing} className="btn-secondary px-4 py-2.5">
+        </Button>
+        <Button variant="secondary" type="submit" formAction={remove} disabled={removing}>
           {t("delete")}
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -60,9 +61,9 @@ export function NewEntryForm({ userId, branches }: { userId: string; branches: S
       <SelectField label={t("branch")} name="location_id" options={branches} />
       <Field label={t("reason")} name="reason" maxLength={200} hint={t("reasonHint")} required />
       <div>
-        <button type="submit" disabled={pending} className="btn-primary px-4 py-2.5">
+        <Button variant="primary" type="submit" disabled={pending}>
           {t("add")}
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -78,9 +79,9 @@ export function ApprovalForm({ userId, month, approved }: { userId: string; mont
     <form action={action} className="flex flex-col gap-2">
       <FormError message={shown.error} />
       <div>
-        <button type="submit" disabled={pending} className={approved ? "btn-secondary px-4 py-2.5" : "btn-primary px-4 py-2.5"}>
+        <Button type="submit" variant={approved ? "secondary" : "primary"} disabled={pending}>
           {approved ? t("reopen") : t("approve")}
-        </button>
+        </Button>
       </div>
     </form>
   );

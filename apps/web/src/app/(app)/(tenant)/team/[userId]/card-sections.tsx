@@ -19,6 +19,7 @@ import { PayrollFile } from "./payroll/payroll-file";
 import { saveAvailability } from "./availability/actions";
 import { removeTimeOff, saveHours } from "./hours/actions";
 import { TimeOffForm } from "./hours/time-off";
+import { Button } from "@/components/ui/button";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 type Member = { user_id: string; email: string; full_name: string | null; role: string; custom_role_id: string | null; custom_role_name: string | null; location_ids: string[]; home_location_id: string | null; joined_at: string; job_title: string | null; phone: string | null; permissions: string[] };
@@ -198,9 +199,9 @@ export async function AvailabilityTab({ member, context }: { member: Member; con
                     {entry.reason && <span dir="auto" className="text-muted"> · {entry.reason}</span>}
                   </span>
                   <form action={removeTimeOff.bind(null, member.user_id, entry.id)}>
-                    <button type="submit" className="btn-link text-danger underline-offset-4 hover:underline">
+                    <Button variant="plain" type="submit" className="btn-link text-danger underline-offset-4 hover:underline">
                       {t("timeOff.remove")}
-                    </button>
+                    </Button>
                   </form>
                 </li>
               ))}

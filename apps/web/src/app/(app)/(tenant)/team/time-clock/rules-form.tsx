@@ -7,6 +7,7 @@ import { Field, SelectField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 
 import { saveRules } from "./actions";
+import { Button } from "@/components/ui/button";
 
 type Rules = {
   work_days_per_week: number;
@@ -56,9 +57,9 @@ export function RulesForm({ rules, canEdit, locale }: { rules: Rules; canEdit: b
       <SelectField label={t("rules.restWeekday")} name="rest_weekday" defaultValue={String(rules.rest_weekday)} disabled={!canEdit} options={weekdays} />
       {canEdit && (
         <div className="sm:col-span-2">
-          <button type="submit" disabled={pending} className="btn-primary px-4 py-2.5">
+          <Button variant="primary" type="submit" disabled={pending}>
             {t("rules.save")}
-          </button>
+          </Button>
         </div>
       )}
     </form>

@@ -10,6 +10,7 @@ import { dayOf, formatDay, formatTime, isDay } from "@/lib/dates";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { EntryActions } from "./entry-actions";
+import { Button } from "@/components/ui/button";
 
 const MODES = ["auto", "first_come", "manual"] as const;
 const hhmm = (time: string | null | undefined) => (time ?? "").slice(0, 5);
@@ -84,9 +85,9 @@ export default async function WaitlistPage({ searchParams }: PageProps<"/schedul
             ))}
           </select>
         </label>
-        <button type="submit" className="btn-secondary px-4 py-2.5 text-sm">
+        <Button variant="secondary" type="submit">
           {t("filters.apply")}
-        </button>
+        </Button>
         {(day || mode || query.service || query.branch) && (
           <Link href="/schedule/waitlist" className="text-sm text-primary-ink underline-offset-4 hover:underline">
             {t("filters.clear")}

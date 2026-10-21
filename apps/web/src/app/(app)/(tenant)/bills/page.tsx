@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/layout/page-header";
 
 import { RunForm } from "./run-form";
 import { EmptyState } from "@/components/empty-state";
+import { Button } from "@/components/ui/button";
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -60,9 +61,9 @@ export default async function BillsPage({ searchParams }: PageProps<"/bills">) {
             ))}
           </select>
         </label>
-        <button type="submit" className="btn-secondary px-4 py-2.5">
+        <Button variant="secondary" type="submit">
           {t("show")}
-        </button>
+        </Button>
       </form>
       <ul className="grid gap-3 sm:grid-cols-3">
         {[

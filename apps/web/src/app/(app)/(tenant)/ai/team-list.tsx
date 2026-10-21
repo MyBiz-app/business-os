@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { AgentAvatar } from "./agent-avatar";
 import type { Agent } from "./types";
+import { Button } from "@/components/ui/button";
 
 /** The same team as the map, as plain cards: for phones, screen readers and anyone who prefers a list. */
 export function TeamList({ agents, selected, compact = false, onPick }: { agents: Agent[]; selected: string | null; compact?: boolean; onPick: (agent: Agent) => void }) {
@@ -15,11 +16,11 @@ export function TeamList({ agents, selected, compact = false, onPick }: { agents
         const dim = agent.state !== "active";
         return (
           <li key={agent.key}>
-            <button
+            <Button variant="plain"
               type="button"
               onClick={() => onPick(agent)}
               aria-pressed={selected === agent.key}
-              className="btn-plain card flex w-full items-center gap-3 p-3 text-start transition hover:-translate-y-0.5"
+              className="card flex w-full items-center gap-3 p-3 text-start transition hover:-translate-y-0.5"
               style={{ boxShadow: selected === agent.key ? `0 0 0 2px ${agent.color}` : undefined }}
             >
               <span className="relative flex shrink-0">
@@ -39,7 +40,7 @@ export function TeamList({ agents, selected, compact = false, onPick }: { agents
                 </span>
                 <span className={`text-xs ${agent.state === "active" ? "text-success-ink" : "text-muted"}`}>{t(`state.${agent.state}`)}</span>
               </span>
-            </button>
+            </Button>
           </li>
         );
       })}

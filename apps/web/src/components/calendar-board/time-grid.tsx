@@ -8,6 +8,7 @@ import { Avatar } from "@/components/avatar";
 import { CardTransition } from "@/components/ui/page-transition";
 import { capLanes, coverage, layOut, minutesIn, visibleHours } from "@/lib/calendar";
 import { formatDay, todayIn } from "@/lib/dates";
+import { Button } from "@/components/ui/button";
 
 export type GridEvent = {
   id: string;
@@ -348,13 +349,13 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                         ? coverage(dayShifts).map((segment) => {
                             const block = y(segment.end) - y(segment.start);
                             return (
-                              <button
-                                type="button"
+                              <Button
+                                variant="plain"
                                 data-peek
                                 key={segment.start}
                                 onClick={(event) => openPeek(event.currentTarget, dayShifts.filter((x) => x.start < segment.end && x.end > segment.start))}
                                 title={`${segment.count} · ${labels.onShift}`}
-                                className="btn-plain absolute inset-x-0.5 flex flex-col items-center justify-center gap-px rounded-md text-[0.6875rem] font-semibold tabular-nums transition-colors hover:ring-2 hover:ring-primary/50"
+                                className="absolute inset-x-0.5 flex flex-col items-center justify-center gap-px rounded-md text-[0.6875rem] font-semibold tabular-nums transition-colors hover:ring-2 hover:ring-primary/50"
                                 style={{
                                   top: y(segment.start) + 1,
                                   height: Math.max(block - 2, 14),
@@ -364,17 +365,17 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                                 {block > 30 && <Users aria-hidden="true" className="size-3 opacity-70" />}
                                 <span aria-hidden="true">{segment.count}</span>
                                 <span className="sr-only">{`${segment.count} ${labels.onShift}, ${clock(segment.start)}-${clock(segment.end)}`}</span>
-                              </button>
+                              </Button>
                             );
                           })
                         : layOut(dayShifts).map((shift) => (
-                            <button
-                              type="button"
+                            <Button
+                              variant="plain"
                               data-peek
                               key={shift.id}
                               onClick={(event) => openPeek(event.currentTarget, [shift])}
                               aria-label={`${shift.name} ${shift.label}`}
-                              className={`btn-plain group/chip absolute flex justify-center rounded-md pt-0.5 transition-colors hover:ring-2 hover:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary ${shift.warn ? "bg-warning/20" : "bg-primary/10"}`}
+                              className={`group/chip absolute flex justify-center rounded-md pt-0.5 transition-colors hover:ring-2 hover:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary ${shift.warn ? "bg-warning/20" : "bg-primary/10"}`}
                               style={{
                                 top: y(shift.start) + 1,
                                 height: Math.max(y(shift.end) - y(shift.start) - 2, 16),
@@ -390,7 +391,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                               >
                                 {shift.name}
                               </span>
-                            </button>
+                            </Button>
                           ))}
                     </div>
                   )}
@@ -417,9 +418,9 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
         >
           <div className="mb-2 flex items-center justify-between gap-2">
             <p className="text-xs font-semibold text-muted">{peek.shifts.length > 1 ? `${labels.peopleOnShift} (${peek.shifts.length})` : labels.shifts}</p>
-            <button type="button" onClick={() => setPeek(null)} aria-label={labels.close} className="btn-ghost size-6 text-muted">
+            <Button variant="quiet" onClick={() => setPeek(null)} aria-label={labels.close} className="size-6 text-muted">
               ×
-            </button>
+            </Button>
           </div>
           <ul className="flex max-h-[min(18rem,50dvh)] flex-col gap-2 overflow-auto">
             {peek.shifts.map((shift) => (

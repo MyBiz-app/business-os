@@ -8,6 +8,7 @@ import { Field } from "@/components/form/field";
 
 import { weekdayNames } from "./describe-schedule";
 import { type ProactiveSetting, type ProactiveSettings, setProactive } from "./tasks-actions";
+import { Button } from "@/components/ui/button";
 
 type Translate = ReturnType<typeof useTranslations<"aiTeam">>;
 
@@ -80,18 +81,18 @@ function ProactiveRow({ setting, canManage, timeZone, t }: { setting: ProactiveS
           {setting.enabled ? (
             <>
               {changed && (
-                <button type="button" disabled={pending || !time} onClick={() => save(true)} className="btn-primary px-3 py-2 text-sm">
+                <Button variant="primary" type="button" disabled={pending || !time} onClick={() => save(true)}>
                   {t("tasks.proactive.save")}
-                </button>
+                </Button>
               )}
-              <button type="button" disabled={pending} onClick={() => save(false)} className="btn-secondary px-3 py-2 text-sm">
+              <Button type="button" disabled={pending} onClick={() => save(false)}>
                 {t("tasks.proactive.disable")}
-              </button>
+              </Button>
             </>
           ) : (
-            <button type="button" disabled={pending || !time} onClick={() => save(true)} className="btn-primary px-3 py-2 text-sm">
+            <Button variant="primary" type="button" disabled={pending || !time} onClick={() => save(true)}>
               {t("tasks.proactive.enable")}
-            </button>
+            </Button>
           )}
         </div>
       )}

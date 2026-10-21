@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 
 import { deleteStation, renameStation, saveStation, type StationState } from "./actions";
 import { ToastOnChange } from "@/components/toast/toaster";
+import { Button } from "@/components/ui/button";
 
 type Branch = { id: string; name: string; color: string; stations: { id: string; name: string }[] };
 
@@ -62,9 +63,9 @@ function StationBranch({ branch }: { branch: Branch }) {
             }}
             className="control min-w-0 flex-1 px-3 py-1.5 text-sm"
           />
-          <button type="button" disabled={pending} onClick={() => run(() => deleteStation(station.id))} aria-label={t("stations.remove", { name: station.name })} title={t("stations.removeHint")} className="btn-ghost size-9">
+          <Button variant="quiet" disabled={pending} onClick={() => run(() => deleteStation(station.id))} aria-label={t("stations.remove", { name: station.name })} title={t("stations.removeHint")} className="size-9">
             <Trash2 aria-hidden="true" className="size-4" />
-          </button>
+          </Button>
         </div>
       ))}
       <form
@@ -81,10 +82,10 @@ function StationBranch({ branch }: { branch: Branch }) {
         }}
       >
         <input value={name} onChange={(e) => setName(e.target.value)} aria-label={t("stations.name")} placeholder={t("stations.namePlaceholder")} maxLength={40} dir="auto" className="control min-w-0 flex-1 px-3 py-1.5 text-sm" />
-        <button type="submit" disabled={pending || !name.trim()} aria-busy={pending} className="btn-secondary px-3 py-1.5 text-sm">
+        <Button variant="secondary" type="submit" disabled={pending || !name.trim()} aria-busy={pending}>
           <Plus aria-hidden="true" className="size-4" />
           {t("stations.add")}
-        </button>
+        </Button>
       </form>
       <ToastOnChange source={state} tone="error" message={message || undefined} />
     </li>

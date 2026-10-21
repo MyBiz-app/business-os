@@ -5,6 +5,7 @@ import { useActionState } from "react";
 
 import { publishWeek, type PublishWeekState } from "./actions";
 import { FormError, FormNotice } from "@/components/form/form-message";
+import { Button } from "@/components/ui/button";
 
 /** Opens the next week of classes for clients now (the weekly release would do it later). */
 export function PublishWeek() {
@@ -14,9 +15,9 @@ export function PublishWeek() {
 
   return (
     <form action={action} className="flex flex-col items-end gap-1">
-      <button type="submit" disabled={pending} aria-busy={pending} title={t("publishWeekHint")} className="btn-secondary px-3 py-2 text-sm font-medium">
+      <Button variant="secondary" type="submit" disabled={pending} aria-busy={pending} title={t("publishWeekHint")}>
         {t("publishWeek")}
-      </button>
+      </Button>
       <FormNotice
         message={
           state.published

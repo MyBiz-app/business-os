@@ -6,7 +6,9 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PendingArea, PeriodPicker, PeriodProvider } from "@/components/period-picker";
-import { Pill } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
 import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
@@ -76,7 +78,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         {member.name}
       </Link>
       <span className="flex flex-wrap items-center gap-2 text-sm text-muted">
-        <Pill tone={member.reason === "inactive" ? "danger" : "primary"}>{t(`reasons.${member.reason}`)}</Pill>
+        <Badge tone={member.reason === "inactive" ? "danger" : "primary"}>{t(`reasons.${member.reason}`)}</Badge>
         {member.last_visit ? t("lastVisit", { date: dateLabel(member.last_visit) }) : t("neverVisited")}
         {member.plan_ends_on && ` · ${t("planEnds", { date: dateLabel(member.plan_ends_on) })}`}
       </span>
@@ -84,10 +86,8 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   );
 
   const table = (id: string, title: string, nameHeader: string, rows: Row[], name: (row: Row) => string, link?: (row: Row) => React.ReactNode) => (
-    <section aria-labelledby={id} className="flex flex-col gap-3 card p-6">
-      <h2 id={id} className="text-lg font-semibold">
-        {title}
-      </h2>
+    <Card as="section" aria-labelledby={id}>
+      <CardHeader titleId={id} title={title} />
       {rows.length === 0 ? (
         <p className="text-sm text-muted">{t("noSessions")}</p>
       ) : (
@@ -120,7 +120,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           ]}
         />
       )}
-    </section>
+    </Card>
   );
 
   return (
@@ -131,14 +131,14 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         description={t("intro")}
         actions={
           <div className="flex flex-wrap items-center gap-3">
-            <Link
+            <ButtonLink
               scroll={false}
               href={{ pathname: "/reports", query: { ...query, staff: excludeStaff ? undefined : "exclude" } }}
               aria-current={excludeStaff ? "true" : undefined}
-              className={excludeStaff ? "btn-primary px-3 py-1.5 text-sm" : "btn-secondary px-3 py-1.5 text-sm"}
+              variant={excludeStaff ? "primary" : "secondary"}
             >
               {t("withoutStaff")}
-            </Link>
+            </ButtonLink>
             <PeriodPicker presets={PRESETS} value={chosen.key} from={start} to={end} today={today} reset={["sort"]} />
           </div>
         }
@@ -160,10 +160,8 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {bySlot.length > 0 && <BusyHours rows={bySlot} locale={locale} />}
       {/* Courts and rooms rented by the hour: how much of their open time was reserved. */}
       {courts.length > 0 && (
-        <section aria-labelledby="by-court" className="flex flex-col gap-3 card p-6">
-          <h2 id="by-court" className="text-lg font-semibold">
-            {t("byCourt")}
-          </h2>
+        <Card as="section" aria-labelledby="by-court">
+          <CardHeader titleId="by-court" title={t("byCourt")} />
           <DataTable
             labelledBy="by-court"
             bare
@@ -210,15 +208,10 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
               { key: "courtRevenue", header: t("courtRevenue"), align: "end", className: "tabular-nums", cell: (row) => formatMoney(row.revenue, row.currency, locale) },
             ]}
           />
-        </section>
+        </Card>
       )}
-      <section aria-labelledby="at-risk-heading" className="flex flex-col gap-3 card p-6">
-        <div className="flex flex-col gap-1">
-          <h2 id="at-risk-heading" className="text-lg font-semibold">
-            {t("atRisk", { count: atRisk.length })}
-          </h2>
-          <p className="text-sm text-muted">{t("atRiskHint", { days: AT_RISK_DAYS })}</p>
-        </div>
+      <Card as="section" aria-labelledby="at-risk-heading" className="flex flex-col gap-3">
+        <CardHeader titleId="at-risk-heading" title={t("atRisk", { count: atRisk.length })} description={t("atRiskHint", { days: AT_RISK_DAYS })} className="mb-0" />
         {atRisk.length === 0 ? (
           <p className="text-sm text-muted">{t("atRiskNone")}</p>
         ) : (
@@ -231,7 +224,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
             <ul className="flex flex-col divide-y divide-border">{atRisk.slice(SHOWN).map(memberRow)}</ul>
           </CollapsibleSection>
         )}
-      </section>
+      </Card>
       {/* Reviews come last: the numbers people act on every day go first. */}
       <ReviewsSummary
         summary={reviews}
