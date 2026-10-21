@@ -259,6 +259,10 @@ def list_clients(
         Literal["only", "exclude"] | None,
         Query(description="only: team members who are also clients; exclude: leave them out"),
     ] = None,
+    city_code: Annotated[
+        int | None,
+        Query(description="Living in this city: the city on the record, else the latest address"),
+    ] = None,
 ) -> ClientPage:
     # RLS limits rows to the current tenant; the filters below narrow further.
     # The current branch's clients, and those without a home branch (they belong to all).
@@ -281,6 +285,12 @@ def list_clients(
     if client_status:
         where += " AND status = :status"
         params["status"] = client_status
+    if city_code is not None:
+        where += """ AND coalesce(app.clients.city_code, (
+            SELECT a.city_code FROM app.client_addresses a
+            WHERE a.client_id = app.clients.id AND a.active AND a.city_code IS NOT NULL
+            ORDER BY a.updated_at DESC LIMIT 1)) = :city_code"""
+        params["city_code"] = city_code
     if staff:
         where += f""" AND {"" if staff == "only" else "NOT "}(user_id IS NOT NULL AND EXISTS (
             SELECT 1 FROM app.tenant_members m
