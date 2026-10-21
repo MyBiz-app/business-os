@@ -9,6 +9,7 @@ import { endInputValue, minuteToTime, timeToMinute } from "@/lib/coverage";
 
 import { type CoverageRuleInput, type CoverageState, saveCoverageRules } from "./actions";
 import { ToastOnChange } from "@/components/toast/toaster";
+import { Button } from "@/components/ui/button";
 
 type Branch = { id: string; name: string; color: string; rules: CoverageRuleInput[] };
 type Row = { weekday: number; starts: string; ends: string; min: number };
@@ -77,20 +78,20 @@ function CoverageBranch({ branch, weekdays }: { branch: Branch; weekdays: string
             {t("coverage.min")}
             <input type="number" min={1} max={50} value={row.min} onChange={(e) => change(index, { min: Number(e.target.value) })} required dir="ltr" className="control w-20 px-2 py-1.5 text-sm text-foreground" />
           </label>
-          <button type="button" onClick={() => setRows((all) => all.filter((_, i) => i !== index))} aria-label={t("coverage.remove")} className="btn-ghost size-9">
+          <Button variant="quiet" onClick={() => setRows((all) => all.filter((_, i) => i !== index))} aria-label={t("coverage.remove")} className="size-9">
             <Trash2 aria-hidden="true" className="size-4" />
-          </button>
+          </Button>
         </div>
       ))}
       <p className="text-xs text-muted">{t("coverage.endHint")}</p>
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" onClick={() => setRows((all) => [...all, { weekday: 0, starts: "09:00", ends: "17:00", min: 1 }])} className="btn-secondary px-3 py-1.5 text-sm">
+        <Button variant="secondary" onClick={() => setRows((all) => [...all, { weekday: 0, starts: "09:00", ends: "17:00", min: 1 }])}>
           <Plus aria-hidden="true" className="size-4" />
           {t("coverage.add")}
-        </button>
-        <button type="button" onClick={save} disabled={saving} aria-busy={saving} className="btn-primary px-3 py-1.5 text-sm">
+        </Button>
+        <Button variant="primary" onClick={save} disabled={saving} aria-busy={saving}>
           {t("planning.save")}
-        </button>
+        </Button>
         <ToastOnChange
           source={state}
           tone={state.saved ? "success" : "error"}

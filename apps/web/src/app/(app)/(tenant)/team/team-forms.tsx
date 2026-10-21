@@ -16,6 +16,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 
 import { changeRole, inviteMember, removeMember, setBranches, type TeamState } from "./actions";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { Button } from "@/components/ui/button";
 
 const ROLES = ["owner", "manager", "front_desk", "staff"] as const;
 // A branch manager is appointed from the branch's page; here it only shows for someone who is one.
@@ -60,16 +61,15 @@ export function InviteForm({ allowOwner }: { allowOwner: boolean }) {
           <FormNotice message={t("inviteCreated", { email: state.email ?? "" })} />
           <div className="flex gap-2">
             <input readOnly value={state.link} dir="ltr" aria-label={t("copy")} className="min-w-0 flex-1 control px-3 py-2 text-sm" />
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={async () => {
                 await navigator.clipboard.writeText(state.link ?? "");
                 setCopied(true);
               }}
-              className="btn-secondary px-3 py-2 text-sm"
             >
               {copied ? t("copied") : t("copy")}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -210,9 +210,9 @@ function RowMenu({ label, children }: { label: string; children: (close: () => v
   }, [open]);
   return (
     <div ref={box} className="relative z-10 shrink-0">
-      <button type="button" aria-label={label} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)} className="btn-ghost size-9 justify-center p-0">
+      <Button variant="quiet" aria-label={label} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)} className="size-9 justify-center">
         <Ellipsis aria-hidden="true" className="size-5" />
-      </button>
+      </Button>
       {open && (
         <div role="menu" className="card absolute end-0 top-full z-20 mt-1 flex min-w-48 flex-col p-1 shadow-lg">
           {children(() => setOpen(false))}
@@ -224,9 +224,9 @@ function RowMenu({ label, children }: { label: string; children: (close: () => v
 
 function MenuItem({ children, onClick, danger = false }: { children: ReactNode; onClick: () => void; danger?: boolean }) {
   return (
-    <button type="button" role="menuitem" onClick={onClick} className={`btn-plain rounded-lg px-3 py-2 text-start text-sm transition-colors hover:bg-surface-2 ${danger ? "text-danger" : ""}`}>
+    <Button variant="plain" role="menuitem" onClick={onClick} className={`rounded-lg px-3 py-2 text-start text-sm transition-colors hover:bg-surface-2 ${danger ? "text-danger" : ""}`}>
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -236,10 +236,10 @@ export function InviteButton({ allowOwner }: { allowOwner: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button type="button" className="btn-primary px-4 py-2 text-sm" onClick={() => setOpen(true)}>
+      <Button variant="primary" onClick={() => setOpen(true)}>
         <UserPlus aria-hidden="true" className="size-4" />
         {t("inviteButton")}
-      </button>
+      </Button>
       {open ? (
         <Modal size="sm" title={t("invite")} onClose={() => setOpen(false)}>
           <InviteForm allowOwner={allowOwner} />
@@ -279,9 +279,9 @@ function MemberBranches({ userId, email, branches, selected, home, onClose }: Me
             ))}
           </select>
         </label>
-        <button type="submit" className="btn-primary px-3 py-1.5 text-sm">
+        <Button variant="primary" type="submit">
           {t("saveBranches")}
-        </button>
+        </Button>
       </form>
     </Modal>
   );

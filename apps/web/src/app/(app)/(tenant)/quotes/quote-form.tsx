@@ -9,6 +9,7 @@ import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
 import { ModalMarker } from "@/components/ui/route-modal";
 import type { FormState } from "@/lib/form-state";
+import { Button, IconButton } from "@/components/ui/button";
 
 type Line = { key: number; description: string; quantity: string; price: string };
 
@@ -93,28 +94,26 @@ export function QuoteForm({ action, defaults, currency, clients, clientId, submi
               value={line.price}
               onChange={(e) => update(line.key, "price", e.target.value)}
             />
-            <button
-              type="button"
-              aria-label={t("removeLine", { number: index + 1 })}
+            <IconButton
+              label={t("removeLine", { number: index + 1 })}
               disabled={lines.length === 1}
               onClick={() => setLines((current) => current.filter((l) => l.key !== line.key))}
-              className="btn-icon mb-1 rounded-lg p-2 text-muted hover:bg-danger/10 hover:text-danger disabled:opacity-40"
+              className="mb-1 text-muted hover:bg-danger/10 hover:text-danger"
             >
               <Trash2 aria-hidden="true" className="size-4" />
-            </button>
+            </IconButton>
           </div>
         ))}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={() => {
               setLines((current) => [...current, { key: next, description: "", quantity: "1", price: "" }]);
               setNext(next + 1);
             }}
-            className="btn-secondary px-3 py-1.5 text-sm"
           >
             <Plus aria-hidden="true" className="size-4" /> {t("addLine")}
-          </button>
+          </Button>
           <p className="font-semibold" aria-live="polite">
             {t("total")}: <span className="tabular-nums" dir="ltr">{total.toFixed(2)} {currency}</span>
           </p>

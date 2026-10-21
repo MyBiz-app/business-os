@@ -9,6 +9,7 @@ import type { components } from "@business-os/api-client";
 import { useToast } from "@/components/toast/toaster";
 
 import { saveMemberAi } from "./ai-actions";
+import { Button } from "@/components/ui/button";
 
 type MemberAi = components["schemas"]["MemberAi"];
 
@@ -73,9 +74,9 @@ export function AiMemberForm({ ai }: { ai: MemberAi }) {
           )}
         </p>
       )}
-      <button type="submit" disabled={pending} className="btn-primary w-fit px-4 py-2 text-sm">
+      <Button variant="primary" type="submit" disabled={pending} className="w-fit">
         {pending ? t("saving") : t("save")}
-      </button>
+      </Button>
     </form>
   );
 }

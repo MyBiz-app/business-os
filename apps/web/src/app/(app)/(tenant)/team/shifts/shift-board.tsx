@@ -14,6 +14,7 @@ import { formatDay } from "@/lib/dates";
 
 import { copyShiftsDay, copyShiftsWeek, type CopyState, deleteShift, deleteTemplate, saveShift, saveTemplate, type ShiftState, type TemplateState } from "./actions";
 import { ToastOnChange } from "@/components/toast/toaster";
+import { Button } from "@/components/ui/button";
 
 export type BoardPerson = { id: string; name: string; title: string; avatar: string | null; homeId: string | null; availability?: AvailabilityWindow[] | null };
 export type BoardShift = {
@@ -77,12 +78,12 @@ export function ShiftBoard(props: {
   const covered = (day: string) => new Set(shifts.filter((s) => s.day === day).map((s) => s.userId)).size;
 
   const shiftButton = (shift: BoardShift, person: BoardPerson, day: string) => (
-    <button
+    <Button
       key={shift.id}
-      type="button"
+      variant="plain"
       disabled={!canEdit}
       onClick={() => setEditing({ shift, userId: person.id, day })}
-      className={`btn-plain flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default ${shift.draft ? "border border-dashed border-border" : ""}`}
+      className={`flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default ${shift.draft ? "border border-dashed border-border" : ""}`}
       style={{ borderInlineStartColor: shift.color, background: `color-mix(in oklab, ${shift.color} ${shift.draft ? 5 : 12}%, var(--surface))` }}
       aria-label={`${person.name}: ${shift.starts}-${shift.ends} ${shift.locationName}${shift.stationName ? `, ${shift.stationName}` : ""}${shift.position ? `, ${shift.position}` : ""}`}
     >
@@ -102,7 +103,7 @@ export function ShiftBoard(props: {
           <span dir="auto" className="truncate">{shift.locationName}</span>
         </span>
       )}
-    </button>
+    </Button>
   );
 
   return (
@@ -146,16 +147,15 @@ export function ShiftBoard(props: {
                   </option>
                 ))}
               </select>
-              <button
-                type="button"
+              <Button
+                variant="secondary"
                 disabled={copying || shifts.length === 0}
                 aria-busy={copying}
                 onClick={() => startCopy(async () => setCopy(await (copyMode === "week" ? copyShiftsWeek(weekStart, copyCount) : copyShiftsDay(weekStart, copyCount))))}
-                className="btn-secondary px-3 py-2 text-sm"
               >
                 <Copy aria-hidden="true" className="size-4" />
                 {t("copyDo")}
-              </button>
+              </Button>
             </div>
             <ToastOnChange source={copy} tone="success" message={copy.copied ? t("copied", { created: copy.copied.created, skipped: copy.copied.skipped }) : undefined} />
             <ToastOnChange source={copy} tone="error" message={copy.error ? tCommon("errors.generic") : undefined} />
@@ -213,14 +213,14 @@ export function ShiftBoard(props: {
                         {isAway && <AwayChip reason={away[`${person.id}:${day}`]} label={t("away")} />}
                         {mine.map((shift) => shiftButton(shift, person, day))}
                         {canEdit && (
-                          <button
-                            type="button"
+                          <Button
+                            variant="plain"
                             onClick={() => setEditing({ shift: null, userId: person.id, day })}
                             aria-label={t("addFor", { name: person.name, day: formatDay(day, locale, { weekday: "long", day: "numeric" }) })}
-                            className={`btn-plain flex flex-1 items-center justify-center rounded-lg border border-dashed border-transparent text-muted transition-colors hover:border-border hover:text-foreground focus-visible:border-border ${mine.length ? "min-h-6 opacity-0 group-hover:opacity-100 focus-visible:opacity-100" : "min-h-12 opacity-40 group-hover:opacity-100"}`}
+                            className={`flex flex-1 items-center justify-center rounded-lg border border-dashed border-transparent text-muted transition-colors hover:border-border hover:text-foreground focus-visible:border-border ${mine.length ? "min-h-6 opacity-0 group-hover:opacity-100 focus-visible:opacity-100" : "min-h-12 opacity-40 group-hover:opacity-100"}`}
                           >
                             <Plus aria-hidden="true" className="size-4" />
-                          </button>
+                          </Button>
                         )}
                       </div>
                     </td>
@@ -263,14 +263,14 @@ export function ShiftBoard(props: {
                 ))}
               </ul>
               {canEdit && (
-                <button
-                  type="button"
+                <Button
+                  variant="plain"
                   onClick={() => setEditing({ shift: null, userId: people[0].id, day })}
                   aria-label={t("dayCardAdd", { day: formatDay(day, locale, { weekday: "long", day: "numeric" }) })}
-                  className="btn-plain flex min-h-11 w-full items-center justify-center border-t border-dashed border-border text-muted transition-colors hover:text-foreground"
+                  className="flex min-h-11 w-full items-center justify-center border-t border-dashed border-border text-muted transition-colors hover:text-foreground"
                 >
                   <Plus aria-hidden="true" className="size-4" />
-                </button>
+                </Button>
               )}
             </section>
           );
@@ -365,8 +365,8 @@ export function ShiftDialog({ editing, people, branches, templates = [], station
         )}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
           {shift ? (
-            <button
-              type="button"
+            <Button
+              variant="danger"
               disabled={deleting}
               aria-busy={deleting}
               onClick={() =>
@@ -375,18 +375,17 @@ export function ShiftDialog({ editing, people, branches, templates = [], station
                   onClose();
                 })
               }
-              className="btn-danger px-3 py-2 text-sm"
             >
               <Trash2 aria-hidden="true" className="size-4" />
               {t("delete")}
-            </button>
+            </Button>
           ) : (
             <span />
           )}
           <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="btn-ghost px-3 py-2 text-sm">
+            <Button variant="quiet" onClick={onClose}>
               {tCommon("cancel")}
-            </button>
+            </Button>
             <SubmitButton className="px-4 py-2 text-sm">{tCommon("save")}</SubmitButton>
           </div>
         </div>
@@ -406,12 +405,12 @@ function TemplatePicker({ templates, onApply }: { templates: BoardTemplate[]; on
       <ul className="flex flex-wrap gap-2">
         {templates.map((tpl) => (
           <li key={tpl.id} className="flex items-center rounded-full border border-border bg-surface-2 text-sm">
-            <button type="button" onClick={() => onApply(tpl)} className="btn-plain rounded-s-full px-3 py-1 font-medium transition-colors hover:text-primary-ink">
+            <Button variant="plain" onClick={() => onApply(tpl)} className="rounded-s-full px-3 py-1 font-medium transition-colors hover:text-primary-ink">
               <span dir="auto">{tpl.name}</span> <span dir="ltr" className="tabular-nums text-muted">{tpl.starts}-{tpl.ends}</span>
-            </button>
-            <button type="button" onClick={() => startDelete(() => deleteTemplate(tpl.id))} aria-label={t("templates.remove", { name: tpl.name })} className="btn-plain rounded-e-full px-2 py-1 text-muted transition-colors hover:text-danger">
+            </Button>
+            <Button variant="plain" onClick={() => startDelete(() => deleteTemplate(tpl.id))} aria-label={t("templates.remove", { name: tpl.name })} className="rounded-e-full px-2 py-1 text-muted transition-colors hover:text-danger">
               <X aria-hidden="true" className="size-3.5" />
-            </button>
+            </Button>
           </li>
         ))}
       </ul>
@@ -428,10 +427,10 @@ function SaveAsTemplate({ locationId, starts, ends, position }: { locationId: st
   const [saving, startSave] = useTransition();
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="btn-ghost -mt-1 self-start px-2 py-1 text-sm">
+      <Button variant="quiet" onClick={() => setOpen(true)} className="-mt-1 self-start">
         <BookmarkPlus aria-hidden="true" className="size-4" />
         {t("templates.save")}
-      </button>
+      </Button>
     );
   }
   const save = () =>
@@ -450,12 +449,12 @@ function SaveAsTemplate({ locationId, starts, ends, position }: { locationId: st
           {t("templates.name")}
           <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder={t("templates.namePlaceholder")} dir="auto" className="control px-3 py-1.5 font-normal" />
         </label>
-        <button type="button" disabled={saving || name.trim() === ""} aria-busy={saving} onClick={save} className="btn-primary px-3 py-1.5 text-sm">
+        <Button variant="primary" disabled={saving || name.trim() === ""} aria-busy={saving} onClick={save}>
           {t("templates.saveDo", { times: `${starts}-${ends}` })}
-        </button>
-        <button type="button" onClick={() => setOpen(false)} className="btn-ghost px-3 py-1.5 text-sm">
+        </Button>
+        <Button variant="quiet" onClick={() => setOpen(false)}>
           {t("templates.cancel")}
-        </button>
+        </Button>
       </div>
       {state.error && (
         <p role="alert" className="text-xs text-danger">

@@ -7,6 +7,7 @@ import { formatTime, todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
 
 import { BookingForm } from "./booking-form";
+import { Button } from "@/components/ui/button";
 
 /** Book a personal appointment: service, staff and day pick the free times; then the client. The
  * page and the window over the schedule show the same thing. */
@@ -111,9 +112,9 @@ export async function AppointmentBody({ query }: { query: Record<string, string 
             <input type="date" name="date" min={today} defaultValue={day} className="control px-3 py-2 font-normal" />
           </label>
           {search && <input type="hidden" name="q" value={search} />}
-          <button type="submit" className="btn-secondary px-4 py-2">
+          <Button variant="secondary" type="submit">
             {t("appointments.show")}
-          </button>
+          </Button>
         </Form>
 
         <section aria-labelledby="slots-heading" className="card flex flex-col gap-5 p-6">
@@ -128,9 +129,9 @@ export async function AppointmentBody({ query }: { query: Record<string, string 
               <span className="sr-only">{t("appointments.searchClient")}</span>
               <input name="q" defaultValue={search} placeholder={t("appointments.searchClient")} className="control w-full px-3 py-2" />
             </label>
-            <button type="submit" className="btn-secondary px-4 py-2">
+            <Button variant="secondary" type="submit">
               {t("appointments.search")}
-            </button>
+            </Button>
           </Form>
           {slots.length === 0 ? (
             <p className="text-muted">{t("appointments.noSlots")}</p>

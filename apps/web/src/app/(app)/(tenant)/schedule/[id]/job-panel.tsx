@@ -6,6 +6,7 @@ import { Pill, type Tone } from "@/components/pill";
 import { googleMapsLink, wazeLink } from "@/lib/maps";
 
 import { setJobStatus } from "../actions";
+import { Button } from "@/components/ui/button";
 
 type Session = components["schemas"]["ScheduledSession"];
 type JobStatus = NonNullable<Session["job_status"]>;
@@ -64,16 +65,16 @@ export async function JobPanel({ session, manageable }: { session: Session; mana
         <div className="flex flex-wrap gap-2">
           {next && (
             <form action={setJobStatus.bind(null, session.id, next)}>
-              <button type="submit" className="btn-primary px-4 py-2 text-sm">
+              <Button variant="primary" type="submit">
                 {t(`actions.${next as Exclude<JobStatus, "scheduled">}`)}
-              </button>
+              </Button>
             </form>
           )}
           {previous && (
             <form action={setJobStatus.bind(null, session.id, previous)}>
-              <button type="submit" className="btn-secondary px-4 py-2 text-sm">
+              <Button variant="secondary" type="submit">
                 {t("undo")}
-              </button>
+              </Button>
             </form>
           )}
         </div>

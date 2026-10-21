@@ -13,6 +13,7 @@ import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { Modal } from "@/components/ui/modal";
 
 import { acknowledgeWarning, type Correction, issueCorrection, listCorrections, markAccountantChecked, moveStage, refreshRun, startRun, type RunError, type RunResult, type RunStage, typeAmount } from "./actions";
+import { Button } from "@/components/ui/button";
 
 type Run = components["schemas"]["Run"];
 type Line = components["schemas"]["RunLine"];
@@ -46,9 +47,9 @@ export function StartRun({ month, label, canManage }: { month: string; label: st
         </p>
       )}
       {canManage ? (
-        <button type="button" className="btn-primary px-4 py-2" disabled={pending} onClick={() => run(() => startRun(month))}>
+        <Button variant="primary" disabled={pending} onClick={() => run(() => startRun(month))}>
           {t("empty.start", { month: label })}
-        </button>
+        </Button>
       ) : (
         <p className="text-sm text-muted">{t("empty.noRights")}</p>
       )}
@@ -160,21 +161,21 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
 
       <div className="flex flex-wrap items-center gap-2">
         {canManage && stage !== "approved" && nextLabel && next && (stage !== "review" || canApprove) && (
-          <button type="button" className="btn-primary px-4 py-2" disabled={pending} onClick={() => act(() => moveStage(month, next))}>
+          <Button variant="primary" disabled={pending} onClick={() => act(() => moveStage(month, next))}>
             {nextLabel}
-          </button>
+          </Button>
         )}
         {stage === "review" && !canApprove && <span className="text-sm text-muted">{t("actions.ownerOnly")}</span>}
         {canManage && index > 0 && stage !== "approved" && (
-          <button type="button" className="btn-secondary px-3 py-2 text-sm" disabled={pending} onClick={() => act(() => moveStage(month, STAGES[index - 1]))}>
+          <Button variant="secondary" disabled={pending} onClick={() => act(() => moveStage(month, STAGES[index - 1]))}>
             {t("actions.back")}
-          </button>
+          </Button>
         )}
         {canManage && stage !== "approved" && (
-          <button type="button" className="btn-ghost px-3 py-2 text-sm" disabled={pending} onClick={() => act(() => refreshRun(month))}>
+          <Button variant="quiet" disabled={pending} onClick={() => act(() => refreshRun(month))}>
             <RefreshCw aria-hidden="true" className="size-4" />
             {t("actions.refresh")}
-          </button>
+          </Button>
         )}
         {canManage && stage !== "approved" && (
           <Link href={`/team/bonuses?month=${month}`} className="btn-secondary px-3 py-2 text-sm">
@@ -191,9 +192,9 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
         </a>
         {stage === "approved" && canApprove && <BankFileForm month={month} />}
         {stage === "approved" && canApprove && run.payslips_draft && (
-          <button type="button" className="btn-secondary px-3 py-2 text-sm" disabled={pending} onClick={() => act(() => markAccountantChecked(month))}>
+          <Button variant="secondary" disabled={pending} onClick={() => act(() => markAccountantChecked(month))}>
             {t("accountantMark")}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -242,7 +243,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
               const left = line.warnings.filter((w) => !w.acknowledged).length;
               return (
                 <li key={line.user_id}>
-                  <button type="button" onClick={() => setOpen(line.user_id)} className="btn-plain card flex w-full flex-col gap-1 p-4 text-start transition hover:shadow-md focus-visible:outline-2">
+                  <Button variant="plain" onClick={() => setOpen(line.user_id)} className="card flex w-full flex-col gap-1 p-4 text-start transition hover:shadow-md focus-visible:outline-2">
                     <span dir="auto" className="font-medium">
                       {line.full_name}
                     </span>
@@ -261,7 +262,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
                         <Pill tone={line.warnings.some((w) => w.severity === "error" && !w.acknowledged) ? "danger" : "warning"}>{t("list.toCheck", { count: left })}</Pill>
                       )}
                     </span>
-                  </button>
+                  </Button>
                 </li>
               );
             })}
@@ -310,9 +311,9 @@ function BankFileForm({ month }: { month: string }) {
           {t("payDate")}
           <input id={`${id}-date`} name="pay_date" type="date" required className={field} />
         </label>
-        <button type="submit" className="btn-secondary self-start px-3 py-2 text-sm sm:col-span-2">
+        <Button variant="secondary" type="submit" className="self-start sm:col-span-2">
           {t("submit")}
-        </button>
+        </Button>
       </form>
     </CollapsibleSection>
   );
@@ -350,9 +351,9 @@ function PaySheet({ line, month, run, locale, canManage, canApprove, onClose }: 
                 <Pill tone={warning.severity === "error" ? "danger" : warning.acknowledged ? "success" : "warning"}>{warning.severity === "error" ? t("error") : warning.acknowledged ? t("acknowledged") : t("warning")}</Pill>
                 <span className="min-w-0 flex-1">{t(`codes.${warning.code}` as "codes.no_bank")}</span>
                 {canManage && warning.severity === "warning" && (
-                  <button type="button" className="btn-ghost px-2 py-1 text-xs" disabled={pending} onClick={() => act(() => acknowledgeWarning(month, line.user_id, warning.key, !warning.acknowledged))}>
+                  <Button variant="quiet" className="text-xs" disabled={pending} onClick={() => act(() => acknowledgeWarning(month, line.user_id, warning.key, !warning.acknowledged))}>
                     {warning.acknowledged ? t("undo") : t("acknowledge")}
-                  </button>
+                  </Button>
                 )}
               </li>
             ))}
@@ -456,13 +457,13 @@ function TypedAmount({ currency, initial, disabled, onSave }: { currency: string
         {t("typedLabel")}
       </label>
       <input id={id} inputMode={minorDigits(currency) > 0 ? "decimal" : "numeric"} dir="ltr" value={value} onChange={(event) => setValue(event.target.value)} placeholder={t("typedLabel")} className="field w-36 py-1" />
-      <button type="submit" className="btn-secondary px-3 py-1 text-xs" disabled={disabled || parsed === null}>
+      <Button variant="secondary" type="submit" className="text-xs" disabled={disabled || parsed === null}>
         {t("save")}
-      </button>
+      </Button>
       {initial !== undefined && (
-        <button type="button" className="btn-ghost px-3 py-1 text-xs" disabled={disabled} onClick={() => onSave(null)}>
+        <Button variant="quiet" className="text-xs" disabled={disabled} onClick={() => onSave(null)}>
           {t("clear")}
-        </button>
+        </Button>
       )}
     </form>
   );
@@ -579,21 +580,21 @@ function Corrections({ month, line, currency, locale }: { month: string; line: L
               <input id={`${id}-a${row.id}`} inputMode="decimal" dir="ltr" value={row.amount} onChange={(event) => update(row.id, { amount: event.target.value })} className="field" />
             </label>
             {rows.length > 1 && (
-              <button type="button" className="btn-ghost size-9" aria-label={t("removeLine")} onClick={() => setRows((current) => current.filter((r) => r.id !== row.id))}>
+              <Button variant="quiet" className="size-9" aria-label={t("removeLine")} onClick={() => setRows((current) => current.filter((r) => r.id !== row.id))}>
                 <X aria-hidden="true" className="size-4" />
-              </button>
+              </Button>
             )}
             {index === rows.length - 1 && rows.length < 5 && (
-              <button type="button" className="btn-ghost px-2 py-2 text-sm" onClick={() => setRows((current) => [...current, { id: Date.now(), label: "", amount: "", deduct: false }])}>
+              <Button variant="quiet" onClick={() => setRows((current) => [...current, { id: Date.now(), label: "", amount: "", deduct: false }])}>
                 <Plus aria-hidden="true" className="size-4" />
                 {t("addLine")}
-              </button>
+              </Button>
             )}
           </div>
         ))}
-        <button type="submit" className="btn-primary self-start px-4 py-2" disabled={pending}>
+        <Button variant="primary" type="submit" className="self-start" disabled={pending}>
           {t("submit")}
-        </button>
+        </Button>
       </form>
     </section>
   );

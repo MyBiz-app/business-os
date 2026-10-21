@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { Button } from "@/components/ui/button";
 
 import { useToast } from "@/components/toast/toaster";
 
@@ -27,13 +28,13 @@ export function SessionStatusButton({
   }
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="plain"
       disabled={pending}
       className={`btn-link text-sm underline-offset-4 hover:underline ${cancelled ? "text-primary-ink" : "text-danger"}`}
       onClick={() => run(!cancelled)}
     >
       {cancelled ? labels.restore : labels.cancel}
-    </button>
+    </Button>
   );
 }

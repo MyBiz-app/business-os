@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Modal } from "@/components/ui/modal";
+import { Button } from "@/components/ui/button";
 
 /** "Add over capacity" for a full class: asks first, then books the client beyond the capacity.
  * `overAction` books over capacity, `waitlistAction` queues the client as usual. */
@@ -24,14 +25,14 @@ export function OverCapacityButton({
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button
-        type="button"
+      <Button
+        variant="secondary"
         aria-label={`${t("addOverCapacity")} - ${name}`}
-        className="btn-secondary px-3 py-1 text-xs"
+        className="text-xs"
         onClick={() => setOpen(true)}
       >
         {t("addOverCapacity")}
-      </button>
+      </Button>
       {open && (
         <Modal
           size="sm"
@@ -40,14 +41,14 @@ export function OverCapacityButton({
           footer={
             <>
               <form action={waitlistAction}>
-                <button type="submit" className="btn-secondary px-4 py-2">
+                <Button variant="secondary" type="submit">
                   {t("keepOnWaitlist")}
-                </button>
+                </Button>
               </form>
               <form action={overAction}>
-                <button type="submit" className="btn-primary px-4 py-2">
+                <Button variant="primary" type="submit">
                   {t("addOverCapacity")}
-                </button>
+                </Button>
               </form>
             </>
           }

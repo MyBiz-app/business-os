@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { ToastOnChange } from "@/components/toast/toaster";
 
 import { type PublishState, publishShifts } from "./actions";
+import { Button } from "@/components/ui/button";
 
 /** Managers: how many shifts of the visible stretch are still drafts, and a button to send them
  * to the team now. Until a shift is published only managers see it. */
@@ -31,16 +32,16 @@ export function PublishBar({ drafts, start, days, branches, summary }: { drafts:
       <ToastOnChange source={state} tone="success" message={state.published ? t("done", { count: state.published }) : undefined} />
       <ToastOnChange source={state} tone="error" message={state.error ? t("error") : undefined} />
       {drafts > 0 && (
-        <button
-          type="button"
+        <Button
+          variant="primary"
           disabled={pending}
           aria-busy={pending}
           onClick={() => startTransition(async () => setState(await publishShifts(start, days, branches)))}
-          className="btn-primary gap-1.5 px-3 py-1.5"
+          className="gap-1.5"
         >
           <Send aria-hidden="true" className="size-4 rtl:-scale-x-100" />
           {t("now")}
-        </button>
+        </Button>
       )}
     </div>
   );
