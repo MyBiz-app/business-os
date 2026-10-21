@@ -51,7 +51,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   let laneIds = limitLanes(asked, view);
   // Nothing picked and no menu branch: all of them side by side when they fit (a month: the first).
   // A week with more than two branches opens as one merged column (branch tags on each class): three lanes cut the class names short.
-  const fits = view === "week" ? branches.length <= 2 : branches.length <= LANE_LIMIT[view];
+  const fits = branches.length <= LANE_LIMIT[view];
   if (laneIds.length === 0 && !branch && branches.length > 1 && (view === "month" || fits)) {
     laneIds = limitLanes(branches.map((b) => b.id), view);
   }
