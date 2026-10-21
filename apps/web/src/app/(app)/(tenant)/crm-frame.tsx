@@ -6,8 +6,10 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { termsOf, vertical } from "@business-os/verticals";
 
+import { CommandPalette } from "@/components/command-palette";
 import { type NavChild, type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
+import { quickActionsFor } from "@/lib/command-palette";
 import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
 import { lockedMenuMode } from "@/lib/nav-capabilities";
@@ -135,6 +137,14 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
   const rank = (item: NavItem) => order.findIndex((key) => g(key) === item.group);
   items.sort((a, b) => rank(a) - rank(b));
 
+  // The pages the Cmd+K window can jump to: what the menu shows, sub-pages included (not the locked previews).
+  const pages = items
+    .filter((item) => !item.locked)
+    .flatMap((item) => [
+      { href: item.href, label: item.label },
+      ...(item.children ?? []).filter((child) => !child.locked && child.href !== item.href).map((child) => ({ href: child.href, label: `${item.label} › ${child.label}` })),
+    ]);
+
   // The floating AI chat: for whoever may use the assistant, in a business that has the AI module.
   const navTone = (await cookies()).get(NAV_TONE_COOKIE)?.value === "dark" ? "dark" : "light";
   const aiBubble = canUseAssistant(tenant) && tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro");
@@ -145,15 +155,20 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     <ScreenContextProvider>
     <div style={brandStyle(brandColor)} className="brand flex flex-1 flex-col md:flex-row">
       <CrmAside initial={navTone} labels={{ light: t("nav.sidebarLight"), dark: t("nav.sidebarDark") }}>
-        <WorkspaceSwitcher
-          name={tenant.name}
-          logo={brandLogo}
-          initial={tenant.name.slice(0, 1)}
-          current={tenant.id}
-          memberships={me.memberships}
-          branches={branches.map(({ id, name, ownLogo }) => ({ id, name, logo: ownLogo }))}
-          branch={currentBranch?.id ?? null}
-        />
+        <div className="flex items-center md:block">
+          <div className="min-w-0 flex-1">
+            <WorkspaceSwitcher
+              name={tenant.name}
+              logo={brandLogo}
+              initial={tenant.name.slice(0, 1)}
+              current={tenant.id}
+              memberships={me.memberships}
+              branches={branches.map(({ id, name, ownLogo }) => ({ id, name, logo: ownLogo }))}
+              branch={currentBranch?.id ?? null}
+            />
+          </div>
+          <CommandPalette tenantId={tenant.id} pages={pages} actions={quickActionsFor(tenant.permissions, tenant.modules)} />
+        </div>
         <SideNav items={items} />
       </CrmAside>
       {/* The floating AI chat sits over the bottom corner: leave it room so it never hides content. */}

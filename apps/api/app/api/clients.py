@@ -227,6 +227,20 @@ SEARCH_TEXT = (
 )
 
 
+# The current branch's clients, and those without a home branch (they belong to all).
+# In a branch-scoped business a client belongs to the branches on its "my branches" list
+# (see client_locations); one on no list belongs to all. Used by the list and by the search.
+VISIBLE_CLIENTS = """WHERE (
+        CASE WHEN (SELECT network_scope FROM app.tenants WHERE id = app.current_tenant_id())
+                  = 'branch'
+             THEN NOT EXISTS (SELECT 1 FROM app.client_locations cl
+                              WHERE cl.client_id = app.clients.id)
+                  OR EXISTS (SELECT 1 FROM app.client_locations cl
+                             WHERE cl.client_id = app.clients.id AND app.in_branch(cl.location_id))
+             ELSE home_location_id IS NULL OR app.in_branch(home_location_id)
+        END)"""
+
+
 def _like_pattern(search: str) -> str:
     escaped = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     return f"%{escaped}%"
@@ -265,18 +279,7 @@ def list_clients(
     ] = None,
 ) -> ClientPage:
     # RLS limits rows to the current tenant; the filters below narrow further.
-    # The current branch's clients, and those without a home branch (they belong to all).
-    # In a branch-scoped business a client belongs to the branches on its "my branches" list
-    # (see client_locations); one on no list belongs to all.
-    where = """WHERE (
-        CASE WHEN (SELECT network_scope FROM app.tenants WHERE id = app.current_tenant_id())
-                  = 'branch'
-             THEN NOT EXISTS (SELECT 1 FROM app.client_locations cl
-                              WHERE cl.client_id = app.clients.id)
-                  OR EXISTS (SELECT 1 FROM app.client_locations cl
-                             WHERE cl.client_id = app.clients.id AND app.in_branch(cl.location_id))
-             ELSE home_location_id IS NULL OR app.in_branch(home_location_id)
-        END)"""
+    where = VISIBLE_CLIENTS
     params: dict[str, object] = {"limit": page_of.limit, "offset": page_of.offset}
     if search and search.strip():
         # Through the function: row level security would keep Postgres from using the index.
