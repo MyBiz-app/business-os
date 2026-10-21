@@ -41,7 +41,7 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
             <Sparkles aria-hidden="true" className="size-4" />
             {t("title")}
           </p>
-          <h2 className="text-2xl font-extrabold tracking-tight">{t("welcomeTitle", { name: isolate(business) })}</h2>
+          <h2 className="text-xl font-semibold">{t("welcomeTitle", { name: isolate(business) })}</h2>
           <p className="text-muted">{t("welcomeText")}</p>
         </div>
       )}
@@ -57,7 +57,7 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
         aria-label={t("progress", { done: setup.done, total: setup.total })}
         className="h-2 overflow-hidden rounded-full bg-foreground/10"
       >
-        <span className="block h-full rounded-full bg-gradient-to-r from-brand-from to-brand-to transition-[width] duration-700" style={{ width: `${percent}%` }} />
+        <span className="block h-full rounded-full bg-primary transition-[width] duration-700" style={{ width: `${percent}%` }} />
       </div>
       <ol className="enter-items grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {setup.steps.map((step) => {

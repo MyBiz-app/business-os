@@ -7,9 +7,9 @@ export type NavTone = "dark" | "light";
 
 export const NAV_TONE_COOKIE = "nav_tone";
 
-/** The CRM's navigation column. It is Midnight Navy by default; in light mode a person can switch
- * to a light column (the choice is kept in a cookie, so the server renders it without a flash).
- * In night mode the column is always dark, so the switch is hidden there. */
+/** The CRM's navigation column. It is light by default (Calm); in light mode a person can switch
+ * to a dark column (the choice is kept in a cookie, so the server renders it without a flash).
+ * In night mode the column takes the night surface, so the switch is hidden there. */
 export function CrmAside({ initial, labels, children }: { initial: NavTone; labels: { light: string; dark: string }; children: ReactNode }) {
   const [tone, setTone] = useState<NavTone>(initial);
   const next: NavTone = tone === "dark" ? "light" : "dark";

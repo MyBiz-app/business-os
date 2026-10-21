@@ -118,7 +118,7 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
   items.sort((a, b) => rank(a) - rank(b));
 
   // The floating AI chat: for whoever may use the assistant, in a business that has the AI module.
-  const navTone = (await cookies()).get(NAV_TONE_COOKIE)?.value === "light" ? "light" : "dark";
+  const navTone = (await cookies()).get(NAV_TONE_COOKIE)?.value === "dark" ? "dark" : "light";
   const aiBubble = canUseAssistant(tenant) && tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro");
 
   // The business's brand color replaces the product color inside its own area.

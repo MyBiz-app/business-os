@@ -184,9 +184,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           // The business's own cover image, under a fade that keeps the text readable.
           // eslint-disable-next-line @next/next/no-img-element -- private image route
           <img src={coverSrc(tenant.cover_url)} alt="" aria-hidden="true" className="absolute inset-0 size-full object-cover" />
-        ) : (
-          <div aria-hidden="true" className="pointer-events-none absolute -end-16 -top-20 size-64 rounded-full bg-primary/20 blur-3xl" />
-        )}
+        ) : null}
         {tenant.cover_url && (
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-surface via-surface/85 to-surface/20 sm:bg-gradient-to-r sm:from-surface sm:via-surface/80 sm:to-transparent rtl:sm:bg-gradient-to-l" />
         )}

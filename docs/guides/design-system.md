@@ -14,7 +14,8 @@ same value in several files, it should become a token here first.
 | Mixed Hebrew/English text | `components/bidi.tsx` (`Ltr`, `UserText`, `brandText`, `DIRECTIONAL_ICON`), `lib/bidi.ts` (`inputDir`) | Emails, phones, URLs, prices go in `<Ltr>`; user-typed text in `<UserText>`; the lint rule `direction/no-physical-classes` forbids `ml-`, `left-`, `text-left` and similar. |
 | Light/dark one-click button | `components/theme-toggle.tsx` (`ThemeToggle`) | For the marketing header/footer and the CRM top bar. The three-way choice stays in `ThemeSwitcher`. |
 | Screenshots of every screen (he/en, light/dark, 390/1440/1920) | `e2e/screen_sweep.py` | Also flags pages that scroll sideways. |
-| UI colors (page, cards, text, borders, success/danger/warning) | `apps/web/src/app/globals.css` → `:root` (light) and `.dark` (dark) | Components use only these tokens (`bg-surface`, `text-muted`, `border-border`…), never raw hex. |
+| UI colors (page, cards, text, borders, success/danger/warning, soft status tints) | `apps/web/src/app/globals.css` → `:root` (light) and `.dark` (dark) | The Calm palette (see below). Components use only these tokens (`bg-surface`, `bg-subtle`, `text-muted`, `border-border`, `bg-success-soft`…), never raw hex. |
+| The product's type scale, weights and corners (business app and console) | `.app-shell` block in `globals.css` | Remaps Tailwind's `text-*`, `font-bold`/`font-extrabold` and `rounded-2xl`/`rounded-3xl` to Calm, so pages follow without editing their classes. The marketing site (`.mk`) keeps its own scale. |
 | The default accent (buttons, links, focus) | `--primary` / `--on-primary` in `globals.css` | A business's own brand color overrides it inside its pages (`.brand`, set by `lib/brand.ts`). |
 | MyBiz's brand gradient (logo tile, hero accent, call-to-action band, badges) | `--brand-from`, `--brand-via`, `--brand-to`, `--brand-strong-*`, `--brand-ink` in `globals.css` | Used as `from-brand-from to-brand-to`. |
 | The MyBiz logo (mark, wordmark, favicon, app icons) and its colors | `packages/brand/src/index.ts` | Then `pnpm --filter @business-os/brand build:assets` redraws every logo file (web favicon, the three apps' icons, the SVGs in `packages/brand/assets`); run it after a name change too, for the wordmark. The web header draws the mark from the same values (`components/brand-mark.tsx`). |
@@ -48,16 +49,46 @@ for text. Use the ink whenever the color is text (or a thin icon) on a card, the
 | Token (CSS / Tailwind) | App (`theme.ts`) | Use for | Light | Dark |
 |---|---|---|---|---|
 | `--primary` / `bg-primary` | `primary` | Fills, rings, focus outlines | #2563EB | #3B82F6 |
-| `--primary-ink` / `text-primary-ink` | `primaryInk` | Links, eyebrows, text on `bg-primary/10` | #1D4ED8 | #60A5FA |
+| `--primary-ink` / `text-primary-ink` | `primaryInk` | Links, eyebrows, the current menu item, text on `bg-primary-subtle` | #1D4ED8 | #60A5FA |
+| `--on-primary` / `text-on-primary` | `onPrimary` | Text on a `bg-primary` fill (white on the night blue is only 3.7:1, so night uses charcoal) | #FFFFFF | #111113 |
 | `--success` / `bg-success` | `success` | Dots, bars, fills | #16A34A | #22C55E |
-| `--success-ink` / `text-success-ink` | `successInk` | Check marks, deltas, "paid" text | #166534 | #4ADE80 |
-| `--on-danger` / `text-on-danger` | `onDanger` | Text on a `bg-danger` fill (white in light, navy in dark: the dark red is too light for white) | #FFFFFF | #0B1020 |
-| `--muted` / `text-muted` | `muted` | Secondary text (4.5:1 even on a 12% primary tint) | #52627A | #94A3B8 |
+| `--success-ink` / `text-success-ink` | `successInk` | Check marks, deltas, "paid" text | #15803D | #4ADE80 |
+| `--on-danger` / `text-on-danger` | `onDanger` | Text on a `bg-danger` fill (white in light, charcoal in dark: the dark red is too light for white) | #FFFFFF | #111113 |
+| `--muted` / `text-muted` | `muted` | Secondary text (4.5:1 even on a 12% primary tint) | #63636E | #A1A1AA |
 
 Never write `text-primary` or `text-success` for text: the bright colors are 3.3 to 4.4:1 on white
 and on their own tint. A business's brand color is already made AA-safe by `lib/brand.ts`
 (web) and `packages/app-kit/src/lib/brand.ts` (apps): it must reach 4.5:1 on the surface, on a
 12% tint of itself, and for the text placed on it. Inside `.brand`, `--primary-ink` is that color.
+
+## Calm (spec v4, design round W2-2)
+
+The product's visual language, taken from the Figma "Calm" foundations (file `6NKFPYTT2pkLQz1CIxFpVN`,
+page Foundations). Quiet: hierarchy by size, not weight; hairlines instead of heavy frames; one action color.
+
+| | Light | Dark | Token |
+|---|---|---|---|
+| Page | #F7F7F8 | #111113 | `--background` |
+| Surface (cards, menus, top bar) | #FFFFFF | #1A1A1D | `--surface` |
+| Subtle fill (table header, hover, tracks) | #F2F2F4 | #232327 | `--subtle` / `bg-subtle` |
+| Current item, selected row | 8% primary | 16% primary | `--primary-subtle` / `bg-primary-subtle` |
+| Border | #E6E6EA | #2E2E33 | `--border` |
+| Text / muted | #18181B / #63636E | #F4F4F5 / #A1A1AA | `--foreground` / `--muted` |
+| Status tints (background) | #ECFDF3, #FFF7E6, #FEF2F2, #EFF6FF | #12261A, #2A2010, #2A1414, #14203A | `bg-success-soft`, `bg-warning-soft`, `bg-danger-soft`, `bg-info-soft` (text: the matching `-ink`, `text-warning`, `text-danger`, `text-info-ink`) |
+
+- **Type** (business app and console, Assistant): 12 caption, 13 small (`text-sm`), 15 body (the default and
+  `text-base`), 17 subheading (`text-lg`), 20 heading (`text-xl`), 24 title (`text-2xl`, page titles), 30 display
+  (`text-3xl`; `text-4xl` caps here too). Weights 400 and 600 only: `font-bold` and `font-extrabold` render 600,
+  and h1-h3 are 600 with normal letter spacing.
+- **Corners**: 10px controls (`--radius-control`, buttons and fields), 12px cards (`--radius-card`, `card`,
+  `rounded-2xl`), 16px windows (`--radius-dialog`, the modal, `rounded-3xl`).
+- **Depth**: cards are flat (surface + hairline, `--elevation` is none); only what floats casts a shadow
+  (`--elevation-floating`: menus, popovers; the modal has its own). A clickable card lifts on hover (`--elevation-hover`).
+- **No gradients in the product**: not on buttons, page titles or the page background. They stay on the marketing
+  site, the logo, and two brand moments (the first screen after sign-up, the AI team).
+- **Navigation**: the side menu and the top bar are light by default (`.nav-light`, the page's own surface); a
+  person can still pick the dark (charcoal) column in light mode (`nav_tone` cookie, `.nav-dark`).
+- The marketing site (`.mk`) restores its rounder cards (20px), fields (12px) and soft card shadow.
 
 ## Components
 

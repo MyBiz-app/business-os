@@ -17,8 +17,8 @@ const WHITE = "#ffffff";
 const NEAR_BLACK = "#18181b";
 // The harshest surfaces the brand color sits on (globals.css --background in light, --surface in
 // dark), so a color that passes here passes on the cards too.
-const LIGHT_SURFACE = "#f8fafc";
-const DARK_SURFACE = "#111827";
+const LIGHT_SURFACE = "#f7f7f8";
+const DARK_SURFACE = "#1a1a1d";
 const AA = 4.5;
 
 /** Text color for content placed on a brand color: whichever of white/near-black reads better. */

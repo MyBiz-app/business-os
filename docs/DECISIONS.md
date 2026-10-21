@@ -420,6 +420,15 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Cause found:** Next.js keeps the scroll position when the first block of the new page is still on screen and otherwise scrolls to the top about 350 ms after the content swapped (measured on the live landing site: the page landed in the middle, then jumped); the team tabs used `scroll: false` between different pages; section links from another page jumped before the content was there.
 - **Decision:** one client component in the root layout owns the scroll after a page change (top, section, back and forward, windows), links to a section of another page are opened by it with `scroll: false`, and menus share one gliding marker. The per-link `scroll={false}` stays for filters on the same page, as the `design-system/no-scroll-jump` rule says.
 
+### Calm design tokens for the product (2026-10-21, CRM Premium slice W2-2, no migration)
+
+- **Owner approval (Adir, 2026-10-21 09:48):** the Figma "Calm" design (foundations, home, client card, insights map) is the look of the business app and the console.
+- **Decision:** the values live once in `globals.css`: neutral gray-white page and charcoal night (not navy), one action color, soft status tints, Assistant with a 12 to 30 scale and weights 400/600 only, corners 10/12/16, flat cards with shadows only on what floats. The business app and the console remap Tailwind's sizes, bold weights and large radii inside `.app-shell`, so the 78 pages follow without editing each one; pages get their Calm components in W3.
+- **Light navigation by default:** the side menu and the top bar are light; the dark column stays as a personal choice (`nav_tone` cookie).
+- **Gradients leave the product** (buttons, page title band, page background, progress bar, upsell panel); they stay on the marketing site, the logo and the two brand moments (first screen after sign-up, AI team).
+- **One deviation from the Figma values:** text on the night-mode blue button is charcoal, not white (white on #3B82F6 is 3.7:1, below AA).
+- The marketing site keeps its own rounder shapes and soft card shadow (`.mk`).
+
 ## Open
 
 
