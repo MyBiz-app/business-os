@@ -232,6 +232,11 @@
     "requireMfaForStaffHint": "Every team member must enter an authenticator code after their password before they can work in this business. Clients are not affected.",
     "auditLink": "Audit log",
     "auditHint": "Who changed roles, team, settings and exports.",
+    "detailsGroups": {
+      "booking": "Booking and cancellation",
+      "clients": "Clients",
+      "sales": "Sales and security"
+    },
     "detailsHint": "Name, language, currency, time zone and booking rules.",
     "nav": {
       "label": "Settings topics",
@@ -367,8 +372,8 @@
       "subtitle": "How long before a visit clients may cancel for free, and what happens when they cancel late or do not come.",
       "confirm": "These are the usual terms for a business like yours. Check them and save once so they are yours.",
       "group": "Free cancellation before a class",
-      "personal": "... before a personal session or appointment",
-      "resource": "... before a court or room",
+      "personal": "Free cancellation before a personal session or appointment",
+      "resource": "Free cancellation before a court or room",
       "lateOutcome": "A late cancellation",
       "noShowOutcome": "A client who does not come",
       "outcomes": {
@@ -569,6 +574,7 @@
     "points": "{value} pts",
     "better": "better",
     "worse": "worse",
+    "trends": "Trends",
     "weeklyRevenue": "Revenue per week",
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
@@ -890,6 +896,14 @@
     }
   },
   "clients": {
+    "nav": {
+      "label": "Client sections",
+      "details": "Details",
+      "membership": "Plans and visits",
+      "paperwork": "Quotes and documents",
+      "talk": "Notes and messages",
+      "privacy": "Consent and privacy"
+    },
     "joinedChip": "Joined {range}",
     "noShowChip": "Missed a class {range}",
     "activeFilters": "Active filters",
@@ -1143,6 +1157,9 @@
     }
   },
   "locations": {
+    "settingsTitle": "Branch settings",
+    "settingsHint": "Client policy and branch groups",
+    "detailsTitle": "Branch details",
     "manager": {
       "title": "Branch manager",
       "subtitle": "Who runs this branch. They get manager rights here only: staff, shifts, bookings and clients of this branch.",
@@ -1226,6 +1243,22 @@
     }
   },
   "team": {
+    "tabsLabel": "Team sections",
+    "tabs": {
+      "members": "People",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "timeClock": "Time clock",
+      "swaps": "Swaps",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "organization": "Structure",
+      "roles": "Roles"
+    },
+    "inviteButton": "Invite someone",
+    "moreActions": "More actions for {name}",
+    "changeRole": "Change role",
+    "branchesMenu": "Branches",
     "title": "Team",
     "subtitle": "People who work in the business and what they can do.",
     "members": "Members",
@@ -1363,6 +1396,7 @@
     "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
     "copyWeekError": "Couldn't copy the week. Try again.",
     "closedDays": "Closed days",
+    "moreActions": "More",
     "closedDay": "Closed",
     "grid": "Calendar grid, scrollable",
     "closeDay": "Close a day",
@@ -1478,6 +1512,7 @@
     }
   },
   "areas": {
+    "joinError": "Could not open the client area. Try again.",
     "switch": "Switch area",
     "current": "Current",
     "client": "Member",
@@ -2822,7 +2857,13 @@
       "incidents": "Incident banners",
       "growth": "Growth",
       "websiteOrders": "Website orders",
-      "churn": "Churn"
+      "churn": "Churn",
+      "metrics": "SaaS numbers",
+      "email": "Email delivery",
+      "catalog": "Catalog and prices",
+      "trials": "Trials ending",
+      "security": "Security center",
+      "legal": "Legal center"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -2864,6 +2905,10 @@
       "broadcasts_manage": {
         "name": "Broadcasts",
         "hint": "Send messages and pop-ups to MyBiz users."
+      },
+      "incidents_manage": {
+        "name": "Incident banners",
+        "hint": "Open and resolve the banner shown on every page when something is wrong."
       }
     },
     "you": "You · {level}",
@@ -2878,6 +2923,12 @@
       "level": "Level",
       "permissions": "Permissions",
       "allPermissions": "All permissions",
+      "templates": {
+        "support": {
+          "name": "Support worker",
+          "hint": "Reads businesses, answers the inbox and handles incident banners."
+        }
+      },
       "save": "Save",
       "added": "Saved.",
       "remove": "Remove",
@@ -3005,7 +3056,7 @@
       "simulated": "Simulated",
       "live": "Live",
       "businesses": "{count, plural, one {# business} other {# businesses}}",
-      "howTo": "A new provider is one class registered in the API (see docs/integrations.md); the default changes with API_<SERVICE>_PROVIDER.",
+      "howTo": "A new provider is one class registered in the API (see docs/guides/integrations.md); the default changes with API_<SERVICE>_PROVIDER.",
       "capabilities": {
         "email": "Email",
         "ai": "AI assistant",
@@ -3209,21 +3260,10 @@
       "readOnly": "You can look but not change: this needs the billing permission.",
       "team": "MyBiz AI team",
       "teamHint": "Helpers for the MyBiz team. They read across businesses with your permissions, write drafts for you to review and send, and every lookup is written to the audit log.",
-      "assistantRole": "Helper",
-      "roles": {
-        "manager": "Manager",
-        "support": "Support",
-        "health": "Business health",
-        "billing": "Billing",
-        "growth": "Growth"
-      },
-      "roleHints": {
-        "manager": "The whole picture, every tool you may use.",
-        "support": "Drafts replies to the inbox.",
-        "health": "Who is at risk of leaving, who has not started.",
-        "billing": "Invoices, overdue amounts, unusual AI use.",
-        "growth": "Follow-ups to leads and announcements, as drafts."
-      },
+      "history": "History",
+      "newChat": "Start a new conversation",
+      "noHistory": "No earlier conversations",
+      "untitled": "Untitled",
       "question": "Ask a question",
       "send": "Send",
       "thinking": "Thinking...",
@@ -3237,7 +3277,10 @@
         "conversation_limit": "This conversation reached its limit. Start a new one.",
         "ai_busy": "The AI is busy. Try again in a moment.",
         "ai_unavailable": "The AI is not answering right now.",
-        "ai_not_configured": "AI is not set up on this server."
+        "ai_not_configured": "AI is not set up on this server.",
+        "agent_disabled": "This agent is switched off.",
+        "agent_not_ready": "This agent cannot be asked yet.",
+        "webSearch": "The web search settings were not saved."
       },
       "connectors": {
         "title": "AI connectors",
@@ -3254,7 +3297,207 @@
           "waiting": "Waiting",
           "last": "Last call"
         }
-      }
+      },
+      "agents": {
+        "manager": {
+          "name": "Dana",
+          "title": "CEO",
+          "topic": "Answers any question and points you to the right specialist."
+        },
+        "support": {
+          "name": "Noa",
+          "title": "Support",
+          "topic": "Reads the inbox and drafts replies."
+        },
+        "health": {
+          "name": "Omer",
+          "title": "Business health",
+          "topic": "Who is at risk of leaving, who has not started."
+        },
+        "billing": {
+          "name": "Yael",
+          "title": "CFO",
+          "topic": "Invoices, overdue amounts, unusual AI use."
+        },
+        "growth": {
+          "name": "Eitan",
+          "title": "Growth",
+          "topic": "Follow-ups to leads and announcements, as drafts."
+        },
+        "legal": {
+          "name": "Ron",
+          "title": "Legal adviser",
+          "topic": "Terms, privacy and messaging rules, as drafts for your lawyer."
+        },
+        "accountant": {
+          "name": "Tal",
+          "title": "Accountant",
+          "topic": "VAT, invoice numbering and year-end preparation, as drafts."
+        },
+        "market": {
+          "name": "Shir",
+          "title": "Market researcher",
+          "topic": "Compares our prices with competitors every month."
+        },
+        "security": {
+          "name": "Gal",
+          "title": "Security",
+          "topic": "Summarises scan results and ranks what to fix."
+        },
+        "product": {
+          "name": "Lior",
+          "title": "Product manager",
+          "topic": "Collects feature requests and suggests priorities.",
+          "weekly": "Weekly report: group the open requests and cancellation reasons into themes, say what changed, and give the three things to build or fix next."
+        },
+        "success": {
+          "name": "Maya",
+          "title": "Customer success",
+          "topic": "Finds businesses in danger and drafts a personal message.",
+          "weekly": "Weekly report: which businesses are at risk, ranked by urgency, which new businesses have not started, and who I should contact first."
+        },
+        "marketing": {
+          "name": "Ori",
+          "title": "MyBiz marketing",
+          "topic": "Landing page text, posts and SEO, as drafts.",
+          "weekly": "Weekly report: a short marketing plan for this week: three post ideas and one landing page improvement, based on the signup funnel and the industry catalog."
+        }
+      },
+      "mapLabel": "MyBiz AI team",
+      "agentSettings": "Agent settings",
+      "agentEnabled": "The agent is switched on",
+      "agentNameHe": "Name in Hebrew",
+      "agentNameEn": "Name in English",
+      "agentPortrait": "Portrait address",
+      "agentPortraitHint": "An https link to a picture. Empty: a colour and the first letter.",
+      "agentInstructions": "Extra instructions",
+      "agentInstructionsHint": "Always added to what the agent is told, for every question. For example: \"We refund by card only.\"",
+      "agentState": {
+        "soon": "coming soon",
+        "off": "switched off",
+        "soonHint": "This agent is on the map but cannot be asked yet. It joins in a later update.",
+        "offHint": "This agent is switched off. Turn it on in the agent settings."
+      },
+      "library": {
+        "title": "Library",
+        "hint": "What this agent can look up: laws, rules, guides and the team's own notes. The agent searches here before it answers, and names the document it used. Notes and approved summaries are always given to it. Text of an official source can be copyrighted: check the licence before uploading.",
+        "loading": "Loading...",
+        "empty": "The library is empty.",
+        "add": {
+          "note": "Add a note",
+          "summary": "Add an approved summary",
+          "link": "Add a link",
+          "file": "Upload a file"
+        },
+        "readSources": "Read the sources",
+        "reading": "Reading the sources: {done} done, {remaining} left...",
+        "readDone": "Done: {updated} updated, {unchanged} unchanged, {failed} could not be read.",
+        "kind": {
+          "file": "File",
+          "link": "Link",
+          "note": "Note",
+          "summary": "Approved summary"
+        },
+        "country": {
+          "il": "Israel",
+          "us": "United States",
+          "eu": "European Union",
+          "all": "Everywhere"
+        },
+        "noText": "no text yet",
+        "pieces": "{count, plural, one {1 piece} other {# pieces}} the agent can find",
+        "version": "version {n}",
+        "reviewed": "last checked {date}",
+        "neverReviewed": "never checked",
+        "off": "switched off",
+        "history": "History",
+        "historyOf": "Versions of {title}",
+        "restore": "Bring back",
+        "restored": "The version is back as a new version.",
+        "close": "Close",
+        "edit": "Edit",
+        "editing": "Edit the document",
+        "switchOff": "Switch off",
+        "switchOn": "Switch on",
+        "delete": "Delete",
+        "confirmDelete": "Delete \"{title}\" and all its versions?",
+        "save": "Save",
+        "saved": "Saved.",
+        "cancel": "Cancel",
+        "fields": {
+          "title": "Title",
+          "body": "Text",
+          "noteHint": "The agent always gets this, in every question. For example: \"We refund by card only.\"",
+          "summaryHint": "A short text that a lawyer or accountant approved. The agent always gets it.",
+          "bodyHint": "The agent searches this text. Every change is saved as a new version.",
+          "url": "Address of the source",
+          "org": "Who published it",
+          "country": "Country",
+          "reviewed": "Last checked",
+          "file": "File",
+          "fileHint": "Text, Markdown, HTML, Word or PDF, up to 10 MB.",
+          "changeNote": "What changed (optional)"
+        },
+        "tryTitle": "Check the library",
+        "tryPlaceholder": "A question, to see what the agent would find",
+        "try": "Search",
+        "tryNothing": "Nothing found for this question.",
+        "errors": {
+          "generic": "Something went wrong. Try again.",
+          "forbidden": "You are not allowed to do this.",
+          "body_required": "A note needs its text.",
+          "kind_cannot_change": "The kind of a document cannot change.",
+          "unsupported_file": "This kind of file is not supported.",
+          "empty_file": "The file has no text.",
+          "file_too_long": "The text is too long.",
+          "unreadable_file": "The file could not be read.",
+          "file_too_large": "The file is larger than 10 MB.",
+          "no_source": "This document has no source link to read.",
+          "not_found": "The document was not found."
+        }
+      },
+      "assistantRole": "Helper",
+      "roles": {
+        "manager": "Manager",
+        "support": "Support",
+        "health": "Business health",
+        "billing": "Billing",
+        "growth": "Growth"
+      },
+      "roleHints": {
+        "manager": "The whole picture, every tool you may use.",
+        "support": "Drafts replies to the inbox.",
+        "health": "Who is at risk of leaving, who has not started.",
+        "billing": "Invoices, overdue amounts, unusual AI use.",
+        "growth": "Follow-ups to leads and announcements, as drafts."
+      },
+      "webSearch": {
+        "title": "Web search",
+        "hint": "Lets the market researcher read competitors' public pricing pages. It costs about $10 per 1,000 searches, so it is off until you switch it on, and it stops at the monthly limit.",
+        "enabled": "Allow web search",
+        "limit": "Searches allowed per month",
+        "used": "Used this month: {count}",
+        "forbidden": "You need billing permission to change this."
+      },
+      "reports": {
+        "title": "Saved reports",
+        "hint": "Price comparisons the market researcher saved. Every price has a link and the date it was read. A price change is always your decision.",
+        "empty": "No reports yet. Ask the market researcher for one.",
+        "summary": "Summary",
+        "item": "Item",
+        "ours": "Us",
+        "cheapest": "Cheapest",
+        "gap": "Gap",
+        "pricier": "We are dearer",
+        "competitor": "Competitor",
+        "source": "Source",
+        "checked": "Read on",
+        "by": "By",
+        "open": "Show details",
+        "close": "Hide details",
+        "dearer": "{count} items where we are dearer than the cheapest competitor"
+      },
+      "weeklyReport": "Weekly report"
     },
     "health": {
       "title": "System health",
@@ -3439,6 +3682,234 @@
       "refund": "Refund (recorded)",
       "note": "Note",
       "back": "Taken back"
+    },
+    "metrics": {
+      "title": "SaaS numbers",
+      "hint": "Recurring revenue, churn and the AI margin. Money is shown per currency and is never converted.",
+      "empty": "No invoices yet.",
+      "currency": "{currency}",
+      "mrr": "Monthly recurring revenue (MRR)",
+      "mrrMonth": "Billed in {month}, the latest invoiced month",
+      "arr": "Annual recurring revenue (ARR)",
+      "arrNote": "MRR times twelve",
+      "arpu": "Revenue per business (ARPU)",
+      "arpuNote": "MRR divided by invoiced businesses",
+      "chart": "Billed per month ({currency})",
+      "month": "Month",
+      "invoices": "Invoices",
+      "paid": "Paid",
+      "open": "Open",
+      "billed": "Billed",
+      "churn": "Churn",
+      "churnRate": "Churn in {month}",
+      "cancelled": "Cancelled",
+      "paying": "Paying at the month start",
+      "ai": "AI margin",
+      "aiHint": "Businesses billed in USD, model cost of the last {days} days against the monthly price of their AI modules.",
+      "aiRevenue": "AI revenue per month",
+      "aiCost": "AI model cost",
+      "aiMargin": "AI margin"
+    },
+    "emailHealth": {
+      "title": "Email delivery",
+      "hint": "Addresses that bounced or marked a message as spam. They are never mailed again.",
+      "webhookClosed": "The provider's bounce webhook is switched off, so bounces are not recorded.",
+      "bounced": "Hard bounces, last 12 months",
+      "complained": "Spam complaints, last 12 months",
+      "waiting": "Emails waiting to be sent",
+      "chart": "Blocked addresses per month",
+      "month": "Month",
+      "blocked": "Blocked",
+      "recent": "Latest blocked addresses",
+      "address": "Address",
+      "reason": "Reason",
+      "when": "Date",
+      "reasons": {
+        "bounced": "Bounced",
+        "complained": "Spam complaint"
+      },
+      "empty": "No blocked addresses."
+    },
+    "catalog": {
+      "title": "Catalog and prices",
+      "hint": "Every industry, module and price in one place, read-only. Prices are set in code; ask the developers to change them.",
+      "industries": "Industries",
+      "empty": "No industries.",
+      "status": {
+        "live": "Open",
+        "beta": "Beta",
+        "planned": "Coming soon"
+      },
+      "requests": "{count, plural, =0 {No one asked yet} one {# request} other {# requests}}",
+      "requestsHint": "Site requests that named this industry (among the latest 300)",
+      "core": "Core price by active clients",
+      "tier": "Active clients",
+      "tierUpTo": "Up to {count}",
+      "tierOver": "Over {count} (a floor, quoted by hand)",
+      "modules": "Modules",
+      "placeholder": "These prices are placeholders from the spec, for modelling only.",
+      "module": "Module",
+      "notes": "Notes",
+      "or": "or",
+      "once": "One-time",
+      "perUnit": "Per unit",
+      "oneOf": "One of its group ({group})",
+      "soon": "Coming soon",
+      "credits": "{count} AI credits a month",
+      "users": "{count} AI users",
+      "needs": "Needs {list}"
+    },
+    "card": {
+      "title": "Business 360",
+      "intro": "Everything we know about this business in one place. Notes and tags are internal and never shown to the business.",
+      "tags": "Tags",
+      "tagsHint": "Separated by commas, up to 12, for example vip, partner, needs-help.",
+      "accountOwner": "Account owner",
+      "accountOwnerHint": "The MyBiz team member who looks after this business (their sign-in email). Leave empty for none.",
+      "save": "Save",
+      "saved": "Saved.",
+      "notes": "Internal notes",
+      "noteLabel": "New note",
+      "notePlaceholder": "Who you spoke to and what they want.",
+      "addNote": "Add note",
+      "noteAdded": "Note added.",
+      "noNotes": "No notes yet.",
+      "timeline": "Timeline",
+      "noTimeline": "Nothing yet.",
+      "by": "by {who}",
+      "errors": {
+        "invalid_tags": "Use up to 12 tags of at most 30 characters.",
+        "unknown_account_owner": "That email is not an active member of the MyBiz team.",
+        "invalid_note": "The note must have 1 to 2000 characters.",
+        "forbidden": "You don't have permission for this.",
+        "not_found": "Not found.",
+        "generic": "Something went wrong. Please try again."
+      },
+      "events": {
+        "signup": "Signed up",
+        "trial_ends": "Free trial ends",
+        "closed": "Closed the business",
+        "invoice": "Invoice {number} · {amount} · {status}",
+        "invoiceStatus": {
+          "open": "open",
+          "paid": "paid",
+          "void": "credited"
+        },
+        "request": "Contact request ({status})",
+        "requestFromBusiness": "Request from the business ({status})",
+        "requestStatus": {
+          "new": "new",
+          "in_progress": "in progress",
+          "done": "done"
+        },
+        "note": "Note",
+        "changes": {
+          "trial_extended": "Trial extended by {days} days",
+          "modules_changed": "Plan changed",
+          "invoice_voided": "Invoice credited",
+          "card_updated": "Tags or account owner changed"
+        }
+      }
+    },
+    "trials": {
+      "title": "Trials ending",
+      "hint": "Businesses whose free trial ends soon, or ended in the last three days. This is the moment they decide whether to pay.",
+      "range": "Show the next {days} days",
+      "empty": "No trials ending in this period.",
+      "business": "Business",
+      "owner": "Owner",
+      "ends": "Trial ends",
+      "clients": "Active clients",
+      "card": "Card",
+      "accountOwner": "Account owner",
+      "actions": "Actions",
+      "cardYes": "On file",
+      "cardNo": "None",
+      "endsOn": "{date}",
+      "ended": "Ended {date}",
+      "message": "Write to the owner",
+      "open": "Open the card",
+      "extend": "Extend",
+      "extendDays": "Days",
+      "extendDone": "The trial now ends on {date}."
+    },
+    "security": {
+      "title": "Security center",
+      "hint": "Two-step sign-in of business owners, the MyBiz team's visits inside businesses and what the security agent found.",
+      "owners": "Owners",
+      "withMfa": "With two-step sign-in",
+      "acknowledged": "Confirmed the risk",
+      "exposed": "Without protection",
+      "unknown": "Unknown here",
+      "unknownNote": "This environment can't read the sign-in provider, so two-step sign-in can't be counted.",
+      "businesses": "Businesses",
+      "requiring": "Businesses requiring two-step sign-in of their team",
+      "ownersTitle": "Owners",
+      "ownersHint": "Owners without two-step sign-in come first. Without it, sensitive actions stay blocked until the owner confirms they understand the risk (warning of {version}).",
+      "ownersEmpty": "No business owners yet.",
+      "owner": "Owner",
+      "business": "Business",
+      "protection": "Two-step sign-in",
+      "on": "On",
+      "off": "Off",
+      "confirmed": "Confirmed {date}",
+      "notConfirmed": "Not confirmed",
+      "visitsTitle": "MyBiz team inside businesses",
+      "visitsHint": "Every visit is also shown to the business owner in the business audit log. Last {days} days.",
+      "visitsEmpty": "The team did not enter any business in this period.",
+      "member": "Team member",
+      "views": "Views",
+      "changes": "Changes",
+      "lastVisit": "Last visit",
+      "findingsTitle": "Security agent findings",
+      "findingsHint": "Saved reports of the security agent, newest first.",
+      "findingsEmpty": "The security agent has not saved a report yet.",
+      "by": "by"
+    },
+    "legal": {
+      "title": "Legal center",
+      "hint": "The current version of each legal document, who accepted it, and the privacy requests.",
+      "documentsTitle": "Document versions",
+      "document": "Document",
+      "version": "Current version",
+      "accepted": "Accepted",
+      "eligible": "Have to accept",
+      "documents": {
+        "terms": "Terms of use",
+        "privacy": "Privacy policy",
+        "dpa": "Data processing terms"
+      },
+      "acceptancesTitle": "Latest acceptances",
+      "acceptancesHint": "Each row is a record: who accepted which version, when and where from. Last {days} days.",
+      "acceptancesEmpty": "No one accepted a document in this period.",
+      "person": "Person",
+      "business": "Business",
+      "when": "When",
+      "context": "Where",
+      "contexts": {
+        "signup": "Sign-up",
+        "client_join": "Joining a business",
+        "reaccept": "New version"
+      },
+      "privacyTitle": "Privacy requests",
+      "privacyHint": "Exports, erasures and closures of the last 12 months. Client details are never shown here.",
+      "privacyEmpty": "No privacy requests in the last 12 months.",
+      "kind": "Request",
+      "kinds": {
+        "business_export": "Business data export",
+        "client_export": "Client data export",
+        "client_erasure": "Client erasure",
+        "business_closure": "Business closure"
+      },
+      "status": "Status",
+      "statuses": {
+        "building": "Building",
+        "ready": "Ready",
+        "failed": "Failed",
+        "done": "Done",
+        "waiting": "Waiting for deletion"
+      },
+      "deleteAfter": "Deleted on {date}"
     }
   },
   "permissions": {
@@ -3823,7 +4294,7 @@
       "other": "Other"
     },
     "print": "Print",
-    "back": "Back to the client",
+    "back": "All sales",
     "thanks": "Thank you!",
     "email": "Email",
     "legalDocument": "Tax document no. {number} was issued by your invoicing provider",
@@ -5269,6 +5740,13 @@
     }
   },
   "leads": {
+    "nav": {
+      "label": "Lead sections",
+      "stage": "Stage",
+      "details": "Details",
+      "activity": "Activity",
+      "messages": "Messages"
+    },
     "truncated": "Showing {shown} of {total} leads.",
     "showMore": "Show more leads",
     "title": "Leads",
@@ -6489,7 +6967,7 @@
   },
   "account": {
     "link": "Settings",
-    "title": "Settings",
+    "title": "My account",
     "subtitle": "Your personal profile and how the app works for you. Only you see these choices.",
     "name": "Full name",
     "nameHint": "Shown on the schedule, in the client app and in reports.",
@@ -6514,6 +6992,8 @@
     },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
+    "addressTitle": "Address",
+    "accessibilityTitle": "Accessibility",
     "birthDate": "Date of birth",
     "birthDateHint": "Only you see this.",
     "addressLine": "Street and number",
@@ -6566,6 +7046,7 @@
       "Sample"
     ],
     "orders": {
+      "back": "All sales",
       "title": "Online orders",
       "subtitle": "Plans clients bought in the app, newest first.",
       "date": "Date",
@@ -6718,11 +7199,6 @@
       "allBranches": "All branches",
       "rosterEmails": "Email me about my shifts",
       "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
-      "signUpClientTitle": "Join as a client too",
-      "signUpClientHint": "Get your own client card in this business, so you can book and pay like any client. You switch between the two areas below.",
-      "signUpClientButton": "Sign me up as a client",
-      "signUpClientDone": "Done. Switch to the client area below.",
-      "signUpClientError": "Could not sign you up. Try again.",
       "colors": "My colors",
       "colorsHint": "Pick your brand color. It colors your clients' app, your web app and this app.",
       "colorHex": "Color code (#rrggbb)",
@@ -6975,11 +7451,14 @@
       "home": "MyBiz",
       "businesses": "Businesses",
       "inbox": "Inbox",
-      "me": "Me"
+      "me": "Me",
+      "ai": "AI"
     },
     "notStaff": {
       "title": "This app is for the MyBiz team",
       "text": "The email you signed in with isn't on the MyBiz team. If it should be, ask an owner to add it.",
+      "mfaTitle": "Two-step sign-in needed",
+      "mfaText": "You are on the MyBiz team, but the team area needs a two-step sign-in code. Sign in on the website, turn on two-step sign-in under Account > Security, then come back.",
       "signOut": "Sign in with another email"
     },
     "home": {
@@ -6994,7 +7473,14 @@
       "latest": "Open requests",
       "newest": "New this week",
       "billing": "Billing, {month}",
-      "paidOpen": "{paid} paid · {open} open"
+      "paidOpen": "{paid} paid · {open} open",
+      "tools": "More",
+      "health": "System health",
+      "incidents": "Incident banners",
+      "debts": "Unpaid invoices",
+      "banners": "{count, plural, =0 {No open banners} one {# open banner} other {# open banners}}",
+      "debtsCount": "{count, plural, =0 {No unpaid invoices} one {# business owes} other {# businesses owe}}",
+      "alarm": "Something needs a look"
     },
     "businesses": {
       "search": "Search a business",
@@ -7044,6 +7530,24 @@
       "email": "Email",
       "error": "Something went wrong. Try again.",
       "you": "you"
+    },
+    "ai": {
+      "title": "AI helpers",
+      "noPermission": "You don't have the usage permission."
+    },
+    "health": {
+      "back": "Back",
+      "noPermission": "You don't have the usage permission."
+    },
+    "incidents": {
+      "back": "Back",
+      "noPermission": "You don't have the incidents permission.",
+      "newOne": "New banner",
+      "titleHint": "Shown in the current language to everyone"
+    },
+    "debts": {
+      "back": "Back",
+      "noPermission": "You don't have the billing permission."
     }
   },
   "verticals": {
@@ -8222,6 +8726,8 @@
     "cycle": "That would make a loop: this person already manages them."
   },
   "shifts": {
+    "settingsTitle": "Shift settings",
+    "settingsHint": "Rooms, minimum staffing, publishing and planning rhythm.",
     "title": "Shifts",
     "soloTitle": "Hours and availability",
     "soloSubtitle": "You run the business on your own, so there is no shift board. Keep your opening hours and availability up to date.",
@@ -9664,6 +10170,10 @@
       "unknownDevice": "Unknown device",
       "when": "When"
     }
+  },
+  "noticeStack": {
+    "summary": "{count, plural, one {# thing is waiting for you} other {# things are waiting for you}}",
+    "toggle": "Things waiting for you"
   },
   "legalUpdate": {
     "title": "We updated our terms",

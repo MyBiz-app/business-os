@@ -16,7 +16,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.deps import TenantContext, require
-from app.api.platform import StaffDep
+from app.api.platform import OwnerDep
 from app.core.permissions import Permission
 from app.providers.choice import platform_default
 from app.providers.registry import (
@@ -221,7 +221,7 @@ def disconnect(capability: BusinessCapability, context: SettingsDep) -> Integrat
 
 
 @router.get("/platform/integrations")
-def platform_integrations(session: StaffDep) -> list[PlatformCapability]:
+def platform_integrations(session: OwnerDep) -> list[PlatformCapability]:
     """The platform's default provider per capability, the providers available, and how many
     businesses connected their own (MyBiz console)."""
     counts: dict[str, dict[str, int]] = {}

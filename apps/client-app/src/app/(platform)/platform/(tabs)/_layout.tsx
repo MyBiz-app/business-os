@@ -51,6 +51,14 @@ export default function TabsLayout() {
           href: can("inbox.manage") ? undefined : null,
         }}
       />
+      <Tabs.Screen
+        name="ai"
+        options={{
+          title: t("ai"),
+          tabBarIcon: icon("sparkles"),
+          href: can("usage.read") ? undefined : null,
+        }}
+      />
       <Tabs.Screen name="me" options={{ title: t("me"), tabBarIcon: icon("person") }} />
     </Tabs>
   );

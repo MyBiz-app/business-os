@@ -1,5 +1,4 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
 
 import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
@@ -7,6 +6,7 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { reopenDay } from "./actions";
 import { CloseDayForm } from "./close-day-form";
+import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -20,9 +20,7 @@ export default async function ClosedDaysPage() {
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/schedule" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-        {t("back")}
-      </Link>
+      <BackLink href="/schedule" label={t("back")} />
       <PageHeader title={t("closedDays")} />
       <section aria-labelledby="close-heading" className="flex flex-col gap-4 card p-6">
         <h2 id="close-heading" className="text-lg font-semibold">

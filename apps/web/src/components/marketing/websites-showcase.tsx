@@ -40,7 +40,7 @@ export function WebsitesShowcase({ sites, heading, caption }: { sites: ShowcaseS
   if (!site) return null;
 
   return (
-    <div ref={track} style={{ height: `${sites.length * 70 + 30}vh` }} className="relative">
+    <div ref={track} style={{ height: `${sites.length * 70 + 30}vh` }} className="relative overflow-x-clip">
       <div className="sticky top-16 flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-8 px-4 py-6">
         <p className="text-center text-sm font-semibold uppercase tracking-wide text-primary-ink">{heading}</p>
         <div className="w-full max-w-3xl" aria-hidden="true">

@@ -1,4 +1,4 @@
-"""A person's own colors (docs/proposals/profile-crop-and-palette.md).
+"""A person's own colors (docs/proposals/done/profile-crop-and-palette.md).
 
 `app.users.palette` gains the value `custom`; the three picked colors (page background, text,
 accent) are kept in their own columns, as `#rrggbb`, and stay when the person switches to a

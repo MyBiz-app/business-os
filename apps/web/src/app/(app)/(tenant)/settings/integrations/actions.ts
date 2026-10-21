@@ -26,12 +26,12 @@ export async function connectProvider(capability: Capability, _state: FormState,
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath("/settings/integrations");
+  revalidatePath("/settings", "layout");
   return { saved: true };
 }
 
 export async function disconnectProvider(capability: Capability): Promise<void> {
   const { api, scope } = await getTenant();
   unwrap(await api.DELETE("/integrations/{capability}", { params: { ...scope, path: { capability } } }));
-  revalidatePath("/settings/integrations");
+  revalidatePath("/settings", "layout");
 }

@@ -1,5 +1,5 @@
 """The workspace upgrade's people and structure: profiles, business identity, organization,
-opening hours, shifts and branch comparisons (docs/proposals/crm-upgrade-2026-10.md)."""
+opening hours, shifts and branch comparisons (docs/proposals/done/crm-upgrade-2026-10.md)."""
 
 from datetime import datetime, timedelta
 from uuid import uuid4

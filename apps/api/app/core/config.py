@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     gemini_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("API_GEMINI_API_KEY", "GEMINI_API_KEY")
     )
+    # Search by meaning for the console agents' libraries (slice C3a). Built but off: "voyage" with
+    # a key switches it on. It costs money, so it waits for go-live (go-live-checklist.md).
+    kb_embeddings_provider: str = "off"  # off | voyage
+    voyage_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("API_VOYAGE_API_KEY", "VOYAGE_API_KEY")
+    )
     # Everyday questions run on the cheap model; a turn that needs many tool calls escalates to
     # the stronger one (P0-6). Prices live in app/ai/gateway.py.
     ai_model: str = "claude-haiku-5-5"
@@ -93,7 +99,7 @@ class Settings(BaseSettings):
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
     email_smtp_port: int = 465
     email_smtp_user: str | None = None  # defaults to the address in email_from
-    # Outside services (decision X13, docs/integrations.md): the platform's default provider
+    # Outside services (decision X13, docs/guides/integrations.md): the platform's default provider
     # per capability and its settings as a JSON object; a business can connect its own
     # (settings → Integrations) for payments, invoicing and messaging.
     payments_provider: str = "simulated"

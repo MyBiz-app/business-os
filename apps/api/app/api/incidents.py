@@ -18,7 +18,7 @@ from app.api.platform import PlatformPermission, require_platform, run_rule
 
 router = APIRouter(tags=["incidents"])
 
-IncidentsDep = Annotated[Session, Depends(require_platform(PlatformPermission.BROADCASTS_MANAGE))]
+IncidentsDep = Annotated[Session, Depends(require_platform(PlatformPermission.INCIDENTS_MANAGE))]
 
 Kind = Literal["incident", "maintenance", "security"]
 Locale = Literal["he", "en"]

@@ -38992,6 +38992,55 @@
         }
       }
     },
+    "/platform/businesses/{tenant_id}": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Business",
+        "description": "One business, for its card (the list is paged, so the card cannot search it).",
+        "operationId": "business",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBusiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/usage": {
       "get": {
         "tags": [
@@ -39474,6 +39523,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StaffMe"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/staff-templates": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Staff Templates",
+        "operationId": "staff_templates",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StaffTemplate"
+                  },
+                  "type": "array",
+                  "title": "Response Staff Templates"
                 }
               }
             }
@@ -40532,6 +40611,302 @@
         }
       }
     },
+    "/platform/ai/web-search": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Web Search Settings",
+        "description": "Web search for console agents: off by default, with a monthly limit on searches.",
+        "operationId": "web_search_settings",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebSearchSettings"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Change Web Search",
+        "description": "Switches web search on or off and sets the searches allowed per month. Written to the\nconsole audit log. Searches cost money: nothing is searched unless this is on.",
+        "operationId": "change_web_search",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebSearchChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebSearchSettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/ai/reports": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "List Reports",
+        "description": "Saved reports of one kind, newest first. Needs the console permission of the kind.",
+        "operationId": "list_reports",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "market",
+                "security"
+              ],
+              "type": "string",
+              "default": "market",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 30,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportSummary"
+                  },
+                  "title": "Response List Reports"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/reports/{report_id}": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Get Report",
+        "operationId": "get_report",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/agents": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Console Agents Map",
+        "description": "The console's AI agents this team member may ask, for the map: the chief and the\nspecialists, each with the team's changes (name, portrait, place, switched off).",
+        "operationId": "console_agents_map",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConsoleAgentCard"
+                  },
+                  "type": "array",
+                  "title": "Response Console Agents Map"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/ai/agents/{key}": {
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Change Console Agent",
+        "description": "Switches an agent on or off, renames it, sets its portrait and place, and writes the extra\ninstructions it always gets. Written to the console audit log.",
+        "operationId": "change_console_agent",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsoleAgentChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConsoleAgentCard"
+                  },
+                  "title": "Response Change Console Agent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/ai/assistant/conversations": {
       "get": {
         "tags": [
@@ -40702,6 +41077,1366 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Chat"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/catalog": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Platform Catalog",
+        "description": "Every industry, module and price in one read-only view.",
+        "operationId": "platform_catalog",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformCatalog"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/ai/agents/{key}/library": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "List Library",
+        "description": "The documents of one agent's library: at most 200, the list of a few dozen in practice.",
+        "operationId": "list_library",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LibraryDocument"
+                  },
+                  "title": "Response List Library"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Add Library Document",
+        "description": "Adds a note, a summary, a link or pasted text to an agent's library.",
+        "operationId": "add_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/agents/{key}/library/upload": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Upload Library File",
+        "description": "Adds a file (text, Markdown, HTML, Word or PDF) to an agent's library.",
+        "operationId": "upload_library_file",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_library_file"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Get Library Document",
+        "operationId": "get_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Change Library Document",
+        "description": "Saves a change. A changed text is a new version; the earlier ones stay.",
+        "operationId": "change_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Delete Library Document",
+        "operationId": "delete_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/versions": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Library Versions",
+        "description": "Every saved version of a document, newest first (at most 100).",
+        "operationId": "library_versions",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LibraryVersion"
+                  },
+                  "title": "Response Library Versions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/versions/{version}": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Library Version",
+        "description": "The document as it was in one version.",
+        "operationId": "library_version",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/restore": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Restore Library Version",
+        "description": "Brings an earlier version back as a new version (nothing is lost).",
+        "operationId": "restore_library_version",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryRestore"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/enabled": {
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Switch Library Document",
+        "description": "Switches a document off (the agent stops using it) or on, without deleting it.",
+        "operationId": "switch_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryEnabled"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryDocumentBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/{doc_id}/refresh": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Refresh Library Document",
+        "description": "Reads the document's source link again; a changed text is a new version, and the\n\"last reviewed\" date becomes today (the source was checked).",
+        "operationId": "refresh_library_document",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/agents/{key}/library/refresh": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Refresh Library",
+        "description": "Reads the sources of an agent's library, a few at a time: call again with the offset\nadvanced by the number of results until `remaining` is 0.",
+        "operationId": "refresh_library",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/library/reindex": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Reindex Library",
+        "description": "Embeds the pieces that are not yet embedded, for search by meaning. Nothing happens\nwhile the embeddings provider is off (the default).",
+        "operationId": "reindex_library",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReindexResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/ai/agents/{key}/library/search": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Search Library",
+        "description": "What the agent would find for a question, to check a library before trusting it.",
+        "operationId": "search_library",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "manager",
+                "support",
+                "health",
+                "billing",
+                "growth",
+                "legal",
+                "accountant",
+                "market",
+                "security",
+                "product",
+                "success",
+                "marketing"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LibrarySearchHit"
+                  },
+                  "title": "Response Search Library"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses/{tenant_id}/card": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Business Card",
+        "description": "Tags, the account owner and the trial end of one business.",
+        "operationId": "business_card",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Set Business Card",
+        "description": "Replaces the tags and the account owner (an email of the MyBiz team, or empty).",
+        "operationId": "set_business_card",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses/{tenant_id}/notes": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Business Notes",
+        "description": "Internal notes, newest first (the last 200).",
+        "operationId": "business_notes",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessNote"
+                  },
+                  "title": "Response Business Notes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Add Business Note",
+        "description": "Writes an internal note about a business; returns the notes.",
+        "operationId": "add_business_note",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessNote"
+                  },
+                  "title": "Response Add Business Note"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses/{tenant_id}/timeline": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Business Timeline",
+        "description": "Sign-up, trial, invoices, requests, changes by the team and notes, newest first (150).",
+        "operationId": "business_timeline",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimelineEvent"
+                  },
+                  "title": "Response Business Timeline"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/trials-ending": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Trials Ending",
+        "description": "Businesses whose free trial ends within `days` or ended in the last three days\n(at most 200), soonest first.",
+        "operationId": "trials_ending",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 30,
+              "minimum": 1,
+              "description": "Look ahead this many days",
+              "default": 7,
+              "title": "Days"
+            },
+            "description": "Look ahead this many days"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrialEnding"
+                  },
+                  "title": "Response Trials Ending"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/metrics/saas": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Saas Metrics",
+        "description": "MRR, ARR, ARPU, churn and the AI margin, with a month-by-month history.",
+        "operationId": "saas_metrics",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaasMetrics"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/metrics/email": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Email Deliverability",
+        "description": "Which addresses bounced or complained: they are never mailed again.",
+        "operationId": "email_deliverability",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliverability"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/security/owners": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Security Owners",
+        "description": "Two-step sign-in and risk confirmations of business owners, with the exposed ones first.",
+        "operationId": "security_owners",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityOwners"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/security/visits": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Security Visits",
+        "description": "How often each MyBiz team member viewed or changed a business, in the last days.",
+        "operationId": "security_visits",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamVisits"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/legal": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Legal Center",
+        "description": "Current document versions and who accepted them, plus the privacy requests.",
+        "operationId": "legal_center",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LegalCenter"
                 }
               }
             }
@@ -45517,6 +47252,37 @@
         ],
         "title": "AICostBoard"
       },
+      "AIMargin": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "cost_usd_minor": {
+            "type": "integer",
+            "title": "Cost Usd Minor",
+            "description": "Model cost of the period, US cents"
+          },
+          "revenue_usd_minor": {
+            "type": "integer",
+            "title": "Revenue Usd Minor",
+            "description": "Monthly price of the AI modules in USD, cents"
+          },
+          "margin_usd_minor": {
+            "type": "integer",
+            "title": "Margin Usd Minor",
+            "description": "Revenue minus cost for businesses billed in USD"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "cost_usd_minor",
+          "revenue_usd_minor",
+          "margin_usd_minor"
+        ],
+        "title": "AIMargin"
+      },
       "AIPause": {
         "properties": {
           "tenant_id": {
@@ -45780,6 +47546,62 @@
           "documents"
         ],
         "title": "AcceptRequest"
+      },
+      "Acceptance": {
+        "properties": {
+          "accepted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Accepted At"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "business_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Name"
+          },
+          "document": {
+            "type": "string",
+            "enum": [
+              "terms",
+              "privacy",
+              "dpa"
+            ],
+            "title": "Document"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "context": {
+            "type": "string",
+            "enum": [
+              "signup",
+              "client_join",
+              "reaccept"
+            ],
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accepted_at",
+          "email",
+          "business_name",
+          "document",
+          "version",
+          "context"
+        ],
+        "title": "Acceptance"
       },
       "Accepted": {
         "properties": {
@@ -48701,6 +50523,86 @@
         ],
         "title": "Body_upload_file"
       },
+      "Body_upload_library_file": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^https?://\\S+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "il",
+                  "us",
+                  "eu",
+                  "all"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "reviewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed On"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_library_file"
+      },
       "Body_upload_location_logo": {
         "properties": {
           "file": {
@@ -49917,6 +51819,79 @@
         ],
         "title": "BusinessAICost"
       },
+      "BusinessCard": {
+        "properties": {
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "account_owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Owner",
+            "description": "The team member who looks after this business"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "trial_ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Trial Ends At"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tags",
+          "account_owner",
+          "updated_by",
+          "updated_at",
+          "trial_ends_at",
+          "closed_at"
+        ],
+        "title": "BusinessCard"
+      },
       "BusinessInvoice": {
         "properties": {
           "id": {
@@ -50048,6 +52023,36 @@
           "questions_left"
         ],
         "title": "BusinessMeter"
+      },
+      "BusinessNote": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "author_email": {
+            "type": "string",
+            "title": "Author Email"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "author_email",
+          "body",
+          "created_at"
+        ],
+        "title": "BusinessNote"
       },
       "BusinessPolicy": {
         "properties": {
@@ -50937,6 +52942,35 @@
         ],
         "title": "Cancellation"
       },
+      "CardChange": {
+        "properties": {
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 12,
+            "title": "Tags"
+          },
+          "account_owner": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 254
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Owner"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tags"
+        ],
+        "title": "CardChange"
+      },
       "Catalog": {
         "properties": {
           "currency": {
@@ -51011,6 +53045,54 @@
           "ai_extra_user_price"
         ],
         "title": "Catalog"
+      },
+      "CatalogIndustryRow": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "live",
+              "beta",
+              "planned"
+            ],
+            "title": "Status"
+          },
+          "requests": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requests",
+            "description": "Site requests naming it (latest 300); null without the inbox permission"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "parent",
+          "status",
+          "requests"
+        ],
+        "title": "CatalogIndustryRow"
       },
       "CatalogModule": {
         "properties": {
@@ -51158,6 +53240,113 @@
         ],
         "title": "CatalogModule"
       },
+      "CatalogModuleRow": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "prices": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Prices",
+            "description": "Monthly (or one-time), minor units, by currency"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "per_unit": {
+            "type": "boolean",
+            "title": "Per Unit"
+          },
+          "billing": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "once"
+            ],
+            "title": "Billing"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group"
+          },
+          "requires_any": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requires Any"
+          },
+          "requires_all": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requires All"
+          },
+          "ai_credits_included": {
+            "type": "integer",
+            "title": "Ai Credits Included"
+          },
+          "ai_users_included": {
+            "type": "integer",
+            "title": "Ai Users Included"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "prices",
+          "available",
+          "per_unit",
+          "billing",
+          "group",
+          "requires_any",
+          "requires_all",
+          "ai_credits_included",
+          "ai_users_included"
+        ],
+        "title": "CatalogModuleRow"
+      },
+      "CatalogTierRow": {
+        "properties": {
+          "up_to_clients": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Up To Clients"
+          },
+          "prices": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Prices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "up_to_clients",
+          "prices"
+        ],
+        "title": "CatalogTierRow"
+      },
       "Chat": {
         "properties": {
           "id": {
@@ -51172,7 +53361,14 @@
               "support",
               "health",
               "billing",
-              "growth"
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
             ],
             "title": "Role"
           },
@@ -51224,7 +53420,14 @@
               "support",
               "health",
               "billing",
-              "growth"
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
             ],
             "title": "Role",
             "default": "manager"
@@ -51431,6 +53634,43 @@
           "birth_year"
         ],
         "title": "Child"
+      },
+      "ChurnMetrics": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "title": "Month"
+          },
+          "cancelled": {
+            "type": "integer",
+            "title": "Cancelled"
+          },
+          "paying_at_start": {
+            "type": "integer",
+            "title": "Paying At Start"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate",
+            "description": "Cancelled over paying at the month's start"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "cancelled",
+          "paying_at_start",
+          "rate"
+        ],
+        "title": "ChurnMetrics"
       },
       "ChurnMonth": {
         "properties": {
@@ -54406,6 +56646,217 @@
         ],
         "title": "ConsentEvent"
       },
+      "ConsoleAgentCard": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "support",
+              "health",
+              "billing",
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
+            ],
+            "title": "Key"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          },
+          "chief": {
+            "type": "boolean",
+            "title": "Chief"
+          },
+          "ready": {
+            "type": "boolean",
+            "title": "Ready",
+            "description": "False until a later slice gives the agent its tools"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "name_he": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name He",
+            "description": "The team's own name for the agent, if set"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "portrait_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait Url"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X",
+            "description": "Place on the map in percent, null: automatic"
+          },
+          "y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions",
+            "description": "Extra instructions; only shown to a member who can change them"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "color",
+          "chief",
+          "ready",
+          "enabled",
+          "name_he",
+          "name_en",
+          "portrait_url",
+          "x",
+          "y",
+          "instructions"
+        ],
+        "title": "ConsoleAgentCard"
+      },
+      "ConsoleAgentChange": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "name_he": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name He"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X"
+          },
+          "y": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y"
+          },
+          "portrait_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500,
+                "pattern": "^https://\\S+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "ConsoleAgentChange"
+      },
       "Consumer": {
         "properties": {
           "tenant_id": {
@@ -55273,6 +57724,51 @@
         "type": "object",
         "title": "CreditOverride"
       },
+      "CurrencyMetrics": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "mrr": {
+            "type": "integer",
+            "title": "Mrr",
+            "description": "Billed in the latest invoiced month, minor units"
+          },
+          "arr": {
+            "type": "integer",
+            "title": "Arr",
+            "description": "MRR times twelve, minor units"
+          },
+          "arpu": {
+            "type": "integer",
+            "title": "Arpu",
+            "description": "MRR per invoiced business, minor units"
+          },
+          "mrr_month": {
+            "type": "string",
+            "format": "date",
+            "title": "Mrr Month"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/RevenueMonth"
+            },
+            "type": "array",
+            "title": "Months"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "mrr",
+          "arr",
+          "arpu",
+          "mrr_month",
+          "months"
+        ],
+        "title": "CurrencyMetrics"
+      },
       "CurrencyRevenue": {
         "properties": {
           "currency": {
@@ -55653,6 +58149,30 @@
           "confirm"
         ],
         "title": "DeleteAccountRequest"
+      },
+      "DeliverabilityMonth": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "title": "Month"
+          },
+          "bounced": {
+            "type": "integer",
+            "title": "Bounced"
+          },
+          "complained": {
+            "type": "integer",
+            "title": "Complained"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "bounced",
+          "complained"
+        ],
+        "title": "DeliverabilityMonth"
       },
       "DeliveryStats": {
         "properties": {
@@ -56380,6 +58900,40 @@
         ],
         "title": "Document"
       },
+      "DocumentCoverage": {
+        "properties": {
+          "document": {
+            "type": "string",
+            "enum": [
+              "terms",
+              "privacy",
+              "dpa"
+            ],
+            "title": "Document"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "accepted": {
+            "type": "integer",
+            "title": "Accepted"
+          },
+          "eligible": {
+            "type": "integer",
+            "title": "Eligible",
+            "description": "People who have to accept it: everyone, or owners for dpa"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document",
+          "version",
+          "accepted",
+          "eligible"
+        ],
+        "title": "DocumentCoverage"
+      },
       "DocumentLink": {
         "properties": {
           "url": {
@@ -56491,6 +59045,54 @@
           "suspend_after_days"
         ],
         "title": "DunningSettings"
+      },
+      "EmailDeliverability": {
+        "properties": {
+          "emails_waiting": {
+            "type": "integer",
+            "title": "Emails Waiting"
+          },
+          "bounced": {
+            "type": "integer",
+            "title": "Bounced",
+            "description": "Hard bounces in the last 12 months"
+          },
+          "complained": {
+            "type": "integer",
+            "title": "Complained",
+            "description": "Spam complaints in the last 12 months"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/DeliverabilityMonth"
+            },
+            "type": "array",
+            "title": "Months"
+          },
+          "recent": {
+            "items": {
+              "$ref": "#/components/schemas/SuppressedAddress"
+            },
+            "type": "array",
+            "title": "Recent",
+            "description": "The latest 50, addresses masked"
+          },
+          "webhook_open": {
+            "type": "boolean",
+            "title": "Webhook Open",
+            "description": "Is the provider's bounce webhook switched on"
+          }
+        },
+        "type": "object",
+        "required": [
+          "emails_waiting",
+          "bounced",
+          "complained",
+          "months",
+          "recent",
+          "webhook_open"
+        ],
+        "title": "EmailDeliverability"
       },
       "Embed": {
         "properties": {
@@ -61959,6 +64561,45 @@
         "type": "object",
         "title": "LeadUpdate"
       },
+      "LegalCenter": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentCoverage"
+            },
+            "type": "array",
+            "title": "Documents"
+          },
+          "acceptances": {
+            "items": {
+              "$ref": "#/components/schemas/Acceptance"
+            },
+            "type": "array",
+            "title": "Acceptances",
+            "description": "The latest 200"
+          },
+          "privacy_requests": {
+            "items": {
+              "$ref": "#/components/schemas/PrivacyRequest"
+            },
+            "type": "array",
+            "title": "Privacy Requests",
+            "description": "The last 12 months, latest 200"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "documents",
+          "acceptances",
+          "privacy_requests"
+        ],
+        "title": "LegalCenter"
+      },
       "LegalPending": {
         "properties": {
           "document": {
@@ -61976,6 +64617,535 @@
           "version"
         ],
         "title": "LegalPending"
+      },
+      "LibraryChange": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "file",
+              "link",
+              "note",
+              "summary"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^https?://\\S+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "il",
+                  "us",
+                  "eu",
+                  "all"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "reviewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed On"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 400000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "change_note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "title"
+        ],
+        "title": "LibraryChange"
+      },
+      "LibraryDocument": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_key": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "support",
+              "health",
+              "billing",
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
+            ],
+            "title": "Agent Key"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "file",
+              "link",
+              "note",
+              "summary"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "il",
+                  "us",
+                  "eu",
+                  "all"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "reviewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed On"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "chars": {
+            "type": "integer",
+            "title": "Chars",
+            "description": "Length of the current text; 0 for a link without text"
+          },
+          "chunks": {
+            "type": "integer",
+            "title": "Chunks",
+            "description": "Pieces the agent can find; 0 means it cannot find it yet"
+          },
+          "updated_by": {
+            "type": "string",
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_key",
+          "kind",
+          "title",
+          "source_url",
+          "source_org",
+          "country",
+          "reviewed_on",
+          "enabled",
+          "version",
+          "chars",
+          "chunks",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "LibraryDocument"
+      },
+      "LibraryDocumentBody": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_key": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "support",
+              "health",
+              "billing",
+              "growth",
+              "legal",
+              "accountant",
+              "market",
+              "security",
+              "product",
+              "success",
+              "marketing"
+            ],
+            "title": "Agent Key"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "file",
+              "link",
+              "note",
+              "summary"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "il",
+                  "us",
+                  "eu",
+                  "all"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "reviewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed On"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "updated_by": {
+            "type": "string",
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_key",
+          "kind",
+          "title",
+          "source_url",
+          "source_org",
+          "country",
+          "reviewed_on",
+          "enabled",
+          "version",
+          "body",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "LibraryDocumentBody"
+      },
+      "LibraryEnabled": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "LibraryEnabled"
+      },
+      "LibraryRestore": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "LibraryRestore"
+      },
+      "LibrarySearchHit": {
+        "properties": {
+          "document": {
+            "type": "string",
+            "title": "Document"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "source_org": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Org"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "last_reviewed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Reviewed"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document",
+          "source_url",
+          "source_org",
+          "country",
+          "last_reviewed",
+          "section",
+          "text"
+        ],
+        "title": "LibrarySearchHit"
+      },
+      "LibraryVersion": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "change_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Note"
+          },
+          "created_by": {
+            "type": "string",
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "chars": {
+            "type": "integer",
+            "title": "Chars"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "change_note",
+          "created_by",
+          "created_at",
+          "chars"
+        ],
+        "title": "LibraryVersion"
       },
       "LimitsUpdate": {
         "properties": {
@@ -63595,6 +66765,12 @@
               "front_desk"
             ],
             "title": "Role"
+          },
+          "client_app": {
+            "type": "boolean",
+            "title": "Client App",
+            "description": "The business offers the client app (the member's client area)",
+            "default": false
           }
         },
         "type": "object",
@@ -64970,6 +68146,21 @@
         ],
         "title": "NoteCreate"
       },
+      "NoteIn": {
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Body"
+          }
+        },
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "title": "NoteIn"
+      },
       "NoticeOut": {
         "properties": {
           "recipients": {
@@ -65737,6 +68928,63 @@
           "free_minutes"
         ],
         "title": "OverridePolicy"
+      },
+      "OwnerSecurity": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "business_name": {
+            "type": "string",
+            "title": "Business Name"
+          },
+          "requires_mfa": {
+            "type": "boolean",
+            "title": "Requires Mfa",
+            "description": "The business requires two-step sign-in of its team"
+          },
+          "mfa_enrolled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mfa Enrolled",
+            "description": "None when the sign-in provider can't be read"
+          },
+          "risk_acknowledged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Risk Acknowledged At",
+            "description": "When the owner confirmed they understand the risk, for the current warning"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "business_id",
+          "business_name",
+          "requires_mfa",
+          "mfa_enrolled",
+          "risk_acknowledged_at"
+        ],
+        "title": "OwnerSecurity"
       },
       "PaletteColors": {
         "properties": {
@@ -67725,6 +70973,49 @@
         ],
         "title": "PlatformCapability"
       },
+      "PlatformCatalog": {
+        "properties": {
+          "core": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogTierRow"
+            },
+            "type": "array",
+            "title": "Core"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogModuleRow"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "presets": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Presets"
+          },
+          "industries": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogIndustryRow"
+            },
+            "type": "array",
+            "title": "Industries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "core",
+          "modules",
+          "presets",
+          "industries"
+        ],
+        "title": "PlatformCatalog"
+      },
       "PlatformPermission": {
         "type": "string",
         "enum": [
@@ -67734,7 +71025,8 @@
           "inbox.manage",
           "usage.read",
           "staff.manage",
-          "broadcasts.manage"
+          "broadcasts.manage",
+          "incidents.manage"
         ],
         "title": "PlatformPermission"
       },
@@ -67908,6 +71200,68 @@
           "monthly"
         ],
         "title": "Price"
+      },
+      "PrivacyRequest": {
+        "properties": {
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "business_export",
+              "client_export",
+              "client_erasure",
+              "business_closure"
+            ],
+            "title": "Kind"
+          },
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "business_name": {
+            "type": "string",
+            "title": "Business Name"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "building",
+              "ready",
+              "failed",
+              "done",
+              "waiting"
+            ],
+            "title": "Status"
+          },
+          "delete_after": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delete After",
+            "description": "Closed businesses: the deletion date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "occurred_at",
+          "kind",
+          "business_id",
+          "business_name",
+          "status",
+          "delete_after"
+        ],
+        "title": "PrivacyRequest"
       },
       "Proactive": {
         "properties": {
@@ -70135,6 +73489,82 @@
         ],
         "title": "Recommendation"
       },
+      "RefreshReport": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/RefreshResult"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "remaining": {
+            "type": "integer",
+            "title": "Remaining",
+            "description": "Sources still to read; call again with a later offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "results",
+          "remaining"
+        ],
+        "title": "RefreshReport"
+      },
+      "RefreshResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "updated",
+              "unchanged",
+              "failed"
+            ],
+            "title": "Result"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "result"
+        ],
+        "title": "RefreshResult"
+      },
+      "ReindexResult": {
+        "properties": {
+          "embedded": {
+            "type": "integer",
+            "title": "Embedded",
+            "description": "Pieces embedded now; 0 while search by meaning is off"
+          }
+        },
+        "type": "object",
+        "required": [
+          "embedded"
+        ],
+        "title": "ReindexResult"
+      },
       "RemoveResult": {
         "properties": {
           "result": {
@@ -70182,6 +73612,101 @@
           "weekdays"
         ],
         "title": "Repeat"
+      },
+      "Report": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "market",
+              "security"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "created_by": {
+            "type": "string",
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "body": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Body",
+            "description": "The full report: for a market report, the prices with their sources and our price against the cheapest competitor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "summary",
+          "created_by",
+          "created_at",
+          "body"
+        ],
+        "title": "Report"
+      },
+      "ReportSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "market",
+              "security"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "created_by": {
+            "type": "string",
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "summary",
+          "created_by",
+          "created_at"
+        ],
+        "title": "ReportSummary"
       },
       "ReservationCreate": {
         "properties": {
@@ -70706,6 +74231,43 @@
           "account"
         ],
         "title": "RevealedBank"
+      },
+      "RevenueMonth": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "title": "Month"
+          },
+          "billed": {
+            "type": "integer",
+            "title": "Billed",
+            "description": "Paid and open invoices, minor units"
+          },
+          "paid": {
+            "type": "integer",
+            "title": "Paid",
+            "description": "Minor units"
+          },
+          "open": {
+            "type": "integer",
+            "title": "Open",
+            "description": "Minor units"
+          },
+          "invoices": {
+            "type": "integer",
+            "title": "Invoices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "billed",
+          "paid",
+          "open",
+          "invoices"
+        ],
+        "title": "RevenueMonth"
       },
       "Review": {
         "properties": {
@@ -71921,6 +75483,45 @@
         ],
         "title": "RunWarning"
       },
+      "SaasMetrics": {
+        "properties": {
+          "currencies": {
+            "items": {
+              "$ref": "#/components/schemas/CurrencyMetrics"
+            },
+            "type": "array",
+            "title": "Currencies"
+          },
+          "churn": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChurnMetrics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ai": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AIMargin"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only for team members who may read usage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currencies",
+          "churn",
+          "ai"
+        ],
+        "title": "SaasMetrics"
+      },
       "Sale": {
         "properties": {
           "plan_id": {
@@ -72449,6 +76050,76 @@
           "kind"
         ],
         "title": "SecurityEventBody"
+      },
+      "SecurityOwners": {
+        "properties": {
+          "owners": {
+            "type": "integer",
+            "title": "Owners",
+            "description": "People who own at least one open business"
+          },
+          "with_mfa": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "With Mfa",
+            "description": "None when the sign-in provider can't be read"
+          },
+          "acknowledged_risk": {
+            "type": "integer",
+            "title": "Acknowledged Risk",
+            "description": "Without two-step sign-in, confirmed the risk"
+          },
+          "exposed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exposed",
+            "description": "Without two-step sign-in and no confirmation yet"
+          },
+          "businesses": {
+            "type": "integer",
+            "title": "Businesses"
+          },
+          "businesses_requiring_mfa": {
+            "type": "integer",
+            "title": "Businesses Requiring Mfa"
+          },
+          "risk_version": {
+            "type": "string",
+            "title": "Risk Version"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/OwnerSecurity"
+            },
+            "type": "array",
+            "title": "Rows",
+            "description": "Owners without two-step sign-in first"
+          }
+        },
+        "type": "object",
+        "required": [
+          "owners",
+          "with_mfa",
+          "acknowledged_risk",
+          "exposed",
+          "businesses",
+          "businesses_requiring_mfa",
+          "risk_version",
+          "rows"
+        ],
+        "title": "SecurityOwners"
       },
       "SecurityPolicy": {
         "properties": {
@@ -74687,6 +78358,19 @@
             "title": "Permissions",
             "default": []
           },
+          "template": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "support"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template",
+            "description": "Start from a ready-made permission set; added to `permissions`"
+          },
           "disabled": {
             "type": "boolean",
             "title": "Disabled",
@@ -74698,6 +78382,27 @@
           "level"
         ],
         "title": "StaffSave"
+      },
+      "StaffTemplate": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformPermission"
+            },
+            "type": "array",
+            "title": "Permissions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "permissions"
+        ],
+        "title": "StaffTemplate"
       },
       "StageBody": {
         "properties": {
@@ -75178,6 +78883,35 @@
           "path"
         ],
         "title": "SupportVisit"
+      },
+      "SuppressedAddress": {
+        "properties": {
+          "address": {
+            "type": "string",
+            "title": "Address",
+            "description": "Masked: the first letter and the domain"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "bounced",
+              "complained"
+            ],
+            "title": "Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "address",
+          "reason",
+          "created_at"
+        ],
+        "title": "SuppressedAddress"
       },
       "SwapCreate": {
         "properties": {
@@ -75718,6 +79452,67 @@
           "name"
         ],
         "title": "TeamGroup"
+      },
+      "TeamVisit": {
+        "properties": {
+          "actor_email": {
+            "type": "string",
+            "title": "Actor Email"
+          },
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "business_name": {
+            "type": "string",
+            "title": "Business Name"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          },
+          "changes": {
+            "type": "integer",
+            "title": "Changes"
+          },
+          "last_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actor_email",
+          "business_id",
+          "business_name",
+          "views",
+          "changes",
+          "last_at"
+        ],
+        "title": "TeamVisit"
+      },
+      "TeamVisits": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/TeamVisit"
+            },
+            "type": "array",
+            "title": "Visits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "visits"
+        ],
+        "title": "TeamVisits"
       },
       "Template": {
         "properties": {
@@ -77470,6 +81265,44 @@
         ],
         "title": "TimeOffRequestCreate"
       },
+      "TimelineEvent": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "description": "signup, trial_ends, closed, invoice, request, change or note; the details depend on the kind"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "kind",
+          "actor",
+          "details"
+        ],
+        "title": "TimelineEvent"
+      },
       "TopPost": {
         "properties": {
           "id": {
@@ -77576,6 +81409,65 @@
           "trial_ends_at"
         ],
         "title": "Trial"
+      },
+      "TrialEnding": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "owner_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Email"
+          },
+          "trial_ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Trial Ends At"
+          },
+          "active_clients": {
+            "type": "integer",
+            "title": "Active Clients"
+          },
+          "has_card": {
+            "type": "boolean",
+            "title": "Has Card"
+          },
+          "account_owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Owner"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "owner_email",
+          "trial_ends_at",
+          "active_clients",
+          "has_card",
+          "account_owner"
+        ],
+        "title": "TrialEnding"
       },
       "TrialExtension": {
         "properties": {
@@ -78327,6 +82219,56 @@
           "items"
         ],
         "title": "WaiverSummary"
+      },
+      "WebSearchChange": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "monthly_limit": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Monthly Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled",
+          "monthly_limit"
+        ],
+        "title": "WebSearchChange"
+      },
+      "WebSearchSettings": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "monthly_limit": {
+            "type": "integer",
+            "title": "Monthly Limit",
+            "description": "Searches allowed per calendar month"
+          },
+          "used_this_month": {
+            "type": "integer",
+            "title": "Used This Month"
+          },
+          "cost_per_1000_usd": {
+            "type": "integer",
+            "title": "Cost Per 1000 Usd",
+            "description": "Anthropic's price at the last check; verify"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled",
+          "monthly_limit",
+          "used_this_month",
+          "cost_per_1000_usd"
+        ],
+        "title": "WebSearchSettings"
       },
       "WebsiteOrder": {
         "properties": {

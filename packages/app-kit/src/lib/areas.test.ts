@@ -29,3 +29,17 @@ test("each area has its own start screen", () => {
   const [platform, business, client] = buildAreas({ platformAdmin: true, memberships: [owner], businesses: [studioAsClient] });
   assert.deepEqual([platform, business, client].map((a) => areaHome(a!)), ["/platform", "/business", "/home"]);
 });
+
+test("a team member gets their business's client area, opened only from the switcher", () => {
+  const member = { ...owner, client_app: true };
+  const areas = buildAreas({ platformAdmin: false, memberships: [member], businesses: [] });
+  assert.deepEqual(areas.map((a) => [a.key, !!a.joinOnOpen]), [["business:t1", false], ["client:t1", true]]);
+  assert.equal(pickArea(areas, "client:t1", ["client"])?.key, "business:t1");
+});
+
+test("no extra client area when already a client or the business has no client app", () => {
+  const joined = buildAreas({ platformAdmin: false, memberships: [{ ...owner, client_app: true }], businesses: [studioAsClient] });
+  assert.deepEqual(joined.map((a) => [a.key, !!a.joinOnOpen]), [["business:t1", false], ["client:t1", false]]);
+  const noApp = buildAreas({ platformAdmin: false, memberships: [{ ...owner, client_app: false }], businesses: [] });
+  assert.deepEqual(noApp.map((a) => a.key), ["business:t1"]);
+});

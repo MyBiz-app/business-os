@@ -108,7 +108,6 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "nav",
     "permissions",
     "platform",
-    "roles",
     "team",
     "terms",
     "verticals"
@@ -131,6 +130,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "locales",
     "modules",
     "nav",
+    "noticeStack",
     "onboarding",
     "platform",
     "security",
@@ -161,6 +161,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "marketing",
     "modules",
     "nav",
+    "noticeStack",
     "period",
     "permissions",
     "platform",

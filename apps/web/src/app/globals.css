@@ -141,7 +141,7 @@
   --color-navy: #111827;
   --color-ai: #7c3aed;
   --color-electric: #06b6d4;
-  /* The site's font: set once in app/fonts.ts (see docs/design-system.md). */
+  /* The site's font: set once in app/fonts.ts (see docs/guides/design-system.md). */
   --font-sans: var(--font-main), system-ui, sans-serif;
   --font-display-stack: var(--font-display), var(--font-main), system-ui, sans-serif;
 }
@@ -405,6 +405,10 @@ h3,
     opacity: 0;
     transform: translateY(-4px) scale(0.97);
     pointer-events: none;
+    /* On a phone a hidden panel must not widen the page. */
+    @media (width < 40rem) {
+      display: none;
+    }
   }
   &[data-open="true"] {
     visibility: visible;
@@ -443,6 +447,48 @@ h3,
     border-color: var(--primary);
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 18%, transparent);
   }
+}
+
+/* Touch screens: every button, icon button and field gets a 44px hit area (WCAG 2.5.5), and text
+   fields use 16px type so a phone browser does not zoom the page when one is focused. These are
+   plain (unlayered) rules so they win over the size classes a page puts on a single control. */
+@media (pointer: coarse), (width < 40rem) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger,
+  .btn-icon,
+  .btn-plain {
+    min-block-size: 2.75rem;
+  }
+  .btn-icon {
+    min-inline-size: 2.75rem;
+  }
+  .btn-link {
+    padding-block: 0.5rem;
+  }
+  input.control:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]),
+  select.control,
+  button.control,
+  textarea.control {
+    min-block-size: 2.75rem;
+    font-size: 1rem;
+  }
+  /* A plain text link inside a table cell, list item or paragraph: a taller touch area without
+     moving the text (vertical padding on an inline link does not change the line height). */
+  :where(td, th, dd, li, p) a:not([class*="btn-"], [class*="flex"], [class*="block"], [class*="grid"], [class*="card"], [class*="size-"], [class*="h-"]) {
+    padding-block: 0.75rem;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-inline-size: 1.25rem;
+    min-block-size: 1.25rem;
+  }
+}
+
+/* A select never outgrows the space it is given (its longest option would otherwise set its width). */
+select {
+  max-inline-size: 100%;
 }
 
 /* ---- Layout ----------------------------------------------------------------------------- */
@@ -488,22 +534,54 @@ h3,
   padding-block: clamp(4.5rem, 9vw, 8rem);
 }
 
-/* Wide-screen policy (docs/design-system.md, "Page widths"): the sections of a form room or a
-   record card flow into two columns once the room itself is wide enough (a container query, so
-   the app's side menu and the settings menu are accounted for). Long text keeps 44rem. */
+/* Sticky chrome. --sticky-top is where the signed-in app header ends; everything that sticks under
+   it (the section bar, filter bars, side columns) starts there, and --section-bar is the extra
+   height of the section menu while it spans the phone width. Anchors use .scroll-anchor so a
+   section heading never lands hidden under them. */
+:root {
+  --sticky-top: 3.5rem;
+  --section-bar: 3.75rem;
+}
+@media (min-width: 48rem) {
+  :root {
+    --sticky-top: 4rem;
+  }
+}
+@media (min-width: 64rem) {
+  :root {
+    --section-bar: 0rem;
+  }
+}
+@utility sticky-below-header {
+  position: sticky;
+  top: calc(var(--sticky-top) + 0.5rem);
+}
+@utility scroll-anchor {
+  scroll-margin-top: calc(var(--sticky-top) + var(--section-bar) + 1rem);
+}
+
+/* Settings and record rooms: one column, in the order the sections are written. A zigzag of two
+   columns put open sections beside closed ones and left holes, so it was dropped (CRM order audit,
+   S1). Only small cards of equal height that never collapse (integrations) use .form-grid, which
+   goes to two columns once the room itself is wide (a container query, so the side menu and the
+   settings menu are accounted for). Long text keeps 44rem. */
 .form-columns {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
 @container (min-width: 56rem) {
-  .form-columns {
-    display: grid;
+  .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
   }
-  .form-columns > header:first-child,
-  .form-columns > .form-span {
+  .form-grid > header:first-child,
+  .form-grid > .form-span {
     grid-column: 1 / -1;
   }
 }
@@ -1698,6 +1776,17 @@ h1[tabindex="-1"]:focus {
   border-top: 1px solid var(--border);
   background: var(--surface);
 }
+/* The same row in a full page sticks to the bottom of the screen, so a long form never hides its save button. */
+/* (:where keeps this weaker than the window rule below.) */
+:where(form) .form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding-block: 0.75rem;
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklab, var(--background) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
 @media (min-width: 40rem) {
   .modal-panel .form-actions {
     margin-inline: -1.5rem;
@@ -1958,7 +2047,7 @@ h1[tabindex="-1"]:focus {
   }
 }
 
-/* ---- Page transitions (view transitions; see docs/design-system.md) ------------------------ */
+/* ---- Page transitions (view transitions; see docs/guides/design-system.md) ------------------------ */
 
 /* Clicks go through to the live page while a transition runs. */
 ::view-transition {

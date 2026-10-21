@@ -62,6 +62,14 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # the twelve console AI agents: a fixed catalog in code
+    "/platform/ai/agents": "fixed list",
+    # the versions of one library document: the SQL returns the latest 100
+    "/platform/ai/library/{doc_id}/versions": "limit in SQL",
+    # the pieces an agent finds for one question: the SQL returns at most 20
+    "/platform/ai/agents/{key}/library/search": "limit in SQL",
+    # the ready-made permission sets of the team form: a fixed list in code
+    "/platform/staff-templates": "fixed list",
     # waiting requests first, then the latest decided: LIMIT 200 (a business) and 50 (a client)
     "/freeze-requests": "limit in SQL",
     "/client/freeze-requests": "limit in SQL",
@@ -131,6 +139,9 @@ BOUNDED = {
     "/platform/billing": "one row per month",
     "/platform/broadcasts": "announcements",
     "/platform/businesses/{tenant_id}/invoices": "one row per month",
+    "/platform/businesses/{tenant_id}/notes": "the last 200 in SQL",
+    "/platform/businesses/{tenant_id}/timeline": "the last 150 in SQL",
+    "/platform/trials-ending": "at most 200 in SQL",
     "/payroll/rates": "one row per rate",
     # the rows of one person
     "/me/devices": "capped in code",

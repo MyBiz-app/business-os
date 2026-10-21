@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function IncidentsPage() {
   const t = await getTranslations("platform.incidents");
   const locale = await getLocale();
-  const { api } = await getPlatformFor("broadcasts.manage");
+  const { api } = await getPlatformFor("incidents.manage");
   const items = unwrap(await api.GET("/platform/incidents"));
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
 

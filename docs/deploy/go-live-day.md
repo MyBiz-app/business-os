@@ -22,11 +22,11 @@ has approved the cost.
 | Step | Who | Detail |
 |---|---|---|
 | Two-step sign-in on the owner's own Supabase, Render, Vercel, GitHub and MyBiz accounts | Owner | [on-call.md](on-call.md), [auth-settings.md](auth-settings.md) |
-| Sentry account, three DSNs; UptimeRobot with phone alert; free status page | Owner | [monitoring.md](../monitoring.md) |
+| Sentry account, three DSNs; UptimeRobot with phone alert; free status page | Owner | [monitoring.md](../guides/monitoring.md) |
 | Cloudflare R2 bucket, token, `age` key; set `OFFSITE_BACKUP_ENABLED=true`; run the first restore drill and fill the table | Owner | [restore-runbook.md](restore-runbook.md), task A2 |
 | Domain and sending domain (Resend); SPF, DKIM, DMARC; mail-tester 10 of 10 | Owner | [email-domain.md](email-domain.md), task A6 |
 | Lawyer reviews `docs/legal/`, terms, privacy and DPA; real company details in `brand.json` | Owner | [legal README](../legal/README.md) |
-| Accessibility coordinator name, phone and email in the statement | Owner | [accessibility-checklist.md](../accessibility-checklist.md) |
+| Accessibility coordinator name, phone and email in the statement | Owner | [accessibility-checklist.md](../guides/accessibility-checklist.md) |
 | App store accounts and the final app identifier | Owner | [go-live-checklist.md](go-live-checklist.md) "App stores" |
 | Firewall (WAF) in front of the site and API; company, bank account and insurance (A8); penetration test (A12) | Owner | [go-live-checklist.md](go-live-checklist.md) sections "Firewall in front of the website and API (WAF)", "Company, bank account and insurance (A8)", "Professional penetration test (A12)" |
 | Run the CI rehearsal once more on the commit that will be released | Claude | Actions: "Go-live rehearsal (CI)"; all steps green |
@@ -62,7 +62,7 @@ has approved the cost.
 
 ## What the CI rehearsal already proved
 
-See "Rehearsal results" in [the scorecard](../reviews/go-live-scorecard-2026-10.md): from-empty
+See "Rehearsal results" in [the scorecard](../reviews/current/go-live-scorecard-2026-10.md): from-empty
 migration time, one migration down and up, an encrypted dump restored with equal row counts and
 policies, and the readiness probe going from 200 to 503 and back during a database outage. Steps 5
 and 6 above repeat the last two on the real services.

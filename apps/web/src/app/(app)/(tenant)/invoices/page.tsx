@@ -101,7 +101,7 @@ export default async function InvoicesPage({ searchParams }: PageProps<"/invoice
         </ul>
       )}
       <section aria-labelledby="series-heading" className="card flex flex-col gap-3 p-6">
-        <h2 id="series-heading" className="text-sm font-medium text-muted">{t("nextNumbers")}</h2>
+        <p id="series-heading" className="text-sm font-medium text-muted">{t("nextNumbers")}</p>
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           {series.map((s) => (
             <li key={s.kind}>

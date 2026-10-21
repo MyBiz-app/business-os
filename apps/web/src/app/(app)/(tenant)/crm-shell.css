@@ -71,3 +71,18 @@
     outline: 2px solid var(--primary);
   }
 }
+
+/* Small screens: a grid cell may shrink below its content (the default `min-width: auto` is what
+ * pushes a whole page sideways), and long words wrap instead of widening a card. */
+.crm-content :where(.grid) > * {
+  min-inline-size: 0;
+}
+@media (max-width: 40rem) {
+  .crm-content main {
+    overflow-wrap: break-word;
+  }
+  .crm-content main > header:first-child .btn-primary,
+  .crm-content main > header:first-child .btn-secondary {
+    flex: 1 1 auto;
+  }
+}

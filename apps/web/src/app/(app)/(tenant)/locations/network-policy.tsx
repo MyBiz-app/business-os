@@ -21,11 +21,11 @@ export function NetworkPolicy({ action, scope, multiBranch }: Props) {
   const options = ["network", "branch"] as const;
 
   return (
-    <form action={formAction} className="card flex flex-col gap-4 p-5" aria-labelledby="network-policy-heading">
+    <form action={formAction} className="flex flex-col gap-4" aria-labelledby="network-policy-heading">
       <div className="flex flex-col gap-1">
-        <h2 id="network-policy-heading" className="text-lg font-semibold">
+        <h3 id="network-policy-heading" className="font-semibold">
           {t("title")}
-        </h2>
+        </h3>
         <p className="text-sm text-muted">{t("hint")}</p>
       </div>
       <FormFeedback state={state} />

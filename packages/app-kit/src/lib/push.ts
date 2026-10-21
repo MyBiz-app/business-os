@@ -6,7 +6,7 @@ import { apiClient } from "./api";
 
 // Push notification plumbing: ask the phone for permission, get its Expo push token and tell the
 // API about it. Nothing sends pushes yet. The token needs the EAS project id (set by `eas init`,
-// see docs/mobile-builds.md); until then registration quietly does nothing.
+// see docs/guides/mobile-builds.md); until then registration quietly does nothing.
 
 const projectId = (Constants.expoConfig?.extra as { eas?: { projectId?: string } } | undefined)?.eas
   ?.projectId;

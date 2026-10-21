@@ -13,7 +13,12 @@ def test_a_new_account_explores_a_sample_business(client: TestClient, auth: Auth
     assert created.status_code == 201, created.text
     tenant_id = created.json()["tenant_id"]
     [membership] = client.get("/me", headers=auth(person)).json()["memberships"]
-    assert membership == {"tenant_id": tenant_id, "tenant_name": "ברברשופ לדוגמה", "role": "owner"}
+    assert membership == {
+        "tenant_id": tenant_id,
+        "tenant_name": "ברברשופ לדוגמה",
+        "role": "owner",
+        "client_app": True,
+    }
     clients = client.get("/clients", headers=auth(person, tenant_id)).json()
     assert clients["total"] > 0  # filled with fictitious data
 

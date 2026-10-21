@@ -168,7 +168,7 @@ export function BrandingEditor({ name, color, logo, cover }: { name: string; col
         </div>
       </div>
 
-      <section aria-labelledby="branding-preview" className="card order-first flex flex-col gap-4 p-5 xl:sticky xl:top-24 xl:order-none">
+      <section aria-labelledby="branding-preview" className="card order-first flex flex-col gap-4 p-5 xl:sticky xl:top-[calc(var(--sticky-top)+2rem)] xl:order-none">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h3 id="branding-preview" className="font-semibold">{tBranding("preview.title")}</h3>
           <SegmentedControl

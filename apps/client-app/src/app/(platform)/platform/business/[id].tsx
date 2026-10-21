@@ -37,13 +37,13 @@ export default function BusinessScreen() {
   const billing = can("billing.manage");
 
   const load = useCallback(async () => {
-    const [all, invoices] = await Promise.all([
-      api.GET("/platform/businesses").then(unwrap),
+    const [one, invoices] = await Promise.all([
+      api.GET("/platform/businesses/{tenant_id}", { params: { path: { tenant_id: id } } }).then((result) => result.data ?? null),
       billing
         ? api.GET("/platform/businesses/{tenant_id}/invoices", { params: { path: { tenant_id: id } } }).then(unwrap)
         : Promise.resolve([]),
     ]);
-    return { business: all.find((b) => b.id === id) ?? null, invoices };
+    return { business: one, invoices };
   }, [api, id, billing]);
   const { data, loading, reload } = useLoad(load);
 

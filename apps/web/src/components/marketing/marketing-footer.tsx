@@ -72,7 +72,7 @@ export async function MarketingFooter() {
             <ul aria-label={t("footer.social")} className="mt-2 flex flex-wrap gap-2">
               {social.map(({ key, label, url }) => (
                 <li key={key}>
-                  <a href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="flex size-9 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-electric hover:text-white">
+                  <a href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="flex size-11 items-center justify-center rounded-full md:size-9 border border-white/20 text-white/80 transition-colors hover:border-electric hover:text-white">
                     <SocialIcon name={key} className="size-4" />
                   </a>
                 </li>

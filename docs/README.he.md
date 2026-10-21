@@ -8,17 +8,18 @@
 
 | מה | איפה | מתי לקרוא |
 |---|---|---|
-| אפיון המוצר (המקור הקובע) | [`spec/v3/spec.he.md`](spec/v3/spec.he.md) · [English](spec/v3/spec.en.md) | מה זה MyBiz, המסכים, התפקידים, התחומים, המודולים ומפת הדרכים |
-| האפיון כקובצי Word | [`spec/MyBiz-Spec-he.docx`](spec/MyBiz-Spec-he.docx) · [`spec/MyBiz-Spec-en.docx`](spec/MyBiz-Spec-en.docx) | נוצרים מ-v3 עם `node scripts/spec-to-docx.cjs he\|en` |
-| פרקי תכנון מפורטים (v2) | [`spec/v2/`](spec/v2/README.md) | ארכיטקטורה, מודל נתונים, AI וכללי תמחור לעומק |
-| החזון המקורי (v1) | [`spec/v1/`](spec/v1/) | האפיון הראשון שלך, נשמר לתיעוד |
+| אפיון המוצר (המקור הקובע) | [`spec/current/`](spec/current/README.md) | האפיון החי (v4): [עברית](spec/current/system.he.md) · [English](spec/current/system.en.md). אפיונים ישנים (v1-v3) ב-[`spec/archive/`](spec/archive/) |
+| האפיון כקובצי Word | [`spec/current/MyBiz-Spec-v4-he.docx`](spec/current/MyBiz-Spec-v4-he.docx) · [`spec/current/MyBiz-Spec-v4-en.docx`](spec/current/MyBiz-Spec-v4-en.docx) | נוצרים מ-v4 עם `node scripts/spec-to-docx.cjs he\|en` |
+| פרקי תכנון מפורטים (v2) | [`spec/archive/v2/`](spec/archive/v2/README.md) | ארכיטקטורה, מודל נתונים, AI וכללי תמחור לעומק |
+| החזון המקורי (v1) | [`spec/archive/v1/`](spec/archive/v1/) | האפיון הראשון שלך, נשמר לתיעוד |
 | החלטות | [`DECISIONS.md`](DECISIONS.md) | למה משהו בנוי כמו שהוא (לכל החלטה יש מזהה, למשל X13) |
 | לוח הסטטוס | [`STATUS.he.md`](STATUS.he.md) · [English](STATUS.md) | מה הושלם, מה בעבודה, מה הבא, ומה מחכה לך |
-| הצעות לפיצ'רים | [`proposals/`](proposals/) | התכנון של פיצ'ר גדול לפני שנבנה (#41-#45, חיבורים) |
-| סקירות | [`reviews/`](reviews/) | סקירות ארכיטקטורה ואבטחה והמשך הטיפול בהן |
-| תחומים | [`verticals.md`](verticals.md) | קטלוג הקטגוריות ואיך מוסיפים קטגוריה |
-| מערכת העיצוב | [`design-system.md`](design-system.md) | גופנים, צבעים, כפתורים, טקסטים ומחירים: איפה משנים מה |
-| שירותים חיצוניים | [`integrations.md`](integrations.md) | איך מוסיפים או מחליפים ספק (סליקה, חשבוניות, הודעות…) |
+| אפיוני סבבים | [`plans/`](plans/README.md) | האפיון שאושר לכל סבב עבודה (בעברית), מאוקטובר 2026 |
+| הצעות לפיצ'רים | [`proposals/`](proposals/README.md) | `done/`: תכנון פיצ'רים שנבנו (#41-#45, חיבורים, לוח זמנים...); `open/`: עדיין לא הוחלט |
+| סקירות | [`reviews/`](reviews/README.md) | `current/`: כרטיס הציונים העדכני; `archive/`: סקירות ארכיטקטורה, אבטחה ופרטיות קודמות |
+| תחומים | [`guides/verticals.md`](guides/verticals.md) | קטלוג הקטגוריות ואיך מוסיפים קטגוריה |
+| מערכת העיצוב | [`guides/design-system.md`](guides/design-system.md) | גופנים, צבעים, כפתורים, טקסטים ומחירים: איפה משנים מה |
+| שירותים חיצוניים | [`guides/integrations.md`](guides/integrations.md) | איך מוסיפים או מחליפים ספק (סליקה, חשבוניות, הודעות…) |
 | אתר הבדיקות | [`deploy/staging.md`](deploy/staging.md) | איפה אתר הבדיקות רץ, הסודות שלו וההגדרה הראשונית |
 
 ## איך המערכת בנויה
@@ -89,6 +90,6 @@ flowchart LR
 | חנויות אפליקציות | עוד לא | בניות ל-App Store ול-Google Play ‏(Expo EAS) |
 | התחברות עם Google / Apple | נבנה; מחכה שתפעיל את הספקים ב-Supabase | - |
 
-החלפה של כל אחד מאלה היא בחירת ספק, לא כתיבה מחדש: ראה [`integrations.md`](integrations.md).
+החלפה של כל אחד מאלה היא בחירת ספק, לא כתיבה מחדש: ראה [`guides/integrations.md`](guides/integrations.md).
 
 </div>

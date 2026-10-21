@@ -8,7 +8,8 @@ import json
 import logging
 import os
 import zipfile
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -39,6 +40,7 @@ class PlatformPermission(StrEnum):
     USAGE_READ = "usage.read"
     STAFF_MANAGE = "staff.manage"
     BROADCASTS_MANAGE = "broadcasts.manage"
+    INCIDENTS_MANAGE = "incidents.manage"
 
 
 Level = Literal["primary_owner", "owner", "manager", "employee"]
@@ -70,12 +72,35 @@ BillingDep = Annotated[Session, Depends(require_platform(PlatformPermission.BILL
 ActDep = Annotated[Session, Depends(require_platform(PlatformPermission.BUSINESSES_ACT))]
 TeamDep = Annotated[Session, Depends(require_platform(PlatformPermission.STAFF_MANAGE))]
 
+# Ready-made permission sets for the team form: a support worker answers businesses and requests.
+STAFF_TEMPLATES: dict[str, tuple[PlatformPermission, ...]] = {
+    "support": (
+        PlatformPermission.BUSINESSES_READ,
+        PlatformPermission.INBOX_MANAGE,
+        PlatformPermission.INCIDENTS_MANAGE,
+    ),
+}
 
-def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
-    """Calls a console function whose rules raise errors; maps them to HTTP errors."""
+
+def require_owner(session: StaffDep) -> Session:
+    """A MyBiz owner (also the primary one): for pages the console shows only to owners. The
+    database functions behind them enforce it too; this keeps the API in step with the menu."""
+    level = session.execute(text("SELECT level FROM app.platform_me()")).scalar_one_or_none()
+    if level not in ("primary_owner", "owner"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="owners_only")
+    return session
+
+
+OwnerDep = Annotated[Session, Depends(require_owner)]
+
+
+@contextmanager
+def rule_errors(db: Session) -> Iterator[None]:
+    """Runs a block of console function calls in a savepoint; the errors their rules raise become
+    HTTP errors."""
     try:
         with db.begin_nested():
-            return db.execute(text(sql), params).scalar()
+            yield
     except DBAPIError as error:
         code = getattr(error.orig, "sqlstate", None)
         detail = str(getattr(getattr(error.orig, "diag", None), "message_primary", "")) or "error"
@@ -86,6 +111,12 @@ def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
         if code in ("P0001", "23514"):
             raise HTTPException(status_code=422, detail=detail) from error
         raise
+
+
+def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
+    """Calls a console function whose rules raise errors; maps them to HTTP errors."""
+    with rule_errors(db):
+        return db.execute(text(sql), params).scalar()
 
 
 class PlatformBusiness(BaseModel):
@@ -118,6 +149,19 @@ def businesses(db: AdminDep, page: FullPageDep) -> list[PlatformBusiness]:
         {"limit": page.limit, "offset": page.offset},
     ).mappings()
     return [PlatformBusiness.model_validate(dict(row)) for row in rows]
+
+
+@router.get("/businesses/{tenant_id}")
+def business(tenant_id: UUID, db: AdminDep) -> PlatformBusiness:
+    """One business, for its card (the list is paged, so the card cannot search it)."""
+    row = (
+        db.execute(text("SELECT * FROM app.platform_business(:id)"), {"id": tenant_id})
+        .mappings()
+        .first()
+    )
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+    return PlatformBusiness.model_validate(dict(row))
 
 
 @router.get("/usage")
@@ -402,7 +446,20 @@ class StaffMember(BaseModel):
 class StaffSave(BaseModel):
     level: Literal["owner", "manager", "employee"]
     permissions: list[PlatformPermission] = []
+    template: Literal["support"] | None = Field(
+        default=None, description="Start from a ready-made permission set; added to `permissions`"
+    )
     disabled: bool = False
+
+
+class StaffTemplate(BaseModel):
+    key: str
+    permissions: list[PlatformPermission]
+
+
+@router.get("/staff-templates")
+def staff_templates(db: TeamDep) -> list[StaffTemplate]:
+    return [StaffTemplate(key=k, permissions=list(v)) for k, v in STAFF_TEMPLATES.items()]
 
 
 @router.get("/staff")
@@ -421,7 +478,10 @@ def save_staff(email: EmailStr, body: StaffSave, db: TeamDep) -> list[StaffMembe
         {
             "email": email,
             "level": body.level,
-            "permissions": sorted({p.value for p in body.permissions}),
+            "permissions": sorted(
+                {p.value for p in body.permissions}
+                | {p.value for p in STAFF_TEMPLATES.get(body.template or "", ())}
+            ),
             "disabled": body.disabled,
         },
     )
@@ -444,7 +504,7 @@ class AuditEntry(BaseModel):
 
 
 @router.get("/audit")
-def audit(db: StaffDep, page: PageDep) -> list[AuditEntry]:
+def audit(db: OwnerDep, page: PageDep) -> list[AuditEntry]:
     """What the MyBiz team did, newest first (owners only)."""
     try:
         with db.begin_nested():

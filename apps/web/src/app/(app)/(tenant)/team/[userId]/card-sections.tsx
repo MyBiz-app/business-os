@@ -25,10 +25,11 @@ type Member = { user_id: string; email: string; full_name: string | null; role: 
 
 const UPCOMING_DAYS = 14;
 
-/** A section of the card that folds; the choice is remembered per browser (`storageKey`). */
-function Block({ title, id, children }: { title: string; id: string; children: React.ReactNode }) {
+/** A section of the card that folds; only the first one of a tab starts open. The choice is
+ * remembered per browser and per person, so folding one card never folds another. */
+function Block({ title, id, memberId, first = false, children }: { title: string; id: string; memberId: string; first?: boolean; children: React.ReactNode }) {
   return (
-    <CollapsibleSection title={title} defaultOpen storageKey={`staff-card-${id}`}>
+    <CollapsibleSection title={title} defaultOpen={first} storageKey={`staff-card-${memberId}-${id}`}>
       <div className="flex flex-col gap-3">{children}</div>
     </CollapsibleSection>
   );
@@ -66,8 +67,8 @@ export async function OverviewTab({ member, context }: { member: Member; context
   ];
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-2 min-[120rem]:grid-cols-3">
-      <Block id="details" title={t("details")}>
+    <div className="flex flex-col gap-4">
+      <Block memberId={member.user_id} id="details" first title={t("details")}>
         <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
           {facts.map(([label, value]) => (
             <div key={label} className="contents">
@@ -77,7 +78,7 @@ export async function OverviewTab({ member, context }: { member: Member; context
           ))}
         </dl>
       </Block>
-      <Block id="hours" title={t("hoursThisMonth")}>
+      <Block memberId={member.user_id} id="hours" title={t("hoursThisMonth")}>
         {clock ? (
           <>
             <p className="text-3xl font-bold tabular-nums">{hm(clock.worked.total)}</p>
@@ -90,7 +91,7 @@ export async function OverviewTab({ member, context }: { member: Member; context
           <p className="text-sm text-muted">{t("noClockAccess")}</p>
         )}
       </Block>
-      <Block id="shifts" title={t("upcomingShifts")}>
+      <Block memberId={member.user_id} id="shifts" title={t("upcomingShifts")}>
         {shifts.length === 0 ? (
           <p className="text-sm text-muted">{t("noShifts", { days: UPCOMING_DAYS })}</p>
         ) : (
@@ -108,7 +109,7 @@ export async function OverviewTab({ member, context }: { member: Member; context
           {t("openShifts")}
         </Link>
       </Block>
-      <Block id="classes" title={t("classesTaught")}>
+      <Block memberId={member.user_id} id="classes" title={t("classesTaught")}>
         {taught.length === 0 ? (
           <p className="text-sm text-muted">{t("noClasses", { days: UPCOMING_DAYS })}</p>
         ) : (
@@ -255,7 +256,7 @@ export async function DocumentsTab({ member, context }: { member: Member; contex
     );
   return (
     <div className="flex flex-col gap-6">
-      <Block id="documents" title={t("documents.title")}>
+      <Block memberId={member.user_id} id="documents" first title={t("documents.title")}>
         <ul className="flex flex-col divide-y divide-border text-sm">
           {signed.map((form) => (
             <li key={form.tax_year} className="flex items-center justify-between gap-3 py-2.5">
@@ -276,12 +277,12 @@ export async function DocumentsTab({ member, context }: { member: Member; contex
         </Link>
       </Block>
       {payslips && (
-        <Block id="payslips" title={tc("payslipsTitle")}>
+        <Block memberId={member.user_id} id="payslips" title={tc("payslipsTitle")}>
           {fileList(payslips, tc("noPayslips"))}
         </Block>
       )}
       {contract && (
-        <Block id="contract" title={tc("contractTitle")}>
+        <Block memberId={member.user_id} id="contract" title={tc("contractTitle")}>
           {fileList(contract, tc("noContract"))}
           <Link href={`/files?folder=${folders.find((f) => f.system_key === "employees")?.id}`} className="w-fit text-sm text-primary-ink underline-offset-4 hover:underline">
             {tc("openFiles")}
@@ -306,7 +307,7 @@ export async function AiTab({ member, context }: { member: Member; context: Cont
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   return (
     <div className="flex flex-col gap-6">
-    <Block id="ai" title={t("aiTitle")}>
+    <Block memberId={member.user_id} id="ai" first title={t("aiTitle")}>
       {ai ? (
         <>
           <dl className="grid grid-cols-2 gap-4 sm:max-w-md">
@@ -329,7 +330,7 @@ export async function AiTab({ member, context }: { member: Member; context: Cont
         {t("openAi")}
       </Link>
     </Block>
-    <Block id="agents" title={t("agentsTitle")}>
+    <Block memberId={member.user_id} id="agents" title={t("agentsTitle")}>
       <p className="text-sm text-muted">{t("agentsHint")}</p>
       {agents.length === 0 ? (
         <p className="text-sm">{t("noAgents")}</p>
@@ -362,7 +363,7 @@ export async function PermissionsTab({ member, context }: { member: Member; cont
   const tAll = await getTranslations();
   const roles = await context.api.GET("/roles", { params: context.scope }).then(unwrap);
   return (
-    <Block id="permissions" title={t("permissionsTitle")}>
+    <Block memberId={member.user_id} id="permissions" first title={t("permissionsTitle")}>
       <p className="text-sm">
         {t("roleIs", { role: member.custom_role_name ?? tAll(`roles.${member.role}` as "roles.staff") })}
       </p>

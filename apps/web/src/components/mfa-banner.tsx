@@ -30,7 +30,7 @@ export async function MfaBanner({ memberships, platform }: { memberships: string
     <div role="status" className="flex flex-wrap items-center justify-center gap-3 border-b border-border bg-warning/10 px-4 py-2 text-sm">
       <ShieldAlert aria-hidden="true" className="size-4" />
       <span>{text}</span>
-      <Link href="/account#security" className="font-medium underline underline-offset-4">
+      <Link href="/account#security" className="inline-block py-2 font-medium underline underline-offset-4 md:py-0">
         {t("mfa.enable")}
       </Link>
       {!platform && !acknowledged && (

@@ -7602,6 +7602,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/businesses/{tenant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business
+         * @description One business, for its card (the list is paged, so the card cannot search it).
+         */
+        get: operations["business"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/usage": {
         parameters: {
             query?: never;
@@ -7793,6 +7813,23 @@ export interface paths {
          * @description The signed-in team member's level and permissions (the console shows what they hold).
          */
         get: operations["platform_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/staff-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff Templates */
+        get: operations["staff_templates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8183,6 +8220,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/ai/web-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Web Search Settings
+         * @description Web search for console agents: off by default, with a monthly limit on searches.
+         */
+        get: operations["web_search_settings"];
+        /**
+         * Change Web Search
+         * @description Switches web search on or off and sets the searches allowed per month. Written to the
+         *     console audit log. Searches cost money: nothing is searched unless this is on.
+         */
+        put: operations["change_web_search"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Reports
+         * @description Saved reports of one kind, newest first. Needs the console permission of the kind.
+         */
+        get: operations["list_reports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/reports/{report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Report */
+        get: operations["get_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Console Agents Map
+         * @description The console's AI agents this team member may ask, for the map: the chief and the
+         *     specialists, each with the team's changes (name, portrait, place, switched off).
+         */
+        get: operations["console_agents_map"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change Console Agent
+         * @description Switches an agent on or off, renames it, sets its portrait and place, and writes the extra
+         *     instructions it always gets. Written to the console audit log.
+         */
+        put: operations["change_console_agent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/ai/assistant/conversations": {
         parameters: {
             query?: never;
@@ -8229,6 +8370,444 @@ export interface paths {
         put?: never;
         /** Console Send Message */
         post: operations["console_send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Platform Catalog
+         * @description Every industry, module and price in one read-only view.
+         */
+        get: operations["platform_catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Library
+         * @description The documents of one agent's library: at most 200, the list of a few dozen in practice.
+         */
+        get: operations["list_library"];
+        put?: never;
+        /**
+         * Add Library Document
+         * @description Adds a note, a summary, a link or pasted text to an agent's library.
+         */
+        post: operations["add_library_document"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}/library/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Library File
+         * @description Adds a file (text, Markdown, HTML, Word or PDF) to an agent's library.
+         */
+        post: operations["upload_library_file"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Library Document */
+        get: operations["get_library_document"];
+        /**
+         * Change Library Document
+         * @description Saves a change. A changed text is a new version; the earlier ones stay.
+         */
+        put: operations["change_library_document"];
+        post?: never;
+        /** Delete Library Document */
+        delete: operations["delete_library_document"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Library Versions
+         * @description Every saved version of a document, newest first (at most 100).
+         */
+        get: operations["library_versions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/versions/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Library Version
+         * @description The document as it was in one version.
+         */
+        get: operations["library_version"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore Library Version
+         * @description Brings an earlier version back as a new version (nothing is lost).
+         */
+        post: operations["restore_library_version"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/enabled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Switch Library Document
+         * @description Switches a document off (the agent stops using it) or on, without deleting it.
+         */
+        put: operations["switch_library_document"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/{doc_id}/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Library Document
+         * @description Reads the document's source link again; a changed text is a new version, and the
+         *     "last reviewed" date becomes today (the source was checked).
+         */
+        post: operations["refresh_library_document"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}/library/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Library
+         * @description Reads the sources of an agent's library, a few at a time: call again with the offset
+         *     advanced by the number of results until `remaining` is 0.
+         */
+        post: operations["refresh_library"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/library/reindex": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reindex Library
+         * @description Embeds the pieces that are not yet embedded, for search by meaning. Nothing happens
+         *     while the embeddings provider is off (the default).
+         */
+        post: operations["reindex_library"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/agents/{key}/library/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Library
+         * @description What the agent would find for a question, to check a library before trusting it.
+         */
+        get: operations["search_library"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Card
+         * @description Tags, the account owner and the trial end of one business.
+         */
+        get: operations["business_card"];
+        /**
+         * Set Business Card
+         * @description Replaces the tags and the account owner (an email of the MyBiz team, or empty).
+         */
+        put: operations["set_business_card"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Notes
+         * @description Internal notes, newest first (the last 200).
+         */
+        get: operations["business_notes"];
+        put?: never;
+        /**
+         * Add Business Note
+         * @description Writes an internal note about a business; returns the notes.
+         */
+        post: operations["add_business_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Timeline
+         * @description Sign-up, trial, invoices, requests, changes by the team and notes, newest first (150).
+         */
+        get: operations["business_timeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/trials-ending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Trials Ending
+         * @description Businesses whose free trial ends within `days` or ended in the last three days
+         *     (at most 200), soonest first.
+         */
+        get: operations["trials_ending"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/metrics/saas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Saas Metrics
+         * @description MRR, ARR, ARPU, churn and the AI margin, with a month-by-month history.
+         */
+        get: operations["saas_metrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/metrics/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Email Deliverability
+         * @description Which addresses bounced or complained: they are never mailed again.
+         */
+        get: operations["email_deliverability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/security/owners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Security Owners
+         * @description Two-step sign-in and risk confirmations of business owners, with the exposed ones first.
+         */
+        get: operations["security_owners"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/security/visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Security Visits
+         * @description How often each MyBiz team member viewed or changed a business, in the last days.
+         */
+        get: operations["security_visits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/legal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Legal Center
+         * @description Current document versions and who accepted them, plus the privacy requests.
+         */
+        get: operations["legal_center"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -9469,6 +10048,26 @@ export interface components {
             /** Businesses */
             businesses: components["schemas"]["BusinessAICost"][];
         };
+        /** AIMargin */
+        AIMargin: {
+            /** Days */
+            days: number;
+            /**
+             * Cost Usd Minor
+             * @description Model cost of the period, US cents
+             */
+            cost_usd_minor: number;
+            /**
+             * Revenue Usd Minor
+             * @description Monthly price of the AI modules in USD, cents
+             */
+            revenue_usd_minor: number;
+            /**
+             * Margin Usd Minor
+             * @description Revenue minus cost for businesses billed in USD
+             */
+            margin_usd_minor: number;
+        };
         /** AIPause */
         AIPause: {
             /**
@@ -9570,6 +10169,30 @@ export interface components {
             documents: {
                 [key: string]: string;
             };
+        };
+        /** Acceptance */
+        Acceptance: {
+            /**
+             * Accepted At
+             * Format: date-time
+             */
+            accepted_at: string;
+            /** Email */
+            email: string;
+            /** Business Name */
+            business_name: string | null;
+            /**
+             * Document
+             * @enum {string}
+             */
+            document: "terms" | "privacy" | "dpa";
+            /** Version */
+            version: string;
+            /**
+             * Context
+             * @enum {string}
+             */
+            context: "signup" | "client_join" | "reaccept";
         };
         /** Accepted */
         Accepted: {
@@ -10638,6 +11261,21 @@ export interface components {
             /** Location Id */
             location_id?: string | null;
         };
+        /** Body_upload_library_file */
+        Body_upload_library_file: {
+            /** File */
+            file: string;
+            /** Title */
+            title?: string | null;
+            /** Source Url */
+            source_url?: string | null;
+            /** Source Org */
+            source_org?: string | null;
+            /** Country */
+            country?: ("il" | "us" | "eu" | "all") | null;
+            /** Reviewed On */
+            reviewed_on?: string | null;
+        };
         /** Body_upload_location_logo */
         Body_upload_location_logo: {
             /** File */
@@ -11111,6 +11749,27 @@ export interface components {
             /** Paused */
             paused: boolean;
         };
+        /** BusinessCard */
+        BusinessCard: {
+            /** Tags */
+            tags: string[];
+            /**
+             * Account Owner
+             * @description The team member who looks after this business
+             */
+            account_owner: string | null;
+            /** Updated By */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
+            /**
+             * Trial Ends At
+             * Format: date-time
+             */
+            trial_ends_at: string;
+            /** Closed At */
+            closed_at: string | null;
+        };
         /** BusinessInvoice */
         BusinessInvoice: {
             /**
@@ -11179,6 +11838,23 @@ export interface components {
              * @description About, at one credit per question
              */
             questions_left: number | null;
+        };
+        /** BusinessNote */
+        BusinessNote: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Author Email */
+            author_email: string;
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** BusinessPolicy */
         BusinessPolicy: {
@@ -11561,6 +12237,13 @@ export interface components {
              */
             resumed_at: string | null;
         };
+        /** CardChange */
+        CardChange: {
+            /** Tags */
+            tags: string[];
+            /** Account Owner */
+            account_owner?: string | null;
+        };
         /** Catalog */
         Catalog: {
             /** Currency */
@@ -11578,6 +12261,23 @@ export interface components {
              * @description One more AI user a month, minor units
              */
             ai_extra_user_price: number;
+        };
+        /** CatalogIndustryRow */
+        CatalogIndustryRow: {
+            /** Key */
+            key: string;
+            /** Parent */
+            parent: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "live" | "beta" | "planned";
+            /**
+             * Requests
+             * @description Site requests naming it (latest 300); null without the inbox permission
+             */
+            requests: number | null;
         };
         /** CatalogModule */
         CatalogModule: {
@@ -11623,6 +12323,46 @@ export interface components {
              */
             ai_credits_included: number;
         };
+        /** CatalogModuleRow */
+        CatalogModuleRow: {
+            /** Key */
+            key: string;
+            /**
+             * Prices
+             * @description Monthly (or one-time), minor units, by currency
+             */
+            prices: {
+                [key: string]: number;
+            };
+            /** Available */
+            available: boolean;
+            /** Per Unit */
+            per_unit: boolean;
+            /**
+             * Billing
+             * @enum {string}
+             */
+            billing: "monthly" | "once";
+            /** Group */
+            group: string | null;
+            /** Requires Any */
+            requires_any: string[];
+            /** Requires All */
+            requires_all: string[];
+            /** Ai Credits Included */
+            ai_credits_included: number;
+            /** Ai Users Included */
+            ai_users_included: number;
+        };
+        /** CatalogTierRow */
+        CatalogTierRow: {
+            /** Up To Clients */
+            up_to_clients: number | null;
+            /** Prices */
+            prices: {
+                [key: string]: number;
+            };
+        };
         /** Chat */
         Chat: {
             /**
@@ -11634,7 +12374,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "manager" | "support" | "health" | "billing" | "growth";
+            role: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
             /** Title */
             title: string | null;
             /** Turns */
@@ -11654,7 +12394,7 @@ export interface components {
              * @default manager
              * @enum {string}
              */
-            role: "manager" | "support" | "health" | "billing" | "growth";
+            role: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
         };
         /** ChatSummary */
         ChatSummary: {
@@ -11753,6 +12493,23 @@ export interface components {
              * @default true
              */
             lives_with_me: boolean;
+        };
+        /** ChurnMetrics */
+        ChurnMetrics: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /** Cancelled */
+            cancelled: number;
+            /** Paying At Start */
+            paying_at_start: number;
+            /**
+             * Rate
+             * @description Cancelled over paying at the month's start
+             */
+            rate: number | null;
         };
         /** ChurnMonth */
         ChurnMonth: {
@@ -12885,6 +13642,63 @@ export interface components {
              */
             created_at: string;
         };
+        /** ConsoleAgentCard */
+        ConsoleAgentCard: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            /** Color */
+            color: string;
+            /** Chief */
+            chief: boolean;
+            /**
+             * Ready
+             * @description False until a later slice gives the agent its tools
+             */
+            ready: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Name He
+             * @description The team's own name for the agent, if set
+             */
+            name_he: string | null;
+            /** Name En */
+            name_en: string | null;
+            /** Portrait Url */
+            portrait_url: string | null;
+            /**
+             * X
+             * @description Place on the map in percent, null: automatic
+             */
+            x: number | null;
+            /** Y */
+            y: number | null;
+            /**
+             * Instructions
+             * @description Extra instructions; only shown to a member who can change them
+             */
+            instructions: string | null;
+        };
+        /** ConsoleAgentChange */
+        ConsoleAgentChange: {
+            /** Enabled */
+            enabled: boolean;
+            /** Name He */
+            name_he?: string | null;
+            /** Name En */
+            name_en?: string | null;
+            /** Instructions */
+            instructions?: string | null;
+            /** X */
+            x?: number | null;
+            /** Y */
+            y?: number | null;
+            /** Portrait Url */
+            portrait_url?: string | null;
+        };
         /** Consumer */
         Consumer: {
             /**
@@ -13254,6 +14068,33 @@ export interface components {
             /** Note */
             note?: string | null;
         };
+        /** CurrencyMetrics */
+        CurrencyMetrics: {
+            /** Currency */
+            currency: string;
+            /**
+             * Mrr
+             * @description Billed in the latest invoiced month, minor units
+             */
+            mrr: number;
+            /**
+             * Arr
+             * @description MRR times twelve, minor units
+             */
+            arr: number;
+            /**
+             * Arpu
+             * @description MRR per invoiced business, minor units
+             */
+            arpu: number;
+            /**
+             * Mrr Month
+             * Format: date
+             */
+            mrr_month: string;
+            /** Months */
+            months: components["schemas"]["RevenueMonth"][];
+        };
         /** CurrencyRevenue */
         CurrencyRevenue: {
             /** Currency */
@@ -13440,6 +14281,18 @@ export interface components {
              * @description Must be true: deleting cannot be undone
              */
             confirm: boolean;
+        };
+        /** DeliverabilityMonth */
+        DeliverabilityMonth: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /** Bounced */
+            bounced: number;
+            /** Complained */
+            complained: number;
         };
         /** DeliveryStats */
         DeliveryStats: {
@@ -13721,6 +14574,23 @@ export interface components {
              */
             created_at: string;
         };
+        /** DocumentCoverage */
+        DocumentCoverage: {
+            /**
+             * Document
+             * @enum {string}
+             */
+            document: "terms" | "privacy" | "dpa";
+            /** Version */
+            version: string;
+            /** Accepted */
+            accepted: number;
+            /**
+             * Eligible
+             * @description People who have to accept it: everyone, or owners for dpa
+             */
+            eligible: number;
+        };
         /** DocumentLink */
         DocumentLink: {
             /**
@@ -13756,6 +14626,33 @@ export interface components {
             read_only_after_days: number;
             /** Suspend After Days */
             suspend_after_days: number;
+        };
+        /** EmailDeliverability */
+        EmailDeliverability: {
+            /** Emails Waiting */
+            emails_waiting: number;
+            /**
+             * Bounced
+             * @description Hard bounces in the last 12 months
+             */
+            bounced: number;
+            /**
+             * Complained
+             * @description Spam complaints in the last 12 months
+             */
+            complained: number;
+            /** Months */
+            months: components["schemas"]["DeliverabilityMonth"][];
+            /**
+             * Recent
+             * @description The latest 50, addresses masked
+             */
+            recent: components["schemas"]["SuppressedAddress"][];
+            /**
+             * Webhook Open
+             * @description Is the provider's bounce webhook switched on
+             */
+            webhook_open: boolean;
         };
         /**
          * Embed
@@ -15796,12 +16693,189 @@ export interface components {
             /** Source */
             source?: ("manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other") | null;
         };
+        /** LegalCenter */
+        LegalCenter: {
+            /** Days */
+            days: number;
+            /** Documents */
+            documents: components["schemas"]["DocumentCoverage"][];
+            /**
+             * Acceptances
+             * @description The latest 200
+             */
+            acceptances: components["schemas"]["Acceptance"][];
+            /**
+             * Privacy Requests
+             * @description The last 12 months, latest 200
+             */
+            privacy_requests: components["schemas"]["PrivacyRequest"][];
+        };
         /** LegalPending */
         LegalPending: {
             /** Document */
             document: string;
             /** Version */
             version: string;
+        };
+        /** LibraryChange */
+        LibraryChange: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "file" | "link" | "note" | "summary";
+            /** Title */
+            title: string;
+            /** Source Url */
+            source_url?: string | null;
+            /** Source Org */
+            source_org?: string | null;
+            /** Country */
+            country?: ("il" | "us" | "eu" | "all") | null;
+            /** Reviewed On */
+            reviewed_on?: string | null;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /** Body */
+            body?: string | null;
+            /** Change Note */
+            change_note?: string | null;
+        };
+        /** LibraryDocument */
+        LibraryDocument: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Agent Key
+             * @enum {string}
+             */
+            agent_key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "file" | "link" | "note" | "summary";
+            /** Title */
+            title: string;
+            /** Source Url */
+            source_url: string | null;
+            /** Source Org */
+            source_org: string | null;
+            /** Country */
+            country: ("il" | "us" | "eu" | "all") | null;
+            /** Reviewed On */
+            reviewed_on: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Version */
+            version: number;
+            /**
+             * Chars
+             * @description Length of the current text; 0 for a link without text
+             */
+            chars: number;
+            /**
+             * Chunks
+             * @description Pieces the agent can find; 0 means it cannot find it yet
+             */
+            chunks: number;
+            /** Updated By */
+            updated_by: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** LibraryDocumentBody */
+        LibraryDocumentBody: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Agent Key
+             * @enum {string}
+             */
+            agent_key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "file" | "link" | "note" | "summary";
+            /** Title */
+            title: string;
+            /** Source Url */
+            source_url: string | null;
+            /** Source Org */
+            source_org: string | null;
+            /** Country */
+            country: ("il" | "us" | "eu" | "all") | null;
+            /** Reviewed On */
+            reviewed_on: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Version */
+            version: number;
+            /** Body */
+            body: string | null;
+            /** Updated By */
+            updated_by: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** LibraryEnabled */
+        LibraryEnabled: {
+            /** Enabled */
+            enabled: boolean;
+        };
+        /** LibraryRestore */
+        LibraryRestore: {
+            /** Version */
+            version: number;
+        };
+        /** LibrarySearchHit */
+        LibrarySearchHit: {
+            /** Document */
+            document: string;
+            /** Source Url */
+            source_url: string | null;
+            /** Source Org */
+            source_org: string | null;
+            /** Country */
+            country: string | null;
+            /** Last Reviewed */
+            last_reviewed: string | null;
+            /** Section */
+            section: string | null;
+            /** Text */
+            text: string;
+        };
+        /** LibraryVersion */
+        LibraryVersion: {
+            /** Version */
+            version: number;
+            /** Change Note */
+            change_note: string | null;
+            /** Created By */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Chars */
+            chars: number;
         };
         /** LimitsUpdate */
         LimitsUpdate: {
@@ -16420,6 +17494,12 @@ export interface components {
              * @enum {string}
              */
             role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
+            /**
+             * Client App
+             * @description The business offers the client app (the member's client area)
+             * @default false
+             */
+            client_app: boolean;
         };
         /** Message */
         Message: {
@@ -16964,6 +18044,11 @@ export interface components {
             /** Booking Id */
             booking_id?: string | null;
         };
+        /** NoteIn */
+        NoteIn: {
+            /** Body */
+            body: string;
+        };
         /** NoticeOut */
         NoticeOut: {
             /**
@@ -17310,6 +18395,33 @@ export interface components {
              * @description Free cancellation before the session
              */
             free_minutes: number;
+        };
+        /** OwnerSecurity */
+        OwnerSecurity: {
+            /** Email */
+            email: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Requires Mfa
+             * @description The business requires two-step sign-in of its team
+             */
+            requires_mfa: boolean;
+            /**
+             * Mfa Enrolled
+             * @description None when the sign-in provider can't be read
+             */
+            mfa_enrolled: boolean | null;
+            /**
+             * Risk Acknowledged At
+             * @description When the owner confirmed they understand the risk, for the current warning
+             */
+            risk_acknowledged_at: string | null;
         };
         /**
          * PaletteColors
@@ -18113,11 +19225,24 @@ export interface components {
             /** Options */
             options: components["schemas"]["ProviderOption"][];
         };
+        /** PlatformCatalog */
+        PlatformCatalog: {
+            /** Core */
+            core: components["schemas"]["CatalogTierRow"][];
+            /** Modules */
+            modules: components["schemas"]["CatalogModuleRow"][];
+            /** Presets */
+            presets: {
+                [key: string]: string[];
+            };
+            /** Industries */
+            industries: components["schemas"]["CatalogIndustryRow"][];
+        };
         /**
          * PlatformPermission
          * @enum {string}
          */
-        PlatformPermission: "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage";
+        PlatformPermission: "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage" | "incidents.manage";
         /** Point */
         Point: {
             /**
@@ -18192,6 +19317,36 @@ export interface components {
              * @description Minor units
              */
             monthly: number;
+        };
+        /** PrivacyRequest */
+        PrivacyRequest: {
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "business_export" | "client_export" | "client_erasure" | "business_closure";
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "building" | "ready" | "failed" | "done" | "waiting";
+            /**
+             * Delete After
+             * @description Closed businesses: the deletion date
+             */
+            delete_after: string | null;
         };
         /** Proactive */
         Proactive: {
@@ -18988,6 +20143,41 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** RefreshReport */
+        RefreshReport: {
+            /** Results */
+            results: components["schemas"]["RefreshResult"][];
+            /**
+             * Remaining
+             * @description Sources still to read; call again with a later offset
+             */
+            remaining: number;
+        };
+        /** RefreshResult */
+        RefreshResult: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Result
+             * @enum {string}
+             */
+            result: "updated" | "unchanged" | "failed";
+            /** Error */
+            error?: string | null;
+        };
+        /** ReindexResult */
+        ReindexResult: {
+            /**
+             * Embedded
+             * @description Pieces embedded now; 0 while search by meaning is off
+             */
+            embedded: number;
+        };
         /** RemoveResult */
         RemoveResult: {
             /**
@@ -19006,6 +20196,61 @@ export interface components {
             weekdays: number[];
             /** Ends On */
             ends_on?: string | null;
+        };
+        /** Report */
+        Report: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "market" | "security";
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Created By */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Body
+             * @description The full report: for a market report, the prices with their sources and our price against the cheapest competitor
+             */
+            body: {
+                [key: string]: unknown;
+            };
+        };
+        /** ReportSummary */
+        ReportSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "market" | "security";
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Created By */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** ReservationCreate */
         ReservationCreate: {
@@ -19265,6 +20510,31 @@ export interface components {
             branch: string;
             /** Account */
             account: string;
+        };
+        /** RevenueMonth */
+        RevenueMonth: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /**
+             * Billed
+             * @description Paid and open invoices, minor units
+             */
+            billed: number;
+            /**
+             * Paid
+             * @description Minor units
+             */
+            paid: number;
+            /**
+             * Open
+             * @description Minor units
+             */
+            open: number;
+            /** Invoices */
+            invoices: number;
         };
         /** Review */
         Review: {
@@ -19710,6 +20980,14 @@ export interface components {
              */
             acknowledged: boolean;
         };
+        /** SaasMetrics */
+        SaasMetrics: {
+            /** Currencies */
+            currencies: components["schemas"]["CurrencyMetrics"][];
+            churn: components["schemas"]["ChurnMetrics"] | null;
+            /** @description Only for team members who may read usage */
+            ai: components["schemas"]["AIMargin"] | null;
+        };
         /** Sale */
         Sale: {
             /**
@@ -19923,6 +21201,40 @@ export interface components {
              * @enum {string}
              */
             kind: "mfa_enabled" | "mfa_disabled";
+        };
+        /** SecurityOwners */
+        SecurityOwners: {
+            /**
+             * Owners
+             * @description People who own at least one open business
+             */
+            owners: number;
+            /**
+             * With Mfa
+             * @description None when the sign-in provider can't be read
+             */
+            with_mfa: number | null;
+            /**
+             * Acknowledged Risk
+             * @description Without two-step sign-in, confirmed the risk
+             */
+            acknowledged_risk: number;
+            /**
+             * Exposed
+             * @description Without two-step sign-in and no confirmation yet
+             */
+            exposed: number | null;
+            /** Businesses */
+            businesses: number;
+            /** Businesses Requiring Mfa */
+            businesses_requiring_mfa: number;
+            /** Risk Version */
+            risk_version: string;
+            /**
+             * Rows
+             * @description Owners without two-step sign-in first
+             */
+            rows: components["schemas"]["OwnerSecurity"][];
         };
         /** SecurityPolicy */
         SecurityPolicy: {
@@ -20754,10 +22066,22 @@ export interface components {
              */
             permissions: components["schemas"]["PlatformPermission"][];
             /**
+             * Template
+             * @description Start from a ready-made permission set; added to `permissions`
+             */
+            template?: "support" | null;
+            /**
              * Disabled
              * @default false
              */
             disabled: boolean;
+        };
+        /** StaffTemplate */
+        StaffTemplate: {
+            /** Key */
+            key: string;
+            /** Permissions */
+            permissions: components["schemas"]["PlatformPermission"][];
         };
         /** StageBody */
         StageBody: {
@@ -20939,6 +22263,24 @@ export interface components {
              */
             changed: boolean;
         };
+        /** SuppressedAddress */
+        SuppressedAddress: {
+            /**
+             * Address
+             * @description Masked: the first letter and the domain
+             */
+            address: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "bounced" | "complained";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** SwapCreate */
         SwapCreate: {
             /**
@@ -21117,6 +22459,34 @@ export interface components {
             color: string;
             /** Lead Key */
             lead_key?: string | null;
+        };
+        /** TeamVisit */
+        TeamVisit: {
+            /** Actor Email */
+            actor_email: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /** Views */
+            views: number;
+            /** Changes */
+            changes: number;
+            /**
+             * Last At
+             * Format: date-time
+             */
+            last_at: string;
+        };
+        /** TeamVisits */
+        TeamVisits: {
+            /** Days */
+            days: number;
+            /** Visits */
+            visits: components["schemas"]["TeamVisit"][];
         };
         /** Template */
         Template: {
@@ -21782,6 +23152,25 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** TimelineEvent */
+        TimelineEvent: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /**
+             * Kind
+             * @description signup, trial_ends, closed, invoice, request, change or note; the details depend on the kind
+             */
+            kind: string;
+            /** Actor */
+            actor: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+        };
         /** TopPost */
         TopPost: {
             /**
@@ -21820,6 +23209,29 @@ export interface components {
              * Format: date-time
              */
             trial_ends_at: string;
+        };
+        /** TrialEnding */
+        TrialEnding: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /** Owner Email */
+            owner_email: string | null;
+            /**
+             * Trial Ends At
+             * Format: date-time
+             */
+            trial_ends_at: string;
+            /** Active Clients */
+            active_clients: number;
+            /** Has Card */
+            has_card: boolean;
+            /** Account Owner */
+            account_owner: string | null;
         };
         /** TrialExtension */
         TrialExtension: {
@@ -22132,6 +23544,30 @@ export interface components {
              * @description Newest first, at most 50
              */
             items: components["schemas"]["Waiver"][];
+        };
+        /** WebSearchChange */
+        WebSearchChange: {
+            /** Enabled */
+            enabled: boolean;
+            /** Monthly Limit */
+            monthly_limit: number;
+        };
+        /** WebSearchSettings */
+        WebSearchSettings: {
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Monthly Limit
+             * @description Searches allowed per calendar month
+             */
+            monthly_limit: number;
+            /** Used This Month */
+            used_this_month: number;
+            /**
+             * Cost Per 1000 Usd
+             * @description Anthropic's price at the last check; verify
+             */
+            cost_per_1000_usd: number;
         };
         /** WebsiteOrder */
         WebsiteOrder: {
@@ -40713,6 +42149,37 @@ export interface operations {
             };
         };
     };
+    business: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformBusiness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     usage: {
         parameters: {
             query?: {
@@ -40984,6 +42451,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StaffMe"];
+                };
+            };
+        };
+    };
+    staff_templates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffTemplate"][];
                 };
             };
         };
@@ -41628,6 +43115,177 @@ export interface operations {
             };
         };
     };
+    web_search_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebSearchSettings"];
+                };
+            };
+        };
+    };
+    change_web_search: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebSearchChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebSearchSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_reports: {
+        parameters: {
+            query?: {
+                kind?: "market" | "security";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    console_agents_map: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsoleAgentCard"][];
+                };
+            };
+        };
+    };
+    change_console_agent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsoleAgentChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsoleAgentCard"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     console_list_chats: {
         parameters: {
             query?: never;
@@ -41734,6 +43392,791 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Chat"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    platform_catalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformCatalog"];
+                };
+            };
+        };
+    };
+    list_library: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocument"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_library_file: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_library_file"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    library_versions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryVersion"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    library_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_library_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryRestore"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    switch_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryEnabled"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryDocumentBody"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_library_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefreshResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_library: {
+        parameters: {
+            query?: {
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefreshReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reindex_library: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReindexResult"];
+                };
+            };
+        };
+    };
+    search_library: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path: {
+                key: "manager" | "support" | "health" | "billing" | "growth" | "legal" | "accountant" | "market" | "security" | "product" | "success" | "marketing";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibrarySearchHit"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_card: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_business_card: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CardChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_notes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessNote"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_business_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessNote"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_timeline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimelineEvent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trials_ending: {
+        parameters: {
+            query?: {
+                /** @description Look ahead this many days */
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrialEnding"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    saas_metrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaasMetrics"];
+                };
+            };
+        };
+    };
+    email_deliverability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailDeliverability"];
+                };
+            };
+        };
+    };
+    security_owners: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SecurityOwners"];
+                };
+            };
+        };
+    };
+    security_visits: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamVisits"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    legal_center: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LegalCenter"];
                 };
             };
             /** @description Validation Error */

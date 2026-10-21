@@ -11,6 +11,11 @@ GLOBAL_TABLES = {
     "platform_audit",
     "platform_ai_settings",
     "platform_ai_conversations",
+    "platform_ai_agents",
+    "platform_kb_documents",  # the console agents' libraries; no API access at all
+    "platform_kb_versions",
+    "platform_kb_chunks",
+    "platform_ai_reports",
     "push_tokens",
     "user_tours",
     "login_devices",
@@ -37,6 +42,8 @@ PLATFORM_TABLES = {
     "platform_ai_pauses",
     "announcements",
     "announcement_deliveries",
+    "platform_business_notes",
+    "platform_business_cards",
 }
 
 
@@ -76,6 +83,11 @@ def test_every_table_has_row_level_security(engine: Engine) -> None:
         "announcement_views",
         "platform_incidents",
         "email_suppressions",
+        "platform_ai_agents",
+        "platform_kb_documents",
+        "platform_kb_versions",
+        "platform_kb_chunks",
+        "platform_ai_reports",
     }
     own = tuple(sorted(PLATFORM_TABLES | own_extra))
     reachable = _query(

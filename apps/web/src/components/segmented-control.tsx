@@ -39,7 +39,7 @@ export function SegmentedControl<T extends string>({
       ref={group}
       role="group"
       aria-label={label}
-      className="relative flex rounded-xl bg-surface-2 p-0.5 ring-1 ring-border"
+      className="relative flex max-w-full overflow-x-auto rounded-xl bg-surface-2 p-0.5 ring-1 ring-border"
     >
       {pill ? (
         <span
@@ -54,7 +54,7 @@ export function SegmentedControl<T extends string>({
           type="button"
           aria-pressed={value === option.value}
           onClick={() => onChange(option.value)}
-          className={`btn-plain relative rounded-[0.6rem] px-3 py-1.5 text-sm transition-colors ${
+          className={`btn-plain relative shrink-0 whitespace-nowrap rounded-[0.6rem] px-3 py-2 text-sm md:py-1.5 transition-colors ${
             value === option.value ? "font-semibold text-foreground" : "text-muted hover:text-foreground"
           }`}
         >
