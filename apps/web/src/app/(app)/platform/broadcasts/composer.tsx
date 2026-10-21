@@ -21,6 +21,7 @@ import {
 } from "./actions";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { Button } from "@/components/ui/button";
 
 type Kind = BroadcastBody["kind"];
 type Channel = BroadcastBody["channels"][number];
@@ -152,7 +153,7 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
 
       <Checks legend={t("channelsTitle")} items={CHANNELS.map((c) => ({ value: c, label: t(`channels.${c}`), hint: t(`channelHints.${c}`) }))} selected={channels} onChange={setChannels} />
 
-      <section className="flex flex-col gap-4 rounded-2xl border border-border p-4" aria-labelledby="audience-title">
+      <section className="flex flex-col gap-4 card p-4 sm:p-5" aria-labelledby="audience-title">
         <h2 id="audience-title" className="font-semibold">
           {t("audienceTitle")}
         </h2>
@@ -198,7 +199,7 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
         </div>
       </section>
 
-      <section className="flex flex-col gap-4 rounded-2xl border border-border p-4" aria-labelledby="content-title">
+      <section className="flex flex-col gap-4 card p-4 sm:p-5" aria-labelledby="content-title">
         <h2 id="content-title" className="font-semibold">
           {t("content.title")}
         </h2>
@@ -241,10 +242,8 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
             <input type="datetime-local" aria-label={t("when.later")} value={at} disabled={sendNow} onChange={(e) => setAt(e.target.value)} className="control w-fit px-3 py-1.5" dir="ltr" />
           </fieldset>
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
+            <Button variant="primary"
               disabled={pending}
-              className="btn-primary px-4 py-2.5"
               onClick={async () => {
                 if (!(await confirm({ message: t("actions.confirm", { count }), confirmLabel: sendNow ? t("actions.send") : t("actions.schedule") }))) return;
                 run(() => scheduleBroadcast(id, body, submitTime), () => {
@@ -254,30 +253,30 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
               }}
             >
               {sendNow ? t("actions.send") : t("actions.schedule")}
-            </button>
-            <button type="button" disabled={pending} className="btn-secondary px-4 py-2.5" onClick={() => run(() => saveBroadcast(id, body), (r) => {
+            </Button>
+            <Button disabled={pending} onClick={() => run(() => saveBroadcast(id, body), (r) => {
               toast("success", t("notices.saved"));
               if (!initial && r.id) router.replace(`/platform/broadcasts/${r.id}`);
             })}>
               {t("actions.saveDraft")}
-            </button>
-            <button type="button" disabled={pending} className="btn-secondary px-4 py-2.5" onClick={() => run(() => sendTest(id, body), (r) => toast(r.tested ? "success" : "error", r.tested ? t("notices.testSent", { email: r.testedTo ?? "" }) : t("notices.testNoProvider")))}>
+            </Button>
+            <Button disabled={pending} onClick={() => run(() => sendTest(id, body), (r) => toast(r.tested ? "success" : "error", r.tested ? t("notices.testSent", { email: r.testedTo ?? "" }) : t("notices.testNoProvider")))}>
               {t("actions.test")}
-            </button>
+            </Button>
             {id && (
               <>
-                <button type="button" disabled={pending} className="btn-secondary px-4 py-2.5" onClick={() => run(() => cancelBroadcast(id), () => {
+                <Button disabled={pending} onClick={() => run(() => cancelBroadcast(id), () => {
                   toast("success", t("notices.cancelled"));
                   router.push("/platform/broadcasts");
                 })}>
                   {t("actions.cancel")}
-                </button>
-                <button type="button" disabled={pending} className="btn-danger px-4 py-2.5" onClick={() => run(() => deleteBroadcast(id), () => {
+                </Button>
+                <Button variant="danger" disabled={pending} onClick={() => run(() => deleteBroadcast(id), () => {
                   toast("success", t("notices.deleted"));
                   router.push("/platform/broadcasts");
                 })}>
                   {t("actions.delete")}
-                </button>
+                </Button>
               </>
             )}
           </div>

@@ -45,7 +45,7 @@ export default async function PlatformCatalogPage() {
         ) : (
           <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {categories.map((category) => (
-              <li key={category.key} className="card flex flex-col gap-3 p-5">
+              <li key={category.key} className="card flex flex-col gap-3 p-4 sm:p-5">
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-semibold">{text(category.key, "name")}</span>
                   <StatusBadge status={category.status} label={t(`status.${category.status}`)} />

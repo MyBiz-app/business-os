@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { FormError } from "@/components/form/form-message";
 
 import { setBusinessAiPaused } from "./actions";
+import { Button } from "@/components/ui/button";
 
 /** Stops AI for one business (asks for a reason, which both audit logs keep) or resumes it. */
 export function PauseButton({ tenantId, name, paused }: { tenantId: string; name: string; paused: boolean }) {
@@ -30,19 +31,19 @@ export function PauseButton({ tenantId, name, paused }: { tenantId: string; name
     return (
       <>
         <FormError message={error} toastOnly />
-        <button type="button" disabled={pending} onClick={() => run(false)} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
+        <Button disabled={pending} onClick={() => run(false)} className="inline-flex items-center gap-1.5">
           <Play aria-hidden="true" className="size-4" />
           {t("resume")}
-        </button>
+        </Button>
       </>
     );
   }
   if (!asking) {
     return (
-      <button type="button" onClick={() => setAsking(true)} aria-label={t("pauseFor", { name })} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
+      <Button onClick={() => setAsking(true)} aria-label={t("pauseFor", { name })} className="inline-flex items-center gap-1.5">
         <Pause aria-hidden="true" className="size-4" />
         {t("pause")}
-      </button>
+      </Button>
     );
   }
   return (
@@ -64,12 +65,12 @@ export function PauseButton({ tenantId, name, paused }: { tenantId: string; name
         placeholder={t("reason")}
         className="control min-w-40 px-3 py-1.5 text-sm"
       />
-      <button type="submit" disabled={pending || reason.trim().length < 3} className="btn-danger px-3 py-1.5 text-sm">
+      <Button variant="danger" type="submit" disabled={pending || reason.trim().length < 3}>
         {t("pause")}
-      </button>
-      <button type="button" onClick={() => setAsking(false)} className="btn-secondary px-3 py-1.5 text-sm">
+      </Button>
+      <Button onClick={() => setAsking(false)}>
         {t("cancel")}
-      </button>
+      </Button>
     </form>
   );
 }

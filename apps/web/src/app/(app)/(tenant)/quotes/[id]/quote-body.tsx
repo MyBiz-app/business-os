@@ -12,6 +12,7 @@ import { whatsappLink } from "@/lib/whatsapp";
 import { copyQuote, sendQuote } from "../actions";
 import { CopyLink } from "./copy-link";
 import { PaymentForm } from "./payment-form";
+import { Button } from "@/components/ui/button";
 
 const WEB_URL = process.env.NEXT_PUBLIC_WEB_URL ?? "http://localhost:3000";
 
@@ -48,7 +49,7 @@ export async function QuoteBody({ id }: { id: string }) {
             {quote.status === "draft" && (
               <>
                 <form action={sendQuote.bind(null, quote.id)}>
-                  <button type="submit" className="btn-primary px-4 py-2">{t("send")}</button>
+                  <Button variant="primary" type="submit">{t("send")}</Button>
                 </form>
                 <Link href={`/quotes/${quote.id}/edit`} className="btn-secondary px-4 py-2">{t("edit")}</Link>
               </>
@@ -63,7 +64,7 @@ export async function QuoteBody({ id }: { id: string }) {
               <a href={`/q/${quote.token}`} target="_blank" rel="noreferrer" className="btn-secondary px-3 py-2 text-sm">{t("preview")}</a>
             )}
             <form action={copyQuote.bind(null, quote.id)}>
-              <button type="submit" className="btn-secondary px-3 py-2 text-sm">{t("copyAsNew")}</button>
+              <Button variant="secondary" type="submit">{t("copyAsNew")}</Button>
             </form>
           </div>
           {quote.status === "draft" && <p className="text-sm text-muted">{t("draftHint")}</p>}

@@ -11,6 +11,7 @@ import { askConsoleAssistant, openConsoleChat, type ChatOpened, type ChatRole, t
 import { AgentEditor } from "./agent-editor";
 import { AgentsMap, useAgentName, type AgentCard } from "./agents-map";
 import { LibraryPanel } from "./library-panel";
+import { Button } from "@/components/ui/button";
 
 export type ChatListItem = { id: string; role: string; title: string | null; updatedAt: string };
 
@@ -96,9 +97,9 @@ export function ConsoleChat({ agents, canEdit, chats: saved, initial }: { agents
             </option>
           ))}
         </select>
-        <button type="button" onClick={startNew} disabled={pending || chatId === null} className="btn-secondary px-3 py-2 text-sm">
+        <Button onClick={startNew} disabled={pending || chatId === null}>
           {t("newChat")}
-        </button>
+        </Button>
       </div>
       {agents.length > 0 && <AgentsMap agents={agents} selected={role} onPick={pick} />}
       {agent && (
@@ -138,9 +139,9 @@ export function ConsoleChat({ agents, canEdit, chats: saved, initial }: { agents
       </ol>
       {askable && weeklyKey && t.has(weeklyKey) && (
         <div>
-          <button type="button" onClick={() => send(t(weeklyKey))} disabled={pending} className="btn-secondary px-3 py-2 text-sm">
+          <Button onClick={() => send(t(weeklyKey))} disabled={pending}>
             {t("weeklyReport")}
-          </button>
+          </Button>
         </div>
       )}
       <form
@@ -162,10 +163,10 @@ export function ConsoleChat({ agents, canEdit, chats: saved, initial }: { agents
           placeholder={t("question")}
           className="control min-w-0 flex-1 px-3 py-2"
         />
-        <button type="submit" disabled={pending || !askable || !text.trim()} className="btn-primary inline-flex items-center gap-2 px-4 py-2">
+        <Button variant="primary" type="submit" disabled={pending || !askable || !text.trim()} className="inline-flex items-center gap-2">
           <Send aria-hidden="true" className="size-4 rtl:-scale-x-100" />
           {t("send")}
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -44,7 +44,7 @@ export default async function BroadcastsPage() {
             const content = item.content.he?.subject || item.content.en?.subject || "";
             const date = item.sent_at ?? item.scheduled_at ?? item.created_at;
             return (
-              <li key={item.id} className="rounded-xl border border-border bg-surface p-4 shadow-sm">
+              <li key={item.id} className="card p-4 sm:p-5">
                 <Link href={`/platform/broadcasts/${item.id}`} className="flex flex-col gap-2">
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold" dir="auto">

@@ -6,6 +6,7 @@ import { useActionState } from "react";
 
 import { type DefaultViewState, saveShiftsDefault } from "./actions";
 import { FormError, FormNotice } from "@/components/form/form-message";
+import { Button } from "@/components/ui/button";
 
 /** Owners: keeps the current view, range and branches as the way the shifts board opens. */
 export function SaveShiftsDefault({ view, range, branches }: { view: "people" | "branches"; range: "day" | "week" | "month" | "custom"; branches: string[] }) {
@@ -14,10 +15,10 @@ export function SaveShiftsDefault({ view, range, branches }: { view: "people" | 
 
   return (
     <form action={action} className="flex items-center gap-2">
-      <button type="submit" disabled={pending} aria-busy={pending} title={t("saveDefaultHint")} className="btn-ghost gap-1.5 px-3 py-1.5 text-sm">
+      <Button variant="quiet" type="submit" disabled={pending} aria-busy={pending} title={t("saveDefaultHint")} className="gap-1.5">
         <Bookmark aria-hidden="true" className="size-4" />
         {t("saveDefault")}
-      </button>
+      </Button>
       <FormNotice message={state.saved ? t("defaultSaved") : undefined} />
       <FormError toastOnly message={state.error ? t("defaultError") : undefined} />
     </form>

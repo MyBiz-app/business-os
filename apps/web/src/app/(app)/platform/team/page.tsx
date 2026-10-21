@@ -52,7 +52,7 @@ export default async function PlatformTeamPage() {
           ))}
         </ul>
       </section>
-      <section aria-labelledby="add-heading" className="card flex flex-col gap-4 p-6">
+      <section aria-labelledby="add-heading" className="card flex flex-col gap-4 p-4 sm:p-5">
         <h2 id="add-heading" className="text-lg font-semibold">
           {t("add")}
         </h2>

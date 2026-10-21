@@ -8,6 +8,7 @@ import { useState, useTransition } from "react";
 import type { components } from "@business-os/api-client";
 
 import { type BonusError, decideBonus, removeAdjustment } from "./actions";
+import { Button } from "@/components/ui/button";
 
 type Adjustment = components["schemas"]["Adjustment"];
 
@@ -68,12 +69,12 @@ export function BonusList({
               <span className="text-muted">{lines.map((row) => row.full_name).join(", ")}</span>
             </span>
             <span className="flex gap-2">
-              <button type="button" className="btn-primary px-3 py-1.5" disabled={pending} onClick={() => run(() => decideBonus(batch, true))}>
+              <Button variant="primary" disabled={pending} onClick={() => run(() => decideBonus(batch, true))}>
                 {t("approve")}
-              </button>
-              <button type="button" className="btn-ghost px-3 py-1.5" disabled={pending} onClick={() => run(() => decideBonus(batch, false))}>
+              </Button>
+              <Button variant="quiet" disabled={pending} onClick={() => run(() => decideBonus(batch, false))}>
                 {t("reject")}
-              </button>
+              </Button>
             </span>
           </div>
           );
@@ -94,9 +95,9 @@ export function BonusList({
                 <bdi className={row.kind === "deduction" ? "text-danger" : undefined}>{formatMoney(row.amount_minor, row.currency || currency, locale)}</bdi>
                 <span className={row.status === "approved" ? "text-success-ink" : "text-muted"}>{t(`status.${row.status}`)}</span>
                 {(canManage || row.status === "proposed") && (
-                  <button type="button" className="btn-link text-danger underline-offset-4 hover:underline" disabled={pending} onClick={() => run(() => removeAdjustment(row.id))}>
+                  <Button variant="plain" className="btn-link text-danger underline-offset-4 hover:underline" disabled={pending} onClick={() => run(() => removeAdjustment(row.id))}>
                     {t("remove")}
-                  </button>
+                  </Button>
                 )}
               </span>
             </li>

@@ -3,6 +3,7 @@
 import { Trash2 } from "lucide-react";
 
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { Button } from "@/components/ui/button";
 
 /** A delete button that asks first. It lives inside the edit form and submits to its own action
  * (a form cannot sit inside another form), so it needs no fields to be valid. */
@@ -10,7 +11,8 @@ export function DeleteButton({ action, label, confirm }: { action: () => Promise
   const ask = useConfirm();
   return (
     <div className="border-t border-border pt-4">
-      <button
+      <Button
+        variant="plain"
         type="submit"
         formAction={action}
         formNoValidate
@@ -26,7 +28,7 @@ export function DeleteButton({ action, label, confirm }: { action: () => Promise
       >
         <Trash2 aria-hidden="true" className="size-4" />
         {label}
-      </button>
+      </Button>
     </div>
   );
 }

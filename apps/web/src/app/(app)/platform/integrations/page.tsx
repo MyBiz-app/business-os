@@ -32,7 +32,7 @@ export default async function PlatformIntegrationsPage() {
       <PageHeader title={t("title")} description={t("subtitle")} />
       <div className="grid gap-4 md:grid-cols-2">
         {capabilities.map((capability) => (
-          <section key={capability.capability} aria-labelledby={`cap-${capability.capability}`} className="flex flex-col gap-3 card p-6">
+          <section key={capability.capability} aria-labelledby={`cap-${capability.capability}`} className="flex flex-col gap-3 card p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 id={`cap-${capability.capability}`} className="text-lg font-semibold">
                 {title(capability.capability)}

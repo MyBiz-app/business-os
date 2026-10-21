@@ -17,6 +17,7 @@ import { SessionStatusButton } from "./session-status-button";
 import { UserText, Ltr } from "@/components/bidi";
 import { BackLink } from "@/components/back-link";
 import { PageHeader } from "@/components/layout/page-header";
+import { Button } from "@/components/ui/button";
 
 type Query = Record<string, string | string[] | undefined>;
 
@@ -96,9 +97,9 @@ export async function SessionBody({ id, query, inModal = false }: { id: string; 
                   ))}
                 </select>
               </label>
-              <button type="submit" className="btn-primary px-4 py-2">
+              <Button variant="primary" type="submit">
                 {tResources("recordPayment")}
-              </button>
+              </Button>
             </form>
           )}
         </section>
@@ -143,9 +144,9 @@ export async function SessionBody({ id, query, inModal = false }: { id: string; 
 
       {writable && session.series_id && session.series_open_ended && (
         <form action={endSeries.bind(null, session.series_id, session.id, day)}>
-          <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
+          <Button variant="plain" type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
             {t("endSeries")}
-          </button>
+          </Button>
         </form>
       )}
 

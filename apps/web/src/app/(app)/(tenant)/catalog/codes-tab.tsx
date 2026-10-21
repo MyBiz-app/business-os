@@ -13,6 +13,7 @@ import { getTenantFor } from "@/lib/tenant";
 import { deletePromoCode, setPromoActive } from "./promos/actions";
 import { catalogHref, type CatalogShow } from "./tabs";
 import { CardTransition } from "@/components/ui/page-transition";
+import { Button } from "@/components/ui/button";
 
 /** Discount codes: tiles that filter, then a list. A row opens the code in a window; pause,
  * resume and delete are also one click away in the row. */
@@ -86,15 +87,15 @@ export async function CodesTab({ show }: { show: CatalogShow }) {
               {writable && (
                 <span className="flex items-center gap-3 text-sm">
                   <form action={setPromoActive.bind(null, code.id, !code.active)}>
-                    <button type="submit" className="btn-link text-primary-ink underline-offset-4 hover:underline">
+                    <Button variant="plain" type="submit" className="btn-link text-primary-ink underline-offset-4 hover:underline">
                       {code.active ? t("promo.pause") : t("promo.resume")}
-                    </button>
+                    </Button>
                   </form>
                   {code.uses === 0 && (
                     <form action={deletePromoCode.bind(null, code.id)}>
-                      <button type="submit" className="btn-link text-danger underline-offset-4 hover:underline">
+                      <Button variant="plain" type="submit" className="btn-link text-danger underline-offset-4 hover:underline">
                         {t("promo.delete")}
-                      </button>
+                      </Button>
                     </form>
                   )}
                 </span>
