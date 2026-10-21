@@ -7274,7 +7274,12 @@
       "sessions": "{count, plural, =0 {אין שיעורים} one {שיעור אחד} other {# שיעורים}}",
       "booked": "{count, plural, =0 {אין רישומים} one {רישום אחד} other {# רישומים}}",
       "attention": "דורש את תשומת לבך",
-      "full": "מלא"
+      "full": "מלא",
+      "new": "חדש",
+      "newTitle": "יצירה",
+      "search": "חיפוש",
+      "timeline": "היומן של היום",
+      "numbers": "30 הימים האחרונים"
     },
     "clients": {
       "search": "חיפוש",
@@ -7304,7 +7309,32 @@
       "searchHint": "שם, טלפון או אימייל",
       "more": "להציג עוד",
       "noteSaved": "ההערה נשמרה.",
-      "selected": "נבחר"
+      "selected": "נבחר",
+      "tabsLabel": "חלקי כרטיס הלקוח",
+      "tabs": {
+        "overview": "סקירה",
+        "billing": "מנויים ותשלומים",
+        "visits": "ביקורים",
+        "notes": "הערות והודעות",
+        "activity": "פעילות"
+      },
+      "nextSell": "למכור מנוי",
+      "nextRenew": "לחדש את המנוי",
+      "nextRenewHint": "המנוי מסתיים ב-{date}.",
+      "nextSellHint": "אין מנוי פעיל.",
+      "creditsLeft": "{count, plural, one {נשארה כניסה אחת} other {נשארו # כניסות}}",
+      "upcomingCount": "{count, plural, =0 {אין תורים קרובים} one {תור אחד קרוב} other {# תורים קרובים}}",
+      "contact": "יצירת קשר",
+      "activityEmpty": "עוד לא קרה כלום.",
+      "activity": {
+        "visit": "הגיע/ה ל{service}",
+        "booked": "נרשם/ה ל{service}",
+        "no_show": "לא הגיע/ה ל{service}",
+        "cancelled": "ביטל/ה את {service}",
+        "waitlisted": "ממתין/ה ל{service}",
+        "note": "הערה: {text}",
+        "plan": "התחיל מנוי: {plan}"
+      }
     },
     "numbers": {
       "title": "מספרים מרכזיים",
@@ -7608,6 +7638,14 @@
         "invalid_branch": "בחרו סניף של העסק.",
         "generic": "משהו השתבש. נסו שוב."
       }
+    },
+    "search": {
+      "title": "חיפוש",
+      "hint": "שם, טלפון או מייל",
+      "clients": "לקוחות",
+      "leads": "לידים",
+      "none": "אף אחד לא תואם.",
+      "prompt": "כתבו לפחות שתי אותיות כדי לחפש לקוחות ולידים."
     }
   },
   "staffApp": {
