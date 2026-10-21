@@ -5,6 +5,7 @@ import { type ApiClient, createApiClient } from "@business-os/api-client";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { riskPromptUrl } from "@/lib/account-status";
 import { createClient } from "@/lib/supabase/server";
 
 export type { Me, Role, Tenant } from "@business-os/api-client";
@@ -92,16 +93,21 @@ export async function getApi(): Promise<ApiClient> {
   });
 }
 
-/** The API wants a code this session doesn't have (the MyBiz team, a business that requires it),
- * or an owner or manager without a code has not yet confirmed the warning before a sensitive
- * action: off to the account page to turn two-step sign-in on or read the warning. The account page
- * itself is left alone so it can't loop. */
+/** The API wants a code this session doesn't have (the MyBiz team, a business that requires it):
+ * off to the account page to turn two-step sign-in on. An owner or manager without a code who has
+ * not yet confirmed the warning before a sensitive action stays on the same page, where `mfa=ack`
+ * opens the warning window (`MfaRiskGate`); after confirming they repeat the action. The account
+ * page, and a page that already asks, are left alone so nothing can loop. */
 async function sendToTwoStepSetup(response: Response): Promise<void> {
   const body = (await response.clone().json().catch(() => null)) as { detail?: unknown } | null;
   const detail = body?.detail;
   if (detail !== "mfa_required" && detail !== "mfa_risk_ack_required") return;
-  if ((await headers()).get("x-pathname")?.startsWith("/account")) return;
-  redirect(detail === "mfa_required" ? "/account?mfa=required#security" : "/account?mfa=ack#security");
+  const requestHeaders = await headers();
+  const pathname = requestHeaders.get("x-pathname") ?? "";
+  if (pathname.startsWith("/account")) return;
+  if (detail === "mfa_required") redirect("/account?mfa=required#security");
+  const prompt = pathname ? riskPromptUrl(pathname, requestHeaders.get("x-search") ?? "") : "/account?mfa=ack#security";
+  if (prompt) redirect(prompt);
 }
 
 /** Returns the response data, or throws ApiError for any non-2xx response. */

@@ -2,14 +2,16 @@
 
 import { ShieldCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useState } from "react";
 
 import { Field } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { MfaRiskDialog } from "@/components/mfa-risk-dialog";
 import { CODE_LENGTH } from "@/lib/mfa";
 
-import { acknowledgeMfaRisk, confirmEnrollment, type EnrollState, type RemoveState, removeFactor, signOutEverywhere, startEnrollment } from "./security-actions";
+import { confirmEnrollment, type EnrollState, type RemoveState, removeFactor, signOutEverywhere, startEnrollment } from "./security-actions";
 
 export type Factor = { id: string; createdAt: string };
 export type Device = { id: string; label: string; lastSeenAt: string; current: boolean };
@@ -24,7 +26,7 @@ export function SecuritySettings({
 }: {
   factors: Factor[];
   devices: Device[];
-  required: "team" | "business" | "ack" | null;
+  required: "team" | "business" | null;
   /** Owners and managers may work without a code once they confirm the warning (not the MyBiz team). */
   riskOptional: boolean;
   riskAcknowledged: boolean;
@@ -34,13 +36,15 @@ export function SecuritySettings({
   const [enrollment, start] = useActionState<EnrollState>(startEnrollment, {});
   const [confirmed, confirm] = useActionState<EnrollState, FormData>(confirmEnrollment, enrollment);
   const [removal, remove] = useActionState<RemoveState, FormData>(removeFactor, {});
+  const [declining, setDeclining] = useState(false);
+  const router = useRouter();
   const scanning = Boolean(enrollment.factorId) && !confirmed.done;
   const when = (iso: string) => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 
   return (
     <div className="flex flex-col gap-6">
       {required && factors.length === 0 && (
-        <FormError message={t(required === "team" ? "mfa.requiredTeam" : required === "ack" ? "mfa.requiredAck" : "mfa.requiredBusiness")} />
+        <FormError message={t(required === "team" ? "mfa.requiredTeam" : "mfa.requiredBusiness")} />
       )}
       <div className="flex flex-col gap-3">
         <h3 className="flex items-center gap-2 font-medium">
@@ -93,11 +97,21 @@ export function SecuritySettings({
             <h4 className="font-medium">{t("mfa.riskTitle")}</h4>
             <p className="text-sm text-muted">{t("mfa.riskBody")}</p>
             {riskAcknowledged ? (
-              <FormNotice message={t("mfa.riskDone")} />
+              <p className="text-sm font-medium">{t("mfa.riskChosen")}</p>
             ) : (
-              <form action={acknowledgeMfaRisk}>
-                <SubmitButton variant="secondary">{t("mfa.riskConfirm")}</SubmitButton>
-              </form>
+              <button type="button" className="btn-secondary self-start px-4 py-2 text-sm" onClick={() => setDeclining(true)}>
+                {t("mfa.riskDecline")}
+              </button>
+            )}
+            {declining && (
+              <MfaRiskDialog
+                source="settings"
+                onClose={() => setDeclining(false)}
+                onDone={() => {
+                  setDeclining(false);
+                  router.refresh();
+                }}
+              />
             )}
           </div>
         )}

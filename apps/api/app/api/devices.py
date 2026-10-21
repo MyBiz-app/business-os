@@ -1,4 +1,5 @@
-"""The devices a person signs in from: a new one is emailed to them (go-live, GL1)."""
+"""The devices a person signs in from: a new one is emailed to them (go-live, GL1). Also the
+person's two-step sign-in policy and the answers to their account status reminders (W2-1)."""
 
 import datetime as dt
 import hashlib
@@ -15,14 +16,22 @@ from app.api.deps import SessionDep, UserDep
 from app.api.routes import ensure_profile
 from app.core.audit import record_everywhere
 from app.core.config import get_settings
-from app.core.mfa import RISK_VERSION, has_acknowledged_risk, record_risk_acknowledgement
+from app.core.mfa import (
+    RISK_VERSION,
+    RiskSource,
+    has_acknowledged_risk,
+    record_risk_acknowledgement,
+)
 from app.messaging.email import Email, Sender, load_all_messages, sender_from_settings
 
 router = APIRouter(prefix="/me/devices", tags=["account"])
 policy_router = APIRouter(prefix="/me/security", tags=["account"])
+reminders_router = APIRouter(prefix="/me/reminders", tags=["account"])
 logger = logging.getLogger(__name__)
 
 MAX_DEVICES = 20
+# "Remind me in a week" about two-step sign-in.
+MFA_SNOOZE = dt.timedelta(days=7)
 
 
 def get_sender() -> Sender | None:
@@ -59,7 +68,19 @@ class SecurityPolicy(BaseModel):
         description="Deprecated: always false, see mfa_risk_acknowledged"
     )
     mfa_risk_acknowledged: bool = Field(
-        description="The person confirmed they understand the risk of working without a code"
+        description="The person confirmed they understand the risk of working without a code "
+        '(also their answer "I don\'t want two-step sign-in": no more reminders)'
+    )
+    mfa_reminder_snoozed_until: datetime | None = Field(
+        default=None, description='"Remind me in a week": no reminder before this time'
+    )
+
+
+class RiskAcknowledgement(BaseModel):
+    source: RiskSource = Field(
+        default="settings",
+        description="Where the person confirmed: security settings, the \"I don't want two-step "
+        'sign-in" choice, or the window of a refused sensitive action',
     )
 
 
@@ -149,22 +170,60 @@ def security_event(body: SecurityEventBody, user: UserDep, session: SessionDep) 
 
 @policy_router.get("")
 def security_policy(user: UserDep, session: SessionDep) -> SecurityPolicy:
-    """What the apps tell people about two-step sign-in (the banner for owners and managers)."""
+    """What the apps tell people about two-step sign-in (the account status of owners and
+    managers)."""
+    snoozed = session.execute(
+        text("SELECT mfa_reminder_snoozed_until FROM app.users WHERE id = app.current_user_id()")
+    ).scalar_one_or_none()
     return SecurityPolicy(
         mfa_enforced=get_settings().mfa_on,
         mfa_required_from=None,
         mfa_required_now=False,
         mfa_risk_acknowledged=has_acknowledged_risk(session),
+        mfa_reminder_snoozed_until=snoozed,
     )
 
 
 @policy_router.post("/mfa-risk-acknowledgement", status_code=204)
-def acknowledge_mfa_risk(user: UserDep, session: SessionDep, request: Request) -> None:
+def acknowledge_mfa_risk(
+    user: UserDep,
+    session: SessionDep,
+    request: Request,
+    body: RiskAcknowledgement | None = None,
+) -> None:
     """The person read the warning about working without two-step sign-in and understands the
-    risk. Kept with the time and address, and shown in the audit log of their businesses."""
+    risk. Kept with the time, address, browser, version of the text and screen, and shown in the
+    audit log of their businesses. The apps then stop reminding them."""
+    source = body.source if body else "settings"
     ensure_profile(session, user.id, user.email)
-    record_risk_acknowledgement(session, request, user.id)
-    record_everywhere(session, "mfa.risk_acknowledged", version=RISK_VERSION)
+    record_risk_acknowledgement(session, request, user.id, source)
+    record_everywhere(session, "mfa.risk_acknowledged", version=RISK_VERSION, source=source)
+
+
+@reminders_router.post("/mfa/snooze", status_code=204)
+def snooze_mfa_reminder(user: UserDep, session: SessionDep) -> None:
+    """ "Remind me in a week": the account status leaves two-step sign-in out for seven days.
+    Sensitive actions still ask for the code or the confirmed warning."""
+    ensure_profile(session, user.id, user.email)
+    session.execute(
+        text("UPDATE app.users SET mfa_reminder_snoozed_until = :until WHERE id = :id"),
+        {"until": datetime.now(UTC) + MFA_SNOOZE, "id": user.id},
+    )
+
+
+@reminders_router.post("/address/skip", status_code=204)
+def skip_address_reminder(user: UserDep, session: SessionDep) -> None:
+    """The home address is optional: "skip" stops the reminder. It can be filled in at any time
+    in the account settings, and is asked for again only where it is needed (form 101)."""
+    ensure_profile(session, user.id, user.email)
+    session.execute(
+        text("""
+            UPDATE app.users
+            SET address_reminder_skipped_at = coalesce(address_reminder_skipped_at, now())
+            WHERE id = :id
+        """),
+        {"id": user.id},
+    )
 
 
 @router.get("")

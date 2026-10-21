@@ -4,8 +4,10 @@ Supabase puts the assurance level in the access token (`aal1`: password or link,
 authenticator code). The MyBiz team always needs `aal2`. A business can require it of its whole
 team (`tenants.require_mfa_for_staff`). For everyone else it is optional but warned about: an owner
 or manager without a code can do sensitive actions only after confirming they understand the
-risk (`app.mfa_risk_acknowledgements`, one row per version of the warning)."""
+risk (`app.mfa_risk_acknowledgements`, one row per version of the warning). That confirmation is
+also the person's answer "I don't want two-step sign-in": the apps stop reminding them."""
 
+from typing import Literal
 from uuid import UUID
 
 from fastapi import HTTPException, Request, status
@@ -20,8 +22,12 @@ AAL2 = "aal2"
 
 # Raise it (to the date of the change) whenever the text of the warning changes: everyone then
 # confirms again before their next sensitive action.
-RISK_VERSION = "2026-10-18"
+RISK_VERSION = "2026-10-21"
 USER_AGENT_LIMIT = 200
+
+# Where the person confirmed: their security settings, the "I don't want two-step sign-in" choice
+# of the account status, or the window that opens when a sensitive action is refused.
+RiskSource = Literal["settings", "opt_out", "sensitive_action"]
 
 # Seeing ID numbers, pay, the team's roles, provider secrets and settings, personal-data exports.
 SENSITIVE_PERMISSIONS = frozenset(
@@ -75,8 +81,11 @@ def check_sensitive_action(session: Session, aal: str) -> None:
     raise mfa_risk_not_acknowledged()
 
 
-def record_risk_acknowledgement(session: Session, request: Request, user_id: UUID) -> None:
-    """Stores that the person read the warning: when, and from where. Doing it twice is a no-op."""
+def record_risk_acknowledgement(
+    session: Session, request: Request, user_id: UUID, source: RiskSource = "settings"
+) -> None:
+    """Stores that the person read the warning: when, from where and in which screen. Doing it
+    twice is a no-op: the first confirmation of a version is the one kept."""
     settings = get_settings()
     address = client_address(
         request,
@@ -85,8 +94,9 @@ def record_risk_acknowledgement(session: Session, request: Request, user_id: UUI
     )
     session.execute(
         text("""
-            INSERT INTO app.mfa_risk_acknowledgements (user_id, version, ip_address, user_agent)
-            VALUES (:user, :version, :ip, :agent)
+            INSERT INTO app.mfa_risk_acknowledgements
+                (user_id, version, ip_address, user_agent, source)
+            VALUES (:user, :version, :ip, :agent, :source)
             ON CONFLICT DO NOTHING
         """),
         {
@@ -94,5 +104,6 @@ def record_risk_acknowledgement(session: Session, request: Request, user_id: UUI
             "version": RISK_VERSION,
             "ip": address,
             "agent": request.headers.get("user-agent", "")[:USER_AGENT_LIMIT],
+            "source": source,
         },
     )

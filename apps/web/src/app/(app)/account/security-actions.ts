@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { API_URL } from "@/lib/api";
+import { API_URL, getApi } from "@/lib/api";
 import { DEVICE_COOKIE, deviceLabel, isCode } from "@/lib/mfa";
 import { createClient } from "@/lib/supabase/server";
 
@@ -50,18 +50,36 @@ export async function removeFactor(_state: RemoveState, formData: FormData): Pro
   return { done: true };
 }
 
-/** The person read the warning about working without two-step sign-in and understands the risk.
- * The API keeps who, when and from where; until then it refuses the sensitive actions. */
-export async function acknowledgeMfaRisk(): Promise<void> {
-  const { data } = await (await createClient()).auth.getSession();
-  if (!data.session) redirect("/login");
-  const response = await fetch(`${API_URL}/me/security/mfa-risk-acknowledgement`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${data.session.access_token}` },
-    cache: "no-store",
+export type RiskSource = "settings" | "opt_out" | "sensitive_action";
+
+/** The person read the warning about working without two-step sign-in and understands the risk
+ * (also their answer "I don't want two-step sign-in"). The API keeps who, when, from which address
+ * and browser, which version of the text and in which screen; until then it refuses the sensitive
+ * actions, and after it the reminders stop. */
+export async function acknowledgeMfaRisk(source: RiskSource): Promise<{ ok: boolean }> {
+  const api = await getApi();
+  const { response } = await api.POST("/me/security/mfa-risk-acknowledgement", {
+    body: { source },
+    // The person's own browser, for the record (this request comes from the web server).
+    headers: { "User-Agent": (await headers()).get("user-agent") ?? "" },
   });
-  if (!response.ok) throw new Error("mfa_risk_acknowledgement_failed");
+  if (!response.ok) return { ok: false };
   revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+/** "Remind me in a week" about two-step sign-in. */
+export async function snoozeMfaReminder(): Promise<{ ok: boolean }> {
+  const { response } = await (await getApi()).POST("/me/reminders/mfa/snooze");
+  if (response.ok) revalidatePath("/", "layout");
+  return { ok: response.ok };
+}
+
+/** "Skip" the home address: it is optional, and asked for again only where it is needed. */
+export async function skipAddressReminder(): Promise<{ ok: boolean }> {
+  const { response } = await (await getApi()).POST("/me/reminders/address/skip");
+  if (response.ok) revalidatePath("/", "layout");
+  return { ok: response.ok };
 }
 
 /** Lets the businesses the person works for see in their audit log that two-step sign-in was

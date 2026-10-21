@@ -16,6 +16,7 @@ export async function proxy(request: NextRequest) {
   const cspHeader = cspReportOnly() ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
   request.headers.set(NONCE_HEADER, nonce);
   request.headers.set("x-pathname", request.nextUrl.pathname);
+  request.headers.set("x-search", request.nextUrl.search);
   request.headers.set(cspHeader, policy);
 
   const response = await updateSession(request);
