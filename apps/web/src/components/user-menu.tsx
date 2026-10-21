@@ -5,8 +5,10 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useCallback, useId, useRef, useState } from "react";
 
+import { AccountStatusLinks } from "@/components/account-status";
 import { Avatar } from "@/components/avatar";
 import { moveFocus, useDismiss } from "@/components/use-dismiss";
+import type { AccountStatusItem } from "@/lib/account-status";
 
 type Props = {
   id: string;
@@ -14,12 +16,14 @@ type Props = {
   email: string;
   avatar: string | null;
   platform: boolean;
+  /** What is worth completing in the account: a dot on the picture, and a list in the menu. */
+  status?: AccountStatusItem[];
   signOut: () => Promise<void>;
 };
 
-/** The signed-in person: their picture opens their settings, the MyBiz console (for the team)
- * and signing out. */
-export function UserMenu({ id, name, email, avatar, platform, signOut }: Props) {
+/** The signed-in person: their picture opens the account status, their settings, the MyBiz console
+ * (for the team) and signing out. */
+export function UserMenu({ id, name, email, avatar, platform, status = [], signOut }: Props) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
@@ -47,11 +51,19 @@ export function UserMenu({ id, name, email, avatar, platform, signOut }: Props) 
         }}
         className="btn-plain flex items-center gap-2 rounded-full p-0.5 pe-2 transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5"
       >
-        <Avatar id={id} name={name} src={avatar} size="sm" />
+        <span className="relative">
+          <Avatar id={id} name={name} src={avatar} size="sm" />
+          {status.length > 0 && (
+            <span aria-hidden="true" className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-warning ring-2 ring-surface" />
+          )}
+        </span>
         <span dir="auto" className="hidden max-w-36 truncate text-sm font-medium sm:inline">
           {name}
         </span>
-        <span className="sr-only">{t("userMenu.open")}</span>
+        <span className="sr-only">
+          {t("userMenu.open")}
+          {status.length > 0 && `. ${t("accountStatus.dotLabel", { count: status.length })}`}
+        </span>
       </button>
       <div
         id={menuId}
@@ -75,6 +87,7 @@ export function UserMenu({ id, name, email, avatar, platform, signOut }: Props) 
             </span>
           </span>
         </div>
+        <AccountStatusLinks items={status} itemClassName={item} />
         <div className="flex flex-col gap-0.5 p-1.5">
           <Link role="menuitem" href="/account" className={item}>
             <Settings aria-hidden="true" className="size-4 text-muted" />

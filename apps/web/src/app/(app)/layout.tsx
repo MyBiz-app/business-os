@@ -1,12 +1,10 @@
-import { AddressReminder } from "@/components/address-reminder";
 import { ScopedMessages } from "@/components/scoped-messages";
 import { signOut } from "@/app/(auth)/actions";
 import { ActivityGuard } from "@/components/activity-guard";
 import { DeviceCheck } from "@/components/device-check";
 import { IncidentBanner, type BannerItem } from "@/components/incident-banner";
 import { LegalBanner } from "@/components/legal-banner";
-import { NoticeStack } from "@/components/notice-stack";
-import { MfaBanner } from "@/components/mfa-banner";
+import { MfaRiskGate } from "@/components/mfa-risk-gate";
 import { AnnouncementsPopup, type PopupItem } from "@/components/announcements-popup";
 import { AppHeader } from "@/components/app-header";
 import { avatarSrc } from "@/components/avatar";
@@ -17,6 +15,8 @@ import { UserMenu } from "@/components/user-menu";
 import { getApi } from "@/lib/api";
 import { getLocale } from "next-intl/server";
 import { getActiveMembership } from "@/lib/tenant";
+import { getAccountStatus } from "@/lib/account-status-server";
+import { Suspense } from "react";
 
 /** The pop-ups meant for this person; a failure here never blocks the page. */
 async function popups(): Promise<PopupItem[]> {
@@ -58,9 +58,8 @@ async function incidents(): Promise<BannerItem[]> {
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { me } = await getActiveMembership();
-  const [announcements, banners] = await Promise.all([popups(), incidents()]);
+  const [announcements, banners, status] = await Promise.all([popups(), incidents(), getAccountStatus()]);
   const legalPending = me.legal_pending ?? [];
-  const showAddressReminder = me.memberships.length > 0 && !me.address_complete;
 
   return (
     <ScopedMessages scopes={["app"]}>
@@ -75,16 +74,16 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           email={me.email}
           avatar={avatarSrc(me.id, me.avatar_url)}
           platform={me.platform_admin}
+          status={status}
           signOut={signOut}
         />
       </AppHeader>
       <IncidentBanner items={banners} />
-      <NoticeStack count={(legalPending.length > 0 ? 1 : 0) + (showAddressReminder ? 1 : 0)}>
-        <LegalBanner pending={legalPending} />
-        <AddressReminder show={showAddressReminder} />
-      </NoticeStack>
-      <MfaBanner memberships={me.memberships.map((m) => m.role)} platform={me.platform_admin} />
+      <LegalBanner pending={legalPending} />
       {children}
+      <Suspense fallback={null}>
+        <MfaRiskGate />
+      </Suspense>
       <ActivityGuard />
       <DeviceCheck />
       {announcements.length > 0 && <AnnouncementsPopup items={announcements} />}

@@ -1,6 +1,7 @@
 """Two-step sign-in (GL1): the assurance level in the token, the gates, and new-device emails."""
 
 from collections.abc import Callable, Iterator
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import pytest
@@ -123,6 +124,56 @@ def test_the_confirmation_is_in_the_audit_log(
     log = client.get("/audit-log", headers=headers)
     assert log.status_code == 200, log.text
     assert "mfa.risk_acknowledged" in [entry["action"] for entry in log.json()["entries"]]
+
+
+def test_the_confirmation_keeps_where_it_was_given(
+    client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine, mfa_on: None
+) -> None:
+    owner_id = client.get("/me", headers=studio["headers"]).json()["id"]
+    headers = auth(owner_id, studio["tenant_id"], aal="aal1")
+    path = "/me/security/mfa-risk-acknowledgement"
+    assert client.post(path, json={"source": "anywhere"}, headers=headers).status_code == 422
+    assert client.post(path, json={"source": "opt_out"}, headers=headers).status_code == 204
+    # A second confirmation of the same version keeps the first one.
+    again = client.post(path, json={"source": "sensitive_action"}, headers=headers)
+    assert again.status_code == 204
+    with engine.connect() as connection:
+        rows = connection.execute(
+            text("""
+                SELECT version, source, user_agent FROM app.mfa_risk_acknowledgements
+                WHERE user_id = :user
+            """),
+            {"user": owner_id},
+        ).all()
+    assert [(row.version, row.source) for row in rows] == [(RISK_VERSION, "opt_out")]
+    log = client.get("/audit-log", headers=headers).json()["entries"]
+    confirmed = [entry for entry in log if entry["action"] == "mfa.risk_acknowledged"]
+    assert confirmed and confirmed[0]["details"]["source"] in {"opt_out", "sensitive_action"}
+
+
+def test_remind_me_in_a_week_does_not_open_sensitive_actions(
+    client: TestClient, studio: dict, auth: AuthHeaders, mfa_on: None
+) -> None:
+    owner_id = client.get("/me", headers=studio["headers"]).json()["id"]
+    headers = auth(owner_id, studio["tenant_id"], aal="aal1")
+    assert client.get("/me/security", headers=headers).json()["mfa_reminder_snoozed_until"] is None
+    assert client.post("/me/reminders/mfa/snooze", headers=headers).status_code == 204
+    policy = client.get("/me/security", headers=headers).json()
+    until = datetime.fromisoformat(policy["mfa_reminder_snoozed_until"])
+    assert timedelta(days=6, hours=23) < until - datetime.now(UTC) <= timedelta(days=7)
+    assert policy["mfa_risk_acknowledged"] is False
+    body = {"cancellation_window_minutes": 60}
+    refused = client.patch("/tenants/current", json=body, headers=headers)
+    assert refused.status_code == 403 and refused.json()["detail"] == "mfa_risk_ack_required"
+
+
+def test_the_home_address_reminder_can_be_skipped(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    me = client.get("/me", headers=headers).json()
+    assert me["address_complete"] is False and me["address_reminder_skipped"] is False
+    assert client.post("/me/reminders/address/skip", headers=headers).status_code == 204
+    assert client.post("/me/reminders/address/skip", headers=headers).status_code == 204
+    assert client.get("/me", headers=headers).json()["address_reminder_skipped"] is True
 
 
 def test_demo_exemption_is_staging_only_and_by_email() -> None:

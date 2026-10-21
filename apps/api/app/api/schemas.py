@@ -74,6 +74,9 @@ class Me(BaseModel):
     address_complete: bool = Field(
         default=False, description="City, street and house number are all filled in"
     )
+    address_reminder_skipped: bool = Field(
+        default=False, description="The person chose to skip the home address reminder"
+    )
     email_roster: bool = Field(
         default=True, description="Email the person when their roster is published"
     )
