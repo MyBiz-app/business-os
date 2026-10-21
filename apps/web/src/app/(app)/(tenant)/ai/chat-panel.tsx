@@ -12,6 +12,7 @@ import { AgentAvatar } from "./agent-avatar";
 import { describeSchedule, type Schedule } from "./describe-schedule";
 import { type Branch, ScopePicker } from "./scope-picker";
 import type { Agent } from "./types";
+import { Button, IconButton } from "@/components/ui/button";
 
 type PendingAction = Conversation["turns"][number]["pending_actions"][number];
 
@@ -132,12 +133,12 @@ export function ActionCard({ action, onDecide }: { action: PendingAction; onDeci
       {preview.full && <p className="text-sm text-muted">{t("fullWaitlist")}</p>}
       {action.status === "pending" ? (
         <div className="flex gap-2">
-          <button type="button" onClick={() => onDecide(action.id, "confirm")} className="btn-primary px-3 py-1.5 text-sm">
+          <Button variant="primary" type="button" onClick={() => onDecide(action.id, "confirm")}>
             {t("confirm")}
-          </button>
-          <button type="button" onClick={() => onDecide(action.id, "reject")} className="btn-secondary px-3 py-1.5 text-sm font-medium">
+          </Button>
+          <Button type="button" onClick={() => onDecide(action.id, "reject")} className="font-medium">
             {t("reject")}
-          </button>
+          </Button>
         </div>
       ) : (
         <p role="status" className={`text-sm font-medium ${STATUS_TONE[action.status]}`}>
@@ -200,9 +201,9 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
   return (
     <section aria-label={t("chatWith", { name: agent.name })} className="ai-panel-in flex min-h-[32rem] min-w-0 flex-1 flex-col overflow-hidden rounded-3xl border border-border bg-surface">
       <header className="flex flex-wrap items-center gap-3 border-b border-border p-3 sm:p-4">
-        <button type="button" onClick={onBack} className="btn-secondary p-2 lg:hidden" aria-label={t("backToTeam")}>
+        <IconButton variant="secondary" onClick={onBack} className="lg:hidden" label={t("backToTeam")}>
           <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
-        </button>
+        </IconButton>
         <AgentAvatar agent={agent} className="size-12 shrink-0" />
         <div className="min-w-0 flex-1">
           <h2 className="truncate font-semibold" dir="auto">
@@ -214,10 +215,10 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
         </div>
         <ScopePicker branches={branches} value={scope} onChange={onScope} />
         {onEdit && (
-          <button type="button" onClick={onEdit} className="btn-secondary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
+          <Button type="button" onClick={onEdit} className="gap-2">
             <Settings aria-hidden="true" className="size-4" />
             <span className="sr-only sm:not-sr-only">{t("edit.open")}</span>
-          </button>
+          </Button>
         )}
         <details className="relative">
           <summary className="btn-secondary inline-flex cursor-pointer list-none items-center gap-2 px-3 py-1.5 text-sm [&::-webkit-details-marker]:hidden">
@@ -228,38 +229,38 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
             {history.length === 0 && <li className="px-2 py-1.5 text-sm text-muted">{t("noHistory")}</li>}
             {history.map((item) => (
               <li key={item.id}>
-                <button type="button" onClick={() => onOpen(item.id)} aria-current={item.id === conversation?.id ? "true" : undefined} className={`btn-plain flex w-full flex-col rounded-lg px-2 py-1.5 text-start text-sm hover:bg-surface ${item.id === conversation?.id ? "bg-surface font-medium" : ""}`}>
+                <Button variant="plain" type="button" onClick={() => onOpen(item.id)} aria-current={item.id === conversation?.id ? "true" : undefined} className={`flex w-full flex-col rounded-lg px-2 py-1.5 text-start text-sm hover:bg-surface ${item.id === conversation?.id ? "bg-surface font-medium" : ""}`}>
                   <span className="truncate" dir="auto">
                     {item.title || tAssistant("untitled")}
                   </span>
                   <span className="text-xs text-muted">{when.format(new Date(item.updated_at))}</span>
-                </button>
+                </Button>
               </li>
             ))}
           </ul>
         </details>
-        <button type="button" onClick={onNew} className="btn-secondary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
+        <Button type="button" onClick={onNew} className="gap-2">
           <Plus aria-hidden="true" className="size-4" />
           <span className="sr-only sm:not-sr-only">{t("newChat")}</span>
-        </button>
+        </Button>
       </header>
 
       <nav aria-label={t("switchAgent")} className="flex gap-2 overflow-x-auto border-b border-border px-3 py-2">
         {agents
           .filter((a) => a.state === "active")
           .map((other) => (
-            <button
+            <Button variant="plain"
               key={other.key}
               type="button"
               onClick={() => onSwitch(other)}
               aria-current={other.key === agent.key ? "true" : undefined}
               aria-label={`${other.name}, ${other.role_title}`}
               title={`${other.name} · ${other.role_title}`}
-              className={`btn-plain shrink-0 rounded-full p-0.5 transition ${other.key === agent.key ? "" : "opacity-60 hover:opacity-100"}`}
+              className={`shrink-0 rounded-full p-0.5 transition ${other.key === agent.key ? "" : "opacity-60 hover:opacity-100"}`}
               style={{ boxShadow: other.key === agent.key ? `0 0 0 2px ${other.color}` : undefined }}
             >
               <AgentAvatar agent={other} className="size-8" />
-            </button>
+            </Button>
           ))}
       </nav>
 
@@ -296,14 +297,14 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
                       <ActionCard key={action.id} action={action} onDecide={onDecide} />
                     ))}
                     {turn.suggestions.map((suggestion) => (
-                      <button key={suggestion.agent_key} type="button" onClick={() => onHandoff(suggestion.agent_key)} className="btn-plain flex flex-col items-start gap-1 rounded-xl border border-primary/40 bg-background p-3 text-start text-sm hover:bg-surface">
+                      <Button variant="plain" key={suggestion.agent_key} type="button" onClick={() => onHandoff(suggestion.agent_key)} className="flex flex-col items-start gap-1 rounded-xl border border-primary/40 bg-background p-3 text-start text-sm hover:bg-surface">
                         <span className="font-medium" dir="auto">
                           {t("handoff", { name: nameOf(suggestion.agent_key) })}
                         </span>
                         <span className="text-muted" dir="auto">
                           {suggestion.reason}
                         </span>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -338,9 +339,9 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
         {suggestions.length > 0 && enabled && (
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
-              <button key={suggestion} type="button" onClick={() => submit(suggestion)} className="btn-plain rounded-full border border-border bg-background px-3 py-1.5 text-sm hover:bg-surface" dir="auto">
+              <Button variant="plain" key={suggestion} type="button" onClick={() => submit(suggestion)} dir="auto" className="rounded-full border border-border bg-background px-3 py-1.5 text-sm hover:bg-surface">
                 {suggestion}
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -371,9 +372,9 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
             className="min-h-[3rem] flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2"
             dir="auto"
           />
-          <button type="submit" disabled={busy || !enabled || !text.trim()} className="btn-primary p-3 disabled:opacity-50" aria-label={tAssistant("send")}>
+          <IconButton variant="primary" type="submit" disabled={busy || !enabled || !text.trim()} label={tAssistant("send")}>
             <SendHorizontal aria-hidden="true" className="size-5 rtl:-scale-x-100" />
-          </button>
+          </IconButton>
         </form>
       </div>
     </section>

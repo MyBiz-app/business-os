@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { Metadata } from "next";
 import { BRAND } from "@business-os/i18n/brand";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -7,7 +8,6 @@ import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { getPlatformFor } from "@/lib/platform";
@@ -62,26 +62,16 @@ export default async function PlatformEmailPage() {
         {board.recent.length === 0 ? (
           <EmptyState variant="list">{t("empty")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="email-recent" className="card">
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("address")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("reason")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("when")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {board.recent.map((row, index) => (
-                  <tr key={`${row.address}-${index}`} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3" dir="ltr">{row.address}</td>
-                    <td className="px-4 py-3"><Pill tone={row.reason === "complained" ? "danger" : "warning"}>{t(`reasons.${row.reason}`)}</Pill></td>
-                    <td className="px-4 py-3">{formatDay(row.created_at, locale, { day: "numeric", month: "numeric", year: "numeric" })}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="email-recent"
+            rows={board.recent}
+            rowKey={(row, index) => `${row.address}-${index}`}
+            columns={[
+              { key: "address", header: t("address"), cell: (row) => <bdi dir="ltr">{row.address}</bdi> },
+              { key: "reason", header: t("reason"), cell: (row) => <Pill tone={row.reason === "complained" ? "danger" : "warning"}>{t(`reasons.${row.reason}`)}</Pill> },
+              { key: "when", header: t("when"), cell: (row) => formatDay(row.created_at, locale, { day: "numeric", month: "numeric", year: "numeric" }) },
+            ]}
+          />
         )}
       </section>
     </Container>

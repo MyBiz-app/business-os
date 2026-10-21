@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { Metadata } from "next";
 import { BRAND } from "@business-os/i18n/brand";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -7,7 +8,6 @@ import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatform } from "@/lib/platform";
 import { StatTile } from "@/components/ui/stat-tile";
@@ -64,41 +64,35 @@ export default async function PlatformSecurityPage() {
         {owners.rows.length === 0 ? (
           <EmptyState variant="list">{t("ownersEmpty")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="security-owners" className="card">
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("owner")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("business")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("protection")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {owners.rows.map((row) => (
-                  <tr key={`${row.business_id}-${row.email}`} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3" dir="ltr">{row.email}</td>
-                    <td className="px-4 py-3" dir="auto">{row.business_name}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {row.mfa_enrolled === null ? (
-                          <Pill tone="muted">{t("unknown")}</Pill>
-                        ) : row.mfa_enrolled ? (
-                          <Pill tone="success">{t("on")}</Pill>
-                        ) : (
-                          <Pill tone={row.risk_acknowledged_at ? "warning" : "danger"}>{t("off")}</Pill>
-                        )}
-                        {row.mfa_enrolled ? null : (
-                          <span className="text-xs text-muted">
-                            {row.risk_acknowledged_at ? t("confirmed", { date: day.format(new Date(row.risk_acknowledged_at)) }) : t("notConfirmed")}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="security-owners"
+            rows={owners.rows}
+            rowKey={(row) => `${row.business_id}-${row.email}`}
+            columns={[
+              { key: "owner", header: t("owner"), cell: (row) => <bdi dir="ltr">{row.email}</bdi> },
+              { key: "business", header: t("business"), cell: (row) => <span dir="auto">{row.business_name}</span> },
+              {
+                key: "protection",
+                header: t("protection"),
+                cell: (row) => (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {row.mfa_enrolled === null ? (
+                      <Pill tone="muted">{t("unknown")}</Pill>
+                    ) : row.mfa_enrolled ? (
+                      <Pill tone="success">{t("on")}</Pill>
+                    ) : (
+                      <Pill tone={row.risk_acknowledged_at ? "warning" : "danger"}>{t("off")}</Pill>
+                    )}
+                    {row.mfa_enrolled ? null : (
+                      <span className="text-xs text-muted">
+                        {row.risk_acknowledged_at ? t("confirmed", { date: day.format(new Date(row.risk_acknowledged_at)) }) : t("notConfirmed")}
+                      </span>
+                    )}
+                  </div>
+                ),
+              },
+            ]}
+          />
         )}
       </section>
 
@@ -108,30 +102,18 @@ export default async function PlatformSecurityPage() {
         {visits.visits.length === 0 ? (
           <EmptyState variant="list">{t("visitsEmpty")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="security-visits" className="card">
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("member")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("business")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("views")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("changes")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("lastVisit")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visits.visits.map((row) => (
-                  <tr key={`${row.business_id}-${row.actor_email}`} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3" dir="ltr">{row.actor_email}</td>
-                    <td className="px-4 py-3" dir="auto">{row.business_name}</td>
-                    <td className="px-4 py-3 text-end tabular-nums">{number.format(row.views)}</td>
-                    <td className="px-4 py-3 text-end tabular-nums">{number.format(row.changes)}</td>
-                    <td className="px-4 py-3">{stamp.format(new Date(row.last_at))}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="security-visits"
+            rows={visits.visits}
+            rowKey={(row) => `${row.business_id}-${row.actor_email}`}
+            columns={[
+              { key: "member", header: t("member"), cell: (row) => <bdi dir="ltr">{row.actor_email}</bdi> },
+              { key: "business", header: t("business"), cell: (row) => <span dir="auto">{row.business_name}</span> },
+              { key: "views", header: t("views"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.views) },
+              { key: "changes", header: t("changes"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.changes) },
+              { key: "lastVisit", header: t("lastVisit"), cell: (row) => stamp.format(new Date(row.last_at)) },
+            ]}
+          />
         )}
       </section>
 

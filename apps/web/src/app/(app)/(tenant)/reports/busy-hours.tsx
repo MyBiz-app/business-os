@@ -1,6 +1,8 @@
 import type { components } from "@business-os/api-client";
 import { getTranslations } from "next-intl/server";
 
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader } from "@/components/ui/card";
 import { ScrollRegion } from "@/components/scroll-region";
 import { addDays, formatDay } from "@/lib/dates";
 
@@ -28,16 +30,14 @@ export async function BusyHours({ rows, locale }: { rows: Row[]; locale: string 
   const [busyDay, busyHour] = busiest.key.split("-").map(Number);
 
   return (
-    <section aria-labelledby="busy-heading" className="flex flex-col gap-4 card p-6">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <h2 id="busy-heading" className="text-lg font-semibold">
-            {t("bySlot")}
-          </h2>
-          <p className="text-sm text-muted">{t("heatmap.hint")}</p>
-        </div>
-        <p className="text-sm font-medium">{t("heatmap.busiest", { slot: `${dayName(busyDay, "long")} ${hourLabel(busyHour)}` })}</p>
-      </div>
+    <Card as="section" aria-labelledby="busy-heading" className="flex flex-col gap-4">
+      <CardHeader
+        titleId="busy-heading"
+        title={t("bySlot")}
+        description={t("heatmap.hint")}
+        actions={<Badge tone="primary">{t("heatmap.busiest", { slot: `${dayName(busyDay, "long")} ${hourLabel(busyHour)}` })}</Badge>}
+        className="mb-0"
+      />
       <ScrollRegion labelledBy="busy-heading">
         <table data-plain className="w-full border-separate border-spacing-1 text-xs">
           <thead>
@@ -82,6 +82,6 @@ export async function BusyHours({ rows, locale }: { rows: Row[]; locale: string 
         ))}
         {t("heatmap.more")}
       </div>
-    </section>
+    </Card>
   );
 }

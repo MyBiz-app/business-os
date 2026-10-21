@@ -10,6 +10,7 @@ import { isolate } from "@/lib/bidi";
 import { describeSchedule, type Schedule, weekdayNames } from "./describe-schedule";
 import { deleteTask, runTaskNow, type TaskBoard, type TaskCard, type TaskResult, type TaskRun, taskRuns, updateTask } from "./tasks-actions";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { Button } from "@/components/ui/button";
 
 type Translate = ReturnType<typeof useTranslations<"aiTeam">>;
 
@@ -125,38 +126,36 @@ function TaskRow({ task, agentName, when }: { task: TaskCard; agentName: string;
       )}
       <div className="flex flex-wrap gap-2">
         {live && (
-          <button type="button" disabled={pending} onClick={() => act(() => updateTask(task.id, { status: task.status === "active" ? "paused" : "active" }))} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
+          <Button type="button" disabled={pending} onClick={() => act(() => updateTask(task.id, { status: task.status === "active" ? "paused" : "active" }))} className="gap-1.5">
             {task.status === "active" ? <Pause aria-hidden="true" className="size-4" /> : <Play aria-hidden="true" className="size-4" />}
             {task.status === "active" ? t("tasks.pause") : t("tasks.resume")}
-          </button>
+          </Button>
         )}
         {live && task.mine && (
           <>
-            <button type="button" disabled={pending} onClick={() => act(() => runTaskNow(task.id))} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
+            <Button type="button" disabled={pending} onClick={() => act(() => runTaskNow(task.id))} className="gap-1.5">
               <Zap aria-hidden="true" className="size-4" />
               {pending ? t("tasks.running") : t("tasks.runNow")}
-            </button>
-            <button type="button" onClick={() => setEditing(!editing)} aria-expanded={editing} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
+            </Button>
+            <Button type="button" onClick={() => setEditing(!editing)} aria-expanded={editing} className="gap-1.5">
               <Pencil aria-hidden="true" className="size-4" />
               {t("tasks.edit")}
-            </button>
+            </Button>
           </>
         )}
-        <button
+        <Button variant="quiet"
           type="button"
           disabled={pending}
           onClick={async () => {
             if (await confirm({ message: t("tasks.confirmDelete"), confirmLabel: t("tasks.delete"), danger: true })) act(() => deleteTask(task.id));
-          }}
-          className="btn-ghost inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-danger"
-        >
+          }} className="gap-1.5 text-danger">
           <Trash2 aria-hidden="true" className="size-4" />
           {t("tasks.delete")}
-        </button>
-        <button type="button" onClick={toggleHistory} aria-expanded={runs !== null} className="btn-ghost ms-auto inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
+        </Button>
+        <Button variant="quiet" type="button" onClick={toggleHistory} aria-expanded={runs !== null} className="ms-auto gap-1.5">
           {runs !== null ? <ChevronUp aria-hidden="true" className="size-4" /> : <ChevronDown aria-hidden="true" className="size-4" />}
           {runs !== null ? t("tasks.hideHistory") : t("tasks.history")}
-        </button>
+        </Button>
       </div>
       {editing && <EditForm task={task} onDone={() => setEditing(false)} act={act} />}
       {runs !== null && <History runs={runs} when={when} />}
@@ -227,12 +226,12 @@ function EditForm({ task, onDone, act }: { task: TaskCard; onDone: () => void; a
         </fieldset>
       )}
       <div className="flex gap-2">
-        <button type="submit" className="btn-primary px-3 py-1.5 text-sm">
+        <Button variant="primary" type="submit">
           {t("tasks.form.save")}
-        </button>
-        <button type="button" onClick={onDone} className="btn-secondary px-3 py-1.5 text-sm">
+        </Button>
+        <Button type="button" onClick={onDone}>
           {t("tasks.form.cancel")}
-        </button>
+        </Button>
       </div>
     </form>
   );

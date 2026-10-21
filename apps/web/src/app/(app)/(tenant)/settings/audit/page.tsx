@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { Metadata } from "next";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -6,7 +7,6 @@ import { BRAND } from "@business-os/i18n/brand";
 
 import { EmptyState } from "@/components/empty-state";
 import { TopicHeader } from "../topic-header";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
 
@@ -99,33 +99,28 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/setting
       {page.entries.length === 0 ? (
         <EmptyState variant="list">{t("empty")}</EmptyState>
       ) : (
-        <ScrollRegion label={t("title")} className="rounded-2xl border border-border">
-          <table className="w-full text-sm">
-            <thead className="bg-surface text-muted">
-              <tr>
-                {(["when", "who", "kind", "action", "details"] as const).map((key) => (
-                  <th key={key} scope="col" className="px-4 py-3 text-start font-medium">
-                    {t(key)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {page.entries.map((entry) => (
-                <tr key={entry.id} className="border-t border-border align-top">
-                  <td className="whitespace-nowrap px-4 py-2.5">{when.format(new Date(entry.occurred_at))}</td>
-                  <td className="px-4 py-2.5" dir="auto">
-                    {entry.actor_name || entry.actor_email || t("system")}
-                    {entry.actor_type === "platform" && <span className="ms-2 text-xs text-muted">{t("mybizTeam")}</span>}
-                  </td>
-                  <td className="px-4 py-2.5">{t(`categories.${entry.category as Category}`)}</td>
-                  <td className="px-4 py-2.5 font-medium">{label(entry.action)}</td>
-                  <td className="px-4 py-2.5 text-muted" dir="auto">{detail(entry.details)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+        <DataTable
+          label={t("title")}
+          rows={page.entries}
+          rowKey={(entry) => entry.id}
+          rowClassName={() => "align-top"}
+          columns={[
+            { key: "when", header: t("when"), nowrap: true, cell: (entry) => when.format(new Date(entry.occurred_at)) },
+            {
+              key: "who",
+              header: t("who"),
+              cell: (entry) => (
+                <span dir="auto">
+                  {entry.actor_name || entry.actor_email || t("system")}
+                  {entry.actor_type === "platform" && <span className="ms-2 text-xs text-muted">{t("mybizTeam")}</span>}
+                </span>
+              ),
+            },
+            { key: "kind", header: t("kind"), cell: (entry) => t(`categories.${entry.category as Category}`) },
+            { key: "action", header: t("action"), className: "font-medium", cell: (entry) => label(entry.action) },
+            { key: "details", header: t("details"), className: "text-muted", cell: (entry) => <span dir="auto">{detail(entry.details)}</span> },
+          ]}
+        />
       )}
       <nav aria-label={t("title")} className="flex items-center justify-between text-sm">
         {cursor ? <Link scroll={false} href={`/settings/audit${params.size ? `?${params}` : ""}`} className="text-primary-ink">{t("newest")}</Link> : <span />}

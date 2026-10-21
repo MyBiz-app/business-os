@@ -3,6 +3,7 @@
 import { Building2, Check, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export type Branch = { id: string; name: string };
 
@@ -52,23 +53,23 @@ export function ScopePicker({ branches, value, onChange }: { branches: Branch[];
   const close = () => popover.current?.hidePopover();
   return (
     <>
-      <button ref={trigger} type="button" popoverTarget={id} className="btn-secondary inline-flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm" aria-label={t("scope.label")} aria-haspopup="true" aria-expanded={open}>
+      <Button ref={trigger} type="button" popoverTarget={id} aria-label={t("scope.label")} aria-haspopup="true" aria-expanded={open} className="cursor-pointer gap-2">
         <Building2 aria-hidden="true" className="size-4" />
         <span className="max-w-[10rem] truncate" dir="auto">
           {label}
         </span>
         <ChevronDown aria-hidden="true" className="size-3.5 text-muted" />
-      </button>
+      </Button>
       <div ref={popover} id={id} popover="auto" onToggle={(e) => {
           const isOpen = (e as unknown as ToggleEvent).newState === "open";
           setOpen(isOpen);
           if (isOpen) place();
         }} role="group" aria-label={t("scope.label")} className="scope-popover m-0 flex w-64 flex-col gap-1 rounded-2xl border border-border bg-background p-2 text-foreground shadow-lg">
         <p className="px-2 pt-1 text-xs text-muted">{t("scope.hint")}</p>
-        <button type="button" onClick={() => onChange(null)} aria-pressed={value === null} className="btn-plain flex items-center justify-between rounded-lg px-2 py-1.5 text-start text-sm font-medium hover:bg-surface">
+        <Button variant="plain" type="button" onClick={() => onChange(null)} aria-pressed={value === null} className="flex items-center justify-between rounded-lg px-2 py-1.5 text-start text-sm font-medium hover:bg-surface">
           {t("scope.all")}
           {value === null && <Check aria-hidden="true" className="size-4 text-primary-ink" />}
-        </button>
+        </Button>
         <ul className="max-h-60 overflow-y-auto" aria-label={t("scope.branches")}>
           {branches.map((branch) => (
             <li key={branch.id}>
@@ -81,9 +82,9 @@ export function ScopePicker({ branches, value, onChange }: { branches: Branch[];
             </li>
           ))}
         </ul>
-        <button type="button" onClick={close} className="btn-primary mt-1 px-3 py-1.5 text-sm">
+        <Button variant="primary" type="button" onClick={close} className="mt-1">
           {t("scope.done")}
-        </button>
+        </Button>
       </div>
     </>
   );

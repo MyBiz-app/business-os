@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { Metadata } from "next";
 import { BRAND } from "@business-os/i18n/brand";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -5,7 +6,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { getPlatform } from "@/lib/platform";
@@ -76,54 +76,60 @@ export default async function PlatformCatalogPage() {
 
       <section aria-labelledby="catalog-core" className="flex flex-col gap-4">
         <h2 id="catalog-core" className="text-lg font-semibold">{t("core")}</h2>
-        <ScrollRegion labelledBy="catalog-core" className="card">
-          <table className="w-full text-sm">
-            <thead className="text-muted">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("tier")}</th>
-                {CURRENCIES.map((c) => (
-                  <th key={c} scope="col" className="px-4 py-3 text-end font-medium">{c}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {catalog.core.map((tier, index) => (
-                <tr key={index} className="border-b border-border last:border-0">
-                  <th scope="row" className="px-4 py-3 text-start font-medium">
-                    {tier.up_to_clients === null ? t("tierOver", { count: number.format(catalog.core[index - 1]?.up_to_clients ?? 0) }) : t("tierUpTo", { count: number.format(tier.up_to_clients) })}
-                  </th>
-                  {CURRENCIES.map((c) => (
-                    <td key={c} className="px-4 py-3 text-end tabular-nums" dir="ltr">{money(tier.prices, c)}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+        <DataTable
+          labelledBy="catalog-core"
+          rows={catalog.core}
+          rowKey={(_, index) => index}
+          columns={[
+            {
+              key: "tier",
+              header: t("tier"),
+              rowHeader: true,
+              cell: (tier) => {
+                const index = catalog.core.indexOf(tier);
+                return tier.up_to_clients === null
+                  ? t("tierOver", { count: number.format(catalog.core[index - 1]?.up_to_clients ?? 0) })
+                  : t("tierUpTo", { count: number.format(tier.up_to_clients) });
+              },
+            },
+            ...CURRENCIES.map((c) => ({
+              key: c,
+              header: c,
+              align: "end" as const,
+              className: "tabular-nums",
+              cell: (tier: (typeof catalog.core)[number]) => <bdi dir="ltr">{money(tier.prices, c)}</bdi>,
+            })),
+          ]}
+        />
       </section>
 
       <section aria-labelledby="catalog-modules" className="flex flex-col gap-4">
         <h2 id="catalog-modules" className="text-lg font-semibold">{t("modules")}</h2>
         <p className="text-sm text-muted">{t("placeholder")}</p>
-        <ScrollRegion labelledBy="catalog-modules" className="card">
-          <table className="w-full text-sm">
-            <thead className="text-muted">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("module")}</th>
-                {CURRENCIES.map((c) => (
-                  <th key={c} scope="col" className="px-4 py-3 text-end font-medium">{c}</th>
-                ))}
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("notes")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {catalog.modules.map((module) => {
+        <DataTable
+          labelledBy="catalog-modules"
+          rows={catalog.modules}
+          rowKey={(module) => module.key}
+          columns={[
+            { key: "module", header: t("module"), rowHeader: true, cell: (module) => tRoot(`modules.names.${module.key as "client_app"}`) },
+            ...CURRENCIES.map((c) => ({
+              key: c,
+              header: c,
+              align: "end" as const,
+              className: "tabular-nums",
+              cell: (module: (typeof catalog.modules)[number]) => <bdi dir="ltr">{money(module.prices, c)}</bdi>,
+            })),
+            {
+              key: "notes",
+              header: t("notes"),
+              className: "text-xs text-muted",
+              cell: (module) => {
                 const name = (key: string) => tRoot(`modules.names.${key as "client_app"}`);
                 const needs = [
                   ...module.requires_all.map(name),
                   ...(module.requires_any.length ? [module.requires_any.map(name).join(` ${t("or")} `)] : []),
                 ];
-                const notes = [
+                return [
                   module.billing === "once" ? t("once") : null,
                   module.per_unit ? t("perUnit") : null,
                   module.group ? t("oneOf", { group: module.group }) : null,
@@ -131,20 +137,13 @@ export default async function PlatformCatalogPage() {
                   module.ai_credits_included ? t("credits", { count: number.format(module.ai_credits_included) }) : null,
                   module.ai_users_included ? t("users", { count: module.ai_users_included }) : null,
                   needs.length ? t("needs", { list: needs.join(", ") }) : null,
-                ].filter(Boolean);
-                return (
-                  <tr key={module.key} className="border-b border-border last:border-0">
-                    <th scope="row" className="px-4 py-3 text-start font-medium">{name(module.key)}</th>
-                    {CURRENCIES.map((c) => (
-                      <td key={c} className="px-4 py-3 text-end tabular-nums" dir="ltr">{money(module.prices, c)}</td>
-                    ))}
-                    <td className="px-4 py-3 text-xs text-muted">{notes.join(" · ")}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </ScrollRegion>
+                ]
+                  .filter(Boolean)
+                  .join(" · ");
+              },
+            },
+          ]}
+        />
       </section>
     </Container>
   );

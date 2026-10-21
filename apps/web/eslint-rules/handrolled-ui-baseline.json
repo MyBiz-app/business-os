@@ -8,54 +8,6 @@
   "src/app/(app)/(tenant)/ai-bubble/ai-bubble.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/ai/agent-dialog.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/agent-editor.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/agent-fields.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/agent-wizard.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/ai-tour.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/chat-panel.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/proactive-settings.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/scope-picker.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/structure-panel.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/tasks-board.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/team-list.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/team-map.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/team-view.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/ai/usage-meter.tsx": [
-    "button"
-  ],
-  "src/app/(app)/(tenant)/bills/run-form.tsx": [
-    "table"
-  ],
-  "src/app/(app)/(tenant)/clients/page.tsx": [
-    "table"
-  ],
   "src/app/(app)/(tenant)/content/heatmap.tsx": [
     "table"
   ],
@@ -98,30 +50,17 @@
   "src/app/(app)/(tenant)/receipts/[id]/receipt-body.tsx": [
     "table"
   ],
-  "src/app/(app)/(tenant)/reports/branch-link.tsx": [
-    "button"
-  ],
   "src/app/(app)/(tenant)/reports/busy-hours.tsx": [
-    "table"
-  ],
-  "src/app/(app)/(tenant)/reports/page.tsx": [
     "table"
   ],
   "src/app/(app)/(tenant)/resources/page.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/sales/orders/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/(tenant)/sales/page.tsx": [
-    "table"
-  ],
   "src/app/(app)/(tenant)/settings/ai-connections/page.tsx": [
     "button"
   ],
   "src/app/(app)/(tenant)/settings/audit/page.tsx": [
-    "button",
-    "table"
+    "button"
   ],
   "src/app/(app)/(tenant)/settings/billing/ai-users.tsx": [
     "button"
@@ -133,8 +72,7 @@
     "table"
   ],
   "src/app/(app)/(tenant)/settings/billing/page.tsx": [
-    "button",
-    "table"
+    "button"
   ],
   "src/app/(app)/(tenant)/settings/branding/branding-editor.tsx": [
     "button"
@@ -151,13 +89,7 @@
   "src/app/(app)/(tenant)/settings/support-section.tsx": [
     "button"
   ],
-  "src/app/(app)/(tenant)/team/payroll/annual/page.tsx": [
-    "table"
-  ],
   "src/app/(app)/(tenant)/team/shifts/shift-board.tsx": [
-    "table"
-  ],
-  "src/app/(app)/(tenant)/team/time-clock/page.tsx": [
     "table"
   ],
   "src/app/(app)/account/profile-form.tsx": [
@@ -174,48 +106,6 @@
   ],
   "src/app/(app)/onboarding/onboarding-form.tsx": [
     "button"
-  ],
-  "src/app/(app)/platform/ai/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/ai/reports.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/audit/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/billing/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/businesses/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/catalog/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/churn/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/email/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/growth/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/health/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/legal/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/metrics/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/security/page.tsx": [
-    "table"
-  ],
-  "src/app/(app)/platform/trials/page.tsx": [
-    "table"
   ],
   "src/app/(app)/suspended/page.tsx": [
     "button"

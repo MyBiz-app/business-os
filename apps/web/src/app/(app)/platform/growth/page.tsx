@@ -1,9 +1,9 @@
+import { DataTable } from "@/components/ui/data-table";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { ColumnChart } from "@/components/charts/column-chart";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { getPlatformFor } from "@/lib/platform";
@@ -83,28 +83,17 @@ export default async function PlatformGrowthPage() {
       <section aria-labelledby="growth-consumers" className="flex flex-col gap-4">
         <h2 id="growth-consumers" className="text-lg font-semibold">{t("consumers")}</h2>
         <p className="text-sm text-muted">{t("consumersHint", { days: DAYS })}</p>
-        <ScrollRegion labelledBy="growth-consumers" className="card">
-          <table className="w-full text-sm">
-            <thead className="text-muted">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("columns.business")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("columns.messages")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("columns.storage")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("columns.ai")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {consumers.map((c) => (
-                <tr key={c.tenant_id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3" dir="auto">{c.name}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{number.format(c.messages)}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{megabytes.format(c.storage_bytes / 1024 ** 2)} MB</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{number.format(c.ai_credits)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+        <DataTable
+          labelledBy="growth-consumers"
+          rows={consumers}
+          rowKey={(c) => c.tenant_id}
+          columns={[
+            { key: "business", header: t("columns.business"), cell: (c) => <span dir="auto">{c.name}</span> },
+            { key: "messages", header: t("columns.messages"), align: "end", className: "tabular-nums", cell: (c) => number.format(c.messages) },
+            { key: "storage", header: t("columns.storage"), align: "end", className: "tabular-nums", cell: (c) => `${megabytes.format(c.storage_bytes / 1024 ** 2)} MB` },
+            { key: "ai", header: t("columns.ai"), align: "end", className: "tabular-nums", cell: (c) => number.format(c.ai_credits) },
+          ]}
+        />
       </section>
     </Container>
   );

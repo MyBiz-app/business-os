@@ -22,6 +22,7 @@ import { ColorChoice, DomainChecks, FaceChooser, type Face, RoleChecks, type Rol
 import { composeInstructions, TEMPLATES, type Tone } from "@/lib/agent-templates";
 import { type Branch, ScopePicker } from "./scope-picker";
 import type { Agent } from "./types";
+import { Button } from "@/components/ui/button";
 
 const STEPS = ["topic", "identity", "role", "data", "access", "trial"] as const;
 const TONES: Tone[] = ["friendly", "formal", "short"];
@@ -164,27 +165,27 @@ export function AgentWizard({ branches, roles, limit, count, onClose, onDone }: 
       onClose={close}
       footer={
         <div className="flex w-full items-center justify-between gap-2">
-            <button type="button" onClick={() => setStep((s) => s - 1)} disabled={step === 0 || busy} className="btn-secondary px-3 py-2 text-sm">
+            <Button type="button" onClick={() => setStep((s) => s - 1)} disabled={step === 0 || busy}>
               <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
               {t("back")}
-            </button>
+            </Button>
             {step < 4 && (
-              <button type="button" onClick={() => setStep((s) => s + 1)} disabled={!valid || full} className="btn-primary px-4 py-2 text-sm">
+              <Button variant="primary" type="button" onClick={() => setStep((s) => s + 1)} disabled={!valid || full}>
                 {t("next")}
                 <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-              </button>
+              </Button>
             )}
             {step === 4 && (
-              <button type="button" onClick={toTrial} disabled={!valid || busy || full} className="btn-primary px-4 py-2 text-sm">
+              <Button variant="primary" type="button" onClick={toTrial} disabled={!valid || busy || full}>
                 {busy ? t("preparing") : t("tryIt")}
                 <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-              </button>
+              </Button>
             )}
             {step === 5 && (
-              <button type="button" onClick={finish} disabled={busy} className="btn-primary px-4 py-2 text-sm">
+              <Button variant="primary" type="button" onClick={finish} disabled={busy}>
                 <Check aria-hidden="true" className="size-4" />
                 {t("hireNamed", { name })}
-              </button>
+              </Button>
             )}
         </div>
       }
@@ -290,9 +291,9 @@ export function AgentWizard({ branches, roles, limit, count, onClose, onDone }: 
                 className="flex gap-2"
               >
                 <input value={text} onChange={(e) => setText(e.target.value)} placeholder={tTeam("placeholder", { name })} aria-label={tTeam("placeholder", { name })} className="control min-w-0 flex-1 px-3 py-2" dir="auto" />
-                <button type="submit" disabled={!text.trim() || waiting !== null} className="btn-primary px-3 py-2" aria-label={t("send")}>
+                <Button variant="primary" type="submit" disabled={!text.trim() || waiting !== null} aria-label={t("send")}>
                   <Send aria-hidden="true" className="size-4 rtl:-scale-x-100" />
-                </button>
+                </Button>
               </form>
             </div>
           )}

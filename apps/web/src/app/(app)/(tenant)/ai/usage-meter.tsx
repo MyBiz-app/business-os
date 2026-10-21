@@ -8,6 +8,7 @@ import { useState } from "react";
 import type { components } from "@business-os/api-client";
 
 import { Modal } from "@/components/ui/modal";
+import { Button, ButtonLink } from "@/components/ui/button";
 
 type Meter = components["schemas"]["Meter"];
 type Usage = components["schemas"]["app__api__ai_team__Usage"];
@@ -55,10 +56,10 @@ export function UsageMeter({ meter, details }: { meter: Meter; details: MeterDet
   if (!details) return <div className="flex min-w-0 flex-1 items-center gap-3 sm:max-w-md">{bar}</div>;
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" title={t("openWindow")} className="btn-plain flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-1 text-start hover:bg-background sm:max-w-md">
+      <Button variant="plain" type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" title={t("openWindow")} className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-1 text-start hover:bg-background sm:max-w-md">
         <Gauge aria-hidden="true" className="size-5 shrink-0 text-muted" />
         {bar}
-      </button>
+      </Button>
       {open && <UsageWindow meter={meter} details={details} onClose={() => setOpen(false)} />}
     </>
   );
@@ -152,18 +153,18 @@ function UsageWindow({ meter, details, onClose }: { meter: Meter; details: Meter
           </p>
         )}
         <div className="flex flex-wrap gap-3">
-          <Link href="/settings/billing#ai-spend-heading" className="btn-secondary px-3 py-2 text-sm">
+          <ButtonLink href="/settings/billing#ai-spend-heading">
             {t("enablePayg")}
-          </Link>
-          <Link href="/upgrade/ai" className="btn-secondary px-3 py-2 text-sm">
+          </ButtonLink>
+          <ButtonLink href="/upgrade/ai">
             {t("upgrade")}
-          </Link>
-          <Link href="/settings/billing#ai-users-heading" className="btn-secondary px-3 py-2 text-sm">
+          </ButtonLink>
+          <ButtonLink href="/settings/billing#ai-users-heading">
             {t("buyUser")}
-          </Link>
-          <Link href="/team" className="btn-secondary px-3 py-2 text-sm">
+          </ButtonLink>
+          <ButtonLink href="/team">
             {t("limitPerson")}
-          </Link>
+          </ButtonLink>
         </div>
       </div>
     </Modal>

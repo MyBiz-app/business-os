@@ -6,6 +6,7 @@ import { useActionState, useState } from "react";
 
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { DataTable } from "@/components/ui/data-table";
 
 import { type RunState, runBilling } from "./actions";
 
@@ -54,54 +55,46 @@ export function RunForm({ month, rows }: { month: string; rows: Row[] }) {
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <div className="card overflow-x-auto">
-        <table className="w-full text-sm">
-          <caption className="sr-only">{t("tableCaption")}</caption>
-          <thead className="text-muted">
-            <tr className="border-b border-border text-start">
-              <th scope="col" className="p-3 text-start">
-                <span className="sr-only">{t("choose")}</span>
-              </th>
-              <th scope="col" className="p-3 text-start font-medium">{t("client")}</th>
-              <th scope="col" className="p-3 text-start font-medium">{t("fee")}</th>
-              <th scope="col" className="p-3 text-start font-medium">{t("hours")}</th>
-              <th scope="col" className="p-3 text-start font-medium">{t("extra")}</th>
-              <th scope="col" className="p-3 text-end font-medium">{t("total")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => {
-              const disabled = row.billed || !row.billable;
-              return (
-                <tr key={row.clientId} className="border-b border-border last:border-0">
-                  <td className="p-3">
-                    <input
-                      type="checkbox"
-                      name="client_ids"
-                      value={row.clientId}
-                      aria-label={t("chooseClient", { name: row.name })}
-                      checked={chosen.has(row.clientId)}
-                      disabled={disabled}
-                      onChange={() => toggle(row.clientId)}
-                      className="size-4 accent-[var(--color-primary)]"
-                    />
-                  </td>
-                  <th scope="row" className="p-3 text-start font-medium">
-                    <Link href={`/clients/${row.clientId}`} className="underline-offset-4 hover:underline" dir="auto">
-                      {row.name}
-                    </Link>
-                    {row.billed && <span className="ms-2 rounded-full border border-border px-2 py-0.5 text-xs text-muted">{t("billed")}</span>}
-                  </th>
-                  <td className="p-3 tabular-nums">{row.fee ?? "-"}</td>
-                  <td className="p-3 tabular-nums">{row.hours}</td>
-                  <td className="p-3 tabular-nums">{row.extra ?? "-"}</td>
-                  <td className="p-3 text-end font-semibold tabular-nums">{row.total}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        label={t("tableCaption")}
+        rows={rows}
+        rowKey={(row) => row.clientId}
+        columns={[
+          {
+            key: "choose",
+            header: <span className="sr-only">{t("choose")}</span>,
+            cell: (row) => (
+              <input
+                type="checkbox"
+                name="client_ids"
+                value={row.clientId}
+                aria-label={t("chooseClient", { name: row.name })}
+                checked={chosen.has(row.clientId)}
+                disabled={row.billed || !row.billable}
+                onChange={() => toggle(row.clientId)}
+                className="size-4 accent-[var(--color-primary)]"
+              />
+            ),
+          },
+          {
+            key: "client",
+            header: t("client"),
+            rowHeader: true,
+            cell: (row) => (
+              <>
+                <Link href={`/clients/${row.clientId}`} className="underline-offset-4 hover:underline" dir="auto">
+                  {row.name}
+                </Link>
+                {row.billed && <span className="ms-2 rounded-full border border-border px-2 py-0.5 text-xs text-muted">{t("billed")}</span>}
+              </>
+            ),
+          },
+          { key: "fee", header: t("fee"), className: "tabular-nums", cell: (row) => row.fee ?? "-" },
+          { key: "hours", header: t("hours"), className: "tabular-nums", cell: (row) => row.hours },
+          { key: "extra", header: t("extra"), className: "tabular-nums", cell: (row) => row.extra ?? "-" },
+          { key: "total", header: t("total"), align: "end", className: "font-semibold tabular-nums", cell: (row) => row.total },
+        ]}
+      />
       <FormError message={state.error ? t("failed") : undefined} />
       <div>
         <SubmitButton disabled={chosen.size === 0}>{t("run", { count: chosen.size })}</SubmitButton>

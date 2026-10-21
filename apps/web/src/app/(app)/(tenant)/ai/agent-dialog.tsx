@@ -2,12 +2,12 @@
 
 import { Check, Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 
 import { Modal } from "@/components/ui/modal";
 
 import { AgentAvatar } from "./agent-avatar";
 import type { Agent, Upsell } from "./types";
+import { Button, ButtonLink } from "@/components/ui/button";
 
 /** What a closed agent says when it's clicked: a locked one makes the case for its module (in full color), the others say why they can't be opened. */
 export function AgentDialog({ agent, upsell, canAdd, onEdit, onClose }: { agent: Agent; upsell: Upsell | null; canAdd: boolean; onEdit?: () => void; onClose: () => void }) {
@@ -46,9 +46,9 @@ export function AgentDialog({ agent, upsell, canAdd, onEdit, onClose }: { agent:
               </p>
             )}
             {canAdd ? (
-              <Link href="/settings/modules" className="btn-primary w-full px-4 py-2.5">
+              <ButtonLink href="/settings/modules" variant="primary" className="w-full">
                 {t("upsell.add")}
-              </Link>
+              </ButtonLink>
             ) : (
               <p role="note" className="w-full rounded-xl bg-surface p-3 text-sm">
                 {t("upsell.askOwner", { module: upsell?.name ?? "" })}
@@ -59,9 +59,9 @@ export function AgentDialog({ agent, upsell, canAdd, onEdit, onClose }: { agent:
           <>
             <p className="text-muted">{t(`closed.${agent.state}` as "closed.disabled", { name: agent.name })}</p>
             {onEdit && (
-              <button type="button" onClick={onEdit} className="btn-secondary px-4 py-2 text-sm">
+              <Button type="button" onClick={onEdit}>
                 {t("edit.open")}
-              </button>
+              </Button>
             )}
           </>
         )}

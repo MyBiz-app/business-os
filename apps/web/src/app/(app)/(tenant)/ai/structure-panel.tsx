@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { CHIEF, connect, connectable, removeTeam, setTeam, type Draft } from "@/lib/ai-structure";
 
 import type { Agent } from "./types";
+import { Button } from "@/components/ui/button";
 
 const TEAM_COLORS = ["#2563EB", "#7C3AED", "#06B6D4", "#10B981", "#F59E0B", "#F43F5E"];
 
@@ -103,10 +104,10 @@ export function StructurePanel({ agents, draft, error, onChange }: Props) {
       <div className="flex flex-col gap-2 border-t border-border pt-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">{t("teams")}</h3>
-          <button type="button" onClick={addTeam} disabled={draft.teams.length >= 20} className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
+          <Button type="button" onClick={addTeam} disabled={draft.teams.length >= 20} className="gap-1.5">
             <Plus aria-hidden="true" className="size-4" />
             {t("addTeam")}
-          </button>
+          </Button>
         </div>
         {draft.teams.length === 0 && <p className="text-sm text-muted">{t("noTeams")}</p>}
         {draft.teams.map((team) => (
@@ -126,9 +127,9 @@ export function StructurePanel({ agents, draft, error, onChange }: Props) {
                   ))}
               </select>
             </label>
-            <button type="button" onClick={() => onChange(removeTeam(draft, team.id))} aria-label={t("removeTeam", { name: team.name })} className="btn-plain rounded-lg p-2 text-muted hover:text-danger">
+            <Button variant="plain" type="button" onClick={() => onChange(removeTeam(draft, team.id))} aria-label={t("removeTeam", { name: team.name })} className="rounded-lg p-2 text-muted hover:text-danger">
               <Trash2 aria-hidden="true" className="size-4" />
-            </button>
+            </Button>
           </div>
         ))}
       </div>

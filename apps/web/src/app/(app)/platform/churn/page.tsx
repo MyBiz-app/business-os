@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { ColumnChart } from "@/components/charts/column-chart";
@@ -5,7 +6,6 @@ import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -43,30 +43,24 @@ export default async function ChurnPage() {
 
       <section aria-labelledby="churn-months" className="flex flex-col gap-3">
         <h2 id="churn-months" className="text-lg font-semibold">{t("churn.rate")}</h2>
-        <ScrollRegion labelledBy="churn-months" className="card">
-          <table className="w-full text-sm">
-            <thead className="text-muted">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("churn.month")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("churn.cancelled")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("churn.paused")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("churn.resumed")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("churn.rate")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...months].reverse().map((row) => (
-                <tr key={row.month} className="border-b border-border last:border-0">
-                  <th scope="row" className="px-4 py-3 text-start font-medium">{monthLabel(row.month)}</th>
-                  <td className="px-4 py-3 text-end tabular-nums">{row.cancelled}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{row.paused}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{row.resumed}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{row.paying_at_start > 0 ? percent.format(row.cancelled / row.paying_at_start) : "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+        <DataTable
+          labelledBy="churn-months"
+          rows={[...months].reverse()}
+          rowKey={(row) => row.month}
+          columns={[
+            { key: "month", header: t("churn.month"), rowHeader: true, cell: (row) => monthLabel(row.month) },
+            { key: "cancelled", header: t("churn.cancelled"), align: "end", className: "tabular-nums", cell: (row) => row.cancelled },
+            { key: "paused", header: t("churn.paused"), align: "end", className: "tabular-nums", cell: (row) => row.paused },
+            { key: "resumed", header: t("churn.resumed"), align: "end", className: "tabular-nums", cell: (row) => row.resumed },
+            {
+              key: "rate",
+              header: t("churn.rate"),
+              align: "end",
+              className: "tabular-nums",
+              cell: (row) => (row.paying_at_start > 0 ? percent.format(row.cancelled / row.paying_at_start) : "-"),
+            },
+          ]}
+        />
       </section>
 
       <section aria-labelledby="churn-reasons" className="flex flex-col gap-3">
@@ -86,41 +80,57 @@ export default async function ChurnPage() {
         {rows.length === 0 ? (
           <EmptyState variant="list">{t("churn.empty")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="churn-list" className="card">
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("churn.business")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("churn.outcome")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("churn.when")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("churn.ends")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("churn.reasonsTitle")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("churn.refund")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id} className="border-b border-border align-top last:border-0">
-                    <td className="px-4 py-3">
-                      <span className="font-medium">{row.name}</span>
-                      {row.owner_email ? <span className="block text-xs text-muted" dir="ltr">{row.owner_email}</span> : null}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Pill tone={row.outcome === "cancelled" ? "danger" : "warning"}>{t(`churn.outcomes.${row.outcome}`)}</Pill>
-                      {row.resumed_at ? <span className="ms-2 text-xs text-muted">{t("churn.back")}</span> : null}
-                    </td>
-                    <td className="px-4 py-3">{formatDay(row.created_at, locale, { day: "numeric", month: "numeric", year: "numeric" })}</td>
-                    <td className="px-4 py-3">{row.ends_at ? formatDay(row.ends_at, locale, { day: "numeric", month: "numeric", year: "numeric" }) : "-"}</td>
-                    <td className="px-4 py-3">
-                      {row.reason ? t(`churn.reasons.${row.reason as (typeof REASONS)[number]}`) : t("churn.noReason")}
-                      {row.note ? <span className="block text-xs text-muted">{row.note}</span> : null}
-                    </td>
-                    <td className="px-4 py-3 text-end tabular-nums">{row.refund_minor ? formatMoney(row.refund_minor, row.currency, locale) : "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="churn-list"
+            rows={rows}
+            rowKey={(row) => row.id}
+            rowClassName={() => "align-top"}
+            columns={[
+              {
+                key: "business",
+                header: t("churn.business"),
+                cell: (row) => (
+                  <>
+                    <span className="font-medium">{row.name}</span>
+                    {row.owner_email ? <span className="block text-xs text-muted" dir="ltr">{row.owner_email}</span> : null}
+                  </>
+                ),
+              },
+              {
+                key: "outcome",
+                header: t("churn.outcome"),
+                cell: (row) => (
+                  <>
+                    <Pill tone={row.outcome === "cancelled" ? "danger" : "warning"}>{t(`churn.outcomes.${row.outcome}`)}</Pill>
+                    {row.resumed_at ? <span className="ms-2 text-xs text-muted">{t("churn.back")}</span> : null}
+                  </>
+                ),
+              },
+              { key: "when", header: t("churn.when"), cell: (row) => formatDay(row.created_at, locale, { day: "numeric", month: "numeric", year: "numeric" }) },
+              {
+                key: "ends",
+                header: t("churn.ends"),
+                cell: (row) => (row.ends_at ? formatDay(row.ends_at, locale, { day: "numeric", month: "numeric", year: "numeric" }) : "-"),
+              },
+              {
+                key: "reason",
+                header: t("churn.reasonsTitle"),
+                cell: (row) => (
+                  <>
+                    {row.reason ? t(`churn.reasons.${row.reason as (typeof REASONS)[number]}`) : t("churn.noReason")}
+                    {row.note ? <span className="block text-xs text-muted">{row.note}</span> : null}
+                  </>
+                ),
+              },
+              {
+                key: "refund",
+                header: t("churn.refund"),
+                align: "end",
+                className: "tabular-nums",
+                cell: (row) => (row.refund_minor ? formatMoney(row.refund_minor, row.currency, locale) : "-"),
+              },
+            ]}
+          />
         )}
       </section>
     </Container>

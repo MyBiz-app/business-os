@@ -1,8 +1,8 @@
+import { DataTable } from "@/components/ui/data-table";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
 import { formatMoney } from "@/lib/money";
@@ -67,39 +67,47 @@ export default async function PlatformAiPage() {
           />
         </div>
         <p className="text-sm text-muted">{t("costsHint")}</p>
-        <ScrollRegion labelledBy="ai-costs" className="card">
-          <table className="w-full text-sm">
-            <thead className="text-muted">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("columns.business")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("columns.credits")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("columns.trend")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("columns.revenue")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("columns.margin")}</th>
-                {canChange && <th scope="col" className="px-4 py-3 text-start font-medium">{t("columns.control")}</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {costs.businesses.map((b) => (
-                <tr key={b.tenant_id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3" dir="auto">
-                    {b.name}
-                    {b.paused && <span className="ms-2 rounded-full bg-danger/10 px-2 py-0.5 text-xs text-danger">{t("paused")}</span>}
-                  </td>
-                  <td className="px-4 py-3 text-end tabular-nums">{number.format(b.credits)}</td>
-                  <td className="px-4 py-3 text-end" aria-label={t("trendLabel", { before: number.format(b.previous_credits) })}>{trend(b.credits, b.previous_credits)}</td>
-                  <td className="px-4 py-3 text-end tabular-nums"><bdi>{b.revenue_monthly_minor ? formatMoney(b.revenue_monthly_minor, b.currency, locale) : "-"}</bdi></td>
-                  <td className="px-4 py-3 text-end tabular-nums"><bdi>{b.margin_usd_minor === null ? "-" : formatMoney(b.margin_usd_minor, "USD", locale)}</bdi></td>
-                  {canChange && (
-                    <td className="px-4 py-3">
-                      <PauseButton tenantId={b.tenant_id} name={b.name} paused={b.paused} />
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+        <DataTable
+          labelledBy="ai-costs"
+          rows={costs.businesses}
+          rowKey={(b) => b.tenant_id}
+          columns={[
+            {
+              key: "business",
+              header: t("columns.business"),
+              cell: (b) => (
+                <span dir="auto">
+                  {b.name}
+                  {b.paused && <span className="ms-2 rounded-full bg-danger/10 px-2 py-0.5 text-xs text-danger">{t("paused")}</span>}
+                </span>
+              ),
+            },
+            { key: "credits", header: t("columns.credits"), align: "end", className: "tabular-nums", cell: (b) => number.format(b.credits) },
+            {
+              key: "trend",
+              header: t("columns.trend"),
+              align: "end",
+              cell: (b) => <span aria-label={t("trendLabel", { before: number.format(b.previous_credits) })}>{trend(b.credits, b.previous_credits)}</span>,
+            },
+            {
+              key: "revenue",
+              header: t("columns.revenue"),
+              align: "end",
+              className: "tabular-nums",
+              cell: (b) => <bdi>{b.revenue_monthly_minor ? formatMoney(b.revenue_monthly_minor, b.currency, locale) : "-"}</bdi>,
+            },
+            {
+              key: "margin",
+              header: t("columns.margin"),
+              align: "end",
+              className: "tabular-nums",
+              cell: (b) => <bdi>{b.margin_usd_minor === null ? "-" : formatMoney(b.margin_usd_minor, "USD", locale)}</bdi>,
+            },
+            ...(canChange
+              ? [{ key: "control", header: t("columns.control"), cell: (b: (typeof costs.businesses)[number]) => <PauseButton tenantId={b.tenant_id} name={b.name} paused={b.paused} /> }]
+              : []),
+          ]}
+        />
       </section>
 
       <section aria-labelledby="ai-connectors" className="flex flex-col gap-4">
@@ -108,36 +116,21 @@ export default async function PlatformAiPage() {
         {connectors.businesses.length === 0 ? (
           <p className="card p-4 sm:p-5 text-sm text-muted">{t("connectors.empty")}</p>
         ) : (
-          <ScrollRegion labelledBy="ai-connectors" className="card">
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("connectors.columns.business")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("connectors.columns.apps")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.calls")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.proposed")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.executed")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.rejected")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("connectors.columns.waiting")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("connectors.columns.last")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {connectors.businesses.map((b) => (
-                  <tr key={b.tenant_id} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3" dir="auto">{b.name}</td>
-                    <td className="px-4 py-3" dir="auto">{b.apps.map((app) => isolate(app)).join(", ") || "-"}</td>
-                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.calls)}</td>
-                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.proposed)}</td>
-                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.executed)}</td>
-                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.rejected)}</td>
-                    <td className="px-4 py-3 text-end tabular-nums">{number.format(b.waiting)}</td>
-                    <td className="px-4 py-3">{b.last_call ? stamp.format(new Date(b.last_call)) : "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="ai-connectors"
+            rows={connectors.businesses}
+            rowKey={(b) => b.tenant_id}
+            columns={[
+              { key: "business", header: t("connectors.columns.business"), cell: (b) => <span dir="auto">{b.name}</span> },
+              { key: "apps", header: t("connectors.columns.apps"), cell: (b) => <span dir="auto">{b.apps.map((app) => isolate(app)).join(", ") || "-"}</span> },
+              { key: "calls", header: t("connectors.columns.calls"), align: "end", className: "tabular-nums", cell: (b) => number.format(b.calls) },
+              { key: "proposed", header: t("connectors.columns.proposed"), align: "end", className: "tabular-nums", cell: (b) => number.format(b.proposed) },
+              { key: "executed", header: t("connectors.columns.executed"), align: "end", className: "tabular-nums", cell: (b) => number.format(b.executed) },
+              { key: "rejected", header: t("connectors.columns.rejected"), align: "end", className: "tabular-nums", cell: (b) => number.format(b.rejected) },
+              { key: "waiting", header: t("connectors.columns.waiting"), align: "end", className: "tabular-nums", cell: (b) => number.format(b.waiting) },
+              { key: "last", header: t("connectors.columns.last"), cell: (b) => (b.last_call ? stamp.format(new Date(b.last_call)) : "-") },
+            ]}
+          />
         )}
       </section>
 

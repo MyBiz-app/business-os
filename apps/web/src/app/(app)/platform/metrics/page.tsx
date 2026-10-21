@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { Metadata } from "next";
 import { BRAND } from "@business-os/i18n/brand";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -6,7 +7,6 @@ import { ColumnChart } from "@/components/charts/column-chart";
 import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -56,30 +56,18 @@ export default async function PlatformMetricsPage() {
                 columns={row.months.map((m) => ({ key: m.month, label: monthLabel(m.month), value: m.billed, display: formatMoney(m.billed, row.currency, locale) }))}
               />
             </div>
-            <ScrollRegion labelledBy={`metrics-${row.currency}`} className="card">
-              <table className="w-full text-sm">
-                <thead className="text-muted">
-                  <tr className="border-b border-border">
-                    <th scope="col" className="px-4 py-3 text-start font-medium">{t("month")}</th>
-                    <th scope="col" className="px-4 py-3 text-end font-medium">{t("invoices")}</th>
-                    <th scope="col" className="px-4 py-3 text-end font-medium">{t("paid")}</th>
-                    <th scope="col" className="px-4 py-3 text-end font-medium">{t("open")}</th>
-                    <th scope="col" className="px-4 py-3 text-end font-medium">{t("billed")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...row.months].reverse().map((m) => (
-                    <tr key={m.month} className="border-b border-border last:border-0">
-                      <th scope="row" className="px-4 py-3 text-start font-medium">{monthLabel(m.month)}</th>
-                      <td className="px-4 py-3 text-end tabular-nums">{m.invoices}</td>
-                      <td className="px-4 py-3 text-end tabular-nums">{formatMoney(m.paid, row.currency, locale)}</td>
-                      <td className="px-4 py-3 text-end tabular-nums">{formatMoney(m.open, row.currency, locale)}</td>
-                      <td className="px-4 py-3 text-end tabular-nums font-medium">{formatMoney(m.billed, row.currency, locale)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </ScrollRegion>
+            <DataTable
+              labelledBy={`metrics-${row.currency}`}
+              rows={[...row.months].reverse()}
+              rowKey={(m) => m.month}
+              columns={[
+                { key: "month", header: t("month"), rowHeader: true, cell: (m) => monthLabel(m.month) },
+                { key: "invoices", header: t("invoices"), align: "end", className: "tabular-nums", cell: (m) => m.invoices },
+                { key: "paid", header: t("paid"), align: "end", className: "tabular-nums", cell: (m) => formatMoney(m.paid, row.currency, locale) },
+                { key: "open", header: t("open"), align: "end", className: "tabular-nums", cell: (m) => formatMoney(m.open, row.currency, locale) },
+                { key: "billed", header: t("billed"), align: "end", className: "tabular-nums font-medium", cell: (m) => formatMoney(m.billed, row.currency, locale) },
+              ]}
+            />
           </section>
         ))
       )}

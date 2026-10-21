@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { components } from "@business-os/api-client";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -5,14 +6,15 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { PendingArea, PeriodPicker, PeriodProvider } from "@/components/period-picker";
-import { Pill } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
 import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
 import { resolveRange } from "@/lib/range";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
-import { ScrollRegion } from "@/components/scroll-region";
 
 import { BranchComparison } from "./branch-comparison";
 import { BranchLink } from "./branch-link";
@@ -76,7 +78,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         {member.name}
       </Link>
       <span className="flex flex-wrap items-center gap-2 text-sm text-muted">
-        <Pill tone={member.reason === "inactive" ? "danger" : "primary"}>{t(`reasons.${member.reason}`)}</Pill>
+        <Badge tone={member.reason === "inactive" ? "danger" : "primary"}>{t(`reasons.${member.reason}`)}</Badge>
         {member.last_visit ? t("lastVisit", { date: dateLabel(member.last_visit) }) : t("neverVisited")}
         {member.plan_ends_on && ` · ${t("planEnds", { date: dateLabel(member.plan_ends_on) })}`}
       </span>
@@ -84,50 +86,41 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   );
 
   const table = (id: string, title: string, nameHeader: string, rows: Row[], name: (row: Row) => string, link?: (row: Row) => React.ReactNode) => (
-    <section aria-labelledby={id} className="flex flex-col gap-3 card p-6">
-      <h2 id={id} className="text-lg font-semibold">
-        {title}
-      </h2>
+    <Card as="section" aria-labelledby={id}>
+      <CardHeader titleId={id} title={title} />
       {rows.length === 0 ? (
         <p className="text-sm text-muted">{t("noSessions")}</p>
       ) : (
-        <ScrollRegion labelledBy={id}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-start text-muted">
-                <th scope="col" className="py-2 pe-4 text-start font-medium">{nameHeader}</th>
-                <th scope="col" className="py-2 pe-4 text-end font-medium">{t("sessions")}</th>
-                <th scope="col" className="py-2 pe-4 text-end font-medium">{t("attended")}</th>
-                <th scope="col" className="py-2 pe-4 text-end font-medium">{t("occupancy")}</th>
-                <th scope="col" className="py-2 text-end font-medium">{t("noShowRate")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.key} className="border-b border-border last:border-0">
-                  <th scope="row" className="py-2 pe-4 text-start font-medium">
-                    {link?.(row) ?? <bdi>{name(row)}</bdi>}
-                  </th>
-                  <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.sessions)}</td>
-                  <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.attended)}</td>
-                  <td className="py-2 pe-4">
-                    <span className="flex items-center justify-end gap-2 tabular-nums">
-                      {row.occupancy !== null && (
-                        <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
-                          <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy)}%` }} />
-                        </span>
-                      )}
-                      {percent(row.occupancy)}
+        <DataTable
+          labelledBy={id}
+          bare
+          density="compact"
+          rows={rows}
+          rowKey={(row) => row.key}
+          columns={[
+            { key: "name", header: nameHeader, rowHeader: true, cell: (row) => link?.(row) ?? <bdi>{name(row)}</bdi> },
+            { key: "sessions", header: t("sessions"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.sessions) },
+            { key: "attended", header: t("attended"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.attended) },
+            {
+              key: "occupancy",
+              header: t("occupancy"),
+              align: "end",
+              cell: (row) => (
+                <span className="flex items-center justify-end gap-2 tabular-nums">
+                  {row.occupancy !== null && (
+                    <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
+                      <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy)}%` }} />
                     </span>
-                  </td>
-                  <td className="py-2 text-end tabular-nums">{percent(row.no_show_rate)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+                  )}
+                  {percent(row.occupancy)}
+                </span>
+              ),
+            },
+            { key: "noShowRate", header: t("noShowRate"), align: "end", className: "tabular-nums", cell: (row) => percent(row.no_show_rate) },
+          ]}
+        />
       )}
-    </section>
+    </Card>
   );
 
   return (
@@ -138,14 +131,14 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         description={t("intro")}
         actions={
           <div className="flex flex-wrap items-center gap-3">
-            <Link
+            <ButtonLink
               scroll={false}
               href={{ pathname: "/reports", query: { ...query, staff: excludeStaff ? undefined : "exclude" } }}
               aria-current={excludeStaff ? "true" : undefined}
-              className={excludeStaff ? "btn-primary px-3 py-1.5 text-sm" : "btn-secondary px-3 py-1.5 text-sm"}
+              variant={excludeStaff ? "primary" : "secondary"}
             >
               {t("withoutStaff")}
-            </Link>
+            </ButtonLink>
             <PeriodPicker presets={PRESETS} value={chosen.key} from={start} to={end} today={today} reset={["sort"]} />
           </div>
         }
@@ -167,59 +160,58 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {bySlot.length > 0 && <BusyHours rows={bySlot} locale={locale} />}
       {/* Courts and rooms rented by the hour: how much of their open time was reserved. */}
       {courts.length > 0 && (
-        <section aria-labelledby="by-court" className="flex flex-col gap-3 card p-6">
-          <h2 id="by-court" className="text-lg font-semibold">
-            {t("byCourt")}
-          </h2>
-          <ScrollRegion labelledBy="by-court">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-start text-muted">
-                  <th scope="col" className="py-2 pe-4 text-start font-medium">{t("court")}</th>
-                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("reservations")}</th>
-                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("reservedHours")}</th>
-                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("occupancy")}</th>
-                  <th scope="col" className="py-2 text-end font-medium">{t("courtRevenue")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courts.map((row) => (
-                  <tr key={row.room_id} className="border-b border-border last:border-0">
-                    <th scope="row" className="py-2 pe-4 text-start font-medium">
-                      <bdi>{row.room_name}</bdi>
-                      <span className="block text-xs font-normal text-muted">
-                        <bdi>{row.location_name}</bdi>
+        <Card as="section" aria-labelledby="by-court">
+          <CardHeader titleId="by-court" title={t("byCourt")} />
+          <DataTable
+            labelledBy="by-court"
+            bare
+            density="compact"
+            rows={courts}
+            rowKey={(row) => row.room_id}
+            columns={[
+              {
+                key: "court",
+                header: t("court"),
+                rowHeader: true,
+                cell: (row) => (
+                  <>
+                    <bdi>{row.room_name}</bdi>
+                    <span className="block text-xs font-normal text-muted">
+                      <bdi>{row.location_name}</bdi>
+                    </span>
+                  </>
+                ),
+              },
+              { key: "reservations", header: t("reservations"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.reservations) },
+              {
+                key: "reservedHours",
+                header: t("reservedHours"),
+                align: "end",
+                className: "tabular-nums",
+                cell: (row) => t("hoursOf", { reserved: number.format(row.reserved_hours), open: number.format(row.open_hours) }),
+              },
+              {
+                key: "occupancy",
+                header: t("occupancy"),
+                align: "end",
+                cell: (row) => (
+                  <span className="flex items-center justify-end gap-2 tabular-nums">
+                    {row.occupancy_percent !== null && (
+                      <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
+                        <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy_percent)}%` }} />
                       </span>
-                    </th>
-                    <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.reservations)}</td>
-                    <td className="py-2 pe-4 text-end tabular-nums">
-                      {t("hoursOf", { reserved: number.format(row.reserved_hours), open: number.format(row.open_hours) })}
-                    </td>
-                    <td className="py-2 pe-4">
-                      <span className="flex items-center justify-end gap-2 tabular-nums">
-                        {row.occupancy_percent !== null && (
-                          <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
-                            <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy_percent)}%` }} />
-                          </span>
-                        )}
-                        {percent(row.occupancy_percent)}
-                      </span>
-                    </td>
-                    <td className="py-2 text-end tabular-nums">{formatMoney(row.revenue, row.currency, locale)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
-        </section>
+                    )}
+                    {percent(row.occupancy_percent)}
+                  </span>
+                ),
+              },
+              { key: "courtRevenue", header: t("courtRevenue"), align: "end", className: "tabular-nums", cell: (row) => formatMoney(row.revenue, row.currency, locale) },
+            ]}
+          />
+        </Card>
       )}
-      <section aria-labelledby="at-risk-heading" className="flex flex-col gap-3 card p-6">
-        <div className="flex flex-col gap-1">
-          <h2 id="at-risk-heading" className="text-lg font-semibold">
-            {t("atRisk", { count: atRisk.length })}
-          </h2>
-          <p className="text-sm text-muted">{t("atRiskHint", { days: AT_RISK_DAYS })}</p>
-        </div>
+      <Card as="section" aria-labelledby="at-risk-heading" className="flex flex-col gap-3">
+        <CardHeader titleId="at-risk-heading" title={t("atRisk", { count: atRisk.length })} description={t("atRiskHint", { days: AT_RISK_DAYS })} className="mb-0" />
         {atRisk.length === 0 ? (
           <p className="text-sm text-muted">{t("atRiskNone")}</p>
         ) : (
@@ -232,7 +224,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
             <ul className="flex flex-col divide-y divide-border">{atRisk.slice(SHOWN).map(memberRow)}</ul>
           </CollapsibleSection>
         )}
-      </section>
+      </Card>
       {/* Reviews come last: the numbers people act on every day go first. */}
       <ReviewsSummary
         summary={reviews}
