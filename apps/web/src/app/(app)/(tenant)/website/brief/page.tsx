@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { BackLink } from "@/components/back-link";
 
 import { WizardBody } from "./wizard-body";
+import { Card } from "@/components/ui/card";
 
 export default async function WebsiteBriefPage() {
   const t = await getTranslations("website");
@@ -12,9 +13,9 @@ export default async function WebsiteBriefPage() {
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/website" label={t("title")} />
       <PageHeader title={t("wizardTitle")} />
-      <section className="card p-6">
+      <Card as="section">
         <WizardBody />
-      </section>
+      </Card>
     </Container>
   );
 }

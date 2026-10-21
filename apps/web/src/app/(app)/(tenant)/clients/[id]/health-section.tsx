@@ -1,13 +1,16 @@
 import type { components } from "@business-os/api-client";
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { Pill, type Tone } from "@/components/pill";
+import { badgeToneOf, type Tone } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
 import { unwrap } from "@/lib/api";
 import { canWriteClients } from "@/lib/permissions";
 import type { getTenant } from "@/lib/tenant";
 
 import { reviewDeclaration } from "./health-actions";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type HealthState = components["schemas"]["ClientHealth"]["state"];
 
@@ -39,12 +42,12 @@ export async function HealthSection({ clientId, context }: Props) {
   const reviewable = latest?.status === "needs_review" && canWriteClients(tenant);
 
   return (
-    <section aria-labelledby="health-heading" className="flex flex-col gap-4 card p-6">
+    <Card as="section" aria-labelledby="health-heading" className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <h2 id="health-heading" className="text-lg font-semibold">
           {t("title")}
         </h2>
-        <Pill tone={HEALTH_TONE[health.state]}>{t(`states.${health.state}`)}</Pill>
+        <Badge tone={badgeToneOf(HEALTH_TONE[health.state])}>{t(`states.${health.state}`)}</Badge>
       </div>
 
       {!latest ? (
@@ -103,25 +106,15 @@ export async function HealthSection({ clientId, context }: Props) {
             />
           </label>
           <div className="flex flex-wrap gap-2">
-            <button
-              type="submit"
-              name="decision"
-              value="approve"
-              className="btn-primary px-4 py-2 text-sm"
-            >
+            <Button type="submit" name="decision" value="approve" variant="primary">
               {t("approve")}
-            </button>
-            <button
-              type="submit"
-              name="decision"
-              value="reject"
-              className="btn-secondary px-4 py-2 text-sm text-danger"
-            >
+            </Button>
+            <Button type="submit" name="decision" value="reject" variant="danger">
               {t("reject")}
-            </button>
+            </Button>
           </div>
         </form>
       )}
-    </section>
+    </Card>
   );
 }

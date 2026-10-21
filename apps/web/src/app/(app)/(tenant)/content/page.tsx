@@ -22,6 +22,8 @@ import { LineChart } from "./line-chart";
 import { NetworkIcon } from "./network-icon";
 import { getStudio } from "./studio";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Card } from "@/components/ui/card";
+import { StatTile } from "@/components/ui/stat-tile";
 
 type Kpi = components["schemas"]["Kpi"];
 
@@ -144,7 +146,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
       />
       {notice}
       {allDemo && (
-        <p role="note" className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm font-medium">
+        <p role="note" className="rounded-xl border border-border bg-warning-soft px-4 py-3 text-sm font-medium">
           {t("demoBanner")}
         </p>
       )}
@@ -157,19 +159,18 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           const note = change(key, kpi);
           const up = trendUp(kpi);
           return (
-            <div key={key} className="card flex flex-col gap-1 p-4">
-              <p className="text-sm text-muted">{t(`kpi.${key}`)}</p>
-              <p className="text-2xl font-extrabold">
-                <bdi>{display(key, kpi.value)}</bdi>
-              </p>
-              {note && <p className={`text-xs font-medium ${up === null ? "text-muted" : up ? "text-success-ink" : "text-danger"}`}>{note}</p>}
-            </div>
+            <StatTile
+              key={key}
+              label={t(`kpi.${key}`)}
+              value={<bdi>{display(key, kpi.value)}</bdi>}
+              trend={note ? { direction: up === null ? "flat" : up ? "up" : "down", label: note, tone: up === null ? "neutral" : up ? "good" : "bad" } : undefined}
+            />
           );
         })}
       </section>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <section className="card min-w-0 p-6">
+        <Card as="section" className="min-w-0">
           {dashboard.followers_series.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
@@ -182,8 +183,8 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
               dayHeader={t("charts.day")}
             />
           )}
-        </section>
-        <section className="card min-w-0 p-6">
+        </Card>
+        <Card as="section" className="min-w-0">
           {dashboard.video_views_weekly.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
@@ -195,8 +196,8 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
               columns={dashboard.video_views_weekly.map((w) => ({ key: w.week_start, label: short(w.week_start), value: w.views, display: full.format(w.views) }))}
             />
           )}
-        </section>
-        <section className="card min-w-0 p-6">
+        </Card>
+        <Card as="section" className="min-w-0">
           <h2 className="mb-3 font-semibold">{t("charts.kindTitle")}</h2>
           {dashboard.engagement_by_kind.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
@@ -210,7 +211,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
                       <span>{t(`kinds.${row.kind as "post"}`)}</span>
                       <bdi className="font-semibold">{full.format(row.engagements)}</bdi>
                     </div>
-                    <div aria-hidden="true" className="h-2 rounded-full bg-foreground/5">
+                    <div aria-hidden="true" className="h-2 rounded-full bg-subtle">
                       <div className="h-2 rounded-full bg-primary" style={{ width: `${Math.max(3, (row.engagements / top) * 100)}%` }} />
                     </div>
                   </li>
@@ -218,17 +219,17 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
               })}
             </ul>
           )}
-        </section>
-        <section className="card min-w-0 p-6">
+        </Card>
+        <Card as="section" className="min-w-0">
           {dashboard.heatmap.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
             <Heatmap cells={dashboard.heatmap} weekdays={weekdays} title={t("charts.heatmapTitle")} hint={t("charts.heatmapHint")} best={best} />
           )}
-        </section>
+        </Card>
       </div>
 
-      <section aria-labelledby="top-posts" className="card min-w-0 flex flex-col gap-4 p-6">
+      <Card as="section" aria-labelledby="top-posts" className="min-w-0 flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="top-posts" className="text-lg font-bold">
             {t("posts.title")}
@@ -280,10 +281,10 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             ))}
           </ol>
         )}
-      </section>
+      </Card>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <section aria-labelledby="audience" className="card min-w-0 flex flex-col gap-4 p-6">
+        <Card as="section" aria-labelledby="audience" className="min-w-0 flex flex-col gap-4">
           <h2 id="audience" className="text-lg font-bold">
             {t("audience.title")}
           </h2>
@@ -307,9 +308,9 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
               </div>
             ))
           )}
-        </section>
+        </Card>
         {dashboard.google_business && (
-          <section aria-labelledby="google" className="card min-w-0 flex flex-col gap-4 p-6">
+          <Card as="section" aria-labelledby="google" className="min-w-0 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <NetworkIcon network="google_business" size="sm" />
               <h2 id="google" className="text-lg font-bold">
@@ -331,11 +332,11 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
                 </div>
               ))}
             </dl>
-          </section>
+          </Card>
         )}
       </div>
 
-      <section aria-labelledby="accounts" className="card flex flex-col gap-4 p-6 print:hidden">
+      <Card as="section" aria-labelledby="accounts" className="flex flex-col gap-4 print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="accounts" className="text-lg font-bold">
             {t("accounts.title")}
@@ -371,7 +372,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             <ConnectCards networks={providers.networks} canManage={canManage} withDemo={false} />
           </div>
         </CollapsibleSection>
-      </section>
+      </Card>
     </Container>
   );
 }

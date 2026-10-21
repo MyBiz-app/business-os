@@ -18,3 +18,8 @@ export function Pill({ tone, children }: { tone: Tone; children: React.ReactNode
     </span>
   );
 }
+
+/** The `Badge` tone that matches a `Pill` tone, for status maps shared with screens not yet moved to `Badge`. */
+export function badgeToneOf(tone: Tone): "neutral" | "primary" | "success" | "warning" | "danger" {
+  return tone === "muted" ? "neutral" : tone;
+}

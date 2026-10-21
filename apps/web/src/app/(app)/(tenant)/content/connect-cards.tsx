@@ -6,6 +6,9 @@ import { SubmitButton } from "@/components/form/submit-button";
 
 import { connectDemo, startConnect } from "./actions";
 import { NetworkIcon } from "./network-icon";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 type Option = components["schemas"]["NetworkOption"];
 
@@ -24,7 +27,7 @@ export async function ConnectCards({ networks, canManage, withDemo }: { networks
         {networks.map((network) => {
           const soon = network.status === "soon";
           return (
-            <li key={network.network} className="card flex flex-col gap-3 p-5">
+            <Card as="li" key={network.network} className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
                 <NetworkIcon network={network.network} muted={soon} />
                 <div className="min-w-0 flex-1">
@@ -32,28 +35,28 @@ export async function ConnectCards({ networks, canManage, withDemo }: { networks
                   {network.connected > 0 && <p className="text-sm text-muted">{t("connect.connected", { count: network.connected })}</p>}
                 </div>
                 {soon && (
-                  <span className="rounded-full bg-foreground/5 px-2.5 py-0.5 text-xs font-semibold text-muted">{t("connect.soon")}</span>
+                  <Badge>{t("connect.soon")}</Badge>
                 )}
               </div>
               <p className="flex-1 text-sm text-muted">{network.gives.map((key) => t(`gives.${key}` as "gives.followers")).join(" · ")}</p>
               {soon ? (
-                <button type="button" disabled className="btn-secondary inline-flex items-center justify-center gap-2 px-4 py-2 opacity-60">
+                <Button variant="secondary" disabled className="justify-center">
                   <Lock aria-hidden="true" className="size-4" />
                   {t("connect.soon")}
-                </button>
+                </Button>
               ) : canManage ? (
                 <form action={startConnect.bind(null, network.provider)}>
                   <SubmitButton className="w-full px-4 py-2">{t("connect.button")}</SubmitButton>
                 </form>
               ) : null}
-            </li>
+            </Card>
           );
         })}
       </ul>
       {!canManage && <p role="note" className="text-sm text-muted">{t("connect.noAccess")}</p>}
       <p className="text-sm text-muted">{t("connect.privacy")}</p>
       {withDemo && canManage && (
-        <form action={connectDemo} className="card flex flex-wrap items-center justify-between gap-3 p-5">
+        <form action={connectDemo} className="card flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
           <p className="max-w-[36rem] text-sm text-muted">{t("connect.demoNote")}</p>
           <SubmitButton variant="secondary">{t("connect.demo")}</SubmitButton>
         </form>

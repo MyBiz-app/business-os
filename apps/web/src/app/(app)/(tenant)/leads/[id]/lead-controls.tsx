@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import { SelectField, TextAreaField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
+import { Button } from "@/components/ui/button";
 
 import { addActivity, changeStage } from "../actions";
 
@@ -30,23 +31,24 @@ export function StageControl({ leadId, stage, lostReason }: { leadId: string; st
             const done = current >= 0 && index < current;
             return (
               <li key={step}>
-                <button
+                <Button
+                  variant="plain"
                   type="submit"
                   name="stage"
                   value={step}
                   disabled={pending || active}
                   aria-current={active ? "step" : undefined}
-                  className={`btn-plain flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-start text-sm font-medium transition ${
+                  className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-start text-sm font-medium transition ${
                     active
                       ? "border-primary bg-primary text-on-primary"
                       : done
-                        ? "border-primary/40 bg-primary/10 hover:bg-primary/15"
+                        ? "border-primary/40 bg-primary-subtle hover:border-primary"
                         : "border-border bg-surface hover:border-primary/50"
                   }`}
                 >
                   <span aria-hidden="true" className="tabular-nums opacity-70">{index + 1}</span>
                   {t(`stages.${step}`)}
-                </button>
+                </Button>
               </li>
             );
           })}
@@ -65,14 +67,14 @@ export function StageControl({ leadId, stage, lostReason }: { leadId: string; st
             <input name="lost_reason" maxLength={500} className="control px-3 py-2 font-normal" />
           </label>
           <SubmitButton>{t("markLost")}</SubmitButton>
-          <button type="button" onClick={() => setLosing(false)} className="btn-link text-sm text-muted underline-offset-4 hover:underline">
+          <Button variant="quiet" onClick={() => setLosing(false)}>
             {t("cancel")}
-          </button>
+          </Button>
         </form>
       ) : (
-        <button type="button" onClick={() => setLosing(true)} className="btn-link self-start text-sm text-muted underline-offset-4 hover:underline">
+        <Button variant="quiet" onClick={() => setLosing(true)} className="self-start">
           {t("markLost")}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -84,7 +86,7 @@ export function ActivityForm({ leadId }: { leadId: string }) {
   const t = useTranslations("leads");
   const [state, action] = useActionState(addActivity.bind(null, leadId), {});
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-xl bg-foreground/[0.03] p-3">
+    <form action={action} className="flex flex-col gap-3 rounded-xl bg-subtle p-3">
       <FormFeedback state={state.error ? state : {}} />
       <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
         <SelectField
