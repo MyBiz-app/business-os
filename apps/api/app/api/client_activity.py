@@ -41,8 +41,9 @@ class ActivityEvent(BaseModel):
     occurred_at: datetime
 
 
-def _feed(with_messages: bool) -> str:
-    parts = [
+FEED = " UNION ALL ".join(
+    f"({part})"
+    for part in [
         """
         SELECT 'booking:' || b.id AS id, 'booking' AS kind, b.status AS status,
                sv.name AS title, NULL AS detail, NULL::integer AS amount, NULL AS currency,
@@ -83,14 +84,19 @@ def _feed(with_messages: bool) -> str:
         JOIN app.leads l ON l.id = a.lead_id
         WHERE l.client_id = :id
         """,
-    ]
-    if with_messages:
-        parts.append("""
+        # Messages show only for a business with the messaging module (`:with_messages`).
+        """
         SELECT 'message:' || m.id, 'message', m.channel, NULL, m.body, NULL, NULL, m.id,
                m.created_at
-        FROM app.messages m WHERE m.client_id = :id
-        """)
-    return " UNION ALL ".join(f"({p})" for p in parts)
+        FROM app.messages m WHERE m.client_id = :id AND :with_messages
+        """,
+    ]
+)
+
+QUERY = (
+    "SELECT id, kind, status, title, detail, amount, currency, ref_id, at AS occurred_at "
+    f"FROM ({FEED}) feed ORDER BY at DESC, id LIMIT :limit OFFSET :offset"
+)
 
 
 @router.get("")
@@ -104,12 +110,12 @@ def client_activity(client_id: UUID, context: ReadDep, page: PageDep) -> list[Ac
     ):
         raise not_found()
     rows = db.execute(
-        text(f"""
-            SELECT id, kind, status, title, detail, amount, currency, ref_id, at AS occurred_at
-            FROM ({_feed(has_module(db, "whatsapp"))}) feed
-            ORDER BY at DESC, id
-            LIMIT :limit OFFSET :offset
-        """),
-        {"id": client_id, "limit": page.limit, "offset": page.offset},
+        text(QUERY),
+        {
+            "id": client_id,
+            "with_messages": has_module(db, "whatsapp"),
+            "limit": page.limit,
+            "offset": page.offset,
+        },
     ).mappings()
     return [ActivityEvent.model_validate(dict(r)) for r in rows]
