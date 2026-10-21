@@ -7,6 +7,7 @@ import { getTenantFor } from "@/lib/tenant";
 import { BackLink } from "@/components/back-link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { Card } from "@/components/ui/card";
 
 /** The business's join code and QR code, to print for the front desk or share. */
 export default async function JoinCodePage() {
@@ -22,7 +23,7 @@ export default async function JoinCodePage() {
       <BackLink href="/clients" label={term("back")} />
       <PageHeader title={t("inviteToApp")} description={t("staffHint")} />
 
-      <section className="flex flex-col items-center gap-5 card p-8 text-center">
+      <Card as="section" padding="none" className="flex flex-col items-center gap-5 p-8 text-center">
         <p className="text-xl font-semibold">{tenant.name}</p>
         <div
           role="img"
@@ -44,7 +45,7 @@ export default async function JoinCodePage() {
         <p dir="ltr" className="break-all text-xs text-muted">
           {link}
         </p>
-      </section>
+      </Card>
     </Container>
   );
 }

@@ -2,6 +2,8 @@
 
 import { Download } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 import { logExport } from "../export-log";
 
 /** Saves the rows as a CSV file (built in the browser from what the page already shows). */
@@ -17,9 +19,9 @@ export function CsvButton({ label, filename, rows }: { label: string; filename: 
     URL.revokeObjectURL(link.href);
   };
   return (
-    <button type="button" onClick={download} className="btn-secondary px-4 py-2 print:hidden">
+    <Button variant="secondary" onClick={download} className="print:hidden">
       <Download aria-hidden="true" className="size-4" />
       {label}
-    </button>
+    </Button>
   );
 }

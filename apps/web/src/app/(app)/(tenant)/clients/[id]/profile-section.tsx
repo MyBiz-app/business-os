@@ -8,6 +8,8 @@ import type { getTenant } from "@/lib/tenant";
 
 import { deleteNote } from "./profile-actions";
 import { NoteForm, ProfileForm } from "./profile-forms";
+import { Card } from "@/components/ui/card";
+import { IconButton } from "@/components/ui/button";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 type Props = {
@@ -24,7 +26,7 @@ export async function ProfileSection({ clientId, values, context, locked }: Prop
   const fields = unwrap(await api.GET("/clients/fields", { params: scope }));
   if (fields.length === 0) return null;
   return (
-    <section aria-labelledby="profile-heading" className="card p-6">
+    <Card as="section" aria-labelledby="profile-heading">
       <h2 id="profile-heading" className="mb-4 text-lg font-semibold">
         {t(`terms.${termsOf(tenant.vertical)}.profile` as "terms.fitness.profile")}
       </h2>
@@ -34,7 +36,7 @@ export async function ProfileSection({ clientId, values, context, locked }: Prop
         values={values}
         readOnly={locked || !canWriteClients(tenant)}
       />
-    </section>
+    </Card>
   );
 }
 
@@ -66,7 +68,7 @@ export async function NotesSection({ clientId, bookings, context, locked }: Note
   }));
 
   return (
-    <section aria-labelledby="notes-heading" className="flex flex-col gap-4 card p-6">
+    <Card as="section" aria-labelledby="notes-heading" className="flex flex-col gap-4">
       <h2 id="notes-heading" className="flex items-center gap-2 text-lg font-semibold">
         <NotebookPen aria-hidden="true" className="size-5 text-primary-ink" />
         {t(`terms.${termsOf(tenant.vertical)}.visitNotes` as "terms.fitness.visitNotes")}
@@ -89,13 +91,9 @@ export async function NotesSection({ clientId, bookings, context, locked }: Note
                   </span>
                   {canWrite && (mine || canWriteClients(tenant)) && (
                     <form action={deleteNote.bind(null, clientId, note.id)}>
-                      <button
-                        type="submit"
-                        aria-label={t("visitNotes.delete")}
-                        className="btn-icon rounded-lg p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger"
-                      >
+                      <IconButton type="submit" label={t("visitNotes.delete")} className="hover:text-danger">
                         <Trash2 aria-hidden="true" className="size-4" />
-                      </button>
+                      </IconButton>
                     </form>
                   )}
                 </div>
@@ -104,6 +102,6 @@ export async function NotesSection({ clientId, bookings, context, locked }: Note
           })}
         </ol>
       )}
-    </section>
+    </Card>
   );
 }

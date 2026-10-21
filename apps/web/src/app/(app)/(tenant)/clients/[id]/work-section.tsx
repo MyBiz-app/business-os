@@ -2,7 +2,7 @@ import { Clock, FileText, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-import { Pill } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
 import { unwrap } from "@/lib/api";
 import { todayIn } from "@/lib/dates";
 import { formatMoney, toMajorUnits } from "@/lib/money";
@@ -12,6 +12,8 @@ import type { getTenant } from "@/lib/tenant";
 import { deleteDocument, updateDocument } from "./work-actions";
 import { BillForm, DocumentForm, RetainerForm, TimeForm } from "./work-forms";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Card } from "@/components/ui/card";
+import { Button, IconButton } from "@/components/ui/button";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 type Props = { clientId: string; context: Context; locked: boolean };
@@ -29,7 +31,7 @@ export async function DocumentsSection({ clientId, context, locked }: Props) {
   const size = new Intl.NumberFormat(locale, { style: "unit", unit: "kilobyte", maximumFractionDigits: 0 });
 
   return (
-    <section aria-labelledby="documents-heading" className="flex flex-col gap-4 card p-6">
+    <Card as="section" aria-labelledby="documents-heading" className="flex flex-col gap-4">
       <h2 id="documents-heading" className="flex items-center gap-2 text-lg font-semibold">
         <FileText aria-hidden="true" className="size-5 text-primary-ink" />
         {t("title")}
@@ -47,24 +49,24 @@ export async function DocumentsSection({ clientId, context, locked }: Props) {
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {document.uploaded_by_client && <Pill tone="primary">{t("fromClient")}</Pill>}
-              {document.shared && !document.uploaded_by_client && <Pill tone="muted">{t("shared")}</Pill>}
+              {document.uploaded_by_client && <Badge tone="primary">{t("fromClient")}</Badge>}
+              {document.shared && !document.uploaded_by_client && <Badge tone="neutral">{t("shared")}</Badge>}
               {document.sign_requested &&
                 (document.signed_at ? (
-                  <Pill tone="success">{t("signedBy", { name: document.signed_name ?? "", date: date.format(new Date(document.signed_at)) })}</Pill>
+                  <Badge tone="success">{t("signedBy", { name: document.signed_name ?? "", date: date.format(new Date(document.signed_at)) })}</Badge>
                 ) : (
-                  <Pill tone="warning">{t("waitingSignature")}</Pill>
+                  <Badge tone="warning">{t("waitingSignature")}</Badge>
                 ))}
               {writable && !document.uploaded_by_client && (
                 <form action={updateDocument.bind(null, clientId, document.id, { shared: !document.shared })}>
-                  <button type="submit" className="btn-secondary px-2.5 py-1 text-xs">{document.shared ? t("unshare") : t("share")}</button>
+                  <Button type="submit" variant="secondary" className="text-xs">{document.shared ? t("unshare") : t("share")}</Button>
                 </form>
               )}
               {writable && (
                 <form action={deleteDocument.bind(null, clientId, document.id)}>
-                  <button type="submit" aria-label={t("delete", { name: document.name })} className="btn-icon rounded-lg p-1 text-muted hover:bg-danger/10 hover:text-danger">
+                  <IconButton type="submit" label={t("delete", { name: document.name })} className="hover:text-danger">
                     <Trash2 aria-hidden="true" className="size-4" />
-                  </button>
+                  </IconButton>
                 </form>
               )}
             </div>
@@ -72,13 +74,13 @@ export async function DocumentsSection({ clientId, context, locked }: Props) {
         ))}
       </ul>
       {writable && (
-        <CollapsibleSection variant="inline" className="rounded-xl bg-foreground/[0.03] p-3" triggerClassName="font-medium text-primary-ink" title={t("add")}>
+        <CollapsibleSection variant="inline" className="rounded-xl bg-subtle p-3" triggerClassName="font-medium text-primary-ink" title={t("add")}>
           <div className="pt-3">
             <DocumentForm clientId={clientId} />
           </div>
         </CollapsibleSection>
       )}
-    </section>
+    </Card>
   );
 }
 
@@ -105,7 +107,7 @@ export async function TimeSection({ clientId, context, locked }: Props) {
   const money = (amount: number) => formatMoney(amount, tenant.currency, locale);
 
   return (
-    <section aria-labelledby="time-heading" className="flex flex-col gap-4 card p-6">
+    <Card as="section" aria-labelledby="time-heading" className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="time-heading" className="flex items-center gap-2 text-lg font-semibold">
           <Clock aria-hidden="true" className="size-5 text-primary-ink" />
@@ -136,7 +138,7 @@ export async function TimeSection({ clientId, context, locked }: Props) {
                 {entry.bill_id ? (
                   <Link href={`/quotes/${entry.bill_id}`} className="text-xs text-primary-ink underline-offset-4 hover:underline">{t("billed", { number: entry.bill_number ?? 0 })}</Link>
                 ) : !entry.billable ? (
-                  <Pill tone="muted">{t("notBillable")}</Pill>
+                  <Badge tone="neutral">{t("notBillable")}</Badge>
                 ) : null}
               </span>
             </li>
@@ -161,6 +163,6 @@ export async function TimeSection({ clientId, context, locked }: Props) {
           </CollapsibleSection>
         </div>
       )}
-    </section>
+    </Card>
   );
 }

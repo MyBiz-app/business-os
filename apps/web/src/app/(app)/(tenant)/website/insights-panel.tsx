@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ColumnChart } from "@/components/charts/column-chart";
 import { isolate } from "@/lib/bidi";
 import { formatDay } from "@/lib/dates";
+import { Card } from "@/components/ui/card";
 
 type Insights = components["schemas"]["Insights"];
 
@@ -18,7 +19,7 @@ export async function InsightsPanel({ insights }: { insights: Insights }) {
   const number = new Intl.NumberFormat(locale);
   const label = (day: string) => formatDay(day, locale, { day: "numeric", month: "numeric" });
   return (
-    <section className="card flex flex-col gap-6 p-6" aria-labelledby="site-insights">
+    <Card as="section" aria-labelledby="site-insights" className="flex flex-col gap-6">
       <h2 id="site-insights" className="text-lg font-semibold">{t("title")}</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-border bg-surface p-4">
@@ -70,6 +71,6 @@ export async function InsightsPanel({ insights }: { insights: Insights }) {
           </ul>
         )}
       </div>
-    </section>
+    </Card>
   );
 }

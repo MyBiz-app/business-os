@@ -8,6 +8,8 @@ import { FormError } from "@/components/form/form-message";
 
 import { eraseClient, type EraseState } from "./privacy-actions";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Card } from "@/components/ui/card";
+import { Button, ButtonLink } from "@/components/ui/button";
 
 /** Privacy requests (owners): download the client's data, or erase their personal details. */
 export function PrivacySection({ clientId, name }: { clientId: string; name: string }) {
@@ -15,7 +17,7 @@ export function PrivacySection({ clientId, name }: { clientId: string; name: str
   const [state, action, pending] = useActionState<EraseState, FormData>(eraseClient.bind(null, clientId), {});
 
   return (
-    <section aria-labelledby="privacy-heading" className="flex flex-col gap-4 card p-6">
+    <Card as="section" aria-labelledby="privacy-heading" className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h2 id="privacy-heading" className="text-lg font-semibold">
           {t("title")}
@@ -23,13 +25,9 @@ export function PrivacySection({ clientId, name }: { clientId: string; name: str
         <p className="text-sm text-muted">{t("intro")}</p>
       </div>
       <div>
-        <a
-          href={`/clients/${clientId}/export`}
-          download
-          className="btn-secondary px-4 py-2.5"
-        >
+        <ButtonLink href={`/clients/${clientId}/export`} download variant="secondary">
           {t("export")}
-        </a>
+        </ButtonLink>
       </div>
       <CollapsibleSection variant="inline" className="border-t border-border pt-4" triggerClassName="font-semibold text-danger" title={t("erase")}>
         <form action={action} className="flex flex-col gap-3">
@@ -37,17 +35,12 @@ export function PrivacySection({ clientId, name }: { clientId: string; name: str
           <FormError message={state.error && t(`errors.${state.error}`)} />
           <CheckboxField label={t("eraseConfirm", { name })} name="confirm" />
           <div>
-            <button
-              type="submit"
-              disabled={pending}
-              aria-busy={pending}
-              className="btn-plain rounded-lg border border-danger px-4 py-2.5 font-semibold text-danger disabled:opacity-60"
-            >
+            <Button type="submit" variant="danger" pending={pending}>
               {t("eraseButton")}
-            </button>
+            </Button>
           </div>
         </form>
       </CollapsibleSection>
-    </section>
+    </Card>
   );
 }

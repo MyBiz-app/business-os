@@ -1,7 +1,7 @@
 import { PawPrint, Plus, Users } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { Pill } from "@/components/pill";
+import { Badge } from "@/components/ui/badge";
 import { unwrap } from "@/lib/api";
 import { canWriteClients } from "@/lib/permissions";
 import type { getTenant } from "@/lib/tenant";
@@ -9,6 +9,8 @@ import type { getTenant } from "@/lib/tenant";
 import { setDependentActive } from "./dependents-actions";
 import { DependentForm } from "./dependents-forms";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 type Props = { clientId: string; context: Context; locked: boolean };
@@ -49,34 +51,35 @@ export async function DependentsSection({ clientId, context, locked }: Props) {
   };
 
   return (
-    <section aria-labelledby="dependents-heading" className="flex flex-col gap-4 card p-6">
+    <Card as="section" aria-labelledby="dependents-heading" className="flex flex-col gap-4">
       <h2 id="dependents-heading" className="flex items-center gap-2 text-lg font-semibold">
         <Icon aria-hidden="true" className="size-5 text-primary-ink" />
         {t(`title.${kind}`)}
       </h2>
       {dependents.length === 0 && <p className="text-sm text-muted">{t(`none.${kind}`)}</p>}
-      <ul className="flex flex-col gap-3">
+      <ul className="flex flex-col divide-y divide-border">
         {dependents.map((dependent) => {
           const facts = [
             dependent.birth_date ? t("age", { years: yearsSince(dependent.birth_date) }) : null,
             ...Object.entries(dependent.details).map(([key, value]) => shown(key, value)),
           ].filter(Boolean);
           return (
-            <li key={dependent.id} className="flex flex-col gap-2 rounded-xl border border-border p-3">
+            <li key={dependent.id} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <span dir="auto" className="font-semibold">{dependent.name}</span>
-                  {!dependent.active && <Pill tone="muted">{t("inactive")}</Pill>}
+                  {!dependent.active && <Badge tone="neutral">{t("inactive")}</Badge>}
                 </div>
                 {writable && (
                   <form action={setDependentActive.bind(null, clientId, dependent.id, !dependent.active)}>
-                    <button
+                    <Button
                       type="submit"
+                      variant="secondary"
                       aria-label={`${dependent.active ? t("retire") : t("restore")} - ${dependent.name}`}
-                      className="btn-secondary px-2.5 py-1 text-xs"
+                      className="text-xs"
                     >
                       {dependent.active ? t("retire") : t("restore")}
-                    </button>
+                    </Button>
                   </form>
                 )}
               </div>
@@ -94,12 +97,12 @@ export async function DependentsSection({ clientId, context, locked }: Props) {
         })}
       </ul>
       {writable && (
-        <CollapsibleSection variant="inline" className="rounded-xl bg-foreground/[0.03] p-3" triggerClassName="font-medium text-primary-ink" title={<><Plus aria-hidden="true" className="size-4" /> {t(`add.${kind}`)}</>}>
+        <CollapsibleSection variant="inline" className="rounded-xl bg-subtle p-3" triggerClassName="font-medium text-primary-ink" title={<><Plus aria-hidden="true" className="size-4" /> {t(`add.${kind}`)}</>}>
           <div className="pt-3">
             <DependentForm clientId={clientId} kind={kind} fields={settings.fields} />
           </div>
         </CollapsibleSection>
       )}
-    </section>
+    </Card>
   );
 }

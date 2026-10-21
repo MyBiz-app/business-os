@@ -154,7 +154,7 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
                   key={value}
                   className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary ${
                     blocked ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-                  } ${on ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-primary/50"}`}
+                  } ${on ? "border-primary bg-primary-subtle" : "border-border bg-surface hover:border-primary/50"}`}
                 >
                   <input
                     type="checkbox"
