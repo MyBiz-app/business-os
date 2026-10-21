@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { SectionNav, type SectionNavItem } from "@/components/section-nav";
 import { PageHeader } from "@/components/layout/page-header";
@@ -61,17 +61,43 @@ export function SettingsRoom({
   const pathname = usePathname();
   const isIndex = pathname === "/settings";
   const current = items.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
-  const menu: SectionNavItem[] = items.map((item) => {
+  // The groups of the open topic page, listed under its item and followed as the page scrolls.
+  const content = useRef<HTMLDivElement>(null);
+  const [groups, setGroups] = useState<{ id: string; title: string }[]>([]);
+  useEffect(() => {
+    const element = content.current;
+    if (!element || isIndex) return;
+    const read = () => {
+      const next = Array.from(element.querySelectorAll<HTMLElement>("[data-settings-group][id]")).map((group) => ({
+        id: group.id,
+        title: group.querySelector("h3")?.textContent?.trim() || group.id,
+      }));
+      setGroups((now) => (JSON.stringify(now) === JSON.stringify(next) ? now : next));
+    };
+    read();
+    // Content that streams in, and the swap between topics, change what is on the page.
+    const observer = new MutationObserver(read);
+    observer.observe(element, { childList: true, subtree: true });
+    return () => {
+      observer.disconnect();
+      setGroups([]);
+    };
+  }, [isIndex, pathname]);
+
+  const menu: SectionNavItem[] = items.flatMap((item) => {
     const Icon = ICONS[item.key];
     const inline = (INLINE_TOPICS as readonly TopicKey[]).includes(item.key);
-    return {
+    const isCurrent = !isIndex && current?.key === item.key;
+    const topic: SectionNavItem = {
       id: item.key,
       label: t(`nav.items.${item.key}`),
       icon: <Icon aria-hidden="true" className="size-4 shrink-0" />,
       group: t(`nav.groups.${item.group}`),
       href: inline && isIndex ? undefined : inline ? `/settings#${item.key}` : item.href,
-      current: !isIndex && current?.key === item.key,
+      current: isCurrent,
     };
+    const sections: SectionNavItem[] = isCurrent ? groups.map((group) => ({ id: group.id, label: group.title, nested: true })) : [];
+    return [topic, ...sections];
   });
 
   return (
@@ -79,7 +105,7 @@ export function SettingsRoom({
       <PageHeader title={title} description={description} className="print:hidden" />
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-6 xl:gap-10">
         <SectionNav items={menu} label={t("nav.label")} />
-        <div className="@container flex min-w-0 flex-col gap-4">
+        <div ref={content} className="@container flex min-w-0 flex-col gap-4">
           <ContentSwap swapKey={isIndex ? "index" : (current?.key ?? "index")}>{children}</ContentSwap>
         </div>
       </div>

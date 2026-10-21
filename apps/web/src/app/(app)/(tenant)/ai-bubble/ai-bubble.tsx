@@ -90,7 +90,11 @@ export function AiBubble() {
   const turns = chat?.conversation.turns ?? [];
   const busy = waitingFor !== null;
 
-  useEffect(() => end.current?.scrollIntoView({ block: "end", behavior: "smooth" }), [turns.length, waitingFor, open]);
+  useEffect(() => {
+    // Scroll the conversation itself, never the page behind it.
+    const list = end.current?.parentElement;
+    list?.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
+  }, [turns.length, waitingFor, open]);
   useEffect(() => {
     if (open) field.current?.focus();
   }, [open, shown?.key]);

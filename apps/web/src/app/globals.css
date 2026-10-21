@@ -2033,6 +2033,28 @@ html:has(dialog:modal) {
   grid-template-rows: 1fr;
 }
 
+/* The marker behind the current item of a side menu or section menu: glides to the item reached. */
+.glide-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--primary) 16%, transparent);
+}
+.glide-pill[data-glide] {
+  transition:
+    transform 220ms var(--ease-out),
+    width 220ms var(--ease-out),
+    height 220ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .glide-pill[data-glide] {
+    transition: none;
+  }
+}
+
 .segmented-pill {
   position: absolute;
   inset-block: 0.125rem;
