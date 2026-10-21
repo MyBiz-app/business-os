@@ -80781,6 +80781,19 @@
             ],
             "title": "Primary Color"
           },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At",
+            "description": "When the business was created (the side menu's 30-day switch)"
+          },
           "logo_url": {
             "anyOf": [
               {

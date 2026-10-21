@@ -656,6 +656,8 @@
     "menu": "Menu",
     "clientApp": "Client app",
     "locked": "Not in your plan",
+    "addCapabilities": "Add capabilities",
+    "lockedHint": "Add",
     "lockedItem": "{name} - not in your plan",
     "sales": "Sales",
     "resources": "Courts & rooms",
@@ -7107,6 +7109,10 @@
     }
   },
   "upgrade": {
+    "indexTitle": "Add capabilities",
+    "indexIntro": "Everything MyBiz can add to your business. Nothing changes until you add it.",
+    "indexAll": "Everything you could add is already in your plan.",
+    "learnMore": "See what it does",
     "notInPlan": "Not in your plan yet",
     "peek": "A peek at what you get",
     "invoiceTitle": "What changes on your invoice",

@@ -22991,6 +22991,11 @@ export interface components {
             /** Primary Color */
             primary_color: string | null;
             /**
+             * Created At
+             * @description When the business was created (the side menu's 30-day switch)
+             */
+            created_at?: string | null;
+            /**
              * Logo Url
              * @description Public path of the logo on this API, if any
              */
