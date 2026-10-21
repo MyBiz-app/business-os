@@ -169,7 +169,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
           return (
             <li key={item.href} className={unfolded ? "max-md:col-span-2" : undefined}>
               {heading && (
-                <p className="mb-1 mt-4 hidden px-3 text-xs font-semibold uppercase tracking-wide text-muted/80 md:block">
+                <p className="mb-1 mt-4 hidden px-3 text-xs font-semibold uppercase tracking-wide text-muted md:block">
                   {heading}
                 </p>
               )}

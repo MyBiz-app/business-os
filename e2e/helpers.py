@@ -7,6 +7,8 @@ import re
 import time
 import urllib.request
 
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+
 BASE = os.environ.get("E2E_WEB_URL", "http://localhost:3000")  # web
 APP = "http://localhost:8081"  # mobile app on Expo web
 MAILBOX = "http://127.0.0.1:54324/api/v1"  # Mailpit from `supabase start`
@@ -26,10 +28,16 @@ def chromium() -> str | None:
 def ready(page) -> None:
     page.wait_for_load_state("networkidle")
     # Entrance animations fade content in; accessibility checks need it fully opaque.
-    page.wait_for_function(
-        "document.getAnimations().every(a => a.effect?.getTiming().iterations === Infinity"
-        " || a.playState !== 'running')"
-    )
+    # The landing hero's live demo keeps starting short transitions (map dots, event pops), so it never
+    # goes fully still: after a few seconds the page counts as settled.
+    try:
+        page.wait_for_function(
+            "document.getAnimations().every(a => a.effect?.getTiming().iterations === Infinity"
+            " || a.playState !== 'running')",
+            timeout=6000,
+        )
+    except PlaywrightTimeoutError:
+        pass
 
 
 def visit(page, url: str) -> None:

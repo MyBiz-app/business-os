@@ -84,12 +84,12 @@ export async function TodayCard({
               <li key={session.id}>
                 <Link
                   href={`/schedule/${session.id}`}
-                  className={`group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-subtle sm:px-5 ${over ? "opacity-60" : ""}`}
+                  className={`group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-subtle sm:px-5`}
                 >
-                  <span className="w-12 shrink-0 text-sm font-semibold tabular-nums" dir="ltr">
+                  <span className={`w-12 shrink-0 text-sm font-semibold tabular-nums ${over ? "text-muted" : ""}`} dir="ltr">
                     {at(session.starts_at)}
                   </span>
-                  <span aria-hidden="true" className="h-9 w-1 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+                  <span aria-hidden="true" className={`h-9 w-1 shrink-0 rounded-full ${over ? "opacity-50" : ""}`} style={{ backgroundColor: color }} />
                   <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <span className="flex min-w-0 items-center gap-2">
                       <span className={`truncate text-sm font-medium ${cancelled ? "text-muted line-through" : ""}`}>{session.service.name}</span>
@@ -100,7 +100,7 @@ export async function TodayCard({
                     <span className="text-xs text-muted sm:hidden">{spots}</span>
                     {!cancelled && (
                       <span aria-hidden="true" className="h-1.5 w-full max-w-48 overflow-hidden rounded-full bg-subtle">
-                        <span className="block h-full rounded-full transition-[width] duration-700" style={{ width: `${fill * 100}%`, backgroundColor: color }} />
+                        <span className={`block h-full rounded-full transition-[width] duration-700 ${over ? "opacity-50" : ""}`} style={{ width: `${fill * 100}%`, backgroundColor: color }} />
                       </span>
                     )}
                   </span>
