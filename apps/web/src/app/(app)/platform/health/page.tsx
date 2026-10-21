@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import type { Metadata } from "next";
 import { BRAND } from "@business-os/i18n/brand";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -6,7 +7,6 @@ import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
 import { StatTile } from "@/components/ui/stat-tile";
@@ -62,37 +62,35 @@ export default async function PlatformHealthPage() {
         {health.jobs.length === 0 ? (
           <EmptyState variant="list">{t("noJobs")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="health-jobs" className="card">
-            <table className="w-full text-sm">
-              <thead className="bg-surface text-muted">
-                <tr>
-                  {(["job", "status", "lastOk", "lastRun", "runs", "failures"] as const).map((key) => (
-                    <th key={key} scope="col" className="px-4 py-3 text-start font-medium">{t(key)}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {health.jobs.map((job) => {
+          <DataTable
+            labelledBy="health-jobs"
+            rows={health.jobs}
+            rowKey={(job) => job.job}
+            rowClassName={() => "align-top"}
+            columns={[
+              { key: "job", header: t("job"), className: "font-medium", cell: (job) => <bdi dir="ltr">{job.job}</bdi> },
+              {
+                key: "status",
+                header: t("status"),
+                className: "font-medium",
+                cell: (job) => {
                   const state = jobState(job);
                   return (
-                    <tr key={job.job} className="border-t border-border align-top">
-                      <td className="px-4 py-2.5 font-medium" dir="ltr">{job.job}</td>
-                      <td className={`px-4 py-2.5 font-medium ${tone[state]}`}>
-                        {t(state)}
-                        {state === "failed" && job.last_result && (
-                          <span className="block max-w-xs truncate text-xs font-normal text-muted" dir="ltr" title={job.last_result}>{job.last_result}</span>
-                        )}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2.5">{at(job.last_ok_at)}</td>
-                      <td className="whitespace-nowrap px-4 py-2.5">{at(job.last_run_at)}</td>
-                      <td className="px-4 py-2.5">{job.runs_24h}</td>
-                      <td className="px-4 py-2.5">{job.failures_24h}</td>
-                    </tr>
+                    <span className={tone[state]}>
+                      {t(state)}
+                      {state === "failed" && job.last_result && (
+                        <span className="block max-w-xs truncate text-xs font-normal text-muted" dir="ltr" title={job.last_result}>{job.last_result}</span>
+                      )}
+                    </span>
                   );
-                })}
-              </tbody>
-            </table>
-          </ScrollRegion>
+                },
+              },
+              { key: "lastOk", header: t("lastOk"), nowrap: true, cell: (job) => at(job.last_ok_at) },
+              { key: "lastRun", header: t("lastRun"), nowrap: true, cell: (job) => at(job.last_run_at) },
+              { key: "runs", header: t("runs"), cell: (job) => job.runs_24h },
+              { key: "failures", header: t("failures"), cell: (job) => job.failures_24h },
+            ]}
+          />
         )}
       </section>
 
@@ -104,27 +102,17 @@ export default async function PlatformHealthPage() {
         {health.routes.length === 0 ? (
           <EmptyState variant="list">{t("noRoutes")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="health-routes" className="card">
-            <table className="w-full text-sm">
-              <thead className="bg-surface text-muted">
-                <tr>
-                  {(["route", "count", "p50", "p95"] as const).map((key) => (
-                    <th key={key} scope="col" className="px-4 py-3 text-start font-medium">{t(key)}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {health.routes.map((route) => (
-                  <tr key={route.route} className="border-t border-border">
-                    <td className="px-4 py-2.5" dir="ltr">{route.route}</td>
-                    <td className="px-4 py-2.5">{route.count}</td>
-                    <td className="px-4 py-2.5">{number.format(route.p50_ms)}</td>
-                    <td className="px-4 py-2.5">{number.format(route.p95_ms)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="health-routes"
+            rows={health.routes}
+            rowKey={(route) => route.route}
+            columns={[
+              { key: "route", header: t("route"), cell: (route) => <bdi dir="ltr">{route.route}</bdi> },
+              { key: "count", header: t("count"), cell: (route) => route.count },
+              { key: "p50", header: t("p50"), cell: (route) => number.format(route.p50_ms) },
+              { key: "p95", header: t("p95"), cell: (route) => number.format(route.p95_ms) },
+            ]}
+          />
         )}
       </section>
 
@@ -136,35 +124,28 @@ export default async function PlatformHealthPage() {
         {health.errors.length === 0 ? (
           <EmptyState variant="list">{t("noErrors")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="health-errors" className="card">
-            <table className="w-full text-sm">
-              <thead className="bg-surface text-muted">
-                <tr>
-                  {(["when", "requestId", "path", "business"] as const).map((key) => (
-                    <th key={key} scope="col" className="px-4 py-3 text-start font-medium">{t(key)}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {health.errors.map((error, index) => (
-                  <tr key={`${error.at}-${index}`} className="border-t border-border">
-                    <td className="whitespace-nowrap px-4 py-2.5">{when.format(new Date(error.at))}</td>
-                    <td className="px-4 py-2.5" dir="ltr">{error.request_id ?? "-"}</td>
-                    <td className="px-4 py-2.5" dir="ltr">{error.method} {error.path ?? "-"} {error.error ? `(${error.error})` : ""}</td>
-                    <td className="px-4 py-2.5" dir="ltr">
-                      {error.tenant_id ? (
-                        <Link href={`/platform/businesses/${error.tenant_id}`} className="text-primary-ink underline-offset-4 hover:underline">
-                          {error.tenant_id.slice(0, 8)}
-                        </Link>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="health-errors"
+            rows={health.errors}
+            rowKey={(error, index) => `${error.at}-${index}`}
+            columns={[
+              { key: "when", header: t("when"), nowrap: true, cell: (error) => when.format(new Date(error.at)) },
+              { key: "requestId", header: t("requestId"), cell: (error) => <bdi dir="ltr">{error.request_id ?? "-"}</bdi> },
+              { key: "path", header: t("path"), cell: (error) => <bdi dir="ltr">{error.method} {error.path ?? "-"} {error.error ? `(${error.error})` : ""}</bdi> },
+              {
+                key: "business",
+                header: t("business"),
+                cell: (error) =>
+                  error.tenant_id ? (
+                    <Link dir="ltr" href={`/platform/businesses/${error.tenant_id}`} className="text-primary-ink underline-offset-4 hover:underline">
+                      {error.tenant_id.slice(0, 8)}
+                    </Link>
+                  ) : (
+                    "-"
+                  ),
+              },
+            ]}
+          />
         )}
       </section>
     </Container>

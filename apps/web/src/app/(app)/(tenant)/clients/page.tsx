@@ -11,13 +11,13 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { DataTable } from "@/components/ui/data-table";
 import { CardTransition } from "@/components/ui/page-transition";
 
 import { addMeAsClient } from "./actions";
 import { StatusBadge } from "./status-badge";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { ScrollRegion } from "@/components/scroll-region";
 import { EmptyState } from "@/components/empty-state";
 import { openedId, withOpen } from "@/lib/open-window";
 
@@ -245,57 +245,60 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           {filtered ? term("noResults") : term("noClients")}
         </EmptyState>
       ) : (
-        <ScrollRegion labelledBy="clients-heading" className="card">
-          <table className="w-full text-start text-sm">
-            <thead className="bg-subtle text-muted">
-              <tr>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.name")}</th>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.phone")}</th>
-                <th scope="col" className="hidden px-4 py-3 text-start font-medium xl:table-cell">{t("clients.email")}</th>
-                <th scope="col" className="hidden px-4 py-3 text-start font-medium lg:table-cell">{t("clients.list.plan")}</th>
-                <th scope="col" className="hidden px-4 py-3 text-start font-medium sm:table-cell">{t("clients.list.lastVisit")}</th>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.status")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.items.map((client) => (
-                <tr key={client.id} className="border-t border-border transition-colors hover:bg-subtle">
-                  <td className="px-4 py-2.5">
-                    <CardTransition name={`client-${client.id}`}>
-                    <Link scroll={false} href={withOpen("/clients", params, client.id)} className="group flex items-center gap-3 font-medium">
-                      <Avatar id={client.id} name={[client.first_name, client.last_name].filter(Boolean).join(" ")} />
-                      <span dir="auto" className="text-primary-ink underline-offset-4 group-hover:underline">
-                        {[client.first_name, client.last_name].filter(Boolean).join(" ")}
-                      </span>
-                      {client.is_staff && <Badge tone="primary">{t("clients.staffBadge")}</Badge>}
-                    </Link>
-                    </CardTransition>
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3" dir="ltr">{client.phone}</td>
-                  <td className="hidden max-w-56 truncate px-4 py-3 xl:table-cell" dir="ltr">{client.email}</td>
-                  <td className="hidden px-4 py-3 lg:table-cell">
-                    {client.plan_name ? (
-                      <span className="flex flex-col">
-                        <span dir="auto" className="font-medium">{client.plan_name}</span>
-                        {client.plan_ends_on && (
-                          <span className="text-xs text-muted">{t("clients.list.planUntil", { date: shortDate(client.plan_ends_on) })}</span>
-                        )}
-                      </span>
-                    ) : (
-                      <span className="text-muted">{t("clients.list.noPlan")}</span>
+        <DataTable
+          labelledBy="clients-heading"
+          rows={result.items}
+          rowKey={(client) => client.id}
+          columns={[
+            {
+              key: "name",
+              header: t("clients.name"),
+              cell: (client) => (
+                <CardTransition name={`client-${client.id}`}>
+                  <Link scroll={false} href={withOpen("/clients", params, client.id)} className="group flex items-center gap-3 font-medium">
+                    <Avatar id={client.id} name={[client.first_name, client.last_name].filter(Boolean).join(" ")} />
+                    <span dir="auto" className="text-primary-ink underline-offset-4 group-hover:underline">
+                      {[client.first_name, client.last_name].filter(Boolean).join(" ")}
+                    </span>
+                    {client.is_staff && <Badge tone="primary">{t("clients.staffBadge")}</Badge>}
+                  </Link>
+                </CardTransition>
+              ),
+            },
+            { key: "phone", header: t("clients.phone"), nowrap: true, cell: (client) => <bdi dir="ltr">{client.phone}</bdi> },
+            {
+              key: "email",
+              header: t("clients.email"),
+              hideBelow: "xl",
+              className: "max-w-56 truncate",
+              cell: (client) => <bdi dir="ltr">{client.email}</bdi>,
+            },
+            {
+              key: "plan",
+              header: t("clients.list.plan"),
+              hideBelow: "lg",
+              cell: (client) =>
+                client.plan_name ? (
+                  <span className="flex flex-col">
+                    <span dir="auto" className="font-medium">{client.plan_name}</span>
+                    {client.plan_ends_on && (
+                      <span className="text-xs text-muted">{t("clients.list.planUntil", { date: shortDate(client.plan_ends_on) })}</span>
                     )}
-                  </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell">
-                    {client.last_visit ? sinceVisit(client.last_visit) : <span className="text-muted">{t("clients.list.never")}</span>}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={client.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+                  </span>
+                ) : (
+                  <span className="text-muted">{t("clients.list.noPlan")}</span>
+                ),
+            },
+            {
+              key: "lastVisit",
+              header: t("clients.list.lastVisit"),
+              hideBelow: "sm",
+              nowrap: true,
+              cell: (client) => (client.last_visit ? sinceVisit(client.last_visit) : <span className="text-muted">{t("clients.list.never")}</span>),
+            },
+            { key: "status", header: t("clients.status"), cell: (client) => <StatusBadge status={client.status} /> },
+          ]}
+        />
       )}
 
       {pages > 1 && (

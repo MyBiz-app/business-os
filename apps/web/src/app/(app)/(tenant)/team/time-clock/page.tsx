@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/ui/data-table";
 import { addMonths, monthStart, todayIn } from "@business-os/i18n/dates";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -53,39 +54,47 @@ export default async function TimeClockPage({ searchParams }: PageProps<"/team/t
       {overview.people.length === 0 ? (
         <EmptyState variant="people">{t("empty")}</EmptyState>
       ) : (
-        <div className="card overflow-x-auto">
-          <table className="w-full min-w-[40rem] text-sm">
-            <thead className="text-start text-muted">
-              <tr>
-                <th scope="col" className="p-3 text-start font-medium">{t("person")}</th>
-                <th scope="col" className="p-3 text-start font-medium">{t("planned")}</th>
-                <th scope="col" className="p-3 text-start font-medium">{t("worked")}</th>
-                <th scope="col" className="p-3 text-start font-medium">{t("overtime")}</th>
-                <th scope="col" className="p-3 text-start font-medium">{t("missing")}</th>
-                <th scope="col" className="p-3 text-start font-medium">{t("status")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {overview.people.map((person) => (
-                <tr key={person.user_id}>
-                  <th scope="row" className="p-3 text-start font-medium">
-                    <Link href={`/team/time-clock/${person.user_id}?month=${month}`} dir="auto" className="underline-offset-2 hover:underline">
-                      {person.user_name}
-                    </Link>
-                  </th>
-                  <td className="p-3 tabular-nums">{hm(person.planned_hours)}</td>
-                  <td className="p-3 tabular-nums">{hm(person.worked.total)}</td>
-                  <td className="p-3 tabular-nums">{hm(person.worked.tier1 + person.worked.tier2 + person.worked.rest_day)}</td>
-                  <td className={`p-3 tabular-nums ${person.missing_shifts > 0 ? "text-warning" : ""}`}>{person.missing_shifts}</td>
-                  <td className="p-3">
-                    {person.approved ? t("approved") : person.open_entries > 0 ? t("open_entries") : t("pending")}
-                    {person.corrections > 0 && <span className="block text-xs text-muted">{t("corrections", { count: person.corrections })}</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          label={t("title")}
+          rows={overview.people}
+          rowKey={(person) => person.user_id}
+          columns={[
+            {
+              key: "person",
+              header: t("person"),
+              className: "font-medium",
+              cell: (person) => (
+                <Link href={`/team/time-clock/${person.user_id}?month=${month}`} dir="auto" className="underline-offset-2 hover:underline">
+                  {person.user_name}
+                </Link>
+              ),
+            },
+            { key: "planned", header: t("planned"), className: "tabular-nums", cell: (person) => hm(person.planned_hours) },
+            { key: "worked", header: t("worked"), className: "tabular-nums", cell: (person) => hm(person.worked.total) },
+            {
+              key: "overtime",
+              header: t("overtime"),
+              className: "tabular-nums",
+              cell: (person) => hm(person.worked.tier1 + person.worked.tier2 + person.worked.rest_day),
+            },
+            {
+              key: "missing",
+              header: t("missing"),
+              className: "tabular-nums",
+              cell: (person) => <span className={person.missing_shifts > 0 ? "text-warning" : undefined}>{person.missing_shifts}</span>,
+            },
+            {
+              key: "status",
+              header: t("status"),
+              cell: (person) => (
+                <>
+                  {person.approved ? t("approved") : person.open_entries > 0 ? t("open_entries") : t("pending")}
+                  {person.corrections > 0 && <span className="block text-xs text-muted">{t("corrections", { count: person.corrections })}</span>}
+                </>
+              ),
+            },
+          ]}
+        />
       )}
 
       <section aria-labelledby="rules-heading" className="card flex flex-col gap-4 p-5">

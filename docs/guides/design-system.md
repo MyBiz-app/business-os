@@ -222,11 +222,16 @@ The team list opens a person's card as a window over the list with `?open=<userI
   put and dots show while the data loads. Heavy pages have a `loading.tsx` built from
   `components/layout/page-skeletons.tsx` at the page's own `Container` width.
 - `design-system/no-handrolled-ui`: new code uses `Button` / `IconButton` / `ButtonLink` instead of a bare `<button>`, and
-  (from W4-1) `DataTable` instead of a bare `<table>`. The components themselves (`components/ui/`) and stories are exempt.
+  `DataTable` (`components/ui/data-table.tsx`) instead of a bare `<table>`. The components themselves (`components/ui/`) and stories are exempt.
   Files that predate the components are listed in `apps/web/eslint-rules/handrolled-ui-baseline.json`, a list that only
   shrinks: after moving a file over, run `node scripts/handrolled-ui-baseline.mjs` in `apps/web` (the test
-  `src/lib/handrolled-ui.test.ts` fails while a listed file no longer needs its entry). Until `DataTable` exists, a new
-  table needs `// eslint-disable-next-line design-system/no-handrolled-ui -- DataTable lands in W4-1`.
+  `src/lib/handrolled-ui.test.ts` fails while a listed file no longer needs its entry). A table that is not a list
+  of records (a chart's data table, a printed document's line items, a calendar grid) keeps its `<table>` with
+  `// eslint-disable-next-line design-system/no-handrolled-ui -- <why>`.
+- `DataTable`: pass `columns` (`header`, `cell`, `align`, `nowrap`, `hideBelow`, `rowHeader`, `sortable`), `rows` and a
+  `rowKey`. It has no client code, so server pages use it as is. Sorting and row selection are controlled: a
+  client page uses `useDataTable` (`components/ui/use-data-table.ts`) and passes `sort`/`onSortChange`/`selection`.
+  `bare` drops the card border for a table that already sits in a card. Stories: `Components/DataTable`.
 - `design-system/no-raw-button`: a `<button>` needs `btn-primary`, `btn-secondary`, `btn-ghost`,
   `btn-danger`, `btn-link`, `btn-icon`, `btn-plain` or `control` in its `className`.
 

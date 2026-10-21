@@ -1,8 +1,8 @@
+import { DataTable } from "@/components/ui/data-table";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { Ltr } from "@/components/bidi";
-import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -47,47 +47,54 @@ export default async function PlatformBillingPage() {
         {overdue.length === 0 ? (
           <EmptyState variant="list">{t("overdue.empty")}</EmptyState>
         ) : (
-          <ScrollRegion labelledBy="overdue-heading" className="card">
-            <table className="w-full text-sm">
-              <thead className="text-muted">
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("overdue.business")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("overdue.owner")}</th>
-                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("overdue.open")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("overdue.since")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("overdue.state")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("overdue.action")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {overdue.map((row) => (
-                  <tr key={row.tenant_id} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3" dir="auto">
-                      <Link href={`/platform/businesses/${row.tenant_id}`} className="text-primary-ink underline-offset-4 hover:underline">{row.name}</Link>
-                    </td>
-                    <td className="px-4 py-3"><Ltr>{row.owner_email ?? ""}</Ltr></td>
-                    <td className="px-4 py-3 text-end tabular-nums"><bdi>{formatMoney(row.open_amount, row.currency, locale)}</bdi></td>
-                    <td className="px-4 py-3">{formatDay(row.oldest_issued_at, locale, { day: "numeric", month: "short", year: "numeric" })}</td>
-                    <td className="px-4 py-3">
-                      <Pill tone={row.billing_state === "active" ? "muted" : "danger"}>{t(`overdue.states.${row.billing_state}`)}</Pill>
-                      {row.grace_until && new Date(row.grace_until) > new Date() && (
-                        <span className="block text-xs text-muted">{t("overdue.graceUntil", { date: formatDay(row.grace_until, locale, { day: "numeric", month: "short" }) })}</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <form action={extendGrace.bind(null, row.tenant_id)} className="flex items-end gap-2">
-                        <label className="flex flex-col gap-1 text-xs text-muted">
-                          {t("overdue.days")}
-                          <input type="number" name="days" min={1} max={90} defaultValue={7} className="control w-20 px-2 py-1.5 text-sm" />
-                        </label>
-                        <SubmitButton className="px-3 py-1.5 text-sm">{t("overdue.extend")}</SubmitButton>
-                      </form>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollRegion>
+          <DataTable
+            labelledBy="overdue-heading"
+            rows={overdue}
+            rowKey={(row) => row.tenant_id}
+            columns={[
+              {
+                key: "business",
+                header: t("overdue.business"),
+                cell: (row) => (
+                  <Link dir="auto" href={`/platform/businesses/${row.tenant_id}`} className="text-primary-ink underline-offset-4 hover:underline">{row.name}</Link>
+                ),
+              },
+              { key: "owner", header: t("overdue.owner"), cell: (row) => <Ltr>{row.owner_email ?? ""}</Ltr> },
+              {
+                key: "open",
+                header: t("overdue.open"),
+                align: "end",
+                className: "tabular-nums",
+                cell: (row) => <bdi>{formatMoney(row.open_amount, row.currency, locale)}</bdi>,
+              },
+              { key: "since", header: t("overdue.since"), cell: (row) => formatDay(row.oldest_issued_at, locale, { day: "numeric", month: "short", year: "numeric" }) },
+              {
+                key: "state",
+                header: t("overdue.state"),
+                cell: (row) => (
+                  <>
+                    <Pill tone={row.billing_state === "active" ? "muted" : "danger"}>{t(`overdue.states.${row.billing_state}`)}</Pill>
+                    {row.grace_until && new Date(row.grace_until) > new Date() && (
+                      <span className="block text-xs text-muted">{t("overdue.graceUntil", { date: formatDay(row.grace_until, locale, { day: "numeric", month: "short" }) })}</span>
+                    )}
+                  </>
+                ),
+              },
+              {
+                key: "action",
+                header: t("overdue.action"),
+                cell: (row) => (
+                  <form action={extendGrace.bind(null, row.tenant_id)} className="flex items-end gap-2">
+                    <label className="flex flex-col gap-1 text-xs text-muted">
+                      {t("overdue.days")}
+                      <input type="number" name="days" min={1} max={90} defaultValue={7} className="control w-20 px-2 py-1.5 text-sm" />
+                    </label>
+                    <SubmitButton className="px-3 py-1.5 text-sm">{t("overdue.extend")}</SubmitButton>
+                  </form>
+                ),
+              },
+            ]}
+          />
         )}
       </section>
       <DunningForm settings={dunning} />
@@ -108,39 +115,34 @@ export default async function PlatformBillingPage() {
             ))}
           </div>
         ))}
-        <ScrollRegion labelledBy="billing-heading" className="card">
-          <table className="w-full text-sm">
-            <thead className="text-muted">
-              <tr className="border-b border-border">
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("month")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("invoices")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("paid")}</th>
-                <th scope="col" className="px-4 py-3 text-end font-medium">{t("open")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {billing.map((row) => (
-                <tr key={`${row.month}-${row.currency}`} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3">{formatDay(row.month, locale, { month: "long", year: "numeric" })}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">{number.format(row.invoices)}</td>
-                  <td className="px-4 py-3 text-end tabular-nums">
-                    <span className="flex items-center justify-end gap-2">
-                      <span
-                        role="img"
-                        aria-label={t("billingStats.paidShare", { value: percent.format(row.paid / Math.max(1, row.paid + row.open)) })}
-                        className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block"
-                      >
-                        <span className="block h-full rounded-full bg-success" style={{ inlineSize: `${(row.paid / Math.max(1, row.paid + row.open)) * 100}%` }} />
-                      </span>
-                      <bdi>{formatMoney(row.paid, row.currency, locale)}</bdi>
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-end tabular-nums"><bdi>{formatMoney(row.open, row.currency, locale)}</bdi></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollRegion>
+        <DataTable
+          labelledBy="billing-heading"
+          rows={billing}
+          rowKey={(row) => `${row.month}-${row.currency}`}
+          columns={[
+            { key: "month", header: t("month"), cell: (row) => formatDay(row.month, locale, { month: "long", year: "numeric" }) },
+            { key: "invoices", header: t("invoices"), align: "end", className: "tabular-nums", cell: (row) => number.format(row.invoices) },
+            {
+              key: "paid",
+              header: t("paid"),
+              align: "end",
+              className: "tabular-nums",
+              cell: (row) => (
+                <span className="flex items-center justify-end gap-2">
+                  <span
+                    role="img"
+                    aria-label={t("billingStats.paidShare", { value: percent.format(row.paid / Math.max(1, row.paid + row.open)) })}
+                    className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block"
+                  >
+                    <span className="block h-full rounded-full bg-success" style={{ inlineSize: `${(row.paid / Math.max(1, row.paid + row.open)) * 100}%` }} />
+                  </span>
+                  <bdi>{formatMoney(row.paid, row.currency, locale)}</bdi>
+                </span>
+              ),
+            },
+            { key: "open", header: t("open"), align: "end", className: "tabular-nums", cell: (row) => <bdi>{formatMoney(row.open, row.currency, locale)}</bdi> },
+          ]}
+        />
         </>
       )}
     </Container>
