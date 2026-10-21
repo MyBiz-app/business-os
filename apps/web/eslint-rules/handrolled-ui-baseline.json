@@ -1,0 +1,585 @@
+{
+  "src/app/(app)/(tenant)/_menu/crm-aside.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/_menu/workspace-switcher.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai-bubble/ai-bubble.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/agent-dialog.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/agent-editor.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/agent-fields.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/agent-wizard.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/ai-tour.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/chat-panel.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/proactive-settings.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/scope-picker.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/structure-panel.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/tasks-board.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/team-list.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/team-map.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/team-view.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/ai/usage-meter.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/bills/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/bills/run-form.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/catalog/codes-tab.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/catalog/delete-button.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/catalog/promos/promo-actions-bar.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/[id]/addresses-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/[id]/dependents-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/[id]/health-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/[id]/plan-forms.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/[id]/plans-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/[id]/privacy-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/[id]/profile-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/[id]/work-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/import/import-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/clients/page.tsx": [
+    "button",
+    "table"
+  ],
+  "src/app/(app)/(tenant)/content/connect-cards.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/content/csv-button.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/content/filter-bar.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/content/heatmap.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/content/line-chart.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/crm-frame.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/dashboard/website-offer-card.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/files/archive-button.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/files/forms.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/files/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/invoices/[id]/invoice-body.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/invoices/document-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/leads/[id]/lead-body.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/leads/[id]/lead-controls.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/leads/copy-link.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/leads/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/leads/stage-filter.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/locations/branch-branding.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/locations/location-groups.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/messages/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/messages/variable-picker.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/migration/follow-up.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/migration/migration-hub.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/quotes/[id]/copy-link.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/quotes/[id]/quote-body.tsx": [
+    "button",
+    "table"
+  ],
+  "src/app/(app)/(tenant)/quotes/quote-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/receipts/[id]/receipt-body.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/reports/branch-link.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/reports/busy-hours.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/reports/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/resources/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/sales/orders/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/sales/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/schedule/[id]/job-panel.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/[id]/over-capacity-button.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/[id]/roster.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/[id]/session-body.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/[id]/session-status-button.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/appointment/appointment-body.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/closed/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/copy-week.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/publish-week.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/save-default.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/schedule/waitlist/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/settings/ai-connections/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/settings/audit/page.tsx": [
+    "button",
+    "table"
+  ],
+  "src/app/(app)/(tenant)/settings/billing/ai-users.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/settings/billing/cancel/cancel-flow.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/settings/billing/invoices/[id]/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/settings/billing/page.tsx": [
+    "button",
+    "table"
+  ],
+  "src/app/(app)/(tenant)/settings/branding/branding-editor.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/settings/export-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/settings/integrations/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/settings/solo-card.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/settings/support-section.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/[userId]/ai-member-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/[userId]/card-sections.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/[userId]/payroll/payroll-file.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/bonuses/bonus-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/bonuses/bonus-list.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/organization/org-chart.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/payroll/annual/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/team/payroll/run-board.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/roles/role-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/shift-swaps/decision-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/shifts/coverage-settings.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/shifts/publish-bar.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/shifts/save-default.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/shifts/shift-board.tsx": [
+    "button",
+    "table"
+  ],
+  "src/app/(app)/(tenant)/team/shifts/station-settings.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/team-forms.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/time-clock/[userId]/entry-forms.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/time-clock/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/(tenant)/team/time-clock/rules-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/team/time-off/decision-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/website/brief/wizard.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/website/embed-panel.tsx": [
+    "button"
+  ],
+  "src/app/(app)/(tenant)/website/respond-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/account/profile-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/account/security-settings.tsx": [
+    "button"
+  ],
+  "src/app/(app)/businesses/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/closed/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/onboarding/onboarding-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/ai/agents-map.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/ai/console-chat.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/ai/library-panel.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/ai/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/ai/pause-button.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/ai/reports.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/audit/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/billing/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/broadcasts/composer.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/businesses/[id]/page.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/businesses/page.tsx": [
+    "button",
+    "table"
+  ],
+  "src/app/(app)/platform/catalog/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/churn/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/email/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/growth/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/health/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/inbox/request-card.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/incidents/incident-form.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/legal/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/metrics/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/security/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/team/staff-forms.tsx": [
+    "button"
+  ],
+  "src/app/(app)/platform/trials/page.tsx": [
+    "table"
+  ],
+  "src/app/(app)/platform/website-orders/order-card.tsx": [
+    "button"
+  ],
+  "src/app/(app)/suspended/page.tsx": [
+    "button"
+  ],
+  "src/app/(auth)/login/code/code-form.tsx": [
+    "button"
+  ],
+  "src/app/(auth)/login/mfa/page.tsx": [
+    "button"
+  ],
+  "src/app/(marketing)/pricing/page.tsx": [
+    "table"
+  ],
+  "src/app/(marketing)/start/cart.tsx": [
+    "button"
+  ],
+  "src/app/(marketing)/start/journey-pieces.tsx": [
+    "button"
+  ],
+  "src/app/(marketing)/start/site-only.tsx": [
+    "button"
+  ],
+  "src/app/(marketing)/start/start-wizard.tsx": [
+    "button"
+  ],
+  "src/app/(marketing)/start/steps.tsx": [
+    "button"
+  ],
+  "src/app/connect/mcp/page.tsx": [
+    "button"
+  ],
+  "src/app/error.tsx": [
+    "button"
+  ],
+  "src/app/global-error.tsx": [
+    "button"
+  ],
+  "src/app/invite/[token]/page.tsx": [
+    "button"
+  ],
+  "src/app/q/[token]/answer-form.tsx": [
+    "button"
+  ],
+  "src/app/q/[token]/page.tsx": [
+    "button",
+    "table"
+  ],
+  "src/components/accessibility-widget.tsx": [
+    "button"
+  ],
+  "src/components/account-status.tsx": [
+    "button"
+  ],
+  "src/components/address-picker.tsx": [
+    "button"
+  ],
+  "src/components/auth/provider-button.tsx": [
+    "button"
+  ],
+  "src/components/branch-map/branch-map.tsx": [
+    "button"
+  ],
+  "src/components/branch-scope-picker.tsx": [
+    "button"
+  ],
+  "src/components/calendar-board/time-grid.tsx": [
+    "button"
+  ],
+  "src/components/charts/column-chart.tsx": [
+    "table"
+  ],
+  "src/components/form/confirm-delete.tsx": [
+    "button"
+  ],
+  "src/components/form/hours-form.tsx": [
+    "button"
+  ],
+  "src/components/form/password-field.tsx": [
+    "button"
+  ],
+  "src/components/form/submit-button.tsx": [
+    "button"
+  ],
+  "src/components/identity-editor.tsx": [
+    "button"
+  ],
+  "src/components/image-crop-dialog.tsx": [
+    "button"
+  ],
+  "src/components/locale-switcher.tsx": [
+    "button"
+  ],
+  "src/components/marketing/ai-team-org.tsx": [
+    "button"
+  ],
+  "src/components/marketing/ai-team-sim.tsx": [
+    "button"
+  ],
+  "src/components/marketing/calc-addon-card.tsx": [
+    "button"
+  ],
+  "src/components/marketing/calc-industry.tsx": [
+    "button"
+  ],
+  "src/components/marketing/day-clock.tsx": [
+    "button"
+  ],
+  "src/components/marketing/demo-stage.tsx": [
+    "button"
+  ],
+  "src/components/marketing/marketing-header.tsx": [
+    "button"
+  ],
+  "src/components/marketing/pricing-calculator.tsx": [
+    "button"
+  ],
+  "src/components/marketing/print-button.tsx": [
+    "button"
+  ],
+  "src/components/marketing/show-accessibility-button.tsx": [
+    "button"
+  ],
+  "src/components/mfa-risk-dialog.tsx": [
+    "button"
+  ],
+  "src/components/more-menu.tsx": [
+    "button"
+  ],
+  "src/components/palette.tsx": [
+    "button"
+  ],
+  "src/components/period-picker.tsx": [
+    "button"
+  ],
+  "src/components/print-button.tsx": [
+    "button"
+  ],
+  "src/components/segmented-control.tsx": [
+    "button"
+  ],
+  "src/components/side-nav.tsx": [
+    "button"
+  ],
+  "src/components/theme-switcher.tsx": [
+    "button"
+  ],
+  "src/components/theme-toggle.tsx": [
+    "button"
+  ],
+  "src/components/toast/toaster.tsx": [
+    "button"
+  ],
+  "src/components/tour/tour.tsx": [
+    "button"
+  ],
+  "src/components/user-menu.tsx": [
+    "button"
+  ]
+}

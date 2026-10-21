@@ -5,8 +5,14 @@
 //  - no-scroll-jump: a Link or router call that only changes the query of the current page (period,
 //    month, filter, page number) keeps the scroll position: it needs scroll={false} (scroll={true} when
 //    the jump to the top is intended).
+//  - no-handrolled-ui: new code uses Button / IconButton and (from W4-1) DataTable instead of a bare
+//    <button> or <table>. Files that predate the components are listed in handrolled-ui-baseline.json;
+//    the list only shrinks (src/lib/handrolled-ui.test.ts fails when a listed file no longer needs it).
 //  - no-raw-button: a <button> carries a system class (btn-primary, btn-secondary, btn-ghost,
 //    btn-danger, btn-link, btn-icon, btn-plain, or control) so every button looks, focuses and sizes the same.
+import { readFileSync } from "node:fs";
+import { relative, sep } from "node:path";
+
 const HEX = /(?:^|[^\w&])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![\w-])/;
 const PALETTE = new RegExp(
   "(?:^|[\\s\"'`:!])-?(?:bg|text|border|ring|from|to|via|fill|stroke|shadow|divide|outline|decoration|accent|caret|placeholder)-" +
@@ -93,6 +99,34 @@ const noRawButton = {
   },
 };
 
+const BASELINE = JSON.parse(readFileSync(new URL("./handrolled-ui-baseline.json", import.meta.url), "utf8"));
+
+/** @type {import("eslint").Rule.RuleModule} */
+const noHandrolledUi = {
+  meta: {
+    type: "problem",
+    docs: { description: "Use the Button and IconButton components (and DataTable) instead of a bare <button> or <table> in new code." },
+    schema: [],
+    messages: {
+      button: "A hand-rolled <button>. Use <Button> (or <IconButton>, <ButtonLink>) from @/components/ui/button; variant=\"plain\" is the escape for a card or row that is a button.",
+      table: "A hand-rolled <table>. Use the DataTable component (W4-1). Until it exists, disable this rule on the line with a reason, e.g. `-- DataTable lands in W4-1`.",
+    },
+  },
+  create(context) {
+    const file = relative(context.cwd ?? process.cwd(), context.filename ?? context.getFilename()).split(sep).join("/");
+    // The components themselves, their stories and the baseline of older files may use the elements.
+    if (/^src\/components\/ui\//.test(file) || /\.stories\.tsx$/.test(file)) return {};
+    const allowed = new Set(BASELINE[file] ?? []);
+    return {
+      JSXOpeningElement(node) {
+        if (node.name.type !== "JSXIdentifier") return;
+        const tag = node.name.name;
+        if ((tag === "button" || tag === "table") && !allowed.has(tag)) context.report({ node, messageId: tag });
+      },
+    };
+  },
+};
+
 /** The route a file belongs to: its folder under src/app without (groups), e.g. "/sales/orders". */
 function routeOf(filename) {
   const match = /[\\/]src[\\/]app[\\/](.*)$/.exec(filename);
@@ -152,5 +186,5 @@ const noScrollJump = {
   },
 };
 
-const plugin = { rules: { "no-raw-colors": noRawColors, "no-raw-button": noRawButton, "no-scroll-jump": noScrollJump } };
+const plugin = { rules: { "no-raw-colors": noRawColors, "no-raw-button": noRawButton, "no-scroll-jump": noScrollJump, "no-handrolled-ui": noHandrolledUi } };
 export default plugin;
