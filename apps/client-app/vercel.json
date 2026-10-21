@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm exec expo export -p web --output-dir dist",
+  "buildCommand": "node scripts/copy-maplibre-worker.mjs && pnpm exec expo export -p web --output-dir dist",
   "outputDirectory": "dist",
   "rewrites": [
     {

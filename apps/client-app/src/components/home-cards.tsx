@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import type { components } from "@business-os/api-client";
 import { formatTime } from "@business-os/i18n/dates";
 import { router } from "expo-router";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Linking, StyleSheet, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -11,13 +11,16 @@ import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/ro
 import { Text } from "@business-os/app-kit/components/text";
 import { Card, elevation, styles } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
+import { byDistance, distanceLabel, hasPoint } from "@business-os/app-kit/lib/distance";
 import { lastVisit, nextBooking, type HomeCard } from "@business-os/app-kit/lib/client-home";
 import { googleMapsLink, wazeLink } from "@business-os/app-kit/lib/maps";
 import { bookingModesFor, termsFor } from "@business-os/app-kit/lib/vertical";
 import { BookingActions } from "@/components/booking-actions";
+import { BranchMap } from "@/components/branch-map";
 import { addressOf, type Location } from "@/lib/use-locations";
 import { notificationIcon, useNotificationText } from "@/lib/notification-text";
 import { useAccount } from "@/lib/use-account";
+import { useDevicePosition } from "@/lib/use-device-position";
 import { useDependents } from "@/lib/use-dependents";
 import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
@@ -311,28 +314,57 @@ function Updates() {
 function BusinessInfo({ data }: { data: HomeData }) {
   const t = useTranslations("client.homeCards");
   const { business, palette } = useBusiness();
+  const [selected, setSelected] = useState<string>();
+  const device = useDevicePosition();
   if (!business) return null;
+  const placed = data.locations.filter(hasPoint);
+  // Nearest first once the person shared where they are; the position never leaves this phone.
+  const ranked = device.position ? byDistance(device.position, data.locations) : [];
+  const km = new Map(ranked.map((r) => [r.place.id, r.km]));
+  const locations = device.position ? [...data.locations].sort((a, b) => (km.get(a.id) ?? Infinity) - (km.get(b.id) ?? Infinity)) : data.locations;
+  const nearest = ranked[0]?.place.id;
+  const near = () => {
+    void device.request();
+  };
   return (
     <Section title={t("businessInfo")}>
       <Card palette={palette}>
         <Text style={[local.lineTitle, { color: palette.foreground }]}>{business.name}</Text>
-        {data.locations.map((location) => (
-          <View key={location.id} style={local.line}>
-            <View style={local.grow}>
-              {data.locations.length > 1 && <Text style={[local.lineTitle, { color: palette.foreground }]}>{location.name}</Text>}
-              <Text style={[local.lineMeta, { color: palette.muted }]}>{location.address ?? t("noAddress")}</Text>
-            </View>
-            {location.address ? (
-              <>
-                <ActionPill label={t("navigateWaze")} icon="navigate-outline" palette={palette} onPress={() => void Linking.openURL(wazeLink(location.address!, location))} />
-                <ActionPill label={t("navigateGoogle")} icon="map-outline" palette={palette} onPress={() => void Linking.openURL(googleMapsLink(location.address!, location))} />
-              </>
-            ) : null}
-            {location.website_url ? (
-              <ActionPill label={t("website")} icon="globe-outline" palette={palette} onPress={() => void Linking.openURL(location.website_url!)} />
-            ) : null}
+        <BranchMap locations={data.locations} selectedId={selected ?? nearest} onSelect={setSelected} />
+        {placed.length > 1 && device.state !== "ready" ? (
+          <View style={local.chips}>
+            <ActionPill label={t("nearMe")} icon="locate-outline" palette={palette} busy={device.state === "asking"} onPress={near} />
           </View>
-        ))}
+        ) : null}
+        {device.state === "denied" || device.state === "unavailable" ? (
+          <Text style={[local.lineMeta, { color: palette.muted }]}>{t(device.state === "denied" ? "nearMeDenied" : "nearMeUnavailable")}</Text>
+        ) : null}
+        {locations.map((location) => {
+          const away = km.get(location.id);
+          const label = away == null ? null : distanceLabel(away);
+          return (
+            <View key={location.id} style={local.line}>
+              <View style={local.grow}>
+                {data.locations.length > 1 && <Text style={[local.lineTitle, { color: palette.foreground }]}>{location.name}</Text>}
+                <Text style={[local.lineMeta, { color: palette.muted }]}>{location.address ?? t("noAddress")}</Text>
+                {label ? (
+                  <Text style={[local.lineMeta, { color: location.id === nearest ? palette.primary : palette.muted }]}>
+                    {t(location.id === nearest ? "nearestAway" : "away", { distance: t(label.unit === "m" ? "meters" : "kilometers", { value: label.value }) })}
+                  </Text>
+                ) : null}
+              </View>
+              {location.address ? (
+                <>
+                  <ActionPill label={t("navigateWaze")} icon="navigate-outline" palette={palette} onPress={() => void Linking.openURL(wazeLink(location.address!, location))} />
+                  <ActionPill label={t("navigateGoogle")} icon="map-outline" palette={palette} onPress={() => void Linking.openURL(googleMapsLink(location.address!, location))} />
+                </>
+              ) : null}
+              {location.website_url ? (
+                <ActionPill label={t("website")} icon="globe-outline" palette={palette} onPress={() => void Linking.openURL(location.website_url!)} />
+              ) : null}
+            </View>
+          );
+        })}
       </Card>
     </Section>
   );

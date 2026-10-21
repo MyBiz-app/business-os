@@ -10,6 +10,7 @@ import { type NavChild, type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
+import { lockedMenuMode } from "@/lib/nav-capabilities";
 import { isSolo, SOLO_MAX_UPGRADES, visibleTopics } from "@/lib/solo";
 import { canManageSettings, canManageTeam, canReadPayroll, canUseAssistant } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
@@ -43,6 +44,8 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
   const sub = (key: string) => t(`nav.sub.${key}` as "nav.sub.people");
   const clientAppLocked = !hasUpgrade(tenant.modules, "client_app");
   const solo = isSolo(tenant);
+  // Missing capabilities are grey items for the first 30 days, then fold into one "Add capabilities".
+  const folded = lockedMenuMode(tenant.created_at) === "folded";
   const candidates: (NavItem & { permission?: string; upgrade?: Upgrade })[] = [
     { href: "/dashboard", group: g("overview"), label: t("nav.dashboard"), icon: "dashboard" },
     { href: "/reports", group: g("overview"), label: t("nav.reports"), icon: "reports", permission: "reports.read",
@@ -61,7 +64,9 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     { href: "/clients", group: g("clients"), label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read",
       children: [
         { href: "/clients", label: sub("clientList") },
-        clientAppLocked ? { href: "/upgrade/client_app", label: t("nav.clientApp"), locked: true } : { href: "/clients/join", label: t("nav.clientApp") },
+        ...(clientAppLocked
+          ? folded ? [] : [{ href: "/upgrade/client_app", label: t("nav.clientApp"), locked: true }]
+          : [{ href: "/clients/join", label: t("nav.clientApp") }]),
         { href: "/clients/import", label: sub("clientImport") },
       ],
     },
@@ -100,6 +105,15 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
     .map(({ href, label, icon, upgrade, group, children }) =>
       upgrade && !hasUpgrade(tenant.modules, upgrade) ? { href: `/upgrade/${upgrade}`, label, icon, group, locked: true } : { href, label, icon, group, children },
     );
+  if (folded) {
+    const hidden = items.filter((item) => item.locked).length > 0 || clientAppLocked;
+    const kept = items.filter((item) => !item.locked);
+    items.length = 0;
+    items.push(...kept);
+    if (hidden && canManageSettings(tenant)) {
+      items.push({ href: "/upgrade", label: t("nav.addCapabilities"), icon: "capabilities", group: g("business") });
+    }
+  }
   // A sub-item shows only if the user may open its page.
   const teamChildren: NavChild[] = [
     { href: "/team", label: sub("people") },

@@ -19153,6 +19153,28 @@
         }
       }
     },
+    "/public/geo/coverage": {
+      "get": {
+        "tags": [
+          "geo"
+        ],
+        "summary": "Coverage",
+        "description": "Where MyBiz businesses are, for the landing page: city names and counts only. A city\nwith fewer than five businesses is not listed (the database enforces it); no one is named.",
+        "operationId": "coverage",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Coverage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/staff": {
       "get": {
         "tags": [
@@ -57968,6 +57990,69 @@
         ],
         "title": "CorrectionItem"
       },
+      "Coverage": {
+        "properties": {
+          "cities": {
+            "items": {
+              "$ref": "#/components/schemas/CoverageCity"
+            },
+            "type": "array",
+            "title": "Cities",
+            "description": "Only cities with at least five businesses"
+          },
+          "businesses": {
+            "type": "integer",
+            "title": "Businesses",
+            "description": "Businesses in those cities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cities",
+          "businesses"
+        ],
+        "title": "Coverage"
+      },
+      "CoverageCity": {
+        "properties": {
+          "name_he": {
+            "type": "string",
+            "title": "Name He"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "businesses": {
+            "type": "integer",
+            "title": "Businesses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name_he",
+          "name_en",
+          "latitude",
+          "longitude",
+          "businesses"
+        ],
+        "title": "CoverageCity"
+      },
       "CoverageGap": {
         "properties": {
           "location_id": {
@@ -80695,6 +80780,19 @@
               }
             ],
             "title": "Primary Color"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At",
+            "description": "When the business was created (the side menu's 30-day switch)"
           },
           "logo_url": {
             "anyOf": [

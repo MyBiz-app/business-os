@@ -656,6 +656,8 @@
     "menu": "Menu",
     "clientApp": "Client app",
     "locked": "Not in your plan",
+    "addCapabilities": "Add capabilities",
+    "lockedHint": "Add",
     "lockedItem": "{name} - not in your plan",
     "sales": "Sales",
     "resources": "Courts & rooms",
@@ -1942,6 +1944,14 @@
       }
     },
     "homeCards": {
+      "nearMe": "Branch near me",
+      "nearMeDenied": "Location is off for this app, so we can't find the nearest branch.",
+      "nearMeUnavailable": "Couldn't find where you are right now.",
+      "nearestAway": "Nearest, {distance} away",
+      "away": "{distance} away",
+      "meters": "{value} m",
+      "kilometers": "{value} km",
+      "mapLabel": "Map of the branches",
       "nothingBooked": "Nothing booked yet.",
       "bookNow": "Book now",
       "navigate": "Navigate",
@@ -5810,6 +5820,16 @@
           ]
         }
       }
+    },
+    "coverage": {
+      "eyebrow": "All over the country",
+      "title": "MyBiz, from the north to the Negev",
+      "subtitle": "{count, plural, one {# business} other {# businesses}} already run on MyBiz, in cities all around Israel.",
+      "dot": "{city}: {count, plural, one {# business} other {# businesses}}",
+      "hover": "{count, plural, one {# business} other {# businesses}}",
+      "mapLabel": "Map of the cities with MyBiz businesses",
+      "failed": "The map could not load right now.",
+      "privacy": "City totals only. A city shows up once at least five businesses are there, and no business is ever named."
     }
   },
   "appointments": {
@@ -5966,7 +5986,9 @@
     "pipeline": "Lead pipeline",
     "viewShowing": "Showing {view}: {count}",
     "viewClear": "Show all leads",
-    "cityHint": "Recommended: it shows where your leads come from."
+    "cityHint": "Recommended: it shows where your leads come from.",
+    "moveTo": "Move {name} to another stage",
+    "moveFailed": "Could not move the lead. Try again."
   },
   "inquiry": {
     "title": "Get in touch · {name}",
@@ -7087,6 +7109,10 @@
     }
   },
   "upgrade": {
+    "indexTitle": "Add capabilities",
+    "indexIntro": "Everything MyBiz can add to your business. Nothing changes until you add it.",
+    "indexAll": "Everything you could add is already in your plan.",
+    "learnMore": "See what it does",
     "notInPlan": "Not in your plan yet",
     "peek": "A peek at what you get",
     "invoiceTitle": "What changes on your invoice",
@@ -11090,5 +11116,18 @@
       "leads": "Leads",
       "won": "Leads won"
     }
+  },
+  "tableViews": {
+    "saved": "Saved views",
+    "save": "Save this view",
+    "name": "View name",
+    "namePlaceholder": "For example: absent for 30 days",
+    "saveButton": "Save",
+    "none": "No saved views yet. Set the filters you want and save them here.",
+    "remove": "Delete view {name}",
+    "columns": "Columns",
+    "columnsLabel": "Choose columns",
+    "reset": "Show all columns",
+    "devicenote": "Views are saved on this device."
   }
 }
