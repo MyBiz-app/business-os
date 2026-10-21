@@ -534,6 +534,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search
+         * @description Matches across the business, only in what the person may open: clients, leads and
+         *     invoices need the same permissions as their lists, people need `staff.read`, classes
+         *     `schedule.read`. Five hits per kind at most.
+         */
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff/{user_id}/identity": {
         parameters: {
             query?: never;
@@ -21710,6 +21732,51 @@ export interface components {
              */
             travel_minutes: number;
         };
+        /** SearchHit */
+        SearchHit: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "client" | "lead" | "staff" | "session" | "invoice";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Subtitle
+             * @description Email, phone, branch or interest: what tells two hits apart
+             */
+            subtitle?: string | null;
+            /**
+             * Tag
+             * @description Client status, lead stage, team role, or the kind of document
+             */
+            tag?: string | null;
+            /**
+             * At
+             * @description When a class starts
+             */
+            at?: string | null;
+            /**
+             * Number
+             * @description An issued document's number
+             */
+            number?: number | null;
+        };
+        /** SearchResults */
+        SearchResults: {
+            /** Query */
+            query: string;
+            /**
+             * Items
+             * @description At most five per kind, grouped by kind
+             */
+            items: components["schemas"]["SearchHit"][];
+        };
         /** SecurityEventBody */
         SecurityEventBody: {
             /**
@@ -25910,6 +25977,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConsentEvent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search: {
+        parameters: {
+            query: {
+                /** @description What to look for */
+                q: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResults"];
                 };
             };
             /** @description Validation Error */

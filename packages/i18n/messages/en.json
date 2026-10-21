@@ -11201,5 +11201,37 @@
     "columnsLabel": "Choose columns",
     "reset": "Show all columns",
     "devicenote": "Views are saved on this device."
+  },
+  "commandPalette": {
+    "open": "Search",
+    "title": "Search and quick actions",
+    "label": "Search clients, leads, team, classes, invoices and pages",
+    "placeholder": "Search, or type a command…",
+    "shortcutMac": "⌘K",
+    "shortcutOther": "Ctrl K",
+    "hint": "Type at least 2 letters to search the business.",
+    "searching": "Searching…",
+    "error": "Search isn't available right now. Try again in a moment.",
+    "noResults": "Nothing found for “{query}”.",
+    "results": "{count, plural, one {# result} other {# results}}",
+    "groups": {
+      "recent": "Recent",
+      "actions": "Quick actions",
+      "pages": "Go to",
+      "client": "Clients",
+      "lead": "Leads",
+      "staff": "Team",
+      "session": "Classes",
+      "invoice": "Invoices"
+    },
+    "actions": {
+      "newClient": "New client",
+      "newLead": "New lead",
+      "bookAppointment": "Book an appointment",
+      "newSession": "New class",
+      "newQuote": "New quote",
+      "newInvoice": "New invoice"
+    },
+    "keys": "↑ ↓ to move, Enter to open, Esc to close"
   }
 }

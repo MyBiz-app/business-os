@@ -459,6 +459,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Body is 15, not 16,** like the web's Calm scale; inputs stay 17 so iOS Safari does not zoom the page on focus.
 - **Cards are flat** (hairline, no shadow); only floating things (sheet, toast, AI bubble) cast one. The primary button lost its glow.
 - **One `Sheet`, one `EmptyState`, `BackBar` with a fallback route,** so a pushed screen is never a dead end. Gradients stay on the sign-in backdrop, the launch splash and the AI team (the brand moments).
+### Global search is one API call that re-uses each list's rules (2026-10-21, CRM Premium slice W4-2, no migration)
+
+- **Decision:** `GET /search` runs one small query per kind (clients, leads, team, classes, invoices), each only when the caller holds the permission of that kind's list and with the same branch rule; it does not use a separate search index or copy of the data. Clients and leads use the existing trigram search functions. Rate limit: 90 calls a minute per address, on top of the per-business ceiling.
+- **Why:** a second index would have to repeat every permission and branch rule and could drift from them, which is how a leak starts. The lists already scale (trigram indexes); classes, team and invoices are small per business and bounded by `LIMIT 5`.
+- **Recent records** (the last five opened from the window) live in the browser per business, like saved views; nothing about them is stored on the server.
+- **Revisit** if invoices per business grow past tens of thousands (add a trigram index on client name) or if a later slice needs quotes and receipts in the same box.
 
 ## Open
 

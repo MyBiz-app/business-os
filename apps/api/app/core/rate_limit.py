@@ -49,6 +49,8 @@ RULES: tuple[Rule, ...] = (
     # An AI app registers itself once per business owner; nothing needs more than a handful.
     Rule("mcp-register", "/mcp-oauth/register", 10),
     Rule("webhooks", "/webhooks/", 600),
+    # Search runs a handful of queries per call; typing with a pause between keys stays far below.
+    Rule("search", "/search", 90),
     Rule("uploads", "/", 30, methods=frozenset({"POST", "PUT"}), pattern=UPLOAD_PATH),
     Rule("all", "/", 1200),
 )

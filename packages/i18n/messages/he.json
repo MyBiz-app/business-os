@@ -11201,5 +11201,37 @@
     "columnsLabel": "בחירת עמודות",
     "reset": "הצגת כל העמודות",
     "devicenote": "התצוגות נשמרות במכשיר הזה."
+  },
+  "commandPalette": {
+    "open": "חיפוש",
+    "title": "חיפוש ופעולות מהירות",
+    "label": "חיפוש לקוחות, לידים, צוות, שיעורים, חשבוניות ודפים",
+    "placeholder": "חיפוש, או הקלדת פעולה…",
+    "shortcutMac": "⌘K",
+    "shortcutOther": "Ctrl K",
+    "hint": "כדי לחפש בעסק, מקלידים לפחות 2 אותיות.",
+    "searching": "מחפש…",
+    "error": "החיפוש לא זמין כרגע. אפשר לנסות שוב בעוד רגע.",
+    "noResults": "לא נמצא דבר עבור “{query}”.",
+    "results": "{count, plural, one {תוצאה #} other {# תוצאות}}",
+    "groups": {
+      "recent": "אחרונים",
+      "actions": "פעולות מהירות",
+      "pages": "מעבר לדף",
+      "client": "לקוחות",
+      "lead": "לידים",
+      "staff": "צוות",
+      "session": "שיעורים",
+      "invoice": "חשבוניות"
+    },
+    "actions": {
+      "newClient": "לקוח חדש",
+      "newLead": "ליד חדש",
+      "bookAppointment": "קביעת תור",
+      "newSession": "שיעור חדש",
+      "newQuote": "הצעת מחיר חדשה",
+      "newInvoice": "חשבונית חדשה"
+    },
+    "keys": "↑ ↓ למעבר, Enter לפתיחה, Esc לסגירה"
   }
 }
