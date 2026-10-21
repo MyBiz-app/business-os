@@ -41,7 +41,7 @@ export function BusinessActions({
   const open = invoices.filter((invoice) => invoice.status !== "void");
 
   return (
-    <section aria-labelledby="actions-heading" className="card flex flex-col gap-6 p-6">
+    <section aria-labelledby="actions-heading" className="card flex flex-col gap-6 p-4 sm:p-5">
       <div className="flex flex-col gap-1">
         <h2 id="actions-heading" className="text-lg font-semibold">
           {t("title")}

@@ -13,6 +13,7 @@ import { PauseButton } from "./pause-button";
 import { MarketReports } from "./reports";
 import { AiSettingsForm } from "./settings-form";
 import { WebSearchForm } from "./web-search-form";
+import { StatTile } from "@/components/ui/stat-tile";
 
 /** AI in the console: what each business costs against what it pays, which models run, the
  * emergency stop, and MyBiz's own AI helpers. */
@@ -40,29 +41,31 @@ export default async function PlatformAiPage() {
       <PageHeader titleId="ai-heading" title={t("title")} description={t("hint")} />
 
       {settings.kill_all && (
-        <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 font-medium text-danger">
+        <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm font-medium text-danger">
           {t("killAllOn")}
         </p>
       )}
 
       <section aria-labelledby="ai-costs" className="flex flex-col gap-4">
         <h2 id="ai-costs" className="text-lg font-semibold">{t("costs")}</h2>
-        <dl className="grid gap-3 sm:grid-cols-3">
-          <div className="flex flex-col gap-1 card p-5">
-            <dt className="text-sm text-muted">{t("totalCredits")}</dt>
-            <dd className="text-2xl font-bold tabular-nums">{number.format(costs.total_credits)}</dd>
-          </div>
-          <div className="flex flex-col gap-1 card p-5">
-            <dt className="text-sm text-muted">{t("previousCredits")}</dt>
-            <dd className="text-2xl font-bold tabular-nums">{number.format(costs.previous_total_credits)}</dd>
-          </div>
-          <div className="flex flex-col gap-1 card p-5">
-            <dt className="text-sm text-muted">{t("revenue")}</dt>
-            <dd className="flex flex-col text-lg font-bold tabular-nums">
-              {costs.revenue.length === 0 ? "-" : costs.revenue.map((r) => <bdi key={r.currency}>{formatMoney(r.revenue_monthly_minor, r.currency, locale)}</bdi>)}
-            </dd>
-          </div>
-        </dl>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <StatTile label={t("totalCredits")} value={number.format(costs.total_credits)} />
+          <StatTile label={t("previousCredits")} value={number.format(costs.previous_total_credits)} />
+          <StatTile
+            label={t("revenue")}
+            value={
+              costs.revenue.length === 0 ? (
+                "-"
+              ) : (
+                <span className="flex flex-col text-lg">
+                  {costs.revenue.map((r) => (
+                    <bdi key={r.currency}>{formatMoney(r.revenue_monthly_minor, r.currency, locale)}</bdi>
+                  ))}
+                </span>
+              )
+            }
+          />
+        </div>
         <p className="text-sm text-muted">{t("costsHint")}</p>
         <ScrollRegion labelledBy="ai-costs" className="card">
           <table className="w-full text-sm">
@@ -103,7 +106,7 @@ export default async function PlatformAiPage() {
         <h2 id="ai-connectors" className="text-lg font-semibold">{t("connectors.title")}</h2>
         <p className="text-sm text-muted">{t("connectors.hint")} {t("connectors.limit", { count: connectors.daily_limit })}</p>
         {connectors.businesses.length === 0 ? (
-          <p className="card p-5 text-sm text-muted">{t("connectors.empty")}</p>
+          <p className="card p-4 sm:p-5 text-sm text-muted">{t("connectors.empty")}</p>
         ) : (
           <ScrollRegion labelledBy="ai-connectors" className="card">
             <table className="w-full text-sm">
@@ -140,7 +143,7 @@ export default async function PlatformAiPage() {
 
       <section aria-labelledby="ai-models" className="flex flex-col gap-4">
         <h2 id="ai-models" className="text-lg font-semibold">{t("models")}</h2>
-        <div className="card p-5">
+        <div className="card p-4 sm:p-5">
           <AiSettingsForm
             killAll={settings.kill_all}
             chosen={{ fast: settings.model_fast, standard: settings.model_standard, strong: settings.model_strong }}
@@ -154,7 +157,7 @@ export default async function PlatformAiPage() {
       <section aria-labelledby="ai-web-search" className="flex flex-col gap-4">
         <h2 id="ai-web-search" className="text-lg font-semibold">{t("webSearch.title")}</h2>
         <p className="text-sm text-muted">{t("webSearch.hint")}</p>
-        <div className="card p-5">
+        <div className="card p-4 sm:p-5">
           <WebSearchForm enabled={webSearch.enabled} monthlyLimit={webSearch.monthly_limit} used={webSearch.used_this_month} canChange={canChange} />
         </div>
       </section>
@@ -168,7 +171,7 @@ export default async function PlatformAiPage() {
       <section aria-labelledby="ai-team" className="flex flex-col gap-4">
         <h2 id="ai-team" className="text-lg font-semibold">{t("team")}</h2>
         <p className="text-sm text-muted">{t("teamHint")}</p>
-        <div className="card p-5">
+        <div className="card p-4 sm:p-5">
           <ConsoleChat
             agents={agents}
             canEdit={canChange}

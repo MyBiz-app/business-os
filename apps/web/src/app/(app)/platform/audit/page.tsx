@@ -43,7 +43,7 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
       {entries.length === 0 ? (
         <EmptyState variant="list">{t("audit.empty")}</EmptyState>
       ) : (
-        <ScrollRegion labelledBy="audit-heading" className="rounded-2xl border border-border">
+        <ScrollRegion labelledBy="audit-heading" className="card">
           <table className="w-full text-sm">
             <thead className="bg-surface text-muted">
               <tr>

@@ -35,7 +35,7 @@ export default async function IncidentsPage() {
           {items.map((item) => {
             const texts = item.content.he?.title ? item.content.he : item.content.en;
             return (
-              <li key={item.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface p-4 shadow-sm">
+              <li key={item.id} className="flex flex-wrap items-center gap-3 card p-4 sm:p-5">
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold" dir="auto">

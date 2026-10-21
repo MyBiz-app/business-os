@@ -16,7 +16,7 @@ export function DunningForm({ settings }: { settings: Settings }) {
   const t = useTranslations("platform.dunning");
   const [state, action] = useActionState<DunningState, FormData>(saveDunning, {});
   return (
-    <form action={action} className="card flex flex-col gap-4 p-6">
+    <form action={action} className="card flex flex-col gap-4 p-4 sm:p-5">
       <h2 className="text-lg font-semibold">{t("title")}</h2>
       <p className="text-sm text-muted">{t("hint")}</p>
       <CheckboxField label={t("enabled")} name="enabled" defaultChecked={settings.enabled} />

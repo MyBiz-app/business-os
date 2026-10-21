@@ -13,6 +13,7 @@ import { industryTexts } from "@/lib/verticals";
 
 import { type InboxState, saveNotes, updateRequest } from "./actions";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Button } from "@/components/ui/button";
 
 type Request = components["schemas"]["ContactRequest"];
 
@@ -89,26 +90,26 @@ export function RequestCard({ request, when }: { request: Request; when: string 
               <CircleDot aria-hidden="true" className="size-4" />
               {t("assigned", { who: request.assignee })}
             </span>
-            <button type="button" disabled={pending} onClick={() => move({ assignee: "" })} className="btn-secondary px-3 py-1.5">
+            <Button disabled={pending} onClick={() => move({ assignee: "" })}>
               {t("unassign")}
-            </button>
+            </Button>
           </>
         ) : (
-          <button type="button" disabled={pending} onClick={() => move({ assignee: "me", status: "in_progress" })} className="btn-secondary px-3 py-1.5">
+          <Button disabled={pending} onClick={() => move({ assignee: "me", status: "in_progress" })}>
             <Hand aria-hidden="true" className="size-4" />
             {t("take")}
-          </button>
+          </Button>
         )}
         {request.status === "done" ? (
-          <button type="button" disabled={pending} onClick={() => move({ status: "new" })} className="btn-secondary px-3 py-1.5">
+          <Button disabled={pending} onClick={() => move({ status: "new" })}>
             <RotateCcw aria-hidden="true" className="size-4" />
             {t("reopen")}
-          </button>
+          </Button>
         ) : (
-          <button type="button" disabled={pending} onClick={() => move({ status: "done" })} className="btn-secondary px-3 py-1.5">
+          <Button disabled={pending} onClick={() => move({ status: "done" })}>
             <Check aria-hidden="true" className="size-4" />
             {t("markDone")}
-          </button>
+          </Button>
         )}
         {request.tenant_id && (
           <Link href={`/platform/businesses/${request.tenant_id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline">

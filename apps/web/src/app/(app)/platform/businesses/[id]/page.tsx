@@ -18,6 +18,8 @@ import { Container } from "@/components/layout/container";
 import { Pill } from "@/components/pill";
 import { PageHeader } from "@/components/layout/page-header";
 import { Ltr, UserText } from "@/components/bidi";
+import { Button } from "@/components/ui/button";
+import { StatTile } from "@/components/ui/stat-tile";
 
 /** Platform console (P-2): one business's modules and usage. Its own data opens only through
  * support access, which the owner grants for a limited time (read-only and audited). */
@@ -57,7 +59,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           </>
         }
       />
-      <dl className="grid gap-3 sm:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-4">
         {(
           [
             ["members", business.members],
@@ -66,14 +68,11 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
             ["aiCredits30d", business.ai_credits_30d],
           ] as const
         ).map(([key, value]) => (
-          <div key={key} className="flex flex-col gap-1 card p-4">
-            <dt className="text-sm text-muted">{t(`platform.columns.${key}`)}</dt>
-            <dd className="text-2xl font-semibold">{number.format(value)}</dd>
-          </div>
+          <StatTile key={key} label={t(`platform.columns.${key}`)} value={number.format(value)} />
         ))}
-      </dl>
+      </div>
       {card && (
-        <section aria-labelledby="card-heading" className="card flex flex-col gap-4 p-6">
+        <section aria-labelledby="card-heading" className="card flex flex-col gap-4 p-4 sm:p-5">
           <div className="flex flex-col gap-1">
             <h2 id="card-heading" className="text-lg font-semibold">
               {t("platform.card.title")}
@@ -94,28 +93,28 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           <CardForm tenantId={business.id} tags={card.tags} accountOwner={card.account_owner} mayAct={mayAct} />
         </section>
       )}
-      <section aria-labelledby="notes-heading" className="card flex flex-col gap-4 p-6">
+      <section aria-labelledby="notes-heading" className="card flex flex-col gap-4 p-4 sm:p-5">
         <h2 id="notes-heading" className="text-lg font-semibold">
           {t("platform.card.notes")}
         </h2>
         {mayAct && <NoteForm tenantId={business.id} />}
       </section>
-      <section aria-labelledby="timeline-heading" className="card flex flex-col gap-2 p-6">
+      <section aria-labelledby="timeline-heading" className="card flex flex-col gap-2 p-4 sm:p-5">
         <h2 id="timeline-heading" className="text-lg font-semibold">
           {t("platform.card.timeline")}
         </h2>
         <Timeline events={timeline} />
       </section>
       {mayAct && (
-        <section aria-labelledby="act-heading" className="card-accent flex flex-col gap-3 p-5">
+        <section aria-labelledby="act-heading" className="card-accent flex flex-col gap-3 p-4 sm:p-5">
           <h2 id="act-heading" className="font-semibold">
             {t("support.actTitle")}
           </h2>
           <p className="text-sm text-muted">{t("support.actIntro")}</p>
           <form action={openAsSupport.bind(null, business.id)}>
-            <button type="submit" className="btn-primary px-5 py-2.5">
+            <Button variant="primary" type="submit">
               {t("support.actOpen")}
-            </button>
+            </Button>
           </form>
         </section>
       )}
@@ -130,9 +129,9 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
               })}
             </p>
             <form action={openAsSupport.bind(null, business.id)}>
-              <button type="submit" className="btn-primary px-4 py-2 text-sm">
+              <Button variant="primary" type="submit">
                 {t("support.open")}
-              </button>
+              </Button>
             </form>
           </>
         ) : (
@@ -148,7 +147,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           invoices={invoices}
         />
       )}
-      <section className="flex flex-col gap-2 card p-6">
+      <section className="flex flex-col gap-2 card p-4 sm:p-5">
         <h2 className="font-semibold">{t("platform.columns.modules")}</h2>
         <p>
           {business.modules.length === 0
@@ -156,7 +155,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
             : business.modules.map((m) => t(`modules.names.${m as "client_app"}`)).join(" · ")}
         </p>
       </section>
-      <section className="card p-6">
+      <section className="card p-4 sm:p-5">
         {credits.length === 0 ? (
           <EmptyState variant="chart">{t("platform.noUsage")}</EmptyState>
         ) : (

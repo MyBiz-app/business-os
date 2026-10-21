@@ -10,6 +10,7 @@ import { Pill } from "@/components/pill";
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatform } from "@/lib/platform";
+import { StatTile } from "@/components/ui/stat-tile";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.security");
@@ -43,19 +44,16 @@ export default async function PlatformSecurityPage() {
         <p role="status" className="card p-4 text-sm text-muted">{t("unknownNote")}</p>
       ) : null}
 
-      <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: t("owners"), value: count(owners.owners), alarm: false },
           { label: t("withMfa"), value: count(owners.with_mfa), alarm: false },
           { label: t("acknowledged"), value: count(owners.acknowledged_risk), alarm: false },
           { label: t("exposed"), value: count(owners.exposed), alarm: (owners.exposed ?? 0) > 0 },
         ].map((fact) => (
-          <div key={fact.label} className="card flex flex-col gap-1 p-5">
-            <dt className="text-sm text-muted">{fact.label}</dt>
-            <dd className={`text-2xl font-semibold ${fact.alarm ? "text-danger" : ""}`} dir="ltr">{fact.value}</dd>
-          </div>
+          <StatTile key={fact.label} label={fact.label} value={<span className={fact.alarm ? "text-danger" : undefined} dir="ltr">{fact.value}</span>} />
         ))}
-      </dl>
+      </div>
       <p className="text-sm text-muted">
         {t("requiring")}: <span dir="ltr">{number.format(owners.businesses_requiring_mfa)} / {number.format(owners.businesses)}</span>
       </p>

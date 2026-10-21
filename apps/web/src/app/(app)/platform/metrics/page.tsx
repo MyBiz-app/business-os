@@ -11,6 +11,7 @@ import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { getPlatformFor } from "@/lib/platform";
+import { StatTile } from "@/components/ui/stat-tile";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.metrics");
@@ -37,19 +38,15 @@ export default async function PlatformMetricsPage() {
         board.currencies.map((row) => (
           <section key={row.currency} aria-labelledby={`metrics-${row.currency}`} className="flex flex-col gap-4">
             <h2 id={`metrics-${row.currency}`} className="text-lg font-semibold">{t("currency", { currency: row.currency })}</h2>
-            <dl className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-3">
               {[
                 { label: t("mrr"), value: formatMoney(row.mrr, row.currency, locale), note: t("mrrMonth", { month: monthLabel(row.mrr_month) }) },
                 { label: t("arr"), value: formatMoney(row.arr, row.currency, locale), note: t("arrNote") },
                 { label: t("arpu"), value: formatMoney(row.arpu, row.currency, locale), note: t("arpuNote") },
               ].map((fact) => (
-                <div key={fact.label} className="card flex flex-col gap-1 p-5">
-                  <dt className="text-sm text-muted">{fact.label}</dt>
-                  <dd className="text-2xl font-semibold" dir="ltr">{fact.value}</dd>
-                  <dd className="text-xs text-muted">{fact.note}</dd>
-                </div>
+                <StatTile key={fact.label} label={fact.label} value={<span dir="ltr">{fact.value}</span>} hint={fact.note} />
               ))}
-            </dl>
+            </div>
             <div className="card flex flex-col gap-3 p-4">
               <ColumnChart
                 title={t("chart", { currency: row.currency })}
@@ -90,20 +87,11 @@ export default async function PlatformMetricsPage() {
       <section aria-labelledby="metrics-churn" className="flex flex-col gap-3">
         <h2 id="metrics-churn" className="text-lg font-semibold">{t("churn")}</h2>
         {board.churn ? (
-          <dl className="grid gap-3 sm:grid-cols-3">
-            <div className="card flex flex-col gap-1 p-5">
-              <dt className="text-sm text-muted">{t("churnRate", { month: monthLabel(board.churn.month) })}</dt>
-              <dd className="text-2xl font-semibold" dir="ltr">{board.churn.rate === null ? "-" : percent.format(board.churn.rate)}</dd>
-            </div>
-            <div className="card flex flex-col gap-1 p-5">
-              <dt className="text-sm text-muted">{t("cancelled")}</dt>
-              <dd className="text-2xl font-semibold" dir="ltr">{board.churn.cancelled}</dd>
-            </div>
-            <div className="card flex flex-col gap-1 p-5">
-              <dt className="text-sm text-muted">{t("paying")}</dt>
-              <dd className="text-2xl font-semibold" dir="ltr">{board.churn.paying_at_start}</dd>
-            </div>
-          </dl>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <StatTile label={t("churnRate", { month: monthLabel(board.churn.month) })} value={<span dir="ltr">{board.churn.rate === null ? "-" : percent.format(board.churn.rate)}</span>} />
+            <StatTile label={t("cancelled")} value={<span dir="ltr">{board.churn.cancelled}</span>} />
+            <StatTile label={t("paying")} value={<span dir="ltr">{board.churn.paying_at_start}</span>} />
+          </div>
         ) : (
           <EmptyState variant="list">{t("empty")}</EmptyState>
         )}
@@ -113,18 +101,15 @@ export default async function PlatformMetricsPage() {
         <section aria-labelledby="metrics-ai" className="flex flex-col gap-3">
           <h2 id="metrics-ai" className="text-lg font-semibold">{t("ai")}</h2>
           <p className="text-sm text-muted">{t("aiHint", { days: board.ai.days })}</p>
-          <dl className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             {[
               { label: t("aiRevenue"), value: board.ai.revenue_usd_minor },
               { label: t("aiCost"), value: board.ai.cost_usd_minor },
               { label: t("aiMargin"), value: board.ai.margin_usd_minor },
             ].map((fact) => (
-              <div key={fact.label} className="card flex flex-col gap-1 p-5">
-                <dt className="text-sm text-muted">{fact.label}</dt>
-                <dd className={`text-2xl font-semibold ${fact.value < 0 ? "text-danger" : ""}`} dir="ltr">{formatMoney(fact.value, "USD", locale)}</dd>
-              </div>
+              <StatTile key={fact.label} label={fact.label} value={<span className={fact.value < 0 ? "text-danger" : undefined} dir="ltr">{formatMoney(fact.value, "USD", locale)}</span>} />
             ))}
-          </dl>
+          </div>
         </section>
       ) : null}
     </Container>

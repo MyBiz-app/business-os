@@ -12,6 +12,7 @@ import { Pill } from "@/components/pill";
 
 import { updateWebsiteOrder } from "./actions";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Button } from "@/components/ui/button";
 
 type Order = components["schemas"]["WebsiteOrder"];
 
@@ -31,7 +32,7 @@ export function OrderCard({ order, price }: { order: Order; price: string }) {
   }
 
   return (
-    <article className="card flex flex-col gap-4 p-5" aria-label={order.tenant_name}>
+    <article className="card flex flex-col gap-4 p-4 sm:p-5" aria-label={order.tenant_name}>
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold" dir="auto">{order.tenant_name}</h3>
@@ -54,10 +55,10 @@ export function OrderCard({ order, price }: { order: Order; price: string }) {
       {submitted && (
         <CollapsibleSection variant="inline" className="rounded-xl border border-border bg-surface p-3" triggerClassName="font-medium text-primary-ink" title={t("prompt")}>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={copy} className="btn-plain btn-secondary inline-flex items-center gap-2 px-3 py-2 text-sm">
+            <Button onClick={copy} className="inline-flex items-center gap-2">
               {copied ? <Check aria-hidden="true" className="size-4" /> : <Copy aria-hidden="true" className="size-4" />}
               {copied ? t("copied") : t("copy")}
-            </button>
+            </Button>
             <a href={`/platform/website-orders/${order.id}/files`} className="btn-plain btn-secondary inline-flex items-center gap-2 px-3 py-2 text-sm">
               <Download aria-hidden="true" className="size-4" />
               {t("files")}

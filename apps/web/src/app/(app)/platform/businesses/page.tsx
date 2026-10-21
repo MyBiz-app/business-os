@@ -8,6 +8,7 @@ import { getPlatformFor } from "@/lib/platform";
 import { industryTexts } from "@/lib/verticals";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { Button } from "@/components/ui/button";
 
 const PAGE_SIZE = 25;
 const SORTS = ["newest", "name", "clients", "bookings", "ai"] as const;
@@ -67,12 +68,12 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
             ))}
           </select>
         </label>
-        <button type="submit" className="btn-secondary px-4 py-2">
+        <Button type="submit">
           {t("platform.list.searchButton")}
-        </button>
+        </Button>
       </form>
       <p className="text-sm text-muted" aria-live="polite">{t("platform.list.count", { count: found.length })}</p>
-      <ScrollRegion labelledBy="businesses-heading" className="rounded-2xl border border-border">
+      <ScrollRegion labelledBy="businesses-heading" className="card">
         <table className="w-full text-sm">
           <thead className="bg-surface text-muted">
             <tr>

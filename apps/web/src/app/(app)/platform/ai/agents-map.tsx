@@ -4,6 +4,7 @@ import { Lock } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import type { ChatRole } from "./actions";
+import { Button } from "@/components/ui/button";
 
 export type AgentCard = {
   key: ChatRole;
@@ -84,14 +85,13 @@ export function AgentsMap({ agents, selected, onPick }: { agents: AgentCard[]; s
           const dim = stateOf(agent) !== "on";
           const active = selected === agent.key;
           return (
-            <button
+            <Button variant="plain"
               key={agent.key}
-              type="button"
               aria-pressed={active}
               aria-label={label(agent)}
               onClick={() => onPick(agent)}
-              className="btn-plain group absolute z-10 flex w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary"
               style={{ left: `${place.x}%`, top: `${place.y}%` }}
+              className="group absolute z-10 flex w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <span className="relative flex">
                 <Face agent={agent} name={nameOf(agent)} className={`${agent.chief ? "size-24" : "size-16"} transition-transform group-hover:scale-105 ${dim ? "grayscale brightness-[.55]" : ""}`} />
@@ -106,7 +106,7 @@ export function AgentsMap({ agents, selected, onPick }: { agents: AgentCard[]; s
                 <span className="text-sm font-semibold" dir="auto">{nameOf(agent)}</span>
                 <span className="text-xs text-muted" dir="auto">{t(`agents.${agent.key}.title`)}</span>
               </span>
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -116,19 +116,19 @@ export function AgentsMap({ agents, selected, onPick }: { agents: AgentCard[]; s
           const dim = stateOf(agent) !== "on";
           return (
             <li key={agent.key}>
-              <button
-                type="button"
+              <Button
+                variant="plain"
                 aria-pressed={selected === agent.key}
                 aria-label={label(agent)}
                 onClick={() => onPick(agent)}
-                className={`btn-plain flex w-full items-center gap-3 rounded-2xl border p-3 text-start ${selected === agent.key ? "border-primary" : "border-border"}`}
+                className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-start ${selected === agent.key ? "border-primary" : "border-border"}`}
               >
                 <Face agent={agent} name={nameOf(agent)} className={`size-11 shrink-0 ${dim ? "grayscale brightness-[.55]" : ""}`} />
                 <span className={`flex min-w-0 flex-col leading-tight ${dim ? "text-muted" : ""}`}>
                   <span className="truncate text-sm font-semibold" dir="auto">{nameOf(agent)}</span>
                   <span className="truncate text-xs text-muted" dir="auto">{t(`agents.${agent.key}.title`)}</span>
                 </span>
-              </button>
+              </Button>
             </li>
           );
         })}
