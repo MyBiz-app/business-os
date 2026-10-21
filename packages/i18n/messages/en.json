@@ -5966,7 +5966,9 @@
     "pipeline": "Lead pipeline",
     "viewShowing": "Showing {view}: {count}",
     "viewClear": "Show all leads",
-    "cityHint": "Recommended: it shows where your leads come from."
+    "cityHint": "Recommended: it shows where your leads come from.",
+    "moveTo": "Move {name} to another stage",
+    "moveFailed": "Could not move the lead. Try again."
   },
   "inquiry": {
     "title": "Get in touch · {name}",
@@ -11089,5 +11091,18 @@
       "leads": "Leads",
       "won": "Leads won"
     }
+  },
+  "tableViews": {
+    "saved": "Saved views",
+    "save": "Save this view",
+    "name": "View name",
+    "namePlaceholder": "For example: absent for 30 days",
+    "saveButton": "Save",
+    "none": "No saved views yet. Set the filters you want and save them here.",
+    "remove": "Delete view {name}",
+    "columns": "Columns",
+    "columnsLabel": "Choose columns",
+    "reset": "Show all columns",
+    "devicenote": "Views are saved on this device."
   }
 }
