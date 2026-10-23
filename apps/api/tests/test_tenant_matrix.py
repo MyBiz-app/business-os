@@ -29,7 +29,13 @@ PLATFORM_TABLES = {
 # time_clock_approvals needs a real member and a first-of-month date; the demo data (D1) fills it.
 # waitlist_requests needs a kind that matches its time columns and a future day.
 # subscription_cancellations is written only when an owner cancels or pauses (R33).
-UNSEEDED: set[str] = {"time_clock_approvals", "waitlist_requests", "subscription_cancellations"}
+# booking_series is written only when a client sets up a standing booking (C5).
+UNSEEDED: set[str] = {
+    "time_clock_approvals",
+    "waitlist_requests",
+    "subscription_cancellations",
+    "booking_series",
+}
 # Values for columns a CHECK constraint pins down (a synthetic row can't guess them).
 OVERRIDES = {
     "ai_agents": {"builtin_key": "'x'"},

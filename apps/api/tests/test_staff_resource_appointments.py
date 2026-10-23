@@ -373,3 +373,25 @@ def test_other_businesses_see_nothing(client: TestClient, academy: dict, auth: A
     assert rooms.status_code == 404
     params = {"service_id": academy["lesson"]["id"], "date": academy["day"].isoformat()}
     assert client.get("/appointments/slots", params=params, headers=theirs).status_code == 404
+
+
+def test_a_standing_lesson_gets_a_court_each_week(
+    client: TestClient, academy: dict, engine: Engine
+) -> None:
+    headers = academy["headers"]
+    dana = new_client(client, headers, "Dana")
+    made = client.post(
+        "/series",
+        json={
+            "client_id": dana,
+            "kind": "appointment",
+            "service_id": academy["lesson"]["id"],
+            "staff_user_id": str(academy["owner"]),
+            "starts_at": at(academy["day"], "10:00"),
+            "occurrences": 3,
+        },
+        headers=headers,
+    )
+    assert made.status_code == 201, made.text
+    assert [r["outcome"] for r in made.json()["results"]] == ["booked"] * 3
+    assert rooms_held(engine) == [("Court 1", "scheduled")] * 3
