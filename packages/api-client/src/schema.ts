@@ -22677,9 +22677,8 @@ export interface components {
             /**
              * Open Entry
              * @description Class only: entry to the place (open gym, pool); its sessions are the opening hours and clients check in
-             * @default false
              */
-            open_entry: boolean;
+            open_entry?: boolean | null;
         };
         /** ServiceOption */
         ServiceOption: {

@@ -80199,10 +80199,16 @@
             "description": "Class only: people one instructor can lead"
           },
           "open_entry": {
-            "type": "boolean",
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Open Entry",
-            "description": "Class only: entry to the place (open gym, pool); its sessions are the opening hours and clients check in",
-            "default": false
+            "description": "Class only: entry to the place (open gym, pool); its sessions are the opening hours and clients check in"
           }
         },
         "type": "object",

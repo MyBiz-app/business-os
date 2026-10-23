@@ -62,8 +62,8 @@ class ServiceCreate(ServiceFields):
     participants_per_instructor: int | None = Field(
         default=None, ge=1, le=1000, description="Class only: people one instructor can lead"
     )
-    open_entry: bool = Field(
-        default=False,
+    open_entry: bool | None = Field(
+        default=None,
         description="Class only: entry to the place (open gym, pool); its sessions are the "
         "opening hours and clients check in",
     )
@@ -174,7 +174,7 @@ def create_service(body: ServiceCreate, context: WriteDep) -> Service:
                        :price_per_hour, :on_site, :travel_minutes,
                        CASE WHEN :booking_mode = 'class'
                             THEN CAST(:participants_per_instructor AS integer) END,
-                       :open_entry
+                       coalesce(:open_entry, false)
                 FROM app.tenants t WHERE t.id = :tenant_id
                 RETURNING {COLUMNS}
             """),
