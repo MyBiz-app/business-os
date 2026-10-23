@@ -505,7 +505,13 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **A1 refinement (2026-10-23):** the light primary fill is `#0071E3`, not `#007AFF`: white text on `#007AFF` is 4.0:1 (below WCAG AA); `#0071E3` is 4.7:1. Dark stays `#0A84FF`. Text-safe blue (`primaryInk`) is `#0062CC` / `#4DA3FF`. Dark mode is true black with `#1C1C1E` surfaces. One line to flip back if the owner prefers the exact iOS blue.
 - **Revisit** if the home mobile Lighthouse score stays under 80 or the blue fails contrast on a surface.
 
-### A lesson takes a coach and a room together (2026-10-23, categories slice C4, migration 0158)
+### Classes with several instructors, and open entry (2026-10-23, categories slice C6, migration 0158)
+
+- **Decision:** a session keeps its lead instructor in `sessions.instructor_user_id` and gets the others in `session_instructors` (also remembered on a weekly series, so the job that extends it gives new sessions the same team). A service may keep a ratio (`participants_per_instructor`, for example 8 children per coach); a session's capacity may not exceed ratio x its instructors (`ratio_exceeded`), and a session with no instructor yet is not checked. Open entry (open gym, pool, co-working) is a class service with `open_entry = true`, not a new booking mode: its sessions are the opening hours and `POST /entries` checks a client in against their plan (a booking that is checked in at once). Without a plan the desk must say `without_plan` (pays at the desk); outside opening hours it answers `entry_closed`.
+- **Why:** a new booking mode would touch every place that treats "not a class" as an appointment (calendar, reports, waitlist); a flag on a class service keeps one engine and the existing plan, credit and roster rules.
+- **Not in this slice:** the calendar and form screens (C10), a branch-wide "open entry" check-in from the client app (C11), an instructor busy check for the extra instructors, and changing the team of a whole series after it was created.
+- **Revisit** if a business needs the ratio to be a hard limit on bookings of an existing class (today it is checked when the session is created or edited).
+### A lesson takes a coach and a room together (2026-10-23, categories slice C4, migration 0159)
 
 - **Model M5 is a flag on an appointment service, not a new booking mode.** `services.needs_resource` (appointment, not on-site) plus the existing `service_rooms` list. The session keeps the staff member and also holds the room (`sessions.holds_room`, not `reserved`: reservations are paid by the hour, a lesson is priced as an appointment).
 - **The client may name a court; if not, the server takes the first free one** (by branch and room name). Free times are the overlap of the coach's hours and a linked room's hours and free time.

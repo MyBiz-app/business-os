@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import ensure_not_erased, not_found
-from app.api.deps import TenantContext, ensure_branch_visible, require
+from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, WidePageDep, encode_cursor
 from app.api.plans import quota_reached, usable_entitlement
@@ -55,6 +55,17 @@ class BookingCreate(BaseModel):
         default=False,
         description="Book the client even though the class is full (owners and managers only); "
         "ignored while a spot is free",
+    )
+
+
+class EntryCreate(BaseModel):
+    client_id: UUID
+    service_id: UUID = Field(description="An open-entry service (open gym, pool, co-working)")
+    location_id: UUID | None = Field(
+        default=None, description="The branch the client walks into; needed when several are open"
+    )
+    without_plan: bool = Field(
+        default=False, description="Let the client in without a valid plan (pays at the desk)"
     )
 
 
@@ -375,6 +386,54 @@ def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) ->
     )
     notify_booking(context.session, booking_id, "booked_by_studio")
     return _load(context.session, booking_id)
+
+
+@router.post("/entries", status_code=status.HTTP_201_CREATED)
+def check_in_entry(body: EntryCreate, context: ManageDep) -> Booking:
+    """A client walks into an open-entry place: the visit is booked in the opening hours that
+    are on now and checked in at once. It uses one of the client's plans; without a valid plan
+    the desk must say `without_plan`."""
+    db = context.session
+    ensure_branch_allowed(context, body.location_id)
+    rows = (
+        db.execute(
+            text("""
+                SELECT s.id, s.location_id
+                FROM app.sessions s JOIN app.services sv ON sv.id = s.service_id
+                WHERE s.service_id = :service_id AND sv.open_entry AND sv.active
+                  AND s.status = 'scheduled' AND s.starts_at <= now() AND s.ends_at > now()
+                  AND (CAST(:location_id AS uuid) IS NULL OR s.location_id = :location_id)
+                  AND (s.location_id IS NULL OR app.in_branch(s.location_id))
+                ORDER BY s.starts_at
+            """),
+            {"service_id": body.service_id, "location_id": body.location_id},
+        )
+        .mappings()
+        .all()
+    )
+    if not rows:
+        raise _conflict("entry_closed")
+    if len(rows) > 1 and body.location_id is None:
+        raise HTTPException(status_code=422, detail="location_required")
+    session_id = rows[0]["id"]
+    booking_id = place_booking(
+        db,
+        context.tenant_id,
+        session_id,
+        body.client_id,
+        requires_plan=not body.without_plan,
+    )
+    booked = db.execute(
+        text("""
+            UPDATE app.bookings
+            SET status = 'checked_in', checked_in_at = now(), updated_at = now()
+            WHERE id = :id AND status = 'booked'
+        """),
+        {"id": booking_id},
+    ).rowcount
+    if not booked:  # the place is full: no waitlist for walking in
+        raise _conflict("session_full")
+    return _load(db, booking_id)
 
 
 @router.patch("/bookings/{booking_id}")

@@ -26,7 +26,8 @@ def extend_series(conn: Connection, now: datetime | None = None) -> int:
         conn.execute(
             text("""
             SELECT ss.id, ss.tenant_id, ss.service_id, ss.location_id, ss.room_id,
-                   ss.instructor_user_id, ss.capacity, ss.weekdays, ss.start_time,
+                   ss.instructor_user_id, ss.extra_instructor_user_ids, ss.capacity, ss.weekdays,
+                   ss.start_time,
                    ss.duration_minutes, ss.ends_on, t.time_zone
             FROM app.session_series ss JOIN app.tenants t ON t.id = ss.tenant_id
             WHERE ss.open_ended AND t.closed_at IS NULL
@@ -83,6 +84,25 @@ def extend_series(conn: Connection, now: datetime | None = None) -> int:
                         "starts": starts,
                     },
                 ).rowcount
+                if row["extra_instructor_user_ids"]:
+                    # The new sessions get the series's team (members who left are skipped).
+                    conn.execute(
+                        text("""
+                            INSERT INTO app.session_instructors (tenant_id, session_id, user_id)
+                            SELECT s.tenant_id, s.id, m.user_id
+                            FROM app.sessions s
+                            JOIN app.tenant_members m ON m.tenant_id = s.tenant_id
+                                AND m.user_id = ANY(CAST(:team AS uuid[]))
+                            WHERE s.series_id = :series_id
+                              AND s.starts_at = ANY(CAST(:starts AS timestamptz[]))
+                            ON CONFLICT DO NOTHING
+                        """),
+                        {
+                            "team": [str(i) for i in row["extra_instructor_user_ids"]],
+                            "series_id": row["id"],
+                            "starts": starts,
+                        },
+                    )
             conn.execute(
                 text("UPDATE app.session_series SET ends_on = :target WHERE id = :id"),
                 {"target": target, "id": row["id"]},

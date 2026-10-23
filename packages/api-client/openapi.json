@@ -24331,7 +24331,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EntryCreate"
+                "$ref": "#/components/schemas/app__api__time_clock__EntryCreate"
               }
             }
           }
@@ -28942,6 +28942,84 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BookingCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entries": {
+      "post": {
+        "tags": [
+          "bookings"
+        ],
+        "summary": "Check In Entry",
+        "description": "A client walks into an open-entry place: the visit is booked in the opening hours that\nare on now and checked in at once. It uses one of the client's plans; without a valid plan\nthe desk must say `without_plan`.",
+        "operationId": "check_in_entry",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__api__bookings__EntryCreate"
               }
             }
           }
@@ -61885,45 +61963,6 @@
         ],
         "title": "EntryCorrection"
       },
-      "EntryCreate": {
-        "properties": {
-          "user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "User Id"
-          },
-          "location_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Location Id"
-          },
-          "clock_in": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Clock In"
-          },
-          "clock_out": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Clock Out"
-          },
-          "reason": {
-            "type": "string",
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Reason"
-          }
-        },
-        "type": "object",
-        "required": [
-          "user_id",
-          "location_id",
-          "clock_in",
-          "clock_out",
-          "reason"
-        ],
-        "title": "EntryCreate"
-      },
       "EraseRequest": {
         "properties": {
           "confirm": {
@@ -78790,6 +78829,32 @@
             ],
             "title": "Instructor Email"
           },
+          "instructors": {
+            "items": {
+              "$ref": "#/components/schemas/SessionInstructor"
+            },
+            "type": "array",
+            "title": "Instructors",
+            "description": "The lead instructor first, then the others"
+          },
+          "participants_per_instructor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participants Per Instructor",
+            "description": "The ratio the service keeps; capacity stays within it"
+          },
+          "open_entry": {
+            "type": "boolean",
+            "title": "Open Entry",
+            "description": "Opening hours of an entry service (open gym, pool)",
+            "default": false
+          },
           "starts_at": {
             "type": "string",
             "format": "date-time",
@@ -80062,11 +80127,6 @@
             "title": "Travel Minutes",
             "default": 0
           },
-          "needs_resource": {
-            "type": "boolean",
-            "title": "Needs Resource",
-            "default": false
-          },
           "waitlist_mode": {
             "anyOf": [
               {
@@ -80084,6 +80144,29 @@
             ],
             "title": "Waitlist Mode",
             "description": "Overrides the business's waitlist mode for this service"
+          },
+          "participants_per_instructor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participants Per Instructor",
+            "description": "Class: people one instructor can lead; none = no ratio"
+          },
+          "open_entry": {
+            "type": "boolean",
+            "title": "Open Entry",
+            "description": "Entry to the place; clients check in",
+            "default": false
+          },
+          "needs_resource": {
+            "type": "boolean",
+            "title": "Needs Resource",
+            "default": false
           }
         },
         "type": "object",
@@ -80251,6 +80334,32 @@
             "title": "Travel Minutes",
             "description": "On-site: time to get there, before each job",
             "default": 0
+          },
+          "participants_per_instructor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participants Per Instructor",
+            "description": "Class only: people one instructor can lead"
+          },
+          "open_entry": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Entry",
+            "description": "Class only: entry to the place (open gym, pool); its sessions are the opening hours and clients check in"
           },
           "needs_resource": {
             "type": "boolean",
@@ -80535,17 +80644,6 @@
             ],
             "title": "Travel Minutes"
           },
-          "needs_resource": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Needs Resource"
-          },
           "waitlist_mode": {
             "anyOf": [
               {
@@ -80563,6 +80661,41 @@
             ],
             "title": "Waitlist Mode",
             "description": "This service's own waitlist mode; null follows the business"
+          },
+          "participants_per_instructor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participants Per Instructor"
+          },
+          "open_entry": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Entry"
+          },
+          "needs_resource": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Resource"
           }
         },
         "type": "object",
@@ -80617,6 +80750,16 @@
               }
             ],
             "title": "Notes"
+          },
+          "extra_instructor_user_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Extra Instructor User Ids",
+            "description": "More instructors besides the lead one (a class run by a team)"
           },
           "service_id": {
             "type": "string",
@@ -80680,6 +80823,43 @@
         ],
         "title": "SessionCreate"
       },
+      "SessionInstructor": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "lead": {
+            "type": "boolean",
+            "title": "Lead",
+            "description": "The one the session's instructor field names"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "email",
+          "full_name",
+          "lead"
+        ],
+        "title": "SessionInstructor"
+      },
       "SessionUpdate": {
         "properties": {
           "location_id": {
@@ -80729,6 +80909,23 @@
               }
             ],
             "title": "Notes"
+          },
+          "extra_instructor_user_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array",
+                "maxItems": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extra Instructor User Ids",
+            "description": "Replaces the other instructors; null keeps them"
           },
           "date": {
             "anyOf": [
@@ -86892,6 +87089,46 @@
         "title": "Usage",
         "description": "This calendar month's use against the business's bundle (space and messages)."
       },
+      "app__api__bookings__EntryCreate": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id",
+            "description": "An open-entry service (open gym, pool, co-working)"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id",
+            "description": "The branch the client walks into; needed when several are open"
+          },
+          "without_plan": {
+            "type": "boolean",
+            "title": "Without Plan",
+            "description": "Let the client in without a valid plan (pays at the desk)",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "service_id"
+        ],
+        "title": "EntryCreate"
+      },
       "app__api__broadcasts__ScheduleBody": {
         "properties": {
           "scheduled_at": {
@@ -87309,6 +87546,45 @@
           "invitations"
         ],
         "title": "Team"
+      },
+      "app__api__time_clock__EntryCreate": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Location Id"
+          },
+          "clock_in": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Clock In"
+          },
+          "clock_out": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Clock Out"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "location_id",
+          "clock_in",
+          "clock_out",
+          "reason"
+        ],
+        "title": "EntryCreate"
       },
       "app__api__time_clock__Hours": {
         "properties": {
