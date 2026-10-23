@@ -474,6 +474,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** the new demo has different businesses with Hebrew names; name lookups would silently skip every layer for them.
 - **Revisit** if two businesses of one industry in one demo need different content (then add a role to the business spec).
 
+### Demo sign-in accounts take over demo team members (2026-10-23, demo slice D5, no migration)
+
+- **Decision:** the owner's "plus" addresses become team members by taking over an existing demo team member of the right branch: every reference to the demo profile moves to the real person (found from the database's own foreign keys), then the demo profile is removed. Passwords are never set by the seed.
+- **Why:** a new member would have no shifts, classes or pay terms; taking over keeps the whole history. The seed cannot create sign-ins, so each address must sign up first and the seed is run again.
+- **Revisit** if a table gets a reference to a person that is not a database foreign key.
+
 ## Open
 
 
