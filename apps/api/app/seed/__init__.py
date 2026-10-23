@@ -104,9 +104,7 @@ def main() -> None:
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
         if args.demo in ("curated", "full"):
-            print(
-                curate(conn, args.owner_email, args.months, random.Random(args.seed), args.demo)
-            )
+            print(curate(conn, args.owner_email, args.months, random.Random(args.seed), args.demo))
             return
         if args.demo == "places":
             print(place_branches(conn, args.owner_email))
