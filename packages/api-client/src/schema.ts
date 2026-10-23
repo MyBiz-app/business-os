@@ -5639,6 +5639,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check In Entry
+         * @description A client walks into an open-entry place: the visit is booked in the opening hours that
+         *     are on now and checked in at once. It uses one of the client's plans; without a valid plan
+         *     the desk must say `without_plan`.
+         */
+        post: operations["check_in_entry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/bookings/{booking_id}": {
         parameters: {
             query?: never;
@@ -15458,31 +15480,6 @@ export interface components {
             /** Reason */
             reason: string;
         };
-        /** EntryCreate */
-        EntryCreate: {
-            /**
-             * User Id
-             * Format: uuid
-             */
-            user_id: string;
-            /**
-             * Location Id
-             * Format: uuid
-             */
-            location_id: string;
-            /**
-             * Clock In
-             * Format: date-time
-             */
-            clock_in: string;
-            /**
-             * Clock Out
-             * Format: date-time
-             */
-            clock_out: string;
-            /** Reason */
-            reason: string;
-        };
         /** EraseRequest */
         EraseRequest: {
             /**
@@ -22017,6 +22014,22 @@ export interface components {
             /** Instructor Email */
             instructor_email: string | null;
             /**
+             * Instructors
+             * @description The lead instructor first, then the others
+             */
+            instructors?: components["schemas"]["SessionInstructor"][];
+            /**
+             * Participants Per Instructor
+             * @description The ratio the service keeps; capacity stays within it
+             */
+            participants_per_instructor?: number | null;
+            /**
+             * Open Entry
+             * @description Opening hours of an entry service (open gym, pool)
+             * @default false
+             */
+            open_entry: boolean;
+            /**
              * Starts At
              * Format: date-time
              */
@@ -22575,6 +22588,17 @@ export interface components {
              * @description Overrides the business's waitlist mode for this service
              */
             waitlist_mode?: ("off" | "auto" | "first_come" | "manual") | null;
+            /**
+             * Participants Per Instructor
+             * @description Class: people one instructor can lead; none = no ratio
+             */
+            participants_per_instructor?: number | null;
+            /**
+             * Open Entry
+             * @description Entry to the place; clients check in
+             * @default false
+             */
+            open_entry: boolean;
         };
         /** ServiceCreate */
         ServiceCreate: {
@@ -22645,6 +22669,17 @@ export interface components {
              * @default 0
              */
             travel_minutes: number;
+            /**
+             * Participants Per Instructor
+             * @description Class only: people one instructor can lead
+             */
+            participants_per_instructor?: number | null;
+            /**
+             * Open Entry
+             * @description Class only: entry to the place (open gym, pool); its sessions are the opening hours and clients check in
+             * @default false
+             */
+            open_entry: boolean;
         };
         /** ServiceOption */
         ServiceOption: {
@@ -22718,6 +22753,10 @@ export interface components {
              * @description This service's own waitlist mode; null follows the business
              */
             waitlist_mode?: ("off" | "auto" | "first_come" | "manual") | null;
+            /** Participants Per Instructor */
+            participants_per_instructor?: number | null;
+            /** Open Entry */
+            open_entry?: boolean | null;
         };
         /** SessionCreate */
         SessionCreate: {
@@ -22729,6 +22768,11 @@ export interface components {
             instructor_user_id?: string | null;
             /** Notes */
             notes?: string | null;
+            /**
+             * Extra Instructor User Ids
+             * @description More instructors besides the lead one (a class run by a team)
+             */
+            extra_instructor_user_ids?: string[];
             /**
              * Service Id
              * Format: uuid
@@ -22752,6 +22796,23 @@ export interface components {
             capacity?: number | null;
             repeat?: components["schemas"]["Repeat"] | null;
         };
+        /** SessionInstructor */
+        SessionInstructor: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Email */
+            email: string;
+            /** Full Name */
+            full_name: string | null;
+            /**
+             * Lead
+             * @description The one the session's instructor field names
+             */
+            lead: boolean;
+        };
         /** SessionUpdate */
         SessionUpdate: {
             /** Location Id */
@@ -22762,6 +22823,11 @@ export interface components {
             instructor_user_id?: string | null;
             /** Notes */
             notes?: string | null;
+            /**
+             * Extra Instructor User Ids
+             * @description Replaces the other instructors; null keeps them
+             */
+            extra_instructor_user_ids?: string[] | null;
             /** Date */
             date?: string | null;
             /** Start Time */
@@ -25203,6 +25269,31 @@ export interface components {
              */
             alerts?: components["schemas"]["QuotaAlert"][];
         };
+        /** EntryCreate */
+        app__api__bookings__EntryCreate: {
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Service Id
+             * Format: uuid
+             * @description An open-entry service (open gym, pool, co-working)
+             */
+            service_id: string;
+            /**
+             * Location Id
+             * @description The branch the client walks into; needed when several are open
+             */
+            location_id?: string | null;
+            /**
+             * Without Plan
+             * @description Let the client in without a valid plan (pays at the desk)
+             * @default false
+             */
+            without_plan: boolean;
+        };
         /** ScheduleBody */
         app__api__broadcasts__ScheduleBody: {
             /**
@@ -25342,6 +25433,31 @@ export interface components {
             members: components["schemas"]["Member"][];
             /** Invitations */
             invitations: components["schemas"]["Invitation"][];
+        };
+        /** EntryCreate */
+        app__api__time_clock__EntryCreate: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Clock In
+             * Format: date-time
+             */
+            clock_in: string;
+            /**
+             * Clock Out
+             * Format: date-time
+             */
+            clock_out: string;
+            /** Reason */
+            reason: string;
         };
         /**
          * Hours
@@ -36955,7 +37071,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["EntryCreate"];
+                "application/json": components["schemas"]["app__api__time_clock__EntryCreate"];
             };
         };
         responses: {
@@ -38919,6 +39035,43 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["BookingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_in_entry: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__api__bookings__EntryCreate"];
             };
         };
         responses: {

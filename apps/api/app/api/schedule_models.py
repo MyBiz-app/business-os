@@ -41,6 +41,11 @@ class Repeat(BaseModel):
 
 
 class SessionCreate(Placement):
+    extra_instructor_user_ids: list[UUID] = Field(
+        default_factory=list,
+        max_length=20,
+        description="More instructors besides the lead one (a class run by a team)",
+    )
     service_id: UUID
     date: dt.date = Field(description="Local date in the business's time zone")
     start_time: time = Field(description="Local wall-clock time")
@@ -59,6 +64,9 @@ class SessionCreate(Placement):
 
 
 class SessionUpdate(Placement):
+    extra_instructor_user_ids: list[UUID] | None = Field(
+        default=None, max_length=20, description="Replaces the other instructors; null keeps them"
+    )
     date: dt.date | None = None
     start_time: time | None = None
     duration_minutes: int | None = Field(default=None, ge=5, le=1440)
@@ -72,6 +80,13 @@ class ServiceSummary(BaseModel):
     color: str | None
 
 
+class SessionInstructor(BaseModel):
+    user_id: UUID
+    email: str
+    full_name: str | None
+    lead: bool = Field(description="The one the session's instructor field names")
+
+
 class ScheduledSession(BaseModel):
     id: UUID
     series_id: UUID | None
@@ -82,6 +97,15 @@ class ScheduledSession(BaseModel):
     room_name: str | None
     instructor_user_id: UUID | None
     instructor_email: str | None
+    instructors: list[SessionInstructor] = Field(
+        default_factory=list, description="The lead instructor first, then the others"
+    )
+    participants_per_instructor: int | None = Field(
+        default=None, description="The ratio the service keeps; capacity stays within it"
+    )
+    open_entry: bool = Field(
+        default=False, description="Opening hours of an entry service (open gym, pool)"
+    )
     starts_at: datetime
     ends_at: datetime
     capacity: int

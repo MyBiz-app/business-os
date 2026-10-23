@@ -20,7 +20,8 @@ DeleteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_DELETE))
 COLUMNS = (
     "id, name, description, duration_minutes, capacity, booking_mode, price_amount, "
     "price_currency, color, active, created_at, updated_at, min_minutes, max_minutes, "
-    "step_minutes, price_per_hour, on_site, travel_minutes, waitlist_mode"
+    "step_minutes, price_per_hour, on_site, travel_minutes, waitlist_mode, "
+    "participants_per_instructor, open_entry"
 )
 COLOR_PATTERN = r"^#[0-9a-fA-F]{6}$"
 # class: scheduled sessions people join; appointment: one-to-one at a free time with a staff member;
@@ -58,9 +59,19 @@ class ServiceCreate(ServiceFields):
     travel_minutes: int = Field(
         default=0, ge=0, le=240, description="On-site: time to get there, before each job"
     )
+    participants_per_instructor: int | None = Field(
+        default=None, ge=1, le=1000, description="Class only: people one instructor can lead"
+    )
+    open_entry: bool = Field(
+        default=False,
+        description="Class only: entry to the place (open gym, pool); its sessions are the "
+        "opening hours and clients check in",
+    )
 
     @model_validator(mode="after")
     def resource_lengths(self) -> "ServiceCreate":
+        if self.open_entry and self.booking_mode != "class":
+            raise ValueError("only a class service can be open entry")
         if self.on_site and self.booking_mode != "appointment":
             raise ValueError("only an appointment service can be on-site")
         if self.booking_mode == "resource":
@@ -93,6 +104,8 @@ class ServiceUpdate(ServiceFields):
     waitlist_mode: Literal["off", "auto", "first_come", "manual"] | None = Field(
         default=None, description="This service's own waitlist mode; null follows the business"
     )
+    participants_per_instructor: int | None = Field(default=None, ge=1, le=1000)
+    open_entry: bool | None = None
 
 
 def check_lengths(minimum: int | None, maximum: int | None, step: int | None) -> None:
@@ -125,6 +138,10 @@ class Service(BaseModel):
     waitlist_mode: Literal["off", "auto", "first_come", "manual"] | None = Field(
         default=None, description="Overrides the business's waitlist mode for this service"
     )
+    participants_per_instructor: int | None = Field(
+        default=None, description="Class: people one instructor can lead; none = no ratio"
+    )
+    open_entry: bool = Field(default=False, description="Entry to the place; clients check in")
 
 
 @router.get("")
@@ -148,12 +165,16 @@ def create_service(body: ServiceCreate, context: WriteDep) -> Service:
                 INSERT INTO app.services
                     (tenant_id, name, description, duration_minutes, capacity, booking_mode,
                      price_amount, price_currency, color, active, min_minutes, max_minutes,
-                     step_minutes, price_per_hour, on_site, travel_minutes)
+                     step_minutes, price_per_hour, on_site, travel_minutes,
+                     participants_per_instructor, open_entry)
                 SELECT :tenant_id, :name, :description, :duration_minutes,
                        CASE WHEN :booking_mode = 'class' THEN :capacity ELSE 1 END,
                        :booking_mode, :price_amount, coalesce(:price_currency, t.currency),
                        :color, :active, :min_minutes, :max_minutes, :step_minutes,
-                       :price_per_hour, :on_site, :travel_minutes
+                       :price_per_hour, :on_site, :travel_minutes,
+                       CASE WHEN :booking_mode = 'class'
+                            THEN CAST(:participants_per_instructor AS integer) END,
+                       :open_entry
                 FROM app.tenants t WHERE t.id = :tenant_id
                 RETURNING {COLUMNS}
             """),
@@ -191,6 +212,7 @@ def update_service(service_id: UUID, body: ServiceUpdate, context: WriteDep) -> 
         "active",
         "on_site",
         "travel_minutes",
+        "open_entry",
     }
     changes = {
         key: value
@@ -211,9 +233,12 @@ def update_service(service_id: UUID, body: ServiceUpdate, context: WriteDep) -> 
                 .first()
             )
     except IntegrityError as error:  # e.g. a resource without its lengths or price per hour
+        reason = str(error.orig)
         detail = (
             "invalid_on_site"
-            if "services_on_site_appointment" in str(error.orig)
+            if "services_on_site_appointment" in reason
+            else "invalid_open_entry"
+            if "services_open_entry_class" in reason
             else "invalid_resource"
         )
         raise HTTPException(
