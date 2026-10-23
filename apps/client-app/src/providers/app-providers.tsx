@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { Platform } from "react-native";
 
+import { NotificationOpener } from "@/components/notification-opener";
 import { AreaProvider } from "@/providers/area-provider";
 import { PlatformProvider } from "@/providers/platform-provider";
 import { StaffProvider } from "@/providers/staff-provider";
@@ -10,6 +12,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <BusinessProvider>
       <AreaProvider>
+        {Platform.OS !== "web" && <NotificationOpener />}
         <StaffProvider>
           <PlatformProvider>{children}</PlatformProvider>
         </StaffProvider>

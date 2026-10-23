@@ -468,6 +468,14 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Recent records** (the last five opened from the window) live in the browser per business, like saved views; nothing about them is stored on the server.
 - **Revisit** if invoices per business grow past tens of thousands (add a trigram index on client name) or if a later slice needs quotes and receipts in the same box.
 
+### "All mine": one view over many businesses, read business by business (2026-10-23, demo slice D7, no migration)
+
+- **Decision:** `GET /client/overview` returns the signed-in person's businesses, next bookings, live cards, waiting items and "book again" suggestions in one response. It lists the person's own client records, then visits each business in turn (the same `X-Tenant-Id` scoping and client policies as every other `/client` route, inside a savepoint) and reads only that person's rows there. There is no cross-business table, view or function, and no business-side route changed. A closed or suspended business, or one without the client app, is left out.
+- **Why:** each business keeps its own client record, so a combined table would be the one place where a business's data and another's meet. Reading one business at a time keeps every row behind that business's own row-level security, and nothing a business can read ever mentions another business. Cost is about ten small queries per business; bounded by 50 businesses and 20 bookings each.
+- **Push:** a client push carries `tenant_id` so a tap opens that business. The app opens it only if the person has an area there, so a forged notification cannot switch to a business they do not belong to.
+- **Look:** inside a business everything keeps the business's colour and logo; "All mine" uses MyBiz's own look so it is always clear that it is the whole picture.
+- **Revisit** if people regularly hold more than about ten businesses (cache the overview) or when the real payment provider needs a combined "to pay" list.
+
 ## Open
 
 
