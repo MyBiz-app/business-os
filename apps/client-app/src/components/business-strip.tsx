@@ -15,7 +15,7 @@ import { useBusiness } from "@/providers/business-provider";
 
 const SIZE = 56;
 
-/** The person's businesses as circles with their logos, like stories: the first is "All mine".
+/** The person's businesses as circles with their logos, like stories: the first is "My businesses".
  * A tap switches business at once (the whole app takes its color and logo); a dot means something
  * waits for them there. Shown only to someone with two businesses or more. */
 export function BusinessStrip({ palette, overview }: { palette: Palette; overview?: ClientOverview | null }) {

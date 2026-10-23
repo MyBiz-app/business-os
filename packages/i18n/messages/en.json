@@ -1703,9 +1703,9 @@
       "signHint": "Sign by writing your name"
     },
     "all": {
-      "title": "All mine",
-      "strip": "My businesses",
-      "circle": "All mine",
+      "title": "My businesses",
+      "strip": "Switch business",
+      "circle": "My businesses",
       "circleWaiting": "{name}, something is waiting for you",
       "next": "What’s next",
       "nextEmpty": "Nothing booked yet in any of your businesses.",

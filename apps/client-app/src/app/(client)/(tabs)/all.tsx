@@ -21,7 +21,7 @@ type Rebook = ClientOverview["rebook"][number];
 
 const DAY_MS = 86_400_000;
 
-/** "All mine": what is next, the cards and what waits for the person, across every business they
+/** "My businesses": what is next, the cards and what waits for the person, across every business they
  * are a client of. Drawn in MyBiz's own look, not a business's, so it is always clear that this is
  * the whole picture and not one business. */
 export default function AllMine() {
