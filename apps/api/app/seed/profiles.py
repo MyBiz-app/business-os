@@ -30,6 +30,7 @@ GYM_NETWORK = "Adir fitness"
 CROSSFIT_BRANCH = ("חיפה - קרוספיט", "הנמל 12, חיפה")
 CROSSFIT_COACHES = (("אורן", "שגיא"), ("שירן", "בן דוד"), ("גיא", "מזרחי"))
 CLIENTS_WITH_PORTRAIT = 100_000  # clients who get a demo sign-in profile to hold a portrait
+FULL_AI_SET = 400  # AI portraits per gender that are enough for every client
 BUSIEST_CLIENTS = 12  # per business: the busiest clients get an AI portrait
 NO_PHOTO_ONE_IN = 10  # clients left without a picture on purpose, as in real life
 
@@ -71,7 +72,9 @@ def _portrait(
 ) -> bytes:
     """AI portraits go to the team and the busiest clients, illustrations to everyone else."""
     gender = "f" if _is_female(full_name, str(user_id)) else "m"
-    pool = _pool("ai" if most_active else "illustrated", gender)
+    ai = _pool("ai", gender)
+    # With only a few dozen AI portraits they go to the busiest; a full set goes to everyone.
+    pool = ai if most_active or len(ai) >= FULL_AI_SET else _pool("illustrated", gender)
     if pool:
         return pool[user_id.int % len(pool)].read_bytes()
     pool = manifest["portraits"][gender]
