@@ -482,6 +482,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** the new demo has different businesses with Hebrew names; name lookups would silently skip every layer for them.
 - **Revisit** if two businesses of one industry in one demo need different content (then add a role to the business spec).
 
+### Demo profile pictures: 1,500 AI portraits (2026-10-23, demo slice D3, no migration)
+
+- **Decision:** the demo people get synthetic AI portraits (Runware, FLUX schnell, 192 px JPEG, about 8 KB each, 750 women and 750 men) drawn by `scripts/generate_demo_portraits.py`, which stops at a hard budget cap and resumes where it stopped. Total spend about $2.77 against the owner's $10 limit. The seed gives a portrait to every active demo client except one in ten, left empty on purpose, and to the team. Children are never given a photo (they are dependents, not users). When the AI set is small, the 12 busiest clients per business get AI portraits and the rest get CC0 illustrated avatars (`scripts/generate_demo_illustrated_avatars.py`).
+- **Why:** a full realistic set makes the demo look like a living business; nobody in the pictures exists, so they can stay after go-live.
+- **Revisit** if the repo size matters (the images are about 12 MB); they could move to object storage.
+
 ### Demo sign-in accounts take over demo team members (2026-10-23, demo slice D5, no migration)
 
 - **Decision:** the owner's "plus" addresses become team members by taking over an existing demo team member of the right branch: every reference to the demo profile moves to the real person (found from the database's own foreign keys), then the demo profile is removed. Passwords are never set by the seed.

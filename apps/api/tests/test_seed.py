@@ -412,7 +412,7 @@ def test_profiles_add_logos_portraits_and_a_crossfit_branch_without_repeating(
         second = enrich_profiles(connection, email)
     assert added is not None and again is None
     assert first["businesses"] == 1 and first["branches"] >= 1
-    assert first["staff"] > 0 and first["clients"] == 40
+    assert first["staff"] > 0 and first["clients"] > 0
     assert not any(second.values())
     with engine.connect() as connection:
         row = connection.execute(
@@ -424,7 +424,7 @@ def test_profiles_add_logos_portraits_and_a_crossfit_branch_without_repeating(
             """),
             {"t": tenant},
         ).one()
-    assert row.client_portraits == 40 and row.without_logo == 0
+    assert row.client_portraits == first["clients"] and row.without_logo == 0
 
 
 def test_curate_reduces_an_account_to_three_businesses_and_leaves_others_alone(
