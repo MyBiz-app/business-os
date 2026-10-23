@@ -30,7 +30,7 @@ jobs:
           RUNWARE_KEY: ${{ secrets.REPLICATE_API_TOKEN }}
           BUDGET_USD: "9"
           PRIOR_SPEND_USD: "0.5"
-        run: python apps/api/scripts/generate_demo_portraits.py 4
+        run: python apps/api/scripts/generate_demo_portraits.py 750
       - name: Commit
         run: |
           git config user.name "demo-portraits"

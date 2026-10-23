@@ -12,6 +12,7 @@ that has real activity. The images are drawn by
 
 import json
 from datetime import datetime
+from functools import cache
 from pathlib import Path
 from uuid import UUID, uuid4
 from zoneinfo import ZoneInfo
@@ -28,7 +29,8 @@ ASSETS = Path(__file__).parent / "assets"
 GYM_NETWORK = "Adir fitness"
 CROSSFIT_BRANCH = ("חיפה - קרוספיט", "הנמל 12, חיפה")
 CROSSFIT_COACHES = (("אורן", "שגיא"), ("שירן", "בן דוד"), ("גיא", "מזרחי"))
-CLIENTS_WITH_PORTRAIT = 40  # per business: clients who have a sign-in profile in the demo
+CLIENTS_WITH_PORTRAIT = 100_000  # clients who get a demo sign-in profile to hold a portrait
+NO_PHOTO_ONE_IN = 10  # clients left without a picture on purpose, as in real life
 
 FEMALE = {
     "נועה", "מאיה", "תמר", "יעל", "שירה", "אביגיל", "מיכל", "ליה", "הדר", "אלה", "נטע", "גלי",
@@ -57,8 +59,17 @@ def _is_female(full_name: str | None, key: str) -> bool:
     return sum(key.encode()) % 2 == 0  # unknown or neutral name: a stable pick
 
 
+@cache
+def _drawn(gender: str) -> tuple[Path, ...]:
+    """The AI-drawn portraits (scripts/generate_demo_portraits.py), when they are there."""
+    return tuple(sorted((ASSETS / "portraits" / "ai").glob(f"{gender}*.jpg")))
+
+
 def _portrait(manifest: dict, full_name: str | None, user_id: UUID) -> bytes:
-    pool = manifest["portraits"]["f" if _is_female(full_name, str(user_id)) else "m"]
+    gender = "f" if _is_female(full_name, str(user_id)) else "m"
+    if drawn := _drawn(gender):
+        return drawn[user_id.int % len(drawn)].read_bytes()
+    pool = manifest["portraits"][gender]
     return _read(pool[user_id.int % len(pool)])
 
 
@@ -228,6 +239,8 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
             {"t": tenant_id, "n": max(0, CLIENTS_WITH_PORTRAIT - linked)},
         ).all()
         for client_id, first, last in clients:
+            if client_id.int % NO_PHOTO_ONE_IN == 0:
+                continue
             user_id = uuid4()
             full_name = f"{first} {last or ''}".strip()
             conn.execute(
