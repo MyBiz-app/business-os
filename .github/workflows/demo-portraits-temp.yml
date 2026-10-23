@@ -1,0 +1,40 @@
+name: Demo portraits (temporary)
+
+# One-off: draws the demo profile portraits with Runware (approved by the owner, hard cap in the
+# script) and commits them to the pull request branch. Runs only when this file changes in a
+# pull request; remove before merge.
+on:
+  pull_request:
+    paths:
+      - .github/workflows/demo-portraits-temp.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: demo-portraits-temp
+  cancel-in-progress: false
+
+jobs:
+  draw:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - run: pip install pillow
+      - name: Draw portraits
+        env:
+          RUNWARE_KEY: ${{ secrets.REPLICATE_API_TOKEN }}
+          BUDGET_USD: "9"
+          PRIOR_SPEND_USD: "0.5"
+        run: python apps/api/scripts/generate_demo_portraits.py 4
+      - name: Commit
+        run: |
+          git config user.name "demo-portraits"
+          git config user.email "noreply@example.invalid"
+          git add apps/api/app/seed/assets/portraits/ai
+          git commit -m "Demo portraits: AI profile pictures" || echo "nothing new"
+          git push
