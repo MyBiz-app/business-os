@@ -240,7 +240,19 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
             _set_avatar(conn, manifest, user_id, full_name)
             counts["staff"] += 1
 
-        # Clients get a sign-in profile (a demo one that cannot be used to sign in) so their
+        # Round 6: pay terms, approved hours, a payroll run and (the gym) a move in progress.
+        added = seed_round6(conn, tenant_id, tenant_name, today)
+        for key in ("pay_setups", "payroll_runs", "move_sessions"):
+            counts[key] += added[key]
+
+        # Round 7: quotes, documents, AI chats, announcements, planning, a website and more.
+        counts["round7"] += sum(seed_round7(conn, tenant_id, tenant_name, today).values())
+
+        # Morning scenarios: the hero clients and the edge cases of the day.
+        counts["scenarios"] += sum(seed_scenarios(conn, tenant_id, tenant_name, today).values())
+
+        # Last, so the scenarios' hero clients are covered in the same run: clients get a sign-in
+        # profile (a demo one that cannot be used to sign in) so their
         # portrait has a place to live: the client's picture is their profile's.
         linked = conn.execute(
             text("""
@@ -280,15 +292,4 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
                 {"u": user_id, "c": client_id},
             )
             counts["clients"] += 1
-
-        # Round 6: pay terms, approved hours, a payroll run and (the gym) a move in progress.
-        added = seed_round6(conn, tenant_id, tenant_name, today)
-        for key in ("pay_setups", "payroll_runs", "move_sessions"):
-            counts[key] += added[key]
-
-        # Round 7: quotes, documents, AI chats, announcements, planning, a website and more.
-        counts["round7"] += sum(seed_round7(conn, tenant_id, tenant_name, today).values())
-
-        # Morning scenarios: the hero clients and the edge cases of the day.
-        counts["scenarios"] += sum(seed_scenarios(conn, tenant_id, tenant_name, today).values())
     return counts
