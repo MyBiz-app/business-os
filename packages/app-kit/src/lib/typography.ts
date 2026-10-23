@@ -37,3 +37,11 @@ export function scaleText<T extends SizedStyle>(style: T, scale: number): T {
     ...(style.lineHeight ? { lineHeight: Math.round(style.lineHeight * scale * 10) / 10 } : {}),
   };
 }
+
+/** The numeric weight the system font (SF on iPhone) is asked for: it has every weight, so no per-weight file. */
+export function systemWeight(weight: unknown): "400" | "500" | "600" {
+  const w = weight === "bold" ? 700 : Number(weight ?? 400);
+  if (w >= 600) return "600";
+  if (w >= 500) return "500";
+  return "400";
+}

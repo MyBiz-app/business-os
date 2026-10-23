@@ -495,6 +495,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Colour:** primary becomes Apple blue (`#007AFF` light, `#0A84FF` dark) on the iOS grouped background (`#F2F2F7`). Contrast of text on the primary is re-checked when the tokens change (slice A1/F1).
 - **Liquid Glass:** translucent blurred surfaces for bars and sheets, with a plain opaque fallback where `backdrop-filter` is missing or reduced transparency is set.
 - **Why:** an Apple-grade first impression for a product whose owners and clients mostly use iPhones, at near-zero page weight.
+- **A1 refinement (2026-10-23):** the light primary fill is `#0071E3`, not `#007AFF`: white text on `#007AFF` is 4.0:1 (below WCAG AA); `#0071E3` is 4.7:1. Dark stays `#0A84FF`. Text-safe blue (`primaryInk`) is `#0062CC` / `#4DA3FF`. Dark mode is true black with `#1C1C1E` surfaces. One line to flip back if the owner prefers the exact iOS blue.
 - **Revisit** if the home mobile Lighthouse score stays under 80 or the blue fails contrast on a surface.
 
 ## Open

@@ -8,21 +8,23 @@
 
 export const palette = {
   light: {
-    background: "#f7f7f8", // the page: a neutral gray-white
-    foreground: "#18181b",
+    background: "#f2f2f7", // the page: the iOS grouped background
+    foreground: "#1c1c1e",
     surface: "#ffffff", // cards, sheets, the tab bar
     // A quiet fill inside a surface (a track, a pressed row, a skeleton).
     subtle: "#f2f2f4",
     border: "#e6e6ea",
     muted: "#63636e", // AA on the page, the surface and every status tint
-    primary: "#2563eb", // the one action color
-    // Text-safe blue: primary text on its own tint is 4.4:1, the ink is 5.3:1 (WCAG AA).
-    primaryInk: "#1d4ed8",
+    // The one action color: Apple's web blue. iOS's #007AFF is only 4.0:1 under white button text, so
+    // the light fill is this slightly deeper blue (4.7:1); dark mode uses the iOS #0A84FF.
+    primary: "#0071e3",
+    // Text-safe blue (links, tinted labels): 4.5:1 or more on the page, white and every tint.
+    primaryInk: "#0062cc",
     onPrimary: "#ffffff",
     accent: "#06b6d4", // Electric Cyan: highlights only, never text
     ai: "#7c3aed", // AI Purple: AI features only
     // Darker than the web's #16a34a fill so it reads as text on white (WCAG AA): the web's success ink.
-    success: "#15803d",
+    success: "#137636",
     successInk: "#127a37",
     warning: "#a84a08",
     danger: "#b91c1c",
@@ -32,31 +34,31 @@ export const palette = {
     warningSoft: "#fff7e6",
     dangerSoft: "#fef2f2",
     infoSoft: "#eff6ff",
-    infoInk: "#1d4ed8",
+    infoInk: "#0062cc",
   },
   dark: {
-    background: "#111113", // charcoal, not navy
-    foreground: "#f4f4f5",
-    surface: "#1a1a1d",
-    subtle: "#232327",
-    border: "#2e2e33",
-    muted: "#a1a1aa",
-    primary: "#3b82f6",
-    primaryInk: "#60a5fa",
+    background: "#000000", // iOS dark: true black page, raised grays on it
+    foreground: "#f5f5f7",
+    surface: "#1c1c1e",
+    subtle: "#2c2c2e",
+    border: "#38383a",
+    muted: "#a1a1a6",
+    primary: "#0a84ff",
+    primaryInk: "#4da3ff",
     // Dark text on the lighter night blue: white on it is only 3.7:1.
-    onPrimary: "#111113",
+    onPrimary: "#000000",
     accent: "#22d3ee",
     ai: "#a78bfa",
     success: "#22c55e",
     successInk: "#4ade80",
     warning: "#fbbf24",
     danger: "#f87171",
-    onDanger: "#111113",
+    onDanger: "#000000",
     successSoft: "#12261a",
     warningSoft: "#2a2010",
     dangerSoft: "#2a1414",
-    infoSoft: "#14203a",
-    infoInk: "#60a5fa",
+    infoSoft: "#0e2038",
+    infoInk: "#4da3ff",
   },
 } as const;
 
@@ -67,7 +69,8 @@ export const highContrast = {
 } as const;
 
 /**
- * Assistant covers Hebrew and Latin; the family names are the ones the font loader registers.
+ * Assistant covers Hebrew and Latin; the family names are the ones the font loader registers. On iPhone
+ * the app uses the system font (SF) and Assistant is the fallback everywhere else, as on the web.
  * Three weights, as on the web: 400 text, 500 labels and buttons, 600 headings (800 does not exist).
  */
 export const fontFamily = {
@@ -85,21 +88,24 @@ export const displayFontFamily = {
 export const textScales = { normal: 1, large: 1.125, larger: 1.25 } as const;
 
 /**
- * Type scale: size and line height in px, the web's Calm scale (12 caption, 13 small, 15 body,
- * 17 subheading, 20 heading, 24 title, 30 display). Hierarchy comes from size, not weight.
+ * Type scale: size and line height in px, Apple's text styles (11 pt caption up to the 34 pt large title).
+ * Hierarchy comes from size; headline is the one 17 pt semibold.
  */
 export const typeScale = {
-  display: { size: 30, line: 36, weight: "semibold" },
-  title: { size: 24, line: 30, weight: "semibold" },
-  heading: { size: 20, line: 26, weight: "semibold" },
-  subheading: { size: 17, line: 24, weight: "semibold" },
-  body: { size: 15, line: 22, weight: "regular" },
-  small: { size: 13, line: 18, weight: "regular" },
+  largeTitle: { size: 34, line: 41, weight: "semibold" },
+  title1: { size: 28, line: 34, weight: "semibold" },
+  title2: { size: 22, line: 28, weight: "semibold" },
+  title3: { size: 20, line: 25, weight: "semibold" },
+  headline: { size: 17, line: 22, weight: "semibold" },
+  body: { size: 17, line: 22, weight: "regular" },
+  callout: { size: 16, line: 21, weight: "regular" },
+  subhead: { size: 15, line: 20, weight: "regular" },
+  footnote: { size: 13, line: 18, weight: "regular" },
   caption: { size: 12, line: 16, weight: "medium" },
 } as const;
 
 /** Every font size a screen may use. */
-export const fontSizes = [12, 13, 15, 17, 20, 24, 30] as const;
+export const fontSizes = [12, 13, 15, 16, 17, 20, 22, 28, 34] as const;
 
 /** Spacing on a 4px grid. Cards pad `lg` (16) on a phone, sections sit `xxl` (24) apart. */
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, xxxl: 32 } as const;

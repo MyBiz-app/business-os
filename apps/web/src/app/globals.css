@@ -13,15 +13,15 @@
 /* Calm (spec v4 design system, Figma "Calm" foundations): a neutral gray-white page, white
  * surfaces, hairline borders, one action color and soft status tints. */
 :root {
-  --background: #f7f7f8;
-  --foreground: #18181b;
+  --background: #f2f2f7;
+  --foreground: #1c1c1e;
   --surface: #ffffff;
   /* A quiet fill inside a surface (table header, hover row, segmented track, inline code). */
   --subtle: #f2f2f4;
   --border: #e6e6ea;
   --muted: #63636e;
-  --palette-primary: #2563eb;
-  --palette-primary-ink: #1d4ed8;
+  --palette-primary: #0071e3;
+  --palette-primary-ink: #0062cc;
   --palette-on-primary: #ffffff;
   --primary: var(--palette-primary);
   --primary-ink: var(--palette-primary-ink);
@@ -39,7 +39,7 @@
   --warning-soft: #fff7e6;
   --danger-soft: #fef2f2;
   --info-soft: #eff6ff;
-  --info-ink: #1d4ed8;
+  --info-ink: #0062cc;
   --shadow-color: 240 6% 10%;
   /* Cards are flat (a white surface and a hairline); only what floats casts a shadow. */
   --elevation: 0 0 #0000;
@@ -59,29 +59,29 @@
   --brand-ink: #1d4ed8;
 }
 
-/* Night: charcoal, not navy. */
+/* Night: iOS dark, a true black page with raised grays. */
 .dark {
-  --background: #111113;
-  --foreground: #f4f4f5;
-  --surface: #1a1a1d;
-  --subtle: #232327;
-  --border: #2e2e33;
-  --muted: #a1a1aa;
-  --palette-primary: #3b82f6;
-  --palette-primary-ink: #60a5fa;
+  --background: #000000;
+  --foreground: #f5f5f7;
+  --surface: #1c1c1e;
+  --subtle: #2c2c2e;
+  --border: #38383a;
+  --muted: #a1a1a6;
+  --palette-primary: #0a84ff;
+  --palette-primary-ink: #4da3ff;
   /* Dark text on the lighter night blue: white on it is only 3.7:1. */
-  --palette-on-primary: #111113;
+  --palette-on-primary: #000000;
   --primary-subtle: color-mix(in oklab, var(--primary) 16%, var(--surface));
   --success: #22c55e;
   --success-ink: #4ade80;
   --danger: #f87171;
-  --on-danger: #111113;
+  --on-danger: #000000;
   --warning: #fbbf24;
   --success-soft: #12261a;
   --warning-soft: #2a2010;
   --danger-soft: #2a1414;
-  --info-soft: #14203a;
-  --info-ink: #60a5fa;
+  --info-soft: #0e2038;
+  --info-ink: #4da3ff;
   --shadow-color: 240 10% 2%;
   --elevation: 0 0 #0000;
   --elevation-hover: 0 1px 3px hsl(var(--shadow-color) / 0.5), 0 8px 24px hsl(var(--shadow-color) / 0.6);
@@ -175,8 +175,8 @@
   --color-ai: #7c3aed;
   --color-electric: #06b6d4;
   /* The site's font: set once in app/fonts.ts (see docs/guides/design-system.md). */
-  --font-sans: var(--font-main), system-ui, sans-serif;
-  --font-display-stack: var(--font-display), var(--font-main), system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, var(--font-main), system-ui, sans-serif;
+  --font-display-stack: -apple-system, BlinkMacSystemFont, var(--font-display), var(--font-main), system-ui, sans-serif;
 }
 
 body {
@@ -982,7 +982,7 @@ html[data-motion="reduce"] *::after {
   --radius-control: 0.75rem;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-main), system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, var(--font-main), system-ui, sans-serif;
 }
 
 /* Night: the same palette on Midnight Navy. Blue lightens a step so links keep 4.5:1. */
