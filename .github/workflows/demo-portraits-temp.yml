@@ -29,7 +29,7 @@ jobs:
         env:
           RUNWARE_KEY: ${{ secrets.REPLICATE_API_TOKEN }}
           BUDGET_USD: "9"
-          PRIOR_SPEND_USD: "0.5"
+          PRIOR_SPEND_USD: "0.55"
         run: python apps/api/scripts/generate_demo_portraits.py 750
       - name: Commit
         run: |

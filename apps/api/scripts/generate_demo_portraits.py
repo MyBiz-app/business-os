@@ -15,6 +15,7 @@ import os
 import random
 import sys
 import time
+import urllib.error
 import urllib.request
 import uuid
 from pathlib import Path
@@ -99,6 +100,26 @@ def call(tasks: list[dict], key: str) -> list[dict]:
         return json.load(response).get("data", [])
 
 
+def call_resilient(tasks: list[dict], key: str) -> list[dict]:
+    """One request for the batch; if it is refused, one request per picture to find the culprit."""
+    try:
+        return call(tasks, key)
+    except urllib.error.HTTPError as error:
+        print(f"batch refused: {error.code} {error.read()[:300]!r}", flush=True)
+    except Exception as error:
+        print(f"batch failed: {error!r}", flush=True)
+        time.sleep(5)
+    results: list[dict] = []
+    for task in tasks:
+        try:
+            results += call([task], key)
+        except urllib.error.HTTPError as error:
+            print(f"refused {task['positivePrompt'][:90]!r}: {error.read()[:200]!r}", flush=True)
+        except Exception as error:
+            print(f"failed: {error!r}", flush=True)
+    return results
+
+
 def shrink(raw: bytes) -> bytes:
     image = Image.open(io.BytesIO(raw)).convert("RGB").resize((SIZE, SIZE), Image.LANCZOS)
     out = io.BytesIO()
@@ -140,13 +161,7 @@ def main() -> None:
             }
             for g, n in group
         ]
-        try:
-            results = call(tasks, key)
-        except Exception as error:  # a failed call is not billed; retry the batch once
-            print(f"batch {start} failed: {error!r}")
-            time.sleep(5)
-            failed += len(group)
-            continue
+        results = call_resilient(tasks, key)
         by_id = {r["taskUUID"]: r for r in results}
         for (g, n), task in zip(group, tasks, strict=True):
             result = by_id.get(task["taskUUID"])
@@ -158,6 +173,9 @@ def main() -> None:
                 shrink(base64.b64decode(result["imageBase64Data"]))
             )
             drawn += 1
+        if failed >= 40 and drawn < failed // 4:
+            print("STOP: too many refusals, something is wrong")
+            break
         print(f"drawn {drawn}, failed {failed}, run cost ${cost_so_far:.4f}", flush=True)
     print(
         f"DONE drawn={drawn} failed={failed} run_cost=${cost_so_far:.4f} "
