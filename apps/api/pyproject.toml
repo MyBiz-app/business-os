@@ -58,6 +58,8 @@ max-statements = 220
 [tool.ruff.lint.per-file-ignores]
 # Inline-styled email HTML reads better unwrapped.
 "app/catalog/welcome.py" = ["E501"]
+# SVG path data in the demo logo drawings.
+"scripts/generate_demo_logos.py" = ["E501"]
 # Demo data, samples and load tests need reproducible pseudo-random numbers, not secrets.
 "app/seed/*" = ["S311"]
 "app/social/demo.py" = ["S311"]

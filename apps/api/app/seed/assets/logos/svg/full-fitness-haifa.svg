@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c27235"/><stop offset="1" stop-color="#7a3806"/>
+    </linearGradient>
+    <clipPath id="tile"><rect width="256" height="256" rx="64"/></clipPath>
+  </defs>
+  <rect width="256" height="256" rx="64" fill="url(#bg)"/>
+  <circle cx="200" cy="48" r="120" fill="#fff" opacity=".07" clip-path="url(#tile)"/>
+  <g>
+        <polygon points="150,48 82,142 120,142 106,210 176,112 136,112" fill="#fff"/>
+  </g>
+</svg>
