@@ -503,10 +503,122 @@ def test_full_demo_builds_four_businesses_with_eleven_branches(engine: Engine) -
     assert set(by_name) == {"אדיר פיטנס", "טניס קלאב השרון", "בלייד ברברס", "מרחב - בריאות ותנועה"}
     assert sum(r[2] for r in rows) == 11
     assert [by_name[n][2] for n in ("אדיר פיטנס", "טניס קלאב השרון")] == [5, 2]
+    with engine.connect() as connection:
+        courts = dict(
+            connection.execute(
+                text("""
+                    SELECT l.name, count(*) FROM app.rooms r
+                    JOIN app.locations l ON l.id = r.location_id
+                    JOIN app.tenants t ON t.id = r.tenant_id
+                    WHERE t.name = 'טניס קלאב השרון' AND r.bookable GROUP BY l.name
+                """)
+            ).all()
+        )
+        pilates_classes = {
+            row[0]
+            for row in connection.execute(
+                text("""
+                    SELECT DISTINCT sv.name FROM app.sessions s
+                    JOIN app.services sv ON sv.id = s.service_id
+                    JOIN app.locations l ON l.id = s.location_id
+                    WHERE l.name = 'רמת גן - פילאטיס ויוגה' AND sv.booking_mode = 'class'
+                """)
+            )
+        }
+    assert courts["הרצליה"] >= 6 and courts["ראשון לציון"] >= 4
+    assert pilates_classes == {"פילאטיס מכשירים", "פילאטיס מזרן", "יוגה פלואו"}
     for _name, vertical, _branches, kinds, quotes, chats in rows:
         category = CATALOG[CATALOG[vertical].category]
         assert set(kinds) <= {category.key, vertical, *category.branch_kinds}
         assert quotes == 4 and chats >= 1  # tailored by role, not by the business name
+
+
+def test_full_demo_has_the_hero_clients_and_morning_scenarios(engine: Engine) -> None:
+    owner = uuid4()
+    email = f"heroes-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+        curate(connection, email, 1, random.Random(4), "full")
+    with engine.connect() as connection:
+        heroes = connection.execute(
+            text("""
+                SELECT t.name, c.custom_fields->>'demo_hero', c.id FROM app.clients c
+                JOIN app.tenants t ON t.id = c.tenant_id
+                JOIN app.tenant_members m ON m.tenant_id = t.id AND m.role = 'owner'
+                JOIN app.users u ON u.id = m.user_id AND u.email = :email
+                WHERE c.custom_fields ? 'demo_hero'
+            """),
+            {"email": email},
+        ).all()
+        by_hero: dict[str, set[str]] = {}
+        for business, slug, _ in heroes:
+            by_hero.setdefault(slug, set()).add(business)
+        assert set(by_hero) == {
+            "noa", "omer", "tamar", "yonatan", "dana", "ariel", "lior", "shira", "maya", "gali",
+            "ron",
+        }  # fmt: skip
+        assert len(by_hero["ron"]) == 4 and len(by_hero["omer"]) == 2
+        ids = {slug: cid for _, slug, cid in heroes if slug != "omer" and slug != "ron"}
+
+        def one(sql: str, **params: object) -> object:
+            return connection.execute(text(sql), params).scalar_one()
+
+        # Noa has no health declaration; Tamar is first in line and her membership ends soon.
+        noa_declarations = one(
+            "SELECT count(*) FROM app.health_declarations WHERE client_id = :c", c=ids["noa"]
+        )
+        assert noa_declarations == 0
+        assert (
+            one(
+                "SELECT count(*) FROM app.bookings WHERE client_id = :c AND status = 'waitlisted'",
+                c=ids["tamar"],
+            )
+            == 1
+        )
+        assert one(
+            "SELECT ends_on - current_date FROM app.entitlements WHERE client_id = :c",
+            c=ids["tamar"],
+        ) in (2, 3)  # the local date may be a day behind UTC
+        assert (
+            one(
+                "SELECT sum(amount) FROM app.payments WHERE client_id = :c AND status = 'failed'",
+                c=ids["yonatan"],
+            )
+            == 45000
+        )
+        assert (
+            one(
+                "SELECT count(*) FROM app.dependents WHERE client_id = :c "
+                "AND NOT (details->>'medical_approval')::boolean",
+                c=ids["dana"],
+            )
+            == 1
+        )
+        assert (
+            one(
+                "SELECT count(*) FROM app.bookings WHERE client_id = :c AND status = 'no_show'",
+                c=ids["lior"],
+            )
+            == 3
+        )
+        assert one("SELECT rating FROM app.reviews WHERE client_id = :c", c=ids["gali"]) == 2
+        assert (
+            one("SELECT status FROM app.freeze_requests WHERE client_id = :c", c=ids["maya"])
+            == "pending"
+        )
+        assert (
+            one(
+                "SELECT count(*) FROM app.promo_codes pc JOIN app.tenants t ON t.id = pc.tenant_id "
+                "JOIN app.tenant_members m ON m.tenant_id = t.id AND m.role = 'owner' "
+                "JOIN app.users u ON u.id = m.user_id AND u.email = :email "
+                "WHERE pc.code = 'LASTCALL'",
+                email=email,
+            )
+            == 4
+        )
 
 
 def test_networks_demo_has_the_round_5_features(engine: Engine) -> None:
@@ -853,4 +965,5 @@ def test_full_demo_connects_the_plus_logins_the_test_customer_and_friends(engine
             {"u": customer},
         ).scalar_one()
         assert invites == 1 and declarations == 0
+        assert first["test_customer"]["bookings"] == 3  # the customer and two friends, one class
     assert CUSTOMER_EMAIL != "adire7399@gmail.com"  # a client, never the primary owner
