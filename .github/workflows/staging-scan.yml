@@ -47,7 +47,9 @@ jobs:
         working-directory: e2e
         env:
           SWEEP_BASE: ${{ inputs.web_url }}
-        run: uv run --with playwright --with axe-playwright-python python staging_axe.py "$GITHUB_WORKSPACE/scan/axe.json"
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/scan"
+          uv run --with playwright --with axe-playwright-python python staging_axe.py "$GITHUB_WORKSPACE/scan/axe.json"
 
       - name: Lighthouse (mobile)
         continue-on-error: true
