@@ -48,6 +48,103 @@ from app.seed.industries import _seed_dependents, _seed_jobs, _seed_practice, _s
 from app.seed.workspace import seed_workspace
 
 
+def _insert_extra_services(conn: Connection, tenant_id: UUID, spec: BusinessSpec) -> None:
+    """The services the spec adds to the industry's starter ones."""
+    for extra in spec.extra_services:
+        conn.execute(
+            text("""
+                INSERT INTO app.services
+                    (tenant_id, name, duration_minutes, capacity, booking_mode, price_amount,
+                     price_currency, color)
+                VALUES (:t, :name, :minutes, :capacity, :mode, :price, 'ILS', :color)
+            """),
+            {
+                "t": tenant_id,
+                "name": extra.name,
+                "minutes": extra.minutes,
+                "capacity": extra.capacity,
+                "mode": extra.mode,
+                "price": extra.price,
+                "color": extra.color,
+            },
+        )
+
+
+def _popularity(service_rows: list, spec: BusinessSpec, rng: random.Random) -> dict:
+    """How well each service fills: the spec's own number, or a random one."""
+    extras = {extra.name: extra for extra in spec.extra_services}
+    return {
+        s["id"]: (
+            extras[s["name"]].popularity
+            if s["name"] in extras
+            else spec.custom_services[i][5]
+            if spec.custom_services
+            else rng.uniform(0.6, 0.95)
+        )
+        for i, s in enumerate(service_rows)
+    }
+
+
+def _classes_at(classes: list, spec: BusinessSpec, branch_name: str) -> list:
+    """The classes that run at a branch: those the spec ties to other branches stay away."""
+    extras = {extra.name: extra for extra in spec.extra_services}
+    return [
+        s
+        for s in classes
+        if s["name"] not in extras
+        or not extras[s["name"]].branches
+        or branch_name in extras[s["name"]].branches
+    ]
+
+
+def _seed_courts(conn: Connection, tenant_id: UUID, spec: BusinessSpec,
+                 branches: list[UUID]) -> None:  # fmt: skip
+    """The spec's numbered courts, or the industry's starter ones."""
+    if any(b.courts for b in spec.branches):
+        _numbered_courts(conn, tenant_id, spec, branches)
+    else:
+        apply_vertical_rooms(conn, tenant_id, spec.vertical, "he")
+
+
+def _numbered_courts(conn: Connection, tenant_id: UUID, spec: BusinessSpec,
+                     branches: list[UUID]) -> None:  # fmt: skip
+    """Each branch's own numbered courts, open every day, rented as the tennis court service
+    (the covered ones first)."""
+    court_services = conn.execute(
+        text("""
+            SELECT id, name FROM app.services WHERE tenant_id = :t AND booking_mode = 'resource'
+            ORDER BY (name LIKE '%טניס%') DESC, created_at
+        """),
+        {"t": tenant_id},
+    ).all()
+    service = court_services[0][0] if court_services else None
+    for branch, branch_spec in zip(branches, spec.branches, strict=True):
+        for number in range(1, branch_spec.courts + 1):
+            name = f"מגרש {number}" + (" (מקורה)" if number <= branch_spec.covered_courts else "")
+            room = conn.execute(
+                text("""
+                    INSERT INTO app.rooms (tenant_id, location_id, name, capacity, bookable)
+                    VALUES (:t, :l, :n, 4, true) RETURNING id
+                """),
+                {"t": tenant_id, "l": branch, "n": name},
+            ).scalar_one()
+            conn.execute(
+                text("""
+                    INSERT INTO app.room_hours (tenant_id, room_id, weekday, starts, ends)
+                    SELECT :t, :r, d, TIME '07:00', TIME '23:00' FROM generate_series(0, 6) d
+                """),
+                {"t": tenant_id, "r": room},
+            )
+            if service:
+                conn.execute(
+                    text("""
+                        INSERT INTO app.service_rooms (tenant_id, service_id, room_id)
+                        VALUES (:t, :s, :r)
+                    """),
+                    {"t": tenant_id, "s": service, "r": room},
+                )
+
+
 def seed(
     conn: Connection,
     owner_email: str,
@@ -126,6 +223,7 @@ def seed(
                 """),
                 {"t": tenant_id, "name": he, "minutes": minutes, "capacity": cap, "color": color},
             )
+    _insert_extra_services(conn, tenant_id, spec)
     service_rows = (
         conn.execute(
             text("""
@@ -137,10 +235,7 @@ def seed(
         .mappings()
         .all()
     )
-    popularity = {
-        s["id"]: (spec.custom_services[i][5] if spec.custom_services else rng.uniform(0.6, 0.95))
-        for i, s in enumerate(service_rows)
-    }
+    popularity = _popularity(service_rows, spec, rng)
     classes = [s for s in service_rows if s["booking_mode"] == "class"]
     appointments = [s for s in service_rows if s["booking_mode"] == "appointment"]
 
@@ -291,11 +386,14 @@ def seed(
             weekly(service, branch, rooms[branch][room_index], staff[branch][coach_index],
                    weekday, at)  # fmt: skip
     elif classes:
-        for branch in branches:
+        for branch, branch_spec in zip(branches, spec.branches, strict=True):
+            branch_classes = _classes_at(classes, spec, branch_spec.name)
+            if not branch_classes:
+                continue
             for weekday in (6, 0, 1, 2, 3, 4, 5):  # Sunday first, as the week runs in Israel
                 count = 1 if weekday == 5 else 2 if weekday == 4 else rng.randint(3, 4)
                 for at in sorted(rng.sample(spec.class_hours, k=min(count, len(spec.class_hours)))):
-                    service = rng.choice(classes)
+                    service = rng.choice(branch_classes)
                     room = rooms[branch][0 if service["capacity"] > 8 else -1]
                     weekly(service, branch, room, rng.choice(staff[branch]), weekday, at)
 
@@ -705,7 +803,7 @@ def seed(
     lead_count = _seed_leads(conn, tenant_id, [owner, *instructors], clients, today, rng, interests)
     reservations = 0
     if any(s["booking_mode"] == "resource" for s in service_rows):
-        apply_vertical_rooms(conn, tenant_id, spec.vertical, "he")
+        _seed_courts(conn, tenant_id, spec, branches)
         reservations = _seed_reservations(
             conn, tenant_id, [c.id for c in clients], start, today, horizon, rng
         )
