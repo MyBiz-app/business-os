@@ -1,0 +1,86 @@
+{
+  "key": "functional",
+  "domain": "fitness",
+  "status": "live",
+  "names": {
+    "he": "אימון פונקציונלי",
+    "en": "Functional training"
+  },
+  "synonyms": {
+    "he": [
+      "פונקציונלי",
+      "אימון קבוצתי",
+      "בוטקמפ"
+    ],
+    "en": [
+      "functional",
+      "bootcamp",
+      "group training"
+    ]
+  },
+  "terms": "fitness",
+  "customer_term": "member",
+  "customers": {
+    "he": "מתאמנים",
+    "en": "Members"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "group_training",
+      "names": {
+        "he": "אימון קבוצתי",
+        "en": "Group training"
+      },
+      "model": "group_class",
+      "duration_minutes": 50,
+      "price_ils": 6000,
+      "capacity": 14
+    },
+    {
+      "key": "small_group",
+      "names": {
+        "he": "קבוצה קטנה",
+        "en": "Small group"
+      },
+      "model": "group_class",
+      "duration_minutes": 45,
+      "price_ils": 10000,
+      "capacity": 5,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "studio_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "small_groups",
+      "text": {
+        "he": "יש גם קבוצות קטנות?",
+        "en": "Do you also offer small groups?"
+      },
+      "kind": "boolean",
+      "affects": "activity:small_group",
+      "default": false
+    },
+    {
+      "key": "coaches",
+      "text": {
+        "he": "כמה מאמנים?",
+        "en": "How many coaches?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "gym",
+    "personal_trainer"
+  ],
+  "order": 5
+}

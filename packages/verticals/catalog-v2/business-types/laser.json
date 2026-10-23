@@ -1,0 +1,83 @@
+{
+  "key": "laser",
+  "domain": "beauty",
+  "status": "live",
+  "names": {
+    "he": "לייזר והסרת שיער",
+    "en": "Laser and hair removal"
+  },
+  "synonyms": {
+    "he": [
+      "לייזר",
+      "הסרת שיער בלייזר",
+      "אפילציה"
+    ],
+    "en": [
+      "laser",
+      "laser hair removal"
+    ]
+  },
+  "terms": "beauty",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "session",
+      "names": {
+        "he": "טיפול לייזר",
+        "en": "Laser session"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 30,
+      "price_ils": 25000,
+      "resource_type": "treatment_room"
+    },
+    {
+      "key": "consult",
+      "names": {
+        "he": "ייעוץ",
+        "en": "Consultation"
+      },
+      "model": "appointment",
+      "duration_minutes": 20,
+      "price_ils": 10000
+    }
+  ],
+  "resources": [
+    {
+      "type": "treatment_room",
+      "count": 2
+    }
+  ],
+  "questions": [
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה חדרים או מכשירים?",
+        "en": "How many rooms or devices?"
+      },
+      "kind": "number",
+      "affects": "resource_count:treatment_room",
+      "default": 2
+    },
+    {
+      "key": "series",
+      "text": {
+        "he": "מוכרים חבילות טיפולים?",
+        "en": "Do you sell treatment packages?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "cosmetics",
+    "spa"
+  ],
+  "order": 27
+}

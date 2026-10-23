@@ -1,0 +1,95 @@
+{
+  "key": "kids_activities",
+  "domain": "learning",
+  "status": "live",
+  "names": {
+    "he": "חוגי ילדים",
+    "en": "Kids' activities"
+  },
+  "synonyms": {
+    "he": [
+      "חוגי ילדים",
+      "חוג לילדים",
+      "גן ילדים",
+      "פעילות לילדים"
+    ],
+    "en": [
+      "kids activities",
+      "children's classes",
+      "kids club"
+    ]
+  },
+  "terms": "classes",
+  "customer_term": "student",
+  "customers": {
+    "he": "תלמידים",
+    "en": "Students"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "kids_class",
+      "names": {
+        "he": "חוג",
+        "en": "Class"
+      },
+      "model": "group_class",
+      "duration_minutes": 45,
+      "price_ils": 5000,
+      "capacity": 14,
+      "series": true
+    },
+    {
+      "key": "birthday",
+      "names": {
+        "he": "יום הולדת",
+        "en": "Birthday party"
+      },
+      "model": "project",
+      "duration_minutes": 120,
+      "price_ils": 120000,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "studio_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "ages",
+      "text": {
+        "he": "לאילו גילאים?",
+        "en": "Which ages?"
+      },
+      "kind": "select",
+      "affects": "none",
+      "options": [
+        "toddlers",
+        "kids",
+        "teens",
+        "all"
+      ],
+      "default": "kids"
+    },
+    {
+      "key": "birthdays",
+      "text": {
+        "he": "מארחים ימי הולדת?",
+        "en": "Do you host birthday parties?"
+      },
+      "kind": "boolean",
+      "affects": "activity:birthday",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "dance",
+    "summer_camp"
+  ],
+  "dependents": "child",
+  "dependents_mode": "required",
+  "order": 44
+}

@@ -1,0 +1,108 @@
+{
+  "key": "dance",
+  "domain": "learning",
+  "status": "live",
+  "names": {
+    "he": "בית ספר לריקוד",
+    "en": "Dance school"
+  },
+  "synonyms": {
+    "he": [
+      "ריקוד",
+      "בלט",
+      "סלסה",
+      "חוג ריקוד",
+      "סטודיו לריקוד"
+    ],
+    "en": [
+      "dance",
+      "ballet",
+      "salsa",
+      "dance studio"
+    ]
+  },
+  "terms": "classes",
+  "customer_term": "student",
+  "customers": {
+    "he": "תלמידים",
+    "en": "Students"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "class",
+      "names": {
+        "he": "שיעור",
+        "en": "Class"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 6000,
+      "capacity": 18
+    },
+    {
+      "key": "private",
+      "names": {
+        "he": "שיעור פרטי",
+        "en": "Private lesson"
+      },
+      "model": "appointment",
+      "duration_minutes": 45,
+      "price_ils": 20000,
+      "optional": true
+    },
+    {
+      "key": "season",
+      "names": {
+        "he": "קורס עונתי",
+        "en": "Seasonal course"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 50000,
+      "capacity": 18,
+      "series": true,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "studio_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "audience",
+      "text": {
+        "he": "ילדים, מבוגרים או שניהם?",
+        "en": "Children, adults or both?"
+      },
+      "kind": "select",
+      "affects": "dependents",
+      "options": [
+        "children",
+        "adults",
+        "both"
+      ],
+      "default": "both"
+    },
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה אולמות?",
+        "en": "How many studios?"
+      },
+      "kind": "number",
+      "affects": "resource_count:studio_room",
+      "default": 1
+    }
+  ],
+  "common_combos": [
+    "kids_activities",
+    "gym"
+  ],
+  "dependents": "child",
+  "dependents_mode": "ask",
+  "order": 41
+}

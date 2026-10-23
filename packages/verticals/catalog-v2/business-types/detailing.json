@@ -1,0 +1,103 @@
+{
+  "key": "detailing",
+  "domain": "automotive",
+  "status": "live",
+  "names": {
+    "he": "דיטיילינג",
+    "en": "Car detailing"
+  },
+  "synonyms": {
+    "he": [
+      "דיטיילינג",
+      "שטיפת רכב",
+      "פוליש",
+      "ניקוי רכב"
+    ],
+    "en": [
+      "detailing",
+      "car wash",
+      "car polish"
+    ]
+  },
+  "terms": "automotive",
+  "customer_term": "customer",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Customers"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "wash",
+      "names": {
+        "he": "שטיפה",
+        "en": "Wash"
+      },
+      "model": "appointment",
+      "duration_minutes": 30,
+      "price_ils": 6000
+    },
+    {
+      "key": "interior",
+      "names": {
+        "he": "ניקוי פנים",
+        "en": "Interior clean"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 12000
+    },
+    {
+      "key": "polish",
+      "names": {
+        "he": "פוליש וציפוי",
+        "en": "Polish and coating"
+      },
+      "model": "appointment",
+      "duration_minutes": 180,
+      "price_ils": 60000
+    },
+    {
+      "key": "mobile_wash",
+      "names": {
+        "he": "שטיפה אצל הלקוח",
+        "en": "Mobile wash"
+      },
+      "model": "on_site",
+      "duration_minutes": 45,
+      "price_ils": 9000,
+      "travel_minutes": 20,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "bays",
+      "text": {
+        "he": "כמה עמדות?",
+        "en": "How many bays?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    },
+    {
+      "key": "mobile",
+      "text": {
+        "he": "יש שירות ניידת?",
+        "en": "Do you offer a mobile service?"
+      },
+      "kind": "boolean",
+      "affects": "activity:mobile_wash",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "garage",
+    "tires"
+  ],
+  "dependents": "vehicle",
+  "dependents_mode": "required",
+  "order": 57
+}

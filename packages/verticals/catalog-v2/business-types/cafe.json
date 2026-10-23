@@ -1,0 +1,100 @@
+{
+  "key": "cafe",
+  "domain": "food_events",
+  "status": "beta",
+  "names": {
+    "he": "בית קפה",
+    "en": "Cafe"
+  },
+  "synonyms": {
+    "he": [
+      "בית קפה",
+      "קפה",
+      "בריסטה"
+    ],
+    "en": [
+      "cafe",
+      "coffee shop",
+      "barista"
+    ]
+  },
+  "terms": "food",
+  "customer_term": "guest",
+  "customers": {
+    "he": "אורחים",
+    "en": "Guests"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "workshop",
+      "names": {
+        "he": "סדנה",
+        "en": "Workshop"
+      },
+      "model": "group_class",
+      "duration_minutes": 120,
+      "price_ils": 14000,
+      "capacity": 14
+    },
+    {
+      "key": "private_event",
+      "names": {
+        "he": "אירוע פרטי",
+        "en": "Private event"
+      },
+      "model": "project",
+      "duration_minutes": 180,
+      "price_ils": 150000,
+      "optional": true
+    },
+    {
+      "key": "tables",
+      "names": {
+        "he": "הזמנת שולחנות",
+        "en": "Table reservation"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 120,
+      "price_ils": 0,
+      "resource_type": "table",
+      "max_minutes": 240,
+      "step_minutes": 30,
+      "optional": true,
+      "coming_soon": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "table",
+      "count": 8
+    }
+  ],
+  "questions": [
+    {
+      "key": "workshops",
+      "text": {
+        "he": "מקיימים סדנאות?",
+        "en": "Do you hold workshops?"
+      },
+      "kind": "boolean",
+      "affects": "activity:workshop",
+      "default": true
+    },
+    {
+      "key": "events",
+      "text": {
+        "he": "מארחים אירועים פרטיים?",
+        "en": "Do you host private events?"
+      },
+      "kind": "boolean",
+      "affects": "activity:private_event",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "bakery",
+    "restaurant"
+  ],
+  "order": 72
+}

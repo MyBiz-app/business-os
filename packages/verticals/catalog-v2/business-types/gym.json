@@ -1,0 +1,97 @@
+{
+  "key": "gym",
+  "domain": "fitness",
+  "status": "live",
+  "names": {
+    "he": "חדר כושר",
+    "en": "Gym"
+  },
+  "synonyms": {
+    "he": [
+      "חדר כושר",
+      "מכון כושר",
+      "ג'ים",
+      "מכון"
+    ],
+    "en": [
+      "gym",
+      "fitness center",
+      "health club"
+    ]
+  },
+  "terms": "fitness",
+  "customer_term": "member",
+  "customers": {
+    "he": "מתאמנים",
+    "en": "Members"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "open_access",
+      "names": {
+        "he": "כניסה חופשית במנוי",
+        "en": "Open access (membership)"
+      },
+      "model": "open_entry",
+      "duration_minutes": 60,
+      "price_ils": 25000
+    },
+    {
+      "key": "personal_training",
+      "names": {
+        "he": "אימון אישי",
+        "en": "Personal training"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 25000
+    },
+    {
+      "key": "studio_class",
+      "names": {
+        "he": "שיעור סטודיו",
+        "en": "Studio class"
+      },
+      "model": "group_class",
+      "duration_minutes": 50,
+      "price_ils": 6000,
+      "capacity": 20,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "studio_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "group_classes",
+      "text": {
+        "he": "יש שיעורים קבוצתיים?",
+        "en": "Do you run group classes?"
+      },
+      "kind": "boolean",
+      "affects": "activity:studio_class",
+      "default": false
+    },
+    {
+      "key": "trainers",
+      "text": {
+        "he": "כמה מאמנים אישיים יש?",
+        "en": "How many personal trainers?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "pilates",
+    "swim_school",
+    "physiotherapy"
+  ],
+  "order": 1
+}

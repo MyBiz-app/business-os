@@ -1,0 +1,79 @@
+{
+  "key": "djs",
+  "domain": "events",
+  "status": "beta",
+  "names": {
+    "he": "די־ג'יי",
+    "en": "DJ"
+  },
+  "synonyms": {
+    "he": [
+      "די ג'יי",
+      "דיג'יי",
+      "DJ",
+      "מוזיקה לאירועים"
+    ],
+    "en": [
+      "dj",
+      "event dj",
+      "wedding dj"
+    ]
+  },
+  "terms": "events",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "planning",
+      "names": {
+        "he": "פגישת היכרות",
+        "en": "Intro meeting"
+      },
+      "model": "appointment",
+      "duration_minutes": 30,
+      "price_ils": 10000
+    },
+    {
+      "key": "event",
+      "names": {
+        "he": "אירוע",
+        "en": "Event"
+      },
+      "model": "project",
+      "duration_minutes": 300,
+      "price_ils": 250000
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "deposit",
+      "text": {
+        "he": "לוקחים מקדמה?",
+        "en": "Do you take a deposit?"
+      },
+      "kind": "boolean",
+      "affects": "activity:event",
+      "default": true
+    },
+    {
+      "key": "crew",
+      "text": {
+        "he": "כמה צוותים?",
+        "en": "How many crews?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 1
+    }
+  ],
+  "common_combos": [
+    "event_suppliers",
+    "photographers"
+  ],
+  "order": 64
+}

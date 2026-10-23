@@ -1,0 +1,77 @@
+{
+  "key": "rehearsal_studios",
+  "domain": "rental_spaces",
+  "status": "beta",
+  "names": {
+    "he": "חדרי חזרות",
+    "en": "Rehearsal rooms"
+  },
+  "synonyms": {
+    "he": [
+      "חדר חזרות",
+      "חדרי חזרות",
+      "אולפן",
+      "להקה"
+    ],
+    "en": [
+      "rehearsal room",
+      "band room",
+      "music studio"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "band",
+  "customers": {
+    "he": "להקות",
+    "en": "Bands"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "room_rental",
+      "names": {
+        "he": "השכרת חדר חזרות",
+        "en": "Rehearsal room rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 9000,
+      "resource_type": "rehearsal_room",
+      "max_minutes": 240,
+      "step_minutes": 60
+    }
+  ],
+  "resources": [
+    {
+      "type": "rehearsal_room",
+      "count": 3
+    }
+  ],
+  "questions": [
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה חדרים?",
+        "en": "How many rooms?"
+      },
+      "kind": "number",
+      "affects": "resource_count:rehearsal_room",
+      "default": 3
+    },
+    {
+      "key": "backline",
+      "text": {
+        "he": "הציוד כלול?",
+        "en": "Is the equipment included?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "music",
+    "photo_studio"
+  ],
+  "order": 20
+}

@@ -1,0 +1,87 @@
+{
+  "key": "crossfit",
+  "domain": "fitness",
+  "status": "live",
+  "names": {
+    "he": "קרוספיט",
+    "en": "CrossFit box"
+  },
+  "synonyms": {
+    "he": [
+      "קרוספיט",
+      "בוקס",
+      "אימון פונקציונלי קשה"
+    ],
+    "en": [
+      "crossfit",
+      "box",
+      "wod"
+    ]
+  },
+  "terms": "fitness",
+  "customer_term": "member",
+  "customers": {
+    "he": "מתאמנים",
+    "en": "Members"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "daily_wod",
+      "names": {
+        "he": "אימון יומי",
+        "en": "Daily workout"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 7000,
+      "capacity": 14
+    },
+    {
+      "key": "foundations",
+      "names": {
+        "he": "קורס יסודות",
+        "en": "Foundations course"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 8000,
+      "capacity": 8,
+      "series": true,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "studio_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "foundations_course",
+      "text": {
+        "he": "יש קורס יסודות למתחילים?",
+        "en": "Is there a beginners' foundations course?"
+      },
+      "kind": "boolean",
+      "affects": "activity:foundations",
+      "default": true
+    },
+    {
+      "key": "coaches",
+      "text": {
+        "he": "כמה מאמנים?",
+        "en": "How many coaches?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 3
+    }
+  ],
+  "common_combos": [
+    "functional",
+    "gym"
+  ],
+  "order": 4
+}

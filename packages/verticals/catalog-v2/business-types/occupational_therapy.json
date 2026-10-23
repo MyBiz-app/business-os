@@ -1,0 +1,86 @@
+{
+  "key": "occupational_therapy",
+  "domain": "health",
+  "status": "beta",
+  "names": {
+    "he": "ריפוי בעיסוק",
+    "en": "Occupational therapy"
+  },
+  "synonyms": {
+    "he": [
+      "ריפוי בעיסוק",
+      "מרפאה בעיסוק",
+      "טיפול התפתחותי"
+    ],
+    "en": [
+      "occupational therapy",
+      "ot",
+      "developmental therapy"
+    ]
+  },
+  "terms": "clinic",
+  "customer_term": "patient",
+  "customers": {
+    "he": "מטופלים",
+    "en": "Patients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "session",
+      "names": {
+        "he": "טיפול",
+        "en": "Session"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 45,
+      "price_ils": 28000,
+      "resource_type": "treatment_room"
+    },
+    {
+      "key": "assessment",
+      "names": {
+        "he": "אבחון",
+        "en": "Assessment"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 45000
+    }
+  ],
+  "resources": [
+    {
+      "type": "treatment_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "kids",
+      "text": {
+        "he": "מטפלים בילדים?",
+        "en": "Do you treat children?"
+      },
+      "kind": "boolean",
+      "affects": "dependents",
+      "default": true
+    },
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה חדרי טיפול?",
+        "en": "How many treatment rooms?"
+      },
+      "kind": "number",
+      "affects": "resource_count:treatment_room",
+      "default": 1
+    }
+  ],
+  "common_combos": [
+    "speech_therapy",
+    "physiotherapy"
+  ],
+  "dependents": "child",
+  "dependents_mode": "ask",
+  "order": 39
+}

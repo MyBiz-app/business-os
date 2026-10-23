@@ -1,0 +1,91 @@
+{
+  "key": "hair_salon",
+  "domain": "beauty",
+  "status": "live",
+  "names": {
+    "he": "מספרה",
+    "en": "Hair salon"
+  },
+  "synonyms": {
+    "he": [
+      "מספרה",
+      "עיצוב שיער",
+      "צבע",
+      "תספורת נשים",
+      "קוסמטיקאית שיער"
+    ],
+    "en": [
+      "hair salon",
+      "hairdresser",
+      "hair stylist"
+    ]
+  },
+  "terms": "beauty",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "cut",
+      "names": {
+        "he": "תספורת ועיצוב",
+        "en": "Cut and style"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 18000
+    },
+    {
+      "key": "color",
+      "names": {
+        "he": "צבע",
+        "en": "Color"
+      },
+      "model": "appointment",
+      "duration_minutes": 90,
+      "price_ils": 25000
+    },
+    {
+      "key": "treatment",
+      "names": {
+        "he": "טיפול שיער",
+        "en": "Hair treatment"
+      },
+      "model": "appointment",
+      "duration_minutes": 45,
+      "price_ils": 12000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "chairs",
+      "text": {
+        "he": "כמה עמדות עבודה?",
+        "en": "How many work stations?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 3
+    },
+    {
+      "key": "walk_in",
+      "text": {
+        "he": "מקבלים גם בלי תור?",
+        "en": "Do you take walk-ins?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "nails",
+    "cosmetics"
+  ],
+  "order": 23
+}

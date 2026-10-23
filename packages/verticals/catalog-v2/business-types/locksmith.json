@@ -1,0 +1,81 @@
+{
+  "key": "locksmith",
+  "domain": "home_field",
+  "status": "beta",
+  "names": {
+    "he": "מנעולן",
+    "en": "Locksmith"
+  },
+  "synonyms": {
+    "he": [
+      "מנעולן",
+      "פריצת דלת",
+      "החלפת צילינדר",
+      "נעילה"
+    ],
+    "en": [
+      "locksmith",
+      "lockout",
+      "lock change"
+    ]
+  },
+  "terms": "home_services",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "job_route",
+  "activities": [
+    {
+      "key": "callout",
+      "names": {
+        "he": "הגעה ופתיחת דלת",
+        "en": "Call-out and unlock"
+      },
+      "model": "on_site",
+      "duration_minutes": 45,
+      "price_ils": 35000,
+      "travel_minutes": 20
+    },
+    {
+      "key": "lock_change",
+      "names": {
+        "he": "החלפת מנעול",
+        "en": "Lock change"
+      },
+      "model": "on_site",
+      "duration_minutes": 60,
+      "price_ils": 45000,
+      "travel_minutes": 30,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "zones",
+      "text": {
+        "he": "באילו אזורים עובדים?",
+        "en": "Which areas do you serve?"
+      },
+      "kind": "text",
+      "affects": "service_area"
+    },
+    {
+      "key": "technicians",
+      "text": {
+        "he": "כמה טכנאים או עובדים?",
+        "en": "How many technicians or workers?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "handyman",
+    "electricians"
+  ],
+  "order": 54
+}

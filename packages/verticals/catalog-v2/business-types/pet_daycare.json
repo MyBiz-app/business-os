@@ -1,0 +1,84 @@
+{
+  "key": "pet_daycare",
+  "domain": "pets",
+  "status": "beta",
+  "names": {
+    "he": "גן כלבים",
+    "en": "Dog daycare"
+  },
+  "synonyms": {
+    "he": [
+      "גן כלבים",
+      "מעון כלבים",
+      "יום בגן",
+      "שמרטף לכלבים"
+    ],
+    "en": [
+      "dog daycare",
+      "doggy daycare",
+      "dog park"
+    ]
+  },
+  "terms": "pets",
+  "customer_term": "owner",
+  "customers": {
+    "he": "בעלים",
+    "en": "Owners"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "day",
+      "names": {
+        "he": "יום בגן",
+        "en": "Day at daycare"
+      },
+      "model": "group_class",
+      "duration_minutes": 540,
+      "price_ils": 12000,
+      "capacity": 15
+    },
+    {
+      "key": "half_day",
+      "names": {
+        "he": "חצי יום",
+        "en": "Half day"
+      },
+      "model": "group_class",
+      "duration_minutes": 270,
+      "price_ils": 7000,
+      "capacity": 15,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "capacity",
+      "text": {
+        "he": "כמה כלבים ביום?",
+        "en": "How many dogs a day?"
+      },
+      "kind": "number",
+      "affects": "activity:day",
+      "default": 15
+    },
+    {
+      "key": "boarding",
+      "text": {
+        "he": "יש גם פנסיון?",
+        "en": "Is there boarding too?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "pet_boarding",
+    "pet_grooming"
+  ],
+  "dependents": "pet",
+  "dependents_mode": "required",
+  "order": 61
+}

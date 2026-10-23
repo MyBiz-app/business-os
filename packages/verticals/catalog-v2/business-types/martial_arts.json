@@ -1,0 +1,101 @@
+{
+  "key": "martial_arts",
+  "domain": "learning",
+  "status": "live",
+  "names": {
+    "he": "אומנויות לחימה",
+    "en": "Martial arts"
+  },
+  "synonyms": {
+    "he": [
+      "קראטה",
+      "ג'ודו",
+      "קרב מגע",
+      "MMA",
+      "בוקס",
+      "טאקוונדו"
+    ],
+    "en": [
+      "karate",
+      "judo",
+      "mma",
+      "boxing",
+      "martial arts",
+      "krav maga"
+    ]
+  },
+  "terms": "classes",
+  "customer_term": "trainee",
+  "customers": {
+    "he": "חניכים",
+    "en": "Trainees"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "class",
+      "names": {
+        "he": "שיעור",
+        "en": "Class"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 6000,
+      "capacity": 20
+    },
+    {
+      "key": "private_lesson",
+      "names": {
+        "he": "שיעור פרטי",
+        "en": "Private lesson"
+      },
+      "model": "appointment",
+      "duration_minutes": 45,
+      "price_ils": 20000,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "studio_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "audience",
+      "text": {
+        "he": "ילדים, מבוגרים או שניהם?",
+        "en": "Children, adults or both?"
+      },
+      "kind": "select",
+      "affects": "dependents",
+      "options": [
+        "children",
+        "adults",
+        "both"
+      ],
+      "default": "both"
+    },
+    {
+      "key": "private",
+      "text": {
+        "he": "מציעים שיעורים פרטיים?",
+        "en": "Do you offer private lessons?"
+      },
+      "kind": "boolean",
+      "affects": "activity:private_lesson",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "gym",
+    "kids_activities"
+  ],
+  "also_in": [
+    "fitness"
+  ],
+  "dependents": "child",
+  "dependents_mode": "ask",
+  "order": 8
+}

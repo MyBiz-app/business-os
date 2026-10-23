@@ -1,0 +1,81 @@
+{
+  "key": "cleaning",
+  "domain": "home_field",
+  "status": "beta",
+  "names": {
+    "he": "ניקיון",
+    "en": "Cleaning"
+  },
+  "synonyms": {
+    "he": [
+      "ניקיון",
+      "משק בית",
+      "ניקיון דירות",
+      "מנקה"
+    ],
+    "en": [
+      "cleaning",
+      "house cleaning",
+      "maid",
+      "cleaners"
+    ]
+  },
+  "terms": "home_services",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "job_route",
+  "activities": [
+    {
+      "key": "home_clean",
+      "names": {
+        "he": "ניקיון בית",
+        "en": "Home cleaning"
+      },
+      "model": "on_site",
+      "duration_minutes": 180,
+      "price_ils": 36000,
+      "travel_minutes": 30
+    },
+    {
+      "key": "deep_clean",
+      "names": {
+        "he": "ניקיון יסודי",
+        "en": "Deep clean"
+      },
+      "model": "project",
+      "duration_minutes": 300,
+      "price_ils": 90000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "zones",
+      "text": {
+        "he": "באילו אזורים עובדים?",
+        "en": "Which areas do you serve?"
+      },
+      "kind": "text",
+      "affects": "service_area"
+    },
+    {
+      "key": "technicians",
+      "text": {
+        "he": "כמה טכנאים או עובדים?",
+        "en": "How many technicians or workers?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "gardening",
+    "handyman"
+  ],
+  "order": 47
+}
