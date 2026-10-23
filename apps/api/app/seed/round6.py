@@ -27,8 +27,9 @@ from app.files import store_file, system_folder_id
 from app.migration.fields import guess_kind, suggest_mapping
 from app.migration.formats import read_any
 from app.schedule.scheduling import local_to_utc
+from app.seed.roles import role_of
 
-GYM_NETWORK = "Adir fitness"
+GYM_NETWORK = "gym"  # a role, see roles.py
 MOVE_ORIGIN = "Previous system (demo)"
 MOVE_FILE = "previous-system-clients.xlsx"
 WORK_WEEKDAYS = {6, 0, 1, 2, 3}  # Sunday to Thursday
@@ -289,6 +290,6 @@ def seed_round6(conn: Connection, tenant_id: UUID, tenant_name: str, today: date
         counts["pay_setups"] = _pay_setup(conn, tenant_id, currency, team)
         counts["time_entries"] = _hours(conn, tenant_id, owner, team, month, today, time_zone, rng)
         counts["payroll_runs"] = _payroll_run(conn, tenant_id, owner, currency, month)
-    if tenant_name == GYM_NETWORK:
+    if role_of(conn, tenant_id) == GYM_NETWORK:
         counts["move_sessions"] = _move_session(conn, tenant_id, owner, time_zone)
     return counts

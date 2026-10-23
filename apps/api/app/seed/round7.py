@@ -27,13 +27,18 @@ from sqlalchemy import Connection, text
 from weasyprint import HTML
 
 from app.api.issued_documents import IssueRequest, LineIn, issue
+from app.seed.roles import role_of
 from app.seed.round6 import _as_tenant, _month, _team
 from app.websites.brief import Brief
 from app.websites.pricing import price_for
 
-GYM_NETWORK = "Adir fitness"
-SALON = "Studio Bloom"
-PIZZA = "Urban Slice"
+# Roles (see roles.py): the content below is keyed by the part a business plays.
+GYM_NETWORK = "gym"
+SALON = "salon"
+BARBER = "barber"
+PIZZA = "pizza"
+COURTS = "courts"
+CLINIC = "clinic"
 
 # Tenant tables that have no demo rows on purpose (table -> why).
 NO_DEMO: dict[str, str] = {
@@ -97,6 +102,32 @@ QUOTES = {
         ("ערב בנות", "הסלון", (("החלקה ותסרוקת", 6, 45_000),)),
         ("חתונה בגן אירועים", "גן אירועים, כפר סבא", (("צוות עיצוב שיער", 1, 280_000),)),
     ),
+    BARBER: (
+        (
+            "חתונה: חתן וחבריו",
+            "הסניף",
+            (("תספורת וזקן", 6, 14_000), ("גילוח בתער", 6, 9_000)),
+        ),
+        ("יום גיבוש לחברה", "משרדי החברה, תל אביב", (("עמדת תספורת נודדת", 1, 160_000),)),
+        ("מועדון חברים", "הסניף", (("כרטיסיית תספורות", 10, 11_000),)),
+        ("צילומי פרסומת", "אולפן צילום, יפו", (("סטיילינג שיער וזקן", 4, 30_000),)),
+    ),
+    COURTS: (
+        (
+            "יום כיף לחברה",
+            "מתחם הרצליה",
+            (("שעת מגרש", 12, 18_000), ("מאמן לקבוצה", 2, 25_000)),
+        ),
+        ("טורניר פרטי", "מתחם ראשון לציון", (("שעת מגרש", 16, 16_000),)),
+        ("מחנה קיץ לילדים", "מתחם הרצליה", (("אקדמיית ילדים", 10, 22_000),)),
+        ("יום הולדת על המגרש", "מתחם ראשון לציון", (("שעת מגרש", 2, 16_000),)),
+    ),
+    CLINIC: (
+        ("סדנת ארגונומיה לחברה", "משרדי החברה, פתח תקווה", (("הרצאה והדרכה", 1, 150_000),)),
+        ("יום בריאות בחברה", "משרדי החברה", (("עמדת פיזיותרפיה", 6, 20_000),)),
+        ("סדנת תזונה לעובדים", "משרדי החברה, כפר סבא", (("סדנה קבוצתית", 1, 90_000),)),
+        ("חבילת טיפולים לקבוצה", "הקליניקה", (("סדרת טיפולים", 8, 25_000),)),
+    ),
     PIZZA: (
         (
             "קייטרינג לחברה",
@@ -117,6 +148,21 @@ CHATS = {
         "יש כרגע {n} לקוחות עם מנוי פעיל. רוצה פירוט לפי סניף?",
     ),
     SALON: ("secretary", "מה יש ביומן מחר?", "מחר יש {n} תורים. הראשון בתשע בבוקר. להציג את כולם?"),
+    BARBER: (
+        "secretary",
+        "כמה תורים יש מחר בשני הסניפים?",
+        "מחר יש {n} תורים. בפלורנטין התור של 10:00 עדיין בלי הגעה. להציג?",
+    ),
+    COURTS: (
+        "secretary",
+        "אילו מגרשים פנויים הערב?",
+        "הערב יש {n} הזמנות. מגרשים פנויים אחרי 21:00. להציע שעות לרשימת ההמתנה?",
+    ),
+    CLINIC: (
+        "care",
+        "מי מהמטופלים מסיים סדרת טיפולים השבוע?",
+        "יש {n} מטופלים בסוף סדרה. להכין להם הצעה לחידוש?",
+    ),
     PIZZA: (
         "analyst",
         "איזה סניף מכר הכי הרבה השבוע?",
@@ -177,16 +223,16 @@ def _quotes(
     tenant_id: UUID,
     owner: UUID,
     currency: str,
-    name: str,
+    role: str | None,
     clients: list,
     today: date,
     rng: random.Random,
 ) -> int:
     """Quotes and events in every status, with lines, an event date and place, and the counter."""
-    if _has(conn, "quotes", tenant_id) or name not in QUOTES:
+    if _has(conn, "quotes", tenant_id) or role not in QUOTES:
         return 0
     for number, ((title, place, lines), status) in enumerate(
-        zip(QUOTES[name], QUOTE_STATUSES, strict=True), start=1
+        zip(QUOTES[role], QUOTE_STATUSES, strict=True), start=1
     ):
         client = clients[(number * 3) % len(clients)]
         sent = (
@@ -366,14 +412,14 @@ def _sales(conn: Connection, tenant_id: UUID, owner: UUID, today: date) -> int:
 
 
 def _ai(
-    conn: Connection, tenant_id: UUID, owner: UUID, name: str, clients: list, today: date
+    conn: Connection, tenant_id: UUID, owner: UUID, role: str | None, clients: list, today: date
 ) -> int:
     """Conversations with several agents, two actions waiting for approval, usage alerts and a
     team on the map. No model is called: the texts are written here."""
     added = 0
     month = today.replace(day=1)
     if not _has(conn, "ai_conversations", tenant_id):
-        chats = [CHATS[name], *MORE_CHATS] if name in CHATS else list(MORE_CHATS)
+        chats = [CHATS[role], *MORE_CHATS] if role in CHATS else list(MORE_CHATS)
         for i, (agent, question, answer) in enumerate(chats):
             started = datetime.now().astimezone() - timedelta(days=i * 2, hours=3)
             messages = [
@@ -860,14 +906,15 @@ def _website(
     tenant_id: UUID,
     owner: UUID,
     name: str,
+    role: str | None,
     currency: str,
     today: date,
     rng: random.Random,
 ) -> int:
     """A website order: the gym's site is live and gets visits, the salon's is being built."""
-    if name not in (GYM_NETWORK, SALON) or _has(conn, "website_orders", tenant_id):
+    if role not in (GYM_NETWORK, SALON, BARBER) or _has(conn, "website_orders", tenant_id):
         return 0
-    live = name == GYM_NETWORK
+    live = role == GYM_NETWORK
     brief = Brief(
         goals=["leads", "bookings"],
         main_action="לקבוע שיעור ניסיון",
@@ -1108,11 +1155,11 @@ def _people(conn: Connection, tenant_id: UUID, owner: UUID, name: str, clients: 
     return added
 
 
-def _subscription_history(conn: Connection, tenant_id: UUID, owner: UUID, name: str,
+def _subscription_history(conn: Connection, tenant_id: UUID, owner: UUID, role: str | None,
                           currency: str) -> int:  # fmt: skip
-    """R33: Studio Bloom paused its subscription a while ago and took it back, so the console's
-    churn view and the business's history have a row. Nothing is cancelled now."""
-    if name != SALON or _has(conn, "subscription_cancellations", tenant_id):
+    """R33: the salon and the barbershop paused their subscription a while ago and took it back,
+    so the console's churn view and the business's history have a row. Nothing is cancelled now."""
+    if role not in (SALON, BARBER) or _has(conn, "subscription_cancellations", tenant_id):
         return 0
     conn.execute(
         text("""
@@ -1128,10 +1175,17 @@ def _subscription_history(conn: Connection, tenant_id: UUID, owner: UUID, name: 
     return 1
 
 
-def _business_size(conn: Connection, tenant_id: UUID, name: str) -> int:
+def _business_size(conn: Connection, tenant_id: UUID, role: str | None) -> int:
     """The size each demo business answered at sign-up (a solo business has no team, so none of
     the three is solo). Only fills an empty answer."""
-    size = {GYM_NETWORK: "network", SALON: "medium", PIZZA: "network"}.get(name)
+    size = {
+        GYM_NETWORK: "network",
+        SALON: "medium",
+        PIZZA: "network",
+        BARBER: "network",
+        COURTS: "network",
+        CLINIC: "medium",
+    }.get(role or "")
     if size is None:
         return 0
     return conn.execute(
@@ -1387,20 +1441,19 @@ def seed_round7(conn: Connection, tenant_id: UUID, tenant_name: str, today: date
     if len(clients) < 5:
         return {}
     team = _team(conn, tenant_id)
+    role = role_of(conn, tenant_id)
     counts = {
-        "quotes": _quotes(conn, tenant_id, owner, currency, tenant_name, clients, today, rng),
+        "quotes": _quotes(conn, tenant_id, owner, currency, role, clients, today, rng),
         "documents": _documents(conn, tenant_id, owner, clients, today),
         "sales": _sales(conn, tenant_id, owner, today),
-        "ai": _ai(conn, tenant_id, owner, tenant_name, clients, today),
+        "ai": _ai(conn, tenant_id, owner, role, clients, today),
         "messages": _messages(conn, tenant_id, owner, tenant_name, clients),
         "planning": _planning(conn, tenant_id, owner, team, today, rng),
-        "website": _website(conn, tenant_id, owner, tenant_name, currency, today, rng),
+        "website": _website(conn, tenant_id, owner, tenant_name, role, currency, today, rng),
         "whatsapp": _whatsapp(conn, tenant_id, clients),
         "people": _people(conn, tenant_id, owner, tenant_name, clients),
-        "size": _business_size(conn, tenant_id, tenant_name),
-        "subscription_history": _subscription_history(
-            conn, tenant_id, owner, tenant_name, currency
-        ),
+        "size": _business_size(conn, tenant_id, role),
+        "subscription_history": _subscription_history(conn, tenant_id, owner, role, currency),
         "cancellation": _cancellation(conn, tenant_id, owner, currency, clients, today),
         "waitlist": _waitlist(conn, tenant_id, clients, today),
         "freeze_requests": _freeze_requests(conn, tenant_id, owner, clients, today),
