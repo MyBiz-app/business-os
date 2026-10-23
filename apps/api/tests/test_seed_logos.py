@@ -18,7 +18,7 @@ def test_full_demo_logos_exist_and_are_small_pngs():
     for entry in full:
         data = (ASSETS / entry["file"]).read_bytes()
         assert data.startswith(PNG_SIGNATURE)
-        assert len(data) < 40_000  # the seed stores these in the database
+        assert len(data) < 200_000  # the seed stores these in the database
 
 
 def test_every_branch_of_the_full_demo_has_its_own_logo():

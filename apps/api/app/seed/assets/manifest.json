@@ -30,7 +30,7 @@
   },
   "בלייד ברברס": {
    "file": "logos/full-barbers.png",
-   "color": "#1f2937"
+   "color": "#b45309"
   },
   "Urban Slice": {
    "file": "logos/b09.png",
@@ -82,11 +82,11 @@
   },
   "אדיר פיטנס": {
    "file": "logos/full-fitness.png",
-   "color": "#ea580c"
+   "color": "#111111"
   },
   "Adir Fitness": {
    "file": "logos/full-fitness.png",
-   "color": "#ea580c"
+   "color": "#111111"
   },
   "טניס קלאב השרון": {
    "file": "logos/full-tennis.png",
@@ -98,7 +98,7 @@
   },
   "Blade Barbers": {
    "file": "logos/full-barbers.png",
-   "color": "#1f2937"
+   "color": "#b45309"
   },
   "מרחב - בריאות ותנועה": {
    "file": "logos/full-clinic.png",
@@ -260,59 +260,59 @@
   },
   "אדיר פיטנס/תל אביב - כוח": {
    "file": "logos/full-fitness-tel-aviv.png",
-   "color": "#c2410c"
+   "color": "#111111"
   },
   "Adir Fitness/תל אביב - כוח": {
    "file": "logos/full-fitness-tel-aviv.png",
-   "color": "#c2410c"
+   "color": "#111111"
   },
   "אדיר פיטנס/באר שבע - כוח": {
    "file": "logos/full-fitness-beer-sheva.png",
-   "color": "#dc2626"
+   "color": "#111111"
   },
   "Adir Fitness/באר שבע - כוח": {
    "file": "logos/full-fitness-beer-sheva.png",
-   "color": "#dc2626"
+   "color": "#111111"
   },
   "אדיר פיטנס/רמת גן - פילאטיס ויוגה": {
    "file": "logos/full-fitness-ramat-gan.png",
-   "color": "#9333ea"
+   "color": "#111111"
   },
   "Adir Fitness/רמת גן - פילאטיס ויוגה": {
    "file": "logos/full-fitness-ramat-gan.png",
-   "color": "#9333ea"
+   "color": "#111111"
   },
   "אדיר פיטנס/חיפה - קרוספיט": {
    "file": "logos/full-fitness-haifa.png",
-   "color": "#b45309"
+   "color": "#111111"
   },
   "Adir Fitness/חיפה - קרוספיט": {
    "file": "logos/full-fitness-haifa.png",
-   "color": "#b45309"
+   "color": "#111111"
   },
   "אדיר פיטנס/ירושלים - לחימה": {
    "file": "logos/full-fitness-jerusalem.png",
-   "color": "#be123c"
+   "color": "#111111"
   },
   "Adir Fitness/ירושלים - לחימה": {
    "file": "logos/full-fitness-jerusalem.png",
-   "color": "#be123c"
+   "color": "#111111"
   },
   "טניס קלאב השרון/הרצליה": {
    "file": "logos/full-tennis-herzliya.png",
-   "color": "#166534"
+   "color": "#15803d"
   },
   "Sharon Tennis Club/הרצליה": {
    "file": "logos/full-tennis-herzliya.png",
-   "color": "#166534"
+   "color": "#15803d"
   },
   "טניס קלאב השרון/ראשון לציון": {
    "file": "logos/full-tennis-rishon.png",
-   "color": "#65a30d"
+   "color": "#15803d"
   },
   "Sharon Tennis Club/ראשון לציון": {
    "file": "logos/full-tennis-rishon.png",
-   "color": "#65a30d"
+   "color": "#15803d"
   },
   "בלייד ברברס/תל אביב - פלורנטין": {
    "file": "logos/full-barbers-florentin.png",
@@ -324,27 +324,27 @@
   },
   "בלייד ברברס/אשדוד - הרובע": {
    "file": "logos/full-barbers-ashdod.png",
-   "color": "#475569"
+   "color": "#b45309"
   },
   "Blade Barbers/אשדוד - הרובע": {
    "file": "logos/full-barbers-ashdod.png",
-   "color": "#475569"
+   "color": "#b45309"
   },
   "מרחב - בריאות ותנועה/פתח תקווה - פיזיותרפיה": {
    "file": "logos/full-clinic-petah-tikva.png",
-   "color": "#0e7490"
+   "color": "#0d9488"
   },
   "Merhav Clinic/פתח תקווה - פיזיותרפיה": {
    "file": "logos/full-clinic-petah-tikva.png",
-   "color": "#0e7490"
+   "color": "#0d9488"
   },
   "מרחב - בריאות ותנועה/כפר סבא - תזונה": {
    "file": "logos/full-clinic-kfar-saba.png",
-   "color": "#65a30d"
+   "color": "#0d9488"
   },
   "Merhav Clinic/כפר סבא - תזונה": {
    "file": "logos/full-clinic-kfar-saba.png",
-   "color": "#65a30d"
+   "color": "#0d9488"
   }
  },
  "portraits": {
