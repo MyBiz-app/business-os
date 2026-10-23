@@ -30,6 +30,7 @@ GYM_NETWORK = "Adir fitness"
 CROSSFIT_BRANCH = ("חיפה - קרוספיט", "הנמל 12, חיפה")
 CROSSFIT_COACHES = (("אורן", "שגיא"), ("שירן", "בן דוד"), ("גיא", "מזרחי"))
 CLIENTS_WITH_PORTRAIT = 100_000  # clients who get a demo sign-in profile to hold a portrait
+BUSIEST_CLIENTS = 12  # per business: the busiest clients get an AI portrait
 NO_PHOTO_ONE_IN = 10  # clients left without a picture on purpose, as in real life
 
 FEMALE = {
@@ -60,20 +61,31 @@ def _is_female(full_name: str | None, key: str) -> bool:
 
 
 @cache
-def _drawn(gender: str) -> tuple[Path, ...]:
-    """The AI-drawn portraits (scripts/generate_demo_portraits.py), when they are there."""
-    return tuple(sorted((ASSETS / "portraits" / "ai").glob(f"{gender}*.jpg")))
+def _pool(kind: str, gender: str) -> tuple[Path, ...]:
+    """The AI-drawn portraits ("ai", a few dozen) or the illustrated avatars ("illustrated")."""
+    return tuple(sorted((ASSETS / "portraits" / kind).glob(f"{gender}*.jpg")))
 
 
-def _portrait(manifest: dict, full_name: str | None, user_id: UUID) -> bytes:
+def _portrait(
+    manifest: dict, full_name: str | None, user_id: UUID, *, most_active: bool = True
+) -> bytes:
+    """AI portraits go to the team and the busiest clients, illustrations to everyone else."""
     gender = "f" if _is_female(full_name, str(user_id)) else "m"
-    if drawn := _drawn(gender):
-        return drawn[user_id.int % len(drawn)].read_bytes()
+    pool = _pool("ai" if most_active else "illustrated", gender)
+    if pool:
+        return pool[user_id.int % len(pool)].read_bytes()
     pool = manifest["portraits"][gender]
     return _read(pool[user_id.int % len(pool)])
 
 
-def _set_avatar(conn: Connection, manifest: dict, user_id: UUID, full_name: str | None) -> None:
+def _set_avatar(
+    conn: Connection,
+    manifest: dict,
+    user_id: UUID,
+    full_name: str | None,
+    *,
+    most_active: bool = True,
+) -> None:
     conn.execute(
         text("""
             UPDATE app.users
@@ -81,7 +93,10 @@ def _set_avatar(conn: Connection, manifest: dict, user_id: UUID, full_name: str 
                 avatar_updated_at = now(), updated_at = now()
             WHERE id = :id AND avatar IS NULL
         """),
-        {"id": user_id, "data": _portrait(manifest, full_name, user_id)},
+        {
+            "id": user_id,
+            "data": _portrait(manifest, full_name, user_id, most_active=most_active),
+        },
     )
 
 
@@ -231,14 +246,17 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
         ).scalar_one()
         clients = conn.execute(
             text("""
-                SELECT id, first_name, last_name FROM app.clients
-                WHERE tenant_id = :t AND user_id IS NULL AND status = 'active'
-                  AND email IS NOT NULL AND email LIKE '%@example.invalid'
-                ORDER BY created_at LIMIT :n
+                SELECT c.id, c.first_name, c.last_name,
+                       (SELECT count(*) FROM app.bookings b
+                        WHERE b.tenant_id = c.tenant_id AND b.client_id = c.id) AS visits
+                FROM app.clients c
+                WHERE c.tenant_id = :t AND c.user_id IS NULL AND c.status = 'active'
+                  AND c.email IS NOT NULL AND c.email LIKE '%@example.invalid'
+                ORDER BY visits DESC, c.created_at LIMIT :n
             """),
             {"t": tenant_id, "n": max(0, CLIENTS_WITH_PORTRAIT - linked)},
         ).all()
-        for client_id, first, last in clients:
+        for rank, (client_id, first, last, _visits) in enumerate(clients):
             if client_id.int % NO_PHOTO_ONE_IN == 0:
                 continue
             user_id = uuid4()
@@ -251,7 +269,7 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
                     "name": full_name,
                 },
             )
-            _set_avatar(conn, manifest, user_id, full_name)
+            _set_avatar(conn, manifest, user_id, full_name, most_active=rank < BUSIEST_CLIENTS)
             conn.execute(
                 text("UPDATE app.clients SET user_id = :u WHERE id = :c"),
                 {"u": user_id, "c": client_id},

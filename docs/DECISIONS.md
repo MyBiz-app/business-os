@@ -474,6 +474,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** the new demo has different businesses with Hebrew names; name lookups would silently skip every layer for them.
 - **Revisit** if two businesses of one industry in one demo need different content (then add a role to the business spec).
 
+### Demo profile pictures: a few AI portraits, illustrations for the rest (2026-10-23, demo slice D3, no migration)
+
+- **Decision:** the owner's Runware account ran out of credit after about 30 portraits and he chose not to top up (the provider asks for a large prepaid minimum). The demo uses what is free: about 30 AI portraits (staff and the 12 busiest clients per business, plus one in ten clients left without a picture on purpose) and 160 CC0 illustrated avatars (DiceBear, `scripts/generate_demo_illustrated_avatars.py`) for all other clients. No photos of real people anywhere.
+- **Why:** an AI portrait costs nothing to keep in the repo at 6 KB each, but producing 1,500 of them needed paid credit. Illustrations read as intentional placeholders.
+- **Revisit** if the owner wants more AI portraits: add images named `f####.jpg` / `m####.jpg` to `app/seed/assets/portraits/ai/`; the seed uses whatever is there.
+
 ## Open
 
 
