@@ -17,7 +17,7 @@ const contrast = (a: string, b: string) => {
 test("text colors reach 4.5:1 on the background and the surface, in both themes", () => {
   for (const scheme of ["light", "dark"] as const) {
     const p = palette[scheme];
-    for (const key of ["foreground", "muted", "primary", "ai", "success", "warning", "danger"] as const) {
+    for (const key of ["foreground", "muted", "primaryInk", "ai", "success", "warning", "danger"] as const) {
       for (const on of [p.background, p.surface]) {
         assert.ok(contrast(p[key], on) >= 4.5, `${scheme} ${key} on ${on}: ${contrast(p[key], on).toFixed(2)}`);
       }
@@ -68,8 +68,8 @@ test("the palette is the web's Calm palette, token by token", () => {
   }
 });
 
-test("type sizes, corners and spacing follow the Calm scale", () => {
-  assert.deepEqual(fontSizes, [12, 13, 15, 17, 20, 24, 30]);
+test("type sizes, corners and spacing follow the Apple scale", () => {
+  assert.deepEqual(fontSizes, [12, 13, 15, 16, 17, 20, 22, 28, 34]);
   for (const entry of Object.values(typeScale)) assert.ok(fontSizes.includes(entry.size), `${entry.size} is not on the scale`);
   assert.deepEqual([radius.control, radius.card, radius.dialog], [10, 12, 16]);
   for (const step of Object.values(space)) assert.equal(step % 4, 0, `${step} is not on the 4px grid`);

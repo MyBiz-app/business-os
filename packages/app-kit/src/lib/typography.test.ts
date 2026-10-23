@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { familyFor, familyForLocale, scaleText } from "./typography.ts";
+import { familyFor, familyForLocale, scaleText, systemWeight } from "./typography.ts";
 
 test("a font weight picks the matching Assistant file", () => {
   assert.equal(familyFor(undefined), "Assistant_400Regular");
@@ -22,4 +22,11 @@ test("text size scales font size and line height", () => {
   assert.deepEqual(scaleText({ fontSize: 16, lineHeight: 24 }, 1.25), { fontSize: 20, lineHeight: 30 });
   assert.deepEqual(scaleText({ fontSize: 16 }, 1), { fontSize: 16 });
   assert.deepEqual(scaleText({}, 1.125), { fontSize: 15.8 });
+});
+
+test("the system font gets the nearest of the three weights", () => {
+  assert.equal(systemWeight(undefined), "400");
+  assert.equal(systemWeight("500"), "500");
+  assert.equal(systemWeight("bold"), "600");
+  assert.equal(systemWeight("800"), "600");
 });
