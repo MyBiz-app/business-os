@@ -1308,251 +1308,354 @@ h1[tabindex="-1"]:focus {
   }
 }
 
-/* The home page opening scene (components/marketing/hero-intro.tsx and day-clock.tsx): a 24-hour
- * dial runs from midnight to the visitor's own time while the business's day happens around it.
- * DayClock sets --p (the share of the day, 0..1) and --sky (the sky's color at that time). The
- * dial has no direction: a clock turns clockwise in Hebrew too. Reduced motion stops the pulses. */
-.dc-backdrop {
+/* The home page opening scene (components/marketing/hero-stage.tsx): a tall section holding a
+ * pinned stage. HeroStageScroll writes --p (scroll progress, 0..1) and data-step (0..3) on .hs;
+ * every movement below is computed from --p, so nothing re-renders while scrolling. Steps:
+ * 0 a client books on the phone, 1 the laptop opens behind it, 2 AI bubbles, 3 business tiles.
+ * Static layout (no pin, finished scene) for reduced motion: see the two blocks at the end. */
+.hs {
+  --p: 0;
+  --dir: 1;
+  --lid: clamp(0, calc((var(--p) - 0.22) * 6), 1);
+  --laptop: clamp(0, calc((var(--p) - 0.2) * 8), 1);
+  --tiles: clamp(0, calc((var(--p) - 0.76) * 8), 1);
+  --zoom: clamp(0, calc((var(--p) - 0.74) * 6), 1);
+  position: relative;
+  height: 330vh;
+}
+@media (min-width: 1024px) {
+  .hs {
+    height: 520vh;
+  }
+}
+.hs-pin {
+  position: sticky;
+  top: 4rem;
+  height: calc(100svh - 4rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+.hs-glow {
   background:
-    radial-gradient(60rem 36rem at 80% -10%, color-mix(in srgb, var(--brand-from) 12%, transparent), transparent 70%),
-    radial-gradient(44rem 30rem at 10% 110%, color-mix(in srgb, var(--brand-to) 12%, transparent), transparent 70%);
+    radial-gradient(48rem 30rem at 75% 20%, color-mix(in srgb, var(--brand-from) 14%, transparent), transparent 70%),
+    radial-gradient(40rem 28rem at 15% 100%, color-mix(in srgb, var(--brand-to) 12%, transparent), transparent 70%);
 }
-.dc-backdrop::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px);
-  background-size: 22px 22px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000, transparent);
-}
-.dc-accent {
+.hs-accent {
   background: linear-gradient(90deg, var(--brand-from), var(--brand-via), var(--brand-to));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-.dark .dc-accent {
+.dark .hs-accent {
   background-image: linear-gradient(90deg, #60a5fa, #a78bfa, #22d3ee);
 }
-.dc-live {
-  width: 0.5rem;
-  height: 0.5rem;
-  flex-shrink: 0;
-  border-radius: 9999px;
-  background: var(--success);
-  animation: dc-live 2s ease-out infinite;
+/* On phones the headline gives way to the step card once the story starts. */
+@media (max-width: 1023px) {
+  .hs-copy {
+    opacity: clamp(0.35, calc(1.4 - var(--p) * 3), 1);
+  }
 }
-.dc-dial {
+
+/* The step cards: wide screens list all four and mark the active one; phones show only the active one. */
+.hs-cards {
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hs-card {
+  --c: #ea580c;
+  --k: clamp(0, calc(var(--p) * 4 - var(--i)), 1);
   position: relative;
-  width: min(100%, 27rem);
-  aspect-ratio: 1;
-  border-radius: 9999px;
-  cursor: grab;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
-}
-.dc-dial:active {
-  cursor: grabbing;
-}
-.dc-dial:focus-visible {
-  box-shadow:
-    0 0 0 3px var(--background),
-    0 0 0 5px var(--primary);
-}
-.dc-sky {
-  position: absolute;
-  inset: -16%;
-  z-index: -1;
-  border-radius: 9999px;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--sky) 38%, transparent), transparent);
-  filter: blur(20px);
-  pointer-events: none;
-}
-.dark .dc-sky {
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--sky) 55%, transparent), transparent);
-}
-.dc-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.dc-track {
-  fill: none;
-  stroke: color-mix(in srgb, var(--foreground) 10%, transparent);
-  stroke-width: 3;
-}
-.dc-tick {
-  stroke: color-mix(in srgb, var(--foreground) 16%, transparent);
-  stroke-width: 0.6;
-  stroke-linecap: round;
-}
-.dc-tick-hour {
-  stroke: color-mix(in srgb, var(--foreground) 38%, transparent);
-  stroke-width: 1;
-}
-.dc-hour {
-  fill: var(--muted);
-  font-size: 7px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-/* The arc of the day so far, on the track (r = 92 of 100, 3 wide). */
-.dc-arc {
-  position: absolute;
-  inset: 3.25%;
-  border-radius: 9999px;
-  background: conic-gradient(
-    color-mix(in srgb, var(--brand-from) 20%, transparent) 0deg,
-    var(--brand-from) calc(var(--p) * 180deg),
-    var(--brand-via) calc(var(--p) * 290deg),
-    var(--brand-to) calc(var(--p) * 360deg),
-    transparent calc(var(--p) * 360deg)
-  );
-  -webkit-mask: radial-gradient(closest-side, transparent 96.3%, #000 96.9%);
-  mask: radial-gradient(closest-side, transparent 96.3%, #000 96.9%);
-  pointer-events: none;
-}
-.dc-mark {
-  fill: var(--surface);
-  stroke: color-mix(in srgb, var(--foreground) 35%, transparent);
-  stroke-width: 1;
-  transition:
-    r 200ms var(--ease-out),
-    fill 200ms var(--ease-out);
-}
-.dc-mark-done {
-  fill: var(--brand-via);
-  stroke: var(--surface);
-}
-.dc-mark-now {
-  fill: var(--brand-to);
-  stroke: var(--surface);
-  stroke-width: 1.4;
-}
-/* The hand: a sun by day and a moon by night, riding the track. */
-.dc-hand {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  transform: rotate(calc(var(--p) * 360deg));
-  pointer-events: none;
-}
-.dc-sun {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-top: calc(4% - 0.625rem);
-  border-radius: 9999px;
-  background: radial-gradient(circle at 35% 35%, #fff, #fde68a 40%, #f59e0b);
-  box-shadow:
-    0 0 0 4px rgb(245 158 11 / 0.22),
-    0 0 26px 6px rgb(245 158 11 / 0.5);
-}
-.dc-dial[data-day="false"] .dc-sun {
-  background: radial-gradient(circle at 35% 35%, #fff, #e0e7ff 45%, #a5b4fc);
-  box-shadow:
-    0 0 0 4px rgb(129 140 248 / 0.22),
-    0 0 26px 6px rgb(129 140 248 / 0.5);
-}
-.dc-face {
-  position: absolute;
-  inset: 18%;
-  display: flex;
+  display: none;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  padding: 7%;
-  border-radius: 9999px;
-  text-align: center;
-  background: color-mix(in srgb, var(--surface) 74%, transparent);
-  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
-  box-shadow: 0 24px 60px -28px hsl(var(--shadow-color) / 0.45);
-  backdrop-filter: blur(10px);
-  pointer-events: none;
-}
-.dc-event {
-  display: flex;
-  max-width: 100%;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  margin-top: 0.2rem;
-  animation: dc-pop 320ms var(--ease-out) both;
-}
-.dc-event-icon {
-  display: inline-grid;
-  width: 1.9rem;
-  height: 1.9rem;
-  margin-bottom: 0.15rem;
-  place-items: center;
-  border-radius: 0.6rem;
-  color: var(--primary-ink);
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
-}
-.dc-stats {
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.9rem 1rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  opacity: 0.55;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
 }
-.dc-stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  gap: 0.1rem;
-  padding: 0.7rem 0.5rem;
-  text-align: center;
+.hs-card[data-i="1"] {
+  --c: #db2777;
 }
-.dc-stats > div + div {
-  border-inline-start: 1px solid var(--border);
+.hs-card[data-i="2"] {
+  --c: #2563eb;
 }
-.dc-stats dd {
-  font-size: 1.3rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+.hs-card[data-i="3"] {
+  --c: #7c3aed;
 }
-.dc-stats dt {
+.dark .hs-card[data-i="2"] {
+  --c: #60a5fa;
+}
+.dark .hs-card[data-i="3"] {
+  --c: #a78bfa;
+}
+.hs-card-n {
   font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c);
+}
+.hs-card-n span:last-child {
   color: var(--muted);
 }
-.dc-cue {
-  animation: dc-cue 1.8s ease-in-out 2.2s infinite;
+.hs[dir="rtl"],
+[dir="rtl"] .hs {
+  --dir: -1;
 }
-@keyframes dc-live {
-  from {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 55%, transparent);
-  }
-  to {
-    box-shadow: 0 0 0 7px transparent;
+.hs-card-text {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+.hs[data-step="0"] .hs-card[data-i="0"] .hs-card-text,
+.hs[data-step="1"] .hs-card[data-i="1"] .hs-card-text,
+.hs[data-step="2"] .hs-card[data-i="2"] .hs-card-text,
+.hs[data-step="3"] .hs-card[data-i="3"] .hs-card-text {
+  max-height: 8rem;
+  opacity: 1;
+}
+.hs-bar {
+  position: absolute;
+  inset-inline: 1rem;
+  bottom: 0.5rem;
+  height: 3px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+  overflow: hidden;
+}
+.hs-bar::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--k) * 100%);
+  background: var(--c);
+}
+.hs[data-step="0"] .hs-card[data-i="0"],
+.hs[data-step="1"] .hs-card[data-i="1"],
+.hs[data-step="2"] .hs-card[data-i="2"],
+.hs[data-step="3"] .hs-card[data-i="3"] {
+  display: flex;
+  opacity: 1;
+  border-color: var(--c);
+}
+@media (min-width: 1024px) {
+  .hs-card {
+    display: flex;
   }
 }
-@keyframes dc-pop {
-  from {
-    opacity: 0;
-    transform: translateY(6px) scale(0.98);
+
+/* The stage: a laptop that opens behind a phone. */
+.hs-stage {
+  position: relative;
+  min-height: 0;
+  height: 100%;
+}
+.hs-devices {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform: scale(calc(1 - var(--zoom) * 0.3));
+  transform-origin: 50% 55%;
+}
+.hs-laptop {
+  grid-area: 1 / 1;
+  width: min(100%, 44rem);
+  align-self: center;
+  opacity: var(--laptop);
+  transform: translateY(calc((1 - var(--laptop)) * 2rem - 6%)) scale(calc(0.8 + var(--laptop) * 0.2));
+  will-change: transform, opacity;
+}
+.hs-phone {
+  grid-area: 1 / 1;
+  position: relative;
+  width: min(11.5rem, 46%);
+  z-index: 2;
+  align-self: center;
+  transform: translateY(calc(var(--laptop) * 14%)) translateX(calc(var(--laptop) * -35% * var(--dir)));
+  will-change: transform;
+}
+@media (min-width: 640px) {
+  .hs-phone {
+    transform: translateY(calc(var(--laptop) * 14%)) translateX(calc(var(--laptop) * -75% * var(--dir)));
+    width: min(14rem, 36%);
   }
 }
-@keyframes dc-cue {
-  50% {
-    transform: translateY(5px);
+.hs-crm .hs-landing {
+  opacity: clamp(0, calc((var(--p) - 0.3) * 10), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p) - 0.3) * 10), 1)) * -1rem));
+  box-shadow: 0 0 0 calc(clamp(0, calc((var(--p) - 0.3) * 10), 1) * 3px) color-mix(in srgb, var(--primary) 30%, transparent);
+}
+/* The Book button turns into "Booked" and a toast confirms it. */
+.hs-book-a {
+  opacity: clamp(0, calc(1 - (var(--p) - 0.08) * 25), 1);
+}
+.hs-book-b {
+  opacity: clamp(0, calc((var(--p) - 0.08) * 25), 1);
+}
+.hs-toast {
+  opacity: clamp(0, calc((var(--p) - 0.12) * 15), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p) - 0.12) * 15), 1)) * 0.75rem));
+}
+
+/* AI bubbles drift out of the phone during step 2, then fade as the tiles arrive. */
+.hs-bubble {
+  --in: clamp(0, calc((var(--p) - 0.5 - var(--i) * 0.06) * 14), 1);
+  --out: clamp(0, calc((0.78 - var(--p)) * 14), 1);
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  max-width: 11rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--surface);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--foreground) 12%, transparent);
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.2;
+  opacity: min(var(--in), var(--out));
+  transform: translateY(calc((1 - var(--in)) * 1rem));
+  inset-inline-end: 2%;
+  top: calc(18% + var(--i) * 17%);
+}
+.hs-bubble:nth-of-type(2) {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+}
+@media (min-width: 640px) {
+  .hs-bubble {
+    font-size: 0.8rem;
+    max-width: 14rem;
   }
 }
+
+/* Business-type tiles appear around the (smaller) devices in the last step. */
+.hs-tile {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--foreground) 10%, transparent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: var(--tiles);
+  transform: translateY(calc((1 - var(--tiles)) * 1rem)) scale(calc(0.9 + var(--tiles) * 0.1));
+  color: #7c3aed;
+}
+.dark .hs-tile {
+  color: #a78bfa;
+}
+.hs-tile:nth-of-type(1) {
+  top: 2%;
+  inset-inline-start: 4%;
+}
+.hs-tile:nth-of-type(2) {
+  top: 2%;
+  inset-inline-end: 4%;
+}
+.hs-tile:nth-of-type(3) {
+  top: 44%;
+  inset-inline-start: 0;
+}
+.hs-tile:nth-of-type(4) {
+  top: 44%;
+  inset-inline-end: 0;
+}
+.hs-tile:nth-of-type(5) {
+  bottom: 2%;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+}
+[dir="rtl"] .hs-tile:nth-of-type(5) {
+  translate: 50% 0;
+}
+.hs-tile {
+  pointer-events: none;
+}
+.hs-cue {
+  position: absolute;
+  bottom: 0.5rem;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+  opacity: clamp(0, calc(1 - var(--p) * 12), 1);
+  pointer-events: none;
+}
+[dir="rtl"] .hs-cue {
+  translate: 50% 0;
+}
+
+/* Reduced motion: no pin, no scroll story. The finished scene sits still, the cards form a list. */
 @media (prefers-reduced-motion: reduce) {
-  .dc-live,
-  .dc-event,
-  .dc-cue {
-    animation: none;
+  .hs {
+    --p: 0.7;
+    height: auto;
   }
-  .dc-mark {
-    transition: none;
+  .hs-pin {
+    position: static;
+    height: auto;
+    overflow: visible;
   }
+  .hs-stage {
+    height: 26rem;
+  }
+  .hs-card {
+    display: flex;
+    opacity: 1;
+  }
+  .hs-card-text {
+    max-height: none;
+    opacity: 1;
+  }
+  .hs-bar,
+  .hs-cue,
+  .hs-tile {
+    display: none;
+  }
+  .hs-copy {
+    opacity: 1;
+  }
+}
+html[data-motion="reduce"] .hs {
+  --p: 0.7;
+  height: auto;
+}
+html[data-motion="reduce"] .hs-pin {
+  position: static;
+  height: auto;
+  overflow: visible;
+}
+html[data-motion="reduce"] .hs-stage {
+  height: 26rem;
+}
+html[data-motion="reduce"] .hs-card {
+  display: flex;
+  opacity: 1;
+}
+html[data-motion="reduce"] .hs-card-text {
+  max-height: none;
+  opacity: 1;
+}
+html[data-motion="reduce"] .hs-bar,
+html[data-motion="reduce"] .hs-cue,
+html[data-motion="reduce"] .hs-tile {
+  display: none;
+}
+html[data-motion="reduce"] .hs-copy {
+  opacity: 1;
 }
 
 /* ---- Auth side panel (components/auth/auth-scene.tsx) -------------------------------------- */
