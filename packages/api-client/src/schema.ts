@@ -9321,6 +9321,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Overview
+         * @description Everything the signed-in person has across the businesses they joined as a client: what
+         *     is next, their live cards, what waits for them and what they could book again. Only the
+         *     person's own rows, read business by business under that business's client policies; a
+         *     business that is closed, suspended or has no client app is left out.
+         */
+        get: operations["my_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/friends/settings": {
         parameters: {
             query?: never;
@@ -13420,6 +13443,28 @@ export interface components {
             latitude: number | null;
             /** Longitude */
             longitude: number | null;
+        };
+        /** ClientOverview */
+        ClientOverview: {
+            /** Businesses */
+            businesses: components["schemas"]["OverviewBusiness"][];
+            /**
+             * Next
+             * @description Upcoming bookings of every business, soonest first
+             */
+            next: components["schemas"]["OverviewVisit"][];
+            /**
+             * Cards
+             * @description Memberships and passes that are live now
+             */
+            cards: components["schemas"]["OverviewCard"][];
+            /** Waiting */
+            waiting: components["schemas"]["OverviewWaiting"][];
+            /**
+             * Rebook
+             * @description Things the client did before, to book again
+             */
+            rebook: components["schemas"]["OverviewRebook"][];
         };
         /** ClientPage */
         ClientPage: {
@@ -18923,6 +18968,162 @@ export interface components {
              * @description Free cancellation before the session
              */
             free_minutes: number;
+        };
+        /** OverviewBusiness */
+        OverviewBusiness: {
+            business: components["schemas"]["ClientBusiness"];
+            /**
+             * Waiting
+             * @description How many things wait for the client here (the dot)
+             */
+            waiting: number;
+            /**
+             * Upcoming
+             * @description Upcoming bookings here
+             */
+            upcoming: number;
+            /** Last Visit At */
+            last_visit_at: string | null;
+            /**
+             * Dormant
+             * @description Nothing upcoming, no live card, no visit for 30 days
+             */
+            dormant: boolean;
+        };
+        /** OverviewCard */
+        OverviewCard: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /**
+             * Entitlement Id
+             * Format: uuid
+             */
+            entitlement_id: string;
+            /** Name */
+            name: string;
+            /** Kind */
+            kind: string;
+            /** Credits Remaining */
+            credits_remaining: number | null;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /** State */
+            state: string;
+        };
+        /** OverviewRebook */
+        OverviewRebook: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /** Booking Mode */
+            booking_mode: string;
+            /** Room Id */
+            room_id: string | null;
+            /** Room Name */
+            room_name: string | null;
+            /** Instructor User Id */
+            instructor_user_id: string | null;
+            /** Instructor Name */
+            instructor_name: string | null;
+            /**
+             * Last At
+             * Format: date-time
+             */
+            last_at: string;
+        };
+        /** OverviewVisit */
+        OverviewVisit: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Booking Mode
+             * @description class, appointment or resource
+             */
+            booking_mode: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted";
+            /** Location Name */
+            location_name: string | null;
+            /** Room Name */
+            room_name: string | null;
+            /** Instructor Name */
+            instructor_name: string | null;
+            /**
+             * Friends
+             * @description First names of friends in the same session
+             */
+            friends: string[];
+        };
+        /** OverviewWaiting */
+        OverviewWaiting: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "health" | "document" | "payment" | "quote" | "invite" | "review";
+            /**
+             * Title
+             * @description What it is about (a document, a quote), if it has a name
+             */
+            title: string | null;
+            /**
+             * Ref
+             * @description The thing's id, number or token, to open it
+             */
+            ref: string | null;
         };
         /** OwnerSecurity */
         OwnerSecurity: {
@@ -45736,6 +45937,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_overview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientOverview"];
                 };
             };
         };

@@ -45,6 +45,8 @@ function BusinessTabs() {
       screenOptions={screenOptions}
     >
       <Tabs.Screen name="home" options={{ title: t("home"), tabBarIcon: icon("home") }} />
+      {/* "My businesses" is reached from the business strip, not from the tab bar. */}
+      <Tabs.Screen name="all" options={{ href: null }} />
       <Tabs.Screen
         name="schedule"
         options={{
