@@ -1,6 +1,8 @@
 import { CalendarCheck, Sparkles, TrendingUp, Users } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { DeviceFrame } from "@/components/ui/device-frame";
+
 /** Decorative previews of the product. They are pictures, so assistive tech skips them. */
 
 export async function DashboardMock() {
@@ -76,8 +78,7 @@ export async function PhoneMock() {
   const t = await getTranslations("marketing");
   const classes = t.raw("mock.classes") as string[];
   return (
-    <div aria-hidden="true" className="mx-auto w-64 rounded-[2.5rem] border-[10px] border-foreground/85 bg-background p-3 shadow-2xl">
-      <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-foreground/20" />
+    <DeviceFrame device="phone">
       <p className="mb-2 text-base font-bold">{t("app.phoneTitle")}</p>
       <div className="mb-3 flex gap-1.5" dir="ltr">
         {["4", "5", "6", "7"].map((day, index) => (
@@ -109,7 +110,7 @@ export async function PhoneMock() {
           </div>
         ))}
       </div>
-    </div>
+    </DeviceFrame>
   );
 }
 
