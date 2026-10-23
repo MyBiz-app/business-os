@@ -42,6 +42,10 @@ def upgrade() -> None:
         )
     """)
     op.execute(
+        "CREATE INDEX session_instructors_session_idx"
+        " ON app.session_instructors (tenant_id, session_id)"
+    )
+    op.execute(
         "CREATE INDEX session_instructors_user_idx ON app.session_instructors (tenant_id, user_id)"
     )
     op.execute("GRANT SELECT, INSERT, DELETE ON app.session_instructors TO app_api")
