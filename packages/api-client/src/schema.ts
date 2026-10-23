@@ -5514,7 +5514,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Get Booking Series */
+        get: operations["get_booking_series"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5936,6 +5937,100 @@ export interface paths {
         get: operations["my_appointment_services"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Book Standing Series
+         * @description Books a client into a standing booking or a course (staff may book without a plan).
+         */
+        post: operations["book_standing_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Client Booking Series */
+        get: operations["list_client_booking_series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/{series_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Booking Series */
+        post: operations["cancel_booking_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Booking Series */
+        get: operations["my_booking_series"];
+        put?: never;
+        /**
+         * Book My Booking Series
+         * @description The signed-in client sets up a standing booking (the business's booking rules apply).
+         *     A business paid in the app takes each court payment separately, so a series there is made
+         *     by the business.
+         */
+        post: operations["book_my_booking_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/series/{series_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel My Booking Series */
+        post: operations["cancel_my_booking_series"];
         delete?: never;
         options?: never;
         head?: never;
@@ -22141,6 +22236,160 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** Series */
+        Series: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "resource" | "appointment" | "class";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /** Room Id */
+            room_id: string | null;
+            /** Staff User Id */
+            staff_user_id: string | null;
+            /**
+             * First Starts At
+             * Format: date-time
+             */
+            first_starts_at: string;
+            /** Minutes */
+            minutes: number | null;
+            /** Every Weeks */
+            every_weeks: number;
+            /** Occurrences */
+            occurrences: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "cancelled";
+            /**
+             * Upcoming
+             * @description Dates still ahead with a live booking
+             */
+            upcoming: number;
+        };
+        /** SeriesCreate */
+        SeriesCreate: {
+            /**
+             * Kind
+             * @description resource: a court or room at the same time each week; appointment: a private lesson or treatment with the same staff member; class: a course, joined once
+             * @enum {string}
+             */
+            kind: "resource" | "appointment" | "class";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             * @description The first date; the others follow every N weeks
+             */
+            starts_at: string;
+            /**
+             * Every Weeks
+             * @default 1
+             */
+            every_weeks: number;
+            /**
+             * Occurrences
+             * @description How many dates, the first included
+             */
+            occurrences: number;
+            /**
+             * Room Id
+             * @description resource: which court or room
+             */
+            room_id?: string | null;
+            /**
+             * Minutes
+             * @description resource: how long
+             */
+            minutes?: number | null;
+            /**
+             * Staff User Id
+             * @description appointment: with whom
+             */
+            staff_user_id?: string | null;
+            /** Dependent Id */
+            dependent_id?: string | null;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+        };
+        /** SeriesCreated */
+        SeriesCreated: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "resource" | "appointment" | "class";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /** Room Id */
+            room_id: string | null;
+            /** Staff User Id */
+            staff_user_id: string | null;
+            /**
+             * First Starts At
+             * Format: date-time
+             */
+            first_starts_at: string;
+            /** Minutes */
+            minutes: number | null;
+            /** Every Weeks */
+            every_weeks: number;
+            /** Occurrences */
+            occurrences: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "cancelled";
+            /**
+             * Upcoming
+             * @description Dates still ahead with a live booking
+             */
+            upcoming: number;
+            /** Results */
+            results: components["schemas"]["SeriesOccurrence"][];
+        };
         /** SeriesEnd */
         SeriesEnd: {
             /**
@@ -22162,6 +22411,73 @@ export interface components {
              * @description Later sessions kept because clients are booked
              */
             kept: number;
+        };
+        /** SeriesFields */
+        SeriesFields: {
+            /**
+             * Kind
+             * @description resource: a court or room at the same time each week; appointment: a private lesson or treatment with the same staff member; class: a course, joined once
+             * @enum {string}
+             */
+            kind: "resource" | "appointment" | "class";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             * @description The first date; the others follow every N weeks
+             */
+            starts_at: string;
+            /**
+             * Every Weeks
+             * @default 1
+             */
+            every_weeks: number;
+            /**
+             * Occurrences
+             * @description How many dates, the first included
+             */
+            occurrences: number;
+            /**
+             * Room Id
+             * @description resource: which court or room
+             */
+            room_id?: string | null;
+            /**
+             * Minutes
+             * @description resource: how long
+             */
+            minutes?: number | null;
+            /**
+             * Staff User Id
+             * @description appointment: with whom
+             */
+            staff_user_id?: string | null;
+            /** Dependent Id */
+            dependent_id?: string | null;
+        };
+        /** SeriesOccurrence */
+        SeriesOccurrence: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "booked" | "waitlisted" | "skipped";
+            /**
+             * Reason
+             * @description Why a date was skipped
+             */
+            reason?: string | null;
+            /** Booking Id */
+            booking_id?: string | null;
         };
         /** SeriesRow */
         SeriesRow: {
@@ -38325,6 +38641,41 @@ export interface operations {
             };
         };
     };
+    get_booking_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     update_series: {
         parameters: {
             query?: never;
@@ -39262,6 +39613,222 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AppointmentService"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_standing_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_client_booking_series: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_booking_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_booking_series: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_my_booking_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesFields"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_my_booking_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"];
                 };
             };
             /** @description Validation Error */
