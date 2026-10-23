@@ -78,6 +78,10 @@ def main() -> None:
         "curated: reduce the owner's account to three businesses (the Adir fitness gym with "
         "strength, pilates and crossfit branches, Studio Bloom and Urban Slice), removing other "
         "businesses the owner alone owns; "
+        "full: reduce the owner's account to four businesses of four categories with eleven "
+        "branches (the Adir Fitness gym with five branches, Sharon Tennis Club with two, "
+        "Blade Barbers with two and the Merhav clinic with two), removing other businesses the "
+        "owner alone owns; "
         "places: give the demo branches their cities and a point on the map (adds only); "
         "profiles: add logos, portraits and the crossfit branch to the owner's existing demo "
         "businesses (adds only, deletes nothing); "
@@ -99,8 +103,10 @@ def main() -> None:
 
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
-        if args.demo == "curated":
-            print(curate(conn, args.owner_email, args.months, random.Random(args.seed)))
+        if args.demo in ("curated", "full"):
+            print(
+                curate(conn, args.owner_email, args.months, random.Random(args.seed), args.demo)
+            )
             return
         if args.demo == "places":
             print(place_branches(conn, args.owner_email))

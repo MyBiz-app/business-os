@@ -2,10 +2,11 @@
 
     uv run python -m app.seed --owner-email you@example.com --demo curated
 
-The account ends with exactly the businesses of the `curated` demo: the gym "Adir fitness"
-(branches of different kinds in one business: strength, pilates and crossfit) and two others.
-An earlier "Iron & Flow" is renamed to "Adir fitness" in place; any other business this
-account solely owns is removed (with its demo staff and clients); a missing one is created.
+The account ends with exactly the businesses of the chosen demo (`curated`: the gym "Adir
+fitness" with strength, pilates and crossfit branches plus two others; `full`: four businesses
+of four categories with eleven branches). With `curated`, an earlier "Iron & Flow" is renamed
+to "Adir fitness" in place; any other business this account solely owns is removed (with its
+demo staff and clients); a missing one is created.
 Logos and portraits are then filled in. Only businesses the account owns alone are touched,
 never anyone else's.
 """
@@ -81,19 +82,19 @@ def place_branches(conn: Connection, owner_email: str) -> dict[str, int]:
 
 
 def curate(
-    conn: Connection, owner_email: str, months: int, rng: random.Random
+    conn: Connection, owner_email: str, months: int, rng: random.Random, demo: str = "curated"
 ) -> dict[str, object]:
     refuse_blocked_owner(owner_email)
     owner = profile_id(conn, owner_email)
     if owner is None:
         sys.exit(f"No account for {owner_email}: sign up on the site first, then run again.")
-    specs = DEMOS["curated"]
+    specs = DEMOS[demo]
     keep = {spec.name for spec in specs}
 
     owned = _owned(conn, owner)
     names = {name for _, name in owned}
     for old, new in RENAMES.items():
-        if old in names and new not in names:
+        if demo == "curated" and old in names and new not in names:
             conn.execute(
                 text("""
                     UPDATE app.tenants SET name = :new, logo = NULL, logo_content_type = NULL,

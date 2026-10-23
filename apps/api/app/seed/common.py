@@ -326,6 +326,61 @@ BEAUTY_STUDIO = BusinessSpec(
     clients=150,
     staff_per_branch=3,
 )
+# The full demo (2026-10-23): the owner's account with four businesses of four categories and
+# eleven branches across the country. All names and addresses are made up.
+ADIR_FITNESS = BusinessSpec(
+    name="אדיר פיטנס",
+    vertical="gym",
+    color="#0f766e",
+    billing_name="אדיר פיטנס בע״מ",
+    branches=(
+        BranchSpec("תל אביב - כוח", "הברזל 3, תל אביב", kind="gym"),
+        BranchSpec("באר שבע - כוח", "רגר 12, באר שבע", kind="gym"),
+        BranchSpec("רמת גן - פילאטיס ויוגה", "ביאליק 22, רמת גן", kind="pilates"),
+        BranchSpec("חיפה - קרוספיט", "הנמל 12, חיפה", kind="crossfit"),
+        # Martial arts is a sub-category of classes, not of fitness, so the branch is tagged
+        # with the nearest fitness kind.
+        BranchSpec("ירושלים - לחימה", "עמק רפאים 30, ירושלים", kind="functional"),
+    ),
+    clients=650,
+    staff_per_branch=4,
+)
+SHARON_TENNIS = BusinessSpec(
+    name="טניס קלאב השרון",
+    vertical="padel_tennis",
+    color="#4d7c0f",
+    billing_name="טניס קלאב השרון בע״מ",
+    branches=(
+        BranchSpec("הרצליה", "הנדיב 71, הרצליה", kind="padel_tennis"),
+        BranchSpec("ראשון לציון", "הכרמל 9, ראשון לציון", kind="padel_tennis"),
+    ),
+    clients=280,
+    staff_per_branch=3,
+)
+BLADE_BARBERS = BusinessSpec(
+    name="בלייד ברברס",
+    vertical="barbershop",
+    color="#b45309",
+    billing_name="בלייד ברברס בע״מ",
+    branches=(
+        BranchSpec("תל אביב - פלורנטין", "וולפסון 18, תל אביב", kind="barbershop"),
+        BranchSpec("אשדוד - הרובע", "הרצל 22, אשדוד", kind="barbershop"),
+    ),
+    clients=320,
+    staff_per_branch=4,
+)
+MERHAV_CLINIC = BusinessSpec(
+    name="מרחב - בריאות ותנועה",
+    vertical="physiotherapy",
+    color="#0e7490",
+    billing_name="מרחב בריאות ותנועה בע״מ",
+    branches=(
+        BranchSpec("פתח תקווה - פיזיותרפיה", "ז׳בוטינסקי 100, פתח תקווה", kind="physiotherapy"),
+        BranchSpec("כפר סבא - תזונה", "ויצמן 140, כפר סבא", kind="nutrition"),
+    ),
+    clients=260,
+    staff_per_branch=3,
+)
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
     "club": (PADEL_CLUB,),
@@ -338,6 +393,8 @@ DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "categories": (IRON_PULSE, PADEL_NETWORK, BEAUTY_STUDIO),
     # The owner's own demo account: three businesses, the gym with branches of different kinds.
     "curated": (IRON_PULSE, STUDIO_BLOOM, URBAN_SLICE),
+    # The owner's full demo: four businesses of four categories, eleven branches.
+    "full": (ADIR_FITNESS, SHARON_TENNIS, BLADE_BARBERS, MERHAV_CLINIC),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
 
