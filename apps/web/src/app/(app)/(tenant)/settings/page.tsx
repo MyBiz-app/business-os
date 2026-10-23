@@ -13,6 +13,7 @@ import HelpSettingsPage from "./help/page";
 import IntegrationsPage from "./integrations/page";
 import MembershipSettingsPage from "./memberships/page";
 import ModulesPage from "./modules/page";
+import TermsSettingsPage from "./terms/page";
 import type { INLINE_TOPICS } from "./settings-room";
 import { topicsFor, type TopicKey } from "./topics";
 
@@ -20,6 +21,7 @@ const PAGES: Record<(typeof INLINE_TOPICS)[number], ComponentType> = {
   business: BusinessSettingsPage,
   memberships: MembershipSettingsPage,
   bookings: BookingSettingsPage,
+  terms: TermsSettingsPage,
   branding: BrandingSettingsPage,
   modules: ModulesPage,
   integrations: IntegrationsPage,

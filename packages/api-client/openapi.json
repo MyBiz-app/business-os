@@ -56032,6 +56032,17 @@
             "type": "integer",
             "title": "Cancellation Window Minutes"
           },
+          "terms_override": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Terms Override",
+            "description": "The business's own words by language and word"
+          },
           "online_sales": {
             "type": "boolean",
             "title": "Online Sales",
@@ -83441,6 +83452,17 @@
             "title": "Business License Expires On",
             "description": "Settings managers only"
           },
+          "terms_override": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Terms Override",
+            "description": "The business's own words by language and word; others keep the industry's"
+          },
           "cancellation_window_minutes": {
             "type": "integer",
             "title": "Cancellation Window Minutes"
@@ -84084,6 +84106,24 @@
               }
             ],
             "title": "Primary Color"
+          },
+          "terms_override": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terms Override",
+            "description": "Replaces the whole set of the business's own words"
           },
           "cancellation_window_minutes": {
             "anyOf": [

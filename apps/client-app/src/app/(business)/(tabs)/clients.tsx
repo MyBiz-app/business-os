@@ -10,7 +10,7 @@ import { Avatar, ListRow, PillRow } from "@business-os/app-kit/components/rows";
 import { Button, Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { useTerm } from "@business-os/app-kit/lib/vertical";
 import { useStaff } from "@/providers/staff-provider";
 
 type Filter = "all" | "valid" | "none" | "absent" | "new";
@@ -25,7 +25,7 @@ export default function Clients() {
   const t = useTranslations("business.clients");
   const tList = useTranslations("clients.list");
   const tClients = useTranslations("clients");
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
   const locale = useLocale();
   const { api, scope, tenant, palette, can } = useStaff();
   const timeZone = tenant?.time_zone ?? "UTC";
@@ -73,7 +73,6 @@ export default function Clients() {
   }, [fetchPage, tenantId]);
   const { data, loading, reload } = useLoad(load);
   if (!tenant) return null;
-  const terms = termsFor(tenant);
   const today = todayIn(tenant.time_zone);
   const items = [...(data?.items ?? []), ...more];
 
@@ -100,20 +99,20 @@ export default function Clients() {
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <View style={{ flex: 1, gap: 2 }}>
-          <Heading palette={palette}>{tTerms(`${terms}.clients`)}</Heading>
+          <Heading palette={palette}>{term(tenant, "clients")}</Heading>
           {data && <Text style={[styles.muted, { color: palette.muted }]}>{t("total", { count: data.total })}</Text>}
         </View>
         {can("clients.write") && (
           <Button
             label={t("add")}
-            accessibilityLabel={tTerms(`${terms}.addClient`)}
+            accessibilityLabel={term(tenant, "addClient")}
             palette={palette}
             onPress={() => router.push("/client/new")}
           />
         )}
       </View>
       <Field
-        label={tTerms(`${terms}.searchClients`)}
+        label={term(tenant, "searchClients")}
         placeholder={t("searchHint")}
         palette={palette}
         value={search}
@@ -142,7 +141,7 @@ export default function Clients() {
       {items.length === 0 ? (
         <Card palette={palette}>
           <Text style={[styles.muted, { color: palette.muted }]}>
-            {loading ? "…" : query ? tTerms(`${terms}.noResults`) : tTerms(`${terms}.noClients`)}
+            {loading ? "…" : query ? term(tenant, "noResults") : term(tenant, "noClients")}
           </Text>
         </Card>
       ) : (
