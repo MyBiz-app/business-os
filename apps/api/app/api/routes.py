@@ -18,6 +18,7 @@ from app.api.schemas import (
     Tenant,
     TenantCreate,
 )
+from app.catalog.activities import seed_activities
 from app.catalog.cancellation import defaults_for
 from app.catalog.verticals import VERTICAL_PACKS
 from app.commerce.modules import PRESETS
@@ -132,6 +133,7 @@ def apply_vertical_pack(
 ) -> None:
     """Gives a new business its vertical's defaults: booking policy, services and plans."""
     pack = VERTICAL_PACKS[vertical]
+    seed_activities(session, tenant_id, vertical)
     session.execute(
         text("""
             UPDATE app.tenants

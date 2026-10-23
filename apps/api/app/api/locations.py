@@ -11,6 +11,7 @@ from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import TenantContext, ensure_branch_visible, require
 from app.api.settings import MAX_LOGO_BYTES, read_image
 from app.catalog.verticals import CATALOG, VerticalPack
+from app.catalog.verticals_v2 import BUSINESS_TYPES
 from app.commerce.modules import MODULES
 from app.core.business_size import grow_from_solo
 from app.core.permissions import Permission
@@ -200,18 +201,13 @@ def kind_pack(business_vertical: str, kind: str | None) -> VerticalPack:
 
 
 def ensure_branch_kind(session: Session, kind: str | None) -> None:
-    """A branch kind must be the business's category or one of its sub-categories."""
-    if kind is None:
+    """A branch kind is any industry of the catalog: one business can mix categories, such as a
+    tennis club with a gym and a physiotherapy room."""
+    if kind is None or kind in CATALOG or kind in BUSINESS_TYPES:
         return
-    vertical = session.execute(
-        text("SELECT vertical FROM app.tenants WHERE id = app.current_tenant_id()")
-    ).scalar_one()
-    pack = CATALOG[vertical]
-    category = CATALOG[pack.category]
-    if kind not in {category.key, pack.key, *category.branch_kinds}:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="invalid_branch_kind"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="invalid_branch_kind"
+    )
 
 
 def _load_locations(session: Session, location_id: UUID | None = None) -> list[Location]:

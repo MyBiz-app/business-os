@@ -19136,6 +19136,332 @@
         }
       }
     },
+    "/activities": {
+      "get": {
+        "tags": [
+          "activities"
+        ],
+        "summary": "List Activities",
+        "description": "What the business offers, switched-off activities last.",
+        "operationId": "list_activities",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TenantActivity"
+                  },
+                  "title": "Response List Activities"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "activities"
+        ],
+        "summary": "Set Activities",
+        "description": "Replaces the set of activities the business offers. Any catalog business type's activity\ncan be chosen (a tennis club may also rent out padel courts); one left out is switched off,\nnot deleted. A newly offered activity is linked to every active branch.",
+        "operationId": "set_activities",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivitiesSet"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TenantActivity"
+                  },
+                  "title": "Response Set Activities"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/locations/{location_id}/activities": {
+      "get": {
+        "tags": [
+          "activities"
+        ],
+        "summary": "Get Branch Activities",
+        "description": "The ids of the activities this branch offers.",
+        "operationId": "get_branch_activities",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "title": "Response Get Branch Activities"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "activities"
+        ],
+        "summary": "Set Branch Activities",
+        "description": "Sets which of the business's activities this branch offers.",
+        "operationId": "set_branch_activities",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchActivitiesSet"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "title": "Response Set Branch Activities"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/geo/cities": {
       "get": {
         "tags": [
@@ -48289,6 +48615,23 @@
         ],
         "title": "ActiveIncident"
       },
+      "ActivitiesSet": {
+        "properties": {
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityChoice"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Activities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activities"
+        ],
+        "title": "ActivitiesSet"
+      },
       "Activity": {
         "properties": {
           "id": {
@@ -48366,6 +48709,26 @@
           "occurred_at"
         ],
         "title": "Activity"
+      },
+      "ActivityChoice": {
+        "properties": {
+          "business_type": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Business Type"
+          },
+          "activity_key": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Activity Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "business_type",
+          "activity_key"
+        ],
+        "title": "ActivityChoice"
       },
       "ActivityCreate": {
         "properties": {
@@ -51770,6 +52133,24 @@
           "status"
         ],
         "title": "BookingUpdate"
+      },
+      "BranchActivitiesSet": {
+        "properties": {
+          "activity_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Activity Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity_ids"
+        ],
+        "title": "BranchActivitiesSet"
       },
       "BranchInsight": {
         "properties": {
@@ -82163,6 +82544,55 @@
           "role"
         ],
         "title": "Tenant"
+      },
+      "TenantActivity": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "business_type": {
+            "type": "string",
+            "title": "Business Type",
+            "description": "The catalog business type the activity came from"
+          },
+          "activity_key": {
+            "type": "string",
+            "title": "Activity Key"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "The service model that runs it (appointment, group_class, ...)"
+          },
+          "resource_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Type",
+            "description": "The kind of court or room it books, if any"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "business_type",
+          "activity_key",
+          "model",
+          "resource_type",
+          "enabled"
+        ],
+        "title": "TenantActivity"
       },
       "TenantCreate": {
         "properties": {

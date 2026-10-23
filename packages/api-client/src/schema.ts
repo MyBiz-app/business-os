@@ -3581,6 +3581,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Activities
+         * @description What the business offers, switched-off activities last.
+         */
+        get: operations["list_activities"];
+        /**
+         * Set Activities
+         * @description Replaces the set of activities the business offers. Any catalog business type's activity
+         *     can be chosen (a tennis club may also rent out padel courts); one left out is switched off,
+         *     not deleted. A newly offered activity is linked to every active branch.
+         */
+        put: operations["set_activities"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/locations/{location_id}/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Branch Activities
+         * @description The ids of the activities this branch offers.
+         */
+        get: operations["get_branch_activities"];
+        /**
+         * Set Branch Activities
+         * @description Sets which of the business's activities this branch offers.
+         */
+        put: operations["set_branch_activities"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/geo/cities": {
         parameters: {
             query?: never;
@@ -10459,6 +10509,11 @@ export interface components {
              */
             created_at: string;
         };
+        /** ActivitiesSet */
+        ActivitiesSet: {
+            /** Activities */
+            activities: components["schemas"]["ActivityChoice"][];
+        };
         /** Activity */
         Activity: {
             /**
@@ -10482,6 +10537,13 @@ export interface components {
              * Format: date-time
              */
             occurred_at: string;
+        };
+        /** ActivityChoice */
+        ActivityChoice: {
+            /** Business Type */
+            business_type: string;
+            /** Activity Key */
+            activity_key: string;
         };
         /** ActivityCreate */
         ActivityCreate: {
@@ -11748,6 +11810,11 @@ export interface components {
              * @enum {string}
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+        };
+        /** BranchActivitiesSet */
+        BranchActivitiesSet: {
+            /** Activity Ids */
+            activity_ids: string[];
         };
         /** BranchInsight */
         BranchInsight: {
@@ -23603,6 +23670,33 @@ export interface components {
              */
             role: ("owner" | "manager" | "branch_manager" | "staff" | "front_desk") | ("support" | "platform");
         };
+        /** TenantActivity */
+        TenantActivity: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Type
+             * @description The catalog business type the activity came from
+             */
+            business_type: string;
+            /** Activity Key */
+            activity_key: string;
+            /**
+             * Model
+             * @description The service model that runs it (appointment, group_class, ...)
+             */
+            model: string;
+            /**
+             * Resource Type
+             * @description The kind of court or room it books, if any
+             */
+            resource_type: string | null;
+            /** Enabled */
+            enabled: boolean;
+        };
         /** TenantCreate */
         TenantCreate: {
             /** Name */
@@ -33826,6 +33920,150 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_activities: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantActivity"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_activities: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivitiesSet"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantActivity"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_branch_activities: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_branch_activities: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchActivitiesSet"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
                 };
             };
             /** @description Validation Error */
