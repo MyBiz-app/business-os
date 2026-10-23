@@ -1,0 +1,95 @@
+{
+  "key": "yoga",
+  "domain": "fitness",
+  "status": "live",
+  "names": {
+    "he": "סטודיו יוגה",
+    "en": "Yoga studio"
+  },
+  "synonyms": {
+    "he": [
+      "יוגה",
+      "מדיטציה"
+    ],
+    "en": [
+      "yoga",
+      "meditation"
+    ]
+  },
+  "terms": "fitness",
+  "customer_term": "member",
+  "customers": {
+    "he": "מתאמנים",
+    "en": "Members"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "yoga_class",
+      "names": {
+        "he": "שיעור יוגה",
+        "en": "Yoga class"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 6000,
+      "capacity": 16
+    },
+    {
+      "key": "private_yoga",
+      "names": {
+        "he": "שיעור פרטי",
+        "en": "Private session"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 25000
+    },
+    {
+      "key": "workshop",
+      "names": {
+        "he": "סדנה",
+        "en": "Workshop"
+      },
+      "model": "group_class",
+      "duration_minutes": 120,
+      "price_ils": 15000,
+      "capacity": 20,
+      "series": true,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "studio_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "workshops",
+      "text": {
+        "he": "מקיימים סדנאות?",
+        "en": "Do you hold workshops?"
+      },
+      "kind": "boolean",
+      "affects": "activity:workshop",
+      "default": false
+    },
+    {
+      "key": "teachers",
+      "text": {
+        "he": "כמה מורים?",
+        "en": "How many teachers?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 3
+    }
+  ],
+  "common_combos": [
+    "pilates",
+    "therapy"
+  ],
+  "order": 3
+}

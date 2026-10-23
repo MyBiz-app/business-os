@@ -1,0 +1,156 @@
+[
+  {
+    "key": "fitness",
+    "order": 1,
+    "icon": "dumbbell",
+    "color": "from-orange-500 to-red-600",
+    "names": {
+      "he": "כושר ותנועה",
+      "en": "Fitness and movement"
+    },
+    "replaces": [
+      "fitness"
+    ]
+  },
+  {
+    "key": "beauty",
+    "order": 2,
+    "icon": "scissors",
+    "color": "from-pink-500 to-rose-600",
+    "names": {
+      "he": "יופי וטיפוח",
+      "en": "Beauty and grooming"
+    },
+    "replaces": [
+      "beauty"
+    ]
+  },
+  {
+    "key": "health",
+    "order": 3,
+    "icon": "stethoscope",
+    "color": "from-teal-500 to-cyan-600",
+    "names": {
+      "he": "בריאות וטיפול",
+      "en": "Health and therapy"
+    },
+    "replaces": [
+      "clinic"
+    ]
+  },
+  {
+    "key": "sports_venues",
+    "order": 4,
+    "icon": "trophy",
+    "color": "from-lime-500 to-green-600",
+    "names": {
+      "he": "מגרשים ומתקני ספורט",
+      "en": "Courts and sports venues"
+    },
+    "replaces": [
+      "sports"
+    ]
+  },
+  {
+    "key": "rental_spaces",
+    "order": 5,
+    "icon": "briefcase",
+    "color": "from-slate-500 to-slate-700",
+    "names": {
+      "he": "חללים להשכרה",
+      "en": "Spaces for rent"
+    },
+    "replaces": []
+  },
+  {
+    "key": "learning",
+    "order": 6,
+    "icon": "graduation-cap",
+    "color": "from-indigo-500 to-violet-600",
+    "names": {
+      "he": "חוגים ולימוד",
+      "en": "Classes and learning"
+    },
+    "replaces": [
+      "classes"
+    ]
+  },
+  {
+    "key": "home_field",
+    "order": 7,
+    "icon": "wrench",
+    "color": "from-amber-500 to-orange-600",
+    "names": {
+      "he": "בית ושטח",
+      "en": "Home and field services"
+    },
+    "replaces": [
+      "home_services"
+    ]
+  },
+  {
+    "key": "automotive",
+    "order": 8,
+    "icon": "car",
+    "color": "from-sky-500 to-blue-700",
+    "names": {
+      "he": "רכב",
+      "en": "Automotive"
+    },
+    "replaces": [
+      "automotive"
+    ]
+  },
+  {
+    "key": "pets",
+    "order": 9,
+    "icon": "paw-print",
+    "color": "from-emerald-500 to-teal-600",
+    "names": {
+      "he": "חיות מחמד",
+      "en": "Pets"
+    },
+    "replaces": [
+      "pets"
+    ]
+  },
+  {
+    "key": "events",
+    "order": 10,
+    "icon": "camera",
+    "color": "from-fuchsia-500 to-purple-600",
+    "names": {
+      "he": "אירועים ויצירה",
+      "en": "Events and creative"
+    },
+    "replaces": [
+      "events"
+    ]
+  },
+  {
+    "key": "professional",
+    "order": 11,
+    "icon": "briefcase",
+    "color": "from-blue-500 to-indigo-700",
+    "names": {
+      "he": "שירותים מקצועיים",
+      "en": "Professional services"
+    },
+    "replaces": [
+      "professional"
+    ]
+  },
+  {
+    "key": "food_events",
+    "order": 12,
+    "icon": "utensils",
+    "color": "from-yellow-500 to-orange-600",
+    "names": {
+      "he": "סדנאות ואירועים באוכל",
+      "en": "Food workshops and events"
+    },
+    "replaces": [
+      "food"
+    ]
+  }
+]

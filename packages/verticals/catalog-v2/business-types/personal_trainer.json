@@ -1,0 +1,97 @@
+{
+  "key": "personal_trainer",
+  "domain": "fitness",
+  "status": "live",
+  "names": {
+    "he": "מאמן אישי",
+    "en": "Personal trainer"
+  },
+  "synonyms": {
+    "he": [
+      "מאמן",
+      "מאמן כושר",
+      "אימון אישי"
+    ],
+    "en": [
+      "personal trainer",
+      "coach",
+      "pt"
+    ]
+  },
+  "terms": "fitness",
+  "customer_term": "member",
+  "customers": {
+    "he": "מתאמנים",
+    "en": "Members"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "session",
+      "names": {
+        "he": "אימון אישי",
+        "en": "Personal session"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 25000
+    },
+    {
+      "key": "couple_session",
+      "names": {
+        "he": "אימון זוגי",
+        "en": "Couple session"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 35000,
+      "optional": true
+    },
+    {
+      "key": "home_session",
+      "names": {
+        "he": "אימון אצל הלקוח או בפארק",
+        "en": "Session at your place or the park"
+      },
+      "model": "on_site",
+      "duration_minutes": 60,
+      "price_ils": 30000,
+      "travel_minutes": 20,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "where",
+      "text": {
+        "he": "איפה מתאמנים?",
+        "en": "Where do you train?"
+      },
+      "kind": "select",
+      "affects": "activity:home_session",
+      "options": [
+        "studio",
+        "client_place",
+        "park",
+        "mixed"
+      ],
+      "default": "studio"
+    },
+    {
+      "key": "couples",
+      "text": {
+        "he": "מציעים אימון זוגי?",
+        "en": "Do you offer couple sessions?"
+      },
+      "kind": "boolean",
+      "affects": "activity:couple_session",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "nutrition",
+    "yoga"
+  ],
+  "order": 6
+}

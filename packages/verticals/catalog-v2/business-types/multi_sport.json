@@ -1,0 +1,148 @@
+{
+  "key": "multi_sport",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "מתחם ספורט רב־ענפי",
+    "en": "Multi-sport complex"
+  },
+  "synonyms": {
+    "he": [
+      "ספורט",
+      "מתחם ספורט",
+      "מרכז ספורט",
+      "מגרשים"
+    ],
+    "en": [
+      "sports complex",
+      "sports center",
+      "multi sport",
+      "sports"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "player",
+  "customers": {
+    "he": "שחקנים",
+    "en": "Players"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "padel_rental",
+      "names": {
+        "he": "השכרת מגרש פאדל",
+        "en": "Padel court rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 90,
+      "price_ils": 16000,
+      "resource_type": "padel_court",
+      "max_minutes": 120,
+      "step_minutes": 30
+    },
+    {
+      "key": "football_rental",
+      "names": {
+        "he": "השכרת מגרש קט־רגל",
+        "en": "Five-a-side rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 45000,
+      "resource_type": "football_5",
+      "max_minutes": 120,
+      "step_minutes": 60
+    },
+    {
+      "key": "tennis_rental",
+      "names": {
+        "he": "השכרת מגרש טניס",
+        "en": "Tennis court rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 12000,
+      "resource_type": "tennis_court",
+      "max_minutes": 180,
+      "step_minutes": 30,
+      "optional": true
+    },
+    {
+      "key": "basketball_rental",
+      "names": {
+        "he": "השכרת מגרש כדורסל",
+        "en": "Basketball rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 20000,
+      "resource_type": "basketball_court",
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "padel_court",
+      "count": 2,
+      "attributes": {
+        "covered": true,
+        "lighting": true,
+        "surface": "artificial_grass"
+      }
+    },
+    {
+      "type": "football_5",
+      "count": 1,
+      "attributes": {
+        "surface": "artificial_grass",
+        "lighting": true
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "sports",
+      "text": {
+        "he": "אילו ענפים יש אצלכם?",
+        "en": "Which sports do you have?"
+      },
+      "kind": "multi_select",
+      "affects": "activity:*",
+      "options": [
+        "tennis",
+        "padel",
+        "football",
+        "basketball",
+        "volleyball",
+        "pickleball",
+        "squash"
+      ],
+      "default": [
+        "padel",
+        "football"
+      ]
+    },
+    {
+      "key": "courts_each",
+      "text": {
+        "he": "כמה מגרשים מכל ענף?",
+        "en": "How many courts of each sport?"
+      },
+      "kind": "number",
+      "affects": "resource_count:*",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "tennis_club",
+    "padel_club",
+    "gym"
+  ],
+  "replaces": [
+    "sports"
+  ],
+  "order": 15
+}

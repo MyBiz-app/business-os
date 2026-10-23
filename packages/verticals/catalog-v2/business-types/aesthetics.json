@@ -1,0 +1,85 @@
+{
+  "key": "aesthetics",
+  "domain": "health",
+  "status": "live",
+  "names": {
+    "he": "אסתטיקה רפואית",
+    "en": "Medical aesthetics"
+  },
+  "synonyms": {
+    "he": [
+      "אסתטיקה רפואית",
+      "בוטוקס",
+      "מילוי",
+      "מרפאה אסתטית"
+    ],
+    "en": [
+      "medical aesthetics",
+      "botox",
+      "fillers"
+    ]
+  },
+  "terms": "clinic",
+  "customer_term": "patient",
+  "customers": {
+    "he": "מטופלים",
+    "en": "Patients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "consult",
+      "names": {
+        "he": "ייעוץ",
+        "en": "Consultation"
+      },
+      "model": "appointment",
+      "duration_minutes": 30,
+      "price_ils": 20000
+    },
+    {
+      "key": "treatment",
+      "names": {
+        "he": "טיפול",
+        "en": "Treatment"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 30,
+      "price_ils": 120000,
+      "resource_type": "treatment_room"
+    }
+  ],
+  "resources": [
+    {
+      "type": "treatment_room",
+      "count": 2
+    }
+  ],
+  "questions": [
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה חדרי טיפול?",
+        "en": "How many treatment rooms?"
+      },
+      "kind": "number",
+      "affects": "resource_count:treatment_room",
+      "default": 2
+    },
+    {
+      "key": "series",
+      "text": {
+        "he": "מוכרים סדרות?",
+        "en": "Do you sell treatment series?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "cosmetics",
+    "laser"
+  ],
+  "order": 35
+}

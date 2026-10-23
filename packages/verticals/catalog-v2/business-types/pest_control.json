@@ -1,0 +1,81 @@
+{
+  "key": "pest_control",
+  "domain": "home_field",
+  "status": "beta",
+  "names": {
+    "he": "הדברה",
+    "en": "Pest control"
+  },
+  "synonyms": {
+    "he": [
+      "הדברה",
+      "מדביר",
+      "הדברת מזיקים",
+      "עכברים",
+      "נמלים"
+    ],
+    "en": [
+      "pest control",
+      "exterminator"
+    ]
+  },
+  "terms": "home_services",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "job_route",
+  "activities": [
+    {
+      "key": "treatment",
+      "names": {
+        "he": "טיפול הדברה",
+        "en": "Pest treatment"
+      },
+      "model": "on_site",
+      "duration_minutes": 60,
+      "price_ils": 40000,
+      "travel_minutes": 30
+    },
+    {
+      "key": "followup",
+      "names": {
+        "he": "ביקור המשך",
+        "en": "Follow-up visit"
+      },
+      "model": "on_site",
+      "duration_minutes": 45,
+      "price_ils": 25000,
+      "travel_minutes": 30,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "zones",
+      "text": {
+        "he": "באילו אזורים עובדים?",
+        "en": "Which areas do you serve?"
+      },
+      "kind": "text",
+      "affects": "service_area"
+    },
+    {
+      "key": "technicians",
+      "text": {
+        "he": "כמה טכנאים או עובדים?",
+        "en": "How many technicians or workers?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "cleaning",
+    "gardening"
+  ],
+  "order": 51
+}

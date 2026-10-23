@@ -1,0 +1,80 @@
+{
+  "key": "handyman",
+  "domain": "home_field",
+  "status": "beta",
+  "names": {
+    "he": "הנדימן",
+    "en": "Handyman"
+  },
+  "synonyms": {
+    "he": [
+      "הנדימן",
+      "שיפוצניק",
+      "תיקונים בבית",
+      "איש תחזוקה"
+    ],
+    "en": [
+      "handyman",
+      "home repair",
+      "odd jobs"
+    ]
+  },
+  "terms": "home_services",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "job_route",
+  "activities": [
+    {
+      "key": "hourly",
+      "names": {
+        "he": "עבודה לפי שעה",
+        "en": "Hourly job"
+      },
+      "model": "on_site",
+      "duration_minutes": 60,
+      "price_ils": 20000,
+      "travel_minutes": 30
+    },
+    {
+      "key": "project",
+      "names": {
+        "he": "עבודה בהצעת מחיר",
+        "en": "Quoted job"
+      },
+      "model": "project",
+      "duration_minutes": 240,
+      "price_ils": 120000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "zones",
+      "text": {
+        "he": "באילו אזורים עובדים?",
+        "en": "Which areas do you serve?"
+      },
+      "kind": "text",
+      "affects": "service_area"
+    },
+    {
+      "key": "technicians",
+      "text": {
+        "he": "כמה טכנאים או עובדים?",
+        "en": "How many technicians or workers?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "electricians",
+    "plumbers"
+  ],
+  "order": 53
+}

@@ -1,0 +1,80 @@
+{
+  "key": "event_suppliers",
+  "domain": "events",
+  "status": "beta",
+  "names": {
+    "he": "ספקי אירועים",
+    "en": "Event suppliers"
+  },
+  "synonyms": {
+    "he": [
+      "ספקים",
+      "ספקי אירועים",
+      "קישוטים",
+      "השכרת ציוד"
+    ],
+    "en": [
+      "event supplier",
+      "event vendor",
+      "event rental",
+      "decor"
+    ]
+  },
+  "terms": "events",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "consult",
+      "names": {
+        "he": "פגישת ייעוץ",
+        "en": "Consultation"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 10000
+    },
+    {
+      "key": "event",
+      "names": {
+        "he": "אספקה לאירוע",
+        "en": "Event supply"
+      },
+      "model": "project",
+      "duration_minutes": 240,
+      "price_ils": 300000
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "deposit",
+      "text": {
+        "he": "לוקחים מקדמה?",
+        "en": "Do you take a deposit?"
+      },
+      "kind": "boolean",
+      "affects": "activity:event",
+      "default": true
+    },
+    {
+      "key": "crew",
+      "text": {
+        "he": "כמה צוותים?",
+        "en": "How many crews?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 1
+    }
+  ],
+  "common_combos": [
+    "djs",
+    "small_venues"
+  ],
+  "order": 65
+}

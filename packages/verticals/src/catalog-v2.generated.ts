@@ -1,0 +1,7817 @@
+// Generated from catalog-v2/ by `pnpm verticals:export`. Do not edit by hand.
+import type { CatalogV2 } from "./v2";
+
+export const CATALOG_V2: CatalogV2 = {
+  "version": 2,
+  "domains": [
+    {
+      "key": "fitness",
+      "order": 1,
+      "icon": "dumbbell",
+      "color": "from-orange-500 to-red-600",
+      "names": {
+        "he": "כושר ותנועה",
+        "en": "Fitness and movement"
+      },
+      "replaces": [
+        "fitness"
+      ]
+    },
+    {
+      "key": "beauty",
+      "order": 2,
+      "icon": "scissors",
+      "color": "from-pink-500 to-rose-600",
+      "names": {
+        "he": "יופי וטיפוח",
+        "en": "Beauty and grooming"
+      },
+      "replaces": [
+        "beauty"
+      ]
+    },
+    {
+      "key": "health",
+      "order": 3,
+      "icon": "stethoscope",
+      "color": "from-teal-500 to-cyan-600",
+      "names": {
+        "he": "בריאות וטיפול",
+        "en": "Health and therapy"
+      },
+      "replaces": [
+        "clinic"
+      ]
+    },
+    {
+      "key": "sports_venues",
+      "order": 4,
+      "icon": "trophy",
+      "color": "from-lime-500 to-green-600",
+      "names": {
+        "he": "מגרשים ומתקני ספורט",
+        "en": "Courts and sports venues"
+      },
+      "replaces": [
+        "sports"
+      ]
+    },
+    {
+      "key": "rental_spaces",
+      "order": 5,
+      "icon": "briefcase",
+      "color": "from-slate-500 to-slate-700",
+      "names": {
+        "he": "חללים להשכרה",
+        "en": "Spaces for rent"
+      },
+      "replaces": []
+    },
+    {
+      "key": "learning",
+      "order": 6,
+      "icon": "graduation-cap",
+      "color": "from-indigo-500 to-violet-600",
+      "names": {
+        "he": "חוגים ולימוד",
+        "en": "Classes and learning"
+      },
+      "replaces": [
+        "classes"
+      ]
+    },
+    {
+      "key": "home_field",
+      "order": 7,
+      "icon": "wrench",
+      "color": "from-amber-500 to-orange-600",
+      "names": {
+        "he": "בית ושטח",
+        "en": "Home and field services"
+      },
+      "replaces": [
+        "home_services"
+      ]
+    },
+    {
+      "key": "automotive",
+      "order": 8,
+      "icon": "car",
+      "color": "from-sky-500 to-blue-700",
+      "names": {
+        "he": "רכב",
+        "en": "Automotive"
+      },
+      "replaces": [
+        "automotive"
+      ]
+    },
+    {
+      "key": "pets",
+      "order": 9,
+      "icon": "paw-print",
+      "color": "from-emerald-500 to-teal-600",
+      "names": {
+        "he": "חיות מחמד",
+        "en": "Pets"
+      },
+      "replaces": [
+        "pets"
+      ]
+    },
+    {
+      "key": "events",
+      "order": 10,
+      "icon": "camera",
+      "color": "from-fuchsia-500 to-purple-600",
+      "names": {
+        "he": "אירועים ויצירה",
+        "en": "Events and creative"
+      },
+      "replaces": [
+        "events"
+      ]
+    },
+    {
+      "key": "professional",
+      "order": 11,
+      "icon": "briefcase",
+      "color": "from-blue-500 to-indigo-700",
+      "names": {
+        "he": "שירותים מקצועיים",
+        "en": "Professional services"
+      },
+      "replaces": [
+        "professional"
+      ]
+    },
+    {
+      "key": "food_events",
+      "order": 12,
+      "icon": "utensils",
+      "color": "from-yellow-500 to-orange-600",
+      "names": {
+        "he": "סדנאות ואירועים באוכל",
+        "en": "Food workshops and events"
+      },
+      "replaces": [
+        "food"
+      ]
+    }
+  ],
+  "resource_types": [
+    {
+      "key": "tennis_court",
+      "names": {
+        "he": "מגרש טניס",
+        "en": "Tennis court"
+      },
+      "default_capacity": 4,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 180,
+      "step_minutes": 30,
+      "attributes": [
+        {
+          "key": "surface",
+          "kind": "select",
+          "options": [
+            "hard",
+            "clay",
+            "artificial_grass"
+          ]
+        },
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        },
+        {
+          "key": "covered",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "padel_court",
+      "names": {
+        "he": "מגרש פאדל",
+        "en": "Padel court"
+      },
+      "default_capacity": 4,
+      "default_minutes": 90,
+      "min_minutes": 60,
+      "max_minutes": 120,
+      "step_minutes": 30,
+      "attributes": [
+        {
+          "key": "surface",
+          "kind": "select",
+          "options": [
+            "artificial_grass"
+          ]
+        },
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        },
+        {
+          "key": "covered",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "football_5",
+      "names": {
+        "he": "מגרש קט־רגל",
+        "en": "Five-a-side pitch"
+      },
+      "default_capacity": 12,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "attributes": [
+        {
+          "key": "surface",
+          "kind": "select",
+          "options": [
+            "artificial_grass",
+            "grass"
+          ]
+        },
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        },
+        {
+          "key": "covered",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "football_7",
+      "names": {
+        "he": "מגרש כדורגל 7/8",
+        "en": "Seven-a-side pitch"
+      },
+      "default_capacity": 16,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "attributes": [
+        {
+          "key": "surface",
+          "kind": "select",
+          "options": [
+            "artificial_grass",
+            "grass"
+          ]
+        },
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "football_11",
+      "names": {
+        "he": "מגרש כדורגל מלא",
+        "en": "Full-size pitch"
+      },
+      "default_capacity": 22,
+      "default_minutes": 90,
+      "min_minutes": 90,
+      "max_minutes": 180,
+      "step_minutes": 30,
+      "attributes": [
+        {
+          "key": "surface",
+          "kind": "select",
+          "options": [
+            "artificial_grass",
+            "grass"
+          ]
+        },
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "walking_football_pitch",
+      "names": {
+        "he": "מגרש כדורגל הליכה",
+        "en": "Walking football pitch"
+      },
+      "default_capacity": 14,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "attributes": [
+        {
+          "key": "surface",
+          "kind": "select",
+          "options": [
+            "artificial_grass",
+            "grass"
+          ]
+        },
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "basketball_court",
+      "names": {
+        "he": "מגרש כדורסל",
+        "en": "Basketball court"
+      },
+      "default_capacity": 10,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "attributes": [
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        },
+        {
+          "key": "covered",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "volleyball_court",
+      "names": {
+        "he": "מגרש כדורעף",
+        "en": "Volleyball court"
+      },
+      "default_capacity": 12,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "attributes": [
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        },
+        {
+          "key": "covered",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "beach_volleyball_court",
+      "names": {
+        "he": "מגרש כדורעף חופים",
+        "en": "Beach volleyball court"
+      },
+      "default_capacity": 4,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "attributes": [
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "pickleball_court",
+      "names": {
+        "he": "מגרש פיקלבול",
+        "en": "Pickleball court"
+      },
+      "default_capacity": 4,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 120,
+      "step_minutes": 30,
+      "attributes": [
+        {
+          "key": "lighting",
+          "kind": "boolean"
+        },
+        {
+          "key": "covered",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "squash_court",
+      "names": {
+        "he": "מגרש סקווש",
+        "en": "Squash court"
+      },
+      "default_capacity": 2,
+      "default_minutes": 45,
+      "min_minutes": 30,
+      "max_minutes": 90,
+      "step_minutes": 15,
+      "attributes": []
+    },
+    {
+      "key": "rehearsal_room",
+      "names": {
+        "he": "חדר חזרות",
+        "en": "Rehearsal room"
+      },
+      "default_capacity": 6,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 240,
+      "step_minutes": 60,
+      "attributes": []
+    },
+    {
+      "key": "meeting_room",
+      "names": {
+        "he": "חדר ישיבות",
+        "en": "Meeting room"
+      },
+      "default_capacity": 8,
+      "default_minutes": 60,
+      "min_minutes": 30,
+      "max_minutes": 480,
+      "step_minutes": 30,
+      "attributes": []
+    },
+    {
+      "key": "photo_studio_space",
+      "names": {
+        "he": "סטודיו צילום",
+        "en": "Photo studio"
+      },
+      "default_capacity": 8,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 480,
+      "step_minutes": 60,
+      "attributes": []
+    },
+    {
+      "key": "workstation",
+      "names": {
+        "he": "עמדת עבודה",
+        "en": "Workstation"
+      },
+      "default_capacity": 1,
+      "default_minutes": 480,
+      "min_minutes": 240,
+      "max_minutes": 720,
+      "step_minutes": 240,
+      "attributes": [
+        {
+          "key": "kind",
+          "kind": "select",
+          "options": [
+            "hot_desk",
+            "fixed_desk",
+            "private_office"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "event_hall",
+      "names": {
+        "he": "אולם אירועים",
+        "en": "Event hall"
+      },
+      "default_capacity": 100,
+      "default_minutes": 240,
+      "min_minutes": 240,
+      "max_minutes": 720,
+      "step_minutes": 240,
+      "attributes": []
+    },
+    {
+      "key": "treatment_room",
+      "names": {
+        "he": "חדר טיפולים",
+        "en": "Treatment room"
+      },
+      "default_capacity": 1,
+      "default_minutes": 60,
+      "min_minutes": 30,
+      "max_minutes": 120,
+      "step_minutes": 15,
+      "attributes": []
+    },
+    {
+      "key": "treatment_chair",
+      "names": {
+        "he": "כיסא טיפולים",
+        "en": "Treatment chair"
+      },
+      "default_capacity": 1,
+      "default_minutes": 30,
+      "min_minutes": 15,
+      "max_minutes": 120,
+      "step_minutes": 15,
+      "attributes": []
+    },
+    {
+      "key": "studio_room",
+      "names": {
+        "he": "סטודיו",
+        "en": "Studio room"
+      },
+      "default_capacity": 20,
+      "default_minutes": 60,
+      "min_minutes": 45,
+      "max_minutes": 120,
+      "step_minutes": 15,
+      "attributes": [
+        {
+          "key": "floor",
+          "kind": "select",
+          "options": [
+            "wood",
+            "mat",
+            "sprung"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "reformer",
+      "names": {
+        "he": "מכשיר רפורמר",
+        "en": "Reformer"
+      },
+      "default_capacity": 1,
+      "default_minutes": 55,
+      "min_minutes": 50,
+      "max_minutes": 60,
+      "step_minutes": 5,
+      "attributes": []
+    },
+    {
+      "key": "swim_lane",
+      "names": {
+        "he": "מסלול שחייה",
+        "en": "Swim lane"
+      },
+      "default_capacity": 8,
+      "default_minutes": 45,
+      "min_minutes": 30,
+      "max_minutes": 90,
+      "step_minutes": 15,
+      "attributes": []
+    },
+    {
+      "key": "escape_room",
+      "names": {
+        "he": "חדר בריחה",
+        "en": "Escape room"
+      },
+      "default_capacity": 6,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 60,
+      "step_minutes": 15,
+      "attributes": []
+    },
+    {
+      "key": "shooting_lane",
+      "names": {
+        "he": "מסלול ירי",
+        "en": "Shooting lane"
+      },
+      "default_capacity": 1,
+      "default_minutes": 30,
+      "min_minutes": 30,
+      "max_minutes": 120,
+      "step_minutes": 30,
+      "attributes": []
+    },
+    {
+      "key": "golf_simulator_bay",
+      "names": {
+        "he": "עמדת סימולטור גולף",
+        "en": "Golf simulator bay"
+      },
+      "default_capacity": 4,
+      "default_minutes": 60,
+      "min_minutes": 60,
+      "max_minutes": 180,
+      "step_minutes": 30,
+      "attributes": []
+    },
+    {
+      "key": "work_bay",
+      "names": {
+        "he": "עמדת עבודה במוסך",
+        "en": "Garage bay"
+      },
+      "default_capacity": 1,
+      "default_minutes": 60,
+      "min_minutes": 15,
+      "max_minutes": 480,
+      "step_minutes": 15,
+      "attributes": [
+        {
+          "key": "lift",
+          "kind": "boolean"
+        }
+      ]
+    },
+    {
+      "key": "training_vehicle",
+      "names": {
+        "he": "רכב לימוד",
+        "en": "Training car"
+      },
+      "default_capacity": 2,
+      "default_minutes": 45,
+      "min_minutes": 45,
+      "max_minutes": 90,
+      "step_minutes": 15,
+      "attributes": [
+        {
+          "key": "gearbox",
+          "kind": "select",
+          "options": [
+            "manual",
+            "automatic"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "table",
+      "names": {
+        "he": "שולחן",
+        "en": "Table"
+      },
+      "default_capacity": 4,
+      "default_minutes": 120,
+      "min_minutes": 60,
+      "max_minutes": 240,
+      "step_minutes": 30,
+      "attributes": []
+    },
+    {
+      "key": "kennel",
+      "names": {
+        "he": "תא פנסיון",
+        "en": "Boarding kennel"
+      },
+      "default_capacity": 1,
+      "default_minutes": 1440,
+      "min_minutes": 1440,
+      "max_minutes": 20160,
+      "step_minutes": 1440,
+      "attributes": [
+        {
+          "key": "size",
+          "kind": "select",
+          "options": [
+            "small",
+            "medium",
+            "large"
+          ]
+        }
+      ]
+    }
+  ],
+  "business_types": [
+    {
+      "key": "gym",
+      "domain": "fitness",
+      "status": "live",
+      "names": {
+        "he": "חדר כושר",
+        "en": "Gym"
+      },
+      "synonyms": {
+        "he": [
+          "חדר כושר",
+          "מכון כושר",
+          "ג'ים",
+          "מכון"
+        ],
+        "en": [
+          "gym",
+          "fitness center",
+          "health club"
+        ]
+      },
+      "terms": "fitness",
+      "customer_term": "member",
+      "customers": {
+        "he": "מתאמנים",
+        "en": "Members"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "open_access",
+          "names": {
+            "he": "כניסה חופשית במנוי",
+            "en": "Open access (membership)"
+          },
+          "model": "open_entry",
+          "duration_minutes": 60,
+          "price_ils": 25000
+        },
+        {
+          "key": "personal_training",
+          "names": {
+            "he": "אימון אישי",
+            "en": "Personal training"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 25000
+        },
+        {
+          "key": "studio_class",
+          "names": {
+            "he": "שיעור סטודיו",
+            "en": "Studio class"
+          },
+          "model": "group_class",
+          "duration_minutes": 50,
+          "price_ils": 6000,
+          "capacity": 20,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "studio_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "group_classes",
+          "text": {
+            "he": "יש שיעורים קבוצתיים?",
+            "en": "Do you run group classes?"
+          },
+          "kind": "boolean",
+          "affects": "activity:studio_class",
+          "default": false
+        },
+        {
+          "key": "trainers",
+          "text": {
+            "he": "כמה מאמנים אישיים יש?",
+            "en": "How many personal trainers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "pilates",
+        "swim_school",
+        "physiotherapy"
+      ],
+      "order": 1
+    },
+    {
+      "key": "pilates",
+      "domain": "fitness",
+      "status": "live",
+      "names": {
+        "he": "סטודיו פילאטיס",
+        "en": "Pilates studio"
+      },
+      "synonyms": {
+        "he": [
+          "פילאטיס",
+          "פילטיס",
+          "רפורמר"
+        ],
+        "en": [
+          "pilates",
+          "reformer"
+        ]
+      },
+      "terms": "fitness",
+      "customer_term": "member",
+      "customers": {
+        "he": "מתאמנים",
+        "en": "Members"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "reformer_class",
+          "names": {
+            "he": "שיעור מכשירים",
+            "en": "Reformer class"
+          },
+          "model": "group_class",
+          "duration_minutes": 50,
+          "price_ils": 12000,
+          "capacity": 6,
+          "resource_type": "reformer"
+        },
+        {
+          "key": "private_session",
+          "names": {
+            "he": "שיעור פרטי",
+            "en": "Private session"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 55,
+          "price_ils": 28000,
+          "resource_type": "reformer"
+        },
+        {
+          "key": "mat_class",
+          "names": {
+            "he": "שיעור מזרן",
+            "en": "Mat class"
+          },
+          "model": "group_class",
+          "duration_minutes": 55,
+          "price_ils": 7000,
+          "capacity": 12,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "reformer",
+          "count": 6
+        },
+        {
+          "type": "studio_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "reformers",
+          "text": {
+            "he": "כמה רפורמרים יש בסטודיו?",
+            "en": "How many reformers does the studio have?"
+          },
+          "kind": "number",
+          "affects": "resource_count:reformer",
+          "default": 6
+        },
+        {
+          "key": "equipment",
+          "text": {
+            "he": "מזרן, מכשירים או שניהם?",
+            "en": "Mat, reformer or both?"
+          },
+          "kind": "select",
+          "affects": "activity:mat_class",
+          "options": [
+            "mat",
+            "reformer",
+            "both"
+          ],
+          "default": "reformer"
+        }
+      ],
+      "common_combos": [
+        "yoga",
+        "physiotherapy"
+      ],
+      "order": 2
+    },
+    {
+      "key": "yoga",
+      "domain": "fitness",
+      "status": "live",
+      "names": {
+        "he": "סטודיו יוגה",
+        "en": "Yoga studio"
+      },
+      "synonyms": {
+        "he": [
+          "יוגה",
+          "מדיטציה"
+        ],
+        "en": [
+          "yoga",
+          "meditation"
+        ]
+      },
+      "terms": "fitness",
+      "customer_term": "member",
+      "customers": {
+        "he": "מתאמנים",
+        "en": "Members"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "yoga_class",
+          "names": {
+            "he": "שיעור יוגה",
+            "en": "Yoga class"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 6000,
+          "capacity": 16
+        },
+        {
+          "key": "private_yoga",
+          "names": {
+            "he": "שיעור פרטי",
+            "en": "Private session"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 25000
+        },
+        {
+          "key": "workshop",
+          "names": {
+            "he": "סדנה",
+            "en": "Workshop"
+          },
+          "model": "group_class",
+          "duration_minutes": 120,
+          "price_ils": 15000,
+          "capacity": 20,
+          "series": true,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "studio_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "workshops",
+          "text": {
+            "he": "מקיימים סדנאות?",
+            "en": "Do you hold workshops?"
+          },
+          "kind": "boolean",
+          "affects": "activity:workshop",
+          "default": false
+        },
+        {
+          "key": "teachers",
+          "text": {
+            "he": "כמה מורים?",
+            "en": "How many teachers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 3
+        }
+      ],
+      "common_combos": [
+        "pilates",
+        "therapy"
+      ],
+      "order": 3
+    },
+    {
+      "key": "crossfit",
+      "domain": "fitness",
+      "status": "live",
+      "names": {
+        "he": "קרוספיט",
+        "en": "CrossFit box"
+      },
+      "synonyms": {
+        "he": [
+          "קרוספיט",
+          "בוקס",
+          "אימון פונקציונלי קשה"
+        ],
+        "en": [
+          "crossfit",
+          "box",
+          "wod"
+        ]
+      },
+      "terms": "fitness",
+      "customer_term": "member",
+      "customers": {
+        "he": "מתאמנים",
+        "en": "Members"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "daily_wod",
+          "names": {
+            "he": "אימון יומי",
+            "en": "Daily workout"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 7000,
+          "capacity": 14
+        },
+        {
+          "key": "foundations",
+          "names": {
+            "he": "קורס יסודות",
+            "en": "Foundations course"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 8000,
+          "capacity": 8,
+          "series": true,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "studio_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "foundations_course",
+          "text": {
+            "he": "יש קורס יסודות למתחילים?",
+            "en": "Is there a beginners' foundations course?"
+          },
+          "kind": "boolean",
+          "affects": "activity:foundations",
+          "default": true
+        },
+        {
+          "key": "coaches",
+          "text": {
+            "he": "כמה מאמנים?",
+            "en": "How many coaches?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 3
+        }
+      ],
+      "common_combos": [
+        "functional",
+        "gym"
+      ],
+      "order": 4
+    },
+    {
+      "key": "functional",
+      "domain": "fitness",
+      "status": "live",
+      "names": {
+        "he": "אימון פונקציונלי",
+        "en": "Functional training"
+      },
+      "synonyms": {
+        "he": [
+          "פונקציונלי",
+          "אימון קבוצתי",
+          "בוטקמפ"
+        ],
+        "en": [
+          "functional",
+          "bootcamp",
+          "group training"
+        ]
+      },
+      "terms": "fitness",
+      "customer_term": "member",
+      "customers": {
+        "he": "מתאמנים",
+        "en": "Members"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "group_training",
+          "names": {
+            "he": "אימון קבוצתי",
+            "en": "Group training"
+          },
+          "model": "group_class",
+          "duration_minutes": 50,
+          "price_ils": 6000,
+          "capacity": 14
+        },
+        {
+          "key": "small_group",
+          "names": {
+            "he": "קבוצה קטנה",
+            "en": "Small group"
+          },
+          "model": "group_class",
+          "duration_minutes": 45,
+          "price_ils": 10000,
+          "capacity": 5,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "studio_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "small_groups",
+          "text": {
+            "he": "יש גם קבוצות קטנות?",
+            "en": "Do you also offer small groups?"
+          },
+          "kind": "boolean",
+          "affects": "activity:small_group",
+          "default": false
+        },
+        {
+          "key": "coaches",
+          "text": {
+            "he": "כמה מאמנים?",
+            "en": "How many coaches?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "gym",
+        "personal_trainer"
+      ],
+      "order": 5
+    },
+    {
+      "key": "personal_trainer",
+      "domain": "fitness",
+      "status": "live",
+      "names": {
+        "he": "מאמן אישי",
+        "en": "Personal trainer"
+      },
+      "synonyms": {
+        "he": [
+          "מאמן",
+          "מאמן כושר",
+          "אימון אישי"
+        ],
+        "en": [
+          "personal trainer",
+          "coach",
+          "pt"
+        ]
+      },
+      "terms": "fitness",
+      "customer_term": "member",
+      "customers": {
+        "he": "מתאמנים",
+        "en": "Members"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "session",
+          "names": {
+            "he": "אימון אישי",
+            "en": "Personal session"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 25000
+        },
+        {
+          "key": "couple_session",
+          "names": {
+            "he": "אימון זוגי",
+            "en": "Couple session"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 35000,
+          "optional": true
+        },
+        {
+          "key": "home_session",
+          "names": {
+            "he": "אימון אצל הלקוח או בפארק",
+            "en": "Session at your place or the park"
+          },
+          "model": "on_site",
+          "duration_minutes": 60,
+          "price_ils": 30000,
+          "travel_minutes": 20,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "where",
+          "text": {
+            "he": "איפה מתאמנים?",
+            "en": "Where do you train?"
+          },
+          "kind": "select",
+          "affects": "activity:home_session",
+          "options": [
+            "studio",
+            "client_place",
+            "park",
+            "mixed"
+          ],
+          "default": "studio"
+        },
+        {
+          "key": "couples",
+          "text": {
+            "he": "מציעים אימון זוגי?",
+            "en": "Do you offer couple sessions?"
+          },
+          "kind": "boolean",
+          "affects": "activity:couple_session",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "nutrition",
+        "yoga"
+      ],
+      "order": 6
+    },
+    {
+      "key": "swim_school",
+      "domain": "fitness",
+      "status": "beta",
+      "names": {
+        "he": "בית ספר לשחייה",
+        "en": "Swim school"
+      },
+      "synonyms": {
+        "he": [
+          "שחייה",
+          "בריכה",
+          "חוג שחייה",
+          "אקדמיית שחייה"
+        ],
+        "en": [
+          "swimming",
+          "swim lessons",
+          "pool"
+        ]
+      },
+      "terms": "fitness",
+      "customer_term": "swimmer",
+      "customers": {
+        "he": "שחיינים",
+        "en": "Swimmers"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "lane_group",
+          "names": {
+            "he": "קבוצה במסלול",
+            "en": "Group in a lane"
+          },
+          "model": "large_group",
+          "duration_minutes": 45,
+          "price_ils": 8000,
+          "capacity": 8,
+          "resource_type": "swim_lane",
+          "min_staff": 1,
+          "series": true
+        },
+        {
+          "key": "private_lesson",
+          "names": {
+            "he": "שיעור פרטי",
+            "en": "Private lesson"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 30,
+          "price_ils": 18000,
+          "resource_type": "swim_lane"
+        }
+      ],
+      "resources": [
+        {
+          "type": "swim_lane",
+          "count": 4
+        }
+      ],
+      "questions": [
+        {
+          "key": "lanes",
+          "text": {
+            "he": "כמה מסלולים?",
+            "en": "How many lanes?"
+          },
+          "kind": "number",
+          "affects": "resource_count:swim_lane",
+          "default": 4
+        },
+        {
+          "key": "audience",
+          "text": {
+            "he": "ילדים, מבוגרים או שניהם?",
+            "en": "Children, adults or both?"
+          },
+          "kind": "select",
+          "affects": "dependents",
+          "options": [
+            "children",
+            "adults",
+            "both"
+          ],
+          "default": "both"
+        }
+      ],
+      "common_combos": [
+        "gym",
+        "kids_activities"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 7
+    },
+    {
+      "key": "martial_arts",
+      "domain": "learning",
+      "status": "live",
+      "names": {
+        "he": "אומנויות לחימה",
+        "en": "Martial arts"
+      },
+      "synonyms": {
+        "he": [
+          "קראטה",
+          "ג'ודו",
+          "קרב מגע",
+          "MMA",
+          "בוקס",
+          "טאקוונדו"
+        ],
+        "en": [
+          "karate",
+          "judo",
+          "mma",
+          "boxing",
+          "martial arts",
+          "krav maga"
+        ]
+      },
+      "terms": "classes",
+      "customer_term": "trainee",
+      "customers": {
+        "he": "חניכים",
+        "en": "Trainees"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "class",
+          "names": {
+            "he": "שיעור",
+            "en": "Class"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 6000,
+          "capacity": 20
+        },
+        {
+          "key": "private_lesson",
+          "names": {
+            "he": "שיעור פרטי",
+            "en": "Private lesson"
+          },
+          "model": "appointment",
+          "duration_minutes": 45,
+          "price_ils": 20000,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "studio_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "audience",
+          "text": {
+            "he": "ילדים, מבוגרים או שניהם?",
+            "en": "Children, adults or both?"
+          },
+          "kind": "select",
+          "affects": "dependents",
+          "options": [
+            "children",
+            "adults",
+            "both"
+          ],
+          "default": "both"
+        },
+        {
+          "key": "private",
+          "text": {
+            "he": "מציעים שיעורים פרטיים?",
+            "en": "Do you offer private lessons?"
+          },
+          "kind": "boolean",
+          "affects": "activity:private_lesson",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "gym",
+        "kids_activities"
+      ],
+      "also_in": [
+        "fitness"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 8
+    },
+    {
+      "key": "tennis_club",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "מועדון טניס",
+        "en": "Tennis club"
+      },
+      "synonyms": {
+        "he": [
+          "טניס",
+          "מגרש טניס",
+          "מגרשי טניס",
+          "קורט",
+          "מועדון טניס"
+        ],
+        "en": [
+          "tennis",
+          "tennis court",
+          "court"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "player",
+      "customers": {
+        "he": "שחקנים",
+        "en": "Players"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "court_rental",
+          "names": {
+            "he": "השכרת מגרש",
+            "en": "Court rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 12000,
+          "resource_type": "tennis_court",
+          "max_minutes": 180,
+          "step_minutes": 30
+        },
+        {
+          "key": "private_lesson",
+          "names": {
+            "he": "שיעור פרטי",
+            "en": "Private lesson"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 25000,
+          "resource_type": "tennis_court"
+        },
+        {
+          "key": "group_lesson",
+          "names": {
+            "he": "שיעור זוגי או קבוצתי",
+            "en": "Pair or group lesson"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 10000,
+          "capacity": 4,
+          "resource_type": "tennis_court",
+          "optional": true
+        },
+        {
+          "key": "kids_academy",
+          "names": {
+            "he": "אקדמיה לילדים",
+            "en": "Kids academy"
+          },
+          "model": "large_group",
+          "duration_minutes": 60,
+          "price_ils": 9000,
+          "capacity": 24,
+          "resource_type": "tennis_court",
+          "min_staff": 3,
+          "series": true,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "tennis_court",
+          "count": 4,
+          "attributes": {
+            "surface": "hard",
+            "lighting": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "courts",
+          "text": {
+            "he": "כמה מגרשים טניס?",
+            "en": "How many tennis courts?"
+          },
+          "kind": "number",
+          "affects": "resource_count:tennis_court",
+          "default": 4
+        },
+        {
+          "key": "surface",
+          "text": {
+            "he": "מה המשטח?",
+            "en": "What is the surface?"
+          },
+          "kind": "select",
+          "affects": "resource_attr:tennis_court.surface",
+          "options": [
+            "hard",
+            "clay",
+            "artificial_grass"
+          ],
+          "default": "hard"
+        },
+        {
+          "key": "lighting",
+          "text": {
+            "he": "יש תאורה?",
+            "en": "Is there lighting?"
+          },
+          "kind": "boolean",
+          "affects": "resource_attr:tennis_court.lighting",
+          "default": true
+        },
+        {
+          "key": "kids",
+          "text": {
+            "he": "יש אקדמיה לילדים?",
+            "en": "Is there a kids' academy?"
+          },
+          "kind": "boolean",
+          "affects": "dependents",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "padel_club",
+        "kids_activities",
+        "gym"
+      ],
+      "replaces": [
+        "padel_tennis"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 9
+    },
+    {
+      "key": "padel_club",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "מועדון פאדל",
+        "en": "Padel club"
+      },
+      "synonyms": {
+        "he": [
+          "פאדל",
+          "מגרש פאדל",
+          "מגרשי פאדל",
+          "פדל"
+        ],
+        "en": [
+          "padel",
+          "padel court",
+          "paddle"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "player",
+      "customers": {
+        "he": "שחקנים",
+        "en": "Players"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "court_rental",
+          "names": {
+            "he": "השכרת מגרש",
+            "en": "Court rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 90,
+          "price_ils": 16000,
+          "resource_type": "padel_court",
+          "max_minutes": 120,
+          "step_minutes": 30
+        },
+        {
+          "key": "lesson",
+          "names": {
+            "he": "שיעור פאדל",
+            "en": "Padel lesson"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 22000,
+          "capacity": 4,
+          "resource_type": "padel_court"
+        },
+        {
+          "key": "americano",
+          "names": {
+            "he": "אמריקנו / טורניר",
+            "en": "Americano / tournament"
+          },
+          "model": "group_class",
+          "duration_minutes": 120,
+          "price_ils": 8000,
+          "capacity": 16,
+          "resource_type": "padel_court",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "padel_court",
+          "count": 4,
+          "attributes": {
+            "covered": true,
+            "lighting": true,
+            "surface": "artificial_grass"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "courts",
+          "text": {
+            "he": "כמה מגרשים פאדל?",
+            "en": "How many padel courts?"
+          },
+          "kind": "number",
+          "affects": "resource_count:padel_court",
+          "default": 4
+        },
+        {
+          "key": "covered",
+          "text": {
+            "he": "המגרשים מקורים?",
+            "en": "Are the courts covered?"
+          },
+          "kind": "boolean",
+          "affects": "resource_attr:padel_court.covered",
+          "default": true
+        },
+        {
+          "key": "coaches",
+          "text": {
+            "he": "יש מאמנים?",
+            "en": "Do you have coaches?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "tennis_club",
+        "gym"
+      ],
+      "replaces": [
+        "padel_tennis"
+      ],
+      "order": 10
+    },
+    {
+      "key": "football_pitches",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "מגרשי כדורגל",
+        "en": "Football pitches"
+      },
+      "synonyms": {
+        "he": [
+          "כדורגל",
+          "קט רגל",
+          "קטרגל",
+          "מגרש כדורגל",
+          "מגרש"
+        ],
+        "en": [
+          "football",
+          "soccer",
+          "five-a-side",
+          "pitch"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "player",
+      "customers": {
+        "he": "שחקנים",
+        "en": "Players"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "pitch_rental",
+          "names": {
+            "he": "השכרת מגרש",
+            "en": "Pitch rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 45000,
+          "resource_type": "football_5",
+          "max_minutes": 120,
+          "step_minutes": 60
+        },
+        {
+          "key": "fixed_team",
+          "names": {
+            "he": "קבוצה קבועה / ליגה",
+            "en": "Fixed weekly team / league"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 40000,
+          "resource_type": "football_5",
+          "max_minutes": 120,
+          "step_minutes": 60,
+          "series": true,
+          "optional": true
+        },
+        {
+          "key": "football_school",
+          "names": {
+            "he": "בית ספר לכדורגל",
+            "en": "Football school"
+          },
+          "model": "large_group",
+          "duration_minutes": 60,
+          "price_ils": 9000,
+          "capacity": 20,
+          "resource_type": "football_5",
+          "min_staff": 2,
+          "series": true,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "football_5",
+          "count": 2,
+          "attributes": {
+            "surface": "artificial_grass",
+            "lighting": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "five_a_side",
+          "text": {
+            "he": "כמה מגרשי קט־רגל?",
+            "en": "How many five-a-side pitches?"
+          },
+          "kind": "number",
+          "affects": "resource_count:football_5",
+          "default": 2
+        },
+        {
+          "key": "bigger",
+          "text": {
+            "he": "יש גם מגרש 7/8 או מלא?",
+            "en": "Any 7/8-a-side or full pitches?"
+          },
+          "kind": "number",
+          "affects": "resource_count:football_7",
+          "default": 0
+        },
+        {
+          "key": "lighting",
+          "text": {
+            "he": "יש תאורה?",
+            "en": "Is there lighting?"
+          },
+          "kind": "boolean",
+          "affects": "resource_attr:football_5.lighting",
+          "default": true
+        },
+        {
+          "key": "kids",
+          "text": {
+            "he": "יש בית ספר לכדורגל לילדים?",
+            "en": "Is there a kids' football school?"
+          },
+          "kind": "boolean",
+          "affects": "dependents",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "basketball_volleyball",
+        "multi_sport"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 11
+    },
+    {
+      "key": "basketball_volleyball",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "מגרשי כדורסל וכדורעף",
+        "en": "Basketball and volleyball courts"
+      },
+      "synonyms": {
+        "he": [
+          "כדורסל",
+          "כדורעף",
+          "כדורעף חופים",
+          "מגרש כדורסל"
+        ],
+        "en": [
+          "basketball",
+          "volleyball",
+          "beach volleyball",
+          "court"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "player",
+      "customers": {
+        "he": "שחקנים",
+        "en": "Players"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "basketball_rental",
+          "names": {
+            "he": "השכרת מגרש כדורסל",
+            "en": "Basketball court rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 20000,
+          "resource_type": "basketball_court",
+          "max_minutes": 120,
+          "step_minutes": 60
+        },
+        {
+          "key": "volleyball_rental",
+          "names": {
+            "he": "השכרת מגרש כדורעף",
+            "en": "Volleyball court rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 15000,
+          "resource_type": "volleyball_court",
+          "max_minutes": 120,
+          "step_minutes": 60,
+          "optional": true
+        },
+        {
+          "key": "beach_rental",
+          "names": {
+            "he": "השכרת מגרש כדורעף חופים",
+            "en": "Beach volleyball rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 10000,
+          "resource_type": "beach_volleyball_court",
+          "max_minutes": 120,
+          "step_minutes": 60,
+          "optional": true
+        },
+        {
+          "key": "group_training",
+          "names": {
+            "he": "אימון קבוצתי",
+            "en": "Group training"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 6000,
+          "capacity": 12,
+          "resource_type": "basketball_court",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "basketball_court",
+          "count": 1,
+          "attributes": {
+            "lighting": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "basketball",
+          "text": {
+            "he": "כמה מגרשי כדורסל?",
+            "en": "How many basketball courts?"
+          },
+          "kind": "number",
+          "affects": "resource_count:basketball_court",
+          "default": 1
+        },
+        {
+          "key": "volleyball",
+          "text": {
+            "he": "כמה מגרשי כדורעף?",
+            "en": "How many volleyball courts?"
+          },
+          "kind": "number",
+          "affects": "resource_count:volleyball_court",
+          "default": 0
+        },
+        {
+          "key": "beach",
+          "text": {
+            "he": "כמה מגרשי כדורעף חופים?",
+            "en": "How many beach volleyball courts?"
+          },
+          "kind": "number",
+          "affects": "resource_count:beach_volleyball_court",
+          "default": 0
+        }
+      ],
+      "common_combos": [
+        "football_pitches",
+        "multi_sport"
+      ],
+      "order": 12
+    },
+    {
+      "key": "walking_football",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "כדורגל הליכה",
+        "en": "Walking football"
+      },
+      "synonyms": {
+        "he": [
+          "כדורגל הליכה",
+          "ווטבול",
+          "כדורגל לגיל הזהב"
+        ],
+        "en": [
+          "walking football",
+          "over 50s football"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "participant",
+      "customers": {
+        "he": "משתתפים",
+        "en": "Participants"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "group_session",
+          "names": {
+            "he": "אימון קבוצתי",
+            "en": "Group session"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 4000,
+          "capacity": 14,
+          "resource_type": "walking_football_pitch"
+        },
+        {
+          "key": "pitch_rental",
+          "names": {
+            "he": "השכרת מגרש",
+            "en": "Pitch rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 35000,
+          "resource_type": "walking_football_pitch",
+          "max_minutes": 120,
+          "step_minutes": 60,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "walking_football_pitch",
+          "count": 1,
+          "attributes": {
+            "surface": "artificial_grass",
+            "lighting": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "pitches",
+          "text": {
+            "he": "כמה מגרשים?",
+            "en": "How many pitches?"
+          },
+          "kind": "number",
+          "affects": "resource_count:walking_football_pitch",
+          "default": 1
+        },
+        {
+          "key": "rental",
+          "text": {
+            "he": "משכירים גם בלי מדריך?",
+            "en": "Do you also rent the pitch without a coach?"
+          },
+          "kind": "boolean",
+          "affects": "activity:pitch_rental",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "football_pitches",
+        "gym"
+      ],
+      "order": 13
+    },
+    {
+      "key": "pickleball_squash",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "פיקלבול וסקווש",
+        "en": "Pickleball and squash"
+      },
+      "synonyms": {
+        "he": [
+          "פיקלבול",
+          "סקווש",
+          "פיקל בול"
+        ],
+        "en": [
+          "pickleball",
+          "squash"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "player",
+      "customers": {
+        "he": "שחקנים",
+        "en": "Players"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "pickleball_rental",
+          "names": {
+            "he": "השכרת מגרש פיקלבול",
+            "en": "Pickleball court rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 10000,
+          "resource_type": "pickleball_court",
+          "max_minutes": 120,
+          "step_minutes": 30
+        },
+        {
+          "key": "squash_rental",
+          "names": {
+            "he": "השכרת מגרש סקווש",
+            "en": "Squash court rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 45,
+          "price_ils": 7000,
+          "resource_type": "squash_court",
+          "max_minutes": 90,
+          "step_minutes": 15,
+          "optional": true
+        },
+        {
+          "key": "lesson",
+          "names": {
+            "he": "שיעור",
+            "en": "Lesson"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 20000,
+          "resource_type": "pickleball_court",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "pickleball_court",
+          "count": 4,
+          "attributes": {
+            "covered": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "pickleball",
+          "text": {
+            "he": "כמה מגרשי פיקלבול?",
+            "en": "How many pickleball courts?"
+          },
+          "kind": "number",
+          "affects": "resource_count:pickleball_court",
+          "default": 4
+        },
+        {
+          "key": "squash",
+          "text": {
+            "he": "כמה מגרשי סקווש?",
+            "en": "How many squash courts?"
+          },
+          "kind": "number",
+          "affects": "resource_count:squash_court",
+          "default": 0
+        }
+      ],
+      "common_combos": [
+        "tennis_club",
+        "padel_club"
+      ],
+      "order": 14
+    },
+    {
+      "key": "multi_sport",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "מתחם ספורט רב־ענפי",
+        "en": "Multi-sport complex"
+      },
+      "synonyms": {
+        "he": [
+          "ספורט",
+          "מתחם ספורט",
+          "מרכז ספורט",
+          "מגרשים"
+        ],
+        "en": [
+          "sports complex",
+          "sports center",
+          "multi sport",
+          "sports"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "player",
+      "customers": {
+        "he": "שחקנים",
+        "en": "Players"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "padel_rental",
+          "names": {
+            "he": "השכרת מגרש פאדל",
+            "en": "Padel court rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 90,
+          "price_ils": 16000,
+          "resource_type": "padel_court",
+          "max_minutes": 120,
+          "step_minutes": 30
+        },
+        {
+          "key": "football_rental",
+          "names": {
+            "he": "השכרת מגרש קט־רגל",
+            "en": "Five-a-side rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 45000,
+          "resource_type": "football_5",
+          "max_minutes": 120,
+          "step_minutes": 60
+        },
+        {
+          "key": "tennis_rental",
+          "names": {
+            "he": "השכרת מגרש טניס",
+            "en": "Tennis court rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 12000,
+          "resource_type": "tennis_court",
+          "max_minutes": 180,
+          "step_minutes": 30,
+          "optional": true
+        },
+        {
+          "key": "basketball_rental",
+          "names": {
+            "he": "השכרת מגרש כדורסל",
+            "en": "Basketball rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 20000,
+          "resource_type": "basketball_court",
+          "max_minutes": 120,
+          "step_minutes": 60,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "padel_court",
+          "count": 2,
+          "attributes": {
+            "covered": true,
+            "lighting": true,
+            "surface": "artificial_grass"
+          }
+        },
+        {
+          "type": "football_5",
+          "count": 1,
+          "attributes": {
+            "surface": "artificial_grass",
+            "lighting": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "sports",
+          "text": {
+            "he": "אילו ענפים יש אצלכם?",
+            "en": "Which sports do you have?"
+          },
+          "kind": "multi_select",
+          "affects": "activity:*",
+          "options": [
+            "tennis",
+            "padel",
+            "football",
+            "basketball",
+            "volleyball",
+            "pickleball",
+            "squash"
+          ],
+          "default": [
+            "padel",
+            "football"
+          ]
+        },
+        {
+          "key": "courts_each",
+          "text": {
+            "he": "כמה מגרשים מכל ענף?",
+            "en": "How many courts of each sport?"
+          },
+          "kind": "number",
+          "affects": "resource_count:*",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "tennis_club",
+        "padel_club",
+        "gym"
+      ],
+      "replaces": [
+        "sports"
+      ],
+      "order": 15
+    },
+    {
+      "key": "escape_room",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "חדר בריחה",
+        "en": "Escape room"
+      },
+      "synonyms": {
+        "he": [
+          "חדר בריחה",
+          "אסקייפ רום",
+          "אסקייפ"
+        ],
+        "en": [
+          "escape room",
+          "escape game"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "participant",
+      "customers": {
+        "he": "משתתפים",
+        "en": "Participants"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "game",
+          "names": {
+            "he": "משחק לקבוצה",
+            "en": "Group game"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 40000,
+          "capacity": 6,
+          "resource_type": "escape_room",
+          "max_minutes": 60,
+          "step_minutes": 15
+        }
+      ],
+      "resources": [
+        {
+          "type": "escape_room",
+          "count": 2
+        }
+      ],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרים?",
+            "en": "How many rooms?"
+          },
+          "kind": "number",
+          "affects": "resource_count:escape_room",
+          "default": 2
+        },
+        {
+          "key": "game_length",
+          "text": {
+            "he": "כמה זמן נמשך משחק?",
+            "en": "How long is a game?"
+          },
+          "kind": "select",
+          "affects": "activity:game",
+          "options": [
+            "45",
+            "60",
+            "75"
+          ],
+          "default": "60"
+        }
+      ],
+      "common_combos": [
+        "shooting_range",
+        "golf_simulator"
+      ],
+      "order": 16
+    },
+    {
+      "key": "shooting_range",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "מטווח",
+        "en": "Shooting range"
+      },
+      "synonyms": {
+        "he": [
+          "מטווח",
+          "ירי",
+          "קשתות"
+        ],
+        "en": [
+          "shooting range",
+          "archery",
+          "range"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "customer",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Customers"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "lane",
+          "names": {
+            "he": "עמדת ירי",
+            "en": "Shooting lane"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 30,
+          "price_ils": 9000,
+          "resource_type": "shooting_lane",
+          "max_minutes": 120,
+          "step_minutes": 30
+        }
+      ],
+      "resources": [
+        {
+          "type": "shooting_lane",
+          "count": 6
+        }
+      ],
+      "questions": [
+        {
+          "key": "lanes",
+          "text": {
+            "he": "כמה עמדות?",
+            "en": "How many lanes?"
+          },
+          "kind": "number",
+          "affects": "resource_count:shooting_lane",
+          "default": 6
+        },
+        {
+          "key": "session",
+          "text": {
+            "he": "כמה זמן מזמינים בדרך כלל?",
+            "en": "How long is a usual session?"
+          },
+          "kind": "select",
+          "affects": "activity:lane",
+          "options": [
+            "30",
+            "60"
+          ],
+          "default": "30"
+        }
+      ],
+      "common_combos": [
+        "escape_room",
+        "golf_simulator"
+      ],
+      "order": 17
+    },
+    {
+      "key": "golf_simulator",
+      "domain": "sports_venues",
+      "status": "beta",
+      "names": {
+        "he": "סימולטור גולף",
+        "en": "Golf simulator"
+      },
+      "synonyms": {
+        "he": [
+          "גולף",
+          "סימולטור",
+          "סימולטור גולף"
+        ],
+        "en": [
+          "golf",
+          "golf simulator",
+          "simulator"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "player",
+      "customers": {
+        "he": "שחקנים",
+        "en": "Players"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "bay",
+          "names": {
+            "he": "השכרת עמדה",
+            "en": "Bay rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 15000,
+          "resource_type": "golf_simulator_bay",
+          "max_minutes": 180,
+          "step_minutes": 30
+        },
+        {
+          "key": "lesson",
+          "names": {
+            "he": "שיעור גולף",
+            "en": "Golf lesson"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 25000,
+          "resource_type": "golf_simulator_bay",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "golf_simulator_bay",
+          "count": 2
+        }
+      ],
+      "questions": [
+        {
+          "key": "bays",
+          "text": {
+            "he": "כמה עמדות?",
+            "en": "How many bays?"
+          },
+          "kind": "number",
+          "affects": "resource_count:golf_simulator_bay",
+          "default": 2
+        },
+        {
+          "key": "lessons",
+          "text": {
+            "he": "יש מדריך גולף?",
+            "en": "Is there a golf coach?"
+          },
+          "kind": "boolean",
+          "affects": "activity:lesson",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "shooting_range",
+        "escape_room"
+      ],
+      "order": 18
+    },
+    {
+      "key": "meeting_rooms",
+      "domain": "rental_spaces",
+      "status": "beta",
+      "names": {
+        "he": "חדרי ישיבות",
+        "en": "Meeting rooms"
+      },
+      "synonyms": {
+        "he": [
+          "חדר ישיבות",
+          "חדרי ישיבות",
+          "חדר ישיבה",
+          "השכרת חדרים"
+        ],
+        "en": [
+          "meeting room",
+          "boardroom",
+          "conference room"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "room_rental",
+          "names": {
+            "he": "השכרת חדר ישיבות",
+            "en": "Meeting room rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 15000,
+          "resource_type": "meeting_room",
+          "max_minutes": 480,
+          "step_minutes": 30
+        }
+      ],
+      "resources": [
+        {
+          "type": "meeting_room",
+          "count": 2
+        }
+      ],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרים?",
+            "en": "How many rooms?"
+          },
+          "kind": "number",
+          "affects": "resource_count:meeting_room",
+          "default": 2
+        },
+        {
+          "key": "equipment",
+          "text": {
+            "he": "יש מסך וציוד היקפי?",
+            "en": "Is there a screen and equipment?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "coworking",
+        "photo_studio"
+      ],
+      "order": 19
+    },
+    {
+      "key": "rehearsal_studios",
+      "domain": "rental_spaces",
+      "status": "beta",
+      "names": {
+        "he": "חדרי חזרות",
+        "en": "Rehearsal rooms"
+      },
+      "synonyms": {
+        "he": [
+          "חדר חזרות",
+          "חדרי חזרות",
+          "אולפן",
+          "להקה"
+        ],
+        "en": [
+          "rehearsal room",
+          "band room",
+          "music studio"
+        ]
+      },
+      "terms": "sports",
+      "customer_term": "band",
+      "customers": {
+        "he": "להקות",
+        "en": "Bands"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "room_rental",
+          "names": {
+            "he": "השכרת חדר חזרות",
+            "en": "Rehearsal room rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 9000,
+          "resource_type": "rehearsal_room",
+          "max_minutes": 240,
+          "step_minutes": 60
+        }
+      ],
+      "resources": [
+        {
+          "type": "rehearsal_room",
+          "count": 3
+        }
+      ],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרים?",
+            "en": "How many rooms?"
+          },
+          "kind": "number",
+          "affects": "resource_count:rehearsal_room",
+          "default": 3
+        },
+        {
+          "key": "backline",
+          "text": {
+            "he": "הציוד כלול?",
+            "en": "Is the equipment included?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "music",
+        "photo_studio"
+      ],
+      "order": 20
+    },
+    {
+      "key": "photo_studio",
+      "domain": "rental_spaces",
+      "status": "beta",
+      "names": {
+        "he": "סטודיו צילום",
+        "en": "Photo studio"
+      },
+      "synonyms": {
+        "he": [
+          "סטודיו צילום",
+          "צילום",
+          "השכרת סטודיו"
+        ],
+        "en": [
+          "photo studio",
+          "studio rental"
+        ]
+      },
+      "terms": "events",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "studio_rental",
+          "names": {
+            "he": "השכרת סטודיו",
+            "en": "Studio rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 120,
+          "price_ils": 20000,
+          "resource_type": "photo_studio_space",
+          "max_minutes": 480,
+          "step_minutes": 60
+        }
+      ],
+      "resources": [
+        {
+          "type": "photo_studio_space",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "spaces",
+          "text": {
+            "he": "כמה סטודיואים?",
+            "en": "How many studios?"
+          },
+          "kind": "number",
+          "affects": "resource_count:photo_studio_space",
+          "default": 1
+        },
+        {
+          "key": "props",
+          "text": {
+            "he": "יש ציוד ותאורה להשכרה?",
+            "en": "Equipment and lighting for rent?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "photographers",
+        "meeting_rooms"
+      ],
+      "order": 21
+    },
+    {
+      "key": "coworking",
+      "domain": "rental_spaces",
+      "status": "beta",
+      "names": {
+        "he": "חלל עבודה משותף",
+        "en": "Coworking space"
+      },
+      "synonyms": {
+        "he": [
+          "חלל עבודה",
+          "קו וורקינג",
+          "משרד להשכרה",
+          "עמדת עבודה"
+        ],
+        "en": [
+          "coworking",
+          "shared office",
+          "hot desk"
+        ]
+      },
+      "terms": "professional",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "day_pass",
+          "names": {
+            "he": "כניסה יומית",
+            "en": "Day pass"
+          },
+          "model": "open_entry",
+          "duration_minutes": 480,
+          "price_ils": 8000
+        },
+        {
+          "key": "desk_rental",
+          "names": {
+            "he": "השכרת עמדה",
+            "en": "Desk rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 480,
+          "price_ils": 7000,
+          "resource_type": "workstation",
+          "max_minutes": 720,
+          "step_minutes": 240,
+          "optional": true
+        },
+        {
+          "key": "meeting_room",
+          "names": {
+            "he": "חדר ישיבות לחברים",
+            "en": "Meeting room for members"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 60,
+          "price_ils": 10000,
+          "resource_type": "meeting_room",
+          "max_minutes": 240,
+          "step_minutes": 30,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "workstation",
+          "count": 10,
+          "attributes": {
+            "kind": "hot_desk"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "desks",
+          "text": {
+            "he": "כמה עמדות?",
+            "en": "How many desks?"
+          },
+          "kind": "number",
+          "affects": "resource_count:workstation",
+          "default": 10
+        },
+        {
+          "key": "rooms",
+          "text": {
+            "he": "יש חדרי ישיבות?",
+            "en": "Are there meeting rooms?"
+          },
+          "kind": "boolean",
+          "affects": "activity:meeting_room",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "meeting_rooms",
+        "consultants"
+      ],
+      "order": 22
+    },
+    {
+      "key": "hair_salon",
+      "domain": "beauty",
+      "status": "live",
+      "names": {
+        "he": "מספרה",
+        "en": "Hair salon"
+      },
+      "synonyms": {
+        "he": [
+          "מספרה",
+          "עיצוב שיער",
+          "צבע",
+          "תספורת נשים",
+          "קוסמטיקאית שיער"
+        ],
+        "en": [
+          "hair salon",
+          "hairdresser",
+          "hair stylist"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "cut",
+          "names": {
+            "he": "תספורת ועיצוב",
+            "en": "Cut and style"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 18000
+        },
+        {
+          "key": "color",
+          "names": {
+            "he": "צבע",
+            "en": "Color"
+          },
+          "model": "appointment",
+          "duration_minutes": 90,
+          "price_ils": 25000
+        },
+        {
+          "key": "treatment",
+          "names": {
+            "he": "טיפול שיער",
+            "en": "Hair treatment"
+          },
+          "model": "appointment",
+          "duration_minutes": 45,
+          "price_ils": 12000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "chairs",
+          "text": {
+            "he": "כמה עמדות עבודה?",
+            "en": "How many work stations?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 3
+        },
+        {
+          "key": "walk_in",
+          "text": {
+            "he": "מקבלים גם בלי תור?",
+            "en": "Do you take walk-ins?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "nails",
+        "cosmetics"
+      ],
+      "order": 23
+    },
+    {
+      "key": "barbershop",
+      "domain": "beauty",
+      "status": "live",
+      "names": {
+        "he": "ברברשופ",
+        "en": "Barbershop"
+      },
+      "synonyms": {
+        "he": [
+          "ברבר",
+          "ברברשופ",
+          "מספרת גברים",
+          "תספורת גברים",
+          "זקן"
+        ],
+        "en": [
+          "barber",
+          "barbershop",
+          "men's haircut"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "haircut",
+          "names": {
+            "he": "תספורת",
+            "en": "Haircut"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 8000
+        },
+        {
+          "key": "beard",
+          "names": {
+            "he": "עיצוב זקן",
+            "en": "Beard trim"
+          },
+          "model": "appointment",
+          "duration_minutes": 20,
+          "price_ils": 5000
+        },
+        {
+          "key": "combo",
+          "names": {
+            "he": "תספורת וזקן",
+            "en": "Haircut and beard"
+          },
+          "model": "appointment",
+          "duration_minutes": 45,
+          "price_ils": 11000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "chairs",
+          "text": {
+            "he": "כמה עמדות עבודה?",
+            "en": "How many work stations?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 3
+        },
+        {
+          "key": "walk_in",
+          "text": {
+            "he": "מקבלים גם בלי תור?",
+            "en": "Do you take walk-ins?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "hair_salon",
+        "tattoo"
+      ],
+      "order": 24
+    },
+    {
+      "key": "cosmetics",
+      "domain": "beauty",
+      "status": "live",
+      "names": {
+        "he": "קוסמטיקה",
+        "en": "Cosmetics clinic"
+      },
+      "synonyms": {
+        "he": [
+          "קוסמטיקה",
+          "קוסמטיקאית",
+          "טיפולי פנים"
+        ],
+        "en": [
+          "cosmetics",
+          "facial",
+          "beautician"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "facial",
+          "names": {
+            "he": "טיפול פנים",
+            "en": "Facial"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 30000
+        },
+        {
+          "key": "deep_cleaning",
+          "names": {
+            "he": "ניקוי עמוק",
+            "en": "Deep cleaning"
+          },
+          "model": "appointment",
+          "duration_minutes": 75,
+          "price_ils": 35000
+        },
+        {
+          "key": "hair_removal",
+          "names": {
+            "he": "הסרת שיער",
+            "en": "Hair removal"
+          },
+          "model": "appointment",
+          "duration_minutes": 20,
+          "price_ils": 6000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרי טיפול?",
+            "en": "How many treatment rooms?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        },
+        {
+          "key": "series",
+          "text": {
+            "he": "מוכרים סדרות טיפולים?",
+            "en": "Do you sell treatment series?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "brows_lashes",
+        "nails"
+      ],
+      "order": 25
+    },
+    {
+      "key": "nails",
+      "domain": "beauty",
+      "status": "live",
+      "names": {
+        "he": "ציפורניים",
+        "en": "Nail salon"
+      },
+      "synonyms": {
+        "he": [
+          "ציפורניים",
+          "מניקור",
+          "פדיקור",
+          "לק ג'ל"
+        ],
+        "en": [
+          "nails",
+          "manicure",
+          "pedicure",
+          "gel polish"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "gel",
+          "names": {
+            "he": "לק ג'ל",
+            "en": "Gel polish"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 15000
+        },
+        {
+          "key": "build",
+          "names": {
+            "he": "בניית ציפורניים",
+            "en": "Nail extensions"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 17000
+        },
+        {
+          "key": "pedicure",
+          "names": {
+            "he": "פדיקור",
+            "en": "Pedicure"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 18000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "chairs",
+          "text": {
+            "he": "כמה עמדות עבודה?",
+            "en": "How many work stations?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        },
+        {
+          "key": "walk_in",
+          "text": {
+            "he": "מקבלים גם בלי תור?",
+            "en": "Do you take walk-ins?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "brows_lashes",
+        "hair_salon"
+      ],
+      "order": 26
+    },
+    {
+      "key": "laser",
+      "domain": "beauty",
+      "status": "live",
+      "names": {
+        "he": "לייזר והסרת שיער",
+        "en": "Laser and hair removal"
+      },
+      "synonyms": {
+        "he": [
+          "לייזר",
+          "הסרת שיער בלייזר",
+          "אפילציה"
+        ],
+        "en": [
+          "laser",
+          "laser hair removal"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "session",
+          "names": {
+            "he": "טיפול לייזר",
+            "en": "Laser session"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 30,
+          "price_ils": 25000,
+          "resource_type": "treatment_room"
+        },
+        {
+          "key": "consult",
+          "names": {
+            "he": "ייעוץ",
+            "en": "Consultation"
+          },
+          "model": "appointment",
+          "duration_minutes": 20,
+          "price_ils": 10000
+        }
+      ],
+      "resources": [
+        {
+          "type": "treatment_room",
+          "count": 2
+        }
+      ],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרים או מכשירים?",
+            "en": "How many rooms or devices?"
+          },
+          "kind": "number",
+          "affects": "resource_count:treatment_room",
+          "default": 2
+        },
+        {
+          "key": "series",
+          "text": {
+            "he": "מוכרים חבילות טיפולים?",
+            "en": "Do you sell treatment packages?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "cosmetics",
+        "spa"
+      ],
+      "order": 27
+    },
+    {
+      "key": "spa",
+      "domain": "beauty",
+      "status": "live",
+      "names": {
+        "he": "ספא",
+        "en": "Spa"
+      },
+      "synonyms": {
+        "he": [
+          "ספא",
+          "עיסוי",
+          "מסאג'",
+          "פינוק"
+        ],
+        "en": [
+          "spa",
+          "massage",
+          "wellness"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "massage",
+          "names": {
+            "he": "עיסוי",
+            "en": "Massage"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 35000,
+          "resource_type": "treatment_room"
+        },
+        {
+          "key": "facial",
+          "names": {
+            "he": "טיפול פנים",
+            "en": "Facial"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 40000,
+          "resource_type": "treatment_room",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "treatment_room",
+          "count": 3
+        }
+      ],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרי טיפול?",
+            "en": "How many treatment rooms?"
+          },
+          "kind": "number",
+          "affects": "resource_count:treatment_room",
+          "default": 3
+        },
+        {
+          "key": "couples",
+          "text": {
+            "he": "יש חדר זוגי?",
+            "en": "Is there a couples' room?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "cosmetics",
+        "yoga"
+      ],
+      "order": 28
+    },
+    {
+      "key": "brows_lashes",
+      "domain": "beauty",
+      "status": "beta",
+      "names": {
+        "he": "גבות וריסים",
+        "en": "Brows and lashes"
+      },
+      "synonyms": {
+        "he": [
+          "גבות",
+          "ריסים",
+          "הרמת ריסים",
+          "מיקרובליידינג"
+        ],
+        "en": [
+          "brows",
+          "lashes",
+          "lash lift",
+          "microblading"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "brows",
+          "names": {
+            "he": "עיצוב גבות",
+            "en": "Brow shaping"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 9000
+        },
+        {
+          "key": "lash_lift",
+          "names": {
+            "he": "הרמת ריסים",
+            "en": "Lash lift"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 22000
+        },
+        {
+          "key": "extensions",
+          "names": {
+            "he": "הדבקת ריסים",
+            "en": "Lash extensions"
+          },
+          "model": "appointment",
+          "duration_minutes": 120,
+          "price_ils": 35000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "chairs",
+          "text": {
+            "he": "כמה עמדות עבודה?",
+            "en": "How many work stations?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        },
+        {
+          "key": "walk_in",
+          "text": {
+            "he": "מקבלים בלי תור?",
+            "en": "Do you take walk-ins?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "nails",
+        "cosmetics"
+      ],
+      "order": 29
+    },
+    {
+      "key": "makeup",
+      "domain": "beauty",
+      "status": "beta",
+      "names": {
+        "he": "איפור",
+        "en": "Makeup artist"
+      },
+      "synonyms": {
+        "he": [
+          "איפור",
+          "מאפרת",
+          "איפור כלות"
+        ],
+        "en": [
+          "makeup",
+          "makeup artist",
+          "bridal makeup"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "makeup",
+          "names": {
+            "he": "איפור",
+            "en": "Makeup"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 30000
+        },
+        {
+          "key": "bridal",
+          "names": {
+            "he": "איפור כלה",
+            "en": "Bridal makeup"
+          },
+          "model": "appointment",
+          "duration_minutes": 120,
+          "price_ils": 120000,
+          "optional": true
+        },
+        {
+          "key": "on_location",
+          "names": {
+            "he": "איפור אצל הלקוחה",
+            "en": "Makeup at your place"
+          },
+          "model": "on_site",
+          "duration_minutes": 90,
+          "price_ils": 45000,
+          "travel_minutes": 30,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "where",
+          "text": {
+            "he": "איפה עובדים?",
+            "en": "Where do you work?"
+          },
+          "kind": "select",
+          "affects": "activity:on_location",
+          "options": [
+            "studio",
+            "client_place",
+            "mixed"
+          ],
+          "default": "studio"
+        },
+        {
+          "key": "bridal",
+          "text": {
+            "he": "מציעה איפור כלות?",
+            "en": "Do you offer bridal makeup?"
+          },
+          "kind": "boolean",
+          "affects": "activity:bridal",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "hair_salon",
+        "brows_lashes"
+      ],
+      "order": 30
+    },
+    {
+      "key": "tattoo",
+      "domain": "beauty",
+      "status": "beta",
+      "names": {
+        "he": "סטודיו קעקועים",
+        "en": "Tattoo studio"
+      },
+      "synonyms": {
+        "he": [
+          "קעקוע",
+          "קעקועים",
+          "פירסינג",
+          "טאטו"
+        ],
+        "en": [
+          "tattoo",
+          "piercing",
+          "tattoo studio"
+        ]
+      },
+      "terms": "beauty",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "consult",
+          "names": {
+            "he": "ייעוץ ותכנון",
+            "en": "Consultation"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 10000
+        },
+        {
+          "key": "session",
+          "names": {
+            "he": "מפגש קעקוע",
+            "en": "Tattoo session"
+          },
+          "model": "appointment",
+          "duration_minutes": 180,
+          "price_ils": 80000,
+          "deposit": true
+        },
+        {
+          "key": "piercing",
+          "names": {
+            "he": "פירסינג",
+            "en": "Piercing"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 15000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "chairs",
+          "text": {
+            "he": "כמה עמדות עבודה?",
+            "en": "How many work stations?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        },
+        {
+          "key": "deposit",
+          "text": {
+            "he": "לוקחים מקדמה?",
+            "en": "Do you take a deposit?"
+          },
+          "kind": "boolean",
+          "affects": "activity:session",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "barbershop",
+        "makeup"
+      ],
+      "order": 31
+    },
+    {
+      "key": "physiotherapy",
+      "domain": "health",
+      "status": "live",
+      "names": {
+        "he": "פיזיותרפיה",
+        "en": "Physiotherapy"
+      },
+      "synonyms": {
+        "he": [
+          "פיזיותרפיה",
+          "פיזיו",
+          "פיזיותרפיסט",
+          "שיקום"
+        ],
+        "en": [
+          "physiotherapy",
+          "physio",
+          "physical therapy",
+          "rehab"
+        ]
+      },
+      "terms": "clinic",
+      "customer_term": "patient",
+      "customers": {
+        "he": "מטופלים",
+        "en": "Patients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "treatment",
+          "names": {
+            "he": "טיפול",
+            "en": "Treatment"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 45,
+          "price_ils": 30000,
+          "resource_type": "treatment_room"
+        },
+        {
+          "key": "assessment",
+          "names": {
+            "he": "אבחון",
+            "en": "Assessment"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 35000
+        },
+        {
+          "key": "rehab_group",
+          "names": {
+            "he": "קבוצת שיקום",
+            "en": "Rehab group"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 8000,
+          "capacity": 8,
+          "series": true,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "treatment_room",
+          "count": 2
+        }
+      ],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרי טיפול?",
+            "en": "How many treatment rooms?"
+          },
+          "kind": "number",
+          "affects": "resource_count:treatment_room",
+          "default": 2
+        },
+        {
+          "key": "groups",
+          "text": {
+            "he": "מקיימים קבוצות שיקום?",
+            "en": "Do you run rehab groups?"
+          },
+          "kind": "boolean",
+          "affects": "activity:rehab_group",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "gym",
+        "pilates",
+        "nutrition"
+      ],
+      "order": 32
+    },
+    {
+      "key": "dental",
+      "domain": "health",
+      "status": "live",
+      "names": {
+        "he": "מרפאת שיניים",
+        "en": "Dental clinic"
+      },
+      "synonyms": {
+        "he": [
+          "שיניים",
+          "רופא שיניים",
+          "שיננית",
+          "מרפאת שיניים"
+        ],
+        "en": [
+          "dentist",
+          "dental",
+          "hygienist"
+        ]
+      },
+      "terms": "clinic",
+      "customer_term": "patient",
+      "customers": {
+        "he": "מטופלים",
+        "en": "Patients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "checkup",
+          "names": {
+            "he": "בדיקה",
+            "en": "Check-up"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 30,
+          "price_ils": 20000,
+          "resource_type": "treatment_chair"
+        },
+        {
+          "key": "hygiene",
+          "names": {
+            "he": "שיננית",
+            "en": "Hygienist visit"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 45,
+          "price_ils": 30000,
+          "resource_type": "treatment_chair"
+        },
+        {
+          "key": "treatment",
+          "names": {
+            "he": "טיפול",
+            "en": "Treatment"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 50000,
+          "resource_type": "treatment_chair",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "treatment_chair",
+          "count": 2
+        }
+      ],
+      "questions": [
+        {
+          "key": "chairs",
+          "text": {
+            "he": "כמה כיסאות טיפולים?",
+            "en": "How many treatment chairs?"
+          },
+          "kind": "number",
+          "affects": "resource_count:treatment_chair",
+          "default": 2
+        },
+        {
+          "key": "hygienist",
+          "text": {
+            "he": "יש שיננית?",
+            "en": "Is there a hygienist?"
+          },
+          "kind": "boolean",
+          "affects": "activity:hygiene",
+          "default": true
+        },
+        {
+          "key": "kids",
+          "text": {
+            "he": "מטפלים גם בילדים?",
+            "en": "Do you treat children?"
+          },
+          "kind": "boolean",
+          "affects": "dependents",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "aesthetics",
+        "nutrition"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 33
+    },
+    {
+      "key": "nutrition",
+      "domain": "health",
+      "status": "live",
+      "names": {
+        "he": "תזונה",
+        "en": "Nutrition"
+      },
+      "synonyms": {
+        "he": [
+          "תזונה",
+          "דיאטנית",
+          "תזונאית",
+          "ייעוץ תזונתי"
+        ],
+        "en": [
+          "nutrition",
+          "dietitian",
+          "nutritionist"
+        ]
+      },
+      "terms": "clinic",
+      "customer_term": "patient",
+      "customers": {
+        "he": "מטופלים",
+        "en": "Patients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "first_visit",
+          "names": {
+            "he": "פגישה ראשונה",
+            "en": "First visit"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 40000
+        },
+        {
+          "key": "follow_up",
+          "names": {
+            "he": "מעקב",
+            "en": "Follow-up"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 20000
+        },
+        {
+          "key": "online",
+          "names": {
+            "he": "פגישה אונליין",
+            "en": "Online session"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 18000,
+          "online": true,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "online",
+          "text": {
+            "he": "מקבלים גם אונליין?",
+            "en": "Do you also see patients online?"
+          },
+          "kind": "boolean",
+          "affects": "activity:online",
+          "default": true
+        },
+        {
+          "key": "staff",
+          "text": {
+            "he": "כמה תזונאיות?",
+            "en": "How many dietitians?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 1
+        }
+      ],
+      "common_combos": [
+        "gym",
+        "personal_trainer"
+      ],
+      "order": 34
+    },
+    {
+      "key": "aesthetics",
+      "domain": "health",
+      "status": "live",
+      "names": {
+        "he": "אסתטיקה רפואית",
+        "en": "Medical aesthetics"
+      },
+      "synonyms": {
+        "he": [
+          "אסתטיקה רפואית",
+          "בוטוקס",
+          "מילוי",
+          "מרפאה אסתטית"
+        ],
+        "en": [
+          "medical aesthetics",
+          "botox",
+          "fillers"
+        ]
+      },
+      "terms": "clinic",
+      "customer_term": "patient",
+      "customers": {
+        "he": "מטופלים",
+        "en": "Patients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "consult",
+          "names": {
+            "he": "ייעוץ",
+            "en": "Consultation"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 20000
+        },
+        {
+          "key": "treatment",
+          "names": {
+            "he": "טיפול",
+            "en": "Treatment"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 30,
+          "price_ils": 120000,
+          "resource_type": "treatment_room"
+        }
+      ],
+      "resources": [
+        {
+          "type": "treatment_room",
+          "count": 2
+        }
+      ],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרי טיפול?",
+            "en": "How many treatment rooms?"
+          },
+          "kind": "number",
+          "affects": "resource_count:treatment_room",
+          "default": 2
+        },
+        {
+          "key": "series",
+          "text": {
+            "he": "מוכרים סדרות?",
+            "en": "Do you sell treatment series?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "cosmetics",
+        "laser"
+      ],
+      "order": 35
+    },
+    {
+      "key": "therapy",
+      "domain": "health",
+      "status": "live",
+      "names": {
+        "he": "טיפול רגשי",
+        "en": "Psychotherapy"
+      },
+      "synonyms": {
+        "he": [
+          "טיפול רגשי",
+          "פסיכולוג",
+          "פסיכותרפיה",
+          "טיפול זוגי",
+          "מטפלת"
+        ],
+        "en": [
+          "therapy",
+          "psychotherapy",
+          "counselling",
+          "psychologist"
+        ]
+      },
+      "terms": "clinic",
+      "customer_term": "patient",
+      "customers": {
+        "he": "מטופלים",
+        "en": "Patients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "session",
+          "names": {
+            "he": "טיפול אישי",
+            "en": "Individual session"
+          },
+          "model": "appointment",
+          "duration_minutes": 50,
+          "price_ils": 40000,
+          "online": true
+        },
+        {
+          "key": "couples",
+          "names": {
+            "he": "טיפול זוגי",
+            "en": "Couples session"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 50000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "online",
+          "text": {
+            "he": "מקבלים גם אונליין?",
+            "en": "Do you see patients online too?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        },
+        {
+          "key": "couples",
+          "text": {
+            "he": "מטפלים בזוגות?",
+            "en": "Do you see couples?"
+          },
+          "kind": "boolean",
+          "affects": "activity:couples",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "life_coaching",
+        "yoga"
+      ],
+      "order": 36
+    },
+    {
+      "key": "life_coaching",
+      "domain": "health",
+      "status": "beta",
+      "names": {
+        "he": "אימון אישי וקואצ'ינג",
+        "en": "Life coaching"
+      },
+      "synonyms": {
+        "he": [
+          "קואצ'ינג",
+          "קואוצ'ינג",
+          "אימון אישי לחיים",
+          "מאמנת"
+        ],
+        "en": [
+          "coaching",
+          "life coach",
+          "career coaching"
+        ]
+      },
+      "terms": "professional",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "session",
+          "names": {
+            "he": "מפגש אימון",
+            "en": "Coaching session"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 35000,
+          "online": true
+        },
+        {
+          "key": "package",
+          "names": {
+            "he": "חבילת מפגשים",
+            "en": "Session package"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 30000,
+          "series": true,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "online",
+          "text": {
+            "he": "מקבלים גם אונליין?",
+            "en": "Do you coach online too?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        },
+        {
+          "key": "package",
+          "text": {
+            "he": "מוכרים חבילות?",
+            "en": "Do you sell packages?"
+          },
+          "kind": "boolean",
+          "affects": "activity:package",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "therapy",
+        "consultants"
+      ],
+      "order": 37
+    },
+    {
+      "key": "speech_therapy",
+      "domain": "health",
+      "status": "beta",
+      "names": {
+        "he": "קלינאות תקשורת",
+        "en": "Speech therapy"
+      },
+      "synonyms": {
+        "he": [
+          "קלינאית תקשורת",
+          "קלינאות",
+          "הגייה",
+          "דיבור"
+        ],
+        "en": [
+          "speech therapy",
+          "speech therapist",
+          "slp"
+        ]
+      },
+      "terms": "clinic",
+      "customer_term": "patient",
+      "customers": {
+        "he": "מטופלים",
+        "en": "Patients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "session",
+          "names": {
+            "he": "טיפול",
+            "en": "Session"
+          },
+          "model": "appointment",
+          "duration_minutes": 45,
+          "price_ils": 28000,
+          "online": true
+        },
+        {
+          "key": "assessment",
+          "names": {
+            "he": "אבחון",
+            "en": "Assessment"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 45000
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "kids",
+          "text": {
+            "he": "מטפלים בילדים?",
+            "en": "Do you treat children?"
+          },
+          "kind": "boolean",
+          "affects": "dependents",
+          "default": true
+        },
+        {
+          "key": "online",
+          "text": {
+            "he": "אונליין גם?",
+            "en": "Online as well?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "occupational_therapy",
+        "therapy"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 38
+    },
+    {
+      "key": "occupational_therapy",
+      "domain": "health",
+      "status": "beta",
+      "names": {
+        "he": "ריפוי בעיסוק",
+        "en": "Occupational therapy"
+      },
+      "synonyms": {
+        "he": [
+          "ריפוי בעיסוק",
+          "מרפאה בעיסוק",
+          "טיפול התפתחותי"
+        ],
+        "en": [
+          "occupational therapy",
+          "ot",
+          "developmental therapy"
+        ]
+      },
+      "terms": "clinic",
+      "customer_term": "patient",
+      "customers": {
+        "he": "מטופלים",
+        "en": "Patients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "session",
+          "names": {
+            "he": "טיפול",
+            "en": "Session"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 45,
+          "price_ils": 28000,
+          "resource_type": "treatment_room"
+        },
+        {
+          "key": "assessment",
+          "names": {
+            "he": "אבחון",
+            "en": "Assessment"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 45000
+        }
+      ],
+      "resources": [
+        {
+          "type": "treatment_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "kids",
+          "text": {
+            "he": "מטפלים בילדים?",
+            "en": "Do you treat children?"
+          },
+          "kind": "boolean",
+          "affects": "dependents",
+          "default": true
+        },
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרי טיפול?",
+            "en": "How many treatment rooms?"
+          },
+          "kind": "number",
+          "affects": "resource_count:treatment_room",
+          "default": 1
+        }
+      ],
+      "common_combos": [
+        "speech_therapy",
+        "physiotherapy"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 39
+    },
+    {
+      "key": "alternative_medicine",
+      "domain": "health",
+      "status": "beta",
+      "names": {
+        "he": "רפואה משלימה",
+        "en": "Alternative medicine"
+      },
+      "synonyms": {
+        "he": [
+          "רפואה משלימה",
+          "דיקור",
+          "רפלקסולוגיה",
+          "הומאופתיה",
+          "נטורופתיה"
+        ],
+        "en": [
+          "alternative medicine",
+          "acupuncture",
+          "reflexology",
+          "naturopathy"
+        ]
+      },
+      "terms": "clinic",
+      "customer_term": "patient",
+      "customers": {
+        "he": "מטופלים",
+        "en": "Patients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "treatment",
+          "names": {
+            "he": "טיפול",
+            "en": "Treatment"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 30000,
+          "resource_type": "treatment_room"
+        },
+        {
+          "key": "first_visit",
+          "names": {
+            "he": "פגישה ראשונה",
+            "en": "First visit"
+          },
+          "model": "appointment",
+          "duration_minutes": 75,
+          "price_ils": 38000
+        }
+      ],
+      "resources": [
+        {
+          "type": "treatment_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה חדרי טיפול?",
+            "en": "How many treatment rooms?"
+          },
+          "kind": "number",
+          "affects": "resource_count:treatment_room",
+          "default": 1
+        },
+        {
+          "key": "series",
+          "text": {
+            "he": "מוכרים סדרות טיפולים?",
+            "en": "Do you sell treatment series?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "spa",
+        "nutrition"
+      ],
+      "order": 40
+    },
+    {
+      "key": "dance",
+      "domain": "learning",
+      "status": "live",
+      "names": {
+        "he": "בית ספר לריקוד",
+        "en": "Dance school"
+      },
+      "synonyms": {
+        "he": [
+          "ריקוד",
+          "בלט",
+          "סלסה",
+          "חוג ריקוד",
+          "סטודיו לריקוד"
+        ],
+        "en": [
+          "dance",
+          "ballet",
+          "salsa",
+          "dance studio"
+        ]
+      },
+      "terms": "classes",
+      "customer_term": "student",
+      "customers": {
+        "he": "תלמידים",
+        "en": "Students"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "class",
+          "names": {
+            "he": "שיעור",
+            "en": "Class"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 6000,
+          "capacity": 18
+        },
+        {
+          "key": "private",
+          "names": {
+            "he": "שיעור פרטי",
+            "en": "Private lesson"
+          },
+          "model": "appointment",
+          "duration_minutes": 45,
+          "price_ils": 20000,
+          "optional": true
+        },
+        {
+          "key": "season",
+          "names": {
+            "he": "קורס עונתי",
+            "en": "Seasonal course"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 50000,
+          "capacity": 18,
+          "series": true,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "studio_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "audience",
+          "text": {
+            "he": "ילדים, מבוגרים או שניהם?",
+            "en": "Children, adults or both?"
+          },
+          "kind": "select",
+          "affects": "dependents",
+          "options": [
+            "children",
+            "adults",
+            "both"
+          ],
+          "default": "both"
+        },
+        {
+          "key": "rooms",
+          "text": {
+            "he": "כמה אולמות?",
+            "en": "How many studios?"
+          },
+          "kind": "number",
+          "affects": "resource_count:studio_room",
+          "default": 1
+        }
+      ],
+      "common_combos": [
+        "kids_activities",
+        "gym"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 41
+    },
+    {
+      "key": "music",
+      "domain": "learning",
+      "status": "live",
+      "names": {
+        "he": "בית ספר למוזיקה",
+        "en": "Music school"
+      },
+      "synonyms": {
+        "he": [
+          "מוזיקה",
+          "שיעורי נגינה",
+          "פסנתר",
+          "גיטרה",
+          "תופים"
+        ],
+        "en": [
+          "music",
+          "music lessons",
+          "piano",
+          "guitar",
+          "drums"
+        ]
+      },
+      "terms": "classes",
+      "customer_term": "student",
+      "customers": {
+        "he": "תלמידים",
+        "en": "Students"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "lesson",
+          "names": {
+            "he": "שיעור נגינה",
+            "en": "Music lesson"
+          },
+          "model": "appointment",
+          "duration_minutes": 45,
+          "price_ils": 18000
+        },
+        {
+          "key": "group",
+          "names": {
+            "he": "קבוצה או תזמורת",
+            "en": "Group or ensemble"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 9000,
+          "capacity": 10,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "audience",
+          "text": {
+            "he": "ילדים, מבוגרים או שניהם?",
+            "en": "Children, adults or both?"
+          },
+          "kind": "select",
+          "affects": "dependents",
+          "options": [
+            "children",
+            "adults",
+            "both"
+          ],
+          "default": "both"
+        },
+        {
+          "key": "teachers",
+          "text": {
+            "he": "כמה מורים?",
+            "en": "How many teachers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 4
+        }
+      ],
+      "common_combos": [
+        "rehearsal_studios",
+        "kids_activities"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 42
+    },
+    {
+      "key": "tutoring",
+      "domain": "learning",
+      "status": "live",
+      "names": {
+        "he": "שיעורים פרטיים",
+        "en": "Tutoring"
+      },
+      "synonyms": {
+        "he": [
+          "שיעורים פרטיים",
+          "מורה פרטי",
+          "הוראה",
+          "הכנה לבגרות"
+        ],
+        "en": [
+          "tutoring",
+          "private tutor",
+          "lessons",
+          "exam prep"
+        ]
+      },
+      "terms": "classes",
+      "customer_term": "student",
+      "customers": {
+        "he": "תלמידים",
+        "en": "Students"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "private",
+          "names": {
+            "he": "שיעור פרטי",
+            "en": "Private lesson"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 18000,
+          "online": true
+        },
+        {
+          "key": "small_group",
+          "names": {
+            "he": "קבוצה קטנה",
+            "en": "Small group"
+          },
+          "model": "group_class",
+          "duration_minutes": 90,
+          "price_ils": 10000,
+          "capacity": 6,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "audience",
+          "text": {
+            "he": "ילדים, מבוגרים או שניהם?",
+            "en": "Children, adults or both?"
+          },
+          "kind": "select",
+          "affects": "dependents",
+          "options": [
+            "children",
+            "adults",
+            "both"
+          ],
+          "default": "both"
+        },
+        {
+          "key": "online",
+          "text": {
+            "he": "מלמדים גם אונליין?",
+            "en": "Do you teach online too?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "kids_activities",
+        "music"
+      ],
+      "dependents": "child",
+      "dependents_mode": "ask",
+      "order": 43
+    },
+    {
+      "key": "kids_activities",
+      "domain": "learning",
+      "status": "live",
+      "names": {
+        "he": "חוגי ילדים",
+        "en": "Kids' activities"
+      },
+      "synonyms": {
+        "he": [
+          "חוגי ילדים",
+          "חוג לילדים",
+          "גן ילדים",
+          "פעילות לילדים"
+        ],
+        "en": [
+          "kids activities",
+          "children's classes",
+          "kids club"
+        ]
+      },
+      "terms": "classes",
+      "customer_term": "student",
+      "customers": {
+        "he": "תלמידים",
+        "en": "Students"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "kids_class",
+          "names": {
+            "he": "חוג",
+            "en": "Class"
+          },
+          "model": "group_class",
+          "duration_minutes": 45,
+          "price_ils": 5000,
+          "capacity": 14,
+          "series": true
+        },
+        {
+          "key": "birthday",
+          "names": {
+            "he": "יום הולדת",
+            "en": "Birthday party"
+          },
+          "model": "project",
+          "duration_minutes": 120,
+          "price_ils": 120000,
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "studio_room",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "ages",
+          "text": {
+            "he": "לאילו גילאים?",
+            "en": "Which ages?"
+          },
+          "kind": "select",
+          "affects": "none",
+          "options": [
+            "toddlers",
+            "kids",
+            "teens",
+            "all"
+          ],
+          "default": "kids"
+        },
+        {
+          "key": "birthdays",
+          "text": {
+            "he": "מארחים ימי הולדת?",
+            "en": "Do you host birthday parties?"
+          },
+          "kind": "boolean",
+          "affects": "activity:birthday",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "dance",
+        "summer_camp"
+      ],
+      "dependents": "child",
+      "dependents_mode": "required",
+      "order": 44
+    },
+    {
+      "key": "summer_camp",
+      "domain": "learning",
+      "status": "beta",
+      "names": {
+        "he": "קייטנה",
+        "en": "Summer camp"
+      },
+      "synonyms": {
+        "he": [
+          "קייטנה",
+          "קייטנות",
+          "מחנה קיץ",
+          "צהרון"
+        ],
+        "en": [
+          "summer camp",
+          "day camp",
+          "holiday camp",
+          "after-school"
+        ]
+      },
+      "terms": "classes",
+      "customer_term": "participant",
+      "customers": {
+        "he": "משתתפים",
+        "en": "Participants"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "camp_week",
+          "names": {
+            "he": "שבוע קייטנה",
+            "en": "Camp week"
+          },
+          "model": "large_group",
+          "duration_minutes": 480,
+          "price_ils": 90000,
+          "capacity": 40,
+          "min_staff": 4,
+          "series": true
+        },
+        {
+          "key": "single_day",
+          "names": {
+            "he": "יום בודד",
+            "en": "Single day"
+          },
+          "model": "large_group",
+          "duration_minutes": 480,
+          "price_ils": 22000,
+          "capacity": 40,
+          "min_staff": 4,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "capacity",
+          "text": {
+            "he": "כמה ילדים בקבוצה?",
+            "en": "How many children per group?"
+          },
+          "kind": "number",
+          "affects": "activity:camp_week",
+          "default": 40
+        },
+        {
+          "key": "counselors",
+          "text": {
+            "he": "כמה מדריכים?",
+            "en": "How many counselors?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 6
+        }
+      ],
+      "common_combos": [
+        "kids_activities",
+        "dance"
+      ],
+      "dependents": "child",
+      "dependents_mode": "required",
+      "order": 45
+    },
+    {
+      "key": "driving_school",
+      "domain": "learning",
+      "status": "beta",
+      "names": {
+        "he": "בית ספר לנהיגה",
+        "en": "Driving school"
+      },
+      "synonyms": {
+        "he": [
+          "נהיגה",
+          "לימוד נהיגה",
+          "מורה לנהיגה",
+          "טסט"
+        ],
+        "en": [
+          "driving school",
+          "driving lessons",
+          "driving instructor"
+        ]
+      },
+      "terms": "classes",
+      "customer_term": "student",
+      "customers": {
+        "he": "תלמידים",
+        "en": "Students"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "lesson",
+          "names": {
+            "he": "שיעור נהיגה",
+            "en": "Driving lesson"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 45,
+          "price_ils": 15000,
+          "resource_type": "training_vehicle"
+        },
+        {
+          "key": "test_day",
+          "names": {
+            "he": "ליווי לטסט",
+            "en": "Test day"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 90,
+          "price_ils": 35000,
+          "resource_type": "training_vehicle",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "training_vehicle",
+          "count": 3,
+          "attributes": {
+            "gearbox": "manual"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "cars",
+          "text": {
+            "he": "כמה רכבים?",
+            "en": "How many cars?"
+          },
+          "kind": "number",
+          "affects": "resource_count:training_vehicle",
+          "default": 3
+        },
+        {
+          "key": "gearbox",
+          "text": {
+            "he": "ידני, אוטומט או שניהם?",
+            "en": "Manual, automatic or both?"
+          },
+          "kind": "select",
+          "affects": "resource_attr:training_vehicle.gearbox",
+          "options": [
+            "manual",
+            "automatic"
+          ],
+          "default": "manual"
+        }
+      ],
+      "common_combos": [
+        "garage"
+      ],
+      "order": 46
+    },
+    {
+      "key": "cleaning",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "ניקיון",
+        "en": "Cleaning"
+      },
+      "synonyms": {
+        "he": [
+          "ניקיון",
+          "משק בית",
+          "ניקיון דירות",
+          "מנקה"
+        ],
+        "en": [
+          "cleaning",
+          "house cleaning",
+          "maid",
+          "cleaners"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "home_clean",
+          "names": {
+            "he": "ניקיון בית",
+            "en": "Home cleaning"
+          },
+          "model": "on_site",
+          "duration_minutes": 180,
+          "price_ils": 36000,
+          "travel_minutes": 30
+        },
+        {
+          "key": "deep_clean",
+          "names": {
+            "he": "ניקיון יסודי",
+            "en": "Deep clean"
+          },
+          "model": "project",
+          "duration_minutes": 300,
+          "price_ils": 90000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "technicians",
+          "text": {
+            "he": "כמה טכנאים או עובדים?",
+            "en": "How many technicians or workers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "gardening",
+        "handyman"
+      ],
+      "order": 47
+    },
+    {
+      "key": "ac_technicians",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "טכנאי מזגנים",
+        "en": "AC technician"
+      },
+      "synonyms": {
+        "he": [
+          "מזגנים",
+          "טכנאי מזגנים",
+          "מיזוג אוויר",
+          "התקנת מזגן"
+        ],
+        "en": [
+          "air conditioning",
+          "ac technician",
+          "hvac"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "service",
+          "names": {
+            "he": "שירות וניקוי מזגן",
+            "en": "AC service"
+          },
+          "model": "on_site",
+          "duration_minutes": 60,
+          "price_ils": 25000,
+          "travel_minutes": 30
+        },
+        {
+          "key": "repair",
+          "names": {
+            "he": "תיקון",
+            "en": "Repair"
+          },
+          "model": "on_site",
+          "duration_minutes": 90,
+          "price_ils": 35000,
+          "travel_minutes": 30
+        },
+        {
+          "key": "install",
+          "names": {
+            "he": "התקנה",
+            "en": "Installation"
+          },
+          "model": "project",
+          "duration_minutes": 180,
+          "price_ils": 80000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "technicians",
+          "text": {
+            "he": "כמה טכנאים או עובדים?",
+            "en": "How many technicians or workers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "electricians",
+        "handyman"
+      ],
+      "order": 48
+    },
+    {
+      "key": "electricians",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "חשמלאי",
+        "en": "Electrician"
+      },
+      "synonyms": {
+        "he": [
+          "חשמלאי",
+          "חשמל",
+          "תקלת חשמל"
+        ],
+        "en": [
+          "electrician",
+          "electrical"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "callout",
+          "names": {
+            "he": "ביקור ואבחון",
+            "en": "Call-out"
+          },
+          "model": "on_site",
+          "duration_minutes": 60,
+          "price_ils": 30000,
+          "travel_minutes": 30
+        },
+        {
+          "key": "project",
+          "names": {
+            "he": "עבודה בהצעת מחיר",
+            "en": "Quoted job"
+          },
+          "model": "project",
+          "duration_minutes": 180,
+          "price_ils": 120000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "technicians",
+          "text": {
+            "he": "כמה טכנאים או עובדים?",
+            "en": "How many technicians or workers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "plumbers",
+        "handyman"
+      ],
+      "order": 49
+    },
+    {
+      "key": "plumbers",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "אינסטלטור",
+        "en": "Plumber"
+      },
+      "synonyms": {
+        "he": [
+          "אינסטלטור",
+          "אינסטלציה",
+          "נזילה",
+          "סתימה"
+        ],
+        "en": [
+          "plumber",
+          "plumbing",
+          "leak"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "callout",
+          "names": {
+            "he": "ביקור ותיקון",
+            "en": "Call-out"
+          },
+          "model": "on_site",
+          "duration_minutes": 60,
+          "price_ils": 30000,
+          "travel_minutes": 30
+        },
+        {
+          "key": "project",
+          "names": {
+            "he": "עבודה בהצעת מחיר",
+            "en": "Quoted job"
+          },
+          "model": "project",
+          "duration_minutes": 180,
+          "price_ils": 100000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "technicians",
+          "text": {
+            "he": "כמה טכנאים או עובדים?",
+            "en": "How many technicians or workers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "electricians",
+        "handyman"
+      ],
+      "order": 50
+    },
+    {
+      "key": "pest_control",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "הדברה",
+        "en": "Pest control"
+      },
+      "synonyms": {
+        "he": [
+          "הדברה",
+          "מדביר",
+          "הדברת מזיקים",
+          "עכברים",
+          "נמלים"
+        ],
+        "en": [
+          "pest control",
+          "exterminator"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "treatment",
+          "names": {
+            "he": "טיפול הדברה",
+            "en": "Pest treatment"
+          },
+          "model": "on_site",
+          "duration_minutes": 60,
+          "price_ils": 40000,
+          "travel_minutes": 30
+        },
+        {
+          "key": "followup",
+          "names": {
+            "he": "ביקור המשך",
+            "en": "Follow-up visit"
+          },
+          "model": "on_site",
+          "duration_minutes": 45,
+          "price_ils": 25000,
+          "travel_minutes": 30,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "technicians",
+          "text": {
+            "he": "כמה טכנאים או עובדים?",
+            "en": "How many technicians or workers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "cleaning",
+        "gardening"
+      ],
+      "order": 51
+    },
+    {
+      "key": "gardening",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "גינון",
+        "en": "Gardening"
+      },
+      "synonyms": {
+        "he": [
+          "גינון",
+          "גנן",
+          "תחזוקת גינה",
+          "גיזום"
+        ],
+        "en": [
+          "gardening",
+          "gardener",
+          "lawn care",
+          "landscaping"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "maintenance",
+          "names": {
+            "he": "תחזוקת גינה",
+            "en": "Garden maintenance"
+          },
+          "model": "on_site",
+          "duration_minutes": 120,
+          "price_ils": 30000,
+          "travel_minutes": 30
+        },
+        {
+          "key": "project",
+          "names": {
+            "he": "עיצוב או שתילה בהצעת מחיר",
+            "en": "Quoted landscaping"
+          },
+          "model": "project",
+          "duration_minutes": 480,
+          "price_ils": 250000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "technicians",
+          "text": {
+            "he": "כמה טכנאים או עובדים?",
+            "en": "How many technicians or workers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "cleaning",
+        "pest_control"
+      ],
+      "order": 52
+    },
+    {
+      "key": "handyman",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "הנדימן",
+        "en": "Handyman"
+      },
+      "synonyms": {
+        "he": [
+          "הנדימן",
+          "שיפוצניק",
+          "תיקונים בבית",
+          "איש תחזוקה"
+        ],
+        "en": [
+          "handyman",
+          "home repair",
+          "odd jobs"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "hourly",
+          "names": {
+            "he": "עבודה לפי שעה",
+            "en": "Hourly job"
+          },
+          "model": "on_site",
+          "duration_minutes": 60,
+          "price_ils": 20000,
+          "travel_minutes": 30
+        },
+        {
+          "key": "project",
+          "names": {
+            "he": "עבודה בהצעת מחיר",
+            "en": "Quoted job"
+          },
+          "model": "project",
+          "duration_minutes": 240,
+          "price_ils": 120000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "technicians",
+          "text": {
+            "he": "כמה טכנאים או עובדים?",
+            "en": "How many technicians or workers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "electricians",
+        "plumbers"
+      ],
+      "order": 53
+    },
+    {
+      "key": "locksmith",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "מנעולן",
+        "en": "Locksmith"
+      },
+      "synonyms": {
+        "he": [
+          "מנעולן",
+          "פריצת דלת",
+          "החלפת צילינדר",
+          "נעילה"
+        ],
+        "en": [
+          "locksmith",
+          "lockout",
+          "lock change"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "callout",
+          "names": {
+            "he": "הגעה ופתיחת דלת",
+            "en": "Call-out and unlock"
+          },
+          "model": "on_site",
+          "duration_minutes": 45,
+          "price_ils": 35000,
+          "travel_minutes": 20
+        },
+        {
+          "key": "lock_change",
+          "names": {
+            "he": "החלפת מנעול",
+            "en": "Lock change"
+          },
+          "model": "on_site",
+          "duration_minutes": 60,
+          "price_ils": 45000,
+          "travel_minutes": 30,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "technicians",
+          "text": {
+            "he": "כמה טכנאים או עובדים?",
+            "en": "How many technicians or workers?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "handyman",
+        "electricians"
+      ],
+      "order": 54
+    },
+    {
+      "key": "moving",
+      "domain": "home_field",
+      "status": "beta",
+      "names": {
+        "he": "הובלות",
+        "en": "Moving company"
+      },
+      "synonyms": {
+        "he": [
+          "הובלות",
+          "הובלה",
+          "העברת דירה",
+          "מובילים"
+        ],
+        "en": [
+          "moving",
+          "movers",
+          "removals",
+          "relocation"
+        ]
+      },
+      "terms": "home_services",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "job_route",
+      "activities": [
+        {
+          "key": "move",
+          "names": {
+            "he": "הובלת דירה",
+            "en": "Home move"
+          },
+          "model": "project",
+          "duration_minutes": 300,
+          "price_ils": 150000
+        },
+        {
+          "key": "small_move",
+          "names": {
+            "he": "הובלה קטנה",
+            "en": "Small move"
+          },
+          "model": "on_site",
+          "duration_minutes": 120,
+          "price_ils": 45000,
+          "travel_minutes": 30,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "zones",
+          "text": {
+            "he": "באילו אזורים עובדים?",
+            "en": "Which areas do you serve?"
+          },
+          "kind": "text",
+          "affects": "service_area"
+        },
+        {
+          "key": "trucks",
+          "text": {
+            "he": "כמה משאיות וצוותים?",
+            "en": "How many trucks and crews?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "cleaning",
+        "handyman"
+      ],
+      "order": 55
+    },
+    {
+      "key": "garage",
+      "domain": "automotive",
+      "status": "live",
+      "names": {
+        "he": "מוסך",
+        "en": "Garage"
+      },
+      "synonyms": {
+        "he": [
+          "מוסך",
+          "טיפול לרכב",
+          "מכונאי",
+          "תיקון רכב",
+          "טסט"
+        ],
+        "en": [
+          "garage",
+          "car repair",
+          "mechanic",
+          "car service"
+        ]
+      },
+      "terms": "automotive",
+      "customer_term": "customer",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Customers"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "service",
+          "names": {
+            "he": "טיפול תקופתי",
+            "en": "Periodic service"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 120,
+          "price_ils": 60000,
+          "resource_type": "work_bay"
+        },
+        {
+          "key": "repair",
+          "names": {
+            "he": "תיקון",
+            "en": "Repair"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 180,
+          "price_ils": 80000,
+          "resource_type": "work_bay"
+        },
+        {
+          "key": "test_prep",
+          "names": {
+            "he": "הכנה לטסט",
+            "en": "Test preparation"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 60,
+          "price_ils": 25000,
+          "resource_type": "work_bay",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "work_bay",
+          "count": 3,
+          "attributes": {
+            "lift": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "bays",
+          "text": {
+            "he": "כמה עמדות עבודה?",
+            "en": "How many work bays?"
+          },
+          "kind": "number",
+          "affects": "resource_count:work_bay",
+          "default": 3
+        },
+        {
+          "key": "mechanics",
+          "text": {
+            "he": "כמה מכונאים?",
+            "en": "How many mechanics?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 3
+        }
+      ],
+      "common_combos": [
+        "tires",
+        "detailing"
+      ],
+      "dependents": "vehicle",
+      "dependents_mode": "required",
+      "order": 56
+    },
+    {
+      "key": "detailing",
+      "domain": "automotive",
+      "status": "live",
+      "names": {
+        "he": "דיטיילינג",
+        "en": "Car detailing"
+      },
+      "synonyms": {
+        "he": [
+          "דיטיילינג",
+          "שטיפת רכב",
+          "פוליש",
+          "ניקוי רכב"
+        ],
+        "en": [
+          "detailing",
+          "car wash",
+          "car polish"
+        ]
+      },
+      "terms": "automotive",
+      "customer_term": "customer",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Customers"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "wash",
+          "names": {
+            "he": "שטיפה",
+            "en": "Wash"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 6000
+        },
+        {
+          "key": "interior",
+          "names": {
+            "he": "ניקוי פנים",
+            "en": "Interior clean"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 12000
+        },
+        {
+          "key": "polish",
+          "names": {
+            "he": "פוליש וציפוי",
+            "en": "Polish and coating"
+          },
+          "model": "appointment",
+          "duration_minutes": 180,
+          "price_ils": 60000
+        },
+        {
+          "key": "mobile_wash",
+          "names": {
+            "he": "שטיפה אצל הלקוח",
+            "en": "Mobile wash"
+          },
+          "model": "on_site",
+          "duration_minutes": 45,
+          "price_ils": 9000,
+          "travel_minutes": 20,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "bays",
+          "text": {
+            "he": "כמה עמדות?",
+            "en": "How many bays?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        },
+        {
+          "key": "mobile",
+          "text": {
+            "he": "יש שירות ניידת?",
+            "en": "Do you offer a mobile service?"
+          },
+          "kind": "boolean",
+          "affects": "activity:mobile_wash",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "garage",
+        "tires"
+      ],
+      "dependents": "vehicle",
+      "dependents_mode": "required",
+      "order": 57
+    },
+    {
+      "key": "tires",
+      "domain": "automotive",
+      "status": "live",
+      "names": {
+        "he": "צמיגים",
+        "en": "Tire shop"
+      },
+      "synonyms": {
+        "he": [
+          "צמיגים",
+          "פנצ'ר",
+          "החלפת צמיגים",
+          "איזון גלגלים"
+        ],
+        "en": [
+          "tires",
+          "tyre shop",
+          "puncture",
+          "wheel alignment"
+        ]
+      },
+      "terms": "automotive",
+      "customer_term": "customer",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Customers"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "tire_change",
+          "names": {
+            "he": "החלפת צמיגים",
+            "en": "Tire change"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 45,
+          "price_ils": 18000,
+          "resource_type": "work_bay"
+        },
+        {
+          "key": "puncture",
+          "names": {
+            "he": "תיקון פנצ'ר",
+            "en": "Puncture repair"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 20,
+          "price_ils": 6000,
+          "resource_type": "work_bay"
+        },
+        {
+          "key": "alignment",
+          "names": {
+            "he": "איזון והתאמה",
+            "en": "Alignment"
+          },
+          "model": "resource_staff",
+          "duration_minutes": 45,
+          "price_ils": 20000,
+          "resource_type": "work_bay",
+          "optional": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "work_bay",
+          "count": 2,
+          "attributes": {
+            "lift": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "bays",
+          "text": {
+            "he": "כמה עמדות עבודה?",
+            "en": "How many work bays?"
+          },
+          "kind": "number",
+          "affects": "resource_count:work_bay",
+          "default": 2
+        },
+        {
+          "key": "walk_in",
+          "text": {
+            "he": "מקבלים גם בלי תור?",
+            "en": "Do you take walk-ins?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "garage",
+        "detailing"
+      ],
+      "dependents": "vehicle",
+      "dependents_mode": "required",
+      "order": 58
+    },
+    {
+      "key": "pet_grooming",
+      "domain": "pets",
+      "status": "beta",
+      "names": {
+        "he": "טיפוח חיות",
+        "en": "Pet grooming"
+      },
+      "synonyms": {
+        "he": [
+          "טיפוח כלבים",
+          "מספרת כלבים",
+          "רחצה",
+          "גרומינג"
+        ],
+        "en": [
+          "pet grooming",
+          "dog grooming",
+          "groomer"
+        ]
+      },
+      "terms": "pets",
+      "customer_term": "owner",
+      "customers": {
+        "he": "בעלים",
+        "en": "Owners"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "bath",
+          "names": {
+            "he": "רחצה",
+            "en": "Bath"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 12000
+        },
+        {
+          "key": "full_groom",
+          "names": {
+            "he": "טיפוח מלא",
+            "en": "Full groom"
+          },
+          "model": "appointment",
+          "duration_minutes": 120,
+          "price_ils": 22000
+        },
+        {
+          "key": "nails",
+          "names": {
+            "he": "גזירת ציפורניים",
+            "en": "Nail trim"
+          },
+          "model": "appointment",
+          "duration_minutes": 15,
+          "price_ils": 5000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "species",
+          "text": {
+            "he": "כלבים, חתולים או שניהם?",
+            "en": "Dogs, cats or both?"
+          },
+          "kind": "select",
+          "affects": "none",
+          "options": [
+            "dogs",
+            "cats",
+            "both"
+          ],
+          "default": "dogs"
+        },
+        {
+          "key": "tables",
+          "text": {
+            "he": "כמה עמדות טיפוח?",
+            "en": "How many grooming tables?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "pet_daycare",
+        "dog_training"
+      ],
+      "dependents": "pet",
+      "dependents_mode": "required",
+      "order": 59
+    },
+    {
+      "key": "dog_training",
+      "domain": "pets",
+      "status": "beta",
+      "names": {
+        "he": "אילוף כלבים",
+        "en": "Dog training"
+      },
+      "synonyms": {
+        "he": [
+          "אילוף",
+          "מאלף",
+          "אילוף כלבים",
+          "גור"
+        ],
+        "en": [
+          "dog training",
+          "dog trainer",
+          "puppy class",
+          "obedience"
+        ]
+      },
+      "terms": "pets",
+      "customer_term": "owner",
+      "customers": {
+        "he": "בעלים",
+        "en": "Owners"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "private",
+          "names": {
+            "he": "אילוף פרטי",
+            "en": "Private training"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 30000
+        },
+        {
+          "key": "group",
+          "names": {
+            "he": "קבוצת אילוף",
+            "en": "Training group"
+          },
+          "model": "group_class",
+          "duration_minutes": 60,
+          "price_ils": 9000,
+          "capacity": 8,
+          "series": true
+        },
+        {
+          "key": "home_visit",
+          "names": {
+            "he": "אילוף בבית הלקוח",
+            "en": "Home training"
+          },
+          "model": "on_site",
+          "duration_minutes": 60,
+          "price_ils": 35000,
+          "travel_minutes": 30,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "where",
+          "text": {
+            "he": "איפה מאלפים?",
+            "en": "Where do you train?"
+          },
+          "kind": "select",
+          "affects": "activity:home_visit",
+          "options": [
+            "field",
+            "client_home",
+            "both"
+          ],
+          "default": "field"
+        },
+        {
+          "key": "groups",
+          "text": {
+            "he": "מקיימים קבוצות?",
+            "en": "Do you run groups?"
+          },
+          "kind": "boolean",
+          "affects": "activity:group",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "pet_grooming",
+        "pet_daycare"
+      ],
+      "dependents": "pet",
+      "dependents_mode": "required",
+      "order": 60
+    },
+    {
+      "key": "pet_daycare",
+      "domain": "pets",
+      "status": "beta",
+      "names": {
+        "he": "גן כלבים",
+        "en": "Dog daycare"
+      },
+      "synonyms": {
+        "he": [
+          "גן כלבים",
+          "מעון כלבים",
+          "יום בגן",
+          "שמרטף לכלבים"
+        ],
+        "en": [
+          "dog daycare",
+          "doggy daycare",
+          "dog park"
+        ]
+      },
+      "terms": "pets",
+      "customer_term": "owner",
+      "customers": {
+        "he": "בעלים",
+        "en": "Owners"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "day",
+          "names": {
+            "he": "יום בגן",
+            "en": "Day at daycare"
+          },
+          "model": "group_class",
+          "duration_minutes": 540,
+          "price_ils": 12000,
+          "capacity": 15
+        },
+        {
+          "key": "half_day",
+          "names": {
+            "he": "חצי יום",
+            "en": "Half day"
+          },
+          "model": "group_class",
+          "duration_minutes": 270,
+          "price_ils": 7000,
+          "capacity": 15,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "capacity",
+          "text": {
+            "he": "כמה כלבים ביום?",
+            "en": "How many dogs a day?"
+          },
+          "kind": "number",
+          "affects": "activity:day",
+          "default": 15
+        },
+        {
+          "key": "boarding",
+          "text": {
+            "he": "יש גם פנסיון?",
+            "en": "Is there boarding too?"
+          },
+          "kind": "boolean",
+          "affects": "none",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "pet_boarding",
+        "pet_grooming"
+      ],
+      "dependents": "pet",
+      "dependents_mode": "required",
+      "order": 61
+    },
+    {
+      "key": "pet_boarding",
+      "domain": "pets",
+      "status": "beta",
+      "names": {
+        "he": "פנסיון לחיות",
+        "en": "Pet boarding"
+      },
+      "synonyms": {
+        "he": [
+          "פנסיון",
+          "פנסיון כלבים",
+          "פנסיון חתולים",
+          "אירוח חיות"
+        ],
+        "en": [
+          "pet boarding",
+          "kennel",
+          "dog boarding",
+          "cattery"
+        ]
+      },
+      "terms": "pets",
+      "customer_term": "owner",
+      "customers": {
+        "he": "בעלים",
+        "en": "Owners"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "night",
+          "names": {
+            "he": "לילה בפנסיון",
+            "en": "Night of boarding"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 1440,
+          "price_ils": 12000,
+          "resource_type": "kennel",
+          "max_minutes": 20160,
+          "step_minutes": 1440,
+          "unit": "night"
+        }
+      ],
+      "resources": [
+        {
+          "type": "kennel",
+          "count": 10,
+          "attributes": {
+            "size": "medium"
+          }
+        }
+      ],
+      "questions": [
+        {
+          "key": "kennels",
+          "text": {
+            "he": "כמה תאים?",
+            "en": "How many kennels?"
+          },
+          "kind": "number",
+          "affects": "resource_count:kennel",
+          "default": 10
+        },
+        {
+          "key": "species",
+          "text": {
+            "he": "כלבים, חתולים או שניהם?",
+            "en": "Dogs, cats or both?"
+          },
+          "kind": "select",
+          "affects": "none",
+          "options": [
+            "dogs",
+            "cats",
+            "both"
+          ],
+          "default": "dogs"
+        }
+      ],
+      "common_combos": [
+        "pet_daycare",
+        "pet_grooming"
+      ],
+      "dependents": "pet",
+      "dependents_mode": "required",
+      "order": 62
+    },
+    {
+      "key": "photographers",
+      "domain": "events",
+      "status": "beta",
+      "names": {
+        "he": "צלם",
+        "en": "Photographer"
+      },
+      "synonyms": {
+        "he": [
+          "צלם",
+          "צילום אירועים",
+          "צלם חתונות",
+          "צילומי משפחה"
+        ],
+        "en": [
+          "photographer",
+          "event photography",
+          "wedding photographer"
+        ]
+      },
+      "terms": "events",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "planning",
+          "names": {
+            "he": "פגישת תכנון",
+            "en": "Planning meeting"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 10000
+        },
+        {
+          "key": "event",
+          "names": {
+            "he": "צילום אירוע",
+            "en": "Event shoot"
+          },
+          "model": "project",
+          "duration_minutes": 240,
+          "price_ils": 300000
+        },
+        {
+          "key": "portrait",
+          "names": {
+            "he": "צילומי פורטרט",
+            "en": "Portrait session"
+          },
+          "model": "appointment",
+          "duration_minutes": 90,
+          "price_ils": 90000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "event_types",
+          "text": {
+            "he": "אילו אירועים?",
+            "en": "Which events?"
+          },
+          "kind": "select",
+          "affects": "none",
+          "options": [
+            "weddings",
+            "family",
+            "corporate",
+            "mixed"
+          ],
+          "default": "mixed"
+        },
+        {
+          "key": "deposit",
+          "text": {
+            "he": "לוקחים מקדמה?",
+            "en": "Do you take a deposit?"
+          },
+          "kind": "boolean",
+          "affects": "activity:event",
+          "default": true
+        }
+      ],
+      "common_combos": [
+        "photo_studio",
+        "djs"
+      ],
+      "order": 63
+    },
+    {
+      "key": "djs",
+      "domain": "events",
+      "status": "beta",
+      "names": {
+        "he": "די־ג'יי",
+        "en": "DJ"
+      },
+      "synonyms": {
+        "he": [
+          "די ג'יי",
+          "דיג'יי",
+          "DJ",
+          "מוזיקה לאירועים"
+        ],
+        "en": [
+          "dj",
+          "event dj",
+          "wedding dj"
+        ]
+      },
+      "terms": "events",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "planning",
+          "names": {
+            "he": "פגישת היכרות",
+            "en": "Intro meeting"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 10000
+        },
+        {
+          "key": "event",
+          "names": {
+            "he": "אירוע",
+            "en": "Event"
+          },
+          "model": "project",
+          "duration_minutes": 300,
+          "price_ils": 250000
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "deposit",
+          "text": {
+            "he": "לוקחים מקדמה?",
+            "en": "Do you take a deposit?"
+          },
+          "kind": "boolean",
+          "affects": "activity:event",
+          "default": true
+        },
+        {
+          "key": "crew",
+          "text": {
+            "he": "כמה צוותים?",
+            "en": "How many crews?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 1
+        }
+      ],
+      "common_combos": [
+        "event_suppliers",
+        "photographers"
+      ],
+      "order": 64
+    },
+    {
+      "key": "event_suppliers",
+      "domain": "events",
+      "status": "beta",
+      "names": {
+        "he": "ספקי אירועים",
+        "en": "Event suppliers"
+      },
+      "synonyms": {
+        "he": [
+          "ספקים",
+          "ספקי אירועים",
+          "קישוטים",
+          "השכרת ציוד"
+        ],
+        "en": [
+          "event supplier",
+          "event vendor",
+          "event rental",
+          "decor"
+        ]
+      },
+      "terms": "events",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "consult",
+          "names": {
+            "he": "פגישת ייעוץ",
+            "en": "Consultation"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 10000
+        },
+        {
+          "key": "event",
+          "names": {
+            "he": "אספקה לאירוע",
+            "en": "Event supply"
+          },
+          "model": "project",
+          "duration_minutes": 240,
+          "price_ils": 300000
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "deposit",
+          "text": {
+            "he": "לוקחים מקדמה?",
+            "en": "Do you take a deposit?"
+          },
+          "kind": "boolean",
+          "affects": "activity:event",
+          "default": true
+        },
+        {
+          "key": "crew",
+          "text": {
+            "he": "כמה צוותים?",
+            "en": "How many crews?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 1
+        }
+      ],
+      "common_combos": [
+        "djs",
+        "small_venues"
+      ],
+      "order": 65
+    },
+    {
+      "key": "small_venues",
+      "domain": "events",
+      "status": "beta",
+      "names": {
+        "he": "מקומות אירוח",
+        "en": "Small venues"
+      },
+      "synonyms": {
+        "he": [
+          "אולם אירועים",
+          "מקום לאירוע",
+          "גן אירועים",
+          "אולם קטן"
+        ],
+        "en": [
+          "event venue",
+          "small venue",
+          "party hall"
+        ]
+      },
+      "terms": "events",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "resource_grid",
+      "activities": [
+        {
+          "key": "tour",
+          "names": {
+            "he": "סיור במקום",
+            "en": "Venue tour"
+          },
+          "model": "appointment",
+          "duration_minutes": 30,
+          "price_ils": 10000
+        },
+        {
+          "key": "hall_rental",
+          "names": {
+            "he": "השכרת אולם",
+            "en": "Hall rental"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 240,
+          "price_ils": 300000,
+          "resource_type": "event_hall",
+          "max_minutes": 720,
+          "step_minutes": 240,
+          "unit": "half_day"
+        }
+      ],
+      "resources": [
+        {
+          "type": "event_hall",
+          "count": 1
+        }
+      ],
+      "questions": [
+        {
+          "key": "halls",
+          "text": {
+            "he": "כמה אולמות?",
+            "en": "How many halls?"
+          },
+          "kind": "number",
+          "affects": "resource_count:event_hall",
+          "default": 1
+        },
+        {
+          "key": "capacity",
+          "text": {
+            "he": "קיבולת מקסימלית?",
+            "en": "Maximum capacity?"
+          },
+          "kind": "number",
+          "affects": "none",
+          "default": 100
+        }
+      ],
+      "common_combos": [
+        "djs",
+        "event_suppliers"
+      ],
+      "order": 66
+    },
+    {
+      "key": "consultants",
+      "domain": "professional",
+      "status": "beta",
+      "names": {
+        "he": "יועצים",
+        "en": "Consultants"
+      },
+      "synonyms": {
+        "he": [
+          "יועץ",
+          "ייעוץ עסקי",
+          "יועצת",
+          "מנטורינג"
+        ],
+        "en": [
+          "consultant",
+          "business consulting",
+          "advisor"
+        ]
+      },
+      "terms": "professional",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "meeting",
+          "names": {
+            "he": "פגישת ייעוץ",
+            "en": "Consulting meeting"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 45000,
+          "online": true
+        },
+        {
+          "key": "project",
+          "names": {
+            "he": "פרויקט",
+            "en": "Project"
+          },
+          "model": "project",
+          "duration_minutes": 240,
+          "price_ils": 600000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "billing",
+          "text": {
+            "he": "חיוב שעתי או ריטיינר?",
+            "en": "Hourly or retainer billing?"
+          },
+          "kind": "select",
+          "affects": "time_billing",
+          "options": [
+            "hourly",
+            "retainer",
+            "both"
+          ],
+          "default": "hourly"
+        },
+        {
+          "key": "staff",
+          "text": {
+            "he": "כמה אנשי מקצוע?",
+            "en": "How many professionals?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "life_coaching",
+        "accountants"
+      ],
+      "time_billing": true,
+      "order": 67
+    },
+    {
+      "key": "accountants",
+      "domain": "professional",
+      "status": "beta",
+      "names": {
+        "he": "רואה חשבון",
+        "en": "Accountants"
+      },
+      "synonyms": {
+        "he": [
+          "רואה חשבון",
+          "רו\"ח",
+          "הנהלת חשבונות",
+          "מס",
+          "יועץ מס"
+        ],
+        "en": [
+          "accountant",
+          "cpa",
+          "bookkeeper",
+          "tax advisor"
+        ]
+      },
+      "terms": "professional",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "meeting",
+          "names": {
+            "he": "פגישת ייעוץ",
+            "en": "Consulting meeting"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 35000,
+          "online": true
+        },
+        {
+          "key": "annual",
+          "names": {
+            "he": "דוחות שנתיים",
+            "en": "Annual returns"
+          },
+          "model": "project",
+          "duration_minutes": 120,
+          "price_ils": 250000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "billing",
+          "text": {
+            "he": "חיוב שעתי או ריטיינר?",
+            "en": "Hourly or retainer billing?"
+          },
+          "kind": "select",
+          "affects": "time_billing",
+          "options": [
+            "hourly",
+            "retainer",
+            "both"
+          ],
+          "default": "hourly"
+        },
+        {
+          "key": "staff",
+          "text": {
+            "he": "כמה אנשי מקצוע?",
+            "en": "How many professionals?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "lawyers",
+        "consultants"
+      ],
+      "time_billing": true,
+      "order": 68
+    },
+    {
+      "key": "lawyers",
+      "domain": "professional",
+      "status": "beta",
+      "names": {
+        "he": "עורך דין",
+        "en": "Lawyers"
+      },
+      "synonyms": {
+        "he": [
+          "עורך דין",
+          "עו\"ד",
+          "משרד עורכי דין",
+          "ייעוץ משפטי"
+        ],
+        "en": [
+          "lawyer",
+          "attorney",
+          "law firm",
+          "legal advice"
+        ]
+      },
+      "terms": "professional",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "consult",
+          "names": {
+            "he": "פגישת ייעוץ",
+            "en": "Legal consultation"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 80000,
+          "online": true
+        },
+        {
+          "key": "case",
+          "names": {
+            "he": "תיק בהצעת מחיר",
+            "en": "Quoted case"
+          },
+          "model": "project",
+          "duration_minutes": 240,
+          "price_ils": 800000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "billing",
+          "text": {
+            "he": "חיוב שעתי או ריטיינר?",
+            "en": "Hourly or retainer billing?"
+          },
+          "kind": "select",
+          "affects": "time_billing",
+          "options": [
+            "hourly",
+            "retainer",
+            "both"
+          ],
+          "default": "hourly"
+        },
+        {
+          "key": "staff",
+          "text": {
+            "he": "כמה אנשי מקצוע?",
+            "en": "How many professionals?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "accountants",
+        "consultants"
+      ],
+      "time_billing": true,
+      "order": 69
+    },
+    {
+      "key": "agencies",
+      "domain": "professional",
+      "status": "beta",
+      "names": {
+        "he": "סוכנויות",
+        "en": "Agencies"
+      },
+      "synonyms": {
+        "he": [
+          "סוכנות",
+          "סוכנות שיווק",
+          "סוכנות פרסום",
+          "סטודיו עיצוב"
+        ],
+        "en": [
+          "agency",
+          "marketing agency",
+          "design studio"
+        ]
+      },
+      "terms": "professional",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [
+        {
+          "key": "kickoff",
+          "names": {
+            "he": "פגישת היכרות",
+            "en": "Kick-off meeting"
+          },
+          "model": "appointment",
+          "duration_minutes": 60,
+          "price_ils": 90000,
+          "online": true
+        },
+        {
+          "key": "retainer",
+          "names": {
+            "he": "ריטיינר חודשי",
+            "en": "Monthly retainer"
+          },
+          "model": "project",
+          "duration_minutes": 240,
+          "price_ils": 500000,
+          "optional": true
+        }
+      ],
+      "resources": [],
+      "questions": [
+        {
+          "key": "billing",
+          "text": {
+            "he": "חיוב שעתי או ריטיינר?",
+            "en": "Hourly or retainer billing?"
+          },
+          "kind": "select",
+          "affects": "time_billing",
+          "options": [
+            "hourly",
+            "retainer",
+            "both"
+          ],
+          "default": "hourly"
+        },
+        {
+          "key": "staff",
+          "text": {
+            "he": "כמה אנשי מקצוע?",
+            "en": "How many professionals?"
+          },
+          "kind": "number",
+          "affects": "staff_count",
+          "default": 2
+        }
+      ],
+      "common_combos": [
+        "consultants",
+        "photographers"
+      ],
+      "time_billing": true,
+      "order": 70
+    },
+    {
+      "key": "pizzeria",
+      "domain": "food_events",
+      "status": "beta",
+      "names": {
+        "he": "פיצרייה",
+        "en": "Pizzeria"
+      },
+      "synonyms": {
+        "he": [
+          "פיצרייה",
+          "פיצה",
+          "פיצריה"
+        ],
+        "en": [
+          "pizzeria",
+          "pizza"
+        ]
+      },
+      "terms": "food",
+      "customer_term": "guest",
+      "customers": {
+        "he": "אורחים",
+        "en": "Guests"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "workshop",
+          "names": {
+            "he": "סדנה",
+            "en": "Workshop"
+          },
+          "model": "group_class",
+          "duration_minutes": 120,
+          "price_ils": 16000,
+          "capacity": 14
+        },
+        {
+          "key": "private_event",
+          "names": {
+            "he": "אירוע פרטי",
+            "en": "Private event"
+          },
+          "model": "project",
+          "duration_minutes": 180,
+          "price_ils": 120000,
+          "optional": true
+        },
+        {
+          "key": "tables",
+          "names": {
+            "he": "הזמנת שולחנות",
+            "en": "Table reservation"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 120,
+          "price_ils": 0,
+          "resource_type": "table",
+          "max_minutes": 240,
+          "step_minutes": 30,
+          "optional": true,
+          "coming_soon": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "table",
+          "count": 8
+        }
+      ],
+      "questions": [
+        {
+          "key": "workshops",
+          "text": {
+            "he": "מקיימים סדנאות?",
+            "en": "Do you hold workshops?"
+          },
+          "kind": "boolean",
+          "affects": "activity:workshop",
+          "default": true
+        },
+        {
+          "key": "events",
+          "text": {
+            "he": "מארחים אירועים פרטיים?",
+            "en": "Do you host private events?"
+          },
+          "kind": "boolean",
+          "affects": "activity:private_event",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "cafe",
+        "catering"
+      ],
+      "order": 71
+    },
+    {
+      "key": "cafe",
+      "domain": "food_events",
+      "status": "beta",
+      "names": {
+        "he": "בית קפה",
+        "en": "Cafe"
+      },
+      "synonyms": {
+        "he": [
+          "בית קפה",
+          "קפה",
+          "בריסטה"
+        ],
+        "en": [
+          "cafe",
+          "coffee shop",
+          "barista"
+        ]
+      },
+      "terms": "food",
+      "customer_term": "guest",
+      "customers": {
+        "he": "אורחים",
+        "en": "Guests"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "workshop",
+          "names": {
+            "he": "סדנה",
+            "en": "Workshop"
+          },
+          "model": "group_class",
+          "duration_minutes": 120,
+          "price_ils": 14000,
+          "capacity": 14
+        },
+        {
+          "key": "private_event",
+          "names": {
+            "he": "אירוע פרטי",
+            "en": "Private event"
+          },
+          "model": "project",
+          "duration_minutes": 180,
+          "price_ils": 150000,
+          "optional": true
+        },
+        {
+          "key": "tables",
+          "names": {
+            "he": "הזמנת שולחנות",
+            "en": "Table reservation"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 120,
+          "price_ils": 0,
+          "resource_type": "table",
+          "max_minutes": 240,
+          "step_minutes": 30,
+          "optional": true,
+          "coming_soon": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "table",
+          "count": 8
+        }
+      ],
+      "questions": [
+        {
+          "key": "workshops",
+          "text": {
+            "he": "מקיימים סדנאות?",
+            "en": "Do you hold workshops?"
+          },
+          "kind": "boolean",
+          "affects": "activity:workshop",
+          "default": true
+        },
+        {
+          "key": "events",
+          "text": {
+            "he": "מארחים אירועים פרטיים?",
+            "en": "Do you host private events?"
+          },
+          "kind": "boolean",
+          "affects": "activity:private_event",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "bakery",
+        "restaurant"
+      ],
+      "order": 72
+    },
+    {
+      "key": "restaurant",
+      "domain": "food_events",
+      "status": "beta",
+      "names": {
+        "he": "מסעדה",
+        "en": "Restaurant"
+      },
+      "synonyms": {
+        "he": [
+          "מסעדה",
+          "שף",
+          "ארוחה"
+        ],
+        "en": [
+          "restaurant",
+          "chef",
+          "dining"
+        ]
+      },
+      "terms": "food",
+      "customer_term": "guest",
+      "customers": {
+        "he": "אורחים",
+        "en": "Guests"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "workshop",
+          "names": {
+            "he": "סדנה",
+            "en": "Workshop"
+          },
+          "model": "group_class",
+          "duration_minutes": 120,
+          "price_ils": 32000,
+          "capacity": 14
+        },
+        {
+          "key": "private_event",
+          "names": {
+            "he": "אירוע פרטי",
+            "en": "Private event"
+          },
+          "model": "project",
+          "duration_minutes": 180,
+          "price_ils": 80000,
+          "optional": true
+        },
+        {
+          "key": "tables",
+          "names": {
+            "he": "הזמנת שולחנות",
+            "en": "Table reservation"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 120,
+          "price_ils": 0,
+          "resource_type": "table",
+          "max_minutes": 240,
+          "step_minutes": 30,
+          "optional": true,
+          "coming_soon": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "table",
+          "count": 8
+        }
+      ],
+      "questions": [
+        {
+          "key": "workshops",
+          "text": {
+            "he": "מקיימים סדנאות?",
+            "en": "Do you hold workshops?"
+          },
+          "kind": "boolean",
+          "affects": "activity:workshop",
+          "default": true
+        },
+        {
+          "key": "events",
+          "text": {
+            "he": "מארחים אירועים פרטיים?",
+            "en": "Do you host private events?"
+          },
+          "kind": "boolean",
+          "affects": "activity:private_event",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "catering",
+        "cafe"
+      ],
+      "order": 73
+    },
+    {
+      "key": "bakery",
+      "domain": "food_events",
+      "status": "beta",
+      "names": {
+        "he": "מאפייה",
+        "en": "Bakery"
+      },
+      "synonyms": {
+        "he": [
+          "מאפייה",
+          "קונדיטוריה",
+          "לחם",
+          "עוגות"
+        ],
+        "en": [
+          "bakery",
+          "patisserie",
+          "bread",
+          "cakes"
+        ]
+      },
+      "terms": "food",
+      "customer_term": "guest",
+      "customers": {
+        "he": "אורחים",
+        "en": "Guests"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "workshop",
+          "names": {
+            "he": "סדנה",
+            "en": "Workshop"
+          },
+          "model": "group_class",
+          "duration_minutes": 120,
+          "price_ils": 15000,
+          "capacity": 14
+        },
+        {
+          "key": "private_event",
+          "names": {
+            "he": "אירוע פרטי",
+            "en": "Private event"
+          },
+          "model": "project",
+          "duration_minutes": 180,
+          "price_ils": 30000,
+          "optional": true
+        },
+        {
+          "key": "tables",
+          "names": {
+            "he": "הזמנת שולחנות",
+            "en": "Table reservation"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 120,
+          "price_ils": 0,
+          "resource_type": "table",
+          "max_minutes": 240,
+          "step_minutes": 30,
+          "optional": true,
+          "coming_soon": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "table",
+          "count": 8
+        }
+      ],
+      "questions": [
+        {
+          "key": "workshops",
+          "text": {
+            "he": "מקיימים סדנאות?",
+            "en": "Do you hold workshops?"
+          },
+          "kind": "boolean",
+          "affects": "activity:workshop",
+          "default": true
+        },
+        {
+          "key": "events",
+          "text": {
+            "he": "מארחים אירועים פרטיים?",
+            "en": "Do you host private events?"
+          },
+          "kind": "boolean",
+          "affects": "activity:private_event",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "cafe",
+        "catering"
+      ],
+      "order": 74
+    },
+    {
+      "key": "catering",
+      "domain": "food_events",
+      "status": "beta",
+      "names": {
+        "he": "קייטרינג",
+        "en": "Catering"
+      },
+      "synonyms": {
+        "he": [
+          "קייטרינג",
+          "שף פרטי",
+          "אוכל לאירועים"
+        ],
+        "en": [
+          "catering",
+          "private chef",
+          "event food"
+        ]
+      },
+      "terms": "food",
+      "customer_term": "guest",
+      "customers": {
+        "he": "אורחים",
+        "en": "Guests"
+      },
+      "calendar_view": "class_blocks",
+      "activities": [
+        {
+          "key": "workshop",
+          "names": {
+            "he": "סדנה",
+            "en": "Workshop"
+          },
+          "model": "group_class",
+          "duration_minutes": 120,
+          "price_ils": 10000,
+          "capacity": 14
+        },
+        {
+          "key": "private_event",
+          "names": {
+            "he": "אירוע פרטי",
+            "en": "Private event"
+          },
+          "model": "project",
+          "duration_minutes": 180,
+          "price_ils": 600000,
+          "optional": true
+        },
+        {
+          "key": "tables",
+          "names": {
+            "he": "הזמנת שולחנות",
+            "en": "Table reservation"
+          },
+          "model": "resource_rental",
+          "duration_minutes": 120,
+          "price_ils": 0,
+          "resource_type": "table",
+          "max_minutes": 240,
+          "step_minutes": 30,
+          "optional": true,
+          "coming_soon": true
+        }
+      ],
+      "resources": [
+        {
+          "type": "table",
+          "count": 8
+        }
+      ],
+      "questions": [
+        {
+          "key": "workshops",
+          "text": {
+            "he": "מקיימים סדנאות?",
+            "en": "Do you hold workshops?"
+          },
+          "kind": "boolean",
+          "affects": "activity:workshop",
+          "default": true
+        },
+        {
+          "key": "events",
+          "text": {
+            "he": "מארחים אירועים פרטיים?",
+            "en": "Do you host private events?"
+          },
+          "kind": "boolean",
+          "affects": "activity:private_event",
+          "default": false
+        }
+      ],
+      "common_combos": [
+        "restaurant",
+        "event_suppliers"
+      ],
+      "order": 75
+    },
+    {
+      "key": "custom",
+      "domain": null,
+      "status": "live",
+      "names": {
+        "he": "מותאם אישית",
+        "en": "Custom"
+      },
+      "synonyms": {
+        "he": [
+          "אחר",
+          "העסק שלי לא ברשימה",
+          "מותאם"
+        ],
+        "en": [
+          "other",
+          "my business is not listed",
+          "custom"
+        ]
+      },
+      "terms": "professional",
+      "customer_term": "client",
+      "customers": {
+        "he": "לקוחות",
+        "en": "Clients"
+      },
+      "calendar_view": "staff_columns",
+      "activities": [],
+      "resources": [],
+      "questions": [
+        {
+          "key": "capacity",
+          "text": {
+            "he": "כמה באים בבת אחת?",
+            "en": "How many come at once?"
+          },
+          "kind": "select",
+          "affects": "axis:capacity",
+          "options": [
+            "one",
+            "few",
+            "many"
+          ],
+          "default": "one"
+        },
+        {
+          "key": "provider",
+          "text": {
+            "he": "מי נותן את השירות?",
+            "en": "Who gives the service?"
+          },
+          "kind": "select",
+          "affects": "axis:provider",
+          "options": [
+            "staff",
+            "resource",
+            "staff_and_resource",
+            "nobody"
+          ],
+          "default": "staff"
+        },
+        {
+          "key": "place",
+          "text": {
+            "he": "איפה?",
+            "en": "Where?"
+          },
+          "kind": "select",
+          "affects": "axis:place",
+          "options": [
+            "at_business",
+            "at_client",
+            "online"
+          ],
+          "default": "at_business"
+        },
+        {
+          "key": "payment",
+          "text": {
+            "he": "איך משלמים?",
+            "en": "How do clients pay?"
+          },
+          "kind": "select",
+          "affects": "axis:payment",
+          "options": [
+            "on_booking",
+            "on_site",
+            "deposit",
+            "membership"
+          ],
+          "default": "on_booking"
+        }
+      ],
+      "common_combos": [],
+      "custom": true,
+      "order": 76
+    }
+  ]
+} as CatalogV2;

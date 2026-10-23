@@ -1,0 +1,88 @@
+{
+  "key": "golf_simulator",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "סימולטור גולף",
+    "en": "Golf simulator"
+  },
+  "synonyms": {
+    "he": [
+      "גולף",
+      "סימולטור",
+      "סימולטור גולף"
+    ],
+    "en": [
+      "golf",
+      "golf simulator",
+      "simulator"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "player",
+  "customers": {
+    "he": "שחקנים",
+    "en": "Players"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "bay",
+      "names": {
+        "he": "השכרת עמדה",
+        "en": "Bay rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 15000,
+      "resource_type": "golf_simulator_bay",
+      "max_minutes": 180,
+      "step_minutes": 30
+    },
+    {
+      "key": "lesson",
+      "names": {
+        "he": "שיעור גולף",
+        "en": "Golf lesson"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 60,
+      "price_ils": 25000,
+      "resource_type": "golf_simulator_bay",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "golf_simulator_bay",
+      "count": 2
+    }
+  ],
+  "questions": [
+    {
+      "key": "bays",
+      "text": {
+        "he": "כמה עמדות?",
+        "en": "How many bays?"
+      },
+      "kind": "number",
+      "affects": "resource_count:golf_simulator_bay",
+      "default": 2
+    },
+    {
+      "key": "lessons",
+      "text": {
+        "he": "יש מדריך גולף?",
+        "en": "Is there a golf coach?"
+      },
+      "kind": "boolean",
+      "affects": "activity:lesson",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "shooting_range",
+    "escape_room"
+  ],
+  "order": 18
+}

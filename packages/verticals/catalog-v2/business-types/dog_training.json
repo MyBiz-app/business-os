@@ -1,0 +1,101 @@
+{
+  "key": "dog_training",
+  "domain": "pets",
+  "status": "beta",
+  "names": {
+    "he": "אילוף כלבים",
+    "en": "Dog training"
+  },
+  "synonyms": {
+    "he": [
+      "אילוף",
+      "מאלף",
+      "אילוף כלבים",
+      "גור"
+    ],
+    "en": [
+      "dog training",
+      "dog trainer",
+      "puppy class",
+      "obedience"
+    ]
+  },
+  "terms": "pets",
+  "customer_term": "owner",
+  "customers": {
+    "he": "בעלים",
+    "en": "Owners"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "private",
+      "names": {
+        "he": "אילוף פרטי",
+        "en": "Private training"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 30000
+    },
+    {
+      "key": "group",
+      "names": {
+        "he": "קבוצת אילוף",
+        "en": "Training group"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 9000,
+      "capacity": 8,
+      "series": true
+    },
+    {
+      "key": "home_visit",
+      "names": {
+        "he": "אילוף בבית הלקוח",
+        "en": "Home training"
+      },
+      "model": "on_site",
+      "duration_minutes": 60,
+      "price_ils": 35000,
+      "travel_minutes": 30,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "where",
+      "text": {
+        "he": "איפה מאלפים?",
+        "en": "Where do you train?"
+      },
+      "kind": "select",
+      "affects": "activity:home_visit",
+      "options": [
+        "field",
+        "client_home",
+        "both"
+      ],
+      "default": "field"
+    },
+    {
+      "key": "groups",
+      "text": {
+        "he": "מקיימים קבוצות?",
+        "en": "Do you run groups?"
+      },
+      "kind": "boolean",
+      "affects": "activity:group",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "pet_grooming",
+    "pet_daycare"
+  ],
+  "dependents": "pet",
+  "dependents_mode": "required",
+  "order": 60
+}

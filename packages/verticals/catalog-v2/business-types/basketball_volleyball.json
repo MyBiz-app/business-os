@@ -1,0 +1,132 @@
+{
+  "key": "basketball_volleyball",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "מגרשי כדורסל וכדורעף",
+    "en": "Basketball and volleyball courts"
+  },
+  "synonyms": {
+    "he": [
+      "כדורסל",
+      "כדורעף",
+      "כדורעף חופים",
+      "מגרש כדורסל"
+    ],
+    "en": [
+      "basketball",
+      "volleyball",
+      "beach volleyball",
+      "court"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "player",
+  "customers": {
+    "he": "שחקנים",
+    "en": "Players"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "basketball_rental",
+      "names": {
+        "he": "השכרת מגרש כדורסל",
+        "en": "Basketball court rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 20000,
+      "resource_type": "basketball_court",
+      "max_minutes": 120,
+      "step_minutes": 60
+    },
+    {
+      "key": "volleyball_rental",
+      "names": {
+        "he": "השכרת מגרש כדורעף",
+        "en": "Volleyball court rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 15000,
+      "resource_type": "volleyball_court",
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "optional": true
+    },
+    {
+      "key": "beach_rental",
+      "names": {
+        "he": "השכרת מגרש כדורעף חופים",
+        "en": "Beach volleyball rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 10000,
+      "resource_type": "beach_volleyball_court",
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "optional": true
+    },
+    {
+      "key": "group_training",
+      "names": {
+        "he": "אימון קבוצתי",
+        "en": "Group training"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 6000,
+      "capacity": 12,
+      "resource_type": "basketball_court",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "basketball_court",
+      "count": 1,
+      "attributes": {
+        "lighting": true
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "basketball",
+      "text": {
+        "he": "כמה מגרשי כדורסל?",
+        "en": "How many basketball courts?"
+      },
+      "kind": "number",
+      "affects": "resource_count:basketball_court",
+      "default": 1
+    },
+    {
+      "key": "volleyball",
+      "text": {
+        "he": "כמה מגרשי כדורעף?",
+        "en": "How many volleyball courts?"
+      },
+      "kind": "number",
+      "affects": "resource_count:volleyball_court",
+      "default": 0
+    },
+    {
+      "key": "beach",
+      "text": {
+        "he": "כמה מגרשי כדורעף חופים?",
+        "en": "How many beach volleyball courts?"
+      },
+      "kind": "number",
+      "affects": "resource_count:beach_volleyball_court",
+      "default": 0
+    }
+  ],
+  "common_combos": [
+    "football_pitches",
+    "multi_sport"
+  ],
+  "order": 12
+}

@@ -1,0 +1,96 @@
+{
+  "key": "makeup",
+  "domain": "beauty",
+  "status": "beta",
+  "names": {
+    "he": "איפור",
+    "en": "Makeup artist"
+  },
+  "synonyms": {
+    "he": [
+      "איפור",
+      "מאפרת",
+      "איפור כלות"
+    ],
+    "en": [
+      "makeup",
+      "makeup artist",
+      "bridal makeup"
+    ]
+  },
+  "terms": "beauty",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "makeup",
+      "names": {
+        "he": "איפור",
+        "en": "Makeup"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 30000
+    },
+    {
+      "key": "bridal",
+      "names": {
+        "he": "איפור כלה",
+        "en": "Bridal makeup"
+      },
+      "model": "appointment",
+      "duration_minutes": 120,
+      "price_ils": 120000,
+      "optional": true
+    },
+    {
+      "key": "on_location",
+      "names": {
+        "he": "איפור אצל הלקוחה",
+        "en": "Makeup at your place"
+      },
+      "model": "on_site",
+      "duration_minutes": 90,
+      "price_ils": 45000,
+      "travel_minutes": 30,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "where",
+      "text": {
+        "he": "איפה עובדים?",
+        "en": "Where do you work?"
+      },
+      "kind": "select",
+      "affects": "activity:on_location",
+      "options": [
+        "studio",
+        "client_place",
+        "mixed"
+      ],
+      "default": "studio"
+    },
+    {
+      "key": "bridal",
+      "text": {
+        "he": "מציעה איפור כלות?",
+        "en": "Do you offer bridal makeup?"
+      },
+      "kind": "boolean",
+      "affects": "activity:bridal",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "hair_salon",
+    "brows_lashes"
+  ],
+  "order": 30
+}

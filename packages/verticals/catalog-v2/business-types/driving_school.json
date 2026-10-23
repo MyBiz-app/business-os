@@ -1,0 +1,93 @@
+{
+  "key": "driving_school",
+  "domain": "learning",
+  "status": "beta",
+  "names": {
+    "he": "בית ספר לנהיגה",
+    "en": "Driving school"
+  },
+  "synonyms": {
+    "he": [
+      "נהיגה",
+      "לימוד נהיגה",
+      "מורה לנהיגה",
+      "טסט"
+    ],
+    "en": [
+      "driving school",
+      "driving lessons",
+      "driving instructor"
+    ]
+  },
+  "terms": "classes",
+  "customer_term": "student",
+  "customers": {
+    "he": "תלמידים",
+    "en": "Students"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "lesson",
+      "names": {
+        "he": "שיעור נהיגה",
+        "en": "Driving lesson"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 45,
+      "price_ils": 15000,
+      "resource_type": "training_vehicle"
+    },
+    {
+      "key": "test_day",
+      "names": {
+        "he": "ליווי לטסט",
+        "en": "Test day"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 90,
+      "price_ils": 35000,
+      "resource_type": "training_vehicle",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "training_vehicle",
+      "count": 3,
+      "attributes": {
+        "gearbox": "manual"
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "cars",
+      "text": {
+        "he": "כמה רכבים?",
+        "en": "How many cars?"
+      },
+      "kind": "number",
+      "affects": "resource_count:training_vehicle",
+      "default": 3
+    },
+    {
+      "key": "gearbox",
+      "text": {
+        "he": "ידני, אוטומט או שניהם?",
+        "en": "Manual, automatic or both?"
+      },
+      "kind": "select",
+      "affects": "resource_attr:training_vehicle.gearbox",
+      "options": [
+        "manual",
+        "automatic"
+      ],
+      "default": "manual"
+    }
+  ],
+  "common_combos": [
+    "garage"
+  ],
+  "order": 46
+}

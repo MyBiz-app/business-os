@@ -1,0 +1,81 @@
+{
+  "key": "escape_room",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "חדר בריחה",
+    "en": "Escape room"
+  },
+  "synonyms": {
+    "he": [
+      "חדר בריחה",
+      "אסקייפ רום",
+      "אסקייפ"
+    ],
+    "en": [
+      "escape room",
+      "escape game"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "participant",
+  "customers": {
+    "he": "משתתפים",
+    "en": "Participants"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "game",
+      "names": {
+        "he": "משחק לקבוצה",
+        "en": "Group game"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 40000,
+      "capacity": 6,
+      "resource_type": "escape_room",
+      "max_minutes": 60,
+      "step_minutes": 15
+    }
+  ],
+  "resources": [
+    {
+      "type": "escape_room",
+      "count": 2
+    }
+  ],
+  "questions": [
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה חדרים?",
+        "en": "How many rooms?"
+      },
+      "kind": "number",
+      "affects": "resource_count:escape_room",
+      "default": 2
+    },
+    {
+      "key": "game_length",
+      "text": {
+        "he": "כמה זמן נמשך משחק?",
+        "en": "How long is a game?"
+      },
+      "kind": "select",
+      "affects": "activity:game",
+      "options": [
+        "45",
+        "60",
+        "75"
+      ],
+      "default": "60"
+    }
+  ],
+  "common_combos": [
+    "shooting_range",
+    "golf_simulator"
+  ],
+  "order": 16
+}
