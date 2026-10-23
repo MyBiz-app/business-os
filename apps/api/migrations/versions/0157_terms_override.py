@@ -31,4 +31,5 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # contract: only a rollback drops it, and the previous release never reads the column.
     op.execute("ALTER TABLE app.tenants DROP COLUMN terms_override")
