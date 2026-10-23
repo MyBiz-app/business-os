@@ -7,6 +7,7 @@ from fastapi import APIRouter
 
 from app.api import (
     account_deletion,
+    activities,
     ai_tasks,
     ai_team,
     ai_usage,
@@ -162,6 +163,7 @@ ROUTERS: list[APIRouter] = [
     contact_emails.public_router,
     data_export.public_router,
     locations.router,
+    activities.router,
     geo.router,
     geo.public_router,
     staff.router,

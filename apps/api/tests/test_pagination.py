@@ -73,6 +73,9 @@ BOUNDED = {
     # waiting requests first, then the latest decided: LIMIT 200 (a business) and 50 (a client)
     "/freeze-requests": "limit in SQL",
     "/client/freeze-requests": "limit in SQL",
+    # a business's activities: at most the catalog's few dozen; a branch's are a subset of them
+    "/activities": "catalog-sized",
+    "/locations/{location_id}/activities": "catalog-sized",
     # the SQL returns at most 200 (staff) or 50 (one client: five requests and a few class places)
     "/waitlist": "limit in SQL",
     "/client/waitlist": "limit in SQL",

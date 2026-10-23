@@ -49,6 +49,7 @@ NO_DEMO: dict[str, str] = {
     "contact_requests": "leads from the public marketing site; they belong to the platform demo",
     "data_exports": "privacy exports are files made on request",
     "form101_forms": "answers are encrypted with the business key, filled in by the employee",
+    "tenant_profile": "the owner's answers while setting up; filled by the onboarding slice (C7)",
     "import_batch_items": "created by a real import run, undone or kept by the owner",
     "import_batches": "created by a real import run; the move session shows the flow",
     "invitations": "live sign-up links that would email a real address",
