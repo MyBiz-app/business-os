@@ -6156,10 +6156,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get Service Rooms
+         * @description The rooms that serve a resource service or an appointment that needs a room.
+         */
+        get: operations["get_service_rooms"];
         /**
          * Set Service Rooms
-         * @description Which bookable rooms serve a resource service (replaces the list).
+         * @description Which bookable rooms serve a resource service, or an appointment that needs a room
+         *     (replaces the list).
          */
         put: operations["set_service_rooms"];
         post?: never;
@@ -11129,6 +11134,11 @@ export interface components {
              * @description On-site services: one of the client's addresses (#42)
              */
             address_id?: string | null;
+            /**
+             * Room Id
+             * @description A service that needs a room: which one (default: the first free one)
+             */
+            room_id?: string | null;
         };
         /** AppointmentService */
         AppointmentService: {
@@ -11155,6 +11165,12 @@ export interface components {
              * @default false
              */
             on_site: boolean;
+            /**
+             * Needs Resource
+             * @description A staff member and a room (a court) are booked together
+             * @default false
+             */
+            needs_resource: boolean;
         };
         /** AppointmentStaff */
         AppointmentStaff: {
@@ -13028,6 +13044,11 @@ export interface components {
              * @description On-site services: one of the client's addresses (#42)
              */
             address_id?: string | null;
+            /**
+             * Room Id
+             * @description A service that needs a room: which one (default: the first free one)
+             */
+            room_id?: string | null;
         };
         /** ClientBooking */
         ClientBooking: {
@@ -22255,6 +22276,11 @@ export interface components {
              */
             travel_minutes: number;
             /**
+             * Needs Resource
+             * @default false
+             */
+            needs_resource: boolean;
+            /**
              * Waitlist Mode
              * @description Overrides the business's waitlist mode for this service
              */
@@ -22329,6 +22355,12 @@ export interface components {
              * @default 0
              */
             travel_minutes: number;
+            /**
+             * Needs Resource
+             * @description Appointment only: the staff member and a room (a court) are booked together
+             * @default false
+             */
+            needs_resource: boolean;
         };
         /** ServiceOption */
         ServiceOption: {
@@ -22397,6 +22429,8 @@ export interface components {
             on_site?: boolean | null;
             /** Travel Minutes */
             travel_minutes?: number | null;
+            /** Needs Resource */
+            needs_resource?: boolean | null;
             /**
              * Waitlist Mode
              * @description This service's own waitlist mode; null follows the business
@@ -22752,6 +22786,13 @@ export interface components {
             staff_user_id: string;
             /** Staff Name */
             staff_name: string;
+            /**
+             * Room Id
+             * @description A service that needs a room: the room this time would use
+             */
+            room_id?: string | null;
+            /** Room Name */
+            room_name?: string | null;
         };
         /** SocialAccount */
         SocialAccount: {
@@ -38893,6 +38934,7 @@ export interface operations {
                 service_id: string;
                 date: string;
                 staff_user_id?: string | null;
+                room_id?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -39153,6 +39195,7 @@ export interface operations {
                 service_id: string;
                 date: string;
                 staff_user_id?: string | null;
+                room_id?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -39652,6 +39695,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoomHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_service_rooms: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceRoom"][];
                 };
             };
             /** @description Validation Error */

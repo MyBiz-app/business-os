@@ -505,6 +505,14 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **A1 refinement (2026-10-23):** the light primary fill is `#0071E3`, not `#007AFF`: white text on `#007AFF` is 4.0:1 (below WCAG AA); `#0071E3` is 4.7:1. Dark stays `#0A84FF`. Text-safe blue (`primaryInk`) is `#0062CC` / `#4DA3FF`. Dark mode is true black with `#1C1C1E` surfaces. One line to flip back if the owner prefers the exact iOS blue.
 - **Revisit** if the home mobile Lighthouse score stays under 80 or the blue fails contrast on a surface.
 
+### A lesson takes a coach and a room together (2026-10-23, categories slice C4, migration 0157)
+
+- **Model M5 is a flag on an appointment service, not a new booking mode.** `services.needs_resource` (appointment, not on-site) plus the existing `service_rooms` list. The session keeps the staff member and also holds the room (`sessions.holds_room`, not `reserved`: reservations are paid by the hour, a lesson is priced as an appointment).
+- **The client may name a court; if not, the server takes the first free one** (by branch and room name). Free times are the overlap of the coach's hours and a linked room's hours and free time.
+- **One rule in the database:** a trigger refuses an appointment session of such a service without a room, so no path (waitlist, seed, future code) can skip the court. An exclusion constraint and per-room locks keep two bookings off one court.
+- **Why:** reuses the appointment and reservation machinery; existing services are untouched (flag defaults off).
+- **Revisit** when a lesson needs two rooms or more than one coach (slice C6 handles several instructors for classes).
+
 ## Open
 
 

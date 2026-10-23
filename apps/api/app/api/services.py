@@ -20,7 +20,7 @@ DeleteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_DELETE))
 COLUMNS = (
     "id, name, description, duration_minutes, capacity, booking_mode, price_amount, "
     "price_currency, color, active, created_at, updated_at, min_minutes, max_minutes, "
-    "step_minutes, price_per_hour, on_site, travel_minutes, waitlist_mode"
+    "step_minutes, price_per_hour, on_site, travel_minutes, waitlist_mode, needs_resource"
 )
 COLOR_PATTERN = r"^#[0-9a-fA-F]{6}$"
 # class: scheduled sessions people join; appointment: one-to-one at a free time with a staff member;
@@ -58,11 +58,17 @@ class ServiceCreate(ServiceFields):
     travel_minutes: int = Field(
         default=0, ge=0, le=240, description="On-site: time to get there, before each job"
     )
+    needs_resource: bool = Field(
+        default=False,
+        description="Appointment only: the staff member and a room (a court) are booked together",
+    )
 
     @model_validator(mode="after")
     def resource_lengths(self) -> "ServiceCreate":
         if self.on_site and self.booking_mode != "appointment":
             raise ValueError("only an appointment service can be on-site")
+        if self.needs_resource and (self.booking_mode != "appointment" or self.on_site):
+            raise ValueError("only an appointment service in the business can need a room")
         if self.booking_mode == "resource":
             check_lengths(self.min_minutes, self.max_minutes, self.step_minutes)
             if self.price_per_hour is None:
@@ -90,6 +96,7 @@ class ServiceUpdate(ServiceFields):
     price_per_hour: int | None = Field(default=None, ge=0)
     on_site: bool | None = None
     travel_minutes: int | None = Field(default=None, ge=0, le=240)
+    needs_resource: bool | None = None
     waitlist_mode: Literal["off", "auto", "first_come", "manual"] | None = Field(
         default=None, description="This service's own waitlist mode; null follows the business"
     )
@@ -122,6 +129,7 @@ class Service(BaseModel):
     price_per_hour: int | None = None
     on_site: bool = False
     travel_minutes: int = 0
+    needs_resource: bool = False
     waitlist_mode: Literal["off", "auto", "first_come", "manual"] | None = Field(
         default=None, description="Overrides the business's waitlist mode for this service"
     )
@@ -148,12 +156,12 @@ def create_service(body: ServiceCreate, context: WriteDep) -> Service:
                 INSERT INTO app.services
                     (tenant_id, name, description, duration_minutes, capacity, booking_mode,
                      price_amount, price_currency, color, active, min_minutes, max_minutes,
-                     step_minutes, price_per_hour, on_site, travel_minutes)
+                     step_minutes, price_per_hour, on_site, travel_minutes, needs_resource)
                 SELECT :tenant_id, :name, :description, :duration_minutes,
                        CASE WHEN :booking_mode = 'class' THEN :capacity ELSE 1 END,
                        :booking_mode, :price_amount, coalesce(:price_currency, t.currency),
                        :color, :active, :min_minutes, :max_minutes, :step_minutes,
-                       :price_per_hour, :on_site, :travel_minutes
+                       :price_per_hour, :on_site, :travel_minutes, :needs_resource
                 FROM app.tenants t WHERE t.id = :tenant_id
                 RETURNING {COLUMNS}
             """),
@@ -191,6 +199,7 @@ def update_service(service_id: UUID, body: ServiceUpdate, context: WriteDep) -> 
         "active",
         "on_site",
         "travel_minutes",
+        "needs_resource",
     }
     changes = {
         key: value
@@ -211,9 +220,12 @@ def update_service(service_id: UUID, body: ServiceUpdate, context: WriteDep) -> 
                 .first()
             )
     except IntegrityError as error:  # e.g. a resource without its lengths or price per hour
+        reason = str(error.orig)
         detail = (
             "invalid_on_site"
-            if "services_on_site_appointment" in str(error.orig)
+            if "services_on_site_appointment" in reason
+            else "invalid_needs_resource"
+            if "services_needs_resource_appointment" in reason
             else "invalid_resource"
         )
         raise HTTPException(
