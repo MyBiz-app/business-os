@@ -468,11 +468,25 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Recent records** (the last five opened from the window) live in the browser per business, like saved views; nothing about them is stored on the server.
 - **Revisit** if invoices per business grow past tens of thousands (add a trigram index on client name) or if a later slice needs quotes and receipts in the same box.
 
+### "My businesses": one view over many businesses, read business by business (2026-10-23, demo slice D7, no migration)
+
+- **Decision:** `GET /client/overview` returns the signed-in person's businesses, next bookings, live cards, waiting items and "book again" suggestions in one response. It lists the person's own client records, then visits each business in turn (the same `X-Tenant-Id` scoping and client policies as every other `/client` route, inside a savepoint) and reads only that person's rows there. There is no cross-business table, view or function, and no business-side route changed. A closed or suspended business, or one without the client app, is left out.
+- **Why:** each business keeps its own client record, so a combined table would be the one place where a business's data and another's meet. Reading one business at a time keeps every row behind that business's own row-level security, and nothing a business can read ever mentions another business. Cost is about ten small queries per business; bounded by 50 businesses and 20 bookings each.
+- **Push:** a client push carries `tenant_id` so a tap opens that business. The app opens it only if the person has an area there, so a forged notification cannot switch to a business they do not belong to.
+- **Look:** inside a business everything keeps the business's colour and logo; "My businesses" uses MyBiz's own look so it is always clear that it is the whole picture.
+- **Revisit** if people regularly hold more than about ten businesses (cache the overview) or when the real payment provider needs a combined "to pay" list.
+
 ### Demo extra layers are keyed by business role, not by name (2026-10-23, demo slice D1, no migration)
 
 - **Decision:** the round 6 and round 7 demo layers choose their content (quotes, AI chats, website, subscription history, business size, the gym's migration session) from a role derived from the business's industry (`seed/roles.py`), not from the English names of the original three demo businesses. Demo `full` rebuilds the owner's account with four businesses (gym, tennis courts, barbershop, physio and nutrition clinic).
 - **Why:** the new demo has different businesses with Hebrew names; name lookups would silently skip every layer for them.
 - **Revisit** if two businesses of one industry in one demo need different content (then add a role to the business spec).
+
+### Demo sign-in accounts take over demo team members (2026-10-23, demo slice D5, no migration)
+
+- **Decision:** the owner's "plus" addresses become team members by taking over an existing demo team member of the right branch: every reference to the demo profile moves to the real person (found from the database's own foreign keys), then the demo profile is removed. Passwords are never set by the seed.
+- **Why:** a new member would have no shifts, classes or pay terms; taking over keeps the whole history. The seed cannot create sign-ins, so each address must sign up first and the seed is run again.
+- **Revisit** if a table gets a reference to a person that is not a database foreign key.
 
 ## Open
 

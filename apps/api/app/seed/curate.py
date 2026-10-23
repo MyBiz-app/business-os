@@ -22,6 +22,7 @@ from app.seed.common import DEMOS, profile_id
 from app.seed.guard import refuse_blocked_owner
 from app.seed.profiles import enrich_profiles
 from app.seed.residence import place_residents
+from app.seed.social import seed_social
 
 RENAMES = {"Iron & Flow": "Adir fitness"}
 # Branches that moved to other cities so the demo map has branches across the country
@@ -130,6 +131,7 @@ def curate(
     ]
     result = enrich_profiles(conn, owner_email)
     places = place_branches(conn, owner_email)
+    social = seed_social(conn, owner_email) if demo == "full" else None
     residents = place_residents(conn, [tenant for tenant, _ in _owned(conn, owner)])
     return {
         "removed": len(remove),
@@ -138,4 +140,5 @@ def curate(
         **result,
         "places": places,
         "residents": residents,
+        **({"social": social} if social else {}),
     }

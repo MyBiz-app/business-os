@@ -24,7 +24,9 @@ class PushResult:
 
 
 class PushSender(Protocol):
-    def send(self, tokens: list[str], title: str, body: str) -> PushResult: ...
+    def send(
+        self, tokens: list[str], title: str, body: str, data: dict[str, str] | None = None
+    ) -> PushResult: ...
 
 
 class LogPushSender:
@@ -32,9 +34,13 @@ class LogPushSender:
 
     def __init__(self) -> None:
         self.sent: list[tuple[list[str], str, str]] = []
+        self.sent_data: list[dict[str, str] | None] = []
 
-    def send(self, tokens: list[str], title: str, body: str) -> PushResult:
+    def send(
+        self, tokens: list[str], title: str, body: str, data: dict[str, str] | None = None
+    ) -> PushResult:
         self.sent.append((tokens, title, body))
+        self.sent_data.append(data)
         return PushResult(delivered=len(tokens))
 
 
@@ -44,12 +50,20 @@ class ExpoPushSender:
     def __init__(self, access_token: str | None = None) -> None:
         self.access_token = access_token
 
-    def send(self, tokens: list[str], title: str, body: str) -> PushResult:
+    def send(
+        self, tokens: list[str], title: str, body: str, data: dict[str, str] | None = None
+    ) -> PushResult:
         delivered, dead = 0, []
         for start in range(0, len(tokens), BATCH):
             chunk = tokens[start : start + BATCH]
             messages = [
-                {"to": token, "title": title, "body": body[:BODY_LIMIT], "sound": "default"}
+                {
+                    "to": token,
+                    "title": title,
+                    "body": body[:BODY_LIMIT],
+                    "sound": "default",
+                    **({"data": data} if data else {}),
+                }
                 for token in chunk
             ]
             headers = {"Content-Type": "application/json", "Accept": "application/json"}
@@ -80,15 +94,25 @@ def tokens_for(conn: Connection, user_id: UUID | None) -> list[str]:
 
 
 def push_to_user(
-    conn: Connection, push: PushSender, user_id: UUID | None, title: str, body: str
+    conn: Connection,
+    push: PushSender,
+    user_id: UUID | None,
+    title: str,
+    body: str,
+    tenant_id: UUID | None = None,
 ) -> bool:
     """Pushes to every phone the person registered; True when at least one accepted it. A push
-    service error counts as not delivered, so the caller falls back to email."""
+    service error counts as not delivered, so the caller falls back to email. `tenant_id` names
+    the business a client's push comes from, so the app opens that business when it is tapped."""
     tokens = tokens_for(conn, user_id)
     if not tokens:
         return False
     try:
-        result = push.send(tokens, title, body)
+        result = (
+            push.send(tokens, title, body, {"tenant_id": str(tenant_id)})
+            if tenant_id
+            else push.send(tokens, title, body)
+        )
     except Exception as error:  # the push service being down must not stop the batch
         print(f"push to {user_id} failed: {error}")
         return False

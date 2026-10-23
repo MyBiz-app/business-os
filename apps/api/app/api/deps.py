@@ -345,6 +345,13 @@ def get_client_context(
     client_id = session.execute(text("SELECT app.current_client_id()")).scalar()
     if client_id is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_client")
+    ensure_client_business_open(session, tenant_id)
+    count_tenant_request(request, tenant_id)
+    return ClientContext(session=session, tenant_id=tenant_id, client_id=client_id)
+
+
+def ensure_client_business_open(session: Session, tenant_id: UUID) -> None:
+    """A closed or suspended business, or one without the client app, serves no client."""
     closed, billing_state = session.execute(
         text("""
             SELECT closed_at IS NOT NULL,
@@ -359,8 +366,6 @@ def get_client_context(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="billing_suspended")
     if not has_module(session, "client_app"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
-    count_tenant_request(request, tenant_id)
-    return ClientContext(session=session, tenant_id=tenant_id, client_id=client_id)
 
 
 ClientDep = Annotated[ClientContext, Depends(get_client_context)]

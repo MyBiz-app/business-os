@@ -297,7 +297,12 @@ def _send_batch(
                 _finish_delivery(conn, row["id"], "sent")
             elif channel == "push":
                 if push is None or not push_to_user(
-                    conn, push, row["user_id"], texts["subject"], texts["body"]
+                    conn,
+                    push,
+                    row["user_id"],
+                    texts["subject"],
+                    texts["body"],
+                    announcement["tenant_id"],
                 ):
                     _finish_delivery(conn, row["id"], "skipped", "no push delivered")
                     counts["skipped"] += 1

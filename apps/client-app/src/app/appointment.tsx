@@ -57,7 +57,7 @@ export default function Appointment() {
   const today = business ? todayIn(business.time_zone) : "";
   const [service, setService] = useState<Service | null>(null);
   const [staff, setStaff] = useState<string | null>(null);
-  const params = useLocalSearchParams<{ day?: string }>();
+  const params = useLocalSearchParams<{ day?: string; service?: string; staff?: string }>();
   const [day, setDay] = useState(params.day || today);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>(null);
@@ -74,6 +74,15 @@ export default function Appointment() {
     return { services, team };
   }, [api, scope, business]);
   const { data } = useLoad(load);
+
+  // "Book again" arrives with the service (and the person) from the last visit already chosen.
+  useEffect(() => {
+    if (service || !data || !params.service) return;
+    const wanted = data.services.find((s) => s.id === params.service);
+    if (!wanted) return;
+    setService(wanted);
+    if (params.staff && data.team.some((m) => m.user_id === params.staff)) setStaff(params.staff);
+  }, [data, params.service, params.staff, service]);
 
   useEffect(() => {
     if (!service || !day) return;
