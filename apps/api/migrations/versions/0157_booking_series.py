@@ -51,6 +51,11 @@ def upgrade() -> None:
         )
     """)
     op.execute("CREATE INDEX booking_series_client ON app.booking_series (tenant_id, client_id)")
+    op.execute("CREATE INDEX booking_series_service ON app.booking_series (tenant_id, service_id)")
+    op.execute(
+        "CREATE INDEX booking_series_room ON app.booking_series (tenant_id, room_id)"
+        " WHERE room_id IS NOT NULL"
+    )
     op.execute(
         "ALTER TABLE app.bookings ADD COLUMN series_id uuid REFERENCES app.booking_series (id)"
     )

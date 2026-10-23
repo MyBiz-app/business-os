@@ -108,7 +108,7 @@ SELECT = """
 
 
 def _load_series(db: Session, series_id: UUID) -> Series:
-    row = db.execute(text(f"{SELECT} WHERE ss.id = :id"), {"id": series_id}).mappings().first()
+    row = db.execute(text(SELECT + " WHERE ss.id = :id"), {"id": series_id}).mappings().first()
     if row is None:
         raise not_found()
     return Series.model_validate(dict(row))
@@ -282,7 +282,7 @@ def list_client_booking_series(client_id: UUID, context: ReadDep, page: PageDep)
     rows = (
         context.session.execute(
             text(
-                f"{SELECT} WHERE ss.client_id = :client ORDER BY ss.created_at DESC, ss.id "
+                SELECT + " WHERE ss.client_id = :client ORDER BY ss.created_at DESC, ss.id "
                 "LIMIT :limit OFFSET :offset"
             ),
             {"client": client_id, "limit": page.limit, "offset": page.offset},
@@ -333,7 +333,7 @@ def my_booking_series(context: ClientDep, page: PageDep) -> list[Series]:
     rows = (
         context.session.execute(
             text(
-                f"{SELECT} WHERE ss.client_id = :client ORDER BY ss.created_at DESC, ss.id "
+                SELECT + " WHERE ss.client_id = :client ORDER BY ss.created_at DESC, ss.id "
                 "LIMIT :limit OFFSET :offset"
             ),
             {"client": context.client_id, "limit": page.limit, "offset": page.offset},
