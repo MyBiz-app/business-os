@@ -260,3 +260,4 @@ export function textKey(key: string, name: string, has: (path: string) => boolea
   }
   return `verticals.${lineage[0]}.${name}`;
 }
+export * from "./terms";

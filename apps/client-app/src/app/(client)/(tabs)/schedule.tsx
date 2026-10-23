@@ -18,7 +18,7 @@ import { type ClientSession, SessionCard } from "@/components/session-card";
 import { Button, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { scheduleViewFor, termsFor } from "@business-os/app-kit/lib/vertical";
+import { scheduleViewFor, useTerm } from "@business-os/app-kit/lib/vertical";
 import { NO_FILTERS, applyFilters, filterOptions, upcomingRelease, type ClassFilters } from "@/lib/class-filters";
 import { useDependents } from "@/lib/use-dependents";
 import { useLocations } from "@/lib/use-locations";
@@ -31,7 +31,7 @@ export default function Schedule() {
   const t = useTranslations("client.schedule");
   const tAppointment = useTranslations("client.appointment");
   const tCourt = useTranslations("client.court");
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
   const locale = useLocale();
   const { api, scope, business, businesses, select, palette } = useBusiness();
   const branches = useLocations();
@@ -315,13 +315,13 @@ export default function Schedule() {
             );
           })}
           {!loading && weekDays(day).every((d) => !marked.has(d)) && (
-            <Text style={[styles.muted, { color: palette.muted }]}>{tTerms(`${termsFor(business)}.appEmpty`)}</Text>
+            <Text style={[styles.muted, { color: palette.muted }]}>{term(business, "appEmpty")}</Text>
           )}
         </View>
       ) : view === "month" ? null : closed && sessions.length === 0 ? null : visible.length === 0 && sessions.length > 0 ? (
         <Text style={[styles.muted, { color: palette.muted }]}>{t("noMatch")}</Text>
       ) : sessions.length === 0 ? (
-        <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : tTerms(`${termsFor(business)}.appEmpty`)}</Text>
+        <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : term(business, "appEmpty")}</Text>
       ) : (
         <View style={local.list}>
           {visible.map((session) => (

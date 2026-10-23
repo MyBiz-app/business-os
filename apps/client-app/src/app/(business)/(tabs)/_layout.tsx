@@ -4,7 +4,7 @@ import { useTranslations } from "use-intl";
 
 import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
 
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { useTerm } from "@business-os/app-kit/lib/vertical";
 import { useAreas } from "@/providers/area-provider";
 import { AiBubble } from "@/components/ai-bubble";
 import { useStaff } from "@/providers/staff-provider";
@@ -18,7 +18,7 @@ export default function TabsLayout() {
   const screenOptions = useTabScreenOptions(palette);
   const icon = (name: Parameters<typeof tabIcon>[0]) => tabIcon(name, palette);
   const t = useTranslations("business.tabs");
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
 
   if (!loading && !session) return <Redirect href="/sign-in" />;
   if (active && active.kind !== "business") return <Redirect href="/" />;
@@ -42,7 +42,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="clients"
         options={{
-          title: tTerms(`${termsFor(tenant)}.clients`),
+          title: term(tenant, "clients"),
           tabBarIcon: icon("people"),
           href: can("clients.read") ? undefined : null,
         }}

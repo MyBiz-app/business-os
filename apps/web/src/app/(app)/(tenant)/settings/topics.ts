@@ -5,6 +5,7 @@ export const SETTINGS_TOPICS = [
   { key: "business", href: "/settings/business", group: "business" },
   { key: "memberships", href: "/settings/memberships", group: "business" },
   { key: "bookings", href: "/settings/bookings", group: "business" },
+  { key: "terms", href: "/settings/terms", group: "business" },
   { key: "branding", href: "/settings/branding", group: "look" },
   { key: "modules", href: "/settings/modules", group: "plan" },
   { key: "billing", href: "/settings/billing", group: "plan" },

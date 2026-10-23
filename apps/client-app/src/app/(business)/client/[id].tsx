@@ -15,7 +15,7 @@ import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { fullName } from "@business-os/app-kit/lib/names";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { billsByTime, dependentsFor, termsFor } from "@business-os/app-kit/lib/vertical";
+import { billsByTime, dependentsFor, useTerm } from "@business-os/app-kit/lib/vertical";
 import { DependentForm } from "@business-os/app-kit/components/dependent-form";
 import { useStaff } from "@/providers/staff-provider";
 
@@ -43,7 +43,7 @@ export default function ClientScreen() {
   const tMethods = useTranslations("receipts.methods");
   const tStatus = useTranslations("clients.statuses");
   const tMessaging = useTranslations("messaging");
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
   const tActivity = useTranslations("clients.activity");
   const tDependents = useTranslations("dependents");
   const tQuotes = useTranslations("quotes");
@@ -128,7 +128,7 @@ export default function ClientScreen() {
   if (!data || !tenant) {
     return (
       <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
-        <BackBar label={tTerms(`${termsFor(tenant)}.clients`)} palette={palette} onPress={() => router.back()} />
+        <BackBar label={term(tenant, "clients")} palette={palette} onPress={() => router.back()} />
       </Screen>
     );
   }
@@ -211,7 +211,7 @@ export default function ClientScreen() {
 
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
-      <BackBar label={tTerms(`${termsFor(tenant)}.clients`)} palette={palette} onPress={() => router.back()} />
+      <BackBar label={term(tenant, "clients")} palette={palette} onPress={() => router.back()} />
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
         <Avatar name={name} palette={palette} size={56} />
@@ -563,7 +563,7 @@ export default function ClientScreen() {
         <>
       <Card palette={palette}>
         <SectionTitle
-          title={tTerms(`${termsFor(tenant)}.visitNotes`)}
+          title={term(tenant, "visitNotes")}
           action={can("clients.write") || can("bookings.manage") ? tNotes("add") : undefined}
           onAction={() => toggle("note")}
           palette={palette}
