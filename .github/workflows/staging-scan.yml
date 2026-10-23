@@ -1,0 +1,75 @@
+name: Staging scan (accessibility, performance, security)
+
+# Manual, read-only scan of the PUBLIC pages of staging, no login and no paid service:
+#   1. axe-core accessibility (e2e/staging_axe.py)
+#   2. Lighthouse performance / accessibility / best practices / SEO (mobile)
+#   3. OWASP ZAP baseline: passive only (spider + passive rules), never attacks
+# The nightly security-nightly.yml covers dependencies, secrets and the image; this one covers the
+# running site. Kept small on purpose (few pages, one run) to spare the Vercel bandwidth.
+# Logged-in screens are covered by the axe check in e2e/crawl.py (local stack), not here.
+on:
+  workflow_dispatch:
+    inputs:
+      web_url:
+        description: Web base URL
+        default: https://business-os-alpha-drab.vercel.app
+      api_url:
+        description: API base URL
+        default: https://business-os-api-staging.onrender.com
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      WEB: ${{ inputs.web_url }}
+      API: ${{ inputs.api_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Wake the free-plan API
+        run: curl -sS --retry 5 --retry-delay 15 --retry-all-errors -m 90 "$API/health/ready"
+
+      - name: Install a browser for Playwright
+        run: uvx playwright install --with-deps chromium
+
+      - name: Accessibility (axe-core)
+        continue-on-error: true
+        working-directory: e2e
+        env:
+          SWEEP_BASE: ${{ inputs.web_url }}
+        run: uv run --with playwright --with axe-playwright-python python staging_axe.py "$GITHUB_WORKSPACE/scan/axe.json"
+
+      - name: Lighthouse (mobile)
+        continue-on-error: true
+        run: |
+          mkdir -p scan/lighthouse
+          for p in / /pricing /features /login /signup /contact; do
+            n=$(echo "$p" | tr '/' '_'); n=${n:-_home}
+            npx --yes lighthouse@12.8.2 "$WEB$p" --quiet --chrome-flags="--headless=new --no-sandbox" \
+              --output=json --output-path="scan/lighthouse/$n.json" || true
+          done
+
+      - name: ZAP baseline (passive)
+        continue-on-error: true
+        run: |
+          mkdir -p scan/zap && chmod 777 scan/zap
+          docker run --rm -v "$PWD/scan/zap:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t "$WEB" -m 3 -J web.json -r web.html -I
+          docker run --rm -v "$PWD/scan/zap:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t "$API/health" -m 1 -J api.json -r api.html -I
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: staging-scan
+          path: scan/
+          retention-days: 30
