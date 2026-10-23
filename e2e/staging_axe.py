@@ -12,6 +12,7 @@ import os
 import sys
 
 from axe_playwright_python.sync_playwright import Axe
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
 
 import helpers as h
@@ -32,12 +33,17 @@ def main(out_path: str) -> None:
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=h.chromium())
         for name, locale, scheme, (w, hgt) in VARIANTS:
+            # The site's strict CSP forbids the string evaluation that helpers.ready() and axe use.
             page = browser.new_context(
-                locale=locale, color_scheme=scheme, viewport={"width": w, "height": hgt}
+                locale=locale, color_scheme=scheme, viewport={"width": w, "height": hgt}, bypass_csp=True
             ).new_page()
             for path in PAGES:
                 response = page.goto(BASE + path)
-                h.ready(page)
+                try:
+                    page.wait_for_load_state("networkidle", timeout=8000)
+                except PlaywrightTimeoutError:
+                    pass  # some pages keep polling; scan what has rendered
+                page.wait_for_timeout(1500)  # let entrance animations finish
                 violations = Axe().run(page).response["violations"]
                 results.append(
                     {
