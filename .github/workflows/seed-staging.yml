@@ -36,7 +36,7 @@ jobs:
   seed:
     name: Seed demo businesses
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     environment: staging
     steps:
       - uses: actions/checkout@v4
