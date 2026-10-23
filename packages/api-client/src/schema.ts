@@ -23498,7 +23498,7 @@ export interface components {
             business_license_expires_on?: string | null;
             /**
              * Terms Override
-             * @description The business's own words by language and word (a missing word: the industry's)
+             * @description The business's own words by language and word; others keep the industry's
              */
             terms_override?: {
                 [key: string]: {

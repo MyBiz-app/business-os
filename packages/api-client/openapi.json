@@ -82250,7 +82250,7 @@
             },
             "type": "object",
             "title": "Terms Override",
-            "description": "The business's own words by language and word (a missing word: the industry's)"
+            "description": "The business's own words by language and word; others keep the industry's"
           },
           "cancellation_window_minutes": {
             "type": "integer",
