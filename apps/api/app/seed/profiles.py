@@ -23,6 +23,7 @@ from app.seed.common import TIME_ZONE
 from app.seed.guard import refuse_blocked_owner
 from app.seed.round6 import seed_round6
 from app.seed.round7 import seed_round7
+from app.seed.scenarios import seed_scenarios
 from app.seed.workspace import OPENING_HOURS
 
 ASSETS = Path(__file__).parent / "assets"
@@ -179,6 +180,7 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
         "payroll_runs": 0,
         "move_sessions": 0,
         "round7": 0,
+        "scenarios": 0,
     }
     today = datetime.now(ZoneInfo(TIME_ZONE)).date()
     tenants = conn.execute(
@@ -286,4 +288,7 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
 
         # Round 7: quotes, documents, AI chats, announcements, planning, a website and more.
         counts["round7"] += sum(seed_round7(conn, tenant_id, tenant_name, today).values())
+
+        # Morning scenarios: the hero clients and the edge cases of the day.
+        counts["scenarios"] += sum(seed_scenarios(conn, tenant_id, tenant_name, today).values())
     return counts

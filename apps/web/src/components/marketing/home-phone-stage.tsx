@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { DeviceFrame } from "@/components/ui/device-frame";
+
 export type HomePhoneLabels = {
   title: string;
   days: string[];
@@ -101,9 +103,8 @@ export function HomePhoneStage({ labels }: { labels: HomePhoneLabels }) {
       >
         {/* soft glow under the phone */}
         <div className="absolute inset-x-6 -bottom-6 h-10 rounded-full bg-primary/30 blur-2xl [transform:translateZ(-60px)]" />
-        <div className="relative h-[27rem] rounded-[2.5rem] border-[10px] border-foreground/85 bg-background p-3 shadow-2xl">
-          <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-foreground/20" />
-          <div className="relative h-[calc(100%-1.125rem)] overflow-hidden">
+        <DeviceFrame device="phone" className="!aspect-auto h-[27rem]">
+          <div className="relative flex-1 overflow-hidden">
             {/* Screen 1: schedule */}
             <div className={pane(0)}>
               <p className="mb-2 text-base font-bold">{labels.title}</p>
@@ -173,7 +174,7 @@ export function HomePhoneStage({ labels }: { labels: HomePhoneLabels }) {
               <p className="mt-3 rounded-xl bg-success/15 px-3 py-2 text-[11px] font-semibold">{labels.inviteSent}</p>
             </div>
           </div>
-        </div>
+        </DeviceFrame>
       </div>
       {/* screen dots */}
       <div className="mt-6 flex justify-center gap-1.5">

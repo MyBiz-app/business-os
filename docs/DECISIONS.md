@@ -494,6 +494,15 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** a new member would have no shifts, classes or pay terms; taking over keeps the whole history. The seed cannot create sign-ins, so each address must sign up first and the seed is run again.
 - **Revisit** if a table gets a reference to a person that is not a database foreign key.
 
+### Apple look: hero concept, font, colour and glass (2026-10-23, Apple-look round slice L1, no migration)
+
+- **Hero concept:** "your business, on every screen". The site hero shows a CSS-drawn phone and laptop (shared `DeviceFrame`, no Apple logo or product names) with live HTML screens, driven by one `--p` CSS progress variable. A 941-frame image sequence was rejected: 50-90 MB per visit, blocked by the CSP and a state update per scroll.
+- **Font:** the system font on Apple devices: stack `-apple-system, BlinkMacSystemFont`, then Assistant (Hebrew and the fallback). No font download on Apple devices.
+- **Colour:** primary becomes Apple blue (`#007AFF` light, `#0A84FF` dark) on the iOS grouped background (`#F2F2F7`). Contrast of text on the primary is re-checked when the tokens change (slice A1/F1).
+- **Liquid Glass:** translucent blurred surfaces for bars and sheets, with a plain opaque fallback where `backdrop-filter` is missing or reduced transparency is set.
+- **Why:** an Apple-grade first impression for a product whose owners and clients mostly use iPhones, at near-zero page weight.
+- **Revisit** if the home mobile Lighthouse score stays under 80 or the blue fails contrast on a surface.
+
 ## Open
 
 
