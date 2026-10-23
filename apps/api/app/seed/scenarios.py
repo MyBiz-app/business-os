@@ -316,10 +316,11 @@ def _gym_heroes(ctx: Ctx) -> int:
     rg = _location(ctx, "רמת גן")
     haifa = _location(ctx, "חיפה")
     jlm = _location(ctx, "ירושלים")
-    cls = _service(ctx, "class")
+    strength_class = _service(ctx, "class", "כוח")
+    pilates_class = _service(ctx, "class", "פילאטיס")
     # Noa signed up yesterday, has no health declaration and a class tonight.
     noa = _client(ctx, "noa", "נועה", "לוי", ta, "instagram", 1)
-    _visit(ctx, noa, ta, cls, 0, 21, "booked", _entitlement(ctx, noa, ta, started_ago=1),
+    _visit(ctx, noa, ta, strength_class, 0, 21, "booked", _entitlement(ctx, noa, ta, started_ago=1),
            capacity=12)  # fmt: skip
     # Omer hurt his knee at the strength branch and was referred to the clinic.
     omer = _client(ctx, "omer", "עומר", "כהן", ta, "referral", 200)
@@ -328,7 +329,7 @@ def _gym_heroes(ctx: Ctx) -> int:
     # Tamar: the pilates membership ends in three days, first on tomorrow's waiting list.
     tamar = _client(ctx, "tamar", "תמר", "אברהם", rg, "walk_in", 150)
     _entitlement(ctx, tamar, rg, started_ago=27, ends_in=3)
-    full = _session(ctx, rg, cls, _at(ctx, 1, 18, 30), capacity=2)
+    full = _session(ctx, rg, pilates_class, _at(ctx, 1, 18, 30), capacity=2)
     for other in _other_clients(ctx, 2):
         _book(ctx, full, other, "booked")
     _book(ctx, full, tamar, "waitlisted")
@@ -355,7 +356,7 @@ def _gym_heroes(ctx: Ctx) -> int:
             },
         )  # fmt: skip
     _failed_payment(ctx, dana, jlm, 28000, 2)
-    _ron(ctx, ta, cls)
+    _ron(ctx, ta, strength_class)
     # Itai: an Instagram lead who asked to be called back yesterday; nobody did.
     itai_phone = "052-555-0142"
     ctx.conn.execute(
