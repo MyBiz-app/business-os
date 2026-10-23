@@ -258,7 +258,7 @@ def my_overview(session: SessionDep) -> ClientOverview:
     rows = [
         dict(row)
         for row in session.execute(
-            text(f"{BUSINESS_SELECT} ORDER BY t.name LIMIT :limit"), {"limit": MAX_BUSINESSES}
+            text(BUSINESS_SELECT + " ORDER BY t.name LIMIT :limit"), {"limit": MAX_BUSINESSES}
         ).mappings()
     ]
     result = ClientOverview(businesses=[], next=[], cards=[], waiting=[], rebook=[])
