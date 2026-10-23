@@ -55,8 +55,8 @@ def load_current_tenant(session: Session) -> Tenant:
         session.execute(
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
-                       t.primary_color, t.created_at, t.cancellation_window_minutes,
-                       t.booking_horizon_days,
+                       t.primary_color, t.created_at, t.terms_override,
+                       t.cancellation_window_minutes, t.booking_horizon_days,
                        t.weekly_release_weekday, t.weekly_release_time, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales, t.require_mfa_for_staff,
                        t.network_scope, t.resource_payment, t.client_id_number,

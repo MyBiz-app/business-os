@@ -12,6 +12,7 @@ import {
   Plug,
   Puzzle,
   Snowflake,
+  Type,
   Sparkles,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -28,6 +29,7 @@ const ICONS: Record<TopicKey, LucideIcon> = {
   business: Building2,
   memberships: Snowflake,
   bookings: CalendarClock,
+  terms: Type,
   branding: Palette,
   modules: Puzzle,
   billing: CreditCard,
@@ -41,7 +43,7 @@ const ICONS: Record<TopicKey, LucideIcon> = {
 type Item = { key: TopicKey; href: string; group: TopicGroup };
 
 /** Topics shown as sections of the `/settings` page (see `page.tsx`); the rest open as pages of their own. */
-export const INLINE_TOPICS = ["business", "memberships", "bookings", "branding", "modules", "integrations", "aiConnections", "data", "help"] as const satisfies readonly TopicKey[];
+export const INLINE_TOPICS = ["business", "memberships", "bookings", "terms", "branding", "modules", "integrations", "aiConnections", "data", "help"] as const satisfies readonly TopicKey[];
 
 /** The room's frame: one inner menu. On `/settings` a click scrolls to that topic's section on the
  * same page; topics with a page of their own (billing, audit), and the topic pages reached by a

@@ -12,8 +12,8 @@ that needs a room when it holds none, so no path can skip the room.
 
 Nothing changes for existing services: the flag defaults to off.
 
-Revision ID: 0159
-Revises: 0158
+Revision ID: 0160
+Revises: 0159
 Create Date: 2026-10-23
 """
 
@@ -24,8 +24,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0159"
-down_revision: str | None = "0158"
+revision: str = "0160"
+down_revision: str | None = "0159"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

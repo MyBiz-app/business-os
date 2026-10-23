@@ -13264,6 +13264,15 @@ export interface components {
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
             /**
+             * Terms Override
+             * @description The business's own words by language and word
+             */
+            terms_override?: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
+            /**
              * Online Sales
              * @description The client can buy plans in the app
              */
@@ -23909,6 +23918,15 @@ export interface components {
              * @description Settings managers only
              */
             business_license_expires_on?: string | null;
+            /**
+             * Terms Override
+             * @description The business's own words by language and word; others keep the industry's
+             */
+            terms_override?: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
             /**
@@ -24203,6 +24221,15 @@ export interface components {
             currency?: string | null;
             /** Primary Color */
             primary_color?: string | null;
+            /**
+             * Terms Override
+             * @description Replaces the whole set of the business's own words
+             */
+            terms_override?: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            } | null;
             /** Cancellation Window Minutes */
             cancellation_window_minutes?: number | null;
             /** Booking Horizon Days */

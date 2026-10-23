@@ -511,7 +511,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** a new booking mode would touch every place that treats "not a class" as an appointment (calendar, reports, waitlist); a flag on a class service keeps one engine and the existing plan, credit and roster rules.
 - **Not in this slice:** the calendar and form screens (C10), a branch-wide "open entry" check-in from the client app (C11), an instructor busy check for the extra instructors, and changing the team of a whole series after it was created.
 - **Revisit** if a business needs the ratio to be a hard limit on bookings of an existing class (today it is checked when the session is created or edited).
-### A lesson takes a coach and a room together (2026-10-23, categories slice C4, migration 0159)
+### A lesson takes a coach and a room together (2026-10-23, categories slice C4, migration 0160)
 
 - **Model M5 is a flag on an appointment service, not a new booking mode.** `services.needs_resource` (appointment, not on-site) plus the existing `service_rooms` list. The session keeps the staff member and also holds the room (`sessions.holds_room`, not `reserved`: reservations are paid by the hour, a lesson is priced as an appointment).
 - **The client may name a court; if not, the server takes the first free one** (by branch and room name). Free times are the overlap of the coach's hours and a linked room's hours and free time.

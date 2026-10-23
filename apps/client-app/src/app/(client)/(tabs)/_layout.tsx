@@ -4,7 +4,7 @@ import { useTranslations } from "use-intl";
 
 import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
 
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { useTerm } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 import { InboxProvider, useInbox } from "@/providers/inbox-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
@@ -36,7 +36,7 @@ function BusinessTabs() {
   const { palette, business } = useBusiness();
   const screenOptions = useTabScreenOptions(palette);
   const icon = (name: Parameters<typeof tabIcon>[0]) => tabIcon(name, palette);
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
   const { inbox } = useInbox();
   const unread = inbox?.unread ?? 0;
 
@@ -50,7 +50,7 @@ function BusinessTabs() {
       <Tabs.Screen
         name="schedule"
         options={{
-          title: business ? tTerms(`${termsFor(business)}.appTab`) : t("schedule"),
+          title: business ? term(business, "appTab") : t("schedule"),
           tabBarIcon: icon("calendar"),
         }}
       />

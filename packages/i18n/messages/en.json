@@ -262,7 +262,8 @@
         "help": "Support",
         "aiConnections": "AI connections",
         "bookings": "Bookings and waitlists",
-        "memberships": "Memberships and freezes"
+        "memberships": "Memberships and freezes",
+        "terms": "Our words"
       },
       "hints": {
         "business": "Details, legal identity, legal readiness and your business emails.",
@@ -271,7 +272,8 @@
         "help": "Let our team look at your account, or write to us.",
         "aiConnections": "Connect Claude or ChatGPT to your business, and approve what they ask to change.",
         "bookings": "What happens when a class, an appointment or a court is full.",
-        "memberships": "Whether clients can ask to freeze from the app, and the rules."
+        "memberships": "Whether clients can ask to freeze from the app, and the rules.",
+        "terms": "What the screens call your clients, schedule and the rest, in your business's own words."
       }
     },
     "branding": {
@@ -410,6 +412,29 @@
       "perPlanHint": "For example a VIP membership with cancellation up to an hour before. The plan wins over the service.",
       "followBusiness": "Follow the business",
       "saveRow": "Save"
+    },
+    "terms": {
+      "title": "Rename words",
+      "subtitle": "Leave a box empty to keep the usual word for your industry. A change shows on every screen, including your clients' app. You are editing the words for the language of this page.",
+      "save": "Save",
+      "words": {
+        "client": "Client (one)",
+        "clients": "Clients (many)",
+        "addClient": "Add a client",
+        "newClient": "New client",
+        "searchClients": "Search clients",
+        "noClients": "No clients yet",
+        "noResults": "No results for the search",
+        "schedule": "The schedule",
+        "newSession": "Add to the schedule",
+        "noSessions": "Nothing on the schedule",
+        "appTab": "Schedule tab in the app",
+        "appEmpty": "Empty day in the app",
+        "place": "The place",
+        "profile": "Client details heading",
+        "visitNotes": "Visit notes",
+        "nextBooking": "Next booking"
+      }
     }
   },
   "locales": {
