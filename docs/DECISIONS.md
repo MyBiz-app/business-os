@@ -476,6 +476,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Look:** inside a business everything keeps the business's colour and logo; "My businesses" uses MyBiz's own look so it is always clear that it is the whole picture.
 - **Revisit** if people regularly hold more than about ten businesses (cache the overview) or when the real payment provider needs a combined "to pay" list.
 
+### Demo extra layers are keyed by business role, not by name (2026-10-23, demo slice D1, no migration)
+
+- **Decision:** the round 6 and round 7 demo layers choose their content (quotes, AI chats, website, subscription history, business size, the gym's migration session) from a role derived from the business's industry (`seed/roles.py`), not from the English names of the original three demo businesses. Demo `full` rebuilds the owner's account with four businesses (gym, tennis courts, barbershop, physio and nutrition clinic).
+- **Why:** the new demo has different businesses with Hebrew names; name lookups would silently skip every layer for them.
+- **Revisit** if two businesses of one industry in one demo need different content (then add a role to the business spec).
+
 ## Open
 
 

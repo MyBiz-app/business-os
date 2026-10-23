@@ -468,6 +468,46 @@ def test_curate_reduces_an_account_to_three_businesses_and_leaves_others_alone(
     assert foreign_left == 1
 
 
+def test_full_demo_builds_four_businesses_with_eleven_branches(engine: Engine) -> None:
+    from app.catalog.verticals import CATALOG
+
+    owner = uuid4()
+    email = f"full-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+        seed_demo(connection, email, "networks", 1, random.Random(4))  # the old three go away
+    with engine.begin() as connection:
+        first = curate(connection, email, 1, random.Random(4), "full")
+    with engine.begin() as connection:
+        again = curate(connection, email, 1, random.Random(4), "full")
+    assert first["removed"] == 3 and first["created"] == 4
+    assert again["removed"] == 0 and again["created"] == 0
+    with engine.connect() as connection:
+        rows = connection.execute(
+            text("""
+                SELECT t.name, t.vertical, count(DISTINCT l.id), array_agg(DISTINCT l.kind),
+                  (SELECT count(*) FROM app.quotes q WHERE q.tenant_id = t.id),
+                  (SELECT count(*) FROM app.ai_conversations c WHERE c.tenant_id = t.id)
+                FROM app.tenants t
+                JOIN app.tenant_members m ON m.tenant_id = t.id AND m.role = 'owner'
+                JOIN app.users u ON u.id = m.user_id AND u.email = :email
+                LEFT JOIN app.locations l ON l.tenant_id = t.id GROUP BY t.id, t.name, t.vertical
+            """),
+            {"email": email},
+        ).all()
+    by_name = {r[0]: r for r in rows}
+    assert set(by_name) == {"אדיר פיטנס", "טניס קלאב השרון", "בלייד ברברס", "מרחב - בריאות ותנועה"}
+    assert sum(r[2] for r in rows) == 11
+    assert [by_name[n][2] for n in ("אדיר פיטנס", "טניס קלאב השרון")] == [5, 2]
+    for _name, vertical, _branches, kinds, quotes, chats in rows:
+        category = CATALOG[CATALOG[vertical].category]
+        assert set(kinds) <= {category.key, vertical, *category.branch_kinds}
+        assert quotes == 4 and chats >= 1  # tailored by role, not by the business name
+
+
 def test_networks_demo_has_the_round_5_features(engine: Engine) -> None:
     owner = uuid4()
     email = f"ai-{owner.hex[:6]}@example.com"
