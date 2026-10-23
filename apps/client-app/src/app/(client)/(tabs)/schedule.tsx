@@ -1,6 +1,6 @@
 import { dayOf, formatDay, todayIn } from "@business-os/i18n/dates";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as Notifications from "expo-notifications";
 import { useCallback, useEffect, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
@@ -59,6 +59,13 @@ export default function Schedule() {
     setBranchFilter(ALL_BRANCHES);
   }, [business?.id]);
   const [filters, setFilters] = useState<ClassFilters>(NO_FILTERS);
+  // "Book again" from the all-mine view arrives with the class type of the last visit chosen.
+  const { service: wantedService } = useLocalSearchParams<{ service?: string }>();
+  useEffect(() => {
+    if (!wantedService) return;
+    setFilters({ ...NO_FILTERS, serviceId: wantedService });
+    router.setParams({ service: undefined });
+  }, [wantedService]);
   const [reminded, setReminded] = useState(false);
 
   if (!business) return null;

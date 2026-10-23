@@ -279,7 +279,9 @@ def send_emails(
         if locale not in messages:
             messages[locale] = load_messages(locale, messages_dir)
         subject, body = render(messages[locale], row["kind"], row["payload"], row)
-        if push and push_to_user(conn, push, row["user_id"], subject, body.split("\n\n", 1)[-1]):
+        if push and push_to_user(
+            conn, push, row["user_id"], subject, body.split("\n\n", 1)[-1], row["tenant_id"]
+        ):
             pushed += 1
             conn.execute(
                 text("""

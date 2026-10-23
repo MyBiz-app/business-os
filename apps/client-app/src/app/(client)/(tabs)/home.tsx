@@ -6,6 +6,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
+import { BusinessStrip } from "@/components/business-strip";
 import { HOME_CARDS, type HomeData } from "@/components/home-cards";
 import { Badge, ListRow } from "@business-os/app-kit/components/rows";
 import { Button, Card, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
@@ -18,7 +19,10 @@ import { useHealth } from "@/lib/use-health";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { homeCardsFor } from "@business-os/app-kit/lib/vertical";
 import { useAccount } from "@/lib/use-account";
+import { useBusinessSwipe } from "@/lib/use-business-swipe";
 import { useLocations } from "@/lib/use-locations";
+import { useOpenBusiness } from "@/lib/use-open-business";
+import { useOverview } from "@/lib/use-overview";
 import { useBusiness } from "@/providers/business-provider";
 
 /** Branded home: what needs attention, then the cards the business's industry lists (its
@@ -32,8 +36,16 @@ export default function Home() {
   const locale = useLocale();
   const formatDay = (day: string) =>
     new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
-  const { api, scope, business, palette } = useBusiness();
+  const { api, scope, business, businesses, palette } = useBusiness();
   const account = useAccount();
+  const overview = useOverview();
+  const openBusiness = useOpenBusiness();
+  const multi = (businesses?.length ?? 0) > 1;
+  const swipe = useBusinessSwipe(
+    (businesses ?? []).map((b) => b.id),
+    business?.id ?? null,
+    (id) => void openBusiness(id),
+  );
 
   const load = useCallback(async () => {
     if (!business) return null;
@@ -69,7 +81,7 @@ export default function Home() {
   const homeData = (loaded: NonNullable<typeof data>): HomeData => ({ ...loaded, locations, reload: () => void reload() });
   const logo = assetUrl(business.logo_url);
 
-  return (
+  const screen = (
     <Screen
       palette={palette}
       refreshing={loading}
@@ -82,6 +94,8 @@ export default function Home() {
         )
       }
     >
+      {multi && <BusinessStrip palette={palette} overview={overview.data} />}
+
       <View style={[local.hero, { backgroundColor: palette.primary }]}>
         {/* Soft light circles give the brand color depth. */}
         <View aria-hidden style={[local.orb, local.orbLarge, { backgroundColor: tint(palette.onPrimary, 0.12) }]} />
@@ -178,9 +192,18 @@ export default function Home() {
       })}
     </Screen>
   );
+  // Swiping sideways over the home screen moves to the next business (only with two or more).
+  return multi ? (
+    <View style={local.fill} {...swipe}>
+      {screen}
+    </View>
+  ) : (
+    screen
+  );
 }
 
 const local = StyleSheet.create({
+  fill: { flex: 1 },
   hero: { borderRadius: radius.dialog, padding: 24, paddingVertical: 32, gap: 6, overflow: "hidden" },
   orb: { position: "absolute", borderRadius: radius.pill },
   orbLarge: { width: 220, height: 220, top: -90, end: -60 },

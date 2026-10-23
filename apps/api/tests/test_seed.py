@@ -17,6 +17,7 @@ from app.seed import (
 )
 from app.seed.curate import curate
 from app.seed.profiles import _add_crossfit_branch, enrich_profiles
+from app.seed.social import CUSTOMER_EMAIL, seed_social
 
 
 def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
@@ -777,3 +778,79 @@ def test_branches_without_a_point_get_their_city_street_and_point(engine: Engine
     by_name = {name: (has_city, has_point) for name, has_city, has_point in rows}
     assert by_name["No street match"] == (True, True)  # fell back to the city's centre
     assert by_name["No city"] == (False, False)
+
+
+def test_full_demo_connects_the_plus_logins_the_test_customer_and_friends(engine: Engine) -> None:
+    owner, customer, friend = uuid4(), uuid4(), uuid4()
+    tag = owner.hex[:6]
+    email = f"social-{tag}@example.com"
+    plus = {t: (uuid4(), f"social-{tag}+{t}@example.com") for t in ("manager", "branch", "coach")}
+    with engine.begin() as connection:
+        for user, address in (
+            (owner, email),
+            (customer, f"cust-{tag}@example.com"),
+            (friend, f"social-{tag}+friend@example.com"),
+            *plus.values(),
+        ):
+            connection.execute(
+                text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+                {"id": user, "email": address},
+            )
+    with engine.begin() as connection:
+        curate(connection, email, 1, random.Random(4), "full")
+        first = seed_social(connection, email, f"cust-{tag}@example.com")
+        again = seed_social(connection, email, f"cust-{tag}@example.com")
+    assert first["logins"]["skipped"] and len(first["logins"]["linked"]) == 3
+    assert again["shared"]["records_added"] == 0
+    with engine.connect() as connection:
+        roles = dict(
+            connection.execute(
+                text("""
+                    SELECT m.user_id, m.role || ':' || cardinality(m.location_ids)
+                    FROM app.tenant_members m WHERE m.user_id = ANY(:ids)
+                """),
+                {"ids": [u for u, _ in plus.values()]},
+            ).all()
+        )
+        assert roles[plus["manager"][0]] == "manager:0"
+        assert roles[plus["branch"][0]] == "branch_manager:1"
+        assert roles[plus["coach"][0]] == "staff:1"
+        businesses = connection.execute(
+            text("""
+                SELECT count(DISTINCT c.tenant_id) FROM app.clients c WHERE c.user_id = :u
+            """),
+            {"u": customer},
+        ).scalar_one()
+        assert businesses == 4
+        friends = connection.execute(
+            text("""
+                SELECT count(*) FROM app.client_friendships f
+                JOIN app.clients c ON c.id IN (f.requester_id, f.addressee_id)
+                WHERE c.user_id = :u AND f.status = 'accepted'
+            """),
+            {"u": customer},
+        ).scalar_one()
+        shared = connection.execute(
+            text("""
+                SELECT count(*) FROM (SELECT user_id FROM app.clients WHERE user_id IS NOT NULL
+                    GROUP BY user_id HAVING count(DISTINCT tenant_id) >= 3) s
+            """)
+        ).scalar_one()
+        assert friends >= 5 and shared >= 4
+        invites = connection.execute(
+            text("""
+                SELECT count(*) FROM app.class_invites i JOIN app.clients c ON c.id = i.invitee_id
+                WHERE c.user_id = :u AND i.status = 'pending'
+            """),
+            {"u": customer},
+        ).scalar_one()
+        declarations = connection.execute(
+            text("""
+                SELECT count(*) FROM app.health_declarations d
+                JOIN app.clients c ON c.id = d.client_id
+                WHERE c.user_id = :u
+            """),
+            {"u": customer},
+        ).scalar_one()
+        assert invites == 1 and declarations == 0
+    assert CUSTOMER_EMAIL != "adire7399@gmail.com"  # a client, never the primary owner

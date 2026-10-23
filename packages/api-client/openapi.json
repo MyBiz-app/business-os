@@ -44163,6 +44163,33 @@
         }
       }
     },
+    "/client/overview": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Overview",
+        "description": "Everything the signed-in person has across the businesses they joined as a client: what\nis next, their live cards, what waits for them and what they could book again. Only the\nperson's own rows, read business by business under that business's client policies; a\nbusiness that is closed, suspended or has no client app is left out.",
+        "operationId": "my_overview",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientOverview"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/client/friends/settings": {
       "get": {
         "tags": [
@@ -56094,6 +56121,57 @@
           "longitude"
         ],
         "title": "ClientOriginOut"
+      },
+      "ClientOverview": {
+        "properties": {
+          "businesses": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewBusiness"
+            },
+            "type": "array",
+            "title": "Businesses"
+          },
+          "next": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewVisit"
+            },
+            "type": "array",
+            "title": "Next",
+            "description": "Upcoming bookings of every business, soonest first"
+          },
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewCard"
+            },
+            "type": "array",
+            "title": "Cards",
+            "description": "Memberships and passes that are live now"
+          },
+          "waiting": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewWaiting"
+            },
+            "type": "array",
+            "title": "Waiting"
+          },
+          "rebook": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewRebook"
+            },
+            "type": "array",
+            "title": "Rebook",
+            "description": "Things the client did before, to book again"
+          }
+        },
+        "type": "object",
+        "required": [
+          "businesses",
+          "next",
+          "cards",
+          "waiting",
+          "rebook"
+        ],
+        "title": "ClientOverview"
       },
       "ClientPage": {
         "properties": {
@@ -70373,6 +70451,350 @@
           "free_minutes"
         ],
         "title": "OverridePolicy"
+      },
+      "OverviewBusiness": {
+        "properties": {
+          "business": {
+            "$ref": "#/components/schemas/ClientBusiness"
+          },
+          "waiting": {
+            "type": "integer",
+            "title": "Waiting",
+            "description": "How many things wait for the client here (the dot)"
+          },
+          "upcoming": {
+            "type": "integer",
+            "title": "Upcoming",
+            "description": "Upcoming bookings here"
+          },
+          "last_visit_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Visit At"
+          },
+          "dormant": {
+            "type": "boolean",
+            "title": "Dormant",
+            "description": "Nothing upcoming, no live card, no visit for 30 days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "business",
+          "waiting",
+          "upcoming",
+          "last_visit_at",
+          "dormant"
+        ],
+        "title": "OverviewBusiness"
+      },
+      "OverviewCard": {
+        "properties": {
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "entitlement_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Entitlement Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "credits_remaining": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credits Remaining"
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Ends On"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          }
+        },
+        "type": "object",
+        "required": [
+          "business_id",
+          "entitlement_id",
+          "name",
+          "kind",
+          "credits_remaining",
+          "ends_on",
+          "state"
+        ],
+        "title": "OverviewCard"
+      },
+      "OverviewRebook": {
+        "properties": {
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "service_name": {
+            "type": "string",
+            "title": "Service Name"
+          },
+          "booking_mode": {
+            "type": "string",
+            "title": "Booking Mode"
+          },
+          "room_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Id"
+          },
+          "room_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Name"
+          },
+          "instructor_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor User Id"
+          },
+          "instructor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor Name"
+          },
+          "last_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "business_id",
+          "service_id",
+          "service_name",
+          "booking_mode",
+          "room_id",
+          "room_name",
+          "instructor_user_id",
+          "instructor_name",
+          "last_at"
+        ],
+        "title": "OverviewRebook"
+      },
+      "OverviewVisit": {
+        "properties": {
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "booking_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Booking Id"
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "service_name": {
+            "type": "string",
+            "title": "Service Name"
+          },
+          "booking_mode": {
+            "type": "string",
+            "title": "Booking Mode",
+            "description": "class, appointment or resource"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "booked",
+              "waitlisted"
+            ],
+            "title": "Status"
+          },
+          "location_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Name"
+          },
+          "room_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Name"
+          },
+          "instructor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor Name"
+          },
+          "friends": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Friends",
+            "description": "First names of friends in the same session"
+          }
+        },
+        "type": "object",
+        "required": [
+          "business_id",
+          "booking_id",
+          "session_id",
+          "service_id",
+          "service_name",
+          "booking_mode",
+          "starts_at",
+          "ends_at",
+          "status",
+          "location_name",
+          "room_name",
+          "instructor_name",
+          "friends"
+        ],
+        "title": "OverviewVisit"
+      },
+      "OverviewWaiting": {
+        "properties": {
+          "business_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Business Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "health",
+              "document",
+              "payment",
+              "quote",
+              "invite",
+              "review"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "What it is about (a document, a quote), if it has a name"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref",
+            "description": "The thing's id, number or token, to open it"
+          }
+        },
+        "type": "object",
+        "required": [
+          "business_id",
+          "kind",
+          "title",
+          "ref"
+        ],
+        "title": "OverviewWaiting"
       },
       "OwnerSecurity": {
         "properties": {

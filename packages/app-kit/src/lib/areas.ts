@@ -55,3 +55,12 @@ export function pickArea(areas: Area[], storedKey: string | null, ready: readonl
 export function areaHome(area: Area): "/home" | "/business" | "/platform" {
   return area.kind === "client" ? "/home" : area.kind === "business" ? "/business" : "/platform";
 }
+
+/** The area a push notification belongs to: the client area of the business that sent it, else
+ * their work area there. Null for a business the person has no area in, so a notification can
+ * never open somewhere they do not belong. */
+export function areaForNotification(areas: Area[], tenantId: unknown): Area | null {
+  if (typeof tenantId !== "string") return null;
+  const mine = areas.filter((a) => a.tenantId === tenantId);
+  return mine.find((a) => a.kind === "client" && !a.joinOnOpen) ?? mine.find((a) => a.kind === "business") ?? null;
+}
