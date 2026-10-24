@@ -36,6 +36,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-status-bar",
       "expo-localization",
       "expo-secure-store",
       "expo-notifications",

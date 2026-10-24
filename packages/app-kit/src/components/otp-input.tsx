@@ -1,6 +1,6 @@
 import { localeDirection, type Locale } from "@business-os/i18n";
 import { useRef } from "react";
-import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, TextInput, type TextInputInstance, View } from "react-native";
 import { useLocale } from "use-intl";
 
 import { tint } from "../lib/brand";
@@ -31,7 +31,7 @@ export function OtpInput({
   onComplete?: (value: string) => void;
   invalid?: boolean;
 }) {
-  const input = useRef<TextInput>(null);
+  const input = useRef<TextInputInstance>(null);
   // Digits always run left to right; in a right-to-left layout the row has to be reversed to do that.
   const rtl = localeDirection[useLocale() as Locale] === "rtl";
   const change = (raw: string) => {
