@@ -95,6 +95,16 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "standing_bookings": _rows(
+            db,
+            """
+            SELECT sv.name AS service, ss.kind, ss.first_starts_at, ss.every_weeks,
+                   ss.occurrences, ss.status, ss.cancelled_at, ss.created_at
+            FROM app.booking_series ss JOIN app.services sv ON sv.id = ss.service_id
+            WHERE ss.client_id = :id ORDER BY ss.first_starts_at
+            """,
+            client_id,
+        ),
         "plans": _rows(
             db,
             """
@@ -362,6 +372,14 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         lock_session(db, session_id)
         cancel_booking(db, booking_id, session_id)
 
+    db.execute(
+        text("""
+            UPDATE app.booking_series SET status = 'cancelled', cancelled_at = now(),
+                   updated_at = now()
+            WHERE client_id = :id AND status = 'active'
+        """),
+        {"id": client_id},
+    )
     removed = db.execute(
         text("DELETE FROM app.health_declarations WHERE client_id = :id"), {"id": client_id}
     ).rowcount
