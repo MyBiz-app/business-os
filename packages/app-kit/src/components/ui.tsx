@@ -70,11 +70,13 @@ type FieldProps = TextInputProps & {
   label: string;
   palette: Palette;
   hint?: string;
+  /** A problem with this field: shown right under it, and the field's edge turns red. */
+  error?: string | null;
   /** "ltr" for emails, phones, codes and numbers: they read and type left to right even in a Hebrew screen. */
   dir?: "ltr";
 };
 
-export function Field({ label, palette, hint, dir, style, ...inputProps }: FieldProps) {
+export function Field({ label, palette, hint, error, dir, style, ...inputProps }: FieldProps) {
   const id = useId();
   return (
     <View style={styles.field}>
@@ -87,23 +89,27 @@ export function Field({ label, palette, hint, dir, style, ...inputProps }: Field
         placeholderTextColor={palette.muted}
         style={[
           styles.input,
-          { color: palette.foreground, borderColor: palette.border, backgroundColor: palette.surface },
+          { color: palette.foreground, borderColor: error ? palette.danger : palette.border, backgroundColor: palette.surface },
           dir === "ltr" && { writingDirection: "ltr", textAlign: "left" },
           style,
         ]}
         {...inputProps}
       />
-      {hint && <Text style={[styles.hint, { color: palette.muted }]}>{hint}</Text>}
+      {error ? <ErrorText message={error} palette={palette} /> : hint ? <Text style={[styles.hint, { color: palette.muted }]}>{hint}</Text> : null}
     </View>
   );
 }
 
+/** A problem message: a small alert mark and the text in the danger color, the same look as the web's. */
 export function ErrorText({ message, palette }: { message?: string | null; palette: Palette }) {
   if (!message) return null;
   return (
-    <Text accessibilityRole="alert" style={[styles.error, { color: palette.danger }]}>
-      {message}
-    </Text>
+    <View style={styles.errorRow}>
+      <Ionicons name="alert-circle" size={16} color={palette.danger} style={styles.errorIcon} />
+      <Text accessibilityRole="alert" style={[styles.error, { color: palette.danger, flex: 1 }]}>
+        {message}
+      </Text>
+    </View>
   );
 }
 
@@ -257,6 +263,8 @@ export const styles = StyleSheet.create({
   // 17px keeps iOS Safari from zooming the page when a field is focused on the web.
   input: { minHeight: controlHeight, borderWidth: 1, borderRadius: radius.control, paddingHorizontal: space.md, fontSize: 17, ...font.regular },
   hint: { fontSize: 13, ...font.regular, textAlign: "left" },
+  errorRow: { flexDirection: "row", alignItems: "flex-start", gap: 6 },
+  errorIcon: { marginTop: 1 },
   error: { fontSize: 13, ...font.medium, textAlign: "left" },
   // A card is a surface with a hairline; no shadow, and no card inside a card.
   card: { borderWidth: 1, borderRadius: radius.card, padding: space.lg, gap: space.md },
