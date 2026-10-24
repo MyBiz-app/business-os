@@ -520,6 +520,7 @@
     },
     "showPassword": "Show password",
     "hidePassword": "Hide password",
+    "capsLockOn": "Caps Lock is on",
     "codeLogin": {
       "title": "Sign in with a code",
       "subtitle": "We'll send you a one-time 6-digit code. No password needed.",

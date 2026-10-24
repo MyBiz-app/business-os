@@ -15,7 +15,7 @@ export function ForgotForm() {
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <FormError message={state.error && t(`errors.${state.error}` as "errors.generic")} />
+      <FormError inline message={state.error && t(`errors.${state.error}` as "errors.generic")} />
       <FormNotice message={state.notice && t("forgot.sent")} />
       <Field label={t("email")} name="email" type="email" autoComplete="email" required defaultValue={state.email} />
       <SubmitButton>{t("forgot.submit")}</SubmitButton>

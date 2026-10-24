@@ -14,10 +14,13 @@ export function SignupForm({ next, email }: { next?: string; email?: string }) {
   const t = useTranslations("auth");
   const [state, action] = useActionState<FormState, FormData>(signup, {});
 
+  const message = state.error ? t(`errors.${state.error}` as "errors.generic") : undefined;
+  const onPassword = state.error === "weak_password";
+
   return (
     <form action={action} className="flex flex-col gap-4">
       {next && <input type="hidden" name="next" value={next} />}
-      <FormError message={state.error && t(`errors.${state.error}` as "errors.generic")} />
+      <FormError inline message={onPassword ? undefined : message} />
       <Field label={t("email")} name="email" type="email" autoComplete="email" required defaultValue={state.email ?? email} />
       <PasswordField
         label={t("password")}
@@ -26,6 +29,7 @@ export function SignupForm({ next, email }: { next?: string; email?: string }) {
         autoComplete="new-password"
         minLength={8}
         required
+        error={onPassword ? message : undefined}
       />
       <SubmitButton>{t("signup.submit")}</SubmitButton>
     </form>
