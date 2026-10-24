@@ -519,6 +519,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** reuses the appointment and reservation machinery; existing services are untouched (flag defaults off).
 - **Revisit** when a lesson needs two rooms or more than one coach (slice C6 handles several instructors for classes).
 
+### Feedback pattern: where an error or a "saved" appears (2026-10-24, web)
+
+- **Decision:** a problem with one field (wrong password, weak password) shows right under that field with an icon, the field turns red (`aria-invalid`) and gets the cursor back. A problem with the whole form shows at the top of a short form (sign-in, sign-up) with no toast on top of it; in long forms it stays a toast as well, so it is seen wherever the page is scrolled. A success is a toast plus the submit button turning into "Saved". Errors stay until closed; successes close alone. This is the pattern of Apple's HIG, Stripe, Linear and Vercel; the toast card itself already followed it.
+- **Password fields:** the icon shows the state (crossed eye while hidden, open eye while shown, it was the other way round), and a "Caps Lock is on" notice appears while the key is on.
+- **Revisit** if sign-in tests show people missing the inline message.
+
 ## Open
 
 

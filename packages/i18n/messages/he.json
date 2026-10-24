@@ -520,6 +520,7 @@
     },
     "showPassword": "הצגת הסיסמה",
     "hidePassword": "הסתרת הסיסמה",
+    "capsLockOn": "Caps Lock פעיל",
     "codeLogin": {
       "title": "כניסה עם קוד",
       "subtitle": "נשלח לכם קוד חד־פעמי בן 6 ספרות. בלי סיסמה.",

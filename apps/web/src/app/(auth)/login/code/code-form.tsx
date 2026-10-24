@@ -26,7 +26,7 @@ export function CodeLoginForm({ channels, next }: { channels: OtpChannel[]; next
         <input type="hidden" name="channel" value={sent.channel} />
         <input type="hidden" name="target" value={sent.target} />
         <p className="text-sm text-muted">{t("codeLogin.codeSent", { target: isolate(sent.target) })}</p>
-        <FormError message={checked.error && t(`errors.${checked.error}` as "errors.generic")} />
+        <FormError inline message={checked.error && t(`errors.${checked.error}` as "errors.generic")} />
         <Field
           label={t("codeLogin.code")}
           name="code"
@@ -49,7 +49,7 @@ export function CodeLoginForm({ channels, next }: { channels: OtpChannel[]; next
   return (
     <form action={send} className="flex flex-col gap-4">
       <input type="hidden" name="channel" value={channel} />
-      <FormError message={sent.error && t(`errors.${sent.error}` as "errors.generic")} />
+      <FormError inline message={sent.error && t(`errors.${sent.error}` as "errors.generic")} />
       {channels.length > 1 && (
         <fieldset className="flex flex-col gap-1.5">
           <legend className="text-sm font-medium">{t("codeLogin.channel")}</legend>

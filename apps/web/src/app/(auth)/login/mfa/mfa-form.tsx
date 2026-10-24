@@ -17,7 +17,7 @@ export function MfaForm({ next }: { next?: string }) {
   return (
     <form action={action} className="flex flex-col gap-4">
       {next && <input type="hidden" name="next" value={next} />}
-      <FormError message={state.error && t(`errors.${state.error}` as "errors.generic")} />
+      <FormError inline message={state.error && t(`errors.${state.error}` as "errors.generic")} />
       <Field
         label={t("mfa.code")}
         name="code"
