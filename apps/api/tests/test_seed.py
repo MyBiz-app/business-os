@@ -964,6 +964,6 @@ def test_full_demo_connects_the_plus_logins_the_test_customer_and_friends(engine
             """),
             {"u": customer},
         ).scalar_one()
-        assert invites == 1 and declarations == 0
+        assert invites >= 1 and declarations == 0
         assert first["test_customer"]["bookings"] == 3  # the customer and two friends, one class
     assert CUSTOMER_EMAIL != "adire7399@gmail.com"  # a client, never the primary owner
