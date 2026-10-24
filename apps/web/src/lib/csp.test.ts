@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { apiOrigin, createNonce, parseCspReports, strictCsp } from "./csp.ts";
+import { apiOrigin, createNonce, parseCspReports, strictCsp, styleTrialCsp } from "./csp.ts";
 
 test("nonces are fresh 128-bit base64 values", () => {
   const a = createNonce();
@@ -68,4 +68,11 @@ test("garbage payloads yield nothing", () => {
   assert.deepEqual(parseCspReports(null), []);
   assert.deepEqual(parseCspReports("x"), []);
   assert.deepEqual(parseCspReports({ "csp-report": 5 }), []);
+});
+
+test("the style trial policy needs the nonce for <style> elements and leaves style attributes inline", () => {
+  const policy = styleTrialCsp("abc", { dev: false });
+  assert.match(policy, /style-src-elem 'self' 'nonce-abc'(;|$)/);
+  assert.match(policy, /style-src-attr 'unsafe-inline'/);
+  assert.doesNotMatch(policy, /style-src-elem[^;]*unsafe-inline/);
 });
