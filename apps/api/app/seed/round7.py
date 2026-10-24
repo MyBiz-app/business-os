@@ -43,6 +43,7 @@ CLINIC = "clinic"
 # Tenant tables that have no demo rows on purpose (table -> why).
 NO_DEMO: dict[str, str] = {
     "ai_agent_avatars": "uploaded images of custom agents; the demo agents use presets",
+    "booking_series": "a client sets up a standing booking in the app, added by the person",
     "checkouts": "payment-provider sessions; paid providers stay off until go-live",
     "client_locations": "a client's saved places in the client app; added by the person",
     "client_social": "a client's own social links, entered by the client",
@@ -63,6 +64,7 @@ NO_DEMO: dict[str, str] = {
     "retainers": "only for industries that bill by time, none of the curated three",
     "room_hours": "only for industries that rent rooms, none of the curated three",
     "service_rooms": "only for industries that rent rooms, none of the curated three",
+    "session_instructors": "the team of a class; its screens come with slices C10 and C11",
     "social_pending": "OAuth candidates that wait for a real sign-in with the network",
     "support_grants": "temporary access the owner gives the platform team",
     "tenant_integrations": "provider credentials; secrets are never seeded",

@@ -157,10 +157,11 @@ jobs:
 
       - uses: pnpm/action-setup@v4
 
+      # No pnpm cache here: this job never installs packages (the audit reads the lockfile),
+      # so there is no store to save and the cache post step would fail the job.
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
 
       - uses: astral-sh/setup-uv@v6
         with:

@@ -25,7 +25,7 @@ from app.api.bookings import (
     place_booking,
 )
 from app.api.common import not_found
-from app.api.deps import ClientDep, TenantContext, require
+from app.api.deps import ClientDep, TenantContext, ensure_client_visible, require
 from app.api.health import ensure_may_book
 from app.api.pagination import PageDep
 from app.api.resources import ReservationFields, create_resource_session
@@ -279,6 +279,7 @@ def book_standing_series(body: SeriesCreate, context: ManageDep) -> SeriesCreate
 
 @router.get("/clients/{client_id}/series")
 def list_client_booking_series(client_id: UUID, context: ReadDep, page: PageDep) -> list[Series]:
+    ensure_client_visible(context, client_id)
     rows = (
         context.session.execute(
             text(
