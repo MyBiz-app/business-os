@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
@@ -8,6 +8,7 @@ import { useTerm } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 import { InboxProvider, useInbox } from "@/providers/inbox-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 /** The client app's bottom tabs, in the selected business's brand color. */
 export default function TabsLayout() {
@@ -19,7 +20,7 @@ export default function TabsLayout() {
   if (!business) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.background }}>
-        <ActivityIndicator color={palette.primary} />
+        <Spinner color={palette.primary} />
       </View>
     );
   }

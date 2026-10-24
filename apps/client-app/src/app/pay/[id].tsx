@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import type { components } from "@business-os/api-client";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Animated, Linking, Platform, StyleSheet, View } from "react-native";
+import { Animated, Linking, Platform, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
@@ -15,6 +15,7 @@ import { tint } from "@business-os/app-kit/lib/brand";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 type Paid = components["schemas"]["CheckoutPaid"];
 type Checkout = components["schemas"]["Checkout"];
@@ -241,7 +242,7 @@ export default function Pay() {
       <ErrorText message={error} palette={palette} />
       {stage === "processing" ? (
         <View accessibilityLiveRegion="polite" style={local.processing}>
-          <ActivityIndicator color={palette.primary} />
+          <Spinner color={palette.primary} />
           <Text style={[styles.muted, { color: palette.foreground }]}>{t("processing")}</Text>
         </View>
       ) : (

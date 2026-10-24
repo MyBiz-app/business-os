@@ -142,7 +142,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
 
           <Section size="default" aria-labelledby="compare-heading" innerClassName="flex flex-col gap-8">
             <SectionHeading id="compare-heading" title={t("compareTitle")} subtitle={t("compareText")} />
-            <div className="card overflow-x-auto">
+            <div className="card overflow-x-auto" role="region" aria-labelledby="compare-heading" tabIndex={0}>
               <table className="w-full min-w-[34rem] text-sm">
                 <caption className="sr-only">{t("compareTitle")}</caption>
                 <thead>

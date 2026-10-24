@@ -44,6 +44,8 @@ def create_app() -> FastAPI:
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
+        # The API only ever answers over HTTPS in staging and production (the host redirects plain HTTP).
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
         # Answers carry one person's or one business's data: no browser or proxy keeps a copy.
         # Routes that choose their own policy (downloads, logos) keep it.
         response.headers.setdefault("Cache-Control", "no-store")

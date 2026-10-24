@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
@@ -8,6 +8,7 @@ import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useAreas } from "@/providers/area-provider";
 import { usePlatform } from "@/providers/platform-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 /** The MyBiz team's tabs; each one appears only for someone whose permissions cover it. */
 export default function TabsLayout() {
@@ -25,7 +26,7 @@ export default function TabsLayout() {
   if (!onTeam) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.background }}>
-        <ActivityIndicator color={palette.primary} />
+        <Spinner color={palette.primary} />
       </View>
     );
   }

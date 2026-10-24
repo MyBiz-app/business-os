@@ -44,7 +44,7 @@ export function CardHeader({
         </h2>
         {description && <p className="text-sm text-muted text-pretty">{description}</p>}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && <div className="flex max-w-full shrink-0 flex-wrap items-center gap-2">{actions}</div>}
     </div>
   );
 }

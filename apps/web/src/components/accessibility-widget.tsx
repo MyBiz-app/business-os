@@ -246,7 +246,7 @@ export function AccessibilityWidget() {
         onClick={dismiss}
         aria-label={t("widgetHide")}
         title={t("widgetHide")}
-        className="btn-icon absolute -end-1 -top-1 flex size-6 items-center justify-center rounded-full bg-black text-white shadow-md ring-2 ring-white/80 hover:bg-navy"
+        className="btn-icon absolute -end-2 -top-2 flex size-7 items-center justify-center rounded-full bg-black text-white shadow-md ring-2 ring-white/80 hover:bg-navy"
       >
         <X aria-hidden="true" className="size-3.5" />
       </button>

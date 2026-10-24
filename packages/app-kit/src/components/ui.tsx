@@ -1,6 +1,5 @@
 import { Children, useEffect, useId, useRef } from "react";
 import {
-  ActivityIndicator,
   Animated,
   Platform,
   RefreshControl,
@@ -20,6 +19,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { FadeIn, PressableScale, useReducedMotion } from "./motion";
 import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
+import { Spinner } from "./spinner";
 
 /**
  * Depth, as on the web: cards are flat (a surface and a hairline), so they carry no shadow. Only what
@@ -61,7 +61,7 @@ export function Button({ label, onPress, palette, variant = "primary", busy, dis
         disabled && { opacity: 0.6 },
       ]}
     >
-      {busy ? <ActivityIndicator color={color} /> : <Text style={[styles.buttonText, { color }]}>{label}</Text>}
+      {busy ? <Spinner color={color} /> : <Text style={[styles.buttonText, { color }]}>{label}</Text>}
     </PressableScale>
   );
 }

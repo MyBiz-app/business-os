@@ -57,6 +57,8 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm --filter ${{ matrix.app }} exec node scripts/copy-maplibre-worker.mjs
           pnpm --filter ${{ matrix.app }} exec expo export -p web --output-dir dist
+          # Vercel skips node_modules folders on upload, which dropped every font and icon: move them out.
+          pnpm --filter ${{ matrix.app }} exec node scripts/relocate-assets.mjs dist
           # Single-page app: every path serves index.html.
           cp apps/${{ matrix.app }}/vercel.json apps/${{ matrix.app }}/dist/vercel.json
           sed -i '/buildCommand/d;/outputDirectory/d' apps/${{ matrix.app }}/dist/vercel.json

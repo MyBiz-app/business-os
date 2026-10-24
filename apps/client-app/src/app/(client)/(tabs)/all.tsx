@@ -34,7 +34,8 @@ export default function AllMine() {
   const byId = new Map((businesses ?? []).map((b) => [b.id, b]));
 
   const zone = (id: string) => byId.get(id)?.time_zone ?? "UTC";
-  const name = (id: string) => byId.get(id)?.name ?? "";
+  // Business names are user text (often Hebrew); isolating them keeps a mixed-language line in reading order.
+  const name = (id: string) => `\u2068${byId.get(id)?.name ?? ""}\u2069`;
   const when = (id: string, iso: string) =>
     `${new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short", timeZone: zone(id) }).format(new Date(iso))} ${formatTime(iso, locale, zone(id))}`;
   const date = (day: string) => new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
