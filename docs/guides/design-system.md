@@ -174,7 +174,11 @@ toast, the AI bubble) does.
   `SubmitButton` into "Saved" for a moment. Field errors stay next to the field.
 - Page transitions (web, view transitions, no library): `components/ui/page-transition.tsx`.
   `PageTransition` goes in a `template.tsx` (a layout persists, so enter/exit never fire there):
-  the landing site fades in with a 12px slide up (250ms) under a fixed header, the CRM only fades
+  the landing site cross-fades (old page 180ms out, new 380ms in, no movement; shorter fades read as a
+  hard cut) under a fixed header. Pages are rendered on demand, so `RouteProgress` also softens the
+  current page (`.site-page` to 55%) the moment a link is clicked and the new page replaces it at
+  full strength; its click listener is in the capture phase because `<Link>` has already prevented
+  the default by the bubbling phase. The CRM only fades
   (150ms) inside its fixed side menu and header. `CardTransition name="lead-<id>"` on a list card plus
   `RouteModal transitionName="lead-<id>"` makes the card grow into its window and shrink back.
   Names must be unique on the page. The motion rules live at the end of `globals.css` and are off
