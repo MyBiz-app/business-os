@@ -17,7 +17,7 @@
     "@types/react": "~19.2.2",
     "eslint": "9.39.5",
     "eslint-config-expo": "57.0.2",
-    "typescript": "^5"
+    "typescript": "^7"
   },
   "dependencies": {
     "@business-os/api-client": "workspace:*",
@@ -44,7 +44,7 @@
     "react": "19.2.3",
     "react-native": "0.86.3",
     "react-native-safe-area-context": "~5.7.0",
-    "typescript": "~6.0.3",
+    "typescript": "~7.0.2",
     "use-intl": "4.14.9"
   }
 }
