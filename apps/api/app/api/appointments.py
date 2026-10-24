@@ -61,6 +61,16 @@ class Slot(BaseModel):
     ends_at: datetime
     staff_user_id: UUID
     staff_name: str
+    room_id: UUID | None = Field(
+        default=None, description="A service that needs a room: the room this time would use"
+    )
+    room_name: str | None = None
+
+
+ROOM_FIELD = Field(
+    default=None,
+    description="A service that needs a room: which one (default: the first free one)",
+)
 
 
 class AppointmentCreate(BaseModel):
@@ -72,6 +82,7 @@ class AppointmentCreate(BaseModel):
     address_id: UUID | None = Field(
         default=None, description="On-site services: one of the client's addresses (#42)"
     )
+    room_id: UUID | None = ROOM_FIELD
 
 
 class ClientAppointmentCreate(BaseModel):
@@ -84,6 +95,7 @@ class ClientAppointmentCreate(BaseModel):
     address_id: UUID | None = Field(
         default=None, description="On-site services: one of the client's addresses (#42)"
     )
+    room_id: UUID | None = ROOM_FIELD
 
 
 # --- Working hours ----------------------------------------------------------------------------
@@ -225,14 +237,69 @@ def _staff(db: Session) -> list[AppointmentStaff]:
     return [AppointmentStaff.model_validate(dict(r)) for r in rows]
 
 
+def _free_rooms(
+    db: Session,
+    service_id: UUID,
+    room_id: UUID | None,
+    day: dt.date,
+    time_zone: str,
+    duration_minutes: int,
+    day_start: datetime,
+) -> list[tuple[UUID, str, set[datetime]]]:
+    """Per room that serves the service (first by branch and name): the starts where it is open
+    and free for the whole length. A service that needs a room is only free where staff AND a
+    room are."""
+    from app.api.resources import service_rooms  # resources imports this module
+
+    rooms = [r for r in service_rooms(db, service_id) if room_id is None or r.id == room_id]
+    ids = [r.id for r in rooms]
+    hours = db.execute(
+        text("""
+            SELECT room_id, starts, ends FROM app.room_hours
+            WHERE weekday = :weekday AND room_id = ANY(:ids)
+        """),
+        {"weekday": day.weekday(), "ids": ids},
+    ).all()
+    busy = db.execute(
+        text("""
+            SELECT room_id, starts_at, ends_at FROM app.sessions
+            WHERE room_id = ANY(:ids) AND status = 'scheduled'
+              AND starts_at < :to AND ends_at > :from
+        """),
+        {"ids": ids, "from": day_start, "to": day_start + timedelta(days=1, hours=1)},
+    ).all()
+    return [
+        (
+            room.id,
+            room.name,
+            set(
+                free_starts(
+                    day,
+                    [Hours(h.starts, h.ends) for h in hours if h.room_id == room.id],
+                    [(b.starts_at, b.ends_at) for b in busy if b.room_id == room.id],
+                    duration_minutes,
+                    time_zone,
+                    now=datetime.now(UTC),
+                )
+            ),
+        )
+        for room in rooms
+    ]
+
+
 def appointment_slots(
-    db: Session, service_id: UUID, day: dt.date, staff_user_id: UUID | None
+    db: Session,
+    service_id: UUID,
+    day: dt.date,
+    staff_user_id: UUID | None,
+    room_id: UUID | None = None,
 ) -> list[Slot]:
-    """Free start times for the service on a local day, per staff member who takes it."""
+    """Free start times for the service on a local day, per staff member who takes it. A
+    service that needs a room lists only the starts where a room is free too, with that room."""
     service = (
         db.execute(
             text("""
-                SELECT duration_minutes, travel_minutes FROM app.services
+                SELECT duration_minutes, travel_minutes, needs_resource FROM app.services
                 WHERE id = :id AND active AND booking_mode = 'appointment'
             """),
             {"id": service_id},
@@ -289,6 +356,17 @@ def appointment_slots(
             now=datetime.now(UTC),
         )
     ]
+    if service["needs_resource"]:
+        rooms = _free_rooms(
+            db, service_id, room_id, day, business["time_zone"], service["duration_minutes"],
+            day_start,
+        )  # fmt: skip
+        with_room = []
+        for slot in slots:
+            room = next((r for r in rooms if slot.starts_at in r[2]), None)
+            if room is not None:
+                with_room.append(slot.model_copy(update={"room_id": room[0], "room_name": room[1]}))
+        slots = with_room
     return sorted(slots, key=lambda slot: (slot.starts_at, slot.staff_name))
 
 
@@ -298,11 +376,34 @@ def create_appointment_session(
     staff_user_id: UUID,
     starts_at: datetime,
     address_id: UUID | None = None,
+    room_id: UUID | None = None,
 ) -> UUID:
     if starts_at <= datetime.now(UTC):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="session_started")
+    needs_room = db.execute(
+        text("SELECT needs_resource FROM app.services WHERE id = :id AND active"),
+        {"id": service_id},
+    ).scalar()
+    if needs_room is None:
+        raise not_found()
+    if room_id is not None and not needs_room:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="no_room_used"
+        )
     try:
         with db.begin_nested():
+            if needs_room:
+                return db.execute(
+                    text(
+                        "SELECT app.create_staff_resource_session(:service, :staff, :room, :starts)"
+                    ),
+                    {
+                        "service": service_id,
+                        "staff": staff_user_id,
+                        "room": room_id,
+                        "starts": starts_at,
+                    },
+                ).scalar_one()
             return db.execute(
                 text("SELECT app.create_appointment_session(:service, :staff, :starts, :address)"),
                 {
@@ -319,12 +420,13 @@ def create_appointment_session(
             "22023": "outside_hours",
             "P0002": "not_found",
             "22004": "address_required",
+            "55000": "room_required",
         }.get(code or "")
         if detail is None:
             raise
         if detail == "not_found":
             raise not_found() from error
-        if detail == "address_required":
+        if detail in ("address_required", "room_required"):
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=detail
             ) from error
@@ -356,8 +458,9 @@ def slots(
     service_id: Annotated[UUID, Query()],
     day: Annotated[dt.date, Query(alias="date")],
     staff_user_id: Annotated[UUID | None, Query()] = None,
+    room_id: Annotated[UUID | None, Query()] = None,
 ) -> list[Slot]:
-    return appointment_slots(context.session, service_id, day, staff_user_id)
+    return appointment_slots(context.session, service_id, day, staff_user_id, room_id)
 
 
 @router.post("/appointments", status_code=status.HTTP_201_CREATED)
@@ -366,7 +469,7 @@ def book_appointment(body: AppointmentCreate, context: ManageDep) -> Booking:
     db = context.session
     _ensure_address_of(db, body.address_id, body.client_id)
     session_id = create_appointment_session(
-        db, body.service_id, body.staff_user_id, body.starts_at, body.address_id
+        db, body.service_id, body.staff_user_id, body.starts_at, body.address_id, body.room_id
     )
     booking_id = place_booking(
         db,
@@ -391,8 +494,9 @@ def my_slots(
     service_id: Annotated[UUID, Query()],
     day: Annotated[dt.date, Query(alias="date")],
     staff_user_id: Annotated[UUID | None, Query()] = None,
+    room_id: Annotated[UUID | None, Query()] = None,
 ) -> list[Slot]:
-    return appointment_slots(context.session, service_id, day, staff_user_id)
+    return appointment_slots(context.session, service_id, day, staff_user_id, room_id)
 
 
 @client_router.post("/appointments", status_code=status.HTTP_201_CREATED)
@@ -405,7 +509,7 @@ def book_my_appointment(body: ClientAppointmentCreate, context: ClientDep) -> Cl
         {"id": context.tenant_id},
     ).scalar_one()
     session_id = create_appointment_session(
-        db, body.service_id, body.staff_user_id, body.starts_at, body.address_id
+        db, body.service_id, body.staff_user_id, body.starts_at, body.address_id, body.room_id
     )
     place_booking(
         db,
@@ -427,6 +531,9 @@ class AppointmentService(BaseModel):
     price_currency: str
     color: str | None
     on_site: bool = Field(default=False, description="At the client's address: needs one (#42)")
+    needs_resource: bool = Field(
+        default=False, description="A staff member and a room (a court) are booked together"
+    )
 
 
 @client_router.get("/appointments/services")
@@ -435,7 +542,7 @@ def my_appointment_services(context: ClientDep) -> list[AppointmentService]:
     rows = context.session.execute(
         text("""
             SELECT id, name, description, duration_minutes, price_amount, price_currency, color,
-                   on_site
+                   on_site, needs_resource
             FROM app.services WHERE active AND booking_mode = 'appointment' ORDER BY name
         """)
     ).mappings()

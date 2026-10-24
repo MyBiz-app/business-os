@@ -29801,6 +29801,23 @@
             }
           },
           {
+            "name": "room_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Room Id"
+            }
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -30492,6 +30509,23 @@
                 }
               ],
               "title": "Staff User Id"
+            }
+          },
+          {
+            "name": "room_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Room Id"
             }
           },
           {
@@ -32018,7 +32052,7 @@
           "resources"
         ],
         "summary": "Set Service Rooms",
-        "description": "Which bookable rooms serve a resource service (replaces the list).",
+        "description": "Which bookable rooms serve a resource service, or an appointment that needs a room\n(replaces the list).",
         "operationId": "set_service_rooms",
         "security": [
           {
@@ -32092,6 +32126,86 @@
                     "$ref": "#/components/schemas/ResourceRoom"
                   },
                   "title": "Response Set Service Rooms"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "resources"
+        ],
+        "summary": "Get Service Rooms",
+        "description": "The rooms that serve a resource service or an appointment that needs a room.",
+        "operationId": "get_service_rooms",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResourceRoom"
+                  },
+                  "title": "Response Get Service Rooms"
                 }
               }
             }
@@ -51043,6 +51157,19 @@
             ],
             "title": "Address Id",
             "description": "On-site services: one of the client's addresses (#42)"
+          },
+          "room_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Id",
+            "description": "A service that needs a room: which one (default: the first free one)"
           }
         },
         "type": "object",
@@ -51103,6 +51230,12 @@
             "type": "boolean",
             "title": "On Site",
             "description": "At the client's address: needs one (#42)",
+            "default": false
+          },
+          "needs_resource": {
+            "type": "boolean",
+            "title": "Needs Resource",
+            "description": "A staff member and a room (a court) are booked together",
             "default": false
           }
         },
@@ -55816,6 +55949,19 @@
             ],
             "title": "Address Id",
             "description": "On-site services: one of the client's addresses (#42)"
+          },
+          "room_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Id",
+            "description": "A service that needs a room: which one (default: the first free one)"
           }
         },
         "type": "object",
@@ -80027,6 +80173,11 @@
             "title": "Open Entry",
             "description": "Entry to the place; clients check in",
             "default": false
+          },
+          "needs_resource": {
+            "type": "boolean",
+            "title": "Needs Resource",
+            "default": false
           }
         },
         "type": "object",
@@ -80220,6 +80371,12 @@
             ],
             "title": "Open Entry",
             "description": "Class only: entry to the place (open gym, pool); its sessions are the opening hours and clients check in"
+          },
+          "needs_resource": {
+            "type": "boolean",
+            "title": "Needs Resource",
+            "description": "Appointment only: the staff member and a room (a court) are booked together",
+            "default": false
           }
         },
         "type": "object",
@@ -80539,6 +80696,17 @@
               }
             ],
             "title": "Open Entry"
+          },
+          "needs_resource": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Resource"
           }
         },
         "type": "object",
@@ -81496,6 +81664,30 @@
           "staff_name": {
             "type": "string",
             "title": "Staff Name"
+          },
+          "room_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Id",
+            "description": "A service that needs a room: the room this time would use"
+          },
+          "room_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Name"
           }
         },
         "type": "object",

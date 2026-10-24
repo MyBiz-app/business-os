@@ -187,10 +187,11 @@ def set_room_hours(room_id: UUID, blocks: list[HoursBlock], context: WriteDep) -
 def set_service_rooms(
     service_id: UUID, room_ids: list[UUID], context: WriteDep
 ) -> list[ResourceRoom]:
-    """Which bookable rooms serve a resource service (replaces the list)."""
+    """Which bookable rooms serve a resource service, or an appointment that needs a room
+    (replaces the list)."""
     db = context.session
     is_resource = db.execute(
-        text("SELECT booking_mode = 'resource' FROM app.services WHERE id = :id"),
+        text("SELECT booking_mode = 'resource' OR needs_resource FROM app.services WHERE id = :id"),
         {"id": service_id},
     ).scalar()
     if is_resource is None:
@@ -217,10 +218,40 @@ def set_service_rooms(
                 for room_id in set(room_ids)
             ],
         )
-    return _services(db, service_id=service_id)[0].rooms
+    return service_rooms(db, service_id)
+
+
+@router.get("/services/{service_id}/rooms")
+def get_service_rooms(service_id: UUID, context: ReadDep) -> list[ResourceRoom]:
+    """The rooms that serve a resource service or an appointment that needs a room."""
+    if (
+        context.session.execute(
+            text("SELECT 1 FROM app.services WHERE id = :id"), {"id": service_id}
+        ).scalar()
+        is None
+    ):
+        raise not_found()
+    return service_rooms(context.session, service_id)
 
 
 # --- What can be reserved ---------------------------------------------------------------------
+
+
+def service_rooms(db: Session, service_id: UUID) -> list[ResourceRoom]:
+    """Active, bookable rooms in active branches that serve the service (resource, or an
+    appointment that needs a room)."""
+    rows = db.execute(
+        text("""
+            SELECT r.id, r.name, r.location_id, l.name AS location_name, r.capacity
+            FROM app.service_rooms sr
+            JOIN app.rooms r ON r.id = sr.room_id AND r.active AND r.bookable
+            JOIN app.locations l ON l.id = r.location_id AND l.active
+            WHERE sr.service_id = :id AND app.in_branch(r.location_id)
+            ORDER BY l.name, r.name, r.id
+        """),
+        {"id": service_id},
+    ).mappings()
+    return [ResourceRoom.model_validate(dict(row)) for row in rows]
 
 
 def _services(db: Session, *, service_id: UUID | None = None) -> list[ResourceService]:
