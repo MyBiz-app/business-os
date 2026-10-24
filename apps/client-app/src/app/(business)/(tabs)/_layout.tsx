@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
@@ -9,6 +9,7 @@ import { useAreas } from "@/providers/area-provider";
 import { AiBubble } from "@/components/ai-bubble";
 import { useStaff } from "@/providers/staff-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 /** The business app's tabs, in the business's own brand color. Tabs follow permissions. */
 export default function TabsLayout() {
@@ -26,7 +27,7 @@ export default function TabsLayout() {
   if (!tenant) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.background }}>
-        <ActivityIndicator color={palette.primary} />
+        <Spinner color={palette.primary} />
       </View>
     );
   }

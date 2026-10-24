@@ -2,7 +2,7 @@ import type { components } from "@business-os/api-client";
 import { formatDay } from "@business-os/i18n/dates";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -13,6 +13,7 @@ import { courtGrid, clockOf, staffRows } from "@/lib/availability";
 import { rentalLengths } from "@/lib/court-search";
 import { useBusiness } from "@/providers/business-provider";
 import { radius } from "@business-os/app-kit/lib/theme";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 type Court = components["schemas"]["ResourceService"];
 type CourtSlot = components["schemas"]["ResourceSlot"];
@@ -78,7 +79,7 @@ function DayAvailability({ kind, day, serviceId, court }: { kind: "courts" | "ap
     <View style={local.day}>
       <Text style={[local.head, { color: palette.foreground }]}>{formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" })}</Text>
       {slots === null ? (
-        <ActivityIndicator color={palette.primary} />
+        <Spinner color={palette.primary} />
       ) : slots.length === 0 ? (
         <Text style={[styles.muted, { color: palette.muted }]}>{t("noFree")}</Text>
       ) : kind === "courts" ? (

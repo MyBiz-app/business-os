@@ -1364,7 +1364,7 @@ h1[tabindex="-1"]:focus {
   padding: 0;
 }
 .hs-card {
-  --c: #ea580c;
+  --c: #c2410c;
   --k: clamp(0, calc(var(--p) * 4 - var(--i)), 1);
   position: relative;
   display: none;
@@ -1374,17 +1374,27 @@ h1[tabindex="-1"]:focus {
   border: 1px solid var(--border);
   border-radius: 1rem;
   background: color-mix(in srgb, var(--surface) 80%, transparent);
+  /* The inactive cards are dimmed part by part: the step number stays at full strength to keep its contrast. */
+  transition: border-color 0.3s ease;
+}
+.hs-card > :not(.hs-card-n) {
   opacity: 0.55;
-  transition: opacity 0.3s ease, border-color 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 .hs-card[data-i="1"] {
-  --c: #db2777;
+  --c: #be185d;
 }
 .hs-card[data-i="2"] {
-  --c: #2563eb;
+  --c: #1d4ed8;
 }
 .hs-card[data-i="3"] {
-  --c: #7c3aed;
+  --c: #6d28d9;
+}
+.dark .hs-card[data-i="0"] {
+  --c: #fb923c;
+}
+.dark .hs-card[data-i="1"] {
+  --c: #f472b6;
 }
 .dark .hs-card[data-i="2"] {
   --c: #60a5fa;
@@ -1439,8 +1449,13 @@ h1[tabindex="-1"]:focus {
 .hs[data-step="2"] .hs-card[data-i="2"],
 .hs[data-step="3"] .hs-card[data-i="3"] {
   display: flex;
-  opacity: 1;
   border-color: var(--c);
+}
+.hs[data-step="0"] .hs-card[data-i="0"] > *,
+.hs[data-step="1"] .hs-card[data-i="1"] > *,
+.hs[data-step="2"] .hs-card[data-i="2"] > *,
+.hs[data-step="3"] .hs-card[data-i="3"] > * {
+  opacity: 1;
 }
 @media (min-width: 1024px) {
   .hs-card {

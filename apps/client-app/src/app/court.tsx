@@ -3,7 +3,7 @@ import type { components } from "@business-os/api-client";
 import { addDays, dayOf, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
@@ -19,6 +19,7 @@ import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { defaultTime, groupByCourt, rentalLengths, splitOffset, timeOptions } from "@/lib/court-search";
 import { useBusiness } from "@/providers/business-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 type Service = components["schemas"]["ResourceService"];
 type Slot = components["schemas"]["ResourceSlot"];
@@ -181,7 +182,7 @@ export default function Court() {
       <Heading palette={palette}>{t("title")}</Heading>
 
       {!services ? (
-        <ActivityIndicator color={palette.primary} />
+        <Spinner color={palette.primary} />
       ) : services.length === 0 ? (
         <EmptyState palette={palette} message={t("none")} />
       ) : (
@@ -264,7 +265,7 @@ export default function Court() {
 
           <Card palette={palette}>
             {found === null ? (
-              <ActivityIndicator color={palette.primary} />
+              <Spinner color={palette.primary} />
             ) : found.exact.length > 0 ? (
               <>
                 <Text style={[local.serviceName, { color: palette.success }]}>{t("exactFree", { time: at })}</Text>
@@ -333,7 +334,7 @@ export default function Court() {
           {showGrid && (
             <Card palette={palette}>
               {slots === null ? (
-                <ActivityIndicator color={palette.primary} />
+                <Spinner color={palette.primary} />
               ) : slots.length === 0 ? (
                 <>
                   <Text style={[styles.muted, { color: palette.muted }]}>{t("noSlots")}</Text>

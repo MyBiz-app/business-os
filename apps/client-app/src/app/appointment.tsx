@@ -3,7 +3,7 @@ import type { components } from "@business-os/api-client";
 import { addDays, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Linking, ScrollView, StyleSheet, View } from "react-native";
+import { Linking, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
@@ -21,6 +21,7 @@ import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useAddresses } from "@/lib/use-addresses";
 import { useDependents } from "@/lib/use-dependents";
 import { useBusiness } from "@/providers/business-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 type Slot = components["schemas"]["Slot"];
 type Service = components["schemas"]["AppointmentService"];
@@ -196,7 +197,7 @@ export default function Appointment() {
 
       <StepTitle palette={palette} n={1} label={t("service")} />
       {!data ? (
-        <ActivityIndicator color={palette.primary} />
+        <Spinner color={palette.primary} />
       ) : (
         <View role="radiogroup" aria-label={t("service")} style={local.list}>
           {data.services.map((item) => {
@@ -273,7 +274,7 @@ export default function Appointment() {
           <StepTitle palette={palette} n={data.team.length > 1 ? 4 : 3} label={t("time")} />
           <Card palette={palette}>
             {slots === null ? (
-              <ActivityIndicator color={palette.primary} />
+              <Spinner color={palette.primary} />
             ) : slots.length === 0 ? (
               <>
                 <Text style={[styles.muted, { color: palette.muted }]}>{t("noSlots")}</Text>
