@@ -14,7 +14,7 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@types/react": "~19.2.2",
+    "@types/react": "~19.3.0",
     "eslint": "9.39.5",
     "eslint-config-expo": "57.0.2",
     "typescript": "^5"
@@ -28,9 +28,9 @@
     "@expo-google-fonts/plus-jakarta-sans": "0.4.2",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@sentry/react-native": "^8.30.0",
-    "@supabase/supabase-js": "2.117.2",
-    "@types/react": "~19.2.2",
+    "@sentry/react-native": "^8.31.0",
+    "@supabase/supabase-js": "2.118.0",
+    "@types/react": "~19.3.0",
     "expo": "~57.0.26",
     "expo-constants": "~57.0.20",
     "expo-font": "~57.0.4",
@@ -41,9 +41,9 @@
     "expo-secure-store": "~57.0.4",
     "expo-status-bar": "~57.0.1",
     "expo-updates": "~57.0.24",
-    "react": "19.2.3",
-    "react-native": "0.86.3",
-    "react-native-safe-area-context": "~5.7.0",
+    "react": "19.3.1",
+    "react-native": "0.88.0",
+    "react-native-safe-area-context": "~5.10.1",
     "typescript": "~6.0.3",
     "use-intl": "4.14.9"
   }
