@@ -88,7 +88,7 @@ def rooms_held(engine: Engine) -> list[tuple[str, str]]:
             for row in connection.execute(
                 text("""
                     SELECT r.name AS room, s.status FROM app.sessions s
-                    JOIN app.rooms r ON r.id = s.room_id WHERE s.holds_room ORDER BY r.name
+                    JOIN app.rooms r ON r.id = s.room_id WHERE s.holds_room ORDER BY r.name, s.status
                 """)
             )
         ]
