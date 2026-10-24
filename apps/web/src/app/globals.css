@@ -2535,13 +2535,36 @@ html:has(dialog:modal) {
   }
 }
 
-/* Landing site: the page and the footer cross-fade as one piece (old 90ms out, new 180ms in), with no
- * movement; the new page already starts at the top (NavigationScroll). */
+/* Landing site: the page and the footer cross-fade as one piece (old 180ms out, new 380ms in), with no
+ * movement; the new page already starts at the top (NavigationScroll). Short fades (under about
+ * 200ms) read as a hard cut, so these are slower than the CRM's. */
 ::view-transition-old(.vt-site-out) {
-  animation: 90ms ease-in both vt-fade reverse;
+  animation: 180ms ease-in both vt-fade reverse;
 }
 ::view-transition-new(.vt-site-in) {
-  animation: 180ms var(--ease-out) both vt-fade;
+  animation: 380ms var(--ease-out) both vt-fade;
+}
+/* The pages are rendered on demand, so a click waits for the server. Until the new page is here the
+ * current one softens at once (RouteProgress sets data-navigating) and the cross-fade takes over from
+ * there, so the swap is never a cut. A fast page change never shows it (90ms delay). */
+.site-page {
+  transition: none;
+}
+html[data-navigating] .site-page {
+  opacity: 0.55;
+  /* Only the way in is animated: when the new page arrives the page is back at full strength at once,
+   * so the cross-fade does not start from a half-faded page. */
+  transition: opacity 240ms var(--ease-out) 90ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-navigating] .site-page {
+    opacity: 1;
+    transition: none;
+  }
+}
+html[data-motion="reduce"][data-navigating] .site-page {
+  opacity: 1;
+  transition: none;
 }
 /* CRM: the content area only fades, no movement you notice (150ms). */
 ::view-transition-old(.vt-app-out) {
