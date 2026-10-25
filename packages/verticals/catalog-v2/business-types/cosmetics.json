@@ -1,0 +1,89 @@
+{
+  "key": "cosmetics",
+  "domain": "beauty",
+  "status": "live",
+  "names": {
+    "he": "קוסמטיקה",
+    "en": "Cosmetics clinic"
+  },
+  "synonyms": {
+    "he": [
+      "קוסמטיקה",
+      "קוסמטיקאית",
+      "טיפולי פנים"
+    ],
+    "en": [
+      "cosmetics",
+      "facial",
+      "beautician"
+    ]
+  },
+  "terms": "beauty",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "facial",
+      "names": {
+        "he": "טיפול פנים",
+        "en": "Facial"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 30000
+    },
+    {
+      "key": "deep_cleaning",
+      "names": {
+        "he": "ניקוי עמוק",
+        "en": "Deep cleaning"
+      },
+      "model": "appointment",
+      "duration_minutes": 75,
+      "price_ils": 35000
+    },
+    {
+      "key": "hair_removal",
+      "names": {
+        "he": "הסרת שיער",
+        "en": "Hair removal"
+      },
+      "model": "appointment",
+      "duration_minutes": 20,
+      "price_ils": 6000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה חדרי טיפול?",
+        "en": "How many treatment rooms?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    },
+    {
+      "key": "series",
+      "text": {
+        "he": "מוכרים סדרות טיפולים?",
+        "en": "Do you sell treatment series?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "brows_lashes",
+    "nails"
+  ],
+  "order": 25
+}

@@ -1,13 +1,13 @@
 import { Assistant_400Regular, Assistant_500Medium, Assistant_600SemiBold } from "@expo-google-fonts/assistant";
 import { PlusJakartaSans_600SemiBold } from "@expo-google-fonts/plus-jakarta-sans";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Redirect, Stack, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import type { ComponentType, ReactNode } from "react";
 
 import { displayFontFamily, fontFamily } from "@business-os/design-tokens";
 import { I18nProvider } from "../providers/i18n-provider";
-import { SessionProvider } from "../providers/session-provider";
+import { SessionProvider, useSession } from "../providers/session-provider";
 import { initMonitoring } from "../lib/monitoring";
 import { ThemeProvider, useTheme } from "../providers/theme-provider";
 import { AnnouncementsModal } from "./announcements-modal";
@@ -19,11 +19,23 @@ import { ToastProvider } from "./toast";
 
 initMonitoring();
 
+/** Screens a signed-out visitor may open; every other address sends them to sign in (a deep link used to
+ * leave a blank screen, because only the tab layouts checked the session). */
+const SIGNED_OUT_ROUTES = ["/", "/sign-in", "/join"];
+
+function SignedOutGuard() {
+  const { session, loading } = useSession();
+  const pathname = usePathname();
+  if (loading || session || SIGNED_OUT_ROUTES.includes(pathname)) return null;
+  return <Redirect href="/sign-in" />;
+}
+
 function ThemedStack() {
   const { scheme, palette } = useTheme();
   return (
     <>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
+      <SignedOutGuard />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: palette.background } }} />
     </>
   );

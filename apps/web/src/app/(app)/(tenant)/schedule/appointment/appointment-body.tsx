@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import Form from "next/form";
-import { termsOf } from "@business-os/verticals";
+import { businessTerms } from "@/lib/verticals";
 
 import { unwrap } from "@/lib/api";
 import { formatTime, todayIn } from "@/lib/dates";
@@ -74,7 +74,7 @@ export async function AppointmentBody({ query }: { query: Record<string, string 
       }),
     )
   ).flat();
-  const terms = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.clients");
+  const terms = businessTerms(t, tenant, locale);
 
   return (
     <>

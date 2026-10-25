@@ -1,0 +1,92 @@
+{
+  "key": "walking_football",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "כדורגל הליכה",
+    "en": "Walking football"
+  },
+  "synonyms": {
+    "he": [
+      "כדורגל הליכה",
+      "ווטבול",
+      "כדורגל לגיל הזהב"
+    ],
+    "en": [
+      "walking football",
+      "over 50s football"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "participant",
+  "customers": {
+    "he": "משתתפים",
+    "en": "Participants"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "group_session",
+      "names": {
+        "he": "אימון קבוצתי",
+        "en": "Group session"
+      },
+      "model": "group_class",
+      "duration_minutes": 60,
+      "price_ils": 4000,
+      "capacity": 14,
+      "resource_type": "walking_football_pitch"
+    },
+    {
+      "key": "pitch_rental",
+      "names": {
+        "he": "השכרת מגרש",
+        "en": "Pitch rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 35000,
+      "resource_type": "walking_football_pitch",
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "walking_football_pitch",
+      "count": 1,
+      "attributes": {
+        "surface": "artificial_grass",
+        "lighting": true
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "pitches",
+      "text": {
+        "he": "כמה מגרשים?",
+        "en": "How many pitches?"
+      },
+      "kind": "number",
+      "affects": "resource_count:walking_football_pitch",
+      "default": 1
+    },
+    {
+      "key": "rental",
+      "text": {
+        "he": "משכירים גם בלי מדריך?",
+        "en": "Do you also rent the pitch without a coach?"
+      },
+      "kind": "boolean",
+      "affects": "activity:pitch_rental",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "football_pitches",
+    "gym"
+  ],
+  "order": 13
+}

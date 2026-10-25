@@ -1,0 +1,104 @@
+{
+  "key": "tires",
+  "domain": "automotive",
+  "status": "live",
+  "names": {
+    "he": "צמיגים",
+    "en": "Tire shop"
+  },
+  "synonyms": {
+    "he": [
+      "צמיגים",
+      "פנצ'ר",
+      "החלפת צמיגים",
+      "איזון גלגלים"
+    ],
+    "en": [
+      "tires",
+      "tyre shop",
+      "puncture",
+      "wheel alignment"
+    ]
+  },
+  "terms": "automotive",
+  "customer_term": "customer",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Customers"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "tire_change",
+      "names": {
+        "he": "החלפת צמיגים",
+        "en": "Tire change"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 45,
+      "price_ils": 18000,
+      "resource_type": "work_bay"
+    },
+    {
+      "key": "puncture",
+      "names": {
+        "he": "תיקון פנצ'ר",
+        "en": "Puncture repair"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 20,
+      "price_ils": 6000,
+      "resource_type": "work_bay"
+    },
+    {
+      "key": "alignment",
+      "names": {
+        "he": "איזון והתאמה",
+        "en": "Alignment"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 45,
+      "price_ils": 20000,
+      "resource_type": "work_bay",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "work_bay",
+      "count": 2,
+      "attributes": {
+        "lift": true
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "bays",
+      "text": {
+        "he": "כמה עמדות עבודה?",
+        "en": "How many work bays?"
+      },
+      "kind": "number",
+      "affects": "resource_count:work_bay",
+      "default": 2
+    },
+    {
+      "key": "walk_in",
+      "text": {
+        "he": "מקבלים גם בלי תור?",
+        "en": "Do you take walk-ins?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "garage",
+    "detailing"
+  ],
+  "dependents": "vehicle",
+  "dependents_mode": "required",
+  "order": 58
+}

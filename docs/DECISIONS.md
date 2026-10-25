@@ -23,6 +23,7 @@ When a decision changes, update the row and note the date - do not delete histor
 | P7 | Medical clinics vertical deferred (health-data regulation). | DECIDED (2026-10-03, delegated) |
 | P8 | Schedule week view shows at most two branches side by side (three lanes were about 45 px each and cut class names); with more branches the week opens as one merged column with branch tags, and the day view still shows up to six. Decided 2026-10-21 (W5-3), delegated. | DECIDED (delegated) |
 | P9 | The side menu's Settings item has no sub-items: the settings page already has its own inner menu of topics and sections, so listing them twice was redundant. Cmd+K still jumps straight to a settings topic. Decided 2026-10-21 (W5-3), delegated. | DECIDED (delegated) |
+| P10 | Industries are rebuilt on three layers: business type (what the owner picks), activities, and one of eight service models (what the engine runs). Tennis and padel are separate business types; a branch may be of any domain; the booking page, guest booking with an email code, 90-minute padel, owner-editable customer words and a custom path ("my business is not listed") follow. All nine recommendations of the spec `docs/plans/2026-10/categories-service-model-spec-2026-10-23.md` were approved by the owner on 2026-10-23. "Waterball" is read as walking football (unconfirmed: if footvolley or something else, it is one more resource type). Slice C1 adds the catalog (`packages/verticals/catalog-v2`) without changing any screen or table. Slice C2 (migration 0156) adds the activities tables; an activity row is per (business, business type, key) because one key means different things in different types; a branch's kind may be any catalog industry. | DECIDED |
 
 ## Technical
 
@@ -482,11 +483,48 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** the new demo has different businesses with Hebrew names; name lookups would silently skip every layer for them.
 - **Revisit** if two businesses of one industry in one demo need different content (then add a role to the business spec).
 
+### Demo profile pictures: 1,500 AI portraits (2026-10-23, demo slice D3, no migration)
+
+- **Decision:** the demo people get synthetic AI portraits (Runware, FLUX schnell, 192 px JPEG, about 8 KB each, 750 women and 750 men) drawn by `scripts/generate_demo_portraits.py`, which stops at a hard budget cap and resumes where it stopped. Total spend about $2.77 against the owner's $10 limit. The seed gives a portrait to every active demo client except one in ten, left empty on purpose, and to the team. Children are never given a photo (they are dependents, not users). When the AI set is small, the 12 busiest clients per business get AI portraits and the rest get CC0 illustrated avatars (`scripts/generate_demo_illustrated_avatars.py`).
+- **Why:** a full realistic set makes the demo look like a living business; nobody in the pictures exists, so they can stay after go-live.
+- **Revisit** if the repo size matters (the images are about 12 MB); they could move to object storage.
+
 ### Demo sign-in accounts take over demo team members (2026-10-23, demo slice D5, no migration)
 
 - **Decision:** the owner's "plus" addresses become team members by taking over an existing demo team member of the right branch: every reference to the demo profile moves to the real person (found from the database's own foreign keys), then the demo profile is removed. Passwords are never set by the seed.
 - **Why:** a new member would have no shifts, classes or pay terms; taking over keeps the whole history. The seed cannot create sign-ins, so each address must sign up first and the seed is run again.
 - **Revisit** if a table gets a reference to a person that is not a database foreign key.
+
+### Apple look: hero concept, font, colour and glass (2026-10-23, Apple-look round slice L1, no migration)
+
+- **Hero concept:** "your business, on every screen". The site hero shows a CSS-drawn phone and laptop (shared `DeviceFrame`, no Apple logo or product names) with live HTML screens, driven by one `--p` CSS progress variable. A 941-frame image sequence was rejected: 50-90 MB per visit, blocked by the CSP and a state update per scroll.
+- **Font:** the system font on Apple devices: stack `-apple-system, BlinkMacSystemFont`, then Assistant (Hebrew and the fallback). No font download on Apple devices.
+- **Colour:** primary becomes Apple blue (`#007AFF` light, `#0A84FF` dark) on the iOS grouped background (`#F2F2F7`). Contrast of text on the primary is re-checked when the tokens change (slice A1/F1).
+- **Liquid Glass:** translucent blurred surfaces for bars and sheets, with a plain opaque fallback where `backdrop-filter` is missing or reduced transparency is set.
+- **Why:** an Apple-grade first impression for a product whose owners and clients mostly use iPhones, at near-zero page weight.
+- **A1 refinement (2026-10-23):** the light primary fill is `#0071E3`, not `#007AFF`: white text on `#007AFF` is 4.0:1 (below WCAG AA); `#0071E3` is 4.7:1. Dark stays `#0A84FF`. Text-safe blue (`primaryInk`) is `#0062CC` / `#4DA3FF`. Dark mode is true black with `#1C1C1E` surfaces. One line to flip back if the owner prefers the exact iOS blue.
+- **Revisit** if the home mobile Lighthouse score stays under 80 or the blue fails contrast on a surface.
+
+### Classes with several instructors, and open entry (2026-10-23, categories slice C6, migration 0158)
+
+- **Decision:** a session keeps its lead instructor in `sessions.instructor_user_id` and gets the others in `session_instructors` (also remembered on a weekly series, so the job that extends it gives new sessions the same team). A service may keep a ratio (`participants_per_instructor`, for example 8 children per coach); a session's capacity may not exceed ratio x its instructors (`ratio_exceeded`), and a session with no instructor yet is not checked. Open entry (open gym, pool, co-working) is a class service with `open_entry = true`, not a new booking mode: its sessions are the opening hours and `POST /entries` checks a client in against their plan (a booking that is checked in at once). Without a plan the desk must say `without_plan` (pays at the desk); outside opening hours it answers `entry_closed`.
+- **Why:** a new booking mode would touch every place that treats "not a class" as an appointment (calendar, reports, waitlist); a flag on a class service keeps one engine and the existing plan, credit and roster rules.
+- **Not in this slice:** the calendar and form screens (C10), a branch-wide "open entry" check-in from the client app (C11), an instructor busy check for the extra instructors, and changing the team of a whole series after it was created.
+- **Revisit** if a business needs the ratio to be a hard limit on bookings of an existing class (today it is checked when the session is created or edited).
+### A lesson takes a coach and a room together (2026-10-23, categories slice C4, migration 0160)
+
+- **Model M5 is a flag on an appointment service, not a new booking mode.** `services.needs_resource` (appointment, not on-site) plus the existing `service_rooms` list. The session keeps the staff member and also holds the room (`sessions.holds_room`, not `reserved`: reservations are paid by the hour, a lesson is priced as an appointment).
+- **The client may name a court; if not, the server takes the first free one** (by branch and room name). Free times are the overlap of the coach's hours and a linked room's hours and free time.
+- **One rule in the database:** a trigger refuses an appointment session of such a service without a room, so no path (waitlist, seed, future code) can skip the court. An exclusion constraint and per-room locks keep two bookings off one court.
+- **Why:** reuses the appointment and reservation machinery; existing services are untouched (flag defaults off).
+- **Revisit** when a lesson needs two rooms or more than one coach (slice C6 handles several instructors for classes).
+
+### Feedback pattern: where an error or a "saved" appears (2026-10-24, web)
+
+- **Decision:** a problem with one field (wrong password, weak password) shows right under that field with an icon, the field turns red (`aria-invalid`) and gets the cursor back. A problem with the whole form shows at the top of a short form (sign-in, sign-up) with no toast on top of it; in long forms it stays a toast as well, so it is seen wherever the page is scrolled. A success is a toast plus the submit button turning into "Saved". Errors stay until closed; successes close alone. This is the pattern of Apple's HIG, Stripe, Linear and Vercel; the toast card itself already followed it.
+- **Password fields:** the icon shows the state (crossed eye while hidden, open eye while shown, it was the other way round), and a "Caps Lock is on" notice appears while the key is on.
+- **Shared building blocks:** `Field`, `TextAreaField` (web) and `Field`/`ErrorText` (Expo app) take an `error` prop, so any form can show a field problem the same way; every form's top-level `FormError` got the same icon look. Forms adopt `error` as their server actions start returning which field failed.
+- **Revisit** if sign-in tests show people missing the inline message.
 
 ## Open
 

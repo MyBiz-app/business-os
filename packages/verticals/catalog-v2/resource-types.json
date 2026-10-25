@@ -1,0 +1,532 @@
+[
+  {
+    "key": "tennis_court",
+    "names": {
+      "he": "מגרש טניס",
+      "en": "Tennis court"
+    },
+    "default_capacity": 4,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 180,
+    "step_minutes": 30,
+    "attributes": [
+      {
+        "key": "surface",
+        "kind": "select",
+        "options": [
+          "hard",
+          "clay",
+          "artificial_grass"
+        ]
+      },
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      },
+      {
+        "key": "covered",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "padel_court",
+    "names": {
+      "he": "מגרש פאדל",
+      "en": "Padel court"
+    },
+    "default_capacity": 4,
+    "default_minutes": 90,
+    "min_minutes": 60,
+    "max_minutes": 120,
+    "step_minutes": 30,
+    "attributes": [
+      {
+        "key": "surface",
+        "kind": "select",
+        "options": [
+          "artificial_grass"
+        ]
+      },
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      },
+      {
+        "key": "covered",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "football_5",
+    "names": {
+      "he": "מגרש קט־רגל",
+      "en": "Five-a-side pitch"
+    },
+    "default_capacity": 12,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 120,
+    "step_minutes": 60,
+    "attributes": [
+      {
+        "key": "surface",
+        "kind": "select",
+        "options": [
+          "artificial_grass",
+          "grass"
+        ]
+      },
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      },
+      {
+        "key": "covered",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "football_7",
+    "names": {
+      "he": "מגרש כדורגל 7/8",
+      "en": "Seven-a-side pitch"
+    },
+    "default_capacity": 16,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 120,
+    "step_minutes": 60,
+    "attributes": [
+      {
+        "key": "surface",
+        "kind": "select",
+        "options": [
+          "artificial_grass",
+          "grass"
+        ]
+      },
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "football_11",
+    "names": {
+      "he": "מגרש כדורגל מלא",
+      "en": "Full-size pitch"
+    },
+    "default_capacity": 22,
+    "default_minutes": 90,
+    "min_minutes": 90,
+    "max_minutes": 180,
+    "step_minutes": 30,
+    "attributes": [
+      {
+        "key": "surface",
+        "kind": "select",
+        "options": [
+          "artificial_grass",
+          "grass"
+        ]
+      },
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "walking_football_pitch",
+    "names": {
+      "he": "מגרש כדורגל הליכה",
+      "en": "Walking football pitch"
+    },
+    "default_capacity": 14,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 120,
+    "step_minutes": 60,
+    "attributes": [
+      {
+        "key": "surface",
+        "kind": "select",
+        "options": [
+          "artificial_grass",
+          "grass"
+        ]
+      },
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "basketball_court",
+    "names": {
+      "he": "מגרש כדורסל",
+      "en": "Basketball court"
+    },
+    "default_capacity": 10,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 120,
+    "step_minutes": 60,
+    "attributes": [
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      },
+      {
+        "key": "covered",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "volleyball_court",
+    "names": {
+      "he": "מגרש כדורעף",
+      "en": "Volleyball court"
+    },
+    "default_capacity": 12,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 120,
+    "step_minutes": 60,
+    "attributes": [
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      },
+      {
+        "key": "covered",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "beach_volleyball_court",
+    "names": {
+      "he": "מגרש כדורעף חופים",
+      "en": "Beach volleyball court"
+    },
+    "default_capacity": 4,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 120,
+    "step_minutes": 60,
+    "attributes": [
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "pickleball_court",
+    "names": {
+      "he": "מגרש פיקלבול",
+      "en": "Pickleball court"
+    },
+    "default_capacity": 4,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 120,
+    "step_minutes": 30,
+    "attributes": [
+      {
+        "key": "lighting",
+        "kind": "boolean"
+      },
+      {
+        "key": "covered",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "squash_court",
+    "names": {
+      "he": "מגרש סקווש",
+      "en": "Squash court"
+    },
+    "default_capacity": 2,
+    "default_minutes": 45,
+    "min_minutes": 30,
+    "max_minutes": 90,
+    "step_minutes": 15,
+    "attributes": []
+  },
+  {
+    "key": "rehearsal_room",
+    "names": {
+      "he": "חדר חזרות",
+      "en": "Rehearsal room"
+    },
+    "default_capacity": 6,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 240,
+    "step_minutes": 60,
+    "attributes": []
+  },
+  {
+    "key": "meeting_room",
+    "names": {
+      "he": "חדר ישיבות",
+      "en": "Meeting room"
+    },
+    "default_capacity": 8,
+    "default_minutes": 60,
+    "min_minutes": 30,
+    "max_minutes": 480,
+    "step_minutes": 30,
+    "attributes": []
+  },
+  {
+    "key": "photo_studio_space",
+    "names": {
+      "he": "סטודיו צילום",
+      "en": "Photo studio"
+    },
+    "default_capacity": 8,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 480,
+    "step_minutes": 60,
+    "attributes": []
+  },
+  {
+    "key": "workstation",
+    "names": {
+      "he": "עמדת עבודה",
+      "en": "Workstation"
+    },
+    "default_capacity": 1,
+    "default_minutes": 480,
+    "min_minutes": 240,
+    "max_minutes": 720,
+    "step_minutes": 240,
+    "attributes": [
+      {
+        "key": "kind",
+        "kind": "select",
+        "options": [
+          "hot_desk",
+          "fixed_desk",
+          "private_office"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "event_hall",
+    "names": {
+      "he": "אולם אירועים",
+      "en": "Event hall"
+    },
+    "default_capacity": 100,
+    "default_minutes": 240,
+    "min_minutes": 240,
+    "max_minutes": 720,
+    "step_minutes": 240,
+    "attributes": []
+  },
+  {
+    "key": "treatment_room",
+    "names": {
+      "he": "חדר טיפולים",
+      "en": "Treatment room"
+    },
+    "default_capacity": 1,
+    "default_minutes": 60,
+    "min_minutes": 30,
+    "max_minutes": 120,
+    "step_minutes": 15,
+    "attributes": []
+  },
+  {
+    "key": "treatment_chair",
+    "names": {
+      "he": "כיסא טיפולים",
+      "en": "Treatment chair"
+    },
+    "default_capacity": 1,
+    "default_minutes": 30,
+    "min_minutes": 15,
+    "max_minutes": 120,
+    "step_minutes": 15,
+    "attributes": []
+  },
+  {
+    "key": "studio_room",
+    "names": {
+      "he": "סטודיו",
+      "en": "Studio room"
+    },
+    "default_capacity": 20,
+    "default_minutes": 60,
+    "min_minutes": 45,
+    "max_minutes": 120,
+    "step_minutes": 15,
+    "attributes": [
+      {
+        "key": "floor",
+        "kind": "select",
+        "options": [
+          "wood",
+          "mat",
+          "sprung"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "reformer",
+    "names": {
+      "he": "מכשיר רפורמר",
+      "en": "Reformer"
+    },
+    "default_capacity": 1,
+    "default_minutes": 55,
+    "min_minutes": 50,
+    "max_minutes": 60,
+    "step_minutes": 5,
+    "attributes": []
+  },
+  {
+    "key": "swim_lane",
+    "names": {
+      "he": "מסלול שחייה",
+      "en": "Swim lane"
+    },
+    "default_capacity": 8,
+    "default_minutes": 45,
+    "min_minutes": 30,
+    "max_minutes": 90,
+    "step_minutes": 15,
+    "attributes": []
+  },
+  {
+    "key": "escape_room",
+    "names": {
+      "he": "חדר בריחה",
+      "en": "Escape room"
+    },
+    "default_capacity": 6,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 60,
+    "step_minutes": 15,
+    "attributes": []
+  },
+  {
+    "key": "shooting_lane",
+    "names": {
+      "he": "מסלול ירי",
+      "en": "Shooting lane"
+    },
+    "default_capacity": 1,
+    "default_minutes": 30,
+    "min_minutes": 30,
+    "max_minutes": 120,
+    "step_minutes": 30,
+    "attributes": []
+  },
+  {
+    "key": "golf_simulator_bay",
+    "names": {
+      "he": "עמדת סימולטור גולף",
+      "en": "Golf simulator bay"
+    },
+    "default_capacity": 4,
+    "default_minutes": 60,
+    "min_minutes": 60,
+    "max_minutes": 180,
+    "step_minutes": 30,
+    "attributes": []
+  },
+  {
+    "key": "work_bay",
+    "names": {
+      "he": "עמדת עבודה במוסך",
+      "en": "Garage bay"
+    },
+    "default_capacity": 1,
+    "default_minutes": 60,
+    "min_minutes": 15,
+    "max_minutes": 480,
+    "step_minutes": 15,
+    "attributes": [
+      {
+        "key": "lift",
+        "kind": "boolean"
+      }
+    ]
+  },
+  {
+    "key": "training_vehicle",
+    "names": {
+      "he": "רכב לימוד",
+      "en": "Training car"
+    },
+    "default_capacity": 2,
+    "default_minutes": 45,
+    "min_minutes": 45,
+    "max_minutes": 90,
+    "step_minutes": 15,
+    "attributes": [
+      {
+        "key": "gearbox",
+        "kind": "select",
+        "options": [
+          "manual",
+          "automatic"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "table",
+    "names": {
+      "he": "שולחן",
+      "en": "Table"
+    },
+    "default_capacity": 4,
+    "default_minutes": 120,
+    "min_minutes": 60,
+    "max_minutes": 240,
+    "step_minutes": 30,
+    "attributes": []
+  },
+  {
+    "key": "kennel",
+    "names": {
+      "he": "תא פנסיון",
+      "en": "Boarding kennel"
+    },
+    "default_capacity": 1,
+    "default_minutes": 1440,
+    "min_minutes": 1440,
+    "max_minutes": 20160,
+    "step_minutes": 1440,
+    "attributes": [
+      {
+        "key": "size",
+        "kind": "select",
+        "options": [
+          "small",
+          "medium",
+          "large"
+        ]
+      }
+    ]
+  }
+]

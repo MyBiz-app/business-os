@@ -8,7 +8,7 @@ RUN apt-get update \
 
 # uv installs the dependencies; pip is removed afterwards because it vendors old copies of urllib3,
 # msgpack and setuptools that image scanners flag and that nothing at runtime uses.
-RUN pip install --no-cache-dir uv==0.13.1 && pip uninstall -y pip
+RUN pip install --no-cache-dir uv==0.13.4 && pip uninstall -y pip
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \

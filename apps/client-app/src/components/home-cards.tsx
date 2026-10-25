@@ -14,7 +14,7 @@ import { tint } from "@business-os/app-kit/lib/brand";
 import { byDistance, distanceLabel, hasPoint } from "@business-os/app-kit/lib/distance";
 import { lastVisit, nextBooking, type HomeCard } from "@business-os/app-kit/lib/client-home";
 import { googleMapsLink, wazeLink } from "@business-os/app-kit/lib/maps";
-import { bookingModesFor, termsFor } from "@business-os/app-kit/lib/vertical";
+import { bookingModesFor, useTerm } from "@business-os/app-kit/lib/vertical";
 import { BookingActions } from "@/components/booking-actions";
 import { BranchMap } from "@/components/branch-map";
 import { addressOf, type Location } from "@/lib/use-locations";
@@ -58,14 +58,14 @@ function Section({ title, action, onAction, children }: { title: string; action?
 
 function NextBooking({ data }: { data: HomeData }) {
   const t = useTranslations("client.homeCards");
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
   const locale = useLocale();
   const { business, palette } = useBusiness();
   if (!business) return null;
   const next = nextBooking(data.bookings, Date.now());
   const book = () => router.navigate(data.appointments > 0 ? "/appointment" : data.courts > 0 ? "/court" : "/schedule");
   return (
-    <Section title={tTerms(`${termsFor(business)}.nextBooking`)}>
+    <Section title={term(business, "nextBooking")}>
       {next ? (
         <NextBookingBody booking={next} data={data} locale={locale} />
       ) : (
@@ -150,12 +150,12 @@ function Shortcuts({ data }: { data: HomeData }) {
   const t = useTranslations("client.homeCards");
   const tAppointment = useTranslations("client.appointment");
   const tCourt = useTranslations("client.court");
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
   const { business, palette } = useBusiness();
   if (!business) return null;
   const items: { key: string; icon: "calendar-outline" | "cut-outline" | "tennisball-outline"; label: string; go: () => void }[] = [];
   if (bookingModesFor(business).includes("class") || data.sessions.length > 0 || data.appointments + data.courts === 0) {
-    items.push({ key: "class", icon: "calendar-outline", label: tTerms(`${termsFor(business)}.appTab`), go: () => router.navigate("/schedule") });
+    items.push({ key: "class", icon: "calendar-outline", label: term(business, "appTab"), go: () => router.navigate("/schedule") });
   }
   if (data.appointments > 0) items.push({ key: "appointment", icon: "cut-outline", label: tAppointment("cta"), go: () => router.push("/appointment") });
   if (data.courts > 0) items.push({ key: "court", icon: "tennisball-outline", label: tCourt("cta"), go: () => router.push("/court") });

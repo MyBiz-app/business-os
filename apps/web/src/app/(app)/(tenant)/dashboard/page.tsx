@@ -8,7 +8,7 @@ import { NewMenu } from "./new-menu";
 import { RotatingCard } from "./rotating-card";
 import { TodayCard } from "./today-card";
 import { usageWarnings } from "@business-os/i18n/usage";
-import { termsOf } from "@business-os/verticals";
+import { businessTerms } from "@/lib/verticals";
 
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -113,7 +113,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
     }
   };
 
-  const term = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.client");
+  const term = businessTerms(t, tenant, locale);
   const mine = todays.filter((session) => session.instructor_user_id === me.id);
   // An employee (no reports) sees their own classes; everyone else sees the whole day.
   const timeline = reports || solo ? todays : mine;

@@ -1,0 +1,88 @@
+{
+  "key": "summer_camp",
+  "domain": "learning",
+  "status": "beta",
+  "names": {
+    "he": "קייטנה",
+    "en": "Summer camp"
+  },
+  "synonyms": {
+    "he": [
+      "קייטנה",
+      "קייטנות",
+      "מחנה קיץ",
+      "צהרון"
+    ],
+    "en": [
+      "summer camp",
+      "day camp",
+      "holiday camp",
+      "after-school"
+    ]
+  },
+  "terms": "classes",
+  "customer_term": "participant",
+  "customers": {
+    "he": "משתתפים",
+    "en": "Participants"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "camp_week",
+      "names": {
+        "he": "שבוע קייטנה",
+        "en": "Camp week"
+      },
+      "model": "large_group",
+      "duration_minutes": 480,
+      "price_ils": 90000,
+      "capacity": 40,
+      "min_staff": 4,
+      "series": true
+    },
+    {
+      "key": "single_day",
+      "names": {
+        "he": "יום בודד",
+        "en": "Single day"
+      },
+      "model": "large_group",
+      "duration_minutes": 480,
+      "price_ils": 22000,
+      "capacity": 40,
+      "min_staff": 4,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "capacity",
+      "text": {
+        "he": "כמה ילדים בקבוצה?",
+        "en": "How many children per group?"
+      },
+      "kind": "number",
+      "affects": "activity:camp_week",
+      "default": 40
+    },
+    {
+      "key": "counselors",
+      "text": {
+        "he": "כמה מדריכים?",
+        "en": "How many counselors?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 6
+    }
+  ],
+  "common_combos": [
+    "kids_activities",
+    "dance"
+  ],
+  "dependents": "child",
+  "dependents_mode": "required",
+  "order": 45
+}

@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { termsOf } from "@business-os/verticals";
+import { businessTerms } from "@/lib/verticals";
 
 import { DateJump } from "@/components/calendar-board/date-jump";
 import { MonthGrid } from "@/components/calendar-board/month-grid";
@@ -31,7 +31,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const tAll = await getTranslations();
   const locale = await getLocale();
   const { tenant, api, scope, branch } = await getTenantFor("schedule.read");
-  const term = (key: "schedule" | "newSession" | "noSessions") => tAll(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.schedule");
+  const term = businessTerms(tAll, tenant, locale);
   const query = await searchParams;
   // The business's own default opens the page; a link with a view or branches always wins.
   const view: BoardRange = isBoardRange(query.view) ? query.view : ((tenant.schedule_default_view ?? "week") as BoardRange);

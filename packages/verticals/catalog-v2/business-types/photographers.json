@@ -1,0 +1,96 @@
+{
+  "key": "photographers",
+  "domain": "events",
+  "status": "beta",
+  "names": {
+    "he": "צלם",
+    "en": "Photographer"
+  },
+  "synonyms": {
+    "he": [
+      "צלם",
+      "צילום אירועים",
+      "צלם חתונות",
+      "צילומי משפחה"
+    ],
+    "en": [
+      "photographer",
+      "event photography",
+      "wedding photographer"
+    ]
+  },
+  "terms": "events",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "planning",
+      "names": {
+        "he": "פגישת תכנון",
+        "en": "Planning meeting"
+      },
+      "model": "appointment",
+      "duration_minutes": 30,
+      "price_ils": 10000
+    },
+    {
+      "key": "event",
+      "names": {
+        "he": "צילום אירוע",
+        "en": "Event shoot"
+      },
+      "model": "project",
+      "duration_minutes": 240,
+      "price_ils": 300000
+    },
+    {
+      "key": "portrait",
+      "names": {
+        "he": "צילומי פורטרט",
+        "en": "Portrait session"
+      },
+      "model": "appointment",
+      "duration_minutes": 90,
+      "price_ils": 90000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "event_types",
+      "text": {
+        "he": "אילו אירועים?",
+        "en": "Which events?"
+      },
+      "kind": "select",
+      "affects": "none",
+      "options": [
+        "weddings",
+        "family",
+        "corporate",
+        "mixed"
+      ],
+      "default": "mixed"
+    },
+    {
+      "key": "deposit",
+      "text": {
+        "he": "לוקחים מקדמה?",
+        "en": "Do you take a deposit?"
+      },
+      "kind": "boolean",
+      "affects": "activity:event",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "photo_studio",
+    "djs"
+  ],
+  "order": 63
+}

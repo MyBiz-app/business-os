@@ -1,0 +1,104 @@
+{
+  "key": "pickleball_squash",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "פיקלבול וסקווש",
+    "en": "Pickleball and squash"
+  },
+  "synonyms": {
+    "he": [
+      "פיקלבול",
+      "סקווש",
+      "פיקל בול"
+    ],
+    "en": [
+      "pickleball",
+      "squash"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "player",
+  "customers": {
+    "he": "שחקנים",
+    "en": "Players"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "pickleball_rental",
+      "names": {
+        "he": "השכרת מגרש פיקלבול",
+        "en": "Pickleball court rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 10000,
+      "resource_type": "pickleball_court",
+      "max_minutes": 120,
+      "step_minutes": 30
+    },
+    {
+      "key": "squash_rental",
+      "names": {
+        "he": "השכרת מגרש סקווש",
+        "en": "Squash court rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 45,
+      "price_ils": 7000,
+      "resource_type": "squash_court",
+      "max_minutes": 90,
+      "step_minutes": 15,
+      "optional": true
+    },
+    {
+      "key": "lesson",
+      "names": {
+        "he": "שיעור",
+        "en": "Lesson"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 60,
+      "price_ils": 20000,
+      "resource_type": "pickleball_court",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "pickleball_court",
+      "count": 4,
+      "attributes": {
+        "covered": true
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "pickleball",
+      "text": {
+        "he": "כמה מגרשי פיקלבול?",
+        "en": "How many pickleball courts?"
+      },
+      "kind": "number",
+      "affects": "resource_count:pickleball_court",
+      "default": 4
+    },
+    {
+      "key": "squash",
+      "text": {
+        "he": "כמה מגרשי סקווש?",
+        "en": "How many squash courts?"
+      },
+      "kind": "number",
+      "affects": "resource_count:squash_court",
+      "default": 0
+    }
+  ],
+  "common_combos": [
+    "tennis_club",
+    "padel_club"
+  ],
+  "order": 14
+}

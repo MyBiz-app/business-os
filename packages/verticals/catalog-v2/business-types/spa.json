@@ -1,0 +1,87 @@
+{
+  "key": "spa",
+  "domain": "beauty",
+  "status": "live",
+  "names": {
+    "he": "ספא",
+    "en": "Spa"
+  },
+  "synonyms": {
+    "he": [
+      "ספא",
+      "עיסוי",
+      "מסאג'",
+      "פינוק"
+    ],
+    "en": [
+      "spa",
+      "massage",
+      "wellness"
+    ]
+  },
+  "terms": "beauty",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "massage",
+      "names": {
+        "he": "עיסוי",
+        "en": "Massage"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 60,
+      "price_ils": 35000,
+      "resource_type": "treatment_room"
+    },
+    {
+      "key": "facial",
+      "names": {
+        "he": "טיפול פנים",
+        "en": "Facial"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 60,
+      "price_ils": 40000,
+      "resource_type": "treatment_room",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "treatment_room",
+      "count": 3
+    }
+  ],
+  "questions": [
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה חדרי טיפול?",
+        "en": "How many treatment rooms?"
+      },
+      "kind": "number",
+      "affects": "resource_count:treatment_room",
+      "default": 3
+    },
+    {
+      "key": "couples",
+      "text": {
+        "he": "יש חדר זוגי?",
+        "en": "Is there a couples' room?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "cosmetics",
+    "yoga"
+  ],
+  "order": 28
+}

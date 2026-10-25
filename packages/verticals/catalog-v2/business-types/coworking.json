@@ -1,0 +1,105 @@
+{
+  "key": "coworking",
+  "domain": "rental_spaces",
+  "status": "beta",
+  "names": {
+    "he": "חלל עבודה משותף",
+    "en": "Coworking space"
+  },
+  "synonyms": {
+    "he": [
+      "חלל עבודה",
+      "קו וורקינג",
+      "משרד להשכרה",
+      "עמדת עבודה"
+    ],
+    "en": [
+      "coworking",
+      "shared office",
+      "hot desk"
+    ]
+  },
+  "terms": "professional",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "day_pass",
+      "names": {
+        "he": "כניסה יומית",
+        "en": "Day pass"
+      },
+      "model": "open_entry",
+      "duration_minutes": 480,
+      "price_ils": 8000
+    },
+    {
+      "key": "desk_rental",
+      "names": {
+        "he": "השכרת עמדה",
+        "en": "Desk rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 480,
+      "price_ils": 7000,
+      "resource_type": "workstation",
+      "max_minutes": 720,
+      "step_minutes": 240,
+      "optional": true
+    },
+    {
+      "key": "meeting_room",
+      "names": {
+        "he": "חדר ישיבות לחברים",
+        "en": "Meeting room for members"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 10000,
+      "resource_type": "meeting_room",
+      "max_minutes": 240,
+      "step_minutes": 30,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "workstation",
+      "count": 10,
+      "attributes": {
+        "kind": "hot_desk"
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "desks",
+      "text": {
+        "he": "כמה עמדות?",
+        "en": "How many desks?"
+      },
+      "kind": "number",
+      "affects": "resource_count:workstation",
+      "default": 10
+    },
+    {
+      "key": "rooms",
+      "text": {
+        "he": "יש חדרי ישיבות?",
+        "en": "Are there meeting rooms?"
+      },
+      "kind": "boolean",
+      "affects": "activity:meeting_room",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "meeting_rooms",
+    "consultants"
+  ],
+  "order": 22
+}

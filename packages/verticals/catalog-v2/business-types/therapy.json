@@ -1,0 +1,83 @@
+{
+  "key": "therapy",
+  "domain": "health",
+  "status": "live",
+  "names": {
+    "he": "טיפול רגשי",
+    "en": "Psychotherapy"
+  },
+  "synonyms": {
+    "he": [
+      "טיפול רגשי",
+      "פסיכולוג",
+      "פסיכותרפיה",
+      "טיפול זוגי",
+      "מטפלת"
+    ],
+    "en": [
+      "therapy",
+      "psychotherapy",
+      "counselling",
+      "psychologist"
+    ]
+  },
+  "terms": "clinic",
+  "customer_term": "patient",
+  "customers": {
+    "he": "מטופלים",
+    "en": "Patients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "session",
+      "names": {
+        "he": "טיפול אישי",
+        "en": "Individual session"
+      },
+      "model": "appointment",
+      "duration_minutes": 50,
+      "price_ils": 40000,
+      "online": true
+    },
+    {
+      "key": "couples",
+      "names": {
+        "he": "טיפול זוגי",
+        "en": "Couples session"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 50000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "online",
+      "text": {
+        "he": "מקבלים גם אונליין?",
+        "en": "Do you see patients online too?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    },
+    {
+      "key": "couples",
+      "text": {
+        "he": "מטפלים בזוגות?",
+        "en": "Do you see couples?"
+      },
+      "kind": "boolean",
+      "affects": "activity:couples",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "life_coaching",
+    "yoga"
+  ],
+  "order": 36
+}

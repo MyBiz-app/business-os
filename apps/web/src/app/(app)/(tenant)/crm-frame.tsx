@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { ScopedMessages } from "@/components/scoped-messages";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { termsOf, vertical } from "@business-os/verticals";
@@ -11,6 +11,7 @@ import { type NavChild, type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { quickActionsFor } from "@/lib/command-palette";
 import { isolate } from "@/lib/bidi";
+import { businessTerms } from "@/lib/verticals";
 import { brandStyle } from "@/lib/brand";
 import { lockedMenuMode } from "@/lib/nav-capabilities";
 import { isSolo, SOLO_MAX_UPGRADES, visibleTopics } from "@/lib/solo";
@@ -31,6 +32,7 @@ import "./crm-shell.css";
 export async function CrmFrame({ children, modal }: { children: ReactNode; modal?: ReactNode }) {
   const { tenant, me, branch } = await getTenant();
   const t = await getTranslations();
+  const term = businessTerms(t, tenant, await getLocale());
   const logo = apiAssetUrl(tenant.logo_url);
   // The branch picker appears once the business has more than one active branch.
   const [branches, rents] = await Promise.all([getBranches(), hasBookableRooms()]);
@@ -61,9 +63,9 @@ export async function CrmFrame({ children, modal }: { children: ReactNode; modal
       href: "/ai", group: g("overview"), label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai",
       children: [{ href: "/ai#ai-team", label: sub("aiTeam") }, { href: "/ai#ai-tasks", label: sub("aiTasks") }],
     },
-    { href: "/schedule", group: g("work"), label: t(`terms.${termsOf(tenant.vertical)}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
+    { href: "/schedule", group: g("work"), label: term("schedule"), icon: "schedule", permission: "schedule.read" },
     ...(rents ? [{ href: "/resources", group: g("work"), label: t("nav.resources"), icon: "resources" as const, permission: "schedule.read" }] : []),
-    { href: "/clients", group: g("clients"), label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read",
+    { href: "/clients", group: g("clients"), label: term("clients"), icon: "clients", permission: "clients.read",
       children: [
         { href: "/clients", label: sub("clientList") },
         ...(clientAppLocked

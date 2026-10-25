@@ -2,7 +2,7 @@
  * `verticals.<key>` and fall back to the parent category; words in `terms.<set>`; client-field
  * labels in `clientFields.<key>`. The casts name one real key so next-intl's typed keys accept
  * the dynamic ones, which packages/verticals' tests check exist for every entry. */
-import { categories, childrenOf, termsOf, textKey, vertical } from "@business-os/verticals";
+import { categories, childrenOf, termOf, termsOf, textKey, vertical, type TermsSource } from "@business-os/verticals";
 
 import type { Messages } from "@business-os/i18n";
 
@@ -64,4 +64,12 @@ export function branchKindOptions(
     { value: "", label: sameAsBusiness },
     ...(category?.branchKinds ?? []).map((key) => ({ value: key, label: text(key, "name") })),
   ];
+}
+
+/**
+ * A business's words (clients, schedule, …): its owner's own where they renamed one, else the
+ * industry's. `t` is the root translator; every screen words a business through this.
+ */
+export function businessTerms(t: (key: never) => string, tenant: TermsSource, locale: string) {
+  return (name: Term): string => termOf(tenant, locale, name, (path) => t(`terms.${path}` as never));
 }

@@ -116,7 +116,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
   }, [days.join()]);
 
   // A cell is one lane of one day. Room for side-by-side events depends on how wide it is.
-  const max = laned ? (days.length > 1 ? 2 : 4) : days.length > 1 ? 3 : 6;
+  const max = laned ? (days.length > 1 ? 2 : 4) : days.length > 1 ? 2 : 6;
   const laneOf = (item: { laneId?: string | null }) => (laned ? (lanes.some((l) => l.id === item.laneId) ? item.laneId : lanes[0].id) : "");
   const cells = useMemo(() => {
     const map = new Map<string, ReturnType<typeof capLanes<GridEvent>>>();

@@ -10,7 +10,7 @@ import { BackBar, PillRow } from "@business-os/app-kit/components/rows";
 import { Button, Card, ErrorText, Field, Heading, Screen } from "@business-os/app-kit/components/ui";
 import { EMPTY_ADDRESS } from "@business-os/app-kit/lib/address";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { useTerm } from "@business-os/app-kit/lib/vertical";
 import { useStaff } from "@/providers/staff-provider";
 
 type Source = NonNullable<components["schemas"]["ClientCreate"]["source"]>;
@@ -21,7 +21,7 @@ const SOURCES: Source[] = ["walk_in", "referral", "instagram", "facebook", "goog
 export default function NewClient() {
   const t = useTranslations("business.clients");
   const tClients = useTranslations("clients");
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
   const { api, scope, tenant, palette } = useStaff();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -32,7 +32,6 @@ export default function NewClient() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   if (!tenant) return null;
-  const terms = termsFor(tenant);
 
   const save = async () => {
     if (!firstName.trim()) {
@@ -67,8 +66,8 @@ export default function NewClient() {
 
   return (
     <Screen palette={palette}>
-      <BackBar label={tTerms(`${terms}.clients`)} palette={palette} onPress={() => router.back()} />
-      <Heading palette={palette}>{tTerms(`${terms}.newClient`)}</Heading>
+      <BackBar label={term(tenant, "clients")} palette={palette} onPress={() => router.back()} />
+      <Heading palette={palette}>{term(tenant, "newClient")}</Heading>
       <Card palette={palette}>
         <Field label={tClients("firstName")} palette={palette} value={firstName} onChangeText={setFirstName} autoComplete="given-name" />
         <Field label={tClients("lastName")} palette={palette} value={lastName} onChangeText={setLastName} autoComplete="family-name" />

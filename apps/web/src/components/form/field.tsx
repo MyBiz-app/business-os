@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { AlertCircle, ChevronDown } from "lucide-react";
 import { useId } from "react";
 
 import { inputDir } from "@/lib/bidi";
@@ -9,18 +9,33 @@ const CONTROL =
 type FieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   hint?: string;
+  /** A problem with this field: shown right under it, and the field's edge turns red. */
+  error?: string;
 };
 
-export function Field({ label, hint, ...inputProps }: FieldProps) {
+/** The message under a field that has a problem. */
+export function FieldError({ id, message }: { id?: string; message?: string }) {
+  if (!message) return null;
+  return (
+    <p id={id} role="alert" className="field-error flex items-start gap-1.5 text-sm text-danger">
+      <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+      {message}
+    </p>
+  );
+}
+
+export function Field({ label, hint, error, ...inputProps }: FieldProps) {
   const id = useId();
-  const hintId = hint ? `${id}-hint` : undefined;
+  const hintId = hint && !error ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
-      <input id={id} aria-describedby={hintId} className={CONTROL} dir={inputDir(inputProps.type)} {...inputProps} />
-      {hint && (
+      <input id={id} aria-describedby={hintId ?? errorId} aria-invalid={error ? true : undefined} className={CONTROL} dir={inputDir(inputProps.type)} {...inputProps} />
+      <FieldError id={errorId} message={error} />
+      {hint && !error && (
         <p id={hintId} className="text-xs text-muted">
           {hint}
         </p>
@@ -29,16 +44,17 @@ export function Field({ label, hint, ...inputProps }: FieldProps) {
   );
 }
 
-type TextAreaFieldProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string };
+type TextAreaFieldProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; error?: string };
 
-export function TextAreaField({ label, ...textAreaProps }: TextAreaFieldProps) {
+export function TextAreaField({ label, error, ...textAreaProps }: TextAreaFieldProps) {
   const id = useId();
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
-      <textarea id={id} rows={4} className={CONTROL} dir="auto" {...textAreaProps} />
+      <textarea id={id} rows={4} className={CONTROL} dir="auto" aria-invalid={error ? true : undefined} {...textAreaProps} />
+      <FieldError message={error} />
     </div>
   );
 }

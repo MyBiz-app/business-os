@@ -1,0 +1,89 @@
+{
+  "key": "pet_boarding",
+  "domain": "pets",
+  "status": "beta",
+  "names": {
+    "he": "פנסיון לחיות",
+    "en": "Pet boarding"
+  },
+  "synonyms": {
+    "he": [
+      "פנסיון",
+      "פנסיון כלבים",
+      "פנסיון חתולים",
+      "אירוח חיות"
+    ],
+    "en": [
+      "pet boarding",
+      "kennel",
+      "dog boarding",
+      "cattery"
+    ]
+  },
+  "terms": "pets",
+  "customer_term": "owner",
+  "customers": {
+    "he": "בעלים",
+    "en": "Owners"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "night",
+      "names": {
+        "he": "לילה בפנסיון",
+        "en": "Night of boarding"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 1440,
+      "price_ils": 12000,
+      "resource_type": "kennel",
+      "max_minutes": 20160,
+      "step_minutes": 1440,
+      "unit": "night"
+    }
+  ],
+  "resources": [
+    {
+      "type": "kennel",
+      "count": 10,
+      "attributes": {
+        "size": "medium"
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "kennels",
+      "text": {
+        "he": "כמה תאים?",
+        "en": "How many kennels?"
+      },
+      "kind": "number",
+      "affects": "resource_count:kennel",
+      "default": 10
+    },
+    {
+      "key": "species",
+      "text": {
+        "he": "כלבים, חתולים או שניהם?",
+        "en": "Dogs, cats or both?"
+      },
+      "kind": "select",
+      "affects": "none",
+      "options": [
+        "dogs",
+        "cats",
+        "both"
+      ],
+      "default": "dogs"
+    }
+  ],
+  "common_combos": [
+    "pet_daycare",
+    "pet_grooming"
+  ],
+  "dependents": "pet",
+  "dependents_mode": "required",
+  "order": 62
+}

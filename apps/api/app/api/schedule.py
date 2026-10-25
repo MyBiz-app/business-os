@@ -48,7 +48,17 @@ SESSION_SELECT = """
            ) ELSE 0 END::int AS waiting_requests,
            ss.open_ended AS series_open_ended,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
-           sv.booking_mode, s.price_amount, s.price_currency,
+           sv.booking_mode, sv.open_entry, sv.participants_per_instructor,
+           s.price_amount, s.price_currency,
+           (SELECT coalesce(jsonb_agg(jsonb_build_object(
+                       'user_id', i.user_id, 'email', iu.email, 'full_name', iu.full_name,
+                       'lead', i.lead) ORDER BY i.lead DESC, iu.email), '[]'::jsonb)
+            FROM (SELECT s.instructor_user_id AS user_id, true AS lead
+                  WHERE s.instructor_user_id IS NOT NULL
+                  UNION ALL
+                  SELECT si.user_id, false FROM app.session_instructors si
+                  WHERE si.session_id = s.id) i
+            JOIN app.users iu ON iu.id = i.user_id) AS instructors,
            CASE WHEN s.reserved THEN EXISTS (
                SELECT 1 FROM app.payments p JOIN app.bookings b ON b.id = p.booking_id
                WHERE b.session_id = s.id AND p.status = 'succeeded'
@@ -90,6 +100,59 @@ def _time_zone(session: Session) -> str:
 def _invalid_reference() -> HTTPException:
     """A referenced service, location, room or instructor is not part of this business."""
     return HTTPException(status_code=422, detail="invalid_reference")
+
+
+def _team(db: Session, lead: UUID | None, extras: list[UUID]) -> list[UUID]:
+    """The other instructors of a session: members of this business, each once, never the lead."""
+    unique = list(dict.fromkeys(extras))
+    if lead in unique:
+        raise _invalid_reference()
+    if unique:
+        known = db.execute(
+            text("""
+                SELECT count(*) FROM app.tenant_members
+                WHERE tenant_id = app.current_tenant_id() AND user_id = ANY(CAST(:ids AS uuid[]))
+            """),
+            {"ids": [str(i) for i in unique]},
+        ).scalar_one()
+        if known != len(unique):
+            raise _invalid_reference()
+    return unique
+
+
+def _check_ratio(
+    db: Session, service_id: UUID, capacity: int, lead: UUID | None, extras: list[UUID]
+) -> None:
+    """A service that keeps a ratio (8 children per coach) may not take more people than its
+    instructors can lead. A session with no instructor yet is not checked."""
+    instructors = (lead is not None) + len(extras)
+    ratio = db.execute(
+        text("SELECT participants_per_instructor FROM app.services WHERE id = :id"),
+        {"id": service_id},
+    ).scalar_one_or_none()
+    if ratio and instructors and capacity > ratio * instructors:
+        raise HTTPException(status_code=422, detail="ratio_exceeded")
+
+
+def _set_team(db: Session, tenant_id: UUID, session_ids: list[UUID], extras: list[UUID]) -> None:
+    """Replaces the other instructors of these sessions."""
+    db.execute(
+        text("DELETE FROM app.session_instructors WHERE session_id = ANY(CAST(:ids AS uuid[]))"),
+        {"ids": [str(i) for i in session_ids]},
+    )
+    if extras:
+        db.execute(
+            text("""
+                INSERT INTO app.session_instructors (tenant_id, session_id, user_id)
+                SELECT :tenant_id, s, u
+                FROM unnest(CAST(:sessions AS uuid[])) AS s, unnest(CAST(:users AS uuid[])) AS u
+            """),
+            {
+                "tenant_id": tenant_id,
+                "sessions": [str(i) for i in session_ids],
+                "users": [str(i) for i in extras],
+            },
+        )
 
 
 def _load(session: Session, session_id: UUID) -> ScheduledSession:
@@ -156,7 +219,13 @@ def list_sessions(
     time_zone = _time_zone(context.session)
     window_start = local_to_utc(start, time.min, time_zone)
     window_end = local_to_utc(start + timedelta(days=days), time.min, time_zone)
-    teaching = "AND s.instructor_user_id = app.current_user_id()" if mine else ""
+    teaching = (
+        "AND (s.instructor_user_id = app.current_user_id() OR EXISTS ("
+        "SELECT 1 FROM app.session_instructors si"
+        " WHERE si.session_id = s.id AND si.user_id = app.current_user_id()))"
+        if mine
+        else ""
+    )
     if location_id:
         teaching += " AND s.location_id = ANY(CAST(:locations AS uuid[]))"
     # An appointment whose booking was cancelled frees the time; it is not shown.
@@ -196,6 +265,8 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
     time_zone = _time_zone(db)
     duration = body.duration_minutes or service["duration_minutes"]
     capacity = body.capacity or service["capacity"]
+    extras = _team(db, body.instructor_user_id, body.extra_instructor_user_ids)
+    _check_ratio(db, body.service_id, capacity, body.instructor_user_id, extras)
     placement = {
         "tenant_id": context.tenant_id,
         "service_id": body.service_id,
@@ -237,11 +308,11 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
                     INSERT INTO app.session_series
                         (tenant_id, service_id, location_id, room_id, instructor_user_id,
                          capacity, weekdays, start_time, duration_minutes, starts_on, ends_on,
-                         open_ended)
+                         open_ended, extra_instructor_user_ids)
                     VALUES
                         (:tenant_id, :service_id, :location_id, :room_id, :instructor_user_id,
                          :capacity, :weekdays, :start_time, :duration, :starts_on, :ends_on,
-                         :open_ended)
+                         :open_ended, CAST(:extras AS uuid[]))
                     RETURNING id
                 """),
                 {
@@ -253,6 +324,7 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
                     "ends_on": ends_on,
                     # Without an end date the series keeps going (app.jobs extends it).
                     "open_ended": body.repeat.ends_on is None,
+                    "extras": [str(i) for i in extras],
                 },
             ).scalar_one()
         ids = (
@@ -278,6 +350,7 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
             .scalars()
             .all()
         )
+        _set_team(db, context.tenant_id, list(ids), extras)
     except IntegrityError as error:
         raise _invalid_reference() from error
     return CreatedSessions(series_id=series_id, session_ids=list(ids))
@@ -316,6 +389,19 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
         if changes.get(key) is not None:
             assignments[key] = changes[key]
 
+    lead = assignments.get("instructor_user_id", current.instructor_user_id)
+    extras = (
+        changes["extra_instructor_user_ids"]
+        if changes.get("extra_instructor_user_ids") is not None
+        else [i.user_id for i in current.instructors if not i.lead]
+    )
+    team_changed = changes.get("extra_instructor_user_ids") is not None
+    if team_changed or "instructor_user_id" in changes or changes.get("capacity") is not None:
+        extras = _team(db, lead, extras)
+        _check_ratio(
+            db, current.service.id, assignments.get("capacity", current.capacity), lead, extras
+        )
+
     if any(changes.get(key) is not None for key in ("date", "start_time", "duration_minutes")):
         time_zone = _time_zone(db)
         local_start = current.starts_at.astimezone(ZoneInfo(time_zone))
@@ -336,6 +422,8 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
             text(f"UPDATE app.sessions SET {set_sql} WHERE id = :id"),
             {**assignments, "id": session_id},
         )
+        if team_changed:
+            _set_team(db, context.tenant_id, [session_id], extras)
     except IntegrityError as error:
         raise _invalid_reference() from error
     promote_waitlist(db, session_id)  # more capacity (or a restored session) frees spots

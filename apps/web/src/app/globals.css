@@ -13,15 +13,15 @@
 /* Calm (spec v4 design system, Figma "Calm" foundations): a neutral gray-white page, white
  * surfaces, hairline borders, one action color and soft status tints. */
 :root {
-  --background: #f7f7f8;
-  --foreground: #18181b;
+  --background: #f2f2f7;
+  --foreground: #1c1c1e;
   --surface: #ffffff;
   /* A quiet fill inside a surface (table header, hover row, segmented track, inline code). */
   --subtle: #f2f2f4;
   --border: #e6e6ea;
   --muted: #63636e;
-  --palette-primary: #2563eb;
-  --palette-primary-ink: #1d4ed8;
+  --palette-primary: #0071e3;
+  --palette-primary-ink: #0062cc;
   --palette-on-primary: #ffffff;
   --primary: var(--palette-primary);
   --primary-ink: var(--palette-primary-ink);
@@ -39,7 +39,7 @@
   --warning-soft: #fff7e6;
   --danger-soft: #fef2f2;
   --info-soft: #eff6ff;
-  --info-ink: #1d4ed8;
+  --info-ink: #0062cc;
   --shadow-color: 240 6% 10%;
   /* Cards are flat (a white surface and a hairline); only what floats casts a shadow. */
   --elevation: 0 0 #0000;
@@ -59,29 +59,29 @@
   --brand-ink: #1d4ed8;
 }
 
-/* Night: charcoal, not navy. */
+/* Night: iOS dark, a true black page with raised grays. */
 .dark {
-  --background: #111113;
-  --foreground: #f4f4f5;
-  --surface: #1a1a1d;
-  --subtle: #232327;
-  --border: #2e2e33;
-  --muted: #a1a1aa;
-  --palette-primary: #3b82f6;
-  --palette-primary-ink: #60a5fa;
+  --background: #000000;
+  --foreground: #f5f5f7;
+  --surface: #1c1c1e;
+  --subtle: #2c2c2e;
+  --border: #38383a;
+  --muted: #a1a1a6;
+  --palette-primary: #0a84ff;
+  --palette-primary-ink: #4da3ff;
   /* Dark text on the lighter night blue: white on it is only 3.7:1. */
-  --palette-on-primary: #111113;
+  --palette-on-primary: #000000;
   --primary-subtle: color-mix(in oklab, var(--primary) 16%, var(--surface));
   --success: #22c55e;
   --success-ink: #4ade80;
   --danger: #f87171;
-  --on-danger: #111113;
+  --on-danger: #000000;
   --warning: #fbbf24;
   --success-soft: #12261a;
   --warning-soft: #2a2010;
   --danger-soft: #2a1414;
-  --info-soft: #14203a;
-  --info-ink: #60a5fa;
+  --info-soft: #0e2038;
+  --info-ink: #4da3ff;
   --shadow-color: 240 10% 2%;
   --elevation: 0 0 #0000;
   --elevation-hover: 0 1px 3px hsl(var(--shadow-color) / 0.5), 0 8px 24px hsl(var(--shadow-color) / 0.6);
@@ -175,8 +175,8 @@
   --color-ai: #7c3aed;
   --color-electric: #06b6d4;
   /* The site's font: set once in app/fonts.ts (see docs/guides/design-system.md). */
-  --font-sans: var(--font-main), system-ui, sans-serif;
-  --font-display-stack: var(--font-display), var(--font-main), system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, var(--font-main), system-ui, sans-serif;
+  --font-display-stack: -apple-system, BlinkMacSystemFont, var(--font-display), var(--font-main), system-ui, sans-serif;
 }
 
 body {
@@ -493,6 +493,26 @@ h3,
     border-color: var(--primary);
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 18%, transparent);
   }
+  /* A field with a problem: red edge (and red focus ring), the message sits right under it. */
+  &[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+  &[aria-invalid="true"]:focus-visible {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--danger) 18%, transparent);
+  }
+}
+
+/* An error message slides in under the field once, so the eye finds it. */
+.field-error {
+  animation: field-error-in 180ms var(--ease-out);
+}
+@keyframes field-error-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-error { animation: none; }
 }
 
 /* Touch screens: every button, icon button and field gets a 44px hit area (WCAG 2.5.5), and text
@@ -982,7 +1002,7 @@ html[data-motion="reduce"] *::after {
   --radius-control: 0.75rem;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-main), system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, var(--font-main), system-ui, sans-serif;
 }
 
 /* Night: the same palette on Midnight Navy. Blue lightens a step so links keep 4.5:1. */
@@ -1308,251 +1328,369 @@ h1[tabindex="-1"]:focus {
   }
 }
 
-/* The home page opening scene (components/marketing/hero-intro.tsx and day-clock.tsx): a 24-hour
- * dial runs from midnight to the visitor's own time while the business's day happens around it.
- * DayClock sets --p (the share of the day, 0..1) and --sky (the sky's color at that time). The
- * dial has no direction: a clock turns clockwise in Hebrew too. Reduced motion stops the pulses. */
-.dc-backdrop {
+/* The home page opening scene (components/marketing/hero-stage.tsx): a tall section holding a
+ * pinned stage. HeroStageScroll writes --p (scroll progress, 0..1) and data-step (0..3) on .hs;
+ * every movement below is computed from --p, so nothing re-renders while scrolling. Steps:
+ * 0 a client books on the phone, 1 the laptop opens behind it, 2 AI bubbles, 3 business tiles.
+ * Static layout (no pin, finished scene) for reduced motion: see the two blocks at the end. */
+.hs {
+  --p: 0;
+  --dir: 1;
+  --lid: clamp(0, calc((var(--p) - 0.22) * 6), 1);
+  --laptop: clamp(0, calc((var(--p) - 0.2) * 8), 1);
+  --tiles: clamp(0, calc((var(--p) - 0.76) * 8), 1);
+  --zoom: clamp(0, calc((var(--p) - 0.74) * 6), 1);
+  position: relative;
+  height: 330vh;
+}
+@media (min-width: 1024px) {
+  .hs {
+    height: 520vh;
+  }
+}
+.hs-pin {
+  position: sticky;
+  top: 4rem;
+  height: calc(100svh - 4rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+.hs-glow {
   background:
-    radial-gradient(60rem 36rem at 80% -10%, color-mix(in srgb, var(--brand-from) 12%, transparent), transparent 70%),
-    radial-gradient(44rem 30rem at 10% 110%, color-mix(in srgb, var(--brand-to) 12%, transparent), transparent 70%);
+    radial-gradient(48rem 30rem at 75% 20%, color-mix(in srgb, var(--brand-from) 14%, transparent), transparent 70%),
+    radial-gradient(40rem 28rem at 15% 100%, color-mix(in srgb, var(--brand-to) 12%, transparent), transparent 70%);
 }
-.dc-backdrop::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px);
-  background-size: 22px 22px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000, transparent);
-}
-.dc-accent {
+.hs-accent {
   background: linear-gradient(90deg, var(--brand-from), var(--brand-via), var(--brand-to));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-.dark .dc-accent {
+.dark .hs-accent {
   background-image: linear-gradient(90deg, #60a5fa, #a78bfa, #22d3ee);
 }
-.dc-live {
-  width: 0.5rem;
-  height: 0.5rem;
-  flex-shrink: 0;
-  border-radius: 9999px;
-  background: var(--success);
-  animation: dc-live 2s ease-out infinite;
+/* On phones the headline gives way to the step card once the story starts. */
+@media (max-width: 1023px) {
+  .hs-copy {
+    opacity: clamp(0.35, calc(1.4 - var(--p) * 3), 1);
+  }
 }
-.dc-dial {
+
+/* The step cards: wide screens list all four and mark the active one; phones show only the active one. */
+.hs-cards {
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hs-card {
+  --c: #c2410c;
+  --k: clamp(0, calc(var(--p) * 4 - var(--i)), 1);
   position: relative;
-  width: min(100%, 27rem);
-  aspect-ratio: 1;
-  border-radius: 9999px;
-  cursor: grab;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
-}
-.dc-dial:active {
-  cursor: grabbing;
-}
-.dc-dial:focus-visible {
-  box-shadow:
-    0 0 0 3px var(--background),
-    0 0 0 5px var(--primary);
-}
-.dc-sky {
-  position: absolute;
-  inset: -16%;
-  z-index: -1;
-  border-radius: 9999px;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--sky) 38%, transparent), transparent);
-  filter: blur(20px);
-  pointer-events: none;
-}
-.dark .dc-sky {
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--sky) 55%, transparent), transparent);
-}
-.dc-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.dc-track {
-  fill: none;
-  stroke: color-mix(in srgb, var(--foreground) 10%, transparent);
-  stroke-width: 3;
-}
-.dc-tick {
-  stroke: color-mix(in srgb, var(--foreground) 16%, transparent);
-  stroke-width: 0.6;
-  stroke-linecap: round;
-}
-.dc-tick-hour {
-  stroke: color-mix(in srgb, var(--foreground) 38%, transparent);
-  stroke-width: 1;
-}
-.dc-hour {
-  fill: var(--muted);
-  font-size: 7px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-/* The arc of the day so far, on the track (r = 92 of 100, 3 wide). */
-.dc-arc {
-  position: absolute;
-  inset: 3.25%;
-  border-radius: 9999px;
-  background: conic-gradient(
-    color-mix(in srgb, var(--brand-from) 20%, transparent) 0deg,
-    var(--brand-from) calc(var(--p) * 180deg),
-    var(--brand-via) calc(var(--p) * 290deg),
-    var(--brand-to) calc(var(--p) * 360deg),
-    transparent calc(var(--p) * 360deg)
-  );
-  -webkit-mask: radial-gradient(closest-side, transparent 96.3%, #000 96.9%);
-  mask: radial-gradient(closest-side, transparent 96.3%, #000 96.9%);
-  pointer-events: none;
-}
-.dc-mark {
-  fill: var(--surface);
-  stroke: color-mix(in srgb, var(--foreground) 35%, transparent);
-  stroke-width: 1;
-  transition:
-    r 200ms var(--ease-out),
-    fill 200ms var(--ease-out);
-}
-.dc-mark-done {
-  fill: var(--brand-via);
-  stroke: var(--surface);
-}
-.dc-mark-now {
-  fill: var(--brand-to);
-  stroke: var(--surface);
-  stroke-width: 1.4;
-}
-/* The hand: a sun by day and a moon by night, riding the track. */
-.dc-hand {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  transform: rotate(calc(var(--p) * 360deg));
-  pointer-events: none;
-}
-.dc-sun {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-top: calc(4% - 0.625rem);
-  border-radius: 9999px;
-  background: radial-gradient(circle at 35% 35%, #fff, #fde68a 40%, #f59e0b);
-  box-shadow:
-    0 0 0 4px rgb(245 158 11 / 0.22),
-    0 0 26px 6px rgb(245 158 11 / 0.5);
-}
-.dc-dial[data-day="false"] .dc-sun {
-  background: radial-gradient(circle at 35% 35%, #fff, #e0e7ff 45%, #a5b4fc);
-  box-shadow:
-    0 0 0 4px rgb(129 140 248 / 0.22),
-    0 0 26px 6px rgb(129 140 248 / 0.5);
-}
-.dc-face {
-  position: absolute;
-  inset: 18%;
-  display: flex;
+  display: none;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  padding: 7%;
-  border-radius: 9999px;
-  text-align: center;
-  background: color-mix(in srgb, var(--surface) 74%, transparent);
-  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
-  box-shadow: 0 24px 60px -28px hsl(var(--shadow-color) / 0.45);
-  backdrop-filter: blur(10px);
-  pointer-events: none;
-}
-.dc-event {
-  display: flex;
-  max-width: 100%;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  margin-top: 0.2rem;
-  animation: dc-pop 320ms var(--ease-out) both;
-}
-.dc-event-icon {
-  display: inline-grid;
-  width: 1.9rem;
-  height: 1.9rem;
-  margin-bottom: 0.15rem;
-  place-items: center;
-  border-radius: 0.6rem;
-  color: var(--primary-ink);
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
-}
-.dc-stats {
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.9rem 1rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  /* The inactive cards are dimmed part by part: the step number stays at full strength to keep its contrast. */
+  transition: border-color 0.3s ease;
 }
-.dc-stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  gap: 0.1rem;
-  padding: 0.7rem 0.5rem;
-  text-align: center;
+.hs-card > :not(.hs-card-n) {
+  opacity: 0.55;
+  transition: opacity 0.3s ease;
 }
-.dc-stats > div + div {
-  border-inline-start: 1px solid var(--border);
+.hs-card[data-i="1"] {
+  --c: #be185d;
 }
-.dc-stats dd {
-  font-size: 1.3rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+.hs-card[data-i="2"] {
+  --c: #1d4ed8;
 }
-.dc-stats dt {
+.hs-card[data-i="3"] {
+  --c: #6d28d9;
+}
+.dark .hs-card[data-i="0"] {
+  --c: #fb923c;
+}
+.dark .hs-card[data-i="1"] {
+  --c: #f472b6;
+}
+.dark .hs-card[data-i="2"] {
+  --c: #60a5fa;
+}
+.dark .hs-card[data-i="3"] {
+  --c: #a78bfa;
+}
+.hs-card-n {
   font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c);
+}
+.hs-card-n span:last-child {
   color: var(--muted);
 }
-.dc-cue {
-  animation: dc-cue 1.8s ease-in-out 2.2s infinite;
+.hs[dir="rtl"],
+[dir="rtl"] .hs {
+  --dir: -1;
 }
-@keyframes dc-live {
-  from {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 55%, transparent);
-  }
-  to {
-    box-shadow: 0 0 0 7px transparent;
+.hs-card-text {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+.hs[data-step="0"] .hs-card[data-i="0"] .hs-card-text,
+.hs[data-step="1"] .hs-card[data-i="1"] .hs-card-text,
+.hs[data-step="2"] .hs-card[data-i="2"] .hs-card-text,
+.hs[data-step="3"] .hs-card[data-i="3"] .hs-card-text {
+  max-height: 8rem;
+  opacity: 1;
+}
+.hs-bar {
+  position: absolute;
+  inset-inline: 1rem;
+  bottom: 0.5rem;
+  height: 3px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+  overflow: hidden;
+}
+.hs-bar::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--k) * 100%);
+  background: var(--c);
+}
+.hs[data-step="0"] .hs-card[data-i="0"],
+.hs[data-step="1"] .hs-card[data-i="1"],
+.hs[data-step="2"] .hs-card[data-i="2"],
+.hs[data-step="3"] .hs-card[data-i="3"] {
+  display: flex;
+  border-color: var(--c);
+}
+.hs[data-step="0"] .hs-card[data-i="0"] > *,
+.hs[data-step="1"] .hs-card[data-i="1"] > *,
+.hs[data-step="2"] .hs-card[data-i="2"] > *,
+.hs[data-step="3"] .hs-card[data-i="3"] > * {
+  opacity: 1;
+}
+@media (min-width: 1024px) {
+  .hs-card {
+    display: flex;
   }
 }
-@keyframes dc-pop {
-  from {
-    opacity: 0;
-    transform: translateY(6px) scale(0.98);
+
+/* The stage: a laptop that opens behind a phone. */
+.hs-stage {
+  position: relative;
+  min-height: 0;
+  height: 100%;
+}
+.hs-devices {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform: scale(calc(1 - var(--zoom) * 0.3));
+  transform-origin: 50% 55%;
+}
+.hs-laptop {
+  grid-area: 1 / 1;
+  width: min(100%, 44rem);
+  align-self: center;
+  opacity: var(--laptop);
+  transform: translateY(calc((1 - var(--laptop)) * 2rem - 6%)) scale(calc(0.8 + var(--laptop) * 0.2));
+  will-change: transform, opacity;
+}
+.hs-phone {
+  grid-area: 1 / 1;
+  position: relative;
+  width: min(11.5rem, 46%);
+  z-index: 2;
+  align-self: center;
+  transform: translateY(calc(var(--laptop) * 14%)) translateX(calc(var(--laptop) * -35% * var(--dir)));
+  will-change: transform;
+}
+@media (min-width: 640px) {
+  .hs-phone {
+    transform: translateY(calc(var(--laptop) * 14%)) translateX(calc(var(--laptop) * -75% * var(--dir)));
+    width: min(14rem, 36%);
   }
 }
-@keyframes dc-cue {
-  50% {
-    transform: translateY(5px);
+.hs-crm .hs-landing {
+  opacity: clamp(0, calc((var(--p) - 0.3) * 10), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p) - 0.3) * 10), 1)) * -1rem));
+  box-shadow: 0 0 0 calc(clamp(0, calc((var(--p) - 0.3) * 10), 1) * 3px) color-mix(in srgb, var(--primary) 30%, transparent);
+}
+/* The Book button turns into "Booked" and a toast confirms it. */
+.hs-book-a {
+  opacity: clamp(0, calc(1 - (var(--p) - 0.08) * 25), 1);
+}
+.hs-book-b {
+  opacity: clamp(0, calc((var(--p) - 0.08) * 25), 1);
+}
+.hs-toast {
+  opacity: clamp(0, calc((var(--p) - 0.12) * 15), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--p) - 0.12) * 15), 1)) * 0.75rem));
+}
+
+/* AI bubbles drift out of the phone during step 2, then fade as the tiles arrive. */
+.hs-bubble {
+  --in: clamp(0, calc((var(--p) - 0.5 - var(--i) * 0.06) * 14), 1);
+  --out: clamp(0, calc((0.78 - var(--p)) * 14), 1);
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  max-width: 11rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--surface);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--foreground) 12%, transparent);
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.2;
+  opacity: min(var(--in), var(--out));
+  transform: translateY(calc((1 - var(--in)) * 1rem));
+  inset-inline-end: 2%;
+  top: calc(18% + var(--i) * 17%);
+}
+.hs-bubble:nth-of-type(2) {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+}
+@media (min-width: 640px) {
+  .hs-bubble {
+    font-size: 0.8rem;
+    max-width: 14rem;
   }
 }
+
+/* Business-type tiles appear around the (smaller) devices in the last step. */
+.hs-tile {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--foreground) 10%, transparent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: var(--tiles);
+  transform: translateY(calc((1 - var(--tiles)) * 1rem)) scale(calc(0.9 + var(--tiles) * 0.1));
+  color: #7c3aed;
+}
+.dark .hs-tile {
+  color: #a78bfa;
+}
+.hs-tile:nth-of-type(1) {
+  top: 2%;
+  inset-inline-start: 4%;
+}
+.hs-tile:nth-of-type(2) {
+  top: 2%;
+  inset-inline-end: 4%;
+}
+.hs-tile:nth-of-type(3) {
+  top: 44%;
+  inset-inline-start: 0;
+}
+.hs-tile:nth-of-type(4) {
+  top: 44%;
+  inset-inline-end: 0;
+}
+.hs-tile:nth-of-type(5) {
+  bottom: 2%;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+}
+[dir="rtl"] .hs-tile:nth-of-type(5) {
+  translate: 50% 0;
+}
+.hs-tile {
+  pointer-events: none;
+}
+.hs-cue {
+  position: absolute;
+  bottom: 0.5rem;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+  opacity: clamp(0, calc(1 - var(--p) * 12), 1);
+  pointer-events: none;
+}
+[dir="rtl"] .hs-cue {
+  translate: 50% 0;
+}
+
+/* Reduced motion: no pin, no scroll story. The finished scene sits still, the cards form a list. */
 @media (prefers-reduced-motion: reduce) {
-  .dc-live,
-  .dc-event,
-  .dc-cue {
-    animation: none;
+  .hs {
+    --p: 0.7;
+    height: auto;
   }
-  .dc-mark {
-    transition: none;
+  .hs-pin {
+    position: static;
+    height: auto;
+    overflow: visible;
   }
+  .hs-stage {
+    height: 26rem;
+  }
+  .hs-card {
+    display: flex;
+    opacity: 1;
+  }
+  .hs-card-text {
+    max-height: none;
+    opacity: 1;
+  }
+  .hs-bar,
+  .hs-cue,
+  .hs-tile {
+    display: none;
+  }
+  .hs-copy {
+    opacity: 1;
+  }
+}
+html[data-motion="reduce"] .hs {
+  --p: 0.7;
+  height: auto;
+}
+html[data-motion="reduce"] .hs-pin {
+  position: static;
+  height: auto;
+  overflow: visible;
+}
+html[data-motion="reduce"] .hs-stage {
+  height: 26rem;
+}
+html[data-motion="reduce"] .hs-card {
+  display: flex;
+  opacity: 1;
+}
+html[data-motion="reduce"] .hs-card-text {
+  max-height: none;
+  opacity: 1;
+}
+html[data-motion="reduce"] .hs-bar,
+html[data-motion="reduce"] .hs-cue,
+html[data-motion="reduce"] .hs-tile {
+  display: none;
+}
+html[data-motion="reduce"] .hs-copy {
+  opacity: 1;
 }
 
 /* ---- Auth side panel (components/auth/auth-scene.tsx) -------------------------------------- */
@@ -2397,13 +2535,36 @@ html:has(dialog:modal) {
   }
 }
 
-/* Landing site: the page and the footer cross-fade as one piece (old 90ms out, new 180ms in), with no
- * movement; the new page already starts at the top (NavigationScroll). */
+/* Landing site: the page and the footer cross-fade as one piece (old 180ms out, new 380ms in), with no
+ * movement; the new page already starts at the top (NavigationScroll). Short fades (under about
+ * 200ms) read as a hard cut, so these are slower than the CRM's. */
 ::view-transition-old(.vt-site-out) {
-  animation: 90ms ease-in both vt-fade reverse;
+  animation: 180ms ease-in both vt-fade reverse;
 }
 ::view-transition-new(.vt-site-in) {
-  animation: 180ms var(--ease-out) both vt-fade;
+  animation: 380ms var(--ease-out) both vt-fade;
+}
+/* The pages are rendered on demand, so a click waits for the server. Until the new page is here the
+ * current one softens at once (RouteProgress sets data-navigating) and the cross-fade takes over from
+ * there, so the swap is never a cut. A fast page change never shows it (90ms delay). */
+.site-page {
+  transition: none;
+}
+html[data-navigating] .site-page {
+  opacity: 0.55;
+  /* Only the way in is animated: when the new page arrives the page is back at full strength at once,
+   * so the cross-fade does not start from a half-faded page. */
+  transition: opacity 240ms var(--ease-out) 90ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-navigating] .site-page {
+    opacity: 1;
+    transition: none;
+  }
+}
+html[data-motion="reduce"][data-navigating] .site-page {
+  opacity: 1;
+  transition: none;
 }
 /* CRM: the content area only fades, no movement you notice (150ms). */
 ::view-transition-old(.vt-app-out) {

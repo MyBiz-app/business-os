@@ -8,7 +8,7 @@ import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore }
 import { AccessibilitySettings, resetAccessibility } from "@/components/accessibility";
 import { useDismiss } from "@/components/use-dismiss";
 
-const SIZE = 56;
+const SIZE = 48;
 const MARGIN = 8;
 const DRAG_THRESHOLD = 6;
 const NUDGE = 16;
@@ -237,18 +237,18 @@ export function AccessibilityWidget() {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         style={{ touchAction: "none" }}
-        className="btn-plain flex size-14 cursor-grab touch-none items-center justify-center rounded-full bg-primary text-on-primary shadow-lg shadow-primary/30 ring-4 ring-white/70 transition-transform duration-200 hover:scale-105 active:scale-95 active:cursor-grabbing dark:ring-black/40"
+        className="btn-plain flex size-12 cursor-grab touch-none items-center justify-center rounded-full bg-primary text-on-primary shadow-lg shadow-primary/30 ring-2 ring-white/70 transition-transform duration-200 hover:scale-105 active:scale-95 active:cursor-grabbing md:size-14 md:ring-4 dark:ring-black/40"
       >
-        <Accessibility aria-hidden="true" className="size-7" />
+        <Accessibility aria-hidden="true" className="size-6 md:size-7" />
       </button>
       <button
         type="button"
         onClick={dismiss}
         aria-label={t("widgetHide")}
         title={t("widgetHide")}
-        className="btn-icon absolute -end-1 -top-1 flex size-6 items-center justify-center rounded-full bg-black text-white shadow-md ring-2 ring-white/80 hover:bg-navy"
+        className="btn-icon absolute -end-1.5 -top-1.5 flex size-6 min-h-0! min-w-0! items-center justify-center rounded-full bg-black/80 text-white shadow-md ring-1 ring-white/80 hover:bg-navy md:-end-2 md:-top-2 md:size-7 md:ring-2"
       >
-        <X aria-hidden="true" className="size-3.5" />
+        <X aria-hidden="true" className="size-3 md:size-3.5" />
       </button>
     </div>
   );

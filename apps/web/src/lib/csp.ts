@@ -75,6 +75,19 @@ export function strictCsp(nonce: string, options: Options): string {
   ].join("; ");
 }
 
+/** The stricter style policy under trial, sent next to the real one as Report-Only: stylesheets and
+ * <style> elements need this request's nonce, and only style *attributes* (React's style props,
+ * next/font) stay inline. Nothing is blocked by it; violations go to /api/csp-report so we can see
+ * which library injects an unnonced <style> before the real policy is switched to this one. */
+export function styleTrialCsp(nonce: string, { dev }: Options): string {
+  return [
+    `style-src-elem 'self' 'nonce-${nonce}'${dev ? " 'unsafe-inline'" : ""}`,
+    "style-src-attr 'unsafe-inline'",
+    `report-uri ${CSP_REPORT_PATH}`,
+    "report-to csp",
+  ].join("; ");
+}
+
 /** The Reporting API endpoint named by `report-to csp` (newer browsers use it over report-uri). */
 export const REPORTING_ENDPOINTS = `csp="${CSP_REPORT_PATH}"`;
 

@@ -1,0 +1,90 @@
+{
+  "key": "tutoring",
+  "domain": "learning",
+  "status": "live",
+  "names": {
+    "he": "שיעורים פרטיים",
+    "en": "Tutoring"
+  },
+  "synonyms": {
+    "he": [
+      "שיעורים פרטיים",
+      "מורה פרטי",
+      "הוראה",
+      "הכנה לבגרות"
+    ],
+    "en": [
+      "tutoring",
+      "private tutor",
+      "lessons",
+      "exam prep"
+    ]
+  },
+  "terms": "classes",
+  "customer_term": "student",
+  "customers": {
+    "he": "תלמידים",
+    "en": "Students"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "private",
+      "names": {
+        "he": "שיעור פרטי",
+        "en": "Private lesson"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 18000,
+      "online": true
+    },
+    {
+      "key": "small_group",
+      "names": {
+        "he": "קבוצה קטנה",
+        "en": "Small group"
+      },
+      "model": "group_class",
+      "duration_minutes": 90,
+      "price_ils": 10000,
+      "capacity": 6,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "audience",
+      "text": {
+        "he": "ילדים, מבוגרים או שניהם?",
+        "en": "Children, adults or both?"
+      },
+      "kind": "select",
+      "affects": "dependents",
+      "options": [
+        "children",
+        "adults",
+        "both"
+      ],
+      "default": "both"
+    },
+    {
+      "key": "online",
+      "text": {
+        "he": "מלמדים גם אונליין?",
+        "en": "Do you teach online too?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "kids_activities",
+    "music"
+  ],
+  "dependents": "child",
+  "dependents_mode": "ask",
+  "order": 43
+}

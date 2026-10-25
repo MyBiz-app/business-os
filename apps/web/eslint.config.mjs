@@ -76,7 +76,6 @@ const eslintConfig = defineConfig([
       "src/app/(app)/(tenant)/ai/team-map.tsx", // white label on a team's own color
       "src/app/(app)/(tenant)/content/network-icon.tsx", // social network brand marks
       "src/app/(app)/(tenant)/content/line-chart.tsx", // one color per social network series
-      "src/components/marketing/day-clock.tsx", // the dial's sky colors through the day
       "src/components/marketing/home-phone-stage.tsx", // the hero phone mock-up
       "src/components/modules/offer-picture.tsx", // WhatsApp / SMS look-alike mock-ups
     ],

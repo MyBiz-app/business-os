@@ -1,0 +1,96 @@
+{
+  "key": "swim_school",
+  "domain": "fitness",
+  "status": "beta",
+  "names": {
+    "he": "בית ספר לשחייה",
+    "en": "Swim school"
+  },
+  "synonyms": {
+    "he": [
+      "שחייה",
+      "בריכה",
+      "חוג שחייה",
+      "אקדמיית שחייה"
+    ],
+    "en": [
+      "swimming",
+      "swim lessons",
+      "pool"
+    ]
+  },
+  "terms": "fitness",
+  "customer_term": "swimmer",
+  "customers": {
+    "he": "שחיינים",
+    "en": "Swimmers"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "lane_group",
+      "names": {
+        "he": "קבוצה במסלול",
+        "en": "Group in a lane"
+      },
+      "model": "large_group",
+      "duration_minutes": 45,
+      "price_ils": 8000,
+      "capacity": 8,
+      "resource_type": "swim_lane",
+      "min_staff": 1,
+      "series": true
+    },
+    {
+      "key": "private_lesson",
+      "names": {
+        "he": "שיעור פרטי",
+        "en": "Private lesson"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 30,
+      "price_ils": 18000,
+      "resource_type": "swim_lane"
+    }
+  ],
+  "resources": [
+    {
+      "type": "swim_lane",
+      "count": 4
+    }
+  ],
+  "questions": [
+    {
+      "key": "lanes",
+      "text": {
+        "he": "כמה מסלולים?",
+        "en": "How many lanes?"
+      },
+      "kind": "number",
+      "affects": "resource_count:swim_lane",
+      "default": 4
+    },
+    {
+      "key": "audience",
+      "text": {
+        "he": "ילדים, מבוגרים או שניהם?",
+        "en": "Children, adults or both?"
+      },
+      "kind": "select",
+      "affects": "dependents",
+      "options": [
+        "children",
+        "adults",
+        "both"
+      ],
+      "default": "both"
+    }
+  ],
+  "common_combos": [
+    "gym",
+    "kids_activities"
+  ],
+  "dependents": "child",
+  "dependents_mode": "ask",
+  "order": 7
+}

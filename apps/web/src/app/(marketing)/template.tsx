@@ -8,7 +8,7 @@ import { PageTransition } from "@/components/ui/page-transition";
 export default function MarketingTemplate({ children }: { children: ReactNode }) {
   return (
     <PageTransition kind="site">
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="site-page flex min-w-0 flex-1 flex-col">
         <div className="flex flex-1 flex-col">{children}</div>
         <MarketingFooter />
       </div>

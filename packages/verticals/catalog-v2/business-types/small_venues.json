@@ -1,0 +1,88 @@
+{
+  "key": "small_venues",
+  "domain": "events",
+  "status": "beta",
+  "names": {
+    "he": "מקומות אירוח",
+    "en": "Small venues"
+  },
+  "synonyms": {
+    "he": [
+      "אולם אירועים",
+      "מקום לאירוע",
+      "גן אירועים",
+      "אולם קטן"
+    ],
+    "en": [
+      "event venue",
+      "small venue",
+      "party hall"
+    ]
+  },
+  "terms": "events",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "tour",
+      "names": {
+        "he": "סיור במקום",
+        "en": "Venue tour"
+      },
+      "model": "appointment",
+      "duration_minutes": 30,
+      "price_ils": 10000
+    },
+    {
+      "key": "hall_rental",
+      "names": {
+        "he": "השכרת אולם",
+        "en": "Hall rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 240,
+      "price_ils": 300000,
+      "resource_type": "event_hall",
+      "max_minutes": 720,
+      "step_minutes": 240,
+      "unit": "half_day"
+    }
+  ],
+  "resources": [
+    {
+      "type": "event_hall",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "halls",
+      "text": {
+        "he": "כמה אולמות?",
+        "en": "How many halls?"
+      },
+      "kind": "number",
+      "affects": "resource_count:event_hall",
+      "default": 1
+    },
+    {
+      "key": "capacity",
+      "text": {
+        "he": "קיבולת מקסימלית?",
+        "en": "Maximum capacity?"
+      },
+      "kind": "number",
+      "affects": "none",
+      "default": 100
+    }
+  ],
+  "common_combos": [
+    "djs",
+    "event_suppliers"
+  ],
+  "order": 66
+}

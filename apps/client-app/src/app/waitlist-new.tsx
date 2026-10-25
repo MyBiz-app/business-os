@@ -1,7 +1,7 @@
 import { addDays, formatDay, todayIn } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -13,6 +13,7 @@ import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useLocations } from "@/lib/use-locations";
 import { useBusiness } from "@/providers/business-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 const DAYS = 14;
 const STEP = 30;
@@ -97,7 +98,7 @@ export default function WaitlistNew() {
         {t("service")}
       </Heading>
       {!services ? (
-        <ActivityIndicator color={palette.primary} />
+        <Spinner color={palette.primary} />
       ) : (
         <View role="radiogroup" aria-label={t("service")} style={local.chips}>
           {services.map((item) => (

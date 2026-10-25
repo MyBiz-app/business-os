@@ -86,3 +86,35 @@ an owner, quotes and deposits) stays `planned` until that capability is built: s
 4.3 and the phase 7 issues. Courts and rooms by the hour are built (#41): Sports & facilities is
 open as beta. Dependents are built (#43): Pet services is open as beta, and Kids activities keeps a
 profile per child. On-site jobs are built (#42): Home & field services is open as beta. Quotes and deposits are built (#44): Creative & events is open as beta. Documents, retainers and time billing are built (#45): Professional services is open as beta (`"time_billing": true` in a pack shows time and monthly bills on the client card). Every category is now open.
+
+## Catalog v2 (business types, activities, service models)
+
+Catalog v2 is the next shape of this catalog, built in slice C1 of the categories and service-model
+spec. It sits next to the one above and changes nothing in it: no screen, table or migration reads it
+yet (C2 fills a business from it, C7 uses it in sign-up).
+
+Three layers: a **business type** (what the owner picks: tennis club, barbershop) is made of
+**activities** (court rental, private lesson), and each activity runs on one of **eight service
+models** (appointment, group class, large group, resource rental, resource plus staff, open entry,
+on-site job, project). Types are listed under **domains** for browsing and search only.
+
+| What | Where |
+|---|---|
+| Domains (12), resource types (28: tennis court, padel court, reformer, treatment room, ...), business types (76, one file each) | `packages/verticals/catalog-v2/` |
+| Types, accessors, `searchBusinessTypes` | `packages/verticals/src/v2.ts` |
+| Copies the rest of the system reads (generated, checked in) | `packages/verticals/src/catalog-v2.generated.ts`, `apps/api/app/verticals_catalog_v2.json` |
+| The API's loader | `apps/api/app/catalog/verticals_v2.py` |
+| Tests | `packages/verticals/test/catalog-v2.test.ts`, `apps/api/tests/test_verticals_v2.py` |
+
+A business type lists: names and `synonyms` (Hebrew and English, what search matches), the v1 `terms`
+set and a `customer_term`, the `calendar_view`, its `activities` (those marked `optional` are offered
+in sign-up but off), starter `resources` (a tennis club gets tennis courts only), two to four
+`questions` that say what each answer changes (`affects`), `common_combos` ("many also add"), and
+`replaces` when it takes over a v1 key (`padel_tennis` becomes `tennis_club` and `padel_club`). A new
+type enters as `beta`. Names are written inline in both languages for now; they move to the
+translation files with the custom-words slice (C3).
+
+To change the catalog edit the JSON, then `pnpm verticals:export` and
+`pnpm --filter @business-os/verticals test`. The tests check that every reference resolves, that each
+activity follows the rules of its model and resource type, that every v1 key has a successor, and
+that every type is found by its own name and each synonym.

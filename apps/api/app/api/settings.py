@@ -1,5 +1,6 @@
 """Business settings and branding."""
 
+import json
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any
@@ -13,6 +14,7 @@ from app.api.common import not_found, set_clause
 from app.api.deps import AnonymousSessionDep, TenantContext, TenantDep, require
 from app.api.routes import load_current_tenant
 from app.api.schemas import Tenant, TenantUpdate
+from app.catalog.terms import clean_terms_override
 from app.core.audit import record
 from app.core.identity import check_digit_valid
 from app.core.legal_readiness import Readiness, evaluate
@@ -99,6 +101,12 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
             "weekly_release_time",
         )
     }
+    if "terms_override" in changes:
+        try:
+            cleaned = clean_terms_override(changes["terms_override"])
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+        changes["terms_override"] = json.dumps(cleaned, ensure_ascii=False)
     if body.address_given():
         changes |= _legal_address(context.session, changes)
     if changes.get("business_number"):
@@ -123,7 +131,7 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
         ).scalar_one()
         if known != len(set(branches)):
             raise HTTPException(status_code=422, detail="unknown_branch")
-    assignments = set_clause(changes, TenantUpdate.model_fields)
+    assignments = set_clause(changes, TenantUpdate.model_fields, casts={"terms_override": "jsonb"})
     context.session.execute(
         text(f"UPDATE app.tenants SET {assignments} WHERE id = app.current_tenant_id()"),
         changes,
