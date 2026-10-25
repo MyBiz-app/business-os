@@ -18,6 +18,7 @@ import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { defaultTime, groupByCourt, rentalLengths, splitOffset, timeOptions } from "@/lib/court-search";
+import { bookAfterHealth, mustDeclare, useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { Spinner } from "@business-os/app-kit/components/spinner";
 
@@ -32,6 +33,18 @@ const KNOWN = ["slot_taken", "outside_hours", "length_not_offered", "health_decl
 /** Reserve a court or room by the hour: what → how long → day → court and time → pay. */
 export default function Court() {
   const t = useTranslations("client.court");
+  const tHealth = useTranslations("client.health");
+  const health = useHealth();
+  const declare = mustDeclare(health);
+  // The business needs a declaration first: say so on the button and open the form, which brings them back here.
+  const fillDeclaration = () => {
+    bookAfterHealth.sessionId = "court";
+    router.push("/health");
+  };
+  // Back with the declaration signed: nothing is waiting to resume (the tap on confirm is theirs).
+  useEffect(() => {
+    if (health && !declare && bookAfterHealth.sessionId === "court") bookAfterHealth.sessionId = null;
+  }, [health, declare]);
   const tCommon = useTranslations("common");
   const tWaitlist = useTranslations("client.waitlist");
   const tAppointment = useTranslations("client.appointment");
@@ -378,13 +391,15 @@ export default function Court() {
               </Card>
               <Button
                 label={
-                  inApp
+                  declare
+                    ? tHealth("fillAndBook")
+                    : inApp
                     ? t("payAndReserve", { price: formatMoney(slot.price_amount, slot.price_currency, locale) })
                     : t("reserve", { time: time(slot.starts_at) })
                 }
                 palette={palette}
                 busy={busy}
-                onPress={() => void reserve()}
+                onPress={() => (declare ? fillDeclaration() : void reserve())}
               />
             </>
           )}
