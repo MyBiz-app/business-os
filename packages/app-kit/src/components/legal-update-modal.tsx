@@ -4,6 +4,7 @@ import { useTranslations } from "use-intl";
 
 import { apiClient } from "../lib/api";
 import { WEB_URL } from "../lib/env";
+import { fetchMe } from "../lib/me";
 import { useSession } from "../providers/session-provider";
 import { useTheme } from "../providers/theme-provider";
 import { radius, scrimColor } from "../lib/theme";
@@ -35,8 +36,8 @@ export function LegalUpdateModal() {
       .GET("/me/legal")
       .then(async ({ data }) => {
         if (cancelled || !data?.length) return;
-        const [me, joined] = await Promise.all([apiClient().GET("/me"), apiClient().GET("/client/businesses")]);
-        const isNew = !me.data?.memberships.length && !joined.data?.length;
+        const [me, joined] = await Promise.all([fetchMe().catch(() => null), apiClient().GET("/client/businesses")]);
+        const isNew = !me?.memberships.length && !joined.data?.length;
         if (!cancelled && !isNew) setPending(data);
       })
       .catch(() => undefined);

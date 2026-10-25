@@ -1,5 +1,5 @@
 import type { components } from "@business-os/api-client";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 
 import { unwrap } from "@business-os/app-kit/lib/api";
@@ -9,8 +9,9 @@ export type Inbox = components["schemas"]["Inbox"];
 
 type InboxContextValue = {
   inbox: Inbox | null;
-  /** Reloads the inbox and returns it (null if it couldn't load). */
-  refresh: () => Promise<Inbox | null>;
+  /** Reloads the inbox and returns it (null if it couldn't load). With `maxAgeMs`, a copy loaded
+   * more recently than that is returned as it is. */
+  refresh: (maxAgeMs?: number) => Promise<Inbox | null>;
   markAllRead: () => Promise<void>;
 };
 
@@ -23,13 +24,17 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
   const { api, scope, business } = useBusiness();
   const [inbox, setInbox] = useState<Inbox | null>(null);
 
-  const refresh = useCallback(async () => {
+  const last = useRef<{ at: number; business: string; inbox: Inbox } | null>(null);
+
+  const refresh = useCallback(async (maxAgeMs = 0) => {
     if (!business) {
       setInbox(null);
       return null;
     }
+    if (last.current?.business === business.id && Date.now() - last.current.at < maxAgeMs) return last.current.inbox;
     try {
       const loaded = unwrap(await api.GET("/client/notifications", { params: scope }));
+      last.current = { at: Date.now(), business: business.id, inbox: loaded };
       setInbox(loaded);
       return loaded;
     } catch {
@@ -40,7 +45,9 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
   const markAllRead = useCallback(async () => {
     if (!business) return;
     try {
-      setInbox(unwrap(await api.POST("/client/notifications/read", { params: scope, body: {} })));
+      const read = unwrap(await api.POST("/client/notifications/read", { params: scope, body: {} }));
+      last.current = { at: Date.now(), business: business.id, inbox: read };
+      setInbox(read);
     } catch {
       // Not critical: they stay unread until the next try.
     }

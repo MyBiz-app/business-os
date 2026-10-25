@@ -11,7 +11,9 @@ import { unwrap } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { PersonRow } from "@/components/person-row";
+import { forgetShared } from "@/lib/client-data";
 import { friendsError } from "@/lib/friends";
+import { useDataContext } from "@/lib/use-data-context";
 import { useBusiness } from "@/providers/business-provider";
 
 /** Tells a friend code from an email or a phone number, so one box does all three. */
@@ -29,6 +31,7 @@ export default function Friends() {
   const locale = useLocale();
   const toast = useToast();
   const { api, scope, business, palette } = useBusiness();
+  const ctx = useDataContext();
   const [lookup, setLookup] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -58,6 +61,7 @@ export default function Friends() {
       return false;
     }
     if (done) toast("success", done);
+    if (ctx) void forgetShared(ctx, "friend-settings");
     await reload();
     return true;
   };

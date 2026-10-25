@@ -8,6 +8,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { tint } from "@business-os/app-kit/lib/brand";
+import { FRESH_MS } from "@business-os/app-kit/lib/query-client";
 import { groupByRecency, updateGroup, type UpdateGroup } from "@business-os/app-kit/lib/client-home";
 import { Chip } from "@business-os/app-kit/components/chip";
 import { PressableScale } from "@business-os/app-kit/components/motion";
@@ -40,7 +41,7 @@ export default function Updates() {
 
   useFocusEffect(
     useCallback(() => {
-      void refresh().then((loaded) => {
+      void refresh(FRESH_MS).then((loaded) => {
         if (!loaded || loaded.unread === 0) return;
         setFresh(new Set(loaded.items.filter((n) => !n.read_at).map((n) => n.id)));
         void markAllRead();

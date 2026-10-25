@@ -1,6 +1,6 @@
 import { addDays, formatDay, monthGrid, monthStart, weekStart } from "@business-os/i18n/dates";
 import { useEffect, useRef } from "react";
-import { FlatList, Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
+import { FlatList, Platform, Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
 import { useLocale } from "use-intl";
 
 import { Chip } from "./chip";
@@ -38,8 +38,13 @@ export function DayStrip({ selected, today, onSelect, marked, closed, palette, t
   // Re-anchor only when the selection leaves the rendered window.
   const offset = Math.round((Date.parse(`${selected}T00:00:00Z`) - Date.parse(`${anchor.current}T00:00:00Z`)) / 86_400_000);
   if (Math.abs(offset) > SPAN - 30) anchor.current = selected;
-  const days = Array.from({ length: SPAN * 2 + 1 }, (_, i) => addDays(anchor.current, i - SPAN));
-  const index = SPAN + Math.round((Date.parse(`${selected}T00:00:00Z`) - Date.parse(`${anchor.current}T00:00:00Z`)) / 86_400_000);
+  // A browser's right-to-left scroll positions run negative, which the list's windowing cannot follow. There the
+  // row is laid out left-to-right with the days listed backwards: it reads the same, and scrolls normally.
+  const flipped = Platform.OS === "web" && typeof document !== "undefined" && document.documentElement.dir === "rtl";
+  const chronological = Array.from({ length: SPAN * 2 + 1 }, (_, i) => addDays(anchor.current, i - SPAN));
+  const days = flipped ? chronological.reverse() : chronological;
+  const chronologicalIndex = SPAN + Math.round((Date.parse(`${selected}T00:00:00Z`) - Date.parse(`${anchor.current}T00:00:00Z`)) / 86_400_000);
+  const index = flipped ? days.length - 1 - chronologicalIndex : chronologicalIndex;
   const side = Math.max(0, (width - 32 - ITEM) / 2);
 
   useEffect(() => {
@@ -60,6 +65,7 @@ export function DayStrip({ selected, today, onSelect, marked, closed, palette, t
       getItemLayout={(_, i) => ({ length: STRIDE, offset: STRIDE * i, index: i })}
       windowSize={7}
       initialNumToRender={15}
+      style={flipped ? { direction: "ltr" } : undefined}
       contentContainerStyle={{ paddingHorizontal: side, paddingVertical: 2 }}
       onMomentumScrollEnd={(e) => {
         const i = Math.round(Math.abs(e.nativeEvent.contentOffset.x) / STRIDE);

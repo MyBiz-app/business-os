@@ -1,43 +1,32 @@
 import type { components } from "@business-os/api-client";
-import { unwrap } from "@business-os/app-kit/lib/api";
 import { useCallback, useEffect, useState } from "react";
 
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { useBusiness } from "@/providers/business-provider";
+import { fetchFriendSettings } from "@/lib/client-data";
+import { useDataContext } from "@/lib/use-data-context";
 
 export type FriendSettings = components["schemas"]["FriendSettings"];
 
 /** The friends switch for the current business: whether it offers friends, my code, my privacy. */
 export function useFriendSettings() {
-  const { api, scope, business } = useBusiness();
-  const load = useCallback(async () => {
-    if (!business) return null;
-    return unwrap(await api.GET("/client/friends/settings", { params: scope }));
-  }, [api, scope, business]);
+  const ctx = useDataContext();
+  const load = useCallback(async () => (ctx ? fetchFriendSettings(ctx) : null), [ctx]);
   return useLoad<FriendSettings | null>(load);
 }
 
-const enabledCache = new Map<string, Promise<boolean>>();
-
-/** Whether the current business offers friends. One request per business, shared by every class card. */
+/** Whether the current business offers friends. One request, shared by every class card and the profile. */
 export function useFriendsEnabled(): boolean {
-  const { api, scope, business } = useBusiness();
+  const ctx = useDataContext();
   const [enabled, setEnabled] = useState(false);
   useEffect(() => {
-    if (!business) return;
-    let cached = enabledCache.get(business.id);
-    if (!cached) {
-      cached = api
-        .GET("/client/friends/settings", { params: scope })
-        .then((r) => unwrap(r).enabled)
-        .catch(() => false);
-      enabledCache.set(business.id, cached);
-    }
+    if (!ctx) return;
     let live = true;
-    void cached.then((value) => live && setEnabled(value));
+    fetchFriendSettings(ctx)
+      .then((settings) => live && setEnabled(settings.enabled))
+      .catch(() => live && setEnabled(false));
     return () => {
       live = false;
     };
-  }, [api, scope, business]);
+  }, [ctx]);
   return enabled;
 }

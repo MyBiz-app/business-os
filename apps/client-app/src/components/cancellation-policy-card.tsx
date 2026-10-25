@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Text } from "@business-os/app-kit/components/text";
 import { Card, Heading, styles } from "@business-os/app-kit/components/ui";
 import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
+import { FRESH_MS, queryClient } from "@business-os/app-kit/lib/query-client";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -15,9 +16,12 @@ export function CancellationPolicyCard({ palette, tenantId }: { palette: Palette
 
   useEffect(() => {
     let live = true;
-    apiClient()
-      .GET("/client/cancellation-policy", { params: { header: { "X-Tenant-Id": tenantId } } })
-      .then(unwrap)
+    queryClient
+      .fetchQuery({
+        queryKey: ["cancellation-policy", tenantId],
+        queryFn: async () => unwrap(await apiClient().GET("/client/cancellation-policy", { params: { header: { "X-Tenant-Id": tenantId } } })),
+        staleTime: FRESH_MS,
+      })
       .then((result) => live && setPolicy(result.text))
       .catch(() => undefined);
     return () => {
