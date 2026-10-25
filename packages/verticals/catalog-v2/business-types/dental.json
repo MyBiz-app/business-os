@@ -1,0 +1,110 @@
+{
+  "key": "dental",
+  "domain": "health",
+  "status": "live",
+  "names": {
+    "he": "מרפאת שיניים",
+    "en": "Dental clinic"
+  },
+  "synonyms": {
+    "he": [
+      "שיניים",
+      "רופא שיניים",
+      "שיננית",
+      "מרפאת שיניים"
+    ],
+    "en": [
+      "dentist",
+      "dental",
+      "hygienist"
+    ]
+  },
+  "terms": "clinic",
+  "customer_term": "patient",
+  "customers": {
+    "he": "מטופלים",
+    "en": "Patients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "checkup",
+      "names": {
+        "he": "בדיקה",
+        "en": "Check-up"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 30,
+      "price_ils": 20000,
+      "resource_type": "treatment_chair"
+    },
+    {
+      "key": "hygiene",
+      "names": {
+        "he": "שיננית",
+        "en": "Hygienist visit"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 45,
+      "price_ils": 30000,
+      "resource_type": "treatment_chair"
+    },
+    {
+      "key": "treatment",
+      "names": {
+        "he": "טיפול",
+        "en": "Treatment"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 60,
+      "price_ils": 50000,
+      "resource_type": "treatment_chair",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "treatment_chair",
+      "count": 2
+    }
+  ],
+  "questions": [
+    {
+      "key": "chairs",
+      "text": {
+        "he": "כמה כיסאות טיפולים?",
+        "en": "How many treatment chairs?"
+      },
+      "kind": "number",
+      "affects": "resource_count:treatment_chair",
+      "default": 2
+    },
+    {
+      "key": "hygienist",
+      "text": {
+        "he": "יש שיננית?",
+        "en": "Is there a hygienist?"
+      },
+      "kind": "boolean",
+      "affects": "activity:hygiene",
+      "default": true
+    },
+    {
+      "key": "kids",
+      "text": {
+        "he": "מטפלים גם בילדים?",
+        "en": "Do you treat children?"
+      },
+      "kind": "boolean",
+      "affects": "dependents",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "aesthetics",
+    "nutrition"
+  ],
+  "dependents": "child",
+  "dependents_mode": "ask",
+  "order": 33
+}

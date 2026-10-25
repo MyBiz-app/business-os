@@ -1,0 +1,91 @@
+{
+  "key": "barbershop",
+  "domain": "beauty",
+  "status": "live",
+  "names": {
+    "he": "ברברשופ",
+    "en": "Barbershop"
+  },
+  "synonyms": {
+    "he": [
+      "ברבר",
+      "ברברשופ",
+      "מספרת גברים",
+      "תספורת גברים",
+      "זקן"
+    ],
+    "en": [
+      "barber",
+      "barbershop",
+      "men's haircut"
+    ]
+  },
+  "terms": "beauty",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "haircut",
+      "names": {
+        "he": "תספורת",
+        "en": "Haircut"
+      },
+      "model": "appointment",
+      "duration_minutes": 30,
+      "price_ils": 8000
+    },
+    {
+      "key": "beard",
+      "names": {
+        "he": "עיצוב זקן",
+        "en": "Beard trim"
+      },
+      "model": "appointment",
+      "duration_minutes": 20,
+      "price_ils": 5000
+    },
+    {
+      "key": "combo",
+      "names": {
+        "he": "תספורת וזקן",
+        "en": "Haircut and beard"
+      },
+      "model": "appointment",
+      "duration_minutes": 45,
+      "price_ils": 11000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "chairs",
+      "text": {
+        "he": "כמה עמדות עבודה?",
+        "en": "How many work stations?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 3
+    },
+    {
+      "key": "walk_in",
+      "text": {
+        "he": "מקבלים גם בלי תור?",
+        "en": "Do you take walk-ins?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "hair_salon",
+    "tattoo"
+  ],
+  "order": 24
+}

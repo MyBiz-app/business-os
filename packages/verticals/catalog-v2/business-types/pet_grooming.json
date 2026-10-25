@@ -1,0 +1,97 @@
+{
+  "key": "pet_grooming",
+  "domain": "pets",
+  "status": "beta",
+  "names": {
+    "he": "טיפוח חיות",
+    "en": "Pet grooming"
+  },
+  "synonyms": {
+    "he": [
+      "טיפוח כלבים",
+      "מספרת כלבים",
+      "רחצה",
+      "גרומינג"
+    ],
+    "en": [
+      "pet grooming",
+      "dog grooming",
+      "groomer"
+    ]
+  },
+  "terms": "pets",
+  "customer_term": "owner",
+  "customers": {
+    "he": "בעלים",
+    "en": "Owners"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "bath",
+      "names": {
+        "he": "רחצה",
+        "en": "Bath"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 12000
+    },
+    {
+      "key": "full_groom",
+      "names": {
+        "he": "טיפוח מלא",
+        "en": "Full groom"
+      },
+      "model": "appointment",
+      "duration_minutes": 120,
+      "price_ils": 22000
+    },
+    {
+      "key": "nails",
+      "names": {
+        "he": "גזירת ציפורניים",
+        "en": "Nail trim"
+      },
+      "model": "appointment",
+      "duration_minutes": 15,
+      "price_ils": 5000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "species",
+      "text": {
+        "he": "כלבים, חתולים או שניהם?",
+        "en": "Dogs, cats or both?"
+      },
+      "kind": "select",
+      "affects": "none",
+      "options": [
+        "dogs",
+        "cats",
+        "both"
+      ],
+      "default": "dogs"
+    },
+    {
+      "key": "tables",
+      "text": {
+        "he": "כמה עמדות טיפוח?",
+        "en": "How many grooming tables?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "pet_daycare",
+    "dog_training"
+  ],
+  "dependents": "pet",
+  "dependents_mode": "required",
+  "order": 59
+}

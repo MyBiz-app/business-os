@@ -34,7 +34,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 |---|---|
 | `apps/web` | Business web app: Next.js, Tailwind, next-intl (he / en), light / dark |
 | `apps/api` | Backend API: Python 3.13, FastAPI, managed with uv |
-| `apps/client-app` | The one app (clients, business and MyBiz team areas): Expo (SDK 57) + Expo Router, shared translations, light / dark, RTL |
+| `apps/client-app` | The one app (clients, business and MyBiz team areas): Expo (SDK 58) + Expo Router, shared translations, light / dark, RTL |
 | `packages/i18n` | Shared translations (he / en) and locale helpers for the web and the apps |
 | `packages/app-kit` | What the three apps share: API client, design tokens, components, providers |
 | `packages/verticals` | The industry catalog: categories and sub-categories, shared by the API, the web and the apps ([how to add one](docs/guides/verticals.md)) |

@@ -1,0 +1,97 @@
+{
+  "key": "custom",
+  "domain": null,
+  "status": "live",
+  "names": {
+    "he": "מותאם אישית",
+    "en": "Custom"
+  },
+  "synonyms": {
+    "he": [
+      "אחר",
+      "העסק שלי לא ברשימה",
+      "מותאם"
+    ],
+    "en": [
+      "other",
+      "my business is not listed",
+      "custom"
+    ]
+  },
+  "terms": "professional",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [],
+  "resources": [],
+  "questions": [
+    {
+      "key": "capacity",
+      "text": {
+        "he": "כמה באים בבת אחת?",
+        "en": "How many come at once?"
+      },
+      "kind": "select",
+      "affects": "axis:capacity",
+      "options": [
+        "one",
+        "few",
+        "many"
+      ],
+      "default": "one"
+    },
+    {
+      "key": "provider",
+      "text": {
+        "he": "מי נותן את השירות?",
+        "en": "Who gives the service?"
+      },
+      "kind": "select",
+      "affects": "axis:provider",
+      "options": [
+        "staff",
+        "resource",
+        "staff_and_resource",
+        "nobody"
+      ],
+      "default": "staff"
+    },
+    {
+      "key": "place",
+      "text": {
+        "he": "איפה?",
+        "en": "Where?"
+      },
+      "kind": "select",
+      "affects": "axis:place",
+      "options": [
+        "at_business",
+        "at_client",
+        "online"
+      ],
+      "default": "at_business"
+    },
+    {
+      "key": "payment",
+      "text": {
+        "he": "איך משלמים?",
+        "en": "How do clients pay?"
+      },
+      "kind": "select",
+      "affects": "axis:payment",
+      "options": [
+        "on_booking",
+        "on_site",
+        "deposit",
+        "membership"
+      ],
+      "default": "on_booking"
+    }
+  ],
+  "common_combos": [],
+  "custom": true,
+  "order": 76
+}

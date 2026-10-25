@@ -13,9 +13,12 @@ export function ResetForm() {
   const t = useTranslations("auth");
   const [state, action] = useActionState<FormState, FormData>(updatePassword, {});
 
+  const message = state.error ? t(`errors.${state.error}` as "errors.generic") : undefined;
+  const onPassword = state.error === "weak_password";
+
   return (
     <form action={action} className="flex flex-col gap-4">
-      <FormError message={state.error && t(`errors.${state.error}` as "errors.generic")} />
+      <FormError inline message={onPassword ? undefined : message} />
       <PasswordField
         label={t("newPassword")}
         hint={t("passwordHint")}
@@ -23,6 +26,7 @@ export function ResetForm() {
         autoComplete="new-password"
         minLength={8}
         required
+        error={onPassword ? message : undefined}
       />
       <SubmitButton>{t("reset.submit")}</SubmitButton>
     </form>

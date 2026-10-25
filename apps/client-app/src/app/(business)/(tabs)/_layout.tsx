@@ -1,14 +1,15 @@
 import { Redirect, Tabs } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
 
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { useTerm } from "@business-os/app-kit/lib/vertical";
 import { useAreas } from "@/providers/area-provider";
 import { AiHeader } from "@/components/ai-header";
 import { useStaff } from "@/providers/staff-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 /** The business app's tabs, in the business's own brand color. Tabs follow permissions. */
 export default function TabsLayout() {
@@ -18,7 +19,7 @@ export default function TabsLayout() {
   const screenOptions = useTabScreenOptions(palette);
   const icon = (name: Parameters<typeof tabIcon>[0]) => tabIcon(name, palette);
   const t = useTranslations("business.tabs");
-  const tTerms = useTranslations("terms");
+  const term = useTerm();
 
   if (!loading && !session) return <Redirect href="/sign-in" />;
   if (active && active.kind !== "business") return <Redirect href="/" />;
@@ -26,7 +27,7 @@ export default function TabsLayout() {
   if (!tenant) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.background }}>
-        <ActivityIndicator color={palette.primary} />
+        <Spinner color={palette.primary} />
       </View>
     );
   }
@@ -43,7 +44,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="clients"
         options={{
-          title: tTerms(`${termsFor(tenant)}.clients`),
+          title: term(tenant, "clients"),
           tabBarIcon: icon("people"),
           href: can("clients.read") ? undefined : null,
         }}

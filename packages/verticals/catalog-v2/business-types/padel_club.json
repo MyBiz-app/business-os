@@ -1,0 +1,120 @@
+{
+  "key": "padel_club",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "מועדון פאדל",
+    "en": "Padel club"
+  },
+  "synonyms": {
+    "he": [
+      "פאדל",
+      "מגרש פאדל",
+      "מגרשי פאדל",
+      "פדל"
+    ],
+    "en": [
+      "padel",
+      "padel court",
+      "paddle"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "player",
+  "customers": {
+    "he": "שחקנים",
+    "en": "Players"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "court_rental",
+      "names": {
+        "he": "השכרת מגרש",
+        "en": "Court rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 90,
+      "price_ils": 16000,
+      "resource_type": "padel_court",
+      "max_minutes": 120,
+      "step_minutes": 30
+    },
+    {
+      "key": "lesson",
+      "names": {
+        "he": "שיעור פאדל",
+        "en": "Padel lesson"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 60,
+      "price_ils": 22000,
+      "capacity": 4,
+      "resource_type": "padel_court"
+    },
+    {
+      "key": "americano",
+      "names": {
+        "he": "אמריקנו / טורניר",
+        "en": "Americano / tournament"
+      },
+      "model": "group_class",
+      "duration_minutes": 120,
+      "price_ils": 8000,
+      "capacity": 16,
+      "resource_type": "padel_court",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "padel_court",
+      "count": 4,
+      "attributes": {
+        "covered": true,
+        "lighting": true,
+        "surface": "artificial_grass"
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "courts",
+      "text": {
+        "he": "כמה מגרשים פאדל?",
+        "en": "How many padel courts?"
+      },
+      "kind": "number",
+      "affects": "resource_count:padel_court",
+      "default": 4
+    },
+    {
+      "key": "covered",
+      "text": {
+        "he": "המגרשים מקורים?",
+        "en": "Are the courts covered?"
+      },
+      "kind": "boolean",
+      "affects": "resource_attr:padel_court.covered",
+      "default": true
+    },
+    {
+      "key": "coaches",
+      "text": {
+        "he": "יש מאמנים?",
+        "en": "Do you have coaches?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "tennis_club",
+    "gym"
+  ],
+  "replaces": [
+    "padel_tennis"
+  ],
+  "order": 10
+}

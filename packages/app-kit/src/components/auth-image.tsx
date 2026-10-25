@@ -14,6 +14,37 @@ function readAsDataUri(blob: Blob): Promise<string> {
   });
 }
 
+// One request per picture however many places show it (the same person sits in many class blocks).
+// Addresses carry a version, so a changed picture has a new address.
+const pictures = new Map<string, Promise<string | null>>();
+const MAX_PICTURES = 200;
+
+function fetchPicture(path: string): Promise<string | null> {
+  let request = pictures.get(path);
+  if (!request) {
+    if (pictures.size >= MAX_PICTURES) pictures.delete(pictures.keys().next().value as string);
+    request = (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const response = await fetch(`${API_URL}${path}`, {
+          headers: data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {},
+        });
+        return response.ok ? await readAsDataUri(await response.blob()) : null;
+      } catch {
+        return null;
+      }
+    })();
+    pictures.set(path, request);
+    void request.then((uri) => uri === null && pictures.delete(path));
+  }
+  return request;
+}
+
+/** Drop the pictures kept in memory (another person signed in). */
+export function forgetPictures() {
+  pictures.clear();
+}
+
 /** A picture that the API only serves to the signed-in person (their own avatar). */
 export function AuthImage({ path, style, label }: { path: string | null | undefined; style: StyleProp<ImageStyle>; label?: string }) {
   const [uri, setUri] = useState<string | null>(null);
@@ -21,19 +52,8 @@ export function AuthImage({ path, style, label }: { path: string | null | undefi
     let cancelled = false;
     setUri(null);
     if (!path) return;
-    void (async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        const response = await fetch(`${API_URL}${path}`, {
-          headers: data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {},
-        });
-        if (!response.ok) return;
-        const next = await readAsDataUri(await response.blob());
-        if (!cancelled) setUri(next);
-      } catch {
-        // No picture: the caller shows the initials instead.
-      }
-    })();
+    // No picture: the caller shows the initials instead.
+    void fetchPicture(path).then((next) => !cancelled && setUri(next));
     return () => {
       cancelled = true;
     };

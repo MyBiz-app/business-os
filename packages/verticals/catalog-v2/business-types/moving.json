@@ -1,0 +1,81 @@
+{
+  "key": "moving",
+  "domain": "home_field",
+  "status": "beta",
+  "names": {
+    "he": "הובלות",
+    "en": "Moving company"
+  },
+  "synonyms": {
+    "he": [
+      "הובלות",
+      "הובלה",
+      "העברת דירה",
+      "מובילים"
+    ],
+    "en": [
+      "moving",
+      "movers",
+      "removals",
+      "relocation"
+    ]
+  },
+  "terms": "home_services",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "job_route",
+  "activities": [
+    {
+      "key": "move",
+      "names": {
+        "he": "הובלת דירה",
+        "en": "Home move"
+      },
+      "model": "project",
+      "duration_minutes": 300,
+      "price_ils": 150000
+    },
+    {
+      "key": "small_move",
+      "names": {
+        "he": "הובלה קטנה",
+        "en": "Small move"
+      },
+      "model": "on_site",
+      "duration_minutes": 120,
+      "price_ils": 45000,
+      "travel_minutes": 30,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "zones",
+      "text": {
+        "he": "באילו אזורים עובדים?",
+        "en": "Which areas do you serve?"
+      },
+      "kind": "text",
+      "affects": "service_area"
+    },
+    {
+      "key": "trucks",
+      "text": {
+        "he": "כמה משאיות וצוותים?",
+        "en": "How many trucks and crews?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "cleaning",
+    "handyman"
+  ],
+  "order": 55
+}

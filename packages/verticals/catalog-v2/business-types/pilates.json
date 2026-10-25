@@ -1,0 +1,106 @@
+{
+  "key": "pilates",
+  "domain": "fitness",
+  "status": "live",
+  "names": {
+    "he": "סטודיו פילאטיס",
+    "en": "Pilates studio"
+  },
+  "synonyms": {
+    "he": [
+      "פילאטיס",
+      "פילטיס",
+      "רפורמר"
+    ],
+    "en": [
+      "pilates",
+      "reformer"
+    ]
+  },
+  "terms": "fitness",
+  "customer_term": "member",
+  "customers": {
+    "he": "מתאמנים",
+    "en": "Members"
+  },
+  "calendar_view": "class_blocks",
+  "activities": [
+    {
+      "key": "reformer_class",
+      "names": {
+        "he": "שיעור מכשירים",
+        "en": "Reformer class"
+      },
+      "model": "group_class",
+      "duration_minutes": 50,
+      "price_ils": 12000,
+      "capacity": 6,
+      "resource_type": "reformer"
+    },
+    {
+      "key": "private_session",
+      "names": {
+        "he": "שיעור פרטי",
+        "en": "Private session"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 55,
+      "price_ils": 28000,
+      "resource_type": "reformer"
+    },
+    {
+      "key": "mat_class",
+      "names": {
+        "he": "שיעור מזרן",
+        "en": "Mat class"
+      },
+      "model": "group_class",
+      "duration_minutes": 55,
+      "price_ils": 7000,
+      "capacity": 12,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "reformer",
+      "count": 6
+    },
+    {
+      "type": "studio_room",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "reformers",
+      "text": {
+        "he": "כמה רפורמרים יש בסטודיו?",
+        "en": "How many reformers does the studio have?"
+      },
+      "kind": "number",
+      "affects": "resource_count:reformer",
+      "default": 6
+    },
+    {
+      "key": "equipment",
+      "text": {
+        "he": "מזרן, מכשירים או שניהם?",
+        "en": "Mat, reformer or both?"
+      },
+      "kind": "select",
+      "affects": "activity:mat_class",
+      "options": [
+        "mat",
+        "reformer",
+        "both"
+      ],
+      "default": "reformer"
+    }
+  ],
+  "common_combos": [
+    "yoga",
+    "physiotherapy"
+  ],
+  "order": 2
+}

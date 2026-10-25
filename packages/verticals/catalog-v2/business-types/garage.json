@@ -1,0 +1,105 @@
+{
+  "key": "garage",
+  "domain": "automotive",
+  "status": "live",
+  "names": {
+    "he": "מוסך",
+    "en": "Garage"
+  },
+  "synonyms": {
+    "he": [
+      "מוסך",
+      "טיפול לרכב",
+      "מכונאי",
+      "תיקון רכב",
+      "טסט"
+    ],
+    "en": [
+      "garage",
+      "car repair",
+      "mechanic",
+      "car service"
+    ]
+  },
+  "terms": "automotive",
+  "customer_term": "customer",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Customers"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "service",
+      "names": {
+        "he": "טיפול תקופתי",
+        "en": "Periodic service"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 120,
+      "price_ils": 60000,
+      "resource_type": "work_bay"
+    },
+    {
+      "key": "repair",
+      "names": {
+        "he": "תיקון",
+        "en": "Repair"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 180,
+      "price_ils": 80000,
+      "resource_type": "work_bay"
+    },
+    {
+      "key": "test_prep",
+      "names": {
+        "he": "הכנה לטסט",
+        "en": "Test preparation"
+      },
+      "model": "resource_staff",
+      "duration_minutes": 60,
+      "price_ils": 25000,
+      "resource_type": "work_bay",
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "work_bay",
+      "count": 3,
+      "attributes": {
+        "lift": true
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "bays",
+      "text": {
+        "he": "כמה עמדות עבודה?",
+        "en": "How many work bays?"
+      },
+      "kind": "number",
+      "affects": "resource_count:work_bay",
+      "default": 3
+    },
+    {
+      "key": "mechanics",
+      "text": {
+        "he": "כמה מכונאים?",
+        "en": "How many mechanics?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 3
+    }
+  ],
+  "common_combos": [
+    "tires",
+    "detailing"
+  ],
+  "dependents": "vehicle",
+  "dependents_mode": "required",
+  "order": 56
+}

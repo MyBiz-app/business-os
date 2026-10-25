@@ -1,0 +1,77 @@
+{
+  "key": "meeting_rooms",
+  "domain": "rental_spaces",
+  "status": "beta",
+  "names": {
+    "he": "חדרי ישיבות",
+    "en": "Meeting rooms"
+  },
+  "synonyms": {
+    "he": [
+      "חדר ישיבות",
+      "חדרי ישיבות",
+      "חדר ישיבה",
+      "השכרת חדרים"
+    ],
+    "en": [
+      "meeting room",
+      "boardroom",
+      "conference room"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "room_rental",
+      "names": {
+        "he": "השכרת חדר ישיבות",
+        "en": "Meeting room rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 15000,
+      "resource_type": "meeting_room",
+      "max_minutes": 480,
+      "step_minutes": 30
+    }
+  ],
+  "resources": [
+    {
+      "type": "meeting_room",
+      "count": 2
+    }
+  ],
+  "questions": [
+    {
+      "key": "rooms",
+      "text": {
+        "he": "כמה חדרים?",
+        "en": "How many rooms?"
+      },
+      "kind": "number",
+      "affects": "resource_count:meeting_room",
+      "default": 2
+    },
+    {
+      "key": "equipment",
+      "text": {
+        "he": "יש מסך וציוד היקפי?",
+        "en": "Is there a screen and equipment?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "coworking",
+    "photo_studio"
+  ],
+  "order": 19
+}

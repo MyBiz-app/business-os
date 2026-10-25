@@ -49,18 +49,27 @@ for text. Use the ink whenever the color is text (or a thin icon) on a card, the
 
 | Token (CSS / Tailwind) | App (`theme.ts`) | Use for | Light | Dark |
 |---|---|---|---|---|
-| `--primary` / `bg-primary` | `primary` | Fills, rings, focus outlines | #2563EB | #3B82F6 |
-| `--primary-ink` / `text-primary-ink` | `primaryInk` | Links, eyebrows, the current menu item, text on `bg-primary-subtle` | #1D4ED8 | #60A5FA |
-| `--on-primary` / `text-on-primary` | `onPrimary` | Text on a `bg-primary` fill (white on the night blue is only 3.7:1, so night uses charcoal) | #FFFFFF | #111113 |
+| `--primary` / `bg-primary` | `primary` | Fills, rings, focus outlines | #0071E3 | #0A84FF |
+| `--primary-ink` / `text-primary-ink` | `primaryInk` | Links, eyebrows, the current menu item, text on `bg-primary-subtle` | #0062CC | #4DA3FF |
+| `--on-primary` / `text-on-primary` | `onPrimary` | Text on a `bg-primary` fill (white on the night blue is only 3.7:1, so night uses black) | #FFFFFF | #000000 |
 | `--success` / `bg-success` | `success` | Dots, bars, fills | #16A34A | #22C55E |
 | `--success-ink` / `text-success-ink` | `successInk` | Check marks, deltas, "paid" text | #15803D | #4ADE80 |
-| `--on-danger` / `text-on-danger` | `onDanger` | Text on a `bg-danger` fill (white in light, charcoal in dark: the dark red is too light for white) | #FFFFFF | #111113 |
-| `--muted` / `text-muted` | `muted` | Secondary text (4.5:1 even on a 12% primary tint) | #63636E | #A1A1AA |
+| `--on-danger` / `text-on-danger` | `onDanger` | Text on a `bg-danger` fill (white in light, black in dark: the dark red is too light for white) | #FFFFFF | #000000 |
+| `--muted` / `text-muted` | `muted` | Secondary text (4.5:1 even on a 12% primary tint) | #63636E | #A1A1A6 |
 
 Never write `text-primary` or `text-success` for text: the bright colors are 3.3 to 4.4:1 on white
 and on their own tint. A business's brand color is already made AA-safe by `lib/brand.ts`
 (web) and `packages/app-kit/src/lib/brand.ts` (apps): it must reach 4.5:1 on the surface, on a
 12% tint of itself, and for the text placed on it. Inside `.brand`, `--primary-ink` is that color.
+
+## Apple layer (2026-10-23, slice A1)
+
+Calm's structure with Apple's values: the page is the iOS grouped background (#F2F2F7; true black at night),
+the action color is Apple blue (#0A84FF at night; in light #0071E3 instead of iOS's #007AFF, because white
+text on #007AFF is only 4.0:1), the font is the system font first (`-apple-system`, then Assistant for
+Hebrew-only systems and Android), and the app's type scale is Apple's text styles (`typeScale` in
+`packages/design-tokens`: 34 large title down to 12 caption). On iPhone the app's `Text` uses SF with the
+requested weight and loads no font file.
 
 ## Calm (spec v4, design round W2-2)
 
@@ -69,13 +78,13 @@ page Foundations). Quiet: hierarchy by size, not weight; hairlines instead of he
 
 | | Light | Dark | Token |
 |---|---|---|---|
-| Page | #F7F7F8 | #111113 | `--background` |
-| Surface (cards, menus, top bar) | #FFFFFF | #1A1A1D | `--surface` |
-| Subtle fill (table header, hover, tracks) | #F2F2F4 | #232327 | `--subtle` / `bg-subtle` |
+| Page (iOS grouped background) | #F2F2F7 | #000000 | `--background` |
+| Surface (cards, menus, top bar) | #FFFFFF | #1C1C1E | `--surface` |
+| Subtle fill (table header, hover, tracks) | #F2F2F7 | #2C2C2E | `--subtle` / `bg-subtle` |
 | Current item, selected row | 8% primary | 16% primary | `--primary-subtle` / `bg-primary-subtle` |
-| Border | #E6E6EA | #2E2E33 | `--border` |
-| Text / muted | #18181B / #63636E | #F4F4F5 / #A1A1AA | `--foreground` / `--muted` |
-| Status tints (background) | #ECFDF3, #FFF7E6, #FEF2F2, #EFF6FF | #12261A, #2A2010, #2A1414, #14203A | `bg-success-soft`, `bg-warning-soft`, `bg-danger-soft`, `bg-info-soft` (text: the matching `-ink`, `text-warning`, `text-danger`, `text-info-ink`) |
+| Border | #E6E6EA | #38383A | `--border` |
+| Text / muted | #1C1C1E / #63636E | #F5F5F7 / #A1A1A6 | `--foreground` / `--muted` |
+| Status tints (background) | #ECFDF3, #FFF7E6, #FEF2F2, #EFF6FF | #12261A, #2A2010, #2A1414, #0E2038 | `bg-success-soft`, `bg-warning-soft`, `bg-danger-soft`, `bg-info-soft` (text: the matching `-ink`, `text-warning`, `text-danger`, `text-info-ink`) |
 
 - **Type** (business app and console, Assistant): 12 caption, 13 small (`text-sm`), 15 body (the default and
   `text-base`), 17 subheading (`text-lg`), 20 heading (`text-xl`), 24 title (`text-2xl`, page titles), 30 display
@@ -165,7 +174,11 @@ toast, the AI bubble) does.
   `SubmitButton` into "Saved" for a moment. Field errors stay next to the field.
 - Page transitions (web, view transitions, no library): `components/ui/page-transition.tsx`.
   `PageTransition` goes in a `template.tsx` (a layout persists, so enter/exit never fire there):
-  the landing site fades in with a 12px slide up (250ms) under a fixed header, the CRM only fades
+  the landing site cross-fades (old page 180ms out, new 380ms in, no movement; shorter fades read as a
+  hard cut) under a fixed header. Pages are rendered on demand, so `RouteProgress` also softens the
+  current page (`.site-page` to 55%) the moment a link is clicked and the new page replaces it at
+  full strength; its click listener is in the capture phase because `<Link>` has already prevented
+  the default by the bubbling phase. The CRM only fades
   (150ms) inside its fixed side menu and header. `CardTransition name="lead-<id>"` on a list card plus
   `RouteModal transitionName="lead-<id>"` makes the card grow into its window and shrink back.
   Names must be unique on the page. The motion rules live at the end of `globals.css` and are off

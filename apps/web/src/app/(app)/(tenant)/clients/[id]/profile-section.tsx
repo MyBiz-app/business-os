@@ -1,6 +1,6 @@
 import { NotebookPen, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { termsOf } from "@business-os/verticals";
+import { businessTerms } from "@/lib/verticals";
 
 import { unwrap } from "@/lib/api";
 import { canWriteClients } from "@/lib/permissions";
@@ -22,13 +22,14 @@ type Props = {
 /** The industry's extra details about the client (e.g. a garage: the car). */
 export async function ProfileSection({ clientId, values, context, locked }: Props) {
   const t = await getTranslations();
+  const locale = await getLocale();
   const { tenant, api, scope } = context;
   const fields = unwrap(await api.GET("/clients/fields", { params: scope }));
   if (fields.length === 0) return null;
   return (
     <Card as="section" aria-labelledby="profile-heading">
       <h2 id="profile-heading" className="mb-4 text-lg font-semibold">
-        {t(`terms.${termsOf(tenant.vertical)}.profile` as "terms.fitness.profile")}
+        {businessTerms(t, tenant, locale)("profile")}
       </h2>
       <ProfileForm
         clientId={clientId}
@@ -71,7 +72,7 @@ export async function NotesSection({ clientId, bookings, context, locked }: Note
     <Card as="section" aria-labelledby="notes-heading" className="flex flex-col gap-4">
       <h2 id="notes-heading" className="flex items-center gap-2 text-lg font-semibold">
         <NotebookPen aria-hidden="true" className="size-5 text-primary-ink" />
-        {t(`terms.${termsOf(tenant.vertical)}.visitNotes` as "terms.fitness.visitNotes")}
+        {businessTerms(t, tenant, locale)("visitNotes")}
       </h2>
       {canWrite && <NoteForm clientId={clientId} bookings={recentVisits} />}
       {notes.length === 0 ? (

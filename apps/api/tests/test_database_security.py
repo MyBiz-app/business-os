@@ -151,6 +151,7 @@ def test_api_sends_security_headers(client: TestClient) -> None:
     assert response.headers["X-Frame-Options"] == "DENY"
     assert response.headers["Referrer-Policy"] == "no-referrer"
     assert response.headers["Cache-Control"] == "no-store"
+    assert "max-age=" in response.headers["Strict-Transport-Security"]
 
 
 # Foreign keys that only record who did something. Nothing filters on them and a person is

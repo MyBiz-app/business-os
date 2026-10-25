@@ -1,0 +1,75 @@
+{
+  "key": "photo_studio",
+  "domain": "rental_spaces",
+  "status": "beta",
+  "names": {
+    "he": "סטודיו צילום",
+    "en": "Photo studio"
+  },
+  "synonyms": {
+    "he": [
+      "סטודיו צילום",
+      "צילום",
+      "השכרת סטודיו"
+    ],
+    "en": [
+      "photo studio",
+      "studio rental"
+    ]
+  },
+  "terms": "events",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "studio_rental",
+      "names": {
+        "he": "השכרת סטודיו",
+        "en": "Studio rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 120,
+      "price_ils": 20000,
+      "resource_type": "photo_studio_space",
+      "max_minutes": 480,
+      "step_minutes": 60
+    }
+  ],
+  "resources": [
+    {
+      "type": "photo_studio_space",
+      "count": 1
+    }
+  ],
+  "questions": [
+    {
+      "key": "spaces",
+      "text": {
+        "he": "כמה סטודיואים?",
+        "en": "How many studios?"
+      },
+      "kind": "number",
+      "affects": "resource_count:photo_studio_space",
+      "default": 1
+    },
+    {
+      "key": "props",
+      "text": {
+        "he": "יש ציוד ותאורה להשכרה?",
+        "en": "Equipment and lighting for rent?"
+      },
+      "kind": "boolean",
+      "affects": "none",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "photographers",
+    "meeting_rooms"
+  ],
+  "order": 21
+}

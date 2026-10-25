@@ -75,6 +75,9 @@ class ClientBusiness(BaseModel):
     time_zone: str
     currency: str
     cancellation_window_minutes: int
+    terms_override: dict[str, dict[str, str]] = Field(
+        default_factory=dict, description="The business's own words by language and word"
+    )
     online_sales: bool = Field(description="The client can buy plans in the app")
     resource_payment: Literal["app", "venue"] = Field(
         default="app", description="Reservations: paid in the app when booking, or at the venue"
@@ -237,7 +240,8 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
-           t.cancellation_window_minutes, t.online_sales, t.resource_payment, t.website_url,
+           t.cancellation_window_minutes, t.terms_override, t.online_sales, t.resource_payment,
+           t.website_url,
            CASE WHEN t.waitlist_enabled THEN t.waitlist_class_mode ELSE 'off' END AS waitlist_class,
            CASE WHEN t.waitlist_enabled THEN t.waitlist_appointment_mode ELSE 'off' END
                AS waitlist_appointment,

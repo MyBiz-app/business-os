@@ -1,10 +1,11 @@
 import { Redirect } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
 import { areaHome } from "@business-os/app-kit/lib/areas";
 import { useAreas } from "@/providers/area-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 /** Sends the person where they belong: sign in, join a business, or the area they used last. */
 export default function Gate() {
@@ -17,7 +18,7 @@ export default function Gate() {
   if (active) return <Redirect href={areaHome(active)} />;
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.background }}>
-      <ActivityIndicator color={palette.primary} />
+      <Spinner color={palette.primary} />
     </View>
   );
 }

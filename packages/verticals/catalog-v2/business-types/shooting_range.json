@@ -1,0 +1,80 @@
+{
+  "key": "shooting_range",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "מטווח",
+    "en": "Shooting range"
+  },
+  "synonyms": {
+    "he": [
+      "מטווח",
+      "ירי",
+      "קשתות"
+    ],
+    "en": [
+      "shooting range",
+      "archery",
+      "range"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "customer",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Customers"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "lane",
+      "names": {
+        "he": "עמדת ירי",
+        "en": "Shooting lane"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 30,
+      "price_ils": 9000,
+      "resource_type": "shooting_lane",
+      "max_minutes": 120,
+      "step_minutes": 30
+    }
+  ],
+  "resources": [
+    {
+      "type": "shooting_lane",
+      "count": 6
+    }
+  ],
+  "questions": [
+    {
+      "key": "lanes",
+      "text": {
+        "he": "כמה עמדות?",
+        "en": "How many lanes?"
+      },
+      "kind": "number",
+      "affects": "resource_count:shooting_lane",
+      "default": 6
+    },
+    {
+      "key": "session",
+      "text": {
+        "he": "כמה זמן מזמינים בדרך כלל?",
+        "en": "How long is a usual session?"
+      },
+      "kind": "select",
+      "affects": "activity:lane",
+      "options": [
+        "30",
+        "60"
+      ],
+      "default": "30"
+    }
+  ],
+  "common_combos": [
+    "escape_room",
+    "golf_simulator"
+  ],
+  "order": 17
+}

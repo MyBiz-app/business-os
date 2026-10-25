@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-import { createNonce, NONCE_HEADER, REPORTING_ENDPOINTS, strictCsp } from "@/lib/csp";
+import { createNonce, NONCE_HEADER, REPORTING_ENDPOINTS, strictCsp, styleTrialCsp } from "@/lib/csp";
 import { cspReportOnly, hstsHeader, indexingAllowed } from "@/lib/site-config";
 import { updateSession } from "@/lib/supabase/proxy";
 
@@ -22,6 +22,10 @@ export async function proxy(request: NextRequest) {
   const response = await updateSession(request);
   response.headers.set(cspHeader, policy);
   response.headers.set("Reporting-Endpoints", REPORTING_ENDPOINTS);
+  // The stricter style policy runs next to the enforced one in report-only mode (see styleTrialCsp).
+  if (!cspReportOnly()) {
+    response.headers.set("Content-Security-Policy-Report-Only", styleTrialCsp(nonce, { dev: process.env.NODE_ENV !== "production" }));
+  }
   const hsts = hstsHeader();
   if (hsts) response.headers.set("Strict-Transport-Security", hsts);
   // Everything except the production site stays out of search results (robots.ts says the same).

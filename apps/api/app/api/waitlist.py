@@ -96,7 +96,11 @@ def take_spot(
             return session_id, waiting
     elif spot["booking_mode"] == "appointment":
         target = create_appointment_session(
-            db, spot["service_id"], spot["instructor_user_id"], spot["starts_at"]
+            db,
+            spot["service_id"],
+            spot["instructor_user_id"],
+            spot["starts_at"],
+            room_id=spot["room_id"],
         )
     else:
         minutes = int((spot["ends_at"] - spot["starts_at"]).total_seconds() // 60)

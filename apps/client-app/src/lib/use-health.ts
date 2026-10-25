@@ -1,20 +1,13 @@
 import type { components } from "@business-os/api-client";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
 import { useLocale } from "use-intl";
 
 import { unwrap } from "@business-os/app-kit/lib/api";
-import { useBusiness } from "@/providers/business-provider";
+import { useCachedLoad } from "@business-os/app-kit/lib/use-cached-load";
+import { dataKey } from "@/lib/client-data";
+import { useDataContext } from "@/lib/use-data-context";
 
 export type MyHealth = components["schemas"]["MyHealth"];
-
-const TTL = 20_000;
-const recent = new Map<string, { at: number; request: Promise<MyHealth> }>();
-
-/** Forget what was fetched, so the next read asks the server (after signing a declaration). */
-export function invalidateHealth(): void {
-  recent.clear();
-}
 
 /** The session the client tapped "book" on while a declaration was missing: once the declaration
  * is signed, that booking continues by itself. */
@@ -26,34 +19,19 @@ export function mustDeclare(health: MyHealth | null): boolean {
 }
 
 /** The client's health declaration state in the current business, refreshed when the screen
- * comes back into focus (for example after signing). Many session cards ask at once, so a read
- * is shared for a few seconds. */
+ * comes back into focus (for example after signing). */
 export function useHealth(): MyHealth | null {
-  const { api, scope, business } = useBusiness();
+  const ctx = useDataContext();
   const locale = useLocale() === "en" ? "en" : "he";
-  const [health, setHealth] = useState<MyHealth | null>(null);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (!business) return;
-      let active = true;
-      const key = `${business.id}:${locale}`;
-      const cached = recent.get(key);
-      const request =
-        cached && Date.now() - cached.at < TTL
-          ? cached.request
-          : api.GET("/client/health-declaration", { params: { ...scope, query: { locale } } }).then(unwrap);
-      if (!cached || request !== cached.request) recent.set(key, { at: Date.now(), request });
-      request
-        .then((result) => active && setHealth(result))
-        .catch(() => {
-          recent.delete(key);
-          if (active) setHealth(null);
-        });
-      return () => {
-        active = false;
-      };
-    }, [api, scope, business, locale]),
+  const { data, error, refresh } = useCachedLoad(
+    ctx ? dataKey(ctx, "health", locale) : ["health"],
+    async () => {
+      if (!ctx) return null;
+      return unwrap(await ctx.api.GET("/client/health-declaration", { params: { ...ctx.scope, query: { locale } } }));
+    },
+    { enabled: Boolean(ctx) },
   );
-  return health;
+  // Signing the form happens on another screen: coming back shows the new state.
+  useFocusEffect(refresh);
+  return ctx && !error ? (data ?? null) : null;
 }

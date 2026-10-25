@@ -23,6 +23,7 @@ When a decision changes, update the row and note the date - do not delete histor
 | P7 | Medical clinics vertical deferred (health-data regulation). | DECIDED (2026-10-03, delegated) |
 | P8 | Schedule week view shows at most two branches side by side (three lanes were about 45 px each and cut class names); with more branches the week opens as one merged column with branch tags, and the day view still shows up to six. Decided 2026-10-21 (W5-3), delegated. | DECIDED (delegated) |
 | P9 | The side menu's Settings item has no sub-items: the settings page already has its own inner menu of topics and sections, so listing them twice was redundant. Cmd+K still jumps straight to a settings topic. Decided 2026-10-21 (W5-3), delegated. | DECIDED (delegated) |
+| P10 | Industries are rebuilt on three layers: business type (what the owner picks), activities, and one of eight service models (what the engine runs). Tennis and padel are separate business types; a branch may be of any domain; the booking page, guest booking with an email code, 90-minute padel, owner-editable customer words and a custom path ("my business is not listed") follow. All nine recommendations of the spec `docs/plans/2026-10/categories-service-model-spec-2026-10-23.md` were approved by the owner on 2026-10-23. "Waterball" is read as walking football (unconfirmed: if footvolley or something else, it is one more resource type). Slice C1 adds the catalog (`packages/verticals/catalog-v2`) without changing any screen or table. Slice C2 (migration 0156) adds the activities tables; an activity row is per (business, business type, key) because one key means different things in different types; a branch's kind may be any catalog industry. | DECIDED |
 
 ## Technical
 
@@ -42,7 +43,7 @@ When a decision changes, update the row and note the date - do not delete histor
 | T12 | Naming: `tenant` in code/DB, "business" in UI copy. End customers are `client` in code; vertical packs rename them in UI (member / customer / patient). | DECIDED (2026-10-03, delegated) |
 | T13 | Identity: one global `user` (login) linked to many tenants as staff and/or client. A client record may exist without an app account (walk-ins). | DECIDED (2026-10-03, delegated) |
 | T14 | Web locale comes from the user's choice (cookie), then browser language, then Hebrew. App URLs are not locale-prefixed; public marketing / booking pages may add prefixes later. | DECIDED (2026-10-03, delegated) |
-| T15 | Tooling versions: Node 22+ (owner on 24), pnpm 12, Python 3.13 via uv, Next.js 16, Expo SDK 57. Line endings LF in the repo (`.gitattributes`). | DECIDED (2026-10-03, delegated) |
+| T15 | Tooling versions: Node 22+ (owner on 24), pnpm 12, Python 3.13 via uv, Next.js 16, Expo SDK 58 (2026-10-24: the App Store Expo Go moved to 58 and iPhones cannot keep an older one). Line endings LF in the repo (`.gitattributes`). | DECIDED (2026-10-03, delegated) |
 | T16 | Database schema is owned by Alembic migrations (hand-written SQL) in `apps/api`. Supabase owns only its own schemas (auth, storage). App tables live in schema `app`, which Supabase does not expose to browsers. | DECIDED (2026-10-03, delegated) |
 | T17 | Tenant isolation: the API runs every transaction as role `app_api` (no RLS bypass) with `app.user_id` / `app.tenant_id` set per transaction. `app.current_tenant_id()` returns a tenant only if the user is a member, so a forged tenant id grants nothing. Isolation is tested at both API and database level. | DECIDED (2026-10-03, delegated) |
 | T18 | Auth: Supabase Auth issues tokens (ES256); the API verifies them against Supabase's JWKS. Clients never query app tables directly; all data goes through the API. | DECIDED (2026-10-03, delegated) |
@@ -482,6 +483,12 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** the new demo has different businesses with Hebrew names; name lookups would silently skip every layer for them.
 - **Revisit** if two businesses of one industry in one demo need different content (then add a role to the business spec).
 
+### Demo profile pictures: 1,500 AI portraits (2026-10-23, demo slice D3, no migration)
+
+- **Decision:** the demo people get synthetic AI portraits (Runware, FLUX schnell, 192 px JPEG, about 8 KB each, 750 women and 750 men) drawn by `scripts/generate_demo_portraits.py`, which stops at a hard budget cap and resumes where it stopped. Total spend about $2.77 against the owner's $10 limit. The seed gives a portrait to every active demo client except one in ten, left empty on purpose, and to the team. Children are never given a photo (they are dependents, not users). When the AI set is small, the 12 busiest clients per business get AI portraits and the rest get CC0 illustrated avatars (`scripts/generate_demo_illustrated_avatars.py`).
+- **Why:** a full realistic set makes the demo look like a living business; nobody in the pictures exists, so they can stay after go-live.
+- **Revisit** if the repo size matters (the images are about 12 MB); they could move to object storage.
+
 ### Demo sign-in accounts take over demo team members (2026-10-23, demo slice D5, no migration)
 
 - **Decision:** the owner's "plus" addresses become team members by taking over an existing demo team member of the right branch: every reference to the demo profile moves to the real person (found from the database's own foreign keys), then the demo profile is removed. Passwords are never set by the seed.
@@ -493,6 +500,36 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Decision:** the owner approved the whole [app upgrade spec](plans/2026-10/app-upgrade-spec-2026-10-25.md) except the paid Apple developer account (not now). The client keeps five bottom tabs: Home, Book, Mine, Updates, Profile; Updates holds friends' notifications, class sign-ups (or the category's equivalent) and general ones, and may be long. Slices U1-U9 follow the spec (U1 fixes, U2 cache and speed, U3 Apple shell, U4 client IA, U5 schedule filter, U6 join by QR / search, U7 business timeline, U8 haptics and swipe, U9 sweep and one deploy).
 - **U1 details:** each branch is a block (name, address, distance, then Waze / Google pills on their own row); the theme switch lives outside the scrolling area of the sign-in screens and is smaller (36); someone brand new is not shown the "terms updated" window (they accept once, when they join or create a business); a missing health declaration is announced on the book button, which opens the form and continues the booking after signing; map labels follow the app language; one shared, darker dim layer behind every modal and sheet in dark mode; the cancellation text mentions only the kinds the business sells; the AI button moved from a floating circle to a slim bar above the business tabs.
 - **Why:** a walkthrough as a new client showed these as the most visible faults; the rest of the spec is larger and goes in separate slices.
+### Apple look: hero concept, font, colour and glass (2026-10-23, Apple-look round slice L1, no migration)
+
+- **Hero concept:** "your business, on every screen". The site hero shows a CSS-drawn phone and laptop (shared `DeviceFrame`, no Apple logo or product names) with live HTML screens, driven by one `--p` CSS progress variable. A 941-frame image sequence was rejected: 50-90 MB per visit, blocked by the CSP and a state update per scroll.
+- **Font:** the system font on Apple devices: stack `-apple-system, BlinkMacSystemFont`, then Assistant (Hebrew and the fallback). No font download on Apple devices.
+- **Colour:** primary becomes Apple blue (`#007AFF` light, `#0A84FF` dark) on the iOS grouped background (`#F2F2F7`). Contrast of text on the primary is re-checked when the tokens change (slice A1/F1).
+- **Liquid Glass:** translucent blurred surfaces for bars and sheets, with a plain opaque fallback where `backdrop-filter` is missing or reduced transparency is set.
+- **Why:** an Apple-grade first impression for a product whose owners and clients mostly use iPhones, at near-zero page weight.
+- **A1 refinement (2026-10-23):** the light primary fill is `#0071E3`, not `#007AFF`: white text on `#007AFF` is 4.0:1 (below WCAG AA); `#0071E3` is 4.7:1. Dark stays `#0A84FF`. Text-safe blue (`primaryInk`) is `#0062CC` / `#4DA3FF`. Dark mode is true black with `#1C1C1E` surfaces. One line to flip back if the owner prefers the exact iOS blue.
+- **Revisit** if the home mobile Lighthouse score stays under 80 or the blue fails contrast on a surface.
+
+### Classes with several instructors, and open entry (2026-10-23, categories slice C6, migration 0158)
+
+- **Decision:** a session keeps its lead instructor in `sessions.instructor_user_id` and gets the others in `session_instructors` (also remembered on a weekly series, so the job that extends it gives new sessions the same team). A service may keep a ratio (`participants_per_instructor`, for example 8 children per coach); a session's capacity may not exceed ratio x its instructors (`ratio_exceeded`), and a session with no instructor yet is not checked. Open entry (open gym, pool, co-working) is a class service with `open_entry = true`, not a new booking mode: its sessions are the opening hours and `POST /entries` checks a client in against their plan (a booking that is checked in at once). Without a plan the desk must say `without_plan` (pays at the desk); outside opening hours it answers `entry_closed`.
+- **Why:** a new booking mode would touch every place that treats "not a class" as an appointment (calendar, reports, waitlist); a flag on a class service keeps one engine and the existing plan, credit and roster rules.
+- **Not in this slice:** the calendar and form screens (C10), a branch-wide "open entry" check-in from the client app (C11), an instructor busy check for the extra instructors, and changing the team of a whole series after it was created.
+- **Revisit** if a business needs the ratio to be a hard limit on bookings of an existing class (today it is checked when the session is created or edited).
+### A lesson takes a coach and a room together (2026-10-23, categories slice C4, migration 0160)
+
+- **Model M5 is a flag on an appointment service, not a new booking mode.** `services.needs_resource` (appointment, not on-site) plus the existing `service_rooms` list. The session keeps the staff member and also holds the room (`sessions.holds_room`, not `reserved`: reservations are paid by the hour, a lesson is priced as an appointment).
+- **The client may name a court; if not, the server takes the first free one** (by branch and room name). Free times are the overlap of the coach's hours and a linked room's hours and free time.
+- **One rule in the database:** a trigger refuses an appointment session of such a service without a room, so no path (waitlist, seed, future code) can skip the court. An exclusion constraint and per-room locks keep two bookings off one court.
+- **Why:** reuses the appointment and reservation machinery; existing services are untouched (flag defaults off).
+- **Revisit** when a lesson needs two rooms or more than one coach (slice C6 handles several instructors for classes).
+
+### Feedback pattern: where an error or a "saved" appears (2026-10-24, web)
+
+- **Decision:** a problem with one field (wrong password, weak password) shows right under that field with an icon, the field turns red (`aria-invalid`) and gets the cursor back. A problem with the whole form shows at the top of a short form (sign-in, sign-up) with no toast on top of it; in long forms it stays a toast as well, so it is seen wherever the page is scrolled. A success is a toast plus the submit button turning into "Saved". Errors stay until closed; successes close alone. This is the pattern of Apple's HIG, Stripe, Linear and Vercel; the toast card itself already followed it.
+- **Password fields:** the icon shows the state (crossed eye while hidden, open eye while shown, it was the other way round), and a "Caps Lock is on" notice appears while the key is on.
+- **Shared building blocks:** `Field`, `TextAreaField` (web) and `Field`/`ErrorText` (Expo app) take an `error` prop, so any form can show a field problem the same way; every form's top-level `FormError` got the same icon look. Forms adopt `error` as their server actions start returning which field failed.
+- **Revisit** if sign-in tests show people missing the inline message.
 
 ## Open
 

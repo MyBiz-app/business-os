@@ -2,7 +2,7 @@ import type { components } from "@business-os/api-client";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, I18nManager, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
+import { I18nManager, KeyboardAvoidingView, Platform, Pressable, ScrollView, type ScrollViewInstance, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
@@ -16,6 +16,7 @@ import { AiActionCard } from "@/components/ai-action-card";
 import { type Agent, AgentFace } from "@/components/agent-face";
 import { useStaff } from "@/providers/staff-provider";
 import { radius } from "@business-os/app-kit/lib/theme";
+import { Spinner } from "@business-os/app-kit/components/spinner";
 
 type Conversation = components["schemas"]["app__api__assistant__Conversation"];
 type ChatError = "ai_not_configured" | "ai_busy" | "ai_unavailable" | "ai_limit_reached" | "ai_user_limit_reached" | "ai_daily_pace_reached" | "ai_rate_limited" | "generic";
@@ -37,7 +38,7 @@ export default function AiChat() {
   const [error, setError] = useState<ChatError | null>(null);
   const [deciding, setDeciding] = useState<string | null>(null);
   const [text, setText] = useState("");
-  const scroller = useRef<ScrollView>(null);
+  const scroller = useRef<ScrollViewInstance>(null);
 
   const loadTeam = useCallback(async () => unwrap(await api.GET("/ai/team", { params: scope })), [api, scope]);
   const { data: team, error: teamError, reload } = useLoad(loadTeam);
@@ -191,7 +192,7 @@ export default function AiChat() {
           <LoadError palette={palette} onRetry={() => void reload()} />
         ) : !team ? (
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <ActivityIndicator color={palette.primary} />
+            <Spinner color={palette.primary} />
           </View>
         ) : !agent ? (
           <View style={{ flex: 1, padding: 24 }}>
@@ -263,7 +264,7 @@ export default function AiChat() {
             ) : null}
             {busy && (
               <View accessibilityRole="progressbar" accessibilityLabel={tTeam("thinking", { name: agent.name })} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <ActivityIndicator color={palette.ai} />
+                <Spinner color={palette.ai} />
                 <Text style={{ color: palette.muted }}>{tTeam("thinking", { name: agent.name })}</Text>
               </View>
             )}

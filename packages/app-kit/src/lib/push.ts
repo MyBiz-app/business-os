@@ -21,6 +21,8 @@ export async function registerPushToken({ ask = false } = {}): Promise<string | 
     if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync("default", {
         name: "default",
+        // The lint rule cannot follow expo-notifications 58 re-exports; the enum is there at runtime.
+        // eslint-disable-next-line import/namespace
         importance: Notifications.AndroidImportance.DEFAULT,
       });
     }

@@ -10,7 +10,7 @@ import { BackBar } from "@business-os/app-kit/components/rows";
 import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { bookAfterHealth, invalidateHealth } from "@/lib/use-health";
+import { bookAfterHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 
 type MyHealth = components["schemas"]["MyHealth"];
@@ -63,7 +63,6 @@ export default function Health() {
           },
         }),
       );
-      invalidateHealth();
       setSaved(result);
       setEditing(false);
       // They came here from a "book" tap: go back so the booking carries on.

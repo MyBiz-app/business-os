@@ -48,7 +48,8 @@ export async function createService(_state: FormState, formData: FormData): Prom
   const body = readForm(formData, tenant.currency);
   if (!body) return { error: "invalid" };
   try {
-    unwrap(await api.POST("/services", { params: scope, body }));
+    // The form has no "needs a room" switch yet (slice C10); an update leaves the flag as it is.
+    unwrap(await api.POST("/services", { params: scope, body: { ...body, needs_resource: false } }));
   } catch (error) {
     return errorState(error);
   }

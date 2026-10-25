@@ -3581,6 +3581,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Activities
+         * @description What the business offers, switched-off activities last.
+         */
+        get: operations["list_activities"];
+        /**
+         * Set Activities
+         * @description Replaces the set of activities the business offers. Any catalog business type's activity
+         *     can be chosen (a tennis club may also rent out padel courts); one left out is switched off,
+         *     not deleted. A newly offered activity is linked to every active branch.
+         */
+        put: operations["set_activities"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/locations/{location_id}/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Branch Activities
+         * @description The ids of the activities this branch offers.
+         */
+        get: operations["get_branch_activities"];
+        /**
+         * Set Branch Activities
+         * @description Sets which of the business's activities this branch offers.
+         */
+        put: operations["set_branch_activities"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/geo/cities": {
         parameters: {
             query?: never;
@@ -5464,7 +5514,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Get Booking Series */
+        get: operations["get_booking_series"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5582,6 +5633,28 @@ export interface paths {
          * @description Books the client if a spot is free, otherwise adds them to the waitlist.
          */
         post: operations["create_booking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check In Entry
+         * @description A client walks into an open-entry place: the visit is booked in the opening hours that
+         *     are on now and checked in at once. It uses one of the client's plans; without a valid plan
+         *     the desk must say `without_plan`.
+         */
+        post: operations["check_in_entry"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5892,6 +5965,100 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Book Standing Series
+         * @description Books a client into a standing booking or a course (staff may book without a plan).
+         */
+        post: operations["book_standing_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Client Booking Series */
+        get: operations["list_client_booking_series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/{series_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Booking Series */
+        post: operations["cancel_booking_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Booking Series */
+        get: operations["my_booking_series"];
+        put?: never;
+        /**
+         * Book My Booking Series
+         * @description The signed-in client sets up a standing booking (the business's booking rules apply).
+         *     A business paid in the app takes each court payment separately, so a series there is made
+         *     by the business.
+         */
+        post: operations["book_my_booking_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/series/{series_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel My Booking Series */
+        post: operations["cancel_my_booking_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/waitlist": {
         parameters: {
             query?: never;
@@ -6106,10 +6273,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get Service Rooms
+         * @description The rooms that serve a resource service or an appointment that needs a room.
+         */
+        get: operations["get_service_rooms"];
         /**
          * Set Service Rooms
-         * @description Which bookable rooms serve a resource service (replaces the list).
+         * @description Which bookable rooms serve a resource service, or an appointment that needs a room
+         *     (replaces the list).
          */
         put: operations["set_service_rooms"];
         post?: never;
@@ -9514,6 +9686,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/sessions/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sessions Participants
+         * @description Participants of many classes in one request (a day's schedule), keyed by class id.
+         *     Classes in categories without participant lists, or not visible to the client, are left out.
+         */
+        get: operations["sessions_participants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/sessions/{session_id}/participants": {
         parameters: {
             query?: never;
@@ -10459,6 +10652,11 @@ export interface components {
              */
             created_at: string;
         };
+        /** ActivitiesSet */
+        ActivitiesSet: {
+            /** Activities */
+            activities: components["schemas"]["ActivityChoice"][];
+        };
         /** Activity */
         Activity: {
             /**
@@ -10482,6 +10680,13 @@ export interface components {
              * Format: date-time
              */
             occurred_at: string;
+        };
+        /** ActivityChoice */
+        ActivityChoice: {
+            /** Business Type */
+            business_type: string;
+            /** Activity Key */
+            activity_key: string;
         };
         /** ActivityCreate */
         ActivityCreate: {
@@ -11067,6 +11272,11 @@ export interface components {
              * @description On-site services: one of the client's addresses (#42)
              */
             address_id?: string | null;
+            /**
+             * Room Id
+             * @description A service that needs a room: which one (default: the first free one)
+             */
+            room_id?: string | null;
         };
         /** AppointmentService */
         AppointmentService: {
@@ -11093,6 +11303,12 @@ export interface components {
              * @default false
              */
             on_site: boolean;
+            /**
+             * Needs Resource
+             * @description A staff member and a room (a court) are booked together
+             * @default false
+             */
+            needs_resource: boolean;
         };
         /** AppointmentStaff */
         AppointmentStaff: {
@@ -11748,6 +11964,11 @@ export interface components {
              * @enum {string}
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+        };
+        /** BranchActivitiesSet */
+        BranchActivitiesSet: {
+            /** Activity Ids */
+            activity_ids: string[];
         };
         /** BranchInsight */
         BranchInsight: {
@@ -12961,6 +13182,11 @@ export interface components {
              * @description On-site services: one of the client's addresses (#42)
              */
             address_id?: string | null;
+            /**
+             * Room Id
+             * @description A service that needs a room: which one (default: the first free one)
+             */
+            room_id?: string | null;
         };
         /** ClientBooking */
         ClientBooking: {
@@ -13058,6 +13284,15 @@ export interface components {
             currency: string;
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
+            /**
+             * Terms Override
+             * @description The business's own words by language and word
+             */
+            terms_override?: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
             /**
              * Online Sales
              * @description The client can buy plans in the app
@@ -15293,31 +15528,6 @@ export interface components {
             clock_in?: string | null;
             /** Clock Out */
             clock_out?: string | null;
-            /** Reason */
-            reason: string;
-        };
-        /** EntryCreate */
-        EntryCreate: {
-            /**
-             * User Id
-             * Format: uuid
-             */
-            user_id: string;
-            /**
-             * Location Id
-             * Format: uuid
-             */
-            location_id: string;
-            /**
-             * Clock In
-             * Format: date-time
-             */
-            clock_in: string;
-            /**
-             * Clock Out
-             * Format: date-time
-             */
-            clock_out: string;
             /** Reason */
             reason: string;
         };
@@ -21855,6 +22065,22 @@ export interface components {
             /** Instructor Email */
             instructor_email: string | null;
             /**
+             * Instructors
+             * @description The lead instructor first, then the others
+             */
+            instructors?: components["schemas"]["SessionInstructor"][];
+            /**
+             * Participants Per Instructor
+             * @description The ratio the service keeps; capacity stays within it
+             */
+            participants_per_instructor?: number | null;
+            /**
+             * Open Entry
+             * @description Opening hours of an entry service (open gym, pool)
+             * @default false
+             */
+            open_entry: boolean;
+            /**
              * Starts At
              * Format: date-time
              */
@@ -22065,6 +22291,160 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** Series */
+        Series: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "resource" | "appointment" | "class";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /** Room Id */
+            room_id: string | null;
+            /** Staff User Id */
+            staff_user_id: string | null;
+            /**
+             * First Starts At
+             * Format: date-time
+             */
+            first_starts_at: string;
+            /** Minutes */
+            minutes: number | null;
+            /** Every Weeks */
+            every_weeks: number;
+            /** Occurrences */
+            occurrences: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "cancelled";
+            /**
+             * Upcoming
+             * @description Dates still ahead with a live booking
+             */
+            upcoming: number;
+        };
+        /** SeriesCreate */
+        SeriesCreate: {
+            /**
+             * Kind
+             * @description resource: a court or room at the same time each week; appointment: a private lesson or treatment with the same staff member; class: a course, joined once
+             * @enum {string}
+             */
+            kind: "resource" | "appointment" | "class";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             * @description The first date; the others follow every N weeks
+             */
+            starts_at: string;
+            /**
+             * Every Weeks
+             * @default 1
+             */
+            every_weeks: number;
+            /**
+             * Occurrences
+             * @description How many dates, the first included
+             */
+            occurrences: number;
+            /**
+             * Room Id
+             * @description resource: which court or room
+             */
+            room_id?: string | null;
+            /**
+             * Minutes
+             * @description resource: how long
+             */
+            minutes?: number | null;
+            /**
+             * Staff User Id
+             * @description appointment: with whom
+             */
+            staff_user_id?: string | null;
+            /** Dependent Id */
+            dependent_id?: string | null;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+        };
+        /** SeriesCreated */
+        SeriesCreated: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "resource" | "appointment" | "class";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /** Room Id */
+            room_id: string | null;
+            /** Staff User Id */
+            staff_user_id: string | null;
+            /**
+             * First Starts At
+             * Format: date-time
+             */
+            first_starts_at: string;
+            /** Minutes */
+            minutes: number | null;
+            /** Every Weeks */
+            every_weeks: number;
+            /** Occurrences */
+            occurrences: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "cancelled";
+            /**
+             * Upcoming
+             * @description Dates still ahead with a live booking
+             */
+            upcoming: number;
+            /** Results */
+            results: components["schemas"]["SeriesOccurrence"][];
+        };
         /** SeriesEnd */
         SeriesEnd: {
             /**
@@ -22086,6 +22466,73 @@ export interface components {
              * @description Later sessions kept because clients are booked
              */
             kept: number;
+        };
+        /** SeriesFields */
+        SeriesFields: {
+            /**
+             * Kind
+             * @description resource: a court or room at the same time each week; appointment: a private lesson or treatment with the same staff member; class: a course, joined once
+             * @enum {string}
+             */
+            kind: "resource" | "appointment" | "class";
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             * @description The first date; the others follow every N weeks
+             */
+            starts_at: string;
+            /**
+             * Every Weeks
+             * @default 1
+             */
+            every_weeks: number;
+            /**
+             * Occurrences
+             * @description How many dates, the first included
+             */
+            occurrences: number;
+            /**
+             * Room Id
+             * @description resource: which court or room
+             */
+            room_id?: string | null;
+            /**
+             * Minutes
+             * @description resource: how long
+             */
+            minutes?: number | null;
+            /**
+             * Staff User Id
+             * @description appointment: with whom
+             */
+            staff_user_id?: string | null;
+            /** Dependent Id */
+            dependent_id?: string | null;
+        };
+        /** SeriesOccurrence */
+        SeriesOccurrence: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "booked" | "waitlisted" | "skipped";
+            /**
+             * Reason
+             * @description Why a date was skipped
+             */
+            reason?: string | null;
+            /** Booking Id */
+            booking_id?: string | null;
         };
         /** SeriesRow */
         SeriesRow: {
@@ -22192,6 +22639,22 @@ export interface components {
              * @description Overrides the business's waitlist mode for this service
              */
             waitlist_mode?: ("off" | "auto" | "first_come" | "manual") | null;
+            /**
+             * Participants Per Instructor
+             * @description Class: people one instructor can lead; none = no ratio
+             */
+            participants_per_instructor?: number | null;
+            /**
+             * Open Entry
+             * @description Entry to the place; clients check in
+             * @default false
+             */
+            open_entry: boolean;
+            /**
+             * Needs Resource
+             * @default false
+             */
+            needs_resource: boolean;
         };
         /** ServiceCreate */
         ServiceCreate: {
@@ -22262,6 +22725,22 @@ export interface components {
              * @default 0
              */
             travel_minutes: number;
+            /**
+             * Participants Per Instructor
+             * @description Class only: people one instructor can lead
+             */
+            participants_per_instructor?: number | null;
+            /**
+             * Open Entry
+             * @description Class only: entry to the place (open gym, pool); its sessions are the opening hours and clients check in
+             */
+            open_entry?: boolean | null;
+            /**
+             * Needs Resource
+             * @description Appointment only: the staff member and a room (a court) are booked together
+             * @default false
+             */
+            needs_resource: boolean;
         };
         /** ServiceOption */
         ServiceOption: {
@@ -22335,6 +22814,12 @@ export interface components {
              * @description This service's own waitlist mode; null follows the business
              */
             waitlist_mode?: ("off" | "auto" | "first_come" | "manual") | null;
+            /** Participants Per Instructor */
+            participants_per_instructor?: number | null;
+            /** Open Entry */
+            open_entry?: boolean | null;
+            /** Needs Resource */
+            needs_resource?: boolean | null;
         };
         /** SessionCreate */
         SessionCreate: {
@@ -22346,6 +22831,11 @@ export interface components {
             instructor_user_id?: string | null;
             /** Notes */
             notes?: string | null;
+            /**
+             * Extra Instructor User Ids
+             * @description More instructors besides the lead one (a class run by a team)
+             */
+            extra_instructor_user_ids?: string[];
             /**
              * Service Id
              * Format: uuid
@@ -22369,6 +22859,23 @@ export interface components {
             capacity?: number | null;
             repeat?: components["schemas"]["Repeat"] | null;
         };
+        /** SessionInstructor */
+        SessionInstructor: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Email */
+            email: string;
+            /** Full Name */
+            full_name: string | null;
+            /**
+             * Lead
+             * @description The one the session's instructor field names
+             */
+            lead: boolean;
+        };
         /** SessionUpdate */
         SessionUpdate: {
             /** Location Id */
@@ -22379,6 +22886,11 @@ export interface components {
             instructor_user_id?: string | null;
             /** Notes */
             notes?: string | null;
+            /**
+             * Extra Instructor User Ids
+             * @description Replaces the other instructors; null keeps them
+             */
+            extra_instructor_user_ids?: string[] | null;
             /** Date */
             date?: string | null;
             /** Start Time */
@@ -22685,6 +23197,13 @@ export interface components {
             staff_user_id: string;
             /** Staff Name */
             staff_name: string;
+            /**
+             * Room Id
+             * @description A service that needs a room: the room this time would use
+             */
+            room_id?: string | null;
+            /** Room Name */
+            room_name?: string | null;
         };
         /** SocialAccount */
         SocialAccount: {
@@ -23420,6 +23939,15 @@ export interface components {
              * @description Settings managers only
              */
             business_license_expires_on?: string | null;
+            /**
+             * Terms Override
+             * @description The business's own words by language and word; others keep the industry's
+             */
+            terms_override?: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
             /**
@@ -23603,6 +24131,33 @@ export interface components {
              */
             role: ("owner" | "manager" | "branch_manager" | "staff" | "front_desk") | ("support" | "platform");
         };
+        /** TenantActivity */
+        TenantActivity: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Type
+             * @description The catalog business type the activity came from
+             */
+            business_type: string;
+            /** Activity Key */
+            activity_key: string;
+            /**
+             * Model
+             * @description The service model that runs it (appointment, group_class, ...)
+             */
+            model: string;
+            /**
+             * Resource Type
+             * @description The kind of court or room it books, if any
+             */
+            resource_type: string | null;
+            /** Enabled */
+            enabled: boolean;
+        };
         /** TenantCreate */
         TenantCreate: {
             /** Name */
@@ -23687,6 +24242,15 @@ export interface components {
             currency?: string | null;
             /** Primary Color */
             primary_color?: string | null;
+            /**
+             * Terms Override
+             * @description Replaces the whole set of the business's own words
+             */
+            terms_override?: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            } | null;
             /** Cancellation Window Minutes */
             cancellation_window_minutes?: number | null;
             /** Booking Horizon Days */
@@ -24793,6 +25357,31 @@ export interface components {
              */
             alerts?: components["schemas"]["QuotaAlert"][];
         };
+        /** EntryCreate */
+        app__api__bookings__EntryCreate: {
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Service Id
+             * Format: uuid
+             * @description An open-entry service (open gym, pool, co-working)
+             */
+            service_id: string;
+            /**
+             * Location Id
+             * @description The branch the client walks into; needed when several are open
+             */
+            location_id?: string | null;
+            /**
+             * Without Plan
+             * @description Let the client in without a valid plan (pays at the desk)
+             * @default false
+             */
+            without_plan: boolean;
+        };
         /** ScheduleBody */
         app__api__broadcasts__ScheduleBody: {
             /**
@@ -24932,6 +25521,31 @@ export interface components {
             members: components["schemas"]["Member"][];
             /** Invitations */
             invitations: components["schemas"]["Invitation"][];
+        };
+        /** EntryCreate */
+        app__api__time_clock__EntryCreate: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Clock In
+             * Format: date-time
+             */
+            clock_in: string;
+            /**
+             * Clock Out
+             * Format: date-time
+             */
+            clock_out: string;
+            /** Reason */
+            reason: string;
         };
         /**
          * Hours
@@ -33839,6 +34453,150 @@ export interface operations {
             };
         };
     };
+    list_activities: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantActivity"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_activities: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivitiesSet"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantActivity"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_branch_activities: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_branch_activities: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchActivitiesSet"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_cities: {
         parameters: {
             query?: {
@@ -36401,7 +37159,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["EntryCreate"];
+                "application/json": components["schemas"]["app__api__time_clock__EntryCreate"];
             };
         };
         responses: {
@@ -38060,6 +38818,41 @@ export interface operations {
             };
         };
     };
+    get_booking_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     update_series: {
         parameters: {
             query?: never;
@@ -38330,6 +39123,43 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["BookingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_in_entry: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__api__bookings__EntryCreate"];
             };
         };
         responses: {
@@ -38655,6 +39485,7 @@ export interface operations {
                 service_id: string;
                 date: string;
                 staff_user_id?: string | null;
+                room_id?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -38915,6 +39746,7 @@ export interface operations {
                 service_id: string;
                 date: string;
                 staff_user_id?: string | null;
+                room_id?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -38997,6 +39829,222 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AppointmentService"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_standing_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_client_booking_series: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_booking_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_booking_series: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_my_booking_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesFields"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_my_booking_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Series"];
                 };
             };
             /** @description Validation Error */
@@ -39414,6 +40462,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoomHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_service_rooms: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceRoom"][];
                 };
             };
             /** @description Validation Error */
@@ -46307,6 +47390,41 @@ export interface operations {
                     "image/png": unknown;
                     "image/jpeg": unknown;
                     "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sessions_participants: {
+        parameters: {
+            query: {
+                session_ids: string[];
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: components["schemas"]["Person"][];
+                    };
                 };
             };
             /** @description Validation Error */

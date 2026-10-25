@@ -328,6 +328,31 @@ def test_the_hold_stops_at_the_cancellation_deadline(
     assert float(hold) >= window["cancellation_window_minutes"] - 1
 
 
+def test_participants_of_many_classes_in_one_request(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    dana = person(client, auth, studio, "Dana")
+    noa = person(client, auth, studio, "Noa")
+    first = new_session(client, studio, capacity=5)
+    second = new_session(client, studio, capacity=5)
+    book(client, dana, first)
+    book(client, noa, first)
+    book(client, noa, second)
+
+    query = [("session_ids", first), ("session_ids", second)]
+    batch = client.get("/client/sessions/participants", params=query, headers=dana["headers"])
+    assert batch.status_code == 200, batch.text
+    body = batch.json()
+    for session_id in (first, second):
+        single = client.get(f"/client/sessions/{session_id}/participants", headers=dana["headers"])
+        assert body[session_id] == single.json()
+    assert [p["first_name"] for p in body[first]] == ["Noa"]
+
+    too_many = [("session_ids", str(uuid4())) for _ in range(61)]
+    refused = client.get("/client/sessions/participants", params=too_many, headers=dana["headers"])
+    assert refused.status_code == 422
+
+
 def test_participants_profiles_and_privacy(
     client: TestClient, studio: dict, auth: AuthHeaders
 ) -> None:

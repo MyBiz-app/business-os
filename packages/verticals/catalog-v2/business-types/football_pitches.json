@@ -1,0 +1,135 @@
+{
+  "key": "football_pitches",
+  "domain": "sports_venues",
+  "status": "beta",
+  "names": {
+    "he": "מגרשי כדורגל",
+    "en": "Football pitches"
+  },
+  "synonyms": {
+    "he": [
+      "כדורגל",
+      "קט רגל",
+      "קטרגל",
+      "מגרש כדורגל",
+      "מגרש"
+    ],
+    "en": [
+      "football",
+      "soccer",
+      "five-a-side",
+      "pitch"
+    ]
+  },
+  "terms": "sports",
+  "customer_term": "player",
+  "customers": {
+    "he": "שחקנים",
+    "en": "Players"
+  },
+  "calendar_view": "resource_grid",
+  "activities": [
+    {
+      "key": "pitch_rental",
+      "names": {
+        "he": "השכרת מגרש",
+        "en": "Pitch rental"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 45000,
+      "resource_type": "football_5",
+      "max_minutes": 120,
+      "step_minutes": 60
+    },
+    {
+      "key": "fixed_team",
+      "names": {
+        "he": "קבוצה קבועה / ליגה",
+        "en": "Fixed weekly team / league"
+      },
+      "model": "resource_rental",
+      "duration_minutes": 60,
+      "price_ils": 40000,
+      "resource_type": "football_5",
+      "max_minutes": 120,
+      "step_minutes": 60,
+      "series": true,
+      "optional": true
+    },
+    {
+      "key": "football_school",
+      "names": {
+        "he": "בית ספר לכדורגל",
+        "en": "Football school"
+      },
+      "model": "large_group",
+      "duration_minutes": 60,
+      "price_ils": 9000,
+      "capacity": 20,
+      "resource_type": "football_5",
+      "min_staff": 2,
+      "series": true,
+      "optional": true
+    }
+  ],
+  "resources": [
+    {
+      "type": "football_5",
+      "count": 2,
+      "attributes": {
+        "surface": "artificial_grass",
+        "lighting": true
+      }
+    }
+  ],
+  "questions": [
+    {
+      "key": "five_a_side",
+      "text": {
+        "he": "כמה מגרשי קט־רגל?",
+        "en": "How many five-a-side pitches?"
+      },
+      "kind": "number",
+      "affects": "resource_count:football_5",
+      "default": 2
+    },
+    {
+      "key": "bigger",
+      "text": {
+        "he": "יש גם מגרש 7/8 או מלא?",
+        "en": "Any 7/8-a-side or full pitches?"
+      },
+      "kind": "number",
+      "affects": "resource_count:football_7",
+      "default": 0
+    },
+    {
+      "key": "lighting",
+      "text": {
+        "he": "יש תאורה?",
+        "en": "Is there lighting?"
+      },
+      "kind": "boolean",
+      "affects": "resource_attr:football_5.lighting",
+      "default": true
+    },
+    {
+      "key": "kids",
+      "text": {
+        "he": "יש בית ספר לכדורגל לילדים?",
+        "en": "Is there a kids' football school?"
+      },
+      "kind": "boolean",
+      "affects": "dependents",
+      "default": false
+    }
+  ],
+  "common_combos": [
+    "basketball_volleyball",
+    "multi_sport"
+  ],
+  "dependents": "child",
+  "dependents_mode": "ask",
+  "order": 11
+}

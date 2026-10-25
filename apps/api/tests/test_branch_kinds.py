@@ -6,7 +6,7 @@ from tests.conftest import STUDIO, AuthHeaders
 from tests.test_bookings import new_client
 
 
-def test_a_branch_kind_must_be_in_the_business_category(client: TestClient, studio: dict) -> None:
+def test_a_branch_kind_can_be_any_industry_of_the_catalog(client: TestClient, studio: dict) -> None:
     headers = studio["headers"]
     main = studio["location"]["id"]
 
@@ -15,12 +15,17 @@ def test_a_branch_kind_must_be_in_the_business_category(client: TestClient, stud
     assert created.json()["kind"] == "yoga" and created.json()["effective_kind"] == "yoga"
     assert created.json()["schedule_view"] == "class_blocks"
 
-    # A sub-category of another category is refused, on create and on update.
-    refused = client.post(
-        "/locations", json={"name": "Cuts", "kind": "barbershop"}, headers=headers
-    )
+    # A branch may be another category's industry: one business can mix categories.
+    cuts = client.post("/locations", json={"name": "Cuts", "kind": "barbershop"}, headers=headers)
+    assert cuts.status_code == 201 and cuts.json()["kind"] == "barbershop"
+    moved = client.patch(f"/locations/{main}", json={"kind": "dance"}, headers=headers)
+    assert moved.status_code == 200
+    client.patch(f"/locations/{main}", json={"kind": None}, headers=headers)
+
+    # A kind the catalog doesn't know is refused, on create and on update.
+    refused = client.post("/locations", json={"name": "X", "kind": "nonsense"}, headers=headers)
     assert refused.status_code == 422 and refused.json()["detail"] == "invalid_branch_kind"
-    refused = client.patch(f"/locations/{main}", json={"kind": "dance"}, headers=headers)
+    refused = client.patch(f"/locations/{main}", json={"kind": "nonsense"}, headers=headers)
     assert refused.status_code == 422
 
     # No kind means "like the business"; the kind can be set and cleared.

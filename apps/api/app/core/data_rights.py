@@ -21,6 +21,9 @@ class ClientTable:
 
 CLIENT_TABLES: dict[str, ClientTable] = {
     "announcement_deliveries": ClientTable("announcements_received", "deleted"),
+    "booking_series": ClientTable(
+        "standing_bookings", "kept", "history; the series is cancelled with the upcoming bookings"
+    ),
     "bookings": ClientTable("bookings", "kept", "history; upcoming ones are cancelled"),
     "checkouts": ClientTable("checkouts", "kept", "payment records"),
     "client_addresses": ClientTable("addresses", "deleted"),

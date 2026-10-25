@@ -68,3 +68,19 @@ describe("card to window transitions (R29)", () => {
     assert.ok(!config.includes("viewTransition"));
   });
 });
+
+describe("soft page changes on the landing site", () => {
+  it("softens the page at once on a click, listening in the capture phase (Next.js's Link has already prevented the default by the bubbling phase)", () => {
+    const source = readFileSync(join(SRC, "components/ui/route-progress.tsx"), "utf8");
+    assert.ok(source.includes('addEventListener("click", onClick, true)'));
+    assert.ok(source.includes("dataset.navigating"));
+  });
+
+  it("has a page element to soften, and fades that last long enough not to read as a cut", () => {
+    assert.ok(readFileSync(join(SRC, "app/(marketing)/template.tsx"), "utf8").includes("site-page"));
+    const css = readFileSync(join(SRC, "app/globals.css"), "utf8");
+    const duration = (rule: string) => Number(new RegExp(`${rule}\\)\\s*\\{\\s*animation:\\s*(\\d+)ms`).exec(css)?.[1]);
+    assert.ok(duration("::view-transition-new\\(\\.vt-site-in") >= 300);
+    assert.ok(duration("::view-transition-old\\(\\.vt-site-out") >= 150);
+  });
+});

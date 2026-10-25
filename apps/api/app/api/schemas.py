@@ -165,6 +165,9 @@ class TenantUpdate(AddressFields):
     time_zone: str | None = None
     currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
     primary_color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
+    terms_override: dict[str, dict[str, str]] | None = Field(
+        default=None, description="Replaces the whole set of the business's own words"
+    )
     cancellation_window_minutes: int | None = Field(default=None, ge=0, le=10080)
     booking_horizon_days: int | None = Field(default=None, ge=1, le=60)
     weekly_release_weekday: int | None = Field(default=None, ge=0, le=6)
@@ -302,6 +305,10 @@ class Tenant(BaseModel):
     business_license_number: str | None = Field(default=None, description="Settings managers only")
     business_license_expires_on: dt.date | None = Field(
         default=None, description="Settings managers only"
+    )
+    terms_override: dict[str, dict[str, str]] = Field(
+        default_factory=dict,
+        description="The business's own words by language and word; others keep the industry's",
     )
     cancellation_window_minutes: int
     booking_horizon_days: int = Field(

@@ -1,0 +1,91 @@
+{
+  "key": "tattoo",
+  "domain": "beauty",
+  "status": "beta",
+  "names": {
+    "he": "סטודיו קעקועים",
+    "en": "Tattoo studio"
+  },
+  "synonyms": {
+    "he": [
+      "קעקוע",
+      "קעקועים",
+      "פירסינג",
+      "טאטו"
+    ],
+    "en": [
+      "tattoo",
+      "piercing",
+      "tattoo studio"
+    ]
+  },
+  "terms": "beauty",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "consult",
+      "names": {
+        "he": "ייעוץ ותכנון",
+        "en": "Consultation"
+      },
+      "model": "appointment",
+      "duration_minutes": 30,
+      "price_ils": 10000
+    },
+    {
+      "key": "session",
+      "names": {
+        "he": "מפגש קעקוע",
+        "en": "Tattoo session"
+      },
+      "model": "appointment",
+      "duration_minutes": 180,
+      "price_ils": 80000,
+      "deposit": true
+    },
+    {
+      "key": "piercing",
+      "names": {
+        "he": "פירסינג",
+        "en": "Piercing"
+      },
+      "model": "appointment",
+      "duration_minutes": 30,
+      "price_ils": 15000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "chairs",
+      "text": {
+        "he": "כמה עמדות עבודה?",
+        "en": "How many work stations?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    },
+    {
+      "key": "deposit",
+      "text": {
+        "he": "לוקחים מקדמה?",
+        "en": "Do you take a deposit?"
+      },
+      "kind": "boolean",
+      "affects": "activity:session",
+      "default": true
+    }
+  ],
+  "common_combos": [
+    "barbershop",
+    "makeup"
+  ],
+  "order": 31
+}

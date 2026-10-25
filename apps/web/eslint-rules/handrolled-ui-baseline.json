@@ -210,9 +210,6 @@
   "src/components/marketing/calc-industry.tsx": [
     "button"
   ],
-  "src/components/marketing/day-clock.tsx": [
-    "button"
-  ],
   "src/components/marketing/demo-stage.tsx": [
     "button"
   ],

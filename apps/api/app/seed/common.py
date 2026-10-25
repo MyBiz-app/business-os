@@ -140,6 +140,24 @@ class BranchSpec:
     address: str
     # A catalog key (a sub-category of the business's category); None means the business's own.
     kind: str | None = None
+    courts: int = 0  # numbered courts (or rooms) for rent by the hour, instead of the starter ones
+    covered_courts: int = 0  # of those, the first ones are covered
+
+
+@dataclass(frozen=True)
+class ExtraService:
+    """A service the demo adds to the industry's starter services. `branches` names the branches
+    that run it (empty: all of them); a class service runs only there, so a pilates branch has no
+    crossfit workout."""
+
+    name: str
+    minutes: int
+    capacity: int
+    mode: str  # "class" | "appointment"
+    price: int  # ILS minor units
+    color: str
+    popularity: float = 0.75
+    branches: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -159,6 +177,7 @@ class BusinessSpec:
     timetable: tuple[tuple[int, str, int, int, int], ...] | None = None
     # When generated classes may start (a pizza workshop is an evening thing).
     class_hours: tuple[str, ...] = CLASS_HOURS
+    extra_services: tuple[ExtraService, ...] = ()
 
 
 STUDIO = BusinessSpec(
@@ -344,6 +363,35 @@ ADIR_FITNESS = BusinessSpec(
     ),
     clients=650,
     staff_per_branch=4,
+    extra_services=(
+        ExtraService(
+            "כוח - שיעור קבוצתי",
+            50,
+            14,
+            "class",
+            6000,
+            "#0f766e",
+            0.9,
+            ("תל אביב - כוח", "באר שבע - כוח"),
+        ),
+        ExtraService(
+            "HIIT", 45, 16, "class", 6000, "#f59e0b", 0.7, ("תל אביב - כוח", "באר שבע - כוח")
+        ),
+        ExtraService(
+            "פילאטיס מכשירים", 50, 6, "class", 9000, "#ec4899", 0.97, ("רמת גן - פילאטיס ויוגה",)
+        ),
+        ExtraService(
+            "פילאטיס מזרן", 55, 12, "class", 6500, "#6366f1", 0.8, ("רמת גן - פילאטיס ויוגה",)
+        ),
+        ExtraService(
+            "יוגה פלואו", 60, 15, "class", 6000, "#10b981", 0.7, ("רמת גן - פילאטיס ויוגה",)
+        ),
+        ExtraService("קרוספיט WOD", 60, 14, "class", 6500, "#dc2626", 0.85, ("חיפה - קרוספיט",)),
+        ExtraService("הרמות אולימפיות", 60, 8, "class", 7000, "#7c3aed", 0.6, ("חיפה - קרוספיט",)),
+        ExtraService("קיקבוקסינג", 60, 16, "class", 6500, "#b91c1c", 0.8, ("ירושלים - לחימה",)),
+        ExtraService("ג׳יו-ג׳יטסו", 75, 12, "class", 7000, "#1d4ed8", 0.65, ("ירושלים - לחימה",)),
+        ExtraService("לחימה לילדים", 45, 14, "class", 5500, "#0891b2", 0.75, ("ירושלים - לחימה",)),
+    ),
 )
 SHARON_TENNIS = BusinessSpec(
     name="טניס קלאב השרון",
@@ -351,11 +399,15 @@ SHARON_TENNIS = BusinessSpec(
     color="#4d7c0f",
     billing_name="טניס קלאב השרון בע״מ",
     branches=(
-        BranchSpec("הרצליה", "הנדיב 71, הרצליה", kind="padel_tennis"),
-        BranchSpec("ראשון לציון", "הכרמל 9, ראשון לציון", kind="padel_tennis"),
+        BranchSpec("הרצליה", "הנדיב 71, הרצליה", kind="padel_tennis", courts=6, covered_courts=2),
+        BranchSpec("ראשון לציון", "הכרמל 9, ראשון לציון", kind="padel_tennis", courts=4),
     ),
     clients=280,
     staff_per_branch=3,
+    extra_services=(
+        ExtraService("שיעור פרטי עם מאמן", 60, 1, "appointment", 22000, "#0369a1", 0.6),
+        ExtraService("קבוצת אקדמיה לילדים", 60, 8, "class", 6000, "#f59e0b", 0.8),
+    ),
 )
 BLADE_BARBERS = BusinessSpec(
     name="בלייד ברברס",
@@ -368,6 +420,7 @@ BLADE_BARBERS = BusinessSpec(
     ),
     clients=320,
     staff_per_branch=4,
+    extra_services=(ExtraService("גילוח בתער", 30, 1, "appointment", 6000, "#b45309", 0.6),),
 )
 MERHAV_CLINIC = BusinessSpec(
     name="מרחב - בריאות ותנועה",
@@ -380,6 +433,14 @@ MERHAV_CLINIC = BusinessSpec(
     ),
     clients=260,
     staff_per_branch=3,
+    extra_services=(
+        ExtraService(
+            "פילאטיס שיקומי", 50, 6, "class", 7000, "#0e7490", 0.8, ("פתח תקווה - פיזיותרפיה",)
+        ),
+        ExtraService(
+            "סדנת תזונה קבוצתית", 60, 12, "class", 6000, "#65a30d", 0.6, ("כפר סבא - תזונה",)
+        ),
+    ),
 )
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),

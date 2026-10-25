@@ -1,10 +1,13 @@
 import { knownCards, type HomeCard } from "./client-home";
-import { isVertical, termsOf, textKey, vertical } from "@business-os/verticals";
+import { useLocale, useTranslations } from "use-intl";
+import { isVertical, termOf, textKey, vertical, type TermKey, type TermsSource } from "@business-os/verticals";
 
-/** The set of industry words (`terms.<set>` in the translations) for a business, from the
- * industry catalog; a sub-category uses its category's words, older cached data the default. */
-export function termsFor(business: { vertical?: string | null } | null | undefined): string {
-  return termsOf(business?.vertical);
+/** A business's word (clients, schedule, …): its owner's own where they renamed one, else the
+ * industry's. Every screen words a business through this. */
+export function useTerm(): (business: TermsSource | null | undefined, name: TermKey) => string {
+  const tTerms = useTranslations("terms") as unknown as (path: string) => string;
+  const locale = useLocale();
+  return (business, name) => termOf(business, locale, name, tTerms);
 }
 
 /** The translator's `t` and `t.has`, loosely typed for dynamic industry keys. */

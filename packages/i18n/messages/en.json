@@ -262,7 +262,8 @@
         "help": "Support",
         "aiConnections": "AI connections",
         "bookings": "Bookings and waitlists",
-        "memberships": "Memberships and freezes"
+        "memberships": "Memberships and freezes",
+        "terms": "Our words"
       },
       "hints": {
         "business": "Details, legal identity, legal readiness and your business emails.",
@@ -271,7 +272,8 @@
         "help": "Let our team look at your account, or write to us.",
         "aiConnections": "Connect Claude or ChatGPT to your business, and approve what they ask to change.",
         "bookings": "What happens when a class, an appointment or a court is full.",
-        "memberships": "Whether clients can ask to freeze from the app, and the rules."
+        "memberships": "Whether clients can ask to freeze from the app, and the rules.",
+        "terms": "What the screens call your clients, schedule and the rest, in your business's own words."
       }
     },
     "branding": {
@@ -410,6 +412,29 @@
       "perPlanHint": "For example a VIP membership with cancellation up to an hour before. The plan wins over the service.",
       "followBusiness": "Follow the business",
       "saveRow": "Save"
+    },
+    "terms": {
+      "title": "Rename words",
+      "subtitle": "Leave a box empty to keep the usual word for your industry. A change shows on every screen, including your clients' app. You are editing the words for the language of this page.",
+      "save": "Save",
+      "words": {
+        "client": "Client (one)",
+        "clients": "Clients (many)",
+        "addClient": "Add a client",
+        "newClient": "New client",
+        "searchClients": "Search clients",
+        "noClients": "No clients yet",
+        "noResults": "No results for the search",
+        "schedule": "The schedule",
+        "newSession": "Add to the schedule",
+        "noSessions": "Nothing on the schedule",
+        "appTab": "Schedule tab in the app",
+        "appEmpty": "Empty day in the app",
+        "place": "The place",
+        "profile": "Client details heading",
+        "visitNotes": "Visit notes",
+        "nextBooking": "Next booking"
+      }
     }
   },
   "locales": {
@@ -495,6 +520,7 @@
     },
     "showPassword": "Show password",
     "hidePassword": "Hide password",
+    "capsLockOn": "Caps Lock is on",
     "codeLogin": {
       "title": "Sign in with a code",
       "subtitle": "We'll send you a one-time 6-digit code. No password needed.",
@@ -4490,87 +4516,72 @@
       "aiTeam": "AI team"
     },
     "intro": {
-      "eyebrow": "24 hours a day, 7 days a week",
-      "title": "Your business keeps working.",
-      "titleAccent": "Even while you sleep.",
-      "text": "Calendar, clients, payments and messages in one system, with an AI team that answers clients, fills open spots and prepares everything for your approval. This is your day so far.",
+      "eyebrow": "The business OS with an AI team",
+      "title": "Your business.",
+      "titleAccent": "On every screen.",
+      "text": "Clients book on their phone, you see it on your computer, and an AI team handles the busywork in between.",
       "cta": "Start free",
-      "scroll": "Continue to the page",
-      "dialLabel": "Your business's day",
-      "dialHint": "Drag the clock or use the arrow keys to see what happens at each hour.",
-      "now": "Now, where you are",
-      "later": "Later today",
-      "replay": "Play the whole day",
-      "backToNow": "Back to now",
-      "statsLabel": "Up to {time}",
-      "currency": "USD",
-      "quiet": {
-        "title": "A new day begins",
-        "meta": "Your business is ready, even at night"
-      },
-      "phases": {
-        "night": "Night",
-        "dawn": "Dawn",
-        "morning": "Morning",
-        "afternoon": "Afternoon",
-        "evening": "Evening"
-      },
-      "stats": {
-        "bookings": "bookings made",
-        "replies": "messages answered",
-        "revenue": "revenue"
-      },
-      "events": [
+      "stageLabel": "How MyBiz works on every screen",
+      "stageDescription": "Four steps: a client books on the app, the booking appears in your calendar, the AI team sends reminders and answers leads, and it fits any kind of business.",
+      "scroll": "Scroll to see",
+      "stepLabel": "Step {n} of {total}",
+      "steps": [
         {
-          "time": "00:40",
-          "title": "A new lead from Instagram",
-          "meta": "The AI agent replied in 20 seconds"
+          "title": "Clients book in two taps",
+          "text": "They pick a class, tap Book, and it is done. The client app is yours, in your colors."
         },
         {
-          "time": "02:15",
-          "title": "Noa booked Pilates for Thursday",
-          "meta": "While you were asleep"
+          "title": "You see it all, from anywhere",
+          "text": "The booking lands in your calendar the moment it happens, on your phone or your computer."
         },
         {
-          "time": "06:30",
-          "title": "Reminders went out to 24 clients",
-          "meta": "In the app and by email"
+          "title": "An AI team that works while you sleep",
+          "text": "Reminders, answers to new leads and open spots filled, all waiting for your approval."
         },
         {
-          "time": "08:00",
-          "title": "The morning class is full",
-          "meta": "3 people on the waitlist"
-        },
-        {
-          "time": "10:20",
-          "title": "A last-minute cancellation",
-          "meta": "The spot went to the first on the waitlist"
-        },
-        {
-          "time": "12:45",
-          "title": "Payment received: $85",
-          "meta": "The receipt went to the client"
-        },
-        {
-          "time": "15:10",
-          "title": "A shift swap in the team",
-          "meta": "Approved in one tap"
-        },
-        {
-          "time": "18:30",
-          "title": "The evening rush",
-          "meta": "18 check-ins in 20 minutes"
-        },
-        {
-          "time": "21:00",
-          "title": "The daily report is ready",
-          "meta": "Revenue up 12% on yesterday"
-        },
-        {
-          "time": "23:20",
-          "title": "The AI prepared 3 ideas for tomorrow",
-          "meta": "Waiting for your approval"
+          "title": "Studio, barber or clinic: it fits",
+          "text": "Fitness, beauty, health, sport and more. Set up in minutes."
         }
+      ],
+      "phone": {
+        "title": "Pilates",
+        "today": "Today",
+        "book": "Book",
+        "booked": "Booked",
+        "toast": "Booked for 18:00",
+        "slots": [
+          "09:30",
+          "18:00",
+          "20:00"
+        ]
+      },
+      "laptop": {
+        "title": "Calendar",
+        "days": [
+          "Sun",
+          "Mon",
+          "Tue"
+        ],
+        "newBooking": "Dana · Pilates 18:00",
+        "new": "New",
+        "events": [
+          "Yoga 09:00",
+          "Open class 12:00",
+          "Strength 17:00",
+          "Pilates 09:30"
+        ]
+      },
+      "ai": [
+        "Reminder sent to Dana",
+        "A new lead got an answer",
+        "An open spot was filled"
+      ],
+      "tiles": [
+        "Fitness",
+        "Barbershop",
+        "Clinic",
+        "Tennis",
+        "Yoga"
       ]
     },
     "hero": {

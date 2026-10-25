@@ -1,0 +1,88 @@
+{
+  "key": "lawyers",
+  "domain": "professional",
+  "status": "beta",
+  "names": {
+    "he": "עורך דין",
+    "en": "Lawyers"
+  },
+  "synonyms": {
+    "he": [
+      "עורך דין",
+      "עו\"ד",
+      "משרד עורכי דין",
+      "ייעוץ משפטי"
+    ],
+    "en": [
+      "lawyer",
+      "attorney",
+      "law firm",
+      "legal advice"
+    ]
+  },
+  "terms": "professional",
+  "customer_term": "client",
+  "customers": {
+    "he": "לקוחות",
+    "en": "Clients"
+  },
+  "calendar_view": "staff_columns",
+  "activities": [
+    {
+      "key": "consult",
+      "names": {
+        "he": "פגישת ייעוץ",
+        "en": "Legal consultation"
+      },
+      "model": "appointment",
+      "duration_minutes": 60,
+      "price_ils": 80000,
+      "online": true
+    },
+    {
+      "key": "case",
+      "names": {
+        "he": "תיק בהצעת מחיר",
+        "en": "Quoted case"
+      },
+      "model": "project",
+      "duration_minutes": 240,
+      "price_ils": 800000,
+      "optional": true
+    }
+  ],
+  "resources": [],
+  "questions": [
+    {
+      "key": "billing",
+      "text": {
+        "he": "חיוב שעתי או ריטיינר?",
+        "en": "Hourly or retainer billing?"
+      },
+      "kind": "select",
+      "affects": "time_billing",
+      "options": [
+        "hourly",
+        "retainer",
+        "both"
+      ],
+      "default": "hourly"
+    },
+    {
+      "key": "staff",
+      "text": {
+        "he": "כמה אנשי מקצוע?",
+        "en": "How many professionals?"
+      },
+      "kind": "number",
+      "affects": "staff_count",
+      "default": 2
+    }
+  ],
+  "common_combos": [
+    "accountants",
+    "consultants"
+  ],
+  "time_billing": true,
+  "order": 69
+}

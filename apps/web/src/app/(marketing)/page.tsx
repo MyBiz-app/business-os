@@ -20,7 +20,7 @@ import {
 } from "@/components/marketing/home";
 import { AiTeamSection } from "@/components/marketing/ai-team-sections";
 import { HomePhone } from "@/components/marketing/home-phone";
-import { HeroIntro } from "@/components/marketing/hero-intro";
+import { HeroStage } from "@/components/marketing/hero-stage";
 import { Reveal } from "@/components/marketing/reveal";
 import {
   BranchesSection,
@@ -50,7 +50,7 @@ export default async function Home() {
     <main id="main" className="enter flex flex-col">
       <OrganizationData />
       <FaqData />
-      <HeroIntro />
+      <HeroStage />
       {/* Hero */}
       <Section
         id="hero"

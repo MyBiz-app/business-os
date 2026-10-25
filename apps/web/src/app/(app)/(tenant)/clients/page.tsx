@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { termsOf } from "@business-os/verticals";
+import { businessTerms } from "@/lib/verticals";
 
 import { Avatar } from "@/components/avatar";
 import { unwrap } from "@/lib/api";
@@ -77,7 +77,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
       },
     }),
   );
-  const term = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.clients");
+  const term = businessTerms(t, tenant, locale);
   const today = todayIn(tenant.time_zone);
   const shortDate = (day: string) => formatDay(day, locale, { day: "numeric", month: "short" });
   const sinceVisit = (day: string) => {

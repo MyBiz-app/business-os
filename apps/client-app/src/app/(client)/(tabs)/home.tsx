@@ -1,6 +1,5 @@
-import { todayIn } from "@business-os/i18n/dates";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import { Image, Linking, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
@@ -9,14 +8,17 @@ import { useLocale, useTranslations } from "use-intl";
 import { BusinessStrip } from "@/components/business-strip";
 import { HOME_CARDS, type HomeData } from "@/components/home-cards";
 import { Badge, ListRow } from "@business-os/app-kit/components/rows";
+import { ListSkeleton } from "@business-os/app-kit/components/skeleton";
 import { Button, Card, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
-import { assetUrl, unwrap } from "@business-os/app-kit/lib/api";
+import { assetUrl } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { colors } from "@business-os/app-kit/lib/theme";
 import { useHealth } from "@/lib/use-health";
-import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { useCachedLoad } from "@business-os/app-kit/lib/use-cached-load";
+import { homeKey, loadHome, prefetchTabs } from "@/lib/client-data";
+import { useDataContext } from "@/lib/use-data-context";
 import { homeCardsFor } from "@business-os/app-kit/lib/vertical";
 import { useAccount } from "@/lib/use-account";
 import { useBusinessSwipe } from "@/lib/use-business-swipe";
@@ -36,7 +38,7 @@ export default function Home() {
   const locale = useLocale();
   const formatDay = (day: string) =>
     new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
-  const { api, scope, business, businesses, palette } = useBusiness();
+  const { business, businesses, palette } = useBusiness();
   const account = useAccount();
   const overview = useOverview();
   const openBusiness = useOpenBusiness();
@@ -47,34 +49,19 @@ export default function Home() {
     (id) => void openBusiness(id),
   );
 
-  const load = useCallback(async () => {
-    if (!business) return null;
-    const start = todayIn(business.time_zone);
-    const [bookings, sessions, entitlements, services, pending, courts] = await Promise.all([
-      api.GET("/client/bookings", { params: scope }),
-      api.GET("/client/sessions", { params: { ...scope, query: { start, days: 14 } } }),
-      api.GET("/client/entitlements", { params: scope }),
-      api.GET("/client/appointments/services", { params: scope }),
-      api.GET("/client/reviews/pending", { params: scope }),
-      api.GET("/client/resources", { params: scope }),
-    ]);
-    return {
-      bookings: unwrap(bookings),
-      sessions: unwrap(sessions),
-      entitlements: entitlements.data ?? [],
-      appointments: services.data?.length ?? 0,
-      courts: courts.data?.length ?? 0,
-      toReview: pending.data ?? [],
-    };
-  }, [api, scope, business]);
-  const { data, error, loading, reload } = useLoad(load);
+  const ctx = useDataContext();
+  const { data, error, refreshing, reload, revalidate } = useCachedLoad(
+    ctx ? homeKey(ctx) : ["home"],
+    () => (ctx ? loadHome(ctx) : Promise.resolve(null)),
+    { enabled: Boolean(ctx) },
+  );
+  // Once home is on screen, the other tabs are fetched quietly so moving to them needs no waiting.
+  useEffect(() => {
+    if (ctx && data) prefetchTabs(ctx);
+  }, [ctx, data]);
   const locations = useLocations();
   // Coming back (e.g. after rating a visit) shows fresh data.
-  useFocusEffect(
-    useCallback(() => {
-      void reload();
-    }, [reload]),
-  );
+  useFocusEffect(revalidate);
 
   if (!business) return null;
   const homeCards = homeCardsFor(business);
@@ -84,7 +71,7 @@ export default function Home() {
   const screen = (
     <Screen
       palette={palette}
-      refreshing={loading}
+      refreshing={refreshing}
       onRefresh={() => void reload()}
       footer={
         (data?.appointments ?? 0) > 0 ? (
@@ -185,6 +172,7 @@ export default function Home() {
       )}
 
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
+      {error === undefined && !data && <ListSkeleton palette={palette} />}
 
       {homeCards.map((card) => {
         const Card = HOME_CARDS[card];
