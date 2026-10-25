@@ -34,6 +34,7 @@ from app.seed.common import (
     BranchSpec,
     BusinessSpec,
 )
+from app.seed.accounts import move_owner, owner_as_client
 from app.seed.curate import curate, place_branches
 from app.seed.demos import seed_demo
 from app.seed.guard import refuse_blocked_owner
@@ -64,7 +65,7 @@ def main() -> None:
     parser.add_argument(
         "--demo",
         default="studio",
-        choices=sorted([*DEMOS, "profiles", "places"]),
+        choices=sorted([*DEMOS, "profiles", "places", "ownerclient"]),
         help="studio: one fitness studio; club: a padel club renting courts by the hour; "
         "pets: a pet grooming salon with owners and their pets; "
         "jobs: an air-conditioning company with on-site jobs at clients' addresses; "
@@ -85,8 +86,14 @@ def main() -> None:
         "places: give the demo branches their cities and a point on the map (adds only); "
         "profiles: add logos, portraits and the crossfit branch to the owner's existing demo "
         "businesses (adds only, deletes nothing); "
+        "ownerclient: one fitness studio the owner also trains in, as a client; "
         "platform: the owner email becomes a platform team owner and the "
         "platform gets small businesses, invoices and requests",
+    )
+    parser.add_argument(
+        "--move-owner-from",
+        default=None,
+        help="Hand every business of this account to --owner-email, then stop",
     )
     parser.add_argument("--owner-name", default=None, help="Sets the owner's display name")
     parser.add_argument(
@@ -103,6 +110,9 @@ def main() -> None:
 
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
+        if args.move_owner_from:
+            print(move_owner(conn, args.move_owner_from, args.owner_email))
+            return
         if args.demo in ("curated", "full"):
             print(curate(conn, args.owner_email, args.months, random.Random(args.seed), args.demo))
             return
@@ -125,9 +135,11 @@ def main() -> None:
         seed_demo(
             conn,
             args.owner_email,
-            args.demo,
+            "studio" if args.demo == "ownerclient" else args.demo,
             args.months,
             random.Random(args.seed),
             owner_name=args.owner_name,
             replace=args.replace,
         )
+        if args.demo == "ownerclient":
+            print(owner_as_client(conn, args.owner_email))
