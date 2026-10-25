@@ -965,6 +965,6 @@ def test_full_demo_connects_the_plus_logins_the_test_customer_and_friends(engine
             {"u": customer},
         ).scalar_one()
         assert invites >= 1 and declarations == 0
-        # The customer and two friends in one class, plus a haircut when the barber has a slot two days on.
+        # The customer and two friends in one class, plus a haircut if the barber has a slot in 2 days.
         assert first["test_customer"]["bookings"] in (3, 4)
     assert CUSTOMER_EMAIL != "adire7399@gmail.com"  # a client, never the primary owner
