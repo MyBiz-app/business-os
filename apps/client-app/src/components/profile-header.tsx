@@ -9,6 +9,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useToast } from "@business-os/app-kit/components/toast";
 import { Button, Card, ErrorText, Field, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
+import { fetchMe } from "@business-os/app-kit/lib/me";
 import { normalizeStatus, STATUS_MAX_LENGTH, statusChanged } from "@business-os/app-kit/lib/profile-status";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -30,11 +31,10 @@ export function ProfileHeader({ name }: { name: string }) {
     setStatus(next.status_text ?? "");
   }, []);
   useEffect(() => {
-    API.GET("/me")
-      .then(unwrap)
+    fetchMe()
       .then(apply)
       .catch(() => undefined);
-  }, [API, apply]);
+  }, [apply]);
 
   const upload = async (result: ImagePicker.ImagePickerResult) => {
     const asset = result.canceled ? null : result.assets[0];

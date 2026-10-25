@@ -5,6 +5,7 @@ import { SegmentedControl } from "@business-os/app-kit/components/segmented-cont
 import { useToast } from "@business-os/app-kit/components/toast";
 import { Card, styles } from "@business-os/app-kit/components/ui";
 import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
+import { fetchMe } from "@business-os/app-kit/lib/me";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useTranslations } from "use-intl";
 
@@ -18,9 +19,7 @@ export function MarketingConsentCard({ palette }: { palette: Palette }) {
 
   useEffect(() => {
     let live = true;
-    apiClient()
-      .GET("/me")
-      .then(unwrap)
+    fetchMe()
       .then((me) => live && setConsent(me.marketing_consent))
       .catch(() => undefined);
     return () => {

@@ -7,6 +7,7 @@ import type { ComponentType, ReactNode } from "react";
 
 import { displayFontFamily, fontFamily } from "@business-os/design-tokens";
 import { I18nProvider } from "../providers/i18n-provider";
+import { QueryProvider } from "../providers/query-provider";
 import { SessionProvider, useSession } from "../providers/session-provider";
 import { initMonitoring } from "../lib/monitoring";
 import { ThemeProvider, useTheme } from "../providers/theme-provider";
@@ -56,17 +57,19 @@ export function AppRoot({ Provider }: { Provider: ComponentType<{ children: Reac
     <ThemeProvider>
       <I18nProvider>
         <SessionProvider>
-          <Provider>
-            <ToastProvider>
-              <AppLockGate>
-                <IncidentBanner />
-                <ThemedStack />
-                <LegalUpdateModal />
-                <AnnouncementsModal />
-              </AppLockGate>
-              <LaunchSplash />
-            </ToastProvider>
-          </Provider>
+          <QueryProvider>
+            <Provider>
+              <ToastProvider>
+                <AppLockGate>
+                  <IncidentBanner />
+                  <ThemedStack />
+                  <LegalUpdateModal />
+                  <AnnouncementsModal />
+                </AppLockGate>
+                <LaunchSplash />
+              </ToastProvider>
+            </Provider>
+          </QueryProvider>
         </SessionProvider>
       </I18nProvider>
     </ThemeProvider>

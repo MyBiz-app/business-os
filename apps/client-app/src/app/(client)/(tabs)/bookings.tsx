@@ -1,24 +1,26 @@
 import type { components } from "@business-os/api-client";
-import { formatTime, todayIn } from "@business-os/i18n/dates";
+import { formatTime } from "@business-os/i18n/dates";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
+import { ListSkeleton } from "@business-os/app-kit/components/skeleton";
 import { Button, Card, EmptyState, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { formatMoney } from "@business-os/app-kit/lib/money";
-import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { useCachedLoad } from "@business-os/app-kit/lib/use-cached-load";
+import { bookingsKey, loadBookings } from "@/lib/client-data";
+import { useDataContext } from "@/lib/use-data-context";
 import { BookingActions } from "@/components/booking-actions";
 import { addressOf, useLocations } from "@/lib/use-locations";
 import { useBusiness } from "@/providers/business-provider";
 import { radius } from "@business-os/app-kit/lib/theme";
 
 type Booking = components["schemas"]["ClientBooking"];
-type Entitlement = components["schemas"]["Entitlement"];
 type Plan = components["schemas"]["Plan"];
 
 const TONE: Partial<Record<Booking["status"], "primary" | "success" | "danger" | "muted">> = {
@@ -28,8 +30,6 @@ const TONE: Partial<Record<Booking["status"], "primary" | "success" | "danger" |
 };
 /** History shows the latest visits first; the rest on request. */
 const HISTORY_PAGE = 10;
-
-const CURRENT = new Set<Entitlement["state"]>(["active", "upcoming", "frozen"]);
 
 /** The client's plans, upcoming bookings (soonest first) and history. */
 export default function Bookings() {
@@ -44,36 +44,19 @@ export default function Bookings() {
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
 
-  const load = useCallback(async () => {
-    if (!business) return null;
-    const [all, entitlements, plans, sessions] = await Promise.all([
-      api.GET("/client/bookings", { params: scope }).then(unwrap),
-      api.GET("/client/entitlements", { params: scope }).then(unwrap),
-      api.GET("/client/plans", { params: scope }).then(unwrap),
-      // Only to learn where each upcoming booking takes place (navigation).
-      api.GET("/client/sessions", { params: { ...scope, query: { start: todayIn(business.time_zone), days: 14 } } }).then((r) => r.data ?? []),
-    ]);
-    const now = Date.now();
-    return {
-      upcoming: all.filter((b) => Date.parse(b.starts_at) >= now && b.status !== "cancelled").reverse(),
-      past: all.filter((b) => Date.parse(b.starts_at) < now || b.status === "cancelled"),
-      current: entitlements.filter((e) => CURRENT.has(e.state)),
-      plans,
-      branchOf: new Map(sessions.map((x) => [x.id, x.location_name])),
-    };
-  }, [api, scope, business]);
-  const { data, error, loading, reload } = useLoad(load);
+  const ctx = useDataContext();
+  const { data, error, loading, refreshing, reload, refresh } = useCachedLoad(
+    ctx ? bookingsKey(ctx) : ["bookings"],
+    () => (ctx ? loadBookings(ctx) : Promise.resolve(null)),
+    { enabled: Boolean(ctx) },
+  );
   const locations = useLocations();
   const [buying, setBuying] = useState<string | null>(null);
   const [allHistory, setAllHistory] = useState(false);
   const [purchase, setPurchase] = useState<{ ok: boolean; message: string } | null>(null);
 
   // Coming back from the payment page shows the new plan.
-  useFocusEffect(
-    useCallback(() => {
-      void reload();
-    }, [reload]),
-  );
+  useFocusEffect(refresh);
 
   /** Starts a checkout at the plan's current price and opens the payment page. */
   const buy = async (plan: Plan) => {
@@ -151,7 +134,7 @@ export default function Bookings() {
       </View>
       <BookingActions
         booking={booking}
-        address={addressOf(locations, data?.branchOf.get(booking.session_id))}
+        address={addressOf(locations, data?.branchOf[booking.session_id])}
         onChange={() => void reload()}
         only={booking.status === "waitlisted" ? "cancel" : undefined}
       />
@@ -159,9 +142,10 @@ export default function Bookings() {
   );
 
   return (
-    <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
+    <Screen palette={palette} refreshing={refreshing} onRefresh={() => void reload()}>
       <Heading palette={palette}>{t("title")}</Heading>
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
+      {error === undefined && !data && <ListSkeleton palette={palette} />}
 
       <Heading palette={palette} level={2}>
         {t("myPlans")}

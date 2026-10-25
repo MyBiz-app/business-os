@@ -1,28 +1,21 @@
 import type { components } from "@business-os/api-client";
-import { useEffect, useState } from "react";
-
-import { unwrap } from "@business-os/app-kit/lib/api";
-import { useBusiness } from "@/providers/business-provider";
+import { useCachedLoad } from "@business-os/app-kit/lib/use-cached-load";
+import { dataKey, fetchLocations } from "@/lib/client-data";
+import { useDataContext } from "@/lib/use-data-context";
 
 export type Location = components["schemas"]["ClientLocation"];
 
+const NONE: Location[] = [];
+
 /** The business's branches with their addresses (empty until loaded or when none is set). */
 export function useLocations(): Location[] {
-  const { api, scope, business } = useBusiness();
-  const [locations, setLocations] = useState<Location[]>([]);
-  useEffect(() => {
-    if (!business) return setLocations([]);
-    let active = true;
-    void api
-      .GET("/client/locations", { params: scope })
-      .then(unwrap)
-      .then((list) => active && setLocations(list))
-      .catch(() => active && setLocations([]));
-    return () => {
-      active = false;
-    };
-  }, [api, scope, business]);
-  return locations;
+  const ctx = useDataContext();
+  const { data } = useCachedLoad(
+    ctx ? dataKey(ctx, "locations-list") : ["locations-list"],
+    () => (ctx ? fetchLocations(ctx) : Promise.resolve(NONE)),
+    { enabled: Boolean(ctx) },
+  );
+  return ctx ? (data ?? NONE) : NONE;
 }
 
 /** The address to navigate to for a booking at the named branch; a business with a single

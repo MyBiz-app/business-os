@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { BRAND } from "@business-os/i18n/brand";
-import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
+import { fetchMe } from "@business-os/app-kit/lib/me";
 import { areaHome, buildAreas, pickArea, type Area, type AreaKind } from "@business-os/app-kit/lib/areas";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useBusiness } from "@/providers/business-provider";
@@ -38,7 +38,7 @@ export function AreaProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     let cancelled = false;
-    void Promise.all([apiClient().GET("/me").then(unwrap), AsyncStorage.getItem(ACTIVE_KEY)])
+    void Promise.all([fetchMe(), AsyncStorage.getItem(ACTIVE_KEY)])
       .then(([me, stored]) => {
         if (cancelled) return;
         setIdentity({ platformAdmin: me.platform_admin, memberships: me.memberships });
