@@ -18,6 +18,6 @@
     "brand:check": "node scripts/brand-sync.mjs --check"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "typescript": "^7"
   }
 }
