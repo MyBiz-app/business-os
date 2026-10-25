@@ -1,15 +1,16 @@
 import { localValue, formatTime, todayIn } from "@business-os/i18n/dates";
-import { router, type Href } from "expo-router";
+import { Redirect, router, type Href } from "expo-router";
 import { Image, Linking, StyleSheet, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Text } from "@business-os/app-kit/components/text";
-import { Avatar, Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
+import { Avatar, BackBar, Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Card, Heading, LoadError, Screen, SkeletonCard, styles } from "@business-os/app-kit/components/ui";
 import { rebookTarget } from "@business-os/app-kit/lib/all-mine";
 import { assetUrl } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { radius } from "@business-os/app-kit/lib/theme";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 import { BusinessStrip } from "@/components/business-strip";
 import { useOpenBusiness } from "@/lib/use-open-business";
@@ -26,6 +27,8 @@ const DAY_MS = 86_400_000;
  * the whole picture and not one business. */
 export default function AllMine() {
   const t = useTranslations("client.all");
+  const tTabs = useTranslations("client.tabs");
+  const { session, loading: sessionLoading } = useSession();
   const locale = useLocale();
   const { palette } = useTheme();
   const { businesses } = useBusiness();
@@ -68,8 +71,11 @@ export default function AllMine() {
 
   const dormant = (data?.businesses ?? []).filter((b) => b.dormant);
 
+  if (!sessionLoading && !session) return <Redirect href="/sign-in" />;
+
   return (
     <Screen title={t("title")} palette={palette} refreshing={loading} onRefresh={() => void reload()}>
+      <BackBar label={tTabs("home")} palette={palette} fallback="/home" />
       <BusinessStrip palette={palette} overview={data} />
 
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}

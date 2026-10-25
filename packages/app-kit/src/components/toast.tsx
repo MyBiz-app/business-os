@@ -7,6 +7,7 @@ import { useTranslations } from "use-intl";
 import { useReducedMotion, PressableScale } from "./motion";
 import { Text } from "./text";
 import { tint } from "../lib/brand";
+import { haptics } from "../lib/haptics";
 import { fixedColors, radius } from "../lib/theme";
 import { useTheme } from "../providers/theme-provider";
 
@@ -39,6 +40,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const counter = useRef(0);
   const show = useCallback<ShowToast>((kind, message, options) => {
     counter.current += 1;
+    if (kind === "success") haptics.success();
+    else if (kind === "error") haptics.error();
     const toast: Toast = { id: counter.current, kind, message, action: options?.action };
     setToasts((all) => [...all.filter((item) => !(item.kind === kind && item.message === message)), toast].slice(-MAX_VISIBLE));
   }, []);

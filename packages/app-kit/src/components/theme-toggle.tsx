@@ -4,6 +4,7 @@ import { useTranslations } from "use-intl";
 
 import { PressableScale } from "./motion";
 import { tint } from "../lib/brand";
+import { haptics } from "../lib/haptics";
 import { useTheme } from "../providers/theme-provider";
 import { radius } from "../lib/theme";
 
@@ -16,7 +17,10 @@ export function ThemeToggle({ size = 48 }: { size?: number }) {
     <PressableScale
       accessibilityRole="button"
       accessibilityLabel={toDark ? t("themeToggleToDark") : t("themeToggleToLight")}
-      onPress={() => setPreference(toDark ? "dark" : "light")}
+      onPress={() => {
+        haptics.select();
+        setPreference(toDark ? "dark" : "light");
+      }}
       style={[styles.button, { width: size, height: size }, { borderColor: palette.border, backgroundColor: tint(palette.primary, 0.08) }]}
     >
       <Ionicons name={toDark ? "moon-outline" : "sunny-outline"} size={size > 40 ? 22 : 18} color={palette.foreground} />

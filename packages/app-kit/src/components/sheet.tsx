@@ -5,6 +5,7 @@ import { Animated, Easing, Modal, PanResponder, Platform, Pressable, ScrollView,
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
+import { haptics } from "../lib/haptics";
 import { scrimColor, type Palette } from "../lib/theme";
 import { useTheme } from "../providers/theme-provider";
 import { useReducedMotion } from "./motion";
@@ -44,7 +45,10 @@ export function Sheet({ visible, onClose, palette, title, subtitle, children, fo
   const [mounted, setMounted] = useState(visible);
 
   useEffect(() => {
-    if (visible) setMounted(true);
+    if (visible) {
+      setMounted(true);
+      haptics.tap();
+    }
     Animated.timing(progress, {
       toValue: visible ? 1 : 0,
       duration: reduced ? 0 : visible ? motion.slow : motion.base,

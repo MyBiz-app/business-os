@@ -16,7 +16,7 @@ import { useCachedLoad } from "@business-os/app-kit/lib/use-cached-load";
 import { bookingsKey, loadBookings } from "@/lib/client-data";
 import { useDataContext } from "@/lib/use-data-context";
 import { AccountRows } from "@/components/account-rows";
-import { BookingActions } from "@/components/booking-actions";
+import { BookingCard } from "@/components/booking-actions";
 import { addressOf, useLocations } from "@/lib/use-locations";
 import { useBusiness } from "@/providers/business-provider";
 import { radius } from "@business-os/app-kit/lib/theme";
@@ -111,7 +111,14 @@ export default function Bookings() {
   const monthShort = new Intl.DateTimeFormat(locale, { month: "short", timeZone: business.time_zone });
   /** An upcoming booking: its date, time and status, with navigate / calendar / cancel. */
   const upcomingCard = (booking: Booking) => (
-    <View key={booking.id} style={[local.upcoming, { borderColor: palette.border }]}>
+    <BookingCard
+      key={booking.id}
+      booking={booking}
+      address={addressOf(locations, data?.branchOf[booking.session_id])}
+      onChange={() => void reload()}
+      only={booking.status === "waitlisted" ? "cancel" : undefined}
+      style={[local.upcoming, { borderColor: palette.border }]}
+    >
       <View style={local.upcomingHead}>
         <View style={[local.dateBlock, { backgroundColor: tint(palette.primary, 0.12) }]}>
           <Text style={[local.dateDay, { color: palette.primary }]}>{dayNumber.format(new Date(booking.starts_at))}</Text>
@@ -133,13 +140,7 @@ export default function Bookings() {
         </View>
         <Badge label={tStatus(`statuses.${booking.status}`)} tone={TONE[booking.status] ?? "muted"} palette={palette} />
       </View>
-      <BookingActions
-        booking={booking}
-        address={addressOf(locations, data?.branchOf[booking.session_id])}
-        onChange={() => void reload()}
-        only={booking.status === "waitlisted" ? "cancel" : undefined}
-      />
-    </View>
+    </BookingCard>
   );
 
   return (
