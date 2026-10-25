@@ -2,7 +2,7 @@ import type { components } from "@business-os/api-client";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { I18nManager, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
+import { I18nManager, KeyboardAvoidingView, Platform, Pressable, ScrollView, type ScrollViewInstance, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
@@ -38,7 +38,7 @@ export default function AiChat() {
   const [error, setError] = useState<ChatError | null>(null);
   const [deciding, setDeciding] = useState<string | null>(null);
   const [text, setText] = useState("");
-  const scroller = useRef<ScrollView>(null);
+  const scroller = useRef<ScrollViewInstance>(null);
 
   const loadTeam = useCallback(async () => unwrap(await api.GET("/ai/team", { params: scope })), [api, scope]);
   const { data: team, error: teamError, reload } = useLoad(loadTeam);
