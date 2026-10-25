@@ -142,8 +142,7 @@ export default function Bookings() {
   );
 
   return (
-    <Screen palette={palette} refreshing={refreshing} onRefresh={() => void reload()}>
-      <Heading palette={palette}>{t("title")}</Heading>
+    <Screen title={t("title")} palette={palette} refreshing={refreshing} onRefresh={() => void reload()}>
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       {error === undefined && !data && <ListSkeleton palette={palette} />}
 

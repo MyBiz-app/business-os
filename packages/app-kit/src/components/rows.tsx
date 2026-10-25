@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { localeDirection, type Locale } from "@business-os/i18n";
 import { type Href, useRouter } from "expo-router";
+import { Children, createContext, useContext } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "./text";
 import { useLocale } from "use-intl";
@@ -84,9 +85,34 @@ type RowProps = {
   palette: Palette;
 };
 
+const InGroup = createContext(false);
+
+/**
+ * Rows grouped on one rounded surface with a hairline between them, like iOS Settings. A `ListRow`
+ * inside it drops its own frame; children that render nothing are skipped.
+ */
+export function RowGroup({ children, palette }: { children: React.ReactNode; palette: Palette }) {
+  const rows = Children.toArray(children);
+  if (rows.length === 0) return null;
+  return (
+    <InGroup.Provider value>
+      <View style={[local.group, { backgroundColor: palette.surface, borderColor: palette.border }]}>
+        {rows.map((row, index) => (
+          <View key={index}>
+            {index > 0 ? <View style={[local.groupLine, { backgroundColor: palette.border }]} /> : null}
+            {row}
+          </View>
+        ))}
+      </View>
+    </InGroup.Provider>
+  );
+}
+
 /** One line of a list on a card surface; pressable when it opens something. */
 export function ListRow({ title, subtitle, trailing, leading, onPress, accessibilityLabel, palette }: RowProps) {
   const { forward } = useBackIcon();
+  const grouped = useContext(InGroup);
+  const box = grouped ? local.groupedRow : [local.rowBox, { backgroundColor: palette.surface, borderColor: palette.border }];
   const content = (
     <View style={local.row}>
       {leading}
@@ -104,13 +130,13 @@ export function ListRow({ title, subtitle, trailing, leading, onPress, accessibi
       {onPress && <Ionicons name={forward} size={18} color={palette.muted} />}
     </View>
   );
-  if (!onPress) return <View style={[local.rowBox, { backgroundColor: palette.surface, borderColor: palette.border }]}>{content}</View>;
+  if (!onPress) return <View style={box}>{content}</View>;
   return (
     <PressableScale
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? [title, subtitle].filter(Boolean).join(", ")}
       onPress={onPress}
-      style={[local.rowBox, { backgroundColor: palette.surface, borderColor: palette.border }]}
+      style={box}
     >
       {content}
     </PressableScale>
@@ -220,6 +246,9 @@ const local = StyleSheet.create({
   avatar: { alignItems: "center", justifyContent: "center", borderWidth: 1 },
   badge: { borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 3, alignSelf: "flex-start" },
   badgeText: { fontSize: 12, ...font.semibold },
+  group: { borderWidth: 1, borderRadius: radius.card, overflow: "hidden" },
+  groupLine: { height: StyleSheet.hairlineWidth, marginStart: 14 },
+  groupedRow: { paddingHorizontal: 14, paddingVertical: 12 },
   rowBox: { borderWidth: 1, borderRadius: radius.card, paddingHorizontal: 14, paddingVertical: 12 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 32 },
   rowText: { flex: 1, gap: 2 },

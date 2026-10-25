@@ -73,6 +73,7 @@ export default function Updates() {
   };
   return (
     <Screen
+      title={t("title")}
       palette={palette}
       refreshing={refreshing}
       onRefresh={() => {
@@ -80,7 +81,6 @@ export default function Updates() {
         void refresh().finally(() => setRefreshing(false));
       }}
     >
-      <Heading palette={palette}>{t("title")}</Heading>
       {inbox && items.length === 0 && <EmptyState palette={palette} message={t("empty")} />}
       {groupByRecency(items, (n) => n.created_at, (instant) => dayOf(instant, business.time_zone), today, addDays(today, -7)).map((group) => (
         <View key={group.key} style={local.group}>

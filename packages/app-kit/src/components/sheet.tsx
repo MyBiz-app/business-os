@@ -1,7 +1,7 @@
 import { motion, radius, space } from "@business-os/design-tokens";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Modal, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Animated, Easing, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
@@ -55,6 +55,22 @@ export function Sheet({ visible, onClose, palette, title, subtitle, children, fo
     });
   }, [visible, progress, reduced]);
 
+  // Drag the handle or title down to dismiss, like an iOS sheet: past 80px (or a quick flick) it closes, else it springs back.
+  const drag = useRef(new Animated.Value(0)).current;
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const pan = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 6 && Math.abs(g.dy) > Math.abs(g.dx),
+      onPanResponderMove: (_, g) => drag.setValue(Math.max(0, g.dy)),
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 80 || g.vy > 0.8) onCloseRef.current();
+        Animated.spring(drag, { toValue: 0, useNativeDriver: native, bounciness: 0 }).start();
+      },
+      onPanResponderTerminate: () => Animated.spring(drag, { toValue: 0, useNativeDriver: native }).start(),
+    }),
+  ).current;
+
   if (!mounted) return null;
   const label = closeLabel ?? t("closeDialog");
   return (
@@ -74,12 +90,14 @@ export function Sheet({ visible, onClose, palette, title, subtitle, children, fo
               borderColor: palette.border,
               maxHeight: height * 0.88,
               paddingBottom: Math.max(insets.bottom, space.lg),
-              transform: [{ translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [height, 0] }) }],
+              transform: [{ translateY: Animated.add(progress.interpolate({ inputRange: [0, 1], outputRange: [height, 0] }), drag) }],
             },
           ]}
         >
-          <View aria-hidden style={[s.handle, { backgroundColor: palette.border }]} />
-          <View style={s.head}>
+          <View aria-hidden style={s.grab} {...pan.panHandlers}>
+            <View style={[s.handle, { backgroundColor: palette.border }]} />
+          </View>
+          <View style={s.head} {...pan.panHandlers}>
             <View style={s.title}>
               <Text accessibilityRole="header" style={[ui.h2, { color: palette.foreground }]}>
                 {title}
@@ -115,6 +133,8 @@ const s = StyleSheet.create({
     paddingTop: space.sm,
     gap: space.md,
   },
+  // A taller touch area around the visible handle, so it is easy to grab.
+  grab: { alignSelf: "stretch", alignItems: "center", paddingVertical: space.xs, marginVertical: -space.xs },
   handle: { alignSelf: "center", width: 36, height: 4, borderRadius: radius.pill },
   head: { flexDirection: "row", alignItems: "flex-start", gap: space.md },
   title: { flex: 1, gap: space.xs },

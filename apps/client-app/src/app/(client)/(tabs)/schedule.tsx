@@ -109,6 +109,7 @@ export default function Schedule() {
 
   return (
     <Screen
+      title={t("title")}
       palette={palette}
       refreshing={loading}
       onRefresh={() => {
@@ -116,7 +117,6 @@ export default function Schedule() {
         win.reload();
       }}
     >
-      <Heading palette={palette}>{t("title")}</Heading>
       {businesses && businesses.length > 1 && (
         <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
           {businesses.map((b) => (

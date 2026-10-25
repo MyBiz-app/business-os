@@ -206,24 +206,51 @@ type ScreenProps = {
   onRefresh?: () => void;
   /** A main action pinned above the tab bar (book, pay, save), like a sticky bottom CTA. */
   footer?: React.ReactNode;
+  /** A large title that shrinks into a slim bar at the top once the person scrolls (the iOS large-title header). */
+  title?: string;
 };
 
-/** A safe-area, scrollable screen with optional pull-to-refresh. */
-export function Screen({ palette, children, refreshing, onRefresh, footer }: ScreenProps) {
+/** How far the large title scrolls before the slim bar's title has fully appeared. */
+const TITLE_COLLAPSE = 36;
+
+/** A safe-area, scrollable screen with optional pull-to-refresh and an optional large title. */
+export function Screen({ palette, children, refreshing, onRefresh, footer, title }: ScreenProps) {
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const barOpacity = scrollY.interpolate({ inputRange: [0, TITLE_COLLAPSE], outputRange: [0, 1], extrapolate: "clamp" });
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.screen, { backgroundColor: palette.background }]}>
-      <ScrollView
+      {title ? (
+        <View style={styles.titleBar} pointerEvents="none">
+          <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: palette.background, opacity: barOpacity }]} />
+          <Animated.View style={[styles.titleBarLine, { backgroundColor: palette.border, opacity: barOpacity }]} />
+          <Animated.Text
+            aria-hidden
+            numberOfLines={1}
+            style={[styles.titleBarText, { color: palette.foreground, opacity: barOpacity }]}
+          >
+            {title}
+          </Animated.Text>
+        </View>
+      ) : null}
+      <Animated.ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
+        scrollEventThrottle={16}
+        onScroll={title ? Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: Platform.OS !== "web" }) : undefined}
         refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} /> : undefined}
       >
+        {title ? (
+          <Text accessibilityRole="header" style={[styles.largeTitle, { color: palette.foreground }]}>
+            {title}
+          </Text>
+        ) : null}
         {/* Each block of the screen rises in, one after another. */}
         {Children.toArray(children).map((child, index) => (
           <FadeIn key={index} index={index} style={styles.block}>
             {child}
           </FadeIn>
         ))}
-      </ScrollView>
+      </Animated.ScrollView>
       {footer ? (
         <View style={[styles.footer, { backgroundColor: palette.background, borderTopColor: palette.border }]}>{footer}</View>
       ) : null}
@@ -268,6 +295,11 @@ export const styles = StyleSheet.create({
   error: { fontSize: 13, ...font.medium, textAlign: "left" },
   // A card is a surface with a hairline; no shadow, and no card inside a card.
   card: { borderWidth: 1, borderRadius: radius.card, padding: space.lg, gap: space.md },
+  // The iOS-style large title (30, the top of the Calm scale) and the slim bar it collapses into (17pt, centered, over a hairline).
+  largeTitle: { fontSize: 30, lineHeight: 36, ...font.semibold, textAlign: "left" },
+  titleBar: { position: "absolute", top: 0, start: 0, end: 0, zIndex: 1, height: 44, alignItems: "center", justifyContent: "center", paddingHorizontal: space.xxxl },
+  titleBarLine: { position: "absolute", start: 0, end: 0, bottom: 0, height: StyleSheet.hairlineWidth },
+  titleBarText: { fontSize: 17, ...font.semibold },
   h1: { fontSize: 24, lineHeight: 30, ...font.semibold, textAlign: "left" },
   h2: { fontSize: 17, lineHeight: 24, ...font.semibold, textAlign: "left" },
   muted: { fontSize: 15, ...font.regular, textAlign: "left" },
