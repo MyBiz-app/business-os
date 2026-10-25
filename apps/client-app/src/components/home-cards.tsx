@@ -3,13 +3,15 @@ import type { components } from "@business-os/api-client";
 import { formatTime } from "@business-os/i18n/dates";
 import { router } from "expo-router";
 import { useState, type ReactNode } from "react";
-import { Linking, StyleSheet, View } from "react-native";
+import { Image, Linking, StyleSheet, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { ActionPill } from "@business-os/app-kit/components/action-pill";
+import { PressableScale } from "@business-os/app-kit/components/motion";
 import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Text } from "@business-os/app-kit/components/text";
 import { Card, EmptyState, styles } from "@business-os/app-kit/components/ui";
+import { assetUrl } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { byDistance, distanceLabel, hasPoint } from "@business-os/app-kit/lib/distance";
 import { lastVisit, nextBooking, type HomeCard } from "@business-os/app-kit/lib/client-home";
@@ -25,7 +27,7 @@ import { useDependents } from "@/lib/use-dependents";
 import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { useInbox } from "@/providers/inbox-provider";
-import { radius } from "@business-os/app-kit/lib/theme";
+import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
 
 type Booking = components["schemas"]["ClientBooking"];
 type Session = components["schemas"]["ClientSession"];
@@ -105,43 +107,63 @@ function NextBookingBody({ booking, data, locale }: { booking: Booking; data: Ho
   );
 }
 
+/** The membership as a Wallet-style card in the business's color: name, entries left or validity,
+ * and the business on it. Several current plans stack as smaller lines under the first. */
 function Membership({ data }: { data: HomeData }) {
   const t = useTranslations("client.homeCards");
   const tBookings = useTranslations("client.bookings");
   const tPlans = useTranslations("plans");
   const locale = useLocale();
-  const { palette } = useBusiness();
+  const { business, palette } = useBusiness();
   const current = data.entitlements.filter((e) => CURRENT.has(e.state));
   const day = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" });
+  if (!business) return null;
+  const main = current[0];
+  if (!main) {
+    return (
+      <Section title={t("membership")}>
+        <ListRow palette={palette} title={t("noPlan")} subtitle={t("noPlanHint")} onPress={() => router.navigate("/bookings")} />
+      </Section>
+    );
+  }
+  const kindLabel = (e: Entitlement) =>
+    e.state !== "active" ? tPlans(`states.${e.state}`) : e.credits_remaining === null ? tPlans("kinds.membership") : null;
+  const logo = assetUrl(business.logo_url);
   return (
     <Section title={t("membership")} action={tBookings("title")} onAction={() => router.navigate("/bookings")}>
-      {current.length > 0 ? (
-        <Card palette={palette}>
-          {current.slice(0, 2).map((e) => (
-            <View key={e.id} style={local.line}>
-              <View style={local.grow}>
-                <Text style={[local.lineTitle, { color: palette.foreground }]}>{e.name}</Text>
-                <Text style={[local.lineMeta, { color: palette.muted }]}>
-                  {tBookings("validUntil", { date: day.format(new Date(`${e.ends_on}T12:00:00Z`)) })}
-                </Text>
-              </View>
-              <Badge
-                tone="primary"
-                palette={palette}
-                label={
-                  e.state !== "active"
-                    ? tPlans(`states.${e.state}`)
-                    : e.credits_remaining === null
-                      ? tPlans("kinds.membership")
-                      : tBookings("entriesLeft", { count: e.credits_remaining })
-                }
-              />
-            </View>
-          ))}
-        </Card>
-      ) : (
-        <ListRow palette={palette} title={t("noPlan")} subtitle={t("noPlanHint")} onPress={() => router.navigate("/bookings")} />
-      )}
+      <PressableScale
+        accessibilityRole="button"
+        accessibilityLabel={`${main.name}, ${kindLabel(main) ?? tBookings("entriesLeft", { count: main.credits_remaining ?? 0 })}`}
+        onPress={() => router.navigate("/bookings")}
+        style={[local.wallet, { backgroundColor: palette.primary }]}
+      >
+        <View aria-hidden style={[local.orb, { backgroundColor: tint(palette.onPrimary, 0.12) }]} />
+        <View style={local.walletTop}>
+          <Text style={[local.walletName, { color: palette.onPrimary }]} numberOfLines={2}>{main.name}</Text>
+          {logo && <Image source={{ uri: logo }} style={local.walletLogo} accessibilityIgnoresInvertColors />}
+        </View>
+        <View>
+          {kindLabel(main) ? (
+            <Text style={[local.walletBig, { color: palette.onPrimary }]}>{kindLabel(main)}</Text>
+          ) : (
+            <Text style={[local.walletBig, { color: palette.onPrimary }]}>{main.credits_remaining}</Text>
+          )}
+          {main.credits_remaining !== null && main.state === "active" && (
+            <Text style={[local.walletMeta, { color: palette.onPrimary }]}>{tBookings("entriesLeftLabel")}</Text>
+          )}
+          <Text style={[local.walletMeta, { color: palette.onPrimary }]}>
+            {tBookings("validUntil", { date: day.format(new Date(`${main.ends_on}T12:00:00Z`)) })}
+          </Text>
+        </View>
+      </PressableScale>
+      {current.slice(1, 3).map((e) => (
+        <View key={e.id} style={local.line}>
+          <Text style={[local.lineTitle, { color: palette.foreground }]}>{e.name}</Text>
+          <Text style={[local.lineMeta, { color: palette.muted }]}>
+            {kindLabel(e) ?? tBookings("entriesLeft", { count: e.credits_remaining ?? 0 })} · {tBookings("validUntil", { date: day.format(new Date(`${e.ends_on}T12:00:00Z`)) })}
+          </Text>
+        </View>
+      ))}
     </Section>
   );
 }
@@ -310,7 +332,8 @@ function Updates() {
   );
 }
 
-function BusinessInfo({ data }: { data: HomeData }) {
+/** Our branches: the map, distances and navigation. Lives in the Profile tab. */
+export function BusinessInfo({ data }: { data: Pick<HomeData, "locations"> }) {
   const t = useTranslations("client.homeCards");
   const { business, palette } = useBusiness();
   const [selected, setSelected] = useState<string>();
@@ -403,5 +426,11 @@ const local = StyleSheet.create({
   nextHead: { flexDirection: "row", gap: 12 },
   nextAccent: { width: 5, borderRadius: 3 },
   nextTitle: { fontSize: 20, fontWeight: "600", textAlign: "left" },
+  wallet: { borderRadius: radius.dialog, padding: 20, minHeight: 168, justifyContent: "space-between", overflow: "hidden" },
+  walletTop: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
+  walletName: { flex: 1, fontSize: 20, fontWeight: "600", textAlign: "left" },
+  walletLogo: { width: 40, height: 40, borderRadius: radius.card, backgroundColor: fixedColors.white },
+  walletBig: { fontSize: 30, fontWeight: "600", textAlign: "left" },
+  walletMeta: { fontSize: 13, opacity: 0.9, textAlign: "left" },
   nextMeta: { fontSize: 15, textAlign: "left" },
 });

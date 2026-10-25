@@ -15,6 +15,7 @@ import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useCachedLoad } from "@business-os/app-kit/lib/use-cached-load";
 import { bookingsKey, loadBookings } from "@/lib/client-data";
 import { useDataContext } from "@/lib/use-data-context";
+import { AccountRows } from "@/components/account-rows";
 import { BookingActions } from "@/components/booking-actions";
 import { addressOf, useLocations } from "@/lib/use-locations";
 import { useBusiness } from "@/providers/business-provider";
@@ -31,7 +32,7 @@ const TONE: Partial<Record<Booking["status"], "primary" | "success" | "danger" |
 /** History shows the latest visits first; the rest on request. */
 const HISTORY_PAGE = 10;
 
-/** The client's plans, upcoming bookings (soonest first) and history. */
+/** "Mine": the client's plans, upcoming bookings (soonest first), history, and their documents and receipts. */
 export default function Bookings() {
   const t = useTranslations("client.bookings");
   const tWaitlist = useTranslations("client.waitlist");
@@ -271,7 +272,7 @@ export default function Bookings() {
       {(business.waitlist_class !== "off" || business.waitlist_appointment !== "off" || business.waitlist_resource !== "off") && (
         <ListRow palette={palette} title={tWaitlist("title")} onPress={() => router.push("/waitlist")} />
       )}
-      <ListRow palette={palette} title={t("receipts")} onPress={() => router.push("/receipts")} />
+      <AccountRows />
     </Screen>
   );
 }
