@@ -212,6 +212,9 @@ class TenantUpdate(AddressFields):
     website_url: str | None = Field(
         default=None, max_length=300, description="The business's website; empty clears it"
     )
+    listed_in_search: bool | None = Field(
+        default=None, description="Show the business in the client app's search (off by default)"
+    )
     employer_file_number: str | None = Field(
         default=None, pattern=r"^[0-9A-Za-z/-]{2,20}$", description="Deductions file (תיק ניכויים)"
     )
@@ -284,6 +287,9 @@ class Tenant(BaseModel):
     )
     website_url: str | None = Field(
         default=None, description="The business's website (its branches may have their own)"
+    )
+    listed_in_search: bool = Field(
+        default=False, description="Whether people can find the business by name in the client app"
     )
     product_track: ProductTrack = Field(
         default="full", description="website_only: a business that ordered a website only"

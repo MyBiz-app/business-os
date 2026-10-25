@@ -44340,6 +44340,55 @@
         }
       }
     },
+    "/public/businesses-search": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Search Businesses",
+        "description": "Businesses that opted in, by name; at most 10, and never without a query.",
+        "operationId": "search_businesses",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 60,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListedBusiness"
+                  },
+                  "title": "Response Search Businesses"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/businesses/{code}": {
       "get": {
         "tags": [
@@ -56239,6 +56288,18 @@
             "title": "Website Url",
             "description": "The business's website, if any"
           },
+          "join_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Join Code",
+            "description": "The code anyone can use to join; shared in friend invitations"
+          },
           "time_zone": {
             "type": "string",
             "title": "Time Zone"
@@ -67721,6 +67782,61 @@
           "unit_price"
         ],
         "title": "LineIn"
+      },
+      "ListedBusiness": {
+        "properties": {
+          "join_code": {
+            "type": "string",
+            "title": "Join Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "primary_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Color"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "join_code",
+          "name",
+          "city",
+          "primary_color",
+          "logo_url"
+        ],
+        "title": "ListedBusiness",
+        "description": "A business that chose to appear in the join screen's search."
       },
       "Location": {
         "properties": {
@@ -83556,6 +83672,12 @@
             "title": "Website Url",
             "description": "The business's website (its branches may have their own)"
           },
+          "listed_in_search": {
+            "type": "boolean",
+            "title": "Listed In Search",
+            "description": "Whether people can find the business by name in the client app",
+            "default": false
+          },
           "product_track": {
             "type": "string",
             "enum": [
@@ -84838,6 +84960,18 @@
             ],
             "title": "Website Url",
             "description": "The business's website; empty clears it"
+          },
+          "listed_in_search": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Listed In Search",
+            "description": "Show the business in the client app's search (off by default)"
           },
           "employer_file_number": {
             "anyOf": [

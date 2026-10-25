@@ -49,6 +49,14 @@
         }
       ],
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow MyBiz to use the camera to scan a business's QR code.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
         "expo-local-authentication",
         {
           "faceIDPermission": "Allow MyBiz to use Face ID to unlock the app."

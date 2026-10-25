@@ -91,7 +91,7 @@ def load_current_tenant(session: Session) -> Tenant:
                        (SELECT st.name_he FROM app.geo_streets st
                          WHERE st.city_code = t.city_code AND st.code = t.street_code)
                            AS street_name,
-                       t.product_track, t.business_size,
+                       t.product_track, t.business_size, t.listed_in_search,
                        t.business_license_number, t.business_license_expires_on
                 FROM app.tenants t
                 LEFT JOIN app.tenant_members m

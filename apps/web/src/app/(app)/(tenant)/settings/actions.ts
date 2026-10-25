@@ -32,6 +32,7 @@ export async function updateDetails(_state: FormState, formData: FormData): Prom
           cancellation_window_minutes: Number(value("cancellation_window_minutes")),
           booking_requires_plan: formData.get("booking_requires_plan") === "on",
           requires_health_declaration: formData.get("requires_health_declaration") === "on",
+          listed_in_search: formData.get("listed_in_search") === "on",
           client_id_number: ["optional", "required"].includes(value("client_id_number")) ? (value("client_id_number") as "optional" | "required") : "off",
           online_sales: formData.get("online_sales") === "on",
           require_mfa_for_staff: formData.get("require_mfa_for_staff") === "on",

@@ -9219,6 +9219,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/businesses-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Businesses
+         * @description Businesses that opted in, by name; at most 10, and never without a query.
+         */
+        get: operations["search_businesses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/businesses/{code}": {
         parameters: {
             query?: never;
@@ -13278,6 +13298,11 @@ export interface components {
              * @description The business's website, if any
              */
             website_url?: string | null;
+            /**
+             * Join Code
+             * @description The code anyone can use to join; shared in friend invitations
+             */
+            join_code?: string | null;
             /** Time Zone */
             time_zone: string;
             /** Currency */
@@ -17592,6 +17617,22 @@ export interface components {
              * @description Minor units, VAT included
              */
             unit_price: number;
+        };
+        /**
+         * ListedBusiness
+         * @description A business that chose to appear in the join screen's search.
+         */
+        ListedBusiness: {
+            /** Join Code */
+            join_code: string;
+            /** Name */
+            name: string;
+            /** City */
+            city: string | null;
+            /** Primary Color */
+            primary_color: string | null;
+            /** Logo Url */
+            logo_url: string | null;
         };
         /** Location */
         Location: {
@@ -23873,6 +23914,12 @@ export interface components {
              */
             website_url?: string | null;
             /**
+             * Listed In Search
+             * @description Whether people can find the business by name in the client app
+             * @default false
+             */
+            listed_in_search: boolean;
+            /**
              * Product Track
              * @description website_only: a business that ordered a website only
              * @default full
@@ -24327,6 +24374,11 @@ export interface components {
              * @description The business's website; empty clears it
              */
             website_url?: string | null;
+            /**
+             * Listed In Search
+             * @description Show the business in the client app's search (off by default)
+             */
+            listed_in_search?: boolean | null;
             /**
              * Employer File Number
              * @description Deductions file (תיק ניכויים)
@@ -46522,6 +46574,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Complaint"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_businesses: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListedBusiness"][];
                 };
             };
             /** @description Validation Error */

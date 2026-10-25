@@ -72,6 +72,9 @@ class ClientBusiness(BaseModel):
     primary_color: str | None
     logo_url: str | None
     website_url: str | None = Field(default=None, description="The business's website, if any")
+    join_code: str | None = Field(
+        default=None, description="The code anyone can use to join; shared in friend invitations"
+    )
     time_zone: str
     currency: str
     cancellation_window_minutes: int
@@ -218,6 +221,31 @@ class ClientSession(BaseModel):
     )
 
 
+LISTED_BUSINESSES_SELECT = f"""
+    SELECT t.join_code, t.name, t.city, t.primary_color, {LOGO_URL.format(t="t")} AS logo_url
+    FROM app.search_listed_businesses(:q) t
+"""
+
+
+class ListedBusiness(BaseModel):
+    """A business that chose to appear in the join screen's search."""
+
+    join_code: str
+    name: str
+    city: str | None
+    primary_color: str | None
+    logo_url: str | None
+
+
+@public_router.get("/public/businesses-search")
+def search_businesses(
+    q: Annotated[str, Query(min_length=2, max_length=60)], session: AnonymousSessionDep
+) -> list[ListedBusiness]:
+    """Businesses that opted in, by name; at most 10, and never without a query."""
+    rows = session.execute(text(LISTED_BUSINESSES_SELECT), {"q": q}).mappings()
+    return [ListedBusiness.model_validate(dict(row)) for row in rows]
+
+
 @public_router.get("/public/businesses/{code}")
 def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile:
     row = (
@@ -241,7 +269,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
            t.cancellation_window_minutes, t.terms_override, t.online_sales, t.resource_payment,
-           t.website_url,
+           t.website_url, t.join_code,
            CASE WHEN t.waitlist_enabled THEN t.waitlist_class_mode ELSE 'off' END AS waitlist_class,
            CASE WHEN t.waitlist_enabled THEN t.waitlist_appointment_mode ELSE 'off' END
                AS waitlist_appointment,

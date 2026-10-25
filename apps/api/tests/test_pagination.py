@@ -91,6 +91,7 @@ BOUNDED = {
     "/platform/billing/churn": "twelve months",
     # the SQL function returns at most 5 open banners, or the latest 50
     "/public/incidents": "limit in SQL",
+    "/public/businesses-search": "at most 10 rows, limited in the SQL function",
     "/platform/incidents": "limit in SQL",
     # one row per quote status and currency
     "/quotes/summary": "grouped",

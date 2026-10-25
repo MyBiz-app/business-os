@@ -11,13 +11,15 @@ import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@busine
 import { EMPTY_ADDRESS } from "@business-os/app-kit/lib/address";
 import { ApiError, apiClient, assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { brandPalette } from "@business-os/app-kit/lib/brand";
-import { CancellationPolicyCard } from "@/components/cancellation-policy-card";
+import { JoinScanner } from "@/components/join-scanner";
+import { JoinWelcome } from "@/components/join-welcome";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 import { radius } from "@business-os/app-kit/lib/theme";
 
 type Profile = components["schemas"]["BusinessProfile"];
+type Listed = components["schemas"]["ListedBusiness"];
 
 const normalize = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16);
 
@@ -44,6 +46,11 @@ export default function Join() {
   // Set once joined: the next step shows the business's cancellation rules before the home screen.
   const [joinedId, setJoinedId] = useState<string | null>(null);
   const palette = brandPalette(basePalette, profile?.primary_color);
+  const [scanning, setScanning] = useState(false);
+  // Opt-in search by name, for people who have no code at hand.
+  const [query, setQuery] = useState("");
+  const [found, setFound] = useState<Listed[] | null>(null);
+  const shown = query.trim().length >= 2 ? found : null;
 
   const lookUp = async (value: string) => {
     if (value.length < 4) return setError(t("unknownCode"));
@@ -65,6 +72,31 @@ export default function Join() {
     // Only for a code that arrived in the link.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.code]);
+
+  useEffect(() => {
+    const text = query.trim();
+    if (text.length < 2) return;
+    let live = true;
+    // Wait for a pause in typing before asking.
+    const timer = setTimeout(() => {
+      apiClient()
+        .GET("/public/businesses-search", { params: { query: { q: text } } })
+        .then(unwrap)
+        .then((rows) => live && setFound(rows))
+        .catch(() => live && setFound([]));
+    }, 350);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [query]);
+
+  const pick = (value: string) => {
+    const next = normalize(value);
+    setCode(next);
+    setScanning(false);
+    void lookUp(next);
+  };
 
   const confirmJoin = async () => {
     if (!firstName.trim()) return setError(t("nameRequired"));
@@ -93,16 +125,7 @@ export default function Join() {
     return <Redirect href={params.code ? { pathname: "/sign-in", params: { code: normalize(params.code) } } : "/sign-in"} />;
   }
 
-  if (joinedId) {
-    return (
-      <Screen palette={palette}>
-        <Heading palette={palette}>{t("joinedTitle", { name: profile?.name ?? "" })}</Heading>
-        <Text style={[styles.muted, { color: palette.muted }]}>{t("joinedBody")}</Text>
-        <CancellationPolicyCard palette={palette} tenantId={joinedId} />
-        <Button label={t("toHome")} palette={palette} onPress={() => router.replace("/home")} />
-      </Screen>
-    );
-  }
+  if (joinedId) return <JoinWelcome name={profile?.name ?? ""} tenantId={joinedId} palette={palette} />;
 
   return (
     <Screen palette={palette}>
@@ -166,6 +189,35 @@ export default function Join() {
           />
           <ErrorText message={error} palette={palette} />
           <Button label={t("continue")} palette={palette} busy={busy} onPress={() => void lookUp(code)} />
+          <Button label={t("scan")} variant="secondary" palette={palette} onPress={() => setScanning(true)} />
+          <Field
+            label={t("searchLabel")}
+            palette={palette}
+            hint={t("searchHint")}
+            value={query}
+            onChangeText={setQuery}
+            autoCorrect={false}
+            returnKeyType="search"
+          />
+          {shown?.length === 0 && <Text style={[styles.muted, { color: palette.muted }]}>{t("searchEmpty")}</Text>}
+          {shown?.map((row) => (
+            <Pressable key={row.join_code} accessibilityRole="button" accessibilityLabel={row.name} onPress={() => pick(row.join_code)}>
+              <Card palette={palette}>
+                <View style={local.brand}>
+                  {row.logo_url ? (
+                    <Image source={{ uri: assetUrl(row.logo_url)! }} style={local.logo} accessibilityIgnoresInvertColors />
+                  ) : (
+                    <View style={[local.logo, { backgroundColor: row.primary_color ?? palette.primary }]} />
+                  )}
+                  <View style={{ flex: 1 }}>
+                    <Text style={[local.name, { color: palette.foreground }]}>{row.name}</Text>
+                    {row.city ? <Text style={[styles.muted, { color: palette.muted }]}>{row.city}</Text> : null}
+                  </View>
+                </View>
+              </Card>
+            </Pressable>
+          ))}
+          <JoinScanner visible={scanning} palette={palette} onCode={pick} onClose={() => setScanning(false)} />
           {businesses && businesses.length > 0 && (
             <Button label={t("back")} variant="secondary" palette={palette} onPress={() => router.replace("/home")} />
           )}
