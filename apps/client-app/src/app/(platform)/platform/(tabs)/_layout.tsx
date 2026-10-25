@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
+import { haptics } from "@business-os/app-kit/lib/haptics";
 
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useAreas } from "@/providers/area-provider";
@@ -34,6 +35,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={screenOptions}
+      screenListeners={{ tabPress: () => haptics.select() }}
     >
       <Tabs.Screen name="home" options={{ title: t("home"), tabBarIcon: icon("shield-checkmark") }} />
       <Tabs.Screen

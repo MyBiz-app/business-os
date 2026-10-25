@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native";
 import { Text } from "./text";
 
 import { PressableScale } from "./motion";
+import { haptics } from "../lib/haptics";
 import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
 import { radius } from "../lib/theme";
@@ -24,7 +25,10 @@ export function Chip({ label, sublabel, selected, onPress, palette, accessibilit
       aria-checked={role === "radio" ? selected : undefined}
       aria-selected={role === "tab" ? selected : undefined}
       accessibilityLabel={accessibilityLabel ?? label}
-      onPress={onPress}
+      onPress={() => {
+        if (!selected) haptics.select();
+        onPress();
+      }}
       style={[
         local.chip,
         selected

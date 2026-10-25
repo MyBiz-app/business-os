@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
+import { haptics } from "@business-os/app-kit/lib/haptics";
 
 import { useTerm } from "@business-os/app-kit/lib/vertical";
 import { useAreas } from "@/providers/area-provider";
@@ -39,6 +40,7 @@ export default function TabsLayout() {
     <AiHeader />
     <Tabs
       screenOptions={screenOptions}
+      screenListeners={{ tabPress: () => haptics.select() }}
     >
       <Tabs.Screen name="today" options={{ title: t("today"), tabBarIcon: icon("today") }} />
       <Tabs.Screen
