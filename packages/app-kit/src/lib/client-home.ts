@@ -78,3 +78,45 @@ export function groupByRecency<T>(
   }
   return (["today", "week", "earlier"] as const).filter((key) => groups[key].length > 0).map((key) => ({ key, items: groups[key] }));
 }
+
+/** Home cards that live in another tab now: the schedule is the Book tab, updates their own tab,
+ * documents/quotes/addresses are in Mine, the branches and map are in Profile, and the health
+ * declaration is the home's single "needs you" card. */
+const ELSEWHERE = new Set<HomeCard>(["shortcuts", "updates", "business_info", "documents", "quotes", "addresses", "health"]);
+
+/** The cards the home draws from the industry's list: only what is about "me right now". */
+export function homeCardsOnHome(cards: readonly HomeCard[]): HomeCard[] {
+  return cards.filter((card) => !ELSEWHERE.has(card));
+}
+
+export type HomeAction = "health" | "pay" | "answer" | "sign" | "review";
+
+/** What waits for the client: the home shows only the most pressing one and says how many more
+ * there are. Order: health declaration, payments, quotes to answer, documents to sign, a visit to rate. */
+export function pickAction(waiting: { health: boolean; pay: number; answer: number; sign: number; review: number }): {
+  first: HomeAction | null;
+  others: number;
+} {
+  const total = (waiting.health ? 1 : 0) + waiting.pay + waiting.answer + waiting.sign + waiting.review;
+  const first: HomeAction | null = waiting.health
+    ? "health"
+    : waiting.pay > 0
+      ? "pay"
+      : waiting.answer > 0
+        ? "answer"
+        : waiting.sign > 0
+          ? "sign"
+          : waiting.review > 0
+            ? "review"
+            : null;
+  return { first, others: first ? total - 1 : 0 };
+}
+
+export type UpdateGroup = "friends" | "bookings" | "general";
+
+/** Which filter of the updates tab a notification belongs to. */
+export function updateGroup(kind: string): UpdateGroup {
+  if (kind.startsWith("friend")) return "friends";
+  if (/^(health|freeze|plan|entitlement)/.test(kind)) return "general";
+  return "bookings";
+}

@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from "expo-router";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { Image, Linking, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { fixedColors, radius } from "@business-os/app-kit/lib/theme";
@@ -19,6 +19,7 @@ import { useHealth } from "@/lib/use-health";
 import { useCachedLoad } from "@business-os/app-kit/lib/use-cached-load";
 import { homeKey, loadHome, prefetchTabs } from "@/lib/client-data";
 import { useDataContext } from "@/lib/use-data-context";
+import { homeCardsOnHome, pickAction } from "@business-os/app-kit/lib/client-home";
 import { homeCardsFor } from "@business-os/app-kit/lib/vertical";
 import { useAccount } from "@/lib/use-account";
 import { useBusinessSwipe } from "@/lib/use-business-swipe";
@@ -32,7 +33,6 @@ import { useBusiness } from "@/providers/business-provider";
 export default function Home() {
   const t = useTranslations("client.home");
   const tHealth = useTranslations("client.health");
-  const tAppointment = useTranslations("client.appointment");
   const tReview = useTranslations("client.review");
   const health = useHealth();
   const locale = useLocale();
@@ -64,22 +64,77 @@ export default function Home() {
   useFocusEffect(revalidate);
 
   if (!business) return null;
-  const homeCards = homeCardsFor(business);
+  const homeCards = homeCardsOnHome(homeCardsFor(business));
   const homeData = (loaded: NonNullable<typeof data>): HomeData => ({ ...loaded, locations, reload: () => void reload() });
   const logo = assetUrl(business.logo_url);
+
+  const toReview = data?.toReview[0];
+  const waiting = pickAction({
+    health: Boolean(health?.required && health.state !== "ok" && health.state !== "needs_review" && health.state !== "rejected"),
+    pay: account.toPay.length,
+    answer: account.toAnswer.length,
+    sign: account.toSign.length,
+    review: toReview ? 1 : 0,
+  });
+  const healthText =
+    health?.state === "expiring" && health.current ? tHealth("expiringBanner", { date: formatDay(health.current.valid_until) }) : tHealth("banner");
+  const pay = account.toPay[0];
+  const answer = account.toAnswer[0];
+  const sign = account.toSign[0];
+  const needsYou = waiting.first && (
+    <Card palette={palette}>
+      <Text accessibilityRole="header" style={[local.reviewTitle, { color: palette.foreground }]}>
+        {t("needsYou")}
+      </Text>
+      {waiting.first === "health" && (
+        <>
+          <Text style={[styles.muted, { color: palette.foreground }]}>{healthText}</Text>
+          <Button label={health?.state === "expiring" ? tHealth("update") : tHealth("fill")} palette={palette} onPress={() => router.push("/health")} />
+        </>
+      )}
+      {waiting.first === "pay" && pay && (
+        <ListRow
+          palette={palette}
+          title={t(pay.kind === "bill" ? "payBill" : "payDeposit", { number: pay.number })}
+          subtitle={pay.title}
+          trailing={<Badge label={formatMoney(pay.deposit_due, pay.currency, locale)} tone="primary" palette={palette} />}
+          onPress={() => void Linking.openURL(`${WEB_URL}/q/${pay.token}`)}
+        />
+      )}
+      {waiting.first === "answer" && answer && (
+        <ListRow
+          palette={palette}
+          title={t("answerQuote", { number: answer.number })}
+          subtitle={`${answer.title} · ${formatMoney(answer.total, answer.currency, locale)}`}
+          onPress={() => void Linking.openURL(`${WEB_URL}/q/${answer.token}`)}
+        />
+      )}
+      {waiting.first === "sign" && sign && (
+        <ListRow palette={palette} title={t("signDocument", { name: sign.name })} subtitle={t("signHint")} onPress={() => router.push("/documents")} />
+      )}
+      {waiting.first === "review" && toReview && (
+        <>
+          <Text style={[local.reviewTitle, { color: palette.foreground }]}>{tReview("cardTitle", { service: toReview.service_name })}</Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{tReview("cardText")}</Text>
+          <Button
+            label={tReview("rate")}
+            palette={palette}
+            variant="secondary"
+            onPress={() => router.push({ pathname: "/review/[id]", params: { id: toReview.booking_id, service: toReview.service_name } })}
+          />
+        </>
+      )}
+      {waiting.others > 0 && (
+        <ListRow palette={palette} title={t("moreWaiting", { count: waiting.others })} onPress={() => router.navigate("/bookings")} />
+      )}
+    </Card>
+  );
 
   const screen = (
     <Screen
       palette={palette}
       refreshing={refreshing}
       onRefresh={() => void reload()}
-      footer={
-        (data?.appointments ?? 0) > 0 ? (
-          <Button label={tAppointment("cta")} palette={palette} onPress={() => router.push("/appointment")} />
-        ) : (
-          <Button label={t("bookClass")} palette={palette} onPress={() => router.navigate("/schedule")} />
-        )
-      }
     >
       {multi && <BusinessStrip palette={palette} overview={overview.data} />}
 
@@ -96,88 +151,20 @@ export default function Home() {
         </Text>
       </View>
 
-      {health?.required && health.state !== "ok" && (
-        <Card palette={palette}>
-          <Text style={[styles.muted, { color: palette.foreground }]}>
-            {health.state === "needs_review" || health.state === "rejected"
-              ? tHealth("reviewPending")
-              : health.state === "expiring" && health.current
-                ? tHealth("expiringBanner", { date: formatDay(health.current.valid_until) })
-                : tHealth("banner")}
-          </Text>
-          {health.state !== "needs_review" && health.state !== "rejected" && (
-            <Button
-              label={health.state === "expiring" ? tHealth("update") : tHealth("fill")}
-              palette={palette}
-              onPress={() => router.push("/health")}
-            />
-          )}
-        </Card>
-      )}
-
-      {account.toPay.length + account.toAnswer.length + account.toSign.length > 0 && (
-        <Card palette={palette}>
-          <Text accessibilityRole="header" style={[local.reviewTitle, { color: palette.foreground }]}>
-            {t("waiting")}
-          </Text>
-          {account.toPay.map((quote) => (
-            <ListRow
-              key={`pay-${quote.token}`}
-              palette={palette}
-              title={t(quote.kind === "bill" ? "payBill" : "payDeposit", { number: quote.number })}
-              subtitle={quote.title}
-              trailing={<Badge label={formatMoney(quote.deposit_due, quote.currency, locale)} tone="primary" palette={palette} />}
-              onPress={() => void Linking.openURL(`${WEB_URL}/q/${quote.token}`)}
-            />
-          ))}
-          {account.toAnswer.map((quote) => (
-            <ListRow
-              key={`answer-${quote.token}`}
-              palette={palette}
-              title={t("answerQuote", { number: quote.number })}
-              subtitle={`${quote.title} · ${formatMoney(quote.total, quote.currency, locale)}`}
-              onPress={() => void Linking.openURL(`${WEB_URL}/q/${quote.token}`)}
-            />
-          ))}
-          {account.toSign.map((document) => (
-            <ListRow
-              key={`sign-${document.id}`}
-              palette={palette}
-              title={t("signDocument", { name: document.name })}
-              subtitle={t("signHint")}
-              onPress={() => router.push("/documents")}
-            />
-          ))}
-        </Card>
-      )}
-
-      {data?.toReview[0] && (
-        <Card palette={palette}>
-          <Text style={[local.reviewTitle, { color: palette.foreground }]}>
-            {tReview("cardTitle", { service: data.toReview[0].service_name })}
-          </Text>
-          <Text style={[styles.muted, { color: palette.muted }]}>{tReview("cardText")}</Text>
-          <Button
-            label={tReview("rate")}
-            palette={palette}
-            variant="secondary"
-            onPress={() =>
-              router.push({
-                pathname: "/review/[id]",
-                params: { id: data.toReview[0].booking_id, service: data.toReview[0].service_name },
-              })
-            }
-          />
-        </Card>
-      )}
-
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       {error === undefined && !data && <ListSkeleton palette={palette} />}
 
       {homeCards.map((card) => {
         const Card = HOME_CARDS[card];
-        return data ? <Card key={card} data={homeData(data)} /> : null;
+        return data ? (
+          <Fragment key={card}>
+            <Card data={homeData(data)} />
+            {/* Right under the next booking: the one thing that needs the client, if anything. */}
+            {card === (homeCards.includes("next_booking") ? "next_booking" : homeCards[0]) && needsYou}
+          </Fragment>
+        ) : null;
       })}
+      {data && homeCards.length === 0 && needsYou}
     </Screen>
   );
   // Swiping sideways over the home screen moves to the next business (only with two or more).
@@ -192,12 +179,12 @@ export default function Home() {
 
 const local = StyleSheet.create({
   fill: { flex: 1 },
-  hero: { borderRadius: radius.dialog, padding: 24, paddingVertical: 32, gap: 6, overflow: "hidden" },
+  hero: { borderRadius: radius.dialog, padding: 20, gap: 4, overflow: "hidden" },
   orb: { position: "absolute", borderRadius: radius.pill },
   orbLarge: { width: 220, height: 220, top: -90, end: -60 },
   orbSmall: { width: 120, height: 120, bottom: -50, end: 70 },
   logo: { width: 48, height: 48, borderRadius: radius.card, backgroundColor: colors.light.surface },
-  business: { fontSize: 30, fontWeight: "600", textAlign: "left" },
+  business: { fontSize: 24, fontWeight: "600", textAlign: "left" },
   greeting: { fontSize: 15, textAlign: "left" },
   reviewTitle: { fontSize: 17, fontWeight: "600", textAlign: "left" },
 });

@@ -8,7 +8,8 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { tint } from "@business-os/app-kit/lib/brand";
-import { groupByRecency } from "@business-os/app-kit/lib/client-home";
+import { groupByRecency, updateGroup, type UpdateGroup } from "@business-os/app-kit/lib/client-home";
+import { Chip } from "@business-os/app-kit/components/chip";
 import { PressableScale } from "@business-os/app-kit/components/motion";
 import { notificationIcon, useNotificationText } from "@/lib/notification-text";
 import { unwrap } from "@business-os/app-kit/lib/api";
@@ -20,7 +21,7 @@ import { radius } from "@business-os/app-kit/lib/theme";
 type Notification = components["schemas"]["Notification"];
 const PAGE = 50; // the API's default page size
 
-/** What the studio did with the client's bookings and declarations, newest first. */
+/** What the business did with the client's bookings and declarations, and what friends did, newest first; filtered by kind. */
 export default function Updates() {
   const t = useTranslations("client.updates");
   const tHome = useTranslations("client.homeCards");
@@ -35,6 +36,7 @@ export default function Updates() {
   // Where the next older page starts: undefined until a page has been loaded here, null at the end.
   const [cursor, setCursor] = useState<string | null | undefined>(undefined);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [filter, setFilter] = useState<UpdateGroup | "all">("all");
 
   useFocusEffect(
     useCallback(() => {
@@ -53,7 +55,11 @@ export default function Updates() {
 
   const newest = inbox?.items ?? [];
   const seen = new Set(newest.map((n) => n.id));
-  const items = [...newest, ...older.filter((n) => !seen.has(n.id))];
+  const all = [...newest, ...older.filter((n) => !seen.has(n.id))];
+  // Only the kinds that exist are offered as filters; "all" is always there.
+  const kinds = (["bookings", "friends", "general"] as const).filter((g) => all.some((n) => updateGroup(n.kind) === g));
+  const active = filter === "all" || kinds.includes(filter) ? filter : "all";
+  const items = active === "all" ? all : all.filter((n) => updateGroup(n.kind) === active);
   const nextCursor = cursor === undefined ? (inbox?.next_cursor ?? null) : cursor;
   const hasMore = nextCursor !== null;
 
@@ -81,6 +87,20 @@ export default function Updates() {
         void refresh().finally(() => setRefreshing(false));
       }}
     >
+      {kinds.length > 1 && (
+        <View accessibilityRole="tablist" accessibilityLabel={t("filter")} style={local.filters}>
+          {(["all", ...kinds] as const).map((g) => (
+            <Chip
+              key={g}
+              role="tab"
+              label={t(`groups.${g}`)}
+              selected={active === g}
+              palette={palette}
+              onPress={() => setFilter(g)}
+            />
+          ))}
+        </View>
+      )}
       {inbox && items.length === 0 && <EmptyState palette={palette} message={t("empty")} />}
       {groupByRecency(items, (n) => n.created_at, (instant) => dayOf(instant, business.time_zone), today, addDays(today, -7)).map((group) => (
         <View key={group.key} style={local.group}>
@@ -122,6 +142,7 @@ const local = StyleSheet.create({
   row: { flexDirection: "row", gap: 10, paddingVertical: 12, alignItems: "flex-start" },
   dot: { width: 8, height: 8, borderRadius: 4, marginTop: 7 },
   group: { gap: 8 },
+  filters: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   icon: { width: 36, height: 36, borderRadius: radius.card, alignItems: "center", justifyContent: "center" },
   info: { flex: 1, gap: 2 },
   text: { fontSize: 15, textAlign: "left" },

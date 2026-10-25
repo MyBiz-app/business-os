@@ -1660,7 +1660,9 @@
       "bookings": "My bookings",
       "profile": "Profile",
       "updates": "Updates",
-      "updatesUnread": "{count, plural, one {Updates, # new} other {Updates, # new}}"
+      "updatesUnread": "{count, plural, one {Updates, # new} other {Updates, # new}}",
+      "book": "Book",
+      "mine": "Mine"
     },
     "signIn": {
       "title": "Sign in",
@@ -1726,7 +1728,9 @@
       "payDeposit": "Pay the deposit for quote {number}",
       "answerQuote": "Answer quote {number}",
       "signDocument": "Sign “{name}”",
-      "signHint": "Sign by writing your name"
+      "signHint": "Sign by writing your name",
+      "needsYou": "Needs you",
+      "moreWaiting": "{count, plural, one {# more thing is waiting} other {# more things are waiting}}"
     },
     "all": {
       "title": "My businesses",
@@ -1784,7 +1788,7 @@
       "releaseReminderBody": "The schedule for the next week is open. Book your spot!"
     },
     "bookings": {
-      "title": "My bookings",
+      "title": "Mine",
       "upcoming": "Upcoming",
       "history": "History",
       "noUpcoming": "Nothing booked yet.",
@@ -1803,7 +1807,8 @@
       "buyFailed": "The purchase didn't go through. Try again.",
       "receipts": "Receipts",
       "noReceipts": "No receipts yet.",
-      "showAll": "Show all ({count})"
+      "showAll": "Show all ({count})",
+      "entriesLeftLabel": "entries left"
     },
     "profile": {
       "title": "Profile",
@@ -1848,7 +1853,8 @@
         "saidYes": "You will get offers and news",
         "saidNo": "No more offers and news",
         "failed": "Could not save your choice. Try again."
-      }
+      },
+      "myDetails": "My details"
     },
     "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
     "full": "Full{count, plural, =0 {} one { · # waiting} other { · # waiting}}",
@@ -1924,6 +1930,13 @@
         "freeze_approved": "Your freeze of {plan} was approved: {from} - {date}.",
         "freeze_rejected": "Your freeze request for {plan} wasn't approved.",
         "credit_returned": "The business gave you back your visit for {service}, {when}."
+      },
+      "filter": "Filter updates",
+      "groups": {
+        "all": "All",
+        "bookings": "Bookings",
+        "friends": "Friends",
+        "general": "General"
       }
     },
     "pay": {
