@@ -69,8 +69,7 @@ export default function AllMine() {
   const dormant = (data?.businesses ?? []).filter((b) => b.dormant);
 
   return (
-    <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
-      <Heading palette={palette}>{t("title")}</Heading>
+    <Screen title={t("title")} palette={palette} refreshing={loading} onRefresh={() => void reload()}>
       <BusinessStrip palette={palette} overview={data} />
 
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}

@@ -8,7 +8,7 @@ import { CancellationPolicyCard } from "@/components/cancellation-policy-card";
 import { ClientIdentityCard } from "@/components/identity-card";
 import { MarketingConsentCard } from "@/components/marketing-consent";
 import { ProfileForm } from "@/components/profile-form";
-import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
+import { Badge, ListRow, RowGroup, SectionTitle } from "@business-os/app-kit/components/rows";
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { Button, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
@@ -39,8 +39,7 @@ export default function Profile() {
     account.documents.length > 0 || account.quotes.length > 0 || account.receipts > 0 || account.onSite || !!business?.dependents || !!health?.form;
 
   return (
-    <Screen palette={palette}>
-      <Heading palette={palette}>{t("client.profile.title")}</Heading>
+    <Screen title={t("client.profile.title")} palette={palette}>
       <ProfileHeader name={[business?.first_name, business?.last_name].filter(Boolean).join(" ")} />
       <Text style={[styles.muted, { color: palette.muted }]}>
         {t("client.profile.signedInAs", { email: session?.user.email ?? "" })}
@@ -56,64 +55,66 @@ export default function Profile() {
       )}
 
       {hasAccountRows && <SectionTitle title={t("client.profile.account")} palette={palette} />}
-      {account.documents.length > 0 && (
-        <ListRow
-          palette={palette}
-          title={t("documents.mine")}
-          subtitle={t("documents.mineHint")}
-          trailing={
-            account.toSign.length > 0 ? (
-              <Badge label={t("client.profile.toSign", { count: account.toSign.length })} tone="danger" palette={palette} />
-            ) : null
-          }
-          onPress={() => router.push("/documents")}
-        />
-      )}
-      {account.quotes.length > 0 && (
-        <ListRow
-          palette={palette}
-          title={quotesTitle}
-          trailing={quotesBadge ? <Badge label={quotesBadge.label} tone={quotesBadge.tone} palette={palette} /> : null}
-          onPress={() => router.push("/quotes")}
-        />
-      )}
-      {account.receipts > 0 && (
-        <ListRow
-          palette={palette}
-          title={t("client.profile.receipts")}
-          subtitle={t("client.profile.receiptsHint")}
-          onPress={() => router.push("/receipts")}
-        />
-      )}
-      {account.onSite && (
-        <ListRow
-          palette={palette}
-          title={t("jobs.myAddresses")}
-          subtitle={t("jobs.myAddressesHint")}
-          onPress={() => router.push("/addresses")}
-        />
-      )}
-      {business?.dependents && (
-        <ListRow
-          palette={palette}
-          title={t(`dependents.mine.${business.dependents}`)}
-          subtitle={t(`dependents.mineHint.${business.dependents}`)}
-          onPress={() => router.push("/dependents")}
-        />
-      )}
-      {health?.form && (
-        <ListRow
-          palette={palette}
-          title={t("client.health.title")}
-          subtitle={t(`health.states.${health.state}`)}
-          trailing={
-            health.state === "ok" ? null : (
-              <Badge label={t(health.state === "expiring" ? "client.health.update" : "client.health.fill")} tone={healthTone} palette={palette} />
-            )
-          }
-          onPress={() => router.push("/health")}
-        />
-      )}
+      <RowGroup palette={palette}>
+        {account.documents.length > 0 && (
+          <ListRow
+            palette={palette}
+            title={t("documents.mine")}
+            subtitle={t("documents.mineHint")}
+            trailing={
+              account.toSign.length > 0 ? (
+                <Badge label={t("client.profile.toSign", { count: account.toSign.length })} tone="danger" palette={palette} />
+              ) : null
+            }
+            onPress={() => router.push("/documents")}
+          />
+        )}
+        {account.quotes.length > 0 && (
+          <ListRow
+            palette={palette}
+            title={quotesTitle}
+            trailing={quotesBadge ? <Badge label={quotesBadge.label} tone={quotesBadge.tone} palette={palette} /> : null}
+            onPress={() => router.push("/quotes")}
+          />
+        )}
+        {account.receipts > 0 && (
+          <ListRow
+            palette={palette}
+            title={t("client.profile.receipts")}
+            subtitle={t("client.profile.receiptsHint")}
+            onPress={() => router.push("/receipts")}
+          />
+        )}
+        {account.onSite && (
+          <ListRow
+            palette={palette}
+            title={t("jobs.myAddresses")}
+            subtitle={t("jobs.myAddressesHint")}
+            onPress={() => router.push("/addresses")}
+          />
+        )}
+        {business?.dependents && (
+          <ListRow
+            palette={palette}
+            title={t(`dependents.mine.${business.dependents}`)}
+            subtitle={t(`dependents.mineHint.${business.dependents}`)}
+            onPress={() => router.push("/dependents")}
+          />
+        )}
+        {health?.form && (
+          <ListRow
+            palette={palette}
+            title={t("client.health.title")}
+            subtitle={t(`health.states.${health.state}`)}
+            trailing={
+              health.state === "ok" ? null : (
+                <Badge label={t(health.state === "expiring" ? "client.health.update" : "client.health.fill")} tone={healthTone} palette={palette} />
+              )
+            }
+            onPress={() => router.push("/health")}
+          />
+        )}
+      </RowGroup>
 
       <ProfileForm key={business?.client_id} />
       <ClientIdentityCard key={`id-${business?.client_id}`} />
