@@ -1,15 +1,14 @@
 """Accounts the demo seed must never fill or tidy.
 
-The MyBiz primary owner owns no businesses (it lands in the console), and `curated` removes the
-other businesses its account owns alone. So the seed refuses these emails for every demo except
-`platform`, which only turns the account into a platform team owner. The list is fixed in code
-and can be extended with the `API_SEED_BLOCKED_EMAILS` environment variable (comma separated).
+The list is empty in code (the MyBiz primary owner, adire7399, may own a demo studio and train
+in it, decision of 2026-10-25) and can be filled with the `API_SEED_BLOCKED_EMAILS` environment
+variable (comma separated). The seed refuses those emails for every demo except `platform`.
 """
 
 import os
 import sys
 
-BLOCKED_OWNERS = frozenset({"adire7399@gmail.com"})
+BLOCKED_OWNERS: frozenset[str] = frozenset()
 ENV_VAR = "API_SEED_BLOCKED_EMAILS"
 
 
@@ -22,6 +21,6 @@ def refuse_blocked_owner(email: str) -> None:
     """Stops the program (SystemExit) when the account must not get demo businesses."""
     if email.strip().lower() in blocked_owners():
         sys.exit(
-            f"Refusing to seed demo businesses for {email}: this account is the platform primary "
-            "owner and must own no businesses. Use the demo account instead."
+            f"Refusing to seed demo businesses for {email}: the account is listed in "
+            f"{ENV_VAR}. Use the demo account instead."
         )

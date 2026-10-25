@@ -57,6 +57,7 @@ ALLOWED = {
     "core/business_export.py": 1,  # table and column names read from the database catalog
     "files/__init__.py": 1,
     "reports/metrics.py": 2,  # the staff filter, a constant fragment (R36)
+    "seed/accounts.py": 2,  # table and column names read from the database catalog (demo seed)
     "seed/social.py": 1,  # table and column names read from the database catalog (demo seed)
     "secrets_rotation.py": 2,  # table and column names from the COLUMNS constant
 }

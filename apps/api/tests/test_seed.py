@@ -814,19 +814,20 @@ def test_curated_demo_fills_every_tenant_table_or_says_why_not(engine: Engine) -
     assert None not in sizes and "solo" not in sizes
 
 
-def test_the_seed_refuses_the_primary_owner_account(
+def test_the_seed_refuses_the_listed_accounts(
     engine: Engine, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from app.seed.guard import refuse_blocked_owner
 
-    for call in (
-        lambda c: curate(c, "Adire7399@gmail.com", 1, random.Random(1)),
-        lambda c: enrich_profiles(c, "adire7399@gmail.com"),
-        lambda c: seed_demo(c, "adire7399@gmail.com", "studio", 1, random.Random(1)),
-    ):
-        with engine.begin() as connection, pytest.raises(SystemExit, match="primary owner"):
-            call(connection)
+    refuse_blocked_owner("adire7399@gmail.com")  # the primary owner may own a demo studio
     monkeypatch.setenv("API_SEED_BLOCKED_EMAILS", " Someone@Example.com ,other@example.com")
+    for call in (
+        lambda c: curate(c, "Someone@example.com", 1, random.Random(1)),
+        lambda c: enrich_profiles(c, "someone@example.com"),
+        lambda c: seed_demo(c, "other@example.com", "studio", 1, random.Random(1)),
+    ):
+        with engine.begin() as connection, pytest.raises(SystemExit, match="Refusing"):
+            call(connection)
     with pytest.raises(SystemExit):
         refuse_blocked_owner("someone@example.com")
     refuse_blocked_owner("fine@example.com")  # anyone else is allowed
@@ -968,3 +969,36 @@ def test_full_demo_connects_the_plus_logins_the_test_customer_and_friends(engine
         # The customer and two friends in one class, plus a haircut if the barber has a slot.
         assert first["test_customer"]["bookings"] in (3, 4)
     assert CUSTOMER_EMAIL != "adire7399@gmail.com"  # a client, never the primary owner
+
+
+def test_the_owner_moves_and_trains_in_their_own_studio(engine: Engine) -> None:
+    from app.seed.accounts import move_owner, owner_as_client
+
+    old, new = uuid4(), uuid4()
+    with engine.begin() as connection:
+        for user, email in ((old, "fake-owner@example.com"), (new, "real-owner@example.com")):
+            connection.execute(
+                text("INSERT INTO app.users (id, email) VALUES (:id, :e)"), {"id": user, "e": email}
+            )
+        (tenant,) = seed_demo(connection, "fake-owner@example.com", "studio", 1, random.Random(1))
+        assert move_owner(connection, "fake-owner@example.com", "real-owner@example.com") == {
+            "moved": 1,
+            "clients": 0,
+        }
+        assert move_owner(connection, "fake-owner@example.com", "real-owner@example.com") == {
+            "moved": 0,
+            "clients": 0,
+        }  # a second run changes nothing
+        owners = connection.execute(
+            text("SELECT user_id FROM app.tenant_members WHERE tenant_id = :t AND role = 'owner'"),
+            {"t": tenant},
+        ).scalars().all()  # fmt: skip
+        assert owners == [new]
+        first = owner_as_client(connection, "real-owner@example.com")
+        again = owner_as_client(connection, "real-owner@example.com")
+        assert first["businesses"] == 1 and again["businesses"] == 1
+        clients = connection.execute(
+            text("SELECT count(*) FROM app.clients WHERE tenant_id = :t AND user_id = :u"),
+            {"t": tenant, "u": new},
+        ).scalar_one()
+        assert clients == 1  # a client of their own studio, once
