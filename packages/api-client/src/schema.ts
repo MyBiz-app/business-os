@@ -9686,6 +9686,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/sessions/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sessions Participants
+         * @description Participants of many classes in one request (a day's schedule), keyed by class id.
+         *     Classes in categories without participant lists, or not visible to the client, are left out.
+         */
+        get: operations["sessions_participants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/sessions/{session_id}/participants": {
         parameters: {
             query?: never;
@@ -47369,6 +47390,41 @@ export interface operations {
                     "image/png": unknown;
                     "image/jpeg": unknown;
                     "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sessions_participants: {
+        parameters: {
+            query: {
+                session_ids: string[];
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: components["schemas"]["Person"][];
+                    };
                 };
             };
             /** @description Validation Error */

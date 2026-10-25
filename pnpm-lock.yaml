@@ -423,6 +423,15 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.117.2
         version: 2.117.2(@opentelemetry/api@1.9.1)
+      '@tanstack/query-async-storage-persister':
+        specifier: 5.90.5
+        version: 5.90.5
+      '@tanstack/react-query':
+        specifier: 5.90.5
+        version: 5.90.5(react@19.3.0)
+      '@tanstack/react-query-persist-client':
+        specifier: 5.90.5
+        version: 5.90.5(@tanstack/react-query@5.90.5(react@19.3.0))(react@19.3.0)
       '@types/react':
         specifier: ~19.2.2
         version: 19.2.18
@@ -3450,6 +3459,29 @@ packages:
 
   '@tailwindcss/postcss@4.3.3':
     resolution: {integrity: sha512-JTSZZGQi1AyKirbLN3azmjVzef92tcX7h+iSqPdaeStyFpGpDlKvvpxeOE8njhbUanbRwr3z8DyzhICWnMtQeg==}
+
+  '@tanstack/query-async-storage-persister@5.90.5':
+    resolution: {integrity: sha512-FmLjtkic/2epLC1WOFUO+zQEboiEgABwDbSnbWDIF8g2BGyPtzaTcf36vW3caFiQo7bnjO+WrprjWwd8YDoY/A==}
+
+  '@tanstack/query-core@5.90.3':
+    resolution: {integrity: sha512-HtPOnCwmx4dd35PfXU8jjkhwYrsHfuqgC8RCJIwWglmhIUIlzPP0ZcEkDAc+UtAWCiLm7T8rxeEfHZlz3hYMCA==}
+
+  '@tanstack/query-core@5.90.5':
+    resolution: {integrity: sha512-wLamYp7FaDq6ZnNehypKI5fNvxHPfTYylE0m/ZpuuzJfJqhR5Pxg9gvGBHZx4n7J+V5Rg5mZxHHTlv25Zt5u+w==}
+
+  '@tanstack/query-persist-client-core@5.91.2':
+    resolution: {integrity: sha512-3a8l4SOADTI4ZXlXyMPqhTpUaeofQJLiILA6bSpd+ofrujCRrYyJWIcwZP6XnOBHn+0s5MVtSZBS0SFVXTmQmA==}
+
+  '@tanstack/react-query-persist-client@5.90.5':
+    resolution: {integrity: sha512-FPgThLtKQOLHRvXPoXzYWRLBC85kGCqN/LGZcQuxeJjw1xOtXkOHm2xJscWE2ggFxR2Ji+o1ekZsdQjSZcZThg==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.90.3
+      react: ^18 || ^19
+
+  '@tanstack/react-query@5.90.5':
+    resolution: {integrity: sha512-pN+8UWpxZkEJ/Rnnj2v2Sxpx1WFlaa9L6a4UO89p6tTQbeo+m0MS8oYDjbggrR8QcTyjKoYWKS3xJQGr3ExT8Q==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@testing-library/dom@10.4.2':
     resolution: {integrity: sha512-yzr2S9HyAIdhz2/6qHgbs665Q7PKVcDF05vsOlHPxG1mo36gKVesdYVeDLnXgfjJ03CrKRk08knc6+E/9m8v2Q==}
@@ -9918,6 +9950,30 @@ snapshots:
       '@tailwindcss/oxide': 4.3.3
       postcss: 8.5.28
       tailwindcss: 4.3.3
+
+  '@tanstack/query-async-storage-persister@5.90.5':
+    dependencies:
+      '@tanstack/query-core': 5.90.3
+      '@tanstack/query-persist-client-core': 5.91.2
+
+  '@tanstack/query-core@5.90.3': {}
+
+  '@tanstack/query-core@5.90.5': {}
+
+  '@tanstack/query-persist-client-core@5.91.2':
+    dependencies:
+      '@tanstack/query-core': 5.90.3
+
+  '@tanstack/react-query-persist-client@5.90.5(@tanstack/react-query@5.90.5(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      '@tanstack/query-persist-client-core': 5.91.2
+      '@tanstack/react-query': 5.90.5(react@19.3.0)
+      react: 19.3.0
+
+  '@tanstack/react-query@5.90.5(react@19.3.0)':
+    dependencies:
+      '@tanstack/query-core': 5.90.5
+      react: 19.3.0
 
   '@testing-library/dom@10.4.2':
     dependencies:

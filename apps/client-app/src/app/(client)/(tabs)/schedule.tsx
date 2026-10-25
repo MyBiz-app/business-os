@@ -16,8 +16,9 @@ import { BranchBar } from "@/components/branch-bar";
 import { Availability } from "@/components/availability";
 import { type ClientSession, SessionCard } from "@/components/session-card";
 import { Button, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
-import { unwrap } from "@business-os/app-kit/lib/api";
-import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { useCachedLoad } from "@business-os/app-kit/lib/use-cached-load";
+import { loadScheduleStatic, scheduleKey } from "@/lib/client-data";
+import { useDataContext } from "@/lib/use-data-context";
 import { scheduleViewFor, useTerm } from "@business-os/app-kit/lib/vertical";
 import { NO_FILTERS, applyFilters, filterOptions, upcomingRelease, type ClassFilters } from "@/lib/class-filters";
 import { useDependents } from "@/lib/use-dependents";
@@ -41,16 +42,12 @@ export default function Schedule() {
 
   const [view, setView] = useState<CalendarView>("day");
   const win = useScheduleWindow(view, day);
-  const load = useCallback(async () => {
-    if (!business) return { appointments: [], courts: [], release: null };
-    const [appointments, courts, release] = await Promise.all([
-      api.GET("/client/appointments/services", { params: scope }),
-      api.GET("/client/resources", { params: scope }),
-      api.GET("/client/schedule-release", { params: scope }),
-    ]);
-    return { appointments: appointments.data ?? [], courts: courts.data ?? [], release: release.data ?? null };
-  }, [api, scope, business]);
-  const { data, loading: loadingStatic } = useLoad(load);
+  const ctx = useDataContext();
+  const { data, loading: loadingStatic } = useCachedLoad(
+    ctx ? scheduleKey(ctx) : ["schedule-static"],
+    () => (ctx ? loadScheduleStatic(ctx) : Promise.resolve({ appointments: [], courts: [], release: null })),
+    { enabled: Boolean(ctx) },
+  );
   const loading = loadingStatic || win.loading;
   const [overrides, setOverrides] = useState<Record<string, ClientSession>>({});
   const [branchFilter, setBranchFilter] = useState<BranchFilter>(ALL_BRANCHES);

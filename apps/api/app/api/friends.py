@@ -12,10 +12,10 @@ import re
 import secrets
 import time
 from datetime import UTC, datetime, timedelta
-from typing import Literal
+from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
@@ -434,6 +434,39 @@ def person_avatar(client_id: UUID, context: ClientDep) -> Response:
     if row is None:
         raise not_found()
     return image_response(row.avatar, row.content_type)
+
+
+MAX_BATCH_SESSIONS = 60
+
+
+@router.get("/sessions/participants")
+def sessions_participants(
+    context: ClientDep,
+    session_ids: Annotated[list[UUID], Query(max_length=MAX_BATCH_SESSIONS)],
+) -> dict[UUID, list[Person]]:
+    """Participants of many classes in one request (a day's schedule), keyed by class id.
+    Classes in categories without participant lists, or not visible to the client, are left out."""
+    db = context.session
+    rows = db.execute(
+        text("""
+            SELECT s.id, t.vertical, l.kind
+            FROM app.sessions s
+            JOIN app.tenants t ON t.id = s.tenant_id
+            LEFT JOIN app.locations l ON l.id = s.location_id
+            WHERE s.id = ANY(:ids)
+        """),
+        {"ids": session_ids},
+    ).all()
+    return {
+        row.id: _people(
+            db,
+            "SELECT * FROM app.social_participants(:id) "
+            "ORDER BY (friendship = 'friends') DESC, first_name",
+            {"id": row.id},
+        )
+        for row in rows
+        if kind_pack(row.vertical, row.kind).social == "on"
+    }
 
 
 @router.get("/sessions/{session_id}/participants")
