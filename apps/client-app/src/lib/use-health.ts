@@ -9,6 +9,15 @@ import { useDataContext } from "@/lib/use-data-context";
 
 export type MyHealth = components["schemas"]["MyHealth"];
 
+/** The session the client tapped "book" on while a declaration was missing: once the declaration
+ * is signed, that booking continues by itself. */
+export const bookAfterHealth: { sessionId: string | null } = { sessionId: null };
+
+/** Whether the business needs a declaration the client has not given (or that ran out) before booking. */
+export function mustDeclare(health: MyHealth | null): boolean {
+  return !!health?.required && (health.state === "missing" || health.state === "expired");
+}
+
 /** The client's health declaration state in the current business, refreshed when the screen
  * comes back into focus (for example after signing). */
 export function useHealth(): MyHealth | null {

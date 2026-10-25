@@ -6,7 +6,7 @@ import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/ta
 
 import { useTerm } from "@business-os/app-kit/lib/vertical";
 import { useAreas } from "@/providers/area-provider";
-import { AiBubble } from "@/components/ai-bubble";
+import { AiHeader } from "@/components/ai-header";
 import { useStaff } from "@/providers/staff-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { Spinner } from "@business-os/app-kit/components/spinner";
@@ -36,6 +36,7 @@ export default function TabsLayout() {
 
   return (
     <View style={{ flex: 1 }}>
+    <AiHeader />
     <Tabs
       screenOptions={screenOptions}
     >
@@ -66,7 +67,6 @@ export default function TabsLayout() {
       />
       <Tabs.Screen name="me" options={{ title: t("me"), tabBarIcon: icon("person") }} />
     </Tabs>
-    <AiBubble />
     </View>
   );
 }

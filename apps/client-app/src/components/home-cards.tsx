@@ -352,15 +352,17 @@ function BusinessInfo({ data }: { data: HomeData }) {
                   </Text>
                 ) : null}
               </View>
-              {location.address ? (
-                <>
-                  <ActionPill label={t("navigateWaze")} icon="navigate-outline" palette={palette} onPress={() => void Linking.openURL(wazeLink(location.address!, location))} />
-                  <ActionPill label={t("navigateGoogle")} icon="map-outline" palette={palette} onPress={() => void Linking.openURL(googleMapsLink(location.address!, location))} />
-                </>
-              ) : null}
-              {location.website_url ? (
-                <ActionPill label={t("website")} icon="globe-outline" palette={palette} onPress={() => void Linking.openURL(location.website_url!)} />
-              ) : null}
+              <View style={local.chips}>
+                {location.address ? (
+                  <>
+                    <ActionPill label={t("navigateWaze")} icon="navigate-outline" palette={palette} onPress={() => void Linking.openURL(wazeLink(location.address!, location))} />
+                    <ActionPill label={t("navigateGoogle")} icon="map-outline" palette={palette} onPress={() => void Linking.openURL(googleMapsLink(location.address!, location))} />
+                  </>
+                ) : null}
+                {location.website_url ? (
+                  <ActionPill label={t("website")} icon="globe-outline" palette={palette} onPress={() => void Linking.openURL(location.website_url!)} />
+                ) : null}
+              </View>
             </View>
           );
         })}
@@ -387,8 +389,9 @@ export const HOME_CARDS: Record<HomeCard, (props: { data: HomeData }) => ReactNo
 
 const local = StyleSheet.create({
   section: { gap: 8 },
-  grow: { flex: 1, gap: 2 },
-  line: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 8 },
+  grow: { gap: 2 },
+  // One branch per block: name, address and distance at full width, the navigation pills on their own row below.
+  line: { gap: 8, paddingVertical: 8 },
   lineTitle: { fontSize: 15, fontWeight: "500", textAlign: "left" },
   lineMeta: { fontSize: 13, textAlign: "left" },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },

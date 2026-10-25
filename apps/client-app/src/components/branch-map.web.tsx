@@ -1,7 +1,7 @@
 import type { Map as MapLibreMap, Marker } from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 
 import { hasPoint } from "@business-os/app-kit/lib/distance";
 import { radius } from "@business-os/app-kit/lib/theme";
@@ -14,10 +14,22 @@ const STYLES = { light: "https://tiles.openfreemap.org/styles/positron", dark: "
 
 type Maplibre = typeof import("maplibre-gl");
 
+/** The tiles label places in their local language (Arabic, English...). Point every label at the
+ * app's language instead, falling back to the Latin name and then the local one. */
+function localizeLabels(target: MapLibreMap, locale: string) {
+  const language = locale.split("-")[0];
+  for (const layer of target.getStyle().layers ?? []) {
+    if (layer.type === "symbol" && layer.layout?.["text-field"] !== undefined) {
+      target.setLayoutProperty(layer.id, "text-field", ["coalesce", ["get", `name:${language}`], ["get", "name:latin"], ["get", "name"]]);
+    }
+  }
+}
+
 /** The branches on a map. MapLibre 6 cannot get its worker from the bundler, so the file is
  * copied next to the app by scripts/copy-maplibre-worker.mjs and handed over here. */
 export function BranchMap({ locations, selectedId, onSelect }: { locations: Location[]; selectedId?: string; onSelect?: (id: string) => void }) {
   const t = useTranslations("client.homeCards");
+  const locale = useLocale();
   const { scheme, palette, reduceMotion } = useTheme();
   const host = useRef<HTMLDivElement>(null);
   const library = useRef<Maplibre | null>(null);
@@ -47,9 +59,17 @@ export function BranchMap({ locations, selectedId, onSelect }: { locations: Loca
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasPins]);
 
+  // A new style (first load, or a theme switch) comes with local-language labels; relabel it.
   useEffect(() => {
-    if (ready) map.current?.setStyle(STYLES[scheme]);
-  }, [ready, scheme]);
+    const target = map.current;
+    if (!ready || !target) return;
+    const relabel = () => localizeLabels(target, locale);
+    target.on("style.load", relabel);
+    target.setStyle(STYLES[scheme]);
+    return () => {
+      target.off("style.load", relabel);
+    };
+  }, [ready, scheme, locale]);
 
   useEffect(() => {
     const target = map.current;
@@ -69,7 +89,10 @@ export function BranchMap({ locations, selectedId, onSelect }: { locations: Loca
     const duration = reduceMotion ? 0 : 600;
     if (chosen) target.easeTo({ center: [chosen.longitude, chosen.latitude], zoom: 13, duration });
     else if (placed.length === 1) target.jumpTo({ center: [placed[0].longitude, placed[0].latitude], zoom: 13 });
-    else target.fitBounds(placed.reduce((box, l) => box.extend([l.longitude, l.latitude]), new maplibre.LngLatBounds()), { padding: 40, duration, maxZoom: 13 });
+    else {
+      target.resize();
+      target.fitBounds(placed.reduce((box, l) => box.extend([l.longitude, l.latitude]), new maplibre.LngLatBounds()), { padding: 40, duration, maxZoom: 13 });
+    }
   }, [ready, placed, selectedId, palette.primary, onSelect, reduceMotion]);
 
   if (!hasPins) return null;

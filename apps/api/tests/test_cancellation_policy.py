@@ -409,3 +409,14 @@ def test_no_show_limit_pauses_app_booking(
     other = new_session(client, studio, 2, local_today() + timedelta(days=6))
     allowed = client.post(f"/client/sessions/{other}/bookings", headers=mine)
     assert allowed.status_code == 201, allowed.text
+
+
+def test_policy_text_mentions_only_the_kinds_the_business_sells() -> None:
+    from app.api.cancellation import BusinessPolicy, policy_text
+
+    mixed = BusinessPolicy(group_minutes=360, personal_minutes=1440, resource_minutes=2880)
+    everything = policy_text(mixed, "en")
+    gym = policy_text(mixed, "en", {"group", "personal"})
+
+    assert "court" in everything.lower() or "room" in everything.lower()
+    assert "court" not in gym.lower() and "room" not in gym.lower()

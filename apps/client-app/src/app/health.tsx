@@ -1,4 +1,5 @@
 import type { components } from "@business-os/api-client";
+import { router } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
@@ -9,6 +10,7 @@ import { BackBar } from "@business-os/app-kit/components/rows";
 import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { bookAfterHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 
 type MyHealth = components["schemas"]["MyHealth"];
@@ -63,6 +65,8 @@ export default function Health() {
       );
       setSaved(result);
       setEditing(false);
+      // They came here from a "book" tap: go back so the booking carries on.
+      if (bookAfterHealth.sessionId && (result.state === "ok" || result.state === "expiring")) router.back();
     } catch {
       setError(t("generic"));
     } finally {

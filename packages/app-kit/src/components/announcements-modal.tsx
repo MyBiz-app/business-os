@@ -4,12 +4,11 @@ import { Image, Linking, Modal, StyleSheet, View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { apiClient } from "../lib/api";
-import { tint } from "../lib/brand";
 import { useSession } from "../providers/session-provider";
 import { useTheme } from "../providers/theme-provider";
 import { Text } from "./text";
 import { Button, Heading, styles } from "./ui";
-import { fixedColors, radius } from "../lib/theme";
+import { radius, scrimColor } from "../lib/theme";
 
 type Item = { id: string; subject: string; body: string; ctaLabel: string; ctaUrl: string; imageUrl: string };
 
@@ -17,7 +16,7 @@ type Item = { id: string; subject: string; body: string; ctaLabel: string; ctaUr
  * they close it (then it never comes back). A failure to load them never blocks the app. */
 export function AnnouncementsModal() {
   const t = useTranslations("app.announcements");
-  const { palette } = useTheme();
+  const { palette, scheme } = useTheme();
   const { session } = useSession();
   const userId = session?.user.id;
   const [queue, setQueue] = useState<Item[]>([]);
@@ -72,7 +71,7 @@ export function AnnouncementsModal() {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={dismiss} accessibilityLabel={t("label", { brand: BRAND.name })}>
-      <View style={styles2.scrim}>
+      <View style={[styles2.scrim, { backgroundColor: scrimColor(scheme) }]}>
         <View style={[styles2.sheet, { backgroundColor: palette.surface, borderColor: palette.border }]}>
           {current.imageUrl ? <Image source={{ uri: current.imageUrl }} style={styles2.image} accessibilityIgnoresInvertColors /> : null}
           <Heading palette={palette} level={2}>
@@ -98,7 +97,7 @@ export function AnnouncementsModal() {
 }
 
 const styles2 = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: tint(fixedColors.black, 0.5), alignItems: "center", justifyContent: "center", padding: 20 },
+  scrim: { flex: 1, alignItems: "center", justifyContent: "center", padding: 20 },
   sheet: { width: "100%", maxWidth: 420, borderRadius: radius.card, borderWidth: 1, padding: 20, gap: 12 },
   image: { width: "100%", height: 160, borderRadius: radius.card },
 });

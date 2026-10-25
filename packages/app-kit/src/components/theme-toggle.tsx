@@ -8,7 +8,7 @@ import { useTheme } from "../providers/theme-provider";
 import { radius } from "../lib/theme";
 
 /** One-tap sun/moon switch between light and dark (it overrides "follow the system"). */
-export function ThemeToggle() {
+export function ThemeToggle({ size = 48 }: { size?: number }) {
   const t = useTranslations("settings");
   const { scheme, setPreference, palette } = useTheme();
   const toDark = scheme === "light";
@@ -17,9 +17,9 @@ export function ThemeToggle() {
       accessibilityRole="button"
       accessibilityLabel={toDark ? t("themeToggleToDark") : t("themeToggleToLight")}
       onPress={() => setPreference(toDark ? "dark" : "light")}
-      style={[styles.button, { borderColor: palette.border, backgroundColor: tint(palette.primary, 0.08) }]}
+      style={[styles.button, { width: size, height: size }, { borderColor: palette.border, backgroundColor: tint(palette.primary, 0.08) }]}
     >
-      <Ionicons name={toDark ? "moon-outline" : "sunny-outline"} size={22} color={palette.foreground} />
+      <Ionicons name={toDark ? "moon-outline" : "sunny-outline"} size={size > 40 ? 22 : 18} color={palette.foreground} />
     </PressableScale>
   );
 }

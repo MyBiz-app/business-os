@@ -211,14 +211,29 @@ def _duration(minutes: int, messages: dict[str, Any]) -> str:
     return unit["minutes"].replace("{n}", str(minutes))
 
 
-def policy_text(policy: BusinessPolicy, locale: str) -> str:
-    """The policy in words, for clients (the business page and the first sign-up)."""
+# A service's booking mode -> the window kind that governs it.
+WINDOW_OF_MODE = {"class": "group", "appointment": "personal", "resource": "resource"}
+
+
+def sold_windows(db: Session) -> set[str]:
+    """The window kinds the business really sells (a gym has no courts to mention)."""
+    modes = db.execute(
+        text("SELECT DISTINCT booking_mode FROM app.services WHERE active")
+    ).scalars()
+    return {WINDOW_OF_MODE[mode] for mode in modes if mode in WINDOW_OF_MODE}
+
+
+def policy_text(policy: BusinessPolicy, locale: str, sold: set[str] | None = None) -> str:
+    """The policy in words, for clients (the business page and the first sign-up). Only the
+    kinds in `sold` are mentioned; with none sold yet, all three are."""
     messages = load_all_messages(locale)["cancellationPolicy"]
     windows = {
         "group": policy.group_minutes,
         "personal": policy.personal_minutes,
         "resource": policy.resource_minutes,
     }
+    if sold:
+        windows = {kind: minutes for kind, minutes in windows.items() if kind in sold}
     lines: list[str] = []
     if len(set(windows.values())) == 1:
         lines.append(messages["free"].replace("{time}", _duration(policy.group_minutes, messages)))
@@ -236,8 +251,8 @@ def policy_text(policy: BusinessPolicy, locale: str) -> str:
     return " ".join(lines)
 
 
-def both_texts(policy: BusinessPolicy) -> PolicyText:
-    return PolicyText(he=policy_text(policy, "he"), en=policy_text(policy, "en"))
+def both_texts(policy: BusinessPolicy, sold: set[str] | None = None) -> PolicyText:
+    return PolicyText(he=policy_text(policy, "he", sold), en=policy_text(policy, "en", sold))
 
 
 def _overview(db: Session) -> PolicyOverview:
@@ -282,7 +297,7 @@ def _overview(db: Session) -> PolicyOverview:
         plans=[
             PlanOverride(plan_id=r["plan_id"], name=r["name"], policy=override(r)) for r in plans
         ],
-        text=both_texts(business),
+        text=both_texts(business, sold_windows(db)),
     )
 
 
@@ -523,7 +538,7 @@ def my_policy(context: ClientDep) -> ClientPolicy:
         data["late_outcome"] = _outcome(data["late_outcome"])
         data["no_show_outcome"] = _outcome(data["no_show_outcome"])
         policy = BusinessPolicy(**data)
-    return ClientPolicy(text=both_texts(policy))
+    return ClientPolicy(text=both_texts(policy, sold_windows(db)))
 
 
 @client_router.get("/bookings/{booking_id}/cancel-preview")

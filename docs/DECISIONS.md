@@ -495,6 +495,11 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **Why:** a new member would have no shifts, classes or pay terms; taking over keeps the whole history. The seed cannot create sign-ins, so each address must sign up first and the seed is run again.
 - **Revisit** if a table gets a reference to a person that is not a database foreign key.
 
+### App upgrade to an Apple-level feel (2026-10-25, spec approved, slice U1 urgent fixes)
+
+- **Decision:** the owner approved the whole [app upgrade spec](plans/2026-10/app-upgrade-spec-2026-10-25.md) except the paid Apple developer account (not now). The client keeps five bottom tabs: Home, Book, Mine, Updates, Profile; Updates holds friends' notifications, class sign-ups (or the category's equivalent) and general ones, and may be long. Slices U1-U9 follow the spec (U1 fixes, U2 cache and speed, U3 Apple shell, U4 client IA, U5 schedule filter, U6 join by QR / search, U7 business timeline, U8 haptics and swipe, U9 sweep and one deploy).
+- **U1 details:** each branch is a block (name, address, distance, then Waze / Google pills on their own row); the theme switch lives outside the scrolling area of the sign-in screens and is smaller (36); someone brand new is not shown the "terms updated" window (they accept once, when they join or create a business); a missing health declaration is announced on the book button, which opens the form and continues the booking after signing; map labels follow the app language; one shared, darker dim layer behind every modal and sheet in dark mode; the cancellation text mentions only the kinds the business sells; the AI button moved from a floating circle to a slim bar above the business tabs.
+- **Why:** a walkthrough as a new client showed these as the most visible faults; the rest of the spec is larger and goes in separate slices.
 ### Apple look: hero concept, font, colour and glass (2026-10-23, Apple-look round slice L1, no migration)
 
 - **Hero concept:** "your business, on every screen". The site hero shows a CSS-drawn phone and laptop (shared `DeviceFrame`, no Apple logo or product names) with live HTML screens, driven by one `--p` CSS progress variable. A 941-frame image sequence was rejected: 50-90 MB per visit, blocked by the CSP and a state update per scroll.

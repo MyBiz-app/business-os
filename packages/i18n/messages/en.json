@@ -1896,6 +1896,7 @@
       "update": "Sign a new declaration",
       "back": "Back",
       "fill": "Fill in health declaration",
+      "fillAndBook": "Fill in declaration and book",
       "view": "View declaration",
       "banner": "Before your first visit, please fill in a short health declaration.",
       "expiringBanner": "Your health declaration ends on {date}. Please sign a new one so you can keep booking.",
