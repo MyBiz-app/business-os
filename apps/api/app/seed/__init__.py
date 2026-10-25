@@ -23,6 +23,7 @@ import random
 from sqlalchemy import create_engine
 
 from app.core.config import get_settings
+from app.seed.accounts import move_owner, owner_as_client
 from app.seed.business import seed
 from app.seed.common import (
     AC_COMPANY,
@@ -34,7 +35,6 @@ from app.seed.common import (
     BranchSpec,
     BusinessSpec,
 )
-from app.seed.accounts import move_owner, owner_as_client
 from app.seed.curate import curate, place_branches
 from app.seed.demos import seed_demo
 from app.seed.guard import refuse_blocked_owner
