@@ -7,7 +7,11 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { AddressPicker } from "@business-os/app-kit/components/address-picker";
+import { AuthCard, AuthShell } from "@business-os/app-kit/components/auth-shell";
+import { DepthLogo } from "@business-os/app-kit/components/launch-splash";
+import { FadeIn } from "@business-os/app-kit/components/motion";
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { supabase } from "@business-os/app-kit/lib/supabase";
 import { EMPTY_ADDRESS } from "@business-os/app-kit/lib/address";
 import { ApiError, apiClient, assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { brandPalette } from "@business-os/app-kit/lib/brand";
@@ -53,6 +57,7 @@ export default function Join() {
   const shown = query.trim().length >= 2 ? found : null;
 
   const lookUp = async (value: string) => {
+    if (value.length === 0) return setError(t("codeRequired"));
     if (value.length < 4) return setError(t("unknownCode"));
     setBusy(true);
     setError(null);
@@ -127,6 +132,77 @@ export default function Join() {
 
   if (joinedId) return <JoinWelcome name={profile?.name ?? ""} tenantId={joinedId} palette={palette} />;
 
+  // A person with no business yet gets a welcome (the branded sign-in frame); others keep the plain join page.
+  const firstTime = businesses !== null && businesses !== undefined && businesses.length === 0 && !profile;
+  const entryForm = (
+    <>
+          {firstTime ? null : <Text style={[styles.muted, { color: palette.muted }]}>{t("subtitle")}</Text>}
+          <Field
+            label={t("code")}
+            palette={palette}
+            value={code}
+            onChangeText={(value) => setCode(normalize(value))}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            style={local.code}
+            onSubmitEditing={() => void lookUp(code)}
+          />
+          <ErrorText message={error} palette={palette} />
+          <Button label={t("continue")} palette={palette} busy={busy} onPress={() => void lookUp(code)} />
+          <Button label={t("scan")} variant="secondary" palette={palette} onPress={() => setScanning(true)} />
+          <Field
+            label={t("searchLabel")}
+            palette={palette}
+            hint={t("searchHint")}
+            value={query}
+            onChangeText={setQuery}
+            autoCorrect={false}
+            returnKeyType="search"
+          />
+          {shown?.length === 0 && <Text style={[styles.muted, { color: palette.muted }]}>{t("searchEmpty")}</Text>}
+          {shown?.map((row) => (
+            <Pressable key={row.join_code} accessibilityRole="button" accessibilityLabel={row.name} onPress={() => pick(row.join_code)}>
+              <Card palette={palette}>
+                <View style={local.brand}>
+                  {row.logo_url ? (
+                    <Image source={{ uri: assetUrl(row.logo_url)! }} style={local.logo} accessibilityIgnoresInvertColors />
+                  ) : (
+                    <View style={[local.logo, { backgroundColor: row.primary_color ?? palette.primary }]} />
+                  )}
+                  <View style={{ flex: 1 }}>
+                    <Text style={[local.name, { color: palette.foreground }]}>{row.name}</Text>
+                    {row.city ? <Text style={[styles.muted, { color: palette.muted }]}>{row.city}</Text> : null}
+                  </View>
+                </View>
+              </Card>
+            </Pressable>
+          ))}
+          <JoinScanner visible={scanning} palette={palette} onCode={pick} onClose={() => setScanning(false)} />
+          {businesses && businesses.length > 0 && (
+            <Button label={t("back")} variant="secondary" palette={palette} onPress={() => router.replace("/home")} />
+          )}
+          {firstTime ? (
+            <Button label={t("otherAccount")} variant="secondary" palette={palette} onPress={() => void supabase.auth.signOut().then(() => router.replace("/sign-in"))} />
+          ) : null}
+    </>
+  );
+
+  if (firstTime) {
+    return (
+      <AuthShell>
+        <FadeIn index={0} style={{ alignItems: "center", gap: 6 }}>
+          <DepthLogo size={0.8} />
+          <Heading palette={palette}>{t("welcomeTitle")}</Heading>
+          <Text style={[styles.muted, { color: palette.muted, textAlign: "center" }]}>{t("welcomeSubtitle")}</Text>
+        </FadeIn>
+        <AuthCard>
+          <Text style={[styles.muted, { color: palette.muted }]}>{t("subtitle")}</Text>
+          {entryForm}
+        </AuthCard>
+      </AuthShell>
+    );
+  }
+
   return (
     <Screen palette={palette}>
       <Heading palette={palette}>{t("title")}</Heading>
@@ -175,53 +251,7 @@ export default function Join() {
           <Button label={t("otherCode")} variant="secondary" palette={palette} onPress={() => setProfile(null)} />
         </>
       ) : (
-        <>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("subtitle")}</Text>
-          <Field
-            label={t("code")}
-            palette={palette}
-            value={code}
-            onChangeText={(value) => setCode(normalize(value))}
-            autoCapitalize="characters"
-            autoCorrect={false}
-            style={local.code}
-            onSubmitEditing={() => void lookUp(code)}
-          />
-          <ErrorText message={error} palette={palette} />
-          <Button label={t("continue")} palette={palette} busy={busy} onPress={() => void lookUp(code)} />
-          <Button label={t("scan")} variant="secondary" palette={palette} onPress={() => setScanning(true)} />
-          <Field
-            label={t("searchLabel")}
-            palette={palette}
-            hint={t("searchHint")}
-            value={query}
-            onChangeText={setQuery}
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {shown?.length === 0 && <Text style={[styles.muted, { color: palette.muted }]}>{t("searchEmpty")}</Text>}
-          {shown?.map((row) => (
-            <Pressable key={row.join_code} accessibilityRole="button" accessibilityLabel={row.name} onPress={() => pick(row.join_code)}>
-              <Card palette={palette}>
-                <View style={local.brand}>
-                  {row.logo_url ? (
-                    <Image source={{ uri: assetUrl(row.logo_url)! }} style={local.logo} accessibilityIgnoresInvertColors />
-                  ) : (
-                    <View style={[local.logo, { backgroundColor: row.primary_color ?? palette.primary }]} />
-                  )}
-                  <View style={{ flex: 1 }}>
-                    <Text style={[local.name, { color: palette.foreground }]}>{row.name}</Text>
-                    {row.city ? <Text style={[styles.muted, { color: palette.muted }]}>{row.city}</Text> : null}
-                  </View>
-                </View>
-              </Card>
-            </Pressable>
-          ))}
-          <JoinScanner visible={scanning} palette={palette} onCode={pick} onClose={() => setScanning(false)} />
-          {businesses && businesses.length > 0 && (
-            <Button label={t("back")} variant="secondary" palette={palette} onPress={() => router.replace("/home")} />
-          )}
-        </>
+        entryForm
       )}
     </Screen>
   );
