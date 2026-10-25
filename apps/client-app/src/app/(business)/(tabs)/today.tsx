@@ -18,6 +18,7 @@ import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { radius } from "@business-os/app-kit/lib/theme";
 import { NeedsYou } from "@/components/needs-you";
+import { buildTimeline, type TimelineState } from "@/lib/day-timeline";
 import { useStaff } from "@/providers/staff-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
@@ -127,13 +128,19 @@ export default function Today() {
     };
   });
 
-  const list = (items: ScheduledSession[]) =>
-    items.map((session) => {
+  // Today reads as a timeline: hour headings, a "now" line, and what is over fades back.
+  const nowMs = day === today ? Date.now() : null;
+  const timeline = buildTimeline(sessions, timeZone, nowMs);
+  const stateOf = new Map<string, TimelineState>();
+  for (const item of timeline) if (item.kind === "session") stateOf.set(item.session.id, item.state);
+
+  const row = (session: ScheduledSession) => {
       const cancelled = session.status === "cancelled";
+      const state = stateOf.get(session.id) ?? "upcoming";
       const full = !cancelled && session.booking_mode === "class" && session.booked >= session.capacity;
       return (
+        <View key={session.id} style={state === "past" ? local.past : undefined}>
         <ListRow
-          key={session.id}
           palette={palette}
           onPress={() => router.push(`/session/${session.id}`)}
           leading={
@@ -165,11 +172,15 @@ export default function Today() {
               <Badge label={t("cancelled")} palette={palette} />
             ) : full ? (
               <Badge label={t("full")} tone="primary" palette={palette} />
+            ) : state === "live" ? (
+              <Badge label={t("now")} tone="primary" palette={palette} />
             ) : undefined
           }
         />
+        </View>
       );
-    });
+  };
+  const list = (items: ScheduledSession[]) => items.map(row);
 
   const usageNotices = data?.usage
     ? usageWarnings(data.usage).map(({ key, percent }) => ({
@@ -256,7 +267,28 @@ export default function Today() {
               <SectionTitle title={t("all")} palette={palette} />
             </>
           )}
-          {list(sessions)}
+          {timeline.map((item) => {
+            if (item.kind === "session") return row(item.session);
+            if (item.kind === "hour")
+              return (
+                <Text
+                  key={item.key}
+                  accessibilityRole="header"
+                  style={[local.hour, { color: palette.muted }]}
+                >
+                  {`${String(item.hour).padStart(2, "0")}:00`}
+                </Text>
+              );
+            return (
+              <View key={item.key} accessible accessibilityLabel={t("now")} style={local.nowRow}>
+                <View style={[local.nowDot, { backgroundColor: palette.danger }]} />
+                <View style={[local.nowLine, { backgroundColor: palette.danger }]} />
+                <Text style={[local.nowText, { color: palette.danger }]}>
+                  {t("now")} {nowMs !== null ? formatTime(new Date(nowMs).toISOString(), locale, timeZone) : ""}
+                </Text>
+              </View>
+            );
+          })}
         </View>
       )}
 
@@ -340,5 +372,11 @@ export default function Today() {
 const local = StyleSheet.create({
   iconButton: { width: 44, height: 44, borderRadius: radius.pill, borderWidth: 1, alignItems: "center", justifyContent: "center" },
   tile: { flexGrow: 1, flexBasis: "45%", borderWidth: 1, borderRadius: radius.card, padding: 14, gap: 4 },
+  past: { opacity: 0.5 },
+  hour: { fontSize: 13, ...font.semibold, textAlign: "left", fontVariant: ["tabular-nums"], marginTop: 6 },
+  nowRow: { flexDirection: "row", alignItems: "center", gap: 6, minHeight: 20 },
+  nowDot: { width: 8, height: 8, borderRadius: 4 },
+  nowLine: { flex: 1, height: 1.5 },
+  nowText: { fontSize: 12, ...font.semibold, fontVariant: ["tabular-nums"] },
   chip: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 44, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1 },
 });

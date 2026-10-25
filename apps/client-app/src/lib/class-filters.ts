@@ -29,6 +29,11 @@ export function applyFilters<T extends Filterable>(sessions: T[], filters: Class
   );
 }
 
+/** How many of the instructor / class type filters are on (the badge on the single Filter button). */
+export function activeFilterCount(filters: ClassFilters): number {
+  return (filters.instructorId ? 1 : 0) + (filters.serviceId ? 1 : 0);
+}
+
 /** "Fill" of a class from 0 to 1, for the progress bar ("4/7 spots"). */
 export function fillRatio(capacity: number, spotsLeft: number): number {
   return capacity > 0 ? Math.min(Math.max((capacity - spotsLeft) / capacity, 0), 1) : 0;

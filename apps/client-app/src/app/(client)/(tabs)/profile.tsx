@@ -12,7 +12,8 @@ import { Badge, ListRow, RowGroup, SectionTitle } from "@business-os/app-kit/com
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { Button, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
-import { useAccount } from "@/lib/use-account";
+import { BusinessInfo } from "@/components/home-cards";
+import { useLocations } from "@/lib/use-locations";
 import { useFriendSettings } from "@/lib/use-friend-settings";
 import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
@@ -22,21 +23,11 @@ export default function Profile() {
   const t = useTranslations();
   const { session } = useSession();
   const { businesses, business, select, palette } = useBusiness();
-  // Quotes and bills (#44, #45), documents (#45) and addresses for on-site services (#42).
-  const account = useAccount();
   const health = useHealth();
   const friends = useFriendSettings().data;
-  const hasBills = account.quotes.some((q) => q.kind === "bill");
-  const quotesTitle = hasBills ? t("client.profile.quotesAndBills") : t("quotes.title");
-  const quotesBadge =
-    account.toPay.length > 0
-      ? { label: t("client.profile.toPay"), tone: "primary" as const }
-      : account.toAnswer.length > 0
-        ? { label: t("client.profile.toAnswer"), tone: "primary" as const }
-        : null;
   const healthTone = health?.state === "ok" ? "success" : health?.state === "needs_review" ? "muted" : "danger";
-  const hasAccountRows =
-    account.documents.length > 0 || account.quotes.length > 0 || account.receipts > 0 || account.onSite || !!business?.dependents || !!health?.form;
+  const hasAccountRows = !!business?.dependents || !!health?.form;
+  const locations = useLocations();
 
   return (
     <Screen title={t("client.profile.title")} palette={palette}>
@@ -54,45 +45,8 @@ export default function Profile() {
         />
       )}
 
-      {hasAccountRows && <SectionTitle title={t("client.profile.account")} palette={palette} />}
+      {hasAccountRows && <SectionTitle title={t("client.profile.myDetails")} palette={palette} />}
       <RowGroup palette={palette}>
-        {account.documents.length > 0 && (
-          <ListRow
-            palette={palette}
-            title={t("documents.mine")}
-            subtitle={t("documents.mineHint")}
-            trailing={
-              account.toSign.length > 0 ? (
-                <Badge label={t("client.profile.toSign", { count: account.toSign.length })} tone="danger" palette={palette} />
-              ) : null
-            }
-            onPress={() => router.push("/documents")}
-          />
-        )}
-        {account.quotes.length > 0 && (
-          <ListRow
-            palette={palette}
-            title={quotesTitle}
-            trailing={quotesBadge ? <Badge label={quotesBadge.label} tone={quotesBadge.tone} palette={palette} /> : null}
-            onPress={() => router.push("/quotes")}
-          />
-        )}
-        {account.receipts > 0 && (
-          <ListRow
-            palette={palette}
-            title={t("client.profile.receipts")}
-            subtitle={t("client.profile.receiptsHint")}
-            onPress={() => router.push("/receipts")}
-          />
-        )}
-        {account.onSite && (
-          <ListRow
-            palette={palette}
-            title={t("jobs.myAddresses")}
-            subtitle={t("jobs.myAddressesHint")}
-            onPress={() => router.push("/addresses")}
-          />
-        )}
         {business?.dependents && (
           <ListRow
             palette={palette}
@@ -115,6 +69,8 @@ export default function Profile() {
           />
         )}
       </RowGroup>
+
+      <BusinessInfo data={{ locations }} />
 
       <ProfileForm key={business?.client_id} />
       <ClientIdentityCard key={`id-${business?.client_id}`} />

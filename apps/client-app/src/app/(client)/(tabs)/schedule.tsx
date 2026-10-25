@@ -12,7 +12,7 @@ import { Chip } from "@business-os/app-kit/components/chip";
 import { ALL_BRANCHES, type BranchFilter, filterByBranch } from "@business-os/app-kit/lib/branch-filter";
 import { type CalendarView, stepDay } from "@business-os/app-kit/lib/calendar-range";
 import { PressableScale } from "@business-os/app-kit/components/motion";
-import { BranchBar } from "@/components/branch-bar";
+import { ScheduleFilters } from "@/components/schedule-filters";
 import { Availability } from "@/components/availability";
 import { type ClientSession, SessionCard } from "@/components/session-card";
 import { Button, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
@@ -132,7 +132,6 @@ export default function Schedule() {
           ))}
         </ScrollView>
       )}
-      <BranchBar branches={branches} filter={branchFilter} onChange={setBranchFilter} palette={palette} />
       {(data?.appointments.length ?? 0) > 0 && (
         <PressableScale
           accessibilityRole="button"
@@ -168,9 +167,23 @@ export default function Schedule() {
           palette={palette}
           labels={{ day: t("viewDay"), week: t("viewWeek"), month: t("viewMonth") }}
         />
-        {day !== today && (
-          <Chip label={t("today")} selected={false} onPress={() => setDay(today)} palette={palette} role="button" />
-        )}
+        <View style={local.barEnd}>
+          {day !== today && (
+            <Chip label={t("today")} selected={false} onPress={() => setDay(today)} palette={palette} role="button" />
+          )}
+          {!availability && (
+            <ScheduleFilters
+              palette={palette}
+              branches={branches}
+              branchFilter={branchFilter}
+              onBranchChange={setBranchFilter}
+              instructors={options.instructors}
+              services={options.services}
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
+          )}
+        </View>
       </View>
       {view === "month" ? (
         <>
@@ -214,53 +227,6 @@ export default function Schedule() {
         <Text accessibilityRole="alert" style={[styles.muted, { color: palette.foreground }]}>
           {closed.reason ? t("closedReason", { reason: closed.reason }) : t("closed")}
         </Text>
-      )}
-
-      {!availability && options.instructors.length + options.services.length > 1 && (
-        <View style={local.filters}>
-          {options.instructors.length > 1 && (
-            <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
-              <Chip
-                role="tab"
-                label={t("allInstructors")}
-                selected={!filters.instructorId}
-                onPress={() => setFilters((f) => ({ ...f, instructorId: null }))}
-                palette={palette}
-              />
-              {options.instructors.map((i) => (
-                <Chip
-                  key={i.id}
-                  role="tab"
-                  label={i.name}
-                  selected={filters.instructorId === i.id}
-                  onPress={() => setFilters((f) => ({ ...f, instructorId: i.id }))}
-                  palette={palette}
-                />
-              ))}
-            </ScrollView>
-          )}
-          {options.services.length > 1 && (
-            <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
-              <Chip
-                role="tab"
-                label={t("allClasses")}
-                selected={!filters.serviceId}
-                onPress={() => setFilters((f) => ({ ...f, serviceId: null }))}
-                palette={palette}
-              />
-              {options.services.map((sv) => (
-                <Chip
-                  key={sv.id}
-                  role="tab"
-                  label={sv.name}
-                  selected={filters.serviceId === sv.id}
-                  onPress={() => setFilters((f) => ({ ...f, serviceId: sv.id }))}
-                  palette={palette}
-                />
-              ))}
-            </ScrollView>
-          )}
-        </View>
       )}
 
       {openingLabel && (
@@ -340,7 +306,7 @@ const local = StyleSheet.create({
   monthTitle: { fontSize: 17, fontWeight: "600" },
   weekHead: { fontSize: 15, fontWeight: "600", marginTop: 4 },
   list: { gap: 12 },
-  filters: { gap: 8 },
+  barEnd: { flexDirection: "row", alignItems: "center", gap: 8 },
   chips: { gap: 8, paddingVertical: 2 },
   release: { borderWidth: 1, borderRadius: radius.card, padding: 14, gap: 10 },
   cta: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: radius.card, padding: 18 },

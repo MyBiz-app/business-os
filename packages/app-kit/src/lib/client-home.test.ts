@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { calendarLink, groupByRecency, isLateCancel, knownCards, lastVisit, nextBooking } from "./client-home.ts";
+import { calendarLink, groupByRecency, homeCardsOnHome, isLateCancel, knownCards, lastVisit, nextBooking, pickAction, updateGroup } from "./client-home.ts";
 
 const booking = (starts_at: string, status = "booked", session_status = "scheduled") => ({ starts_at, status, session_status });
 const now = Date.parse("2026-10-14T10:00:00Z");
@@ -50,4 +50,28 @@ test("updates are grouped as today, this week and earlier", () => {
   const items = ["2026-10-14", "2026-10-12", "2026-10-01", "2026-10-14"].map((d) => ({ d }));
   const groups = groupByRecency(items, (i) => i.d, (s) => s, "2026-10-14", "2026-10-07");
   assert.deepEqual(groups.map((g) => [g.key, g.items.length]), [["today", 2], ["week", 1], ["earlier", 1]]);
+});
+
+test("cards that moved to other tabs are not drawn on the home", () => {
+  assert.deepEqual(
+    homeCardsOnHome(["next_booking", "membership", "shortcuts", "rebook", "updates", "business_info", "health", "documents"]),
+    ["next_booking", "membership", "rebook"],
+  );
+});
+
+test("the home shows the most pressing action and counts the others", () => {
+  assert.deepEqual(pickAction({ health: false, pay: 0, answer: 0, sign: 0, review: 0 }), { first: null, others: 0 });
+  assert.deepEqual(pickAction({ health: true, pay: 2, answer: 0, sign: 1, review: 0 }), { first: "health", others: 3 });
+  assert.deepEqual(pickAction({ health: false, pay: 0, answer: 1, sign: 1, review: 1 }), { first: "answer", others: 2 });
+  assert.deepEqual(pickAction({ health: false, pay: 0, answer: 0, sign: 0, review: 1 }), { first: "review", others: 0 });
+});
+
+test("updates fall into friends, bookings and general", () => {
+  assert.equal(updateGroup("friend_request"), "friends");
+  assert.equal(updateGroup("booked_by_studio"), "bookings");
+  assert.equal(updateGroup("waitlist_spot_open"), "bookings");
+  assert.equal(updateGroup("session_reminder"), "bookings");
+  assert.equal(updateGroup("health_approved"), "general");
+  assert.equal(updateGroup("freeze_rejected"), "general");
+  assert.equal(updateGroup("plan_ending"), "general");
 });
