@@ -7361,6 +7361,7 @@
       },
       "saved": "Saved.",
       "days": "Days of the week",
+      "now": "Now",
       "noneOnDay": "Nothing on this day.",
       "backToDay": "Back to the day",
       "sessions": "{count, plural, =0 {Nothing booked} one {# session} other {# sessions}}",
