@@ -44,6 +44,6 @@ export function AiHeader() {
 
 const local = StyleSheet.create({
   bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingHorizontal: 16 },
-  name: { flex: 1, fontSize: 14, ...font.medium },
+  name: { flex: 1, ...font.medium },
   button: { width: SIZE, height: SIZE, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
 });
