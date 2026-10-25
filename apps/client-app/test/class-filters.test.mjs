@@ -35,3 +35,9 @@ test("a release in the past is not announced", () => {
   assert.equal(lib.upcomingRelease("2026-10-14T11:00:00Z", now), null);
   assert.equal(lib.upcomingRelease("2026-10-15T17:00:00Z", now)?.toISOString(), "2026-10-15T17:00:00.000Z");
 });
+
+test("the filter button counts only the filters that are on", () => {
+  assert.equal(lib.activeFilterCount(lib.NO_FILTERS), 0);
+  assert.equal(lib.activeFilterCount({ instructorId: "i1", serviceId: null }), 1);
+  assert.equal(lib.activeFilterCount({ instructorId: "i1", serviceId: "yoga" }), 2);
+});

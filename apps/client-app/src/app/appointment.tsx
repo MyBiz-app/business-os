@@ -20,6 +20,7 @@ import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useAddresses } from "@/lib/use-addresses";
 import { useDependents } from "@/lib/use-dependents";
+import { bookAfterHealth, mustDeclare, useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { Spinner } from "@business-os/app-kit/components/spinner";
 
@@ -44,6 +45,18 @@ const ME = "me";
 /** Book a personal appointment: service → staff → day → time. */
 export default function Appointment() {
   const t = useTranslations("client.appointment");
+  const tHealth = useTranslations("client.health");
+  const health = useHealth();
+  const declare = mustDeclare(health);
+  // The business needs a declaration first: say so on the button and open the form, which brings them back here.
+  const fillDeclaration = () => {
+    bookAfterHealth.sessionId = "appointment";
+    router.push("/health");
+  };
+  // Back with the declaration signed: nothing is waiting to resume (the tap on confirm is theirs).
+  useEffect(() => {
+    if (health && !declare && bookAfterHealth.sessionId === "appointment") bookAfterHealth.sessionId = null;
+  }, [health, declare]);
   const tCommon = useTranslations("common");
   const tWaitlist = useTranslations("client.waitlist");
   const tDependents = useTranslations("dependents");
@@ -358,7 +371,7 @@ export default function Appointment() {
               )}
             </Card>
           )}
-          {slot && (!kind || choices.length > 0) && (!onSite || place) && <Button label={t("confirm", { time: time(slot.starts_at) })} palette={palette} busy={busy} onPress={() => void book()} />}
+          {slot && (!kind || choices.length > 0) && (!onSite || place) && <Button label={declare ? tHealth("fillAndBook") : t("confirm", { time: time(slot.starts_at) })} palette={palette} busy={busy} onPress={() => (declare ? fillDeclaration() : void book())} />}
         </>
       )}
     </Screen>
