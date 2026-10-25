@@ -37,6 +37,7 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
     tenant.cancellation_window_minutes,
     tenant.booking_requires_plan,
     tenant.requires_health_declaration,
+    tenant.listed_in_search,
     tenant.client_id_number,
     tenant.online_sales,
     tenant.require_mfa_for_staff,
@@ -113,6 +114,7 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
         <SettingsGroup id="client-rules" title={t("settings.detailsGroups.clients")}>
           <SettingsRows>
             <SwitchRow label={t("settings.requirePlan")} hint={t("settings.requirePlanHint")} name="booking_requires_plan" defaultChecked={tenant.booking_requires_plan} />
+            <SwitchRow label={t("settings.listedInSearch")} hint={t("settings.listedInSearchHint")} name="listed_in_search" defaultChecked={tenant.listed_in_search} />
             <SwitchRow label={t("settings.requireHealth")} hint={t("settings.requireHealthHint")} name="requires_health_declaration" defaultChecked={tenant.requires_health_declaration} />
             <SelectRow
               label={t("settings.clientIdNumber")}

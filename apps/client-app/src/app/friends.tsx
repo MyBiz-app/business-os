@@ -8,6 +8,7 @@ import { BackBar, Badge, SectionTitle } from "@business-os/app-kit/components/ro
 import { useToast } from "@business-os/app-kit/components/toast";
 import { Button, Card, ErrorText, Field, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
+import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { PersonRow } from "@/components/person-row";
 import { friendsError } from "@/lib/friends";
@@ -70,8 +71,15 @@ export default function Friends() {
     if (ok) setLookup("");
   };
 
-  const share = () =>
-    data && Share.share({ message: t("shareMessage", { business: business.name, code: data.settings.friend_code }) });
+  // With the business's join code, the message carries a link a friend can open to join first.
+  const share = () => {
+    if (!data) return;
+    const code = data.settings.friend_code;
+    const message = business.join_code
+      ? t("shareMessageLink", { business: business.name, code, link: `${WEB_URL}/join/${business.join_code}` })
+      : t("shareMessage", { business: business.name, code });
+    void Share.share({ message });
+  };
 
   const hours = (iso: string) =>
     new Intl.DateTimeFormat(locale, {

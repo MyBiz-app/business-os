@@ -435,7 +435,9 @@
         "visitNotes": "Visit notes",
         "nextBooking": "Next booking"
       }
-    }
+    },
+    "listedInSearch": "Let people find the business by name in the app",
+    "listedInSearchHint": "Off by default. When on, the app's join screen lists the business (name, city and logo) when someone searches for it. Otherwise people join with your code or QR."
   },
   "locales": {
     "he": "עברית",
@@ -1711,9 +1713,27 @@
       "nameRequired": "Please enter your first name, so the business knows who you are.",
       "marketing": "Send me offers and news from this business (optional). You can change this any time in your profile.",
       "joinedTitle": "Welcome to {name}",
-      "joinedBody": "You joined. Before your first booking, here are the business's rules for cancelling.",
+      "joinedBody": "Welcome aboard. Three quick steps to get started.",
       "toHome": "Continue",
-      "legal": "By joining you agree to the business's terms of use and the privacy policy, which you can read on our website."
+      "legal": "By joining you agree to the business's terms of use and the privacy policy, which you can read on our website.",
+      "scan": "Scan a QR code",
+      "scanHint": "Point the camera at the business's QR code",
+      "scanClose": "Close",
+      "scanDenied": "Camera access is off. Allow it in your phone's settings, or type the code instead.",
+      "searchLabel": "Or search for the business by name",
+      "searchHint": "Only businesses that chose to appear are listed.",
+      "searchEmpty": "No business with that name is listed. Ask them for their code or QR.",
+      "showPolicy": "Read the cancellation policy",
+      "step": {
+        "health": "Fill in the health declaration",
+        "plan": "Choose a plan",
+        "book": "Book your first session"
+      },
+      "stepHint": {
+        "health": "It takes a minute, and you can't book before it.",
+        "plan": "Pick the plan that fits how often you come.",
+        "book": "See what's on and save your spot."
+      }
     },
     "home": {
       "greeting": "Hi {name}",
@@ -9358,7 +9378,8 @@
       "friends_disabled": "Friends are not available here.",
       "friends_rate_limited": "Too many searches. Try again later.",
       "not_found": "No one found. Check the code, phone or email."
-    }
+    },
+    "shareMessageLink": "Join me at {business} on MyBiz: {link} After you join, add me as a friend with my code: {code}"
   },
   "content": {
     "title": "Content & creative",

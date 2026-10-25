@@ -326,3 +326,27 @@ def test_client_home_cards_and_branches_follow_the_business(
     # A client who never joined this business sees none of its branches.
     stranger = client.get("/client/locations", headers=auth(uuid4(), studio["tenant_id"]))
     assert stranger.status_code in (403, 404)
+
+
+def test_business_search_lists_only_businesses_that_opted_in(
+    client: TestClient, studio: dict
+) -> None:
+    code = join_code(client, studio)
+
+    assert client.get("/public/businesses-search", params={"q": "Studio"}).json() == []
+    assert client.get("/public/businesses-search", params={"q": "S"}).status_code == 422
+
+    changed = client.patch(
+        "/tenants/current", json={"listed_in_search": True}, headers=studio["headers"]
+    )
+    assert changed.status_code == 200, changed.text
+    assert changed.json()["listed_in_search"] is True
+
+    found = client.get("/public/businesses-search", params={"q": "studio fl"}).json()
+    assert [row["join_code"] for row in found] == [code]
+    assert set(found[0]) == {"join_code", "name", "city", "primary_color", "logo_url"}
+    # A wildcard typed by a person is just text, not "everything".
+    assert client.get("/public/businesses-search", params={"q": "%%"}).json() == []
+
+    client.patch("/tenants/current", json={"listed_in_search": False}, headers=studio["headers"])
+    assert client.get("/public/businesses-search", params={"q": "Studio"}).json() == []
