@@ -53,6 +53,14 @@ export const fetchReceipts = (c: DataContext) =>
 export const fetchReleasePolicy = (c: DataContext) =>
   shared(c, "schedule-release", async () => unwrap(await c.api.GET("/client/schedule-release", { params: c.scope })));
 
+export const fetchFriendSettings = (c: DataContext) =>
+  shared(c, "friend-settings", async () => unwrap(await c.api.GET("/client/friends/settings", { params: c.scope })));
+export const fetchIdentity = (c: DataContext) =>
+  shared(c, "identity", async () => unwrap(await c.api.GET("/client/identity", { params: c.scope })));
+
+/** Drops a shared copy after the person changed it, so the next read asks the server. */
+export const forgetShared = (c: DataContext, name: string) => queryClient.invalidateQueries({ queryKey: dataKey(c, "get", name) });
+
 /** The sessions of a window of days starting at `start` (at most 14). */
 export const fetchSessions = (c: DataContext, start: string, days: number) =>
   shared(c, "sessions", async () => unwrap(await c.api.GET("/client/sessions", { params: { ...c.scope, query: { start, days } } })), [start, days]);

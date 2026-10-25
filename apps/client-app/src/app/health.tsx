@@ -9,7 +9,10 @@ import { SegmentedControl } from "@business-os/app-kit/components/segmented-cont
 import { BackBar } from "@business-os/app-kit/components/rows";
 import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
+import { queryClient } from "@business-os/app-kit/lib/query-client";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { dataKey } from "@/lib/client-data";
+import { useDataContext } from "@/lib/use-data-context";
 import { bookAfterHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -23,6 +26,7 @@ export default function Health() {
   const tHealth = useTranslations("health");
   const locale = useLocale() === "en" ? "en" : "he";
   const { api, scope, business, palette } = useBusiness();
+  const ctx = useDataContext();
 
   const load = useCallback(async () => {
     if (!business) return undefined;
@@ -65,6 +69,7 @@ export default function Health() {
       );
       setSaved(result);
       setEditing(false);
+      if (ctx) void queryClient.invalidateQueries({ queryKey: dataKey(ctx, "health") });
       // They came here from a "book" tap: go back so the booking carries on.
       if (bookAfterHealth.sessionId && (result.state === "ok" || result.state === "expiring")) router.back();
     } catch {

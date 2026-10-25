@@ -8,6 +8,8 @@ import { SegmentedControl } from "@business-os/app-kit/components/segmented-cont
 import { Button, Card, ErrorText, Field, LoadError, styles } from "@business-os/app-kit/components/ui";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { fetchIdentity, forgetShared } from "@/lib/client-data";
+import { useDataContext } from "@/lib/use-data-context";
 import { useBusiness } from "@/providers/business-provider";
 import { useStaff } from "@/providers/staff-provider";
 import type { Palette } from "@business-os/app-kit/lib/theme";
@@ -151,15 +153,23 @@ function check(result: { response: Response; error?: unknown }): void {
 /** The signed-in client's own ID number in the current business (hidden when it does not ask). */
 export function ClientIdentityCard() {
   const { api, scope, palette } = useBusiness();
+  const ctx = useDataContext();
   const t = useTranslations("identity.mine");
   const calls = useMemo<IdentityApi>(
     () => ({
-      load: async () => unwrap(await api.GET("/client/identity", { params: scope })),
-      save: async (body) => unwrap(await api.PUT("/client/identity", { params: scope, body })),
-      remove: async () => check(await api.DELETE("/client/identity", { params: scope })),
+      load: async () => (ctx ? fetchIdentity(ctx) : unwrap(await api.GET("/client/identity", { params: scope }))),
+      save: async (body) => {
+        const saved = unwrap(await api.PUT("/client/identity", { params: scope, body }));
+        if (ctx) await forgetShared(ctx, "identity");
+        return saved;
+      },
+      remove: async () => {
+        check(await api.DELETE("/client/identity", { params: scope }));
+        if (ctx) await forgetShared(ctx, "identity");
+      },
       reveal: async () => unwrap(await api.POST("/client/identity/reveal", { params: scope })).number,
     }),
-    [api, scope],
+    [api, scope, ctx],
   );
   return <IdentityCard palette={palette} calls={calls} intro={t("optionalClient")} />;
 }

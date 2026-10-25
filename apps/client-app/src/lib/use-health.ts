@@ -23,7 +23,7 @@ export function mustDeclare(health: MyHealth | null): boolean {
 export function useHealth(): MyHealth | null {
   const ctx = useDataContext();
   const locale = useLocale() === "en" ? "en" : "he";
-  const { data, error, refresh } = useCachedLoad(
+  const { data, error, revalidate } = useCachedLoad(
     ctx ? dataKey(ctx, "health", locale) : ["health"],
     async () => {
       if (!ctx) return null;
@@ -31,7 +31,7 @@ export function useHealth(): MyHealth | null {
     },
     { enabled: Boolean(ctx) },
   );
-  // Signing the form happens on another screen: coming back shows the new state.
-  useFocusEffect(refresh);
+  // Coming back to a screen asks again only when what is shown is old; signing the form refreshes it itself.
+  useFocusEffect(revalidate);
   return ctx && !error ? (data ?? null) : null;
 }

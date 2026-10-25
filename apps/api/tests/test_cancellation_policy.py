@@ -73,6 +73,21 @@ def test_policy_text_names_what_differs(client: TestClient, studio: dict) -> Non
     same = policy(client, headers, group_minutes=1440, personal_minutes=1440)
     assert same["text"]["en"].startswith("You can cancel for free up to 1 day before the session.")
 
+    # The text names only the kinds the business sells, so sell all three.
+    for service in (
+        {"name": "Cut", "duration_minutes": 30, "booking_mode": "appointment"},
+        {
+            "name": "Court rental",
+            "duration_minutes": 60,
+            "booking_mode": "resource",
+            "min_minutes": 60,
+            "max_minutes": 60,
+            "step_minutes": 30,
+            "price_per_hour": 12000,
+        },
+    ):
+        assert client.post("/services", json=service, headers=headers).status_code == 201
+
     mixed = policy(client, headers, late_outcome="recorded", no_show_limit=3)["text"]["en"]
     assert "a class for free up to 6 hours" in mixed
     assert "a court or room for free up to 1 day" in mixed

@@ -30,7 +30,11 @@ export function QueryProvider({ children }: { children: ReactNode }) {
         persister: queryPersister,
         maxAge: KEEP_MS,
         buster: CACHE_VERSION,
-        dehydrateOptions: { shouldDehydrateQuery: (query) => query.state.status === "success" && query.meta?.persist !== false },
+        // Only settled queries: one that is refetching carries a live promise, and its cancellation is logged as an error.
+        dehydrateOptions: {
+          shouldDehydrateQuery: (query) =>
+            query.state.status === "success" && query.state.fetchStatus === "idle" && query.meta?.persist !== false,
+        },
       }}
     >
       {children}
