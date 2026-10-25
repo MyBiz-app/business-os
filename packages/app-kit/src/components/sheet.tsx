@@ -5,8 +5,8 @@ import { Animated, Easing, Modal, Platform, Pressable, ScrollView, StyleSheet, u
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
-import { tint } from "../lib/brand";
-import { fixedColors, type Palette } from "../lib/theme";
+import { scrimColor, type Palette } from "../lib/theme";
+import { useTheme } from "../providers/theme-provider";
 import { useReducedMotion } from "./motion";
 import { Text } from "./text";
 import { elevation, styles as ui } from "./ui";
@@ -35,6 +35,7 @@ type SheetProps = {
  */
 export function Sheet({ visible, onClose, palette, title, subtitle, children, footer, closeLabel }: SheetProps) {
   const t = useTranslations("common");
+  const { scheme } = useTheme();
   const reduced = useReducedMotion();
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -59,7 +60,7 @@ export function Sheet({ visible, onClose, palette, title, subtitle, children, fo
   return (
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <View style={s.root}>
-        <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: tint(fixedColors.black, 0.45), opacity: progress }]}>
+        <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: scrimColor(scheme), opacity: progress }]}>
           <Pressable aria-hidden tabIndex={-1} style={s.fill} onPress={onClose} />
         </Animated.View>
         <Animated.View

@@ -3,22 +3,22 @@ import { Linking, Modal, StyleSheet, View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { apiClient } from "../lib/api";
-import { tint } from "../lib/brand";
 import { WEB_URL } from "../lib/env";
 import { useSession } from "../providers/session-provider";
 import { useTheme } from "../providers/theme-provider";
-import { fixedColors, radius } from "../lib/theme";
+import { radius, scrimColor } from "../lib/theme";
 import { Text } from "./text";
 import { Button, ErrorText, Heading, styles } from "./ui";
 
 type Pending = { document: string; version: string };
 
 /** Asks the person to accept the legal documents they have not accepted in their current
- * version (new ones, or ones that changed). Shown when the app opens, until they accept; a
- * failure to load never blocks the app. */
+ * version (ones that changed since they accepted). Shown when the app opens, until they accept; a
+ * failure to load never blocks the app. Someone brand new, with no business and no joined business
+ * yet, is not asked: they accept once, when they join or create a business. */
 export function LegalUpdateModal() {
   const t = useTranslations("legalUpdate");
-  const { palette } = useTheme();
+  const { palette, scheme } = useTheme();
   const { session } = useSession();
   const userId = session?.user.id;
   const [pending, setPending] = useState<Pending[]>([]);
@@ -33,8 +33,11 @@ export function LegalUpdateModal() {
     let cancelled = false;
     void apiClient()
       .GET("/me/legal")
-      .then(({ data }) => {
-        if (!cancelled && data) setPending(data);
+      .then(async ({ data }) => {
+        if (cancelled || !data?.length) return;
+        const [me, joined] = await Promise.all([apiClient().GET("/me"), apiClient().GET("/client/businesses")]);
+        const isNew = !me.data?.memberships.length && !joined.data?.length;
+        if (!cancelled && !isNew) setPending(data);
       })
       .catch(() => undefined);
     return () => {
@@ -61,7 +64,7 @@ export function LegalUpdateModal() {
   if (pending.length === 0) return null;
   return (
     <Modal visible transparent animationType="fade" accessibilityLabel={t("title")}>
-      <View style={local.scrim}>
+      <View style={[local.scrim, { backgroundColor: scrimColor(scheme) }]}>
         <View style={[local.sheet, { backgroundColor: palette.surface, borderColor: palette.border }]}>
           <Heading palette={palette} level={2}>
             {t("title")}
@@ -85,6 +88,6 @@ export function LegalUpdateModal() {
 }
 
 const local = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: tint(fixedColors.black, 0.5), alignItems: "center", justifyContent: "center", padding: 20 },
+  scrim: { flex: 1, alignItems: "center", justifyContent: "center", padding: 20 },
   sheet: { width: "100%", maxWidth: 420, borderRadius: radius.card, borderWidth: 1, padding: 20, gap: 12 },
 });

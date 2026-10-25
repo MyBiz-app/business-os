@@ -1,7 +1,7 @@
 import type { components } from "@business-os/api-client";
 import { formatTime } from "@business-os/i18n/dates";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
@@ -16,6 +16,7 @@ import { SessionSheet } from "@/components/session-sheet";
 import { forgetSessionPeople, useSessionPeople } from "@/lib/session-people";
 import { fillRatio } from "@/lib/class-filters";
 import { useFriendsEnabled } from "@/lib/use-friend-settings";
+import { bookAfterHealth, mustDeclare, useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { radius } from "@business-os/app-kit/lib/theme";
 
@@ -63,6 +64,16 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
   const friendsEnabled = useFriendsEnabled();
   const group = session.capacity > 1 && session.status !== "cancelled";
   const people = useSessionPeople(session.id, friendsEnabled && group, session.spots_left);
+  const health = useHealth();
+  const declare = mustDeclare(health);
+  const resume = useRef<() => void>(undefined);
+  // Back from signing the declaration they were sent to: carry on with the booking they asked for.
+  useEffect(() => {
+    if (health && !declare && bookAfterHealth.sessionId === session.id) {
+      bookAfterHealth.sessionId = null;
+      resume.current?.();
+    }
+  }, [health, declare, session.id]);
   if (!business) return null;
 
   const hours = `${formatTime(session.starts_at, locale, business.time_zone)}-${formatTime(session.ends_at, locale, business.time_zone)}`;
@@ -109,13 +120,22 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
     );
   };
 
-  const book = () =>
-    run(() =>
+  const book = () => {
+    if (declare) {
+      // The business needs a declaration first: say so up front instead of failing after the tap.
+      bookAfterHealth.sessionId = session.id;
+      router.push("/health");
+      return Promise.resolve();
+    }
+    return run(() =>
       api.POST("/client/sessions/{session_id}/bookings", {
         params: { ...scope, path: { session_id: session.id } },
         body: { dependent_id: chosen && chosen.id !== ME ? chosen.id : null },
       }),
     );
+  };
+  resume.current = () => void book();
+  const bookLabel = declare ? t("health.fillAndBook") : full ? t("joinWaitlist") : t("book");
 
   const cancel = async (booking = mine) => {
     if (!booking) return;
@@ -154,8 +174,8 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
       {kind ? (
         choices.length > 0 ? (
           <Button
-            label={full ? t("joinWaitlist") : t("book")}
-            accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} - ${label}${chosen ? ` - ${chosen.name}` : ""}`}
+            label={bookLabel}
+            accessibilityLabel={`${bookLabel} - ${label}${chosen ? ` - ${chosen.name}` : ""}`}
             variant={full ? "secondary" : "primary"}
             palette={palette}
             busy={busy}
@@ -180,8 +200,8 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
         />
       ) : (
         <Button
-          label={full ? t("joinWaitlist") : t("book")}
-          accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} - ${label}`}
+          label={bookLabel}
+          accessibilityLabel={`${bookLabel} - ${label}`}
           variant={full ? "secondary" : "primary"}
           palette={palette}
           busy={busy}

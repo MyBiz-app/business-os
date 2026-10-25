@@ -19,13 +19,14 @@ export function AuthShell({ children, themeToggle = true }: { children: React.Re
       <AuthBackdrop />
       <SafeAreaView edges={["top", "bottom", "left", "right"]} style={styles.fill}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          {themeToggle ? (
-            <View style={styles.corner}>
-              <ThemeToggle />
-            </View>
-          ) : null}
           <View style={styles.column}>{children}</View>
         </ScrollView>
+        {/* Outside the ScrollView so the keyboard and tall content never move it. */}
+        {themeToggle ? (
+          <View style={styles.corner} pointerEvents="box-none">
+            <ThemeToggle size={36} />
+          </View>
+        ) : null}
       </SafeAreaView>
     </View>
   );

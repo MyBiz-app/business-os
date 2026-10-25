@@ -13,14 +13,14 @@ import { AuthCard, AuthShell } from "./auth-shell";
 import { DepthLogo } from "./launch-splash";
 import { Text } from "./text";
 import { Button, Heading, styles } from "./ui";
-import { radius } from "../lib/theme";
+import { radius, scrimColor } from "../lib/theme";
 
 /** Covers the app with a Face ID / fingerprint prompt when the user turned the lock on in their
  * preferences: at launch, and after the app has been in the background for a while. The session
  * itself stays in the phone's secure store; this only guards the screen. */
 export function AppLockGate({ children }: { children: React.ReactNode }) {
   const t = useTranslations("appLock");
-  const { palette } = useTheme();
+  const { palette, scheme } = useTheme();
   const { session } = useSession();
   const [locked, setLocked] = useState<boolean | null>(null);
   const [failed, setFailed] = useState(false);
@@ -110,7 +110,7 @@ export function AppLockGate({ children }: { children: React.ReactNode }) {
     <>
       {children}
       <Modal visible={offer && !showLock} transparent animationType="fade" onRequestClose={() => void answerOffer(false)}>
-        <View style={[styles2.scrim]}>
+        <View style={[styles2.scrim, { backgroundColor: scrimColor(scheme) }]}>
           <View style={[styles2.sheet, { backgroundColor: palette.surface, borderColor: palette.border }]}>
             <View style={[styles2.badge, { backgroundColor: tint(palette.primary, 0.14) }]}>
               <Ionicons name="finger-print" size={34} color={palette.primary} />
@@ -156,7 +156,7 @@ export function AppLockGate({ children }: { children: React.ReactNode }) {
 }
 
 const styles2 = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: "rgba(11, 16, 32, 0.55)", justifyContent: "center", padding: 24 },
+  scrim: { flex: 1, justifyContent: "center", padding: 24 },
   sheet: { borderWidth: 1, borderRadius: radius.dialog, padding: 24, gap: 14, maxWidth: 420, width: "100%", alignSelf: "center" },
   badge: { width: 64, height: 64, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", alignSelf: "center" },
   who: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10 },
