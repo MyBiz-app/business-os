@@ -221,6 +221,12 @@ class ClientSession(BaseModel):
     )
 
 
+LISTED_BUSINESSES_SELECT = f"""
+    SELECT t.join_code, t.name, t.city, t.primary_color, {LOGO_URL.format(t="t")} AS logo_url
+    FROM app.search_listed_businesses(:q) t
+"""
+
+
 class ListedBusiness(BaseModel):
     """A business that chose to appear in the join screen's search."""
 
@@ -236,14 +242,7 @@ def search_businesses(
     q: Annotated[str, Query(min_length=2, max_length=60)], session: AnonymousSessionDep
 ) -> list[ListedBusiness]:
     """Businesses that opted in, by name; at most 10, and never without a query."""
-    rows = session.execute(
-        text(f"""
-            SELECT t.join_code, t.name, t.city, t.primary_color,
-                   {LOGO_URL.format(t="t")} AS logo_url
-            FROM app.search_listed_businesses(:q) t
-        """),
-        {"q": q},
-    ).mappings()
+    rows = session.execute(text(LISTED_BUSINESSES_SELECT), {"q": q}).mappings()
     return [ListedBusiness.model_validate(dict(row)) for row in rows]
 
 
