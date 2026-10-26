@@ -95,8 +95,9 @@ def move_owner(conn: Connection, old_email: str, new_email: str) -> dict[str, in
 
 
 def owner_as_client(conn: Connection, owner_email: str) -> dict[str, int]:
-    """Makes the owner a client of each fitness business they own, with a membership that ends
-    in a month and a class tomorrow. Idempotent."""
+    """Makes the owner a client of each business they own (the first branch is home), with a
+    membership that ends in a month where the business sells one and a class tomorrow where it
+    runs classes. Idempotent."""
     owner = _user(conn, owner_email)
     if owner is None:
         raise SystemExit(f"No account for {owner_email}: sign in with it once, then run again.")
@@ -106,7 +107,7 @@ def owner_as_client(conn: Connection, owner_email: str) -> dict[str, int]:
             SELECT t.id, (SELECT l.id FROM app.locations l WHERE l.tenant_id = t.id
                           ORDER BY l.created_at, l.id LIMIT 1)
             FROM app.tenants t JOIN app.tenant_members m ON m.tenant_id = t.id
-            WHERE m.user_id = :u AND m.role = 'owner' AND t.vertical = 'fitness'
+            WHERE m.user_id = :u AND m.role = 'owner'
         """),
         {"u": owner},
     ).all():

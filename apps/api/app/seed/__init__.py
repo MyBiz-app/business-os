@@ -65,7 +65,7 @@ def main() -> None:
     parser.add_argument(
         "--demo",
         default="studio",
-        choices=sorted([*DEMOS, "profiles", "places", "ownerclient"]),
+        choices=sorted([*DEMOS, "profiles", "places", "ownerclient", "asclient"]),
         help="studio: one fitness studio; club: a padel club renting courts by the hour; "
         "pets: a pet grooming salon with owners and their pets; "
         "jobs: an air-conditioning company with on-site jobs at clients' addresses; "
@@ -87,6 +87,7 @@ def main() -> None:
         "profiles: add logos, portraits and the crossfit branch to the owner's existing demo "
         "businesses (adds only, deletes nothing); "
         "ownerclient: one fitness studio the owner also trains in, as a client; "
+        "asclient: make the owner a client of every business they already own (adds only); "
         "platform: the owner email becomes a platform team owner and the "
         "platform gets small businesses, invoices and requests",
     )
@@ -131,6 +132,9 @@ def main() -> None:
                 staff_name=args.owner_name,
                 replace=args.replace,
             )
+            return
+        if args.demo == "asclient":
+            print(owner_as_client(conn, args.owner_email))
             return
         seed_demo(
             conn,
