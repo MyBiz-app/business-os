@@ -6,7 +6,7 @@ addresses all land in the one real inbox. Decision T91 in [`DECISIONS.md`](../DE
 | Email | What it is |
 |---|---|
 | `adire7399@gmail.com` | MyBiz primary owner: the console (always asks for a 2FA code). Also owner of the demo studio "סטודיו פלואו (דמו)" and a client of it: switch between the owner and the client view in the app. |
-| `adired7399@gmail.com` | Owner of the full demo: Adir Fitness (5 branches), Sharon Tennis Club, Blade Barbers, Merhav clinic. Exempt from 2FA on staging (`API_MFA_DEMO_EXEMPT_EMAILS`). |
+| `adired7399@gmail.com` | Owner of the full demo (Adir Fitness with 5 branches, Sharon Tennis Club, Blade Barbers, Merhav clinic) and also a client of each of them (`asclient`), so the app shows both sides. Exempt from 2FA on staging (`API_MFA_DEMO_EXEMPT_EMAILS`). |
 | `adired7399+manager@gmail.com` | Network manager of Adir Fitness |
 | `adired7399+branch@gmail.com` | Branch manager (Tel Aviv, strength) |
 | `adired7399+coach@gmail.com` | Coach (Ramat Gan, yoga) |
@@ -26,4 +26,5 @@ the **Seed staging demo data** workflow:
 
 1. Hand over the old owner: owner_email = `adired7399@gmail.com`, move_owner_from = `adiredri73@gmail.com`.
 2. Refresh the full demo: demo = `full`, owner_email = `adired7399@gmail.com` (links the plus logins).
-3. Studio + client for the primary owner: demo = `ownerclient`, owner_email = `adire7399@gmail.com`.
+3. Owner as client of every business they own: demo = `asclient`, owner_email = `adired7399@gmail.com`.
+4. Studio + client for the primary owner: demo = `ownerclient`, owner_email = `adire7399@gmail.com`.
