@@ -268,8 +268,9 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
             </Text>
           )}
         </Pressable>
-        {!cancelled && <View style={styles.action}>{actionButton}</View>}
       </View>
+      {/* Full width under the details: beside them it squeezed the class name into narrow lines. */}
+      {!cancelled && <View style={styles.actionFull}>{actionButton}</View>}
       {kind && !cancelled && choices.length > 1 && (
         <View role="radiogroup" aria-label={tDependents("who")} style={styles.who}>
           <Text style={[styles.meta, { color: palette.muted }]}>{tDependents("who")}</Text>
@@ -346,6 +347,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 12 },
   info: { flex: 1, gap: 2, alignItems: "stretch" },
   action: { minWidth: 110 },
+  actionFull: { alignSelf: "stretch" },
   time: { fontSize: 15, fontWeight: "500", fontVariant: ["tabular-nums"], textAlign: "left", writingDirection: "ltr" },
   when: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 6, marginBottom: 4 },
   day: { fontSize: 13, fontWeight: "500", textAlign: "left" },

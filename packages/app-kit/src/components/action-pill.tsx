@@ -35,12 +35,15 @@ export function ActionPill({
       style={[local.pill, { backgroundColor: tint(color, 0.12), opacity: busy ? 0.6 : 1 }]}
     >
       <Ionicons name={icon} size={16} color={color} />
-      <Text style={[local.label, { color }]}>{label}</Text>
+      <Text numberOfLines={1} style={[local.label, { color }]}>
+        {label}
+      </Text>
     </PressableScale>
   );
 }
 
 const local = StyleSheet.create({
-  pill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, minHeight: 44, borderRadius: radius.pill },
+  // Never shrinks: a row of pills wraps onto the next line instead of breaking a label in two.
+  pill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, minHeight: 44, borderRadius: radius.pill, flexShrink: 0 },
   label: { fontSize: 13, fontWeight: "500" },
 });

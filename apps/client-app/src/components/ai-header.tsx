@@ -27,9 +27,14 @@ export function AiHeader() {
 
   return (
     <View style={[local.bar, { paddingTop: insets.top, height: BAR + insets.top, backgroundColor: palette.background }]}>
-      <Text numberOfLines={1} style={[local.name, { color: palette.muted }]}>
-        {tenant.name}
-      </Text>
+      {/* Today's large title already names the business: show it here only on the other tabs. */}
+      {tab === "today" ? (
+        <View style={local.name} />
+      ) : (
+        <Text numberOfLines={1} style={[local.name, { color: palette.muted }]}>
+          {tenant.name}
+        </Text>
+      )}
       <PressableScale
         accessibilityRole="button"
         accessibilityLabel={t("bubble")}
