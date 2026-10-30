@@ -7383,6 +7383,14 @@
     },
     "today": {
       "title": "Today",
+      "nowCard": {
+        "live": "Now",
+        "next": "Next up",
+        "nextIn": "Starts in {minutes, plural, one {# minute} other {# minutes}}",
+        "filled": "{booked} of {capacity} booked",
+        "attendance": "Take attendance",
+        "open": "Open"
+      },
       "greeting": "{part, select, morning {Good morning} afternoon {Good afternoon} evening {Good evening} other {Hello}}",
       "none": "Nothing booked today.",
       "mine": "Yours today",

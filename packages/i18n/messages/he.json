@@ -7383,6 +7383,14 @@
     },
     "today": {
       "title": "היום",
+      "nowCard": {
+        "live": "עכשיו",
+        "next": "הבא בתור",
+        "nextIn": "מתחיל בעוד {minutes, plural, one {דקה} other {# דקות}}",
+        "filled": "{booked} מתוך {capacity} רשומים",
+        "attendance": "סימון נוכחות",
+        "open": "פתיחה"
+      },
       "greeting": "{part, select, morning {בוקר טוב} afternoon {צהריים טובים} evening {ערב טוב} other {שלום}}",
       "none": "אין היום כלום ביומן.",
       "mine": "שלך היום",

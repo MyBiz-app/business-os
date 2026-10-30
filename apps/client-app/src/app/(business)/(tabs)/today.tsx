@@ -18,7 +18,8 @@ import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { radius } from "@business-os/app-kit/lib/theme";
 import { NeedsYou } from "@/components/needs-you";
-import { buildTimeline, type TimelineState } from "@/lib/day-timeline";
+import { NowCard } from "@/components/now-card";
+import { buildTimeline, focusSession, type TimelineState } from "@/lib/day-timeline";
 import { useStaff } from "@/providers/staff-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
@@ -131,6 +132,7 @@ export default function Today() {
   // Today reads as a timeline: hour headings, a "now" line, and what is over fades back.
   const nowMs = day === today ? Date.now() : null;
   const timeline = buildTimeline(sessions, timeZone, nowMs);
+  const focus = nowMs === null ? null : focusSession(sessions, nowMs);
   const stateOf = new Map<string, TimelineState>();
   for (const item of timeline) if (item.kind === "session") stateOf.set(item.session.id, item.state);
 
@@ -241,6 +243,10 @@ export default function Today() {
           </Pressable>
         )}
       </View>
+
+      {focus && nowMs !== null && can("schedule.read") ? (
+        <NowCard session={focus.session} live={focus.live} nowMs={nowMs} timeZone={timeZone} palette={palette} />
+      ) : null}
 
       <NeedsYou lists={attention} usageNotices={usageNotices} waiting={waiting} palette={palette} />
 
