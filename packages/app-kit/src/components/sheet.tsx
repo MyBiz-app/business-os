@@ -1,7 +1,7 @@
 import { motion, radius, space } from "@business-os/design-tokens";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Animated, Easing, KeyboardAvoidingView, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
@@ -79,7 +79,7 @@ export function Sheet({ visible, onClose, palette, title, subtitle, children, fo
   const label = closeLabel ?? t("closeDialog");
   return (
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
-      <View style={s.root}>
+      <KeyboardAvoidingView style={s.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: scrimColor(scheme), opacity: progress }]}>
           <Pressable aria-hidden tabIndex={-1} style={s.fill} onPress={onClose} />
         </Animated.View>
@@ -112,12 +112,12 @@ export function Sheet({ visible, onClose, palette, title, subtitle, children, fo
               <Ionicons name="close" size={22} color={palette.muted} />
             </Pressable>
           </View>
-          <ScrollView style={s.scroll} contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
+          <ScrollView style={s.scroll} contentContainerStyle={s.body} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
             {children}
           </ScrollView>
           {footer ? <View style={s.footer}>{footer}</View> : null}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
