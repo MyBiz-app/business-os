@@ -2,11 +2,12 @@ import type { components } from "@business-os/api-client";
 import { addDays, formatDay, todayIn } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { View } from "react-native";
+import { Linking, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, ListRow, PillRow } from "@business-os/app-kit/components/rows";
+import { SwipeRow } from "@business-os/app-kit/components/swipe-row";
 import { Button, Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -159,7 +160,7 @@ export default function Clients() {
                   })
                 : client.plan_name
               : tList("noPlan");
-            return (
+            const row = (
               <ListRow
                 key={client.id}
                 palette={palette}
@@ -168,6 +169,14 @@ export default function Clients() {
                 subtitle={`${plan} · ${lastVisit(client.last_visit)}`}
                 onPress={() => router.push(`/client/${client.id}`)}
               />
+            );
+            // A shortcut only: the same call button is on the client's card. Clients without a phone have none.
+            return client.phone ? (
+              <SwipeRow key={client.id} label={t("call")} icon="call" tone="primary" palette={palette} onAction={() => void Linking.openURL(`tel:${client.phone}`)}>
+                {row}
+              </SwipeRow>
+            ) : (
+              row
             );
           })}
           {data && data.total > items.length && (
