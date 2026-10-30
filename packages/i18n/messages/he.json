@@ -4503,6 +4503,14 @@
         "reply_to": "מייל המענה",
         "notifications": "מייל ההתראות"
       }
+    },
+    "ownerAlert": {
+      "title": "{business}: מה חדש",
+      "booking_new": "הזמנות חדשות: {count}",
+      "booking_cancelled": "ביטולים: {count}",
+      "waitlist_joined": "נוספו לרשימת המתנה: {count}",
+      "client_joined": "לקוחות חדשים: {count}",
+      "lead_new": "פניות חדשות: {count}"
     }
   },
   "support": {
@@ -7808,6 +7816,17 @@
       "staff": "צוות",
       "sessions": "שיעורים ותורים",
       "invoices": "מסמכים"
+    },
+    "alerts": {
+      "title": "התראות לטלפון שלי",
+      "hint": "פעולות של לקוחות מגיעות לטלפון כסיכום אחד בשעה, ולא בין {from} ל-{until}.",
+      "kinds": {
+        "booking_new": "הזמנות חדשות",
+        "booking_cancelled": "ביטולים",
+        "waitlist_joined": "הצטרפו לרשימת המתנה",
+        "client_joined": "לקוחות חדשים",
+        "lead_new": "פניות חדשות"
+      }
     }
   },
   "staffApp": {

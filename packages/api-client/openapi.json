@@ -21220,6 +21220,168 @@
         ]
       }
     },
+    "/owner-alerts": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Get Alert Settings",
+        "description": "The alert kinds and whether each is on for this owner in this business.",
+        "operationId": "get_alert_settings",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertSettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/owner-alerts/{kind}": {
+      "put": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Set Alert",
+        "description": "Switches one alert kind on or off for this owner in this business.",
+        "operationId": "set_alert",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "booking_new",
+                "booking_cancelled",
+                "waitlist_joined",
+                "client_joined",
+                "lead_new"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertChoice"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertSettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/me/tours": {
       "get": {
         "tags": [
@@ -50897,6 +51059,70 @@
           "limits"
         ],
         "title": "AiSpend"
+      },
+      "AlertChoice": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "AlertChoice"
+      },
+      "AlertSetting": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "booking_new",
+              "booking_cancelled",
+              "waitlist_joined",
+              "client_joined",
+              "lead_new"
+            ],
+            "title": "Kind"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "enabled"
+        ],
+        "title": "AlertSetting"
+      },
+      "AlertSettings": {
+        "properties": {
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/AlertSetting"
+            },
+            "type": "array",
+            "title": "Kinds"
+          },
+          "quiet_from_hour": {
+            "type": "integer",
+            "title": "Quiet From Hour"
+          },
+          "quiet_until_hour": {
+            "type": "integer",
+            "title": "Quiet Until Hour"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kinds",
+          "quiet_from_hour",
+          "quiet_until_hour"
+        ],
+        "title": "AlertSettings"
       },
       "Announcement": {
         "properties": {

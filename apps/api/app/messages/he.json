@@ -130,6 +130,14 @@
         "reply_to": "מייל המענה",
         "notifications": "מייל ההתראות"
       }
+    },
+    "ownerAlert": {
+      "title": "{business}: מה חדש",
+      "booking_new": "הזמנות חדשות: {count}",
+      "booking_cancelled": "ביטולים: {count}",
+      "waitlist_joined": "נוספו לרשימת המתנה: {count}",
+      "client_joined": "לקוחות חדשים: {count}",
+      "lead_new": "פניות חדשות: {count}"
     }
   },
   "securityEmail": {

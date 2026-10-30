@@ -13,6 +13,7 @@ from app.core.config import get_settings
 from app.core.tenant_scope import Tally, start_tally
 from app.jobs.base import LOCK_PREFIX
 from app.jobs.outbound import (
+    alert_owners_job,
     issue_documents,
     move_files,
     notify_payslips,
@@ -49,6 +50,7 @@ JOBS = {
     "notify-shifts": notify_shifts,
     "remind-payroll": remind_payroll_job,
     "notify-payslips": notify_payslips,
+    "alert-owners": alert_owners_job,
     "message-reminders": message_reminders,
     "follow-up-leads": follow_up_leads,
     "purge-expired": purge_expired,
@@ -92,6 +94,7 @@ HOURLY = [
     "notify-shifts",
     "send-announcements",
     "notify-payslips",
+    "alert-owners",
 ]
 # GitHub's free scheduler throttles "hourly" crons on staging to a run every 1-6 hours (observed
 # gaps up to ~6h), so an hourly job is late only after 8 hours without a success.

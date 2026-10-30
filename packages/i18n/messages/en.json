@@ -4503,6 +4503,14 @@
         "reply_to": "reply-to email",
         "notifications": "notifications email"
       }
+    },
+    "ownerAlert": {
+      "title": "{business}: what's new",
+      "booking_new": "New bookings: {count}",
+      "booking_cancelled": "Cancellations: {count}",
+      "waitlist_joined": "Joined a waitlist: {count}",
+      "client_joined": "New clients: {count}",
+      "lead_new": "New enquiries: {count}"
     }
   },
   "support": {
@@ -7808,6 +7816,17 @@
       "staff": "Team",
       "sessions": "Classes and appointments",
       "invoices": "Documents"
+    },
+    "alerts": {
+      "title": "Alerts on my phone",
+      "hint": "Clients' own actions reach your phone as one summary per hour, never between {from} and {until}.",
+      "kinds": {
+        "booking_new": "New bookings",
+        "booking_cancelled": "Cancellations",
+        "waitlist_joined": "Joined a waitlist",
+        "client_joined": "New clients",
+        "lead_new": "New enquiries"
+      }
     }
   },
   "staffApp": {
