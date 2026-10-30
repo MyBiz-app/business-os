@@ -9,6 +9,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { Button } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { markIntroSeen } from "@business-os/app-kit/lib/intro";
+import { radius } from "@business-os/app-kit/lib/theme";
 import { font } from "@business-os/app-kit/lib/typography";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
@@ -52,8 +53,8 @@ export default function Intro() {
 }
 
 const local = StyleSheet.create({
-  badge: { width: 88, height: 88, borderRadius: 44, alignItems: "center", justifyContent: "center", alignSelf: "center" },
-  title: { fontSize: 28, ...font.semibold, textAlign: "center" },
+  badge: { width: 88, height: 88, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", alignSelf: "center" },
+  title: { fontSize: 30, ...font.semibold, textAlign: "center" },
   body: { fontSize: 17, ...font.regular, textAlign: "center" },
   dots: { flexDirection: "row", gap: 8, justifyContent: "center", paddingVertical: 4 },
   dot: { width: 8, height: 8, borderRadius: 4 },
