@@ -24,7 +24,7 @@ initMonitoring();
 
 /** Screens a signed-out visitor may open; every other address sends them to sign in (a deep link used to
  * leave a blank screen, because only the tab layouts checked the session). */
-const SIGNED_OUT_ROUTES = ["/", "/sign-in", "/join"];
+const SIGNED_OUT_ROUTES = ["/", "/intro", "/sign-in", "/join"];
 
 function SignedOutGuard() {
   const { session, loading } = useSession();
