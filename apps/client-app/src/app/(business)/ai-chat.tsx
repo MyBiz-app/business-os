@@ -281,7 +281,7 @@ export default function AiChat() {
                     key={suggestion}
                     accessibilityRole="button"
                     onPress={() => void send(suggestion)}
-                    style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface, borderRadius: radius.card, paddingHorizontal: 14, paddingVertical: 8 }}
+                    style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface, borderRadius: radius.card, paddingHorizontal: 14, minHeight: 44, justifyContent: "center" }}
                   >
                     <Text style={{ color: palette.foreground }}>{suggestion}</Text>
                   </Pressable>

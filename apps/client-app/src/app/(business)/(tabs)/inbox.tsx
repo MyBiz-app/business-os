@@ -132,6 +132,7 @@ export default function Inbox() {
                 palette={palette}
                 leading={<Avatar name={name} palette={palette} />}
                 title={name}
+                subtitleLines={3}
                 subtitle={[
                   lead.interest,
                   tLeads(`sources.${lead.source}`),

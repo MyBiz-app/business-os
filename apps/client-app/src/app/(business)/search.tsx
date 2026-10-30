@@ -91,7 +91,7 @@ export default function Search() {
     <Screen palette={palette}>
       <BackBar label={tBusiness("today.title")} palette={palette} fallback="/today" />
       <Heading palette={palette}>{t("title")}</Heading>
-      <Field label={t("title")} placeholder={t("hint")} palette={palette} value={text} onChangeText={setText} autoFocus autoCapitalize="none" returnKeyType="search" />
+      <Field label={t("hint")} palette={palette} value={text} onChangeText={setText} autoFocus autoCapitalize="none" returnKeyType="search" />
       {ready && failed ? (
         <LoadError palette={palette} onRetry={() => setAttempt((value) => value + 1)} />
       ) : !ready ? (

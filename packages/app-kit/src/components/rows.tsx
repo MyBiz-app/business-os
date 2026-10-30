@@ -56,7 +56,7 @@ export function Avatar({ name, color, palette, size = 40 }: { name: string; colo
         { width: size, height: size, borderRadius: size / 2, backgroundColor: tint(base, 0.14), borderColor: tint(base, 0.3) },
       ]}
     >
-      <Text style={{ color: palette.foreground, ...font.semibold, fontSize: size * 0.36 }}>{initials(name)}</Text>
+      <Text style={{ color: palette.foreground, ...font.semibold, fontSize: Math.max(12, size * 0.36) }}>{initials(name)}</Text>
     </View>
   );
 }
@@ -76,6 +76,8 @@ export function Badge({ label, tone = "muted", palette }: { label: string; tone?
 type RowProps = {
   title: string;
   subtitle?: string | null;
+  /** Lines the subtitle may take before it is cut with an ellipsis (default 2). */
+  subtitleLines?: number;
   /** Shown at the end of the row: a time, a price, a badge. */
   trailing?: React.ReactNode;
   /** Shown at the start: an avatar, a time, a color bar. */
@@ -109,7 +111,7 @@ export function RowGroup({ children, palette }: { children: React.ReactNode; pal
 }
 
 /** One line of a list on a card surface; pressable when it opens something. */
-export function ListRow({ title, subtitle, trailing, leading, onPress, accessibilityLabel, palette }: RowProps) {
+export function ListRow({ title, subtitle, subtitleLines = 2, trailing, leading, onPress, accessibilityLabel, palette }: RowProps) {
   const { forward } = useBackIcon();
   const grouped = useContext(InGroup);
   const box = grouped ? local.groupedRow : [local.rowBox, { backgroundColor: palette.surface, borderColor: palette.border }];
@@ -121,7 +123,7 @@ export function ListRow({ title, subtitle, trailing, leading, onPress, accessibi
           {title}
         </Text>
         {subtitle ? (
-          <Text style={[local.rowSub, { color: palette.muted }]} numberOfLines={2}>
+          <Text style={[local.rowSub, { color: palette.muted }]} numberOfLines={subtitleLines}>
             {subtitle}
           </Text>
         ) : null}

@@ -84,6 +84,7 @@ export function Sheet({ visible, onClose, palette, title, subtitle, children, fo
           <Pressable aria-hidden tabIndex={-1} style={s.fill} onPress={onClose} />
         </Animated.View>
         <Animated.View
+          role="dialog"
           accessibilityViewIsModal
           accessibilityLabel={title}
           style={[
