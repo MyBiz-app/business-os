@@ -5,6 +5,7 @@ import { useTranslations } from "use-intl";
 
 import { AuthImage } from "@business-os/app-kit/components/auth-image";
 import { Avatar } from "@business-os/app-kit/components/rows";
+import { Sheet } from "@business-os/app-kit/components/sheet";
 import { Text } from "@business-os/app-kit/components/text";
 import { useToast } from "@business-os/app-kit/components/toast";
 import { Button, Card, ErrorText, Field, styles } from "@business-os/app-kit/components/ui";
@@ -25,6 +26,7 @@ export function ProfileHeader({ name }: { name: string }) {
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState<"photo" | "status" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [choosing, setChoosing] = useState(false);
 
   const apply = useCallback((next: Me) => {
     setMe(next);
@@ -105,15 +107,14 @@ export function ProfileHeader({ name }: { name: string }) {
         <Text style={[styles.h2, { color: palette.foreground }]}>{name}</Text>
         {me?.status_text ? <Text style={[styles.muted, { color: palette.muted }]}>{me.status_text}</Text> : null}
       </View>
-      <View style={local.row}>
-        <View style={local.flex}>
-          <Button label={t("takePhoto")} variant="secondary" palette={palette} busy={busy === "photo"} onPress={() => void fromCamera()} />
+      <Button label={t("changePhoto")} variant="secondary" palette={palette} busy={busy === "photo"} onPress={() => setChoosing(true)} />
+      <Sheet visible={choosing} onClose={() => setChoosing(false)} palette={palette} title={t("changePhoto")}>
+        <View style={local.choices}>
+          <Button label={t("takePhoto")} variant="secondary" palette={palette} onPress={() => { setChoosing(false); void fromCamera(); }} />
+          <Button label={t("choosePhoto")} variant="secondary" palette={palette} onPress={() => { setChoosing(false); void fromGallery(); }} />
+          {me?.avatar_url ? <Button label={t("removePhoto")} variant="danger" palette={palette} onPress={() => { setChoosing(false); void removePhoto(); }} /> : null}
         </View>
-        <View style={local.flex}>
-          <Button label={t("choosePhoto")} variant="secondary" palette={palette} busy={busy === "photo"} onPress={() => void fromGallery()} />
-        </View>
-      </View>
-      {me?.avatar_url ? <Button label={t("removePhoto")} variant="secondary" palette={palette} busy={busy === "photo"} onPress={() => void removePhoto()} /> : null}
+      </Sheet>
       <Field
         label={t("status")}
         palette={palette}
@@ -136,6 +137,5 @@ const local = StyleSheet.create({
   avatarBox: { width: AVATAR_SIZE, height: AVATAR_SIZE },
   photo: { position: "absolute", top: 0, start: 0, width: AVATAR_SIZE, height: AVATAR_SIZE, borderRadius: AVATAR_SIZE / 2, overflow: "hidden" },
   photoImage: { width: AVATAR_SIZE, height: AVATAR_SIZE },
-  row: { flexDirection: "row", gap: 8 },
-  flex: { flex: 1 },
+  choices: { gap: 8 },
 });

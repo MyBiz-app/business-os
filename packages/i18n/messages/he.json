@@ -1849,6 +1849,7 @@
       "photoSaved": "התמונה עודכנה",
       "photoFailed": "לא הצלחנו לעדכן את התמונה",
       "photoPermission": "אפשרו גישה בהגדרות הטלפון כדי להוסיף תמונה",
+      "changePhoto": "שינוי תמונה",
       "status": "סטטוס",
       "statusPlaceholder": "משפט קצר עליכם",
       "statusCount": "{count}/{max}",
@@ -7530,8 +7531,10 @@
       "requests": "חופשה",
       "noRequests": "אין בקשות חופשה.",
       "request": "בקשת חופשה",
-      "from": "יום ראשון (YYYY-MM-DD)",
-      "to": "יום אחרון (YYYY-MM-DD)",
+      "from": "היום הראשון",
+      "to": "היום האחרון",
+      "today": "היום",
+      "closedShort": "סגור",
       "reason": "סיבה (לא חובה)",
       "send": "שליחת בקשה",
       "sent": "הבקשה נשלחה. מנהל יחליט.",
@@ -7607,7 +7610,8 @@
       "classRestored": "השיעור חזר ללוח.",
       "classCancelled": "השיעור בוטל",
       "markedCheckedIn": "{name} סומן כנוכח",
-      "markedNoShow": "{name} סומן כלא הגיע"
+      "markedNoShow": "{name} סומן כלא הגיע",
+      "more": "עוד"
     },
     "leads": {
       "open": "פתוחים",
