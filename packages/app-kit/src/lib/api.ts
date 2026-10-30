@@ -1,6 +1,7 @@
 import { createApiClient, type ApiClient } from "@business-os/api-client";
 
 import { API_URL } from "./env";
+import { isNetworkFailure, setOnline } from "./connection";
 import { queryClient } from "./query-client";
 import { supabase } from "./supabase";
 
@@ -28,11 +29,15 @@ export function apiClient(): ApiClient {
       return request;
     },
     onResponse({ request, response }) {
+      setOnline(true);
       // Anything the person changed may show on other screens: their saved copies count as old.
       if (response.ok && request.method !== "GET" && !BACKGROUND_PATHS.test(new URL(request.url).pathname)) {
         void queryClient.invalidateQueries();
       }
       return response;
+    },
+    onError({ error }) {
+      if (isNetworkFailure(error)) setOnline(false);
     },
   });
   return client;
