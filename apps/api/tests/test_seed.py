@@ -1031,3 +1031,34 @@ def test_a_demo_business_and_an_empty_account_can_be_removed(engine: Engine) -> 
             "app_users": 0,
             "auth_users": 0,
         }
+
+
+def test_a_business_with_a_second_owner_is_removed_only_when_allowed(engine: Engine) -> None:
+    from app.seed.accounts import delete_businesses
+
+    with engine.begin() as connection:
+        for email in ("main-owner@example.com", "co-owner@example.com"):
+            connection.execute(
+                text("INSERT INTO app.users (id, email) VALUES (:id, :e)"),
+                {"id": uuid4(), "e": email},
+            )
+        (shared,) = seed_demo(connection, "main-owner@example.com", "studio", 1, random.Random(3))
+    with engine.begin() as connection:
+        co_owner = connection.execute(
+            text("SELECT id FROM app.users WHERE email = 'co-owner@example.com'")
+        ).scalar_one()
+        connection.execute(
+            text(
+                "INSERT INTO app.tenant_members (tenant_id, user_id, role) VALUES (:t, :u, 'owner')"
+            ),
+            {"t": shared, "u": co_owner},
+        )
+    with engine.begin() as connection:
+        with pytest.raises(SystemExit, match="not owned"):
+            delete_businesses(connection, "main-owner@example.com", [str(shared)])
+        assert (
+            delete_businesses(
+                connection, "main-owner@example.com", [str(shared)], allow_co_owners=True
+            )
+            == 1
+        )

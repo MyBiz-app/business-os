@@ -103,6 +103,11 @@ def main() -> None:
         help="Remove a business (id) that --owner-email owns alone, then stop (repeatable)",
     )
     parser.add_argument(
+        "--allow-co-owners",
+        action="store_true",
+        help="With --delete-business: also remove businesses that have other owners",
+    )
+    parser.add_argument(
         "--delete-account",
         default=None,
         help="Remove this account if it holds no business or client record, then stop",
@@ -123,7 +128,14 @@ def main() -> None:
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
         if args.delete_business:
-            print(delete_businesses(conn, args.owner_email, args.delete_business))
+            print(
+                delete_businesses(
+                    conn,
+                    args.owner_email,
+                    args.delete_business,
+                    allow_co_owners=args.allow_co_owners,
+                )
+            )
             return
         if args.delete_account:
             print(delete_account(conn, args.delete_account))
