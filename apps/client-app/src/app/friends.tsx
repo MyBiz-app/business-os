@@ -139,8 +139,8 @@ export default function Friends() {
               <Text style={[styles.muted, { color: palette.muted }]}>{hours(invite.starts_at)}</Text>
               <Text style={[styles.muted, { color: palette.muted }]}>
                 {invite.direction === "received"
-                  ? t("invitedBy", { name: invite.other_first_name ?? "" })
-                  : t("youInvited", { name: invite.other_first_name ?? "" })}
+                  ? t("invitedBy", { name: invite.other_first_name || t("someone") })
+                  : t("youInvited", { name: invite.other_first_name || t("someone") })}
               </Text>
               {invite.direction === "received" ? (
                 <View style={{ gap: 8 }}>

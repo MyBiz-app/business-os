@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { tint } from "../lib/brand";
 import { useTheme } from "../providers/theme-provider";
@@ -14,6 +14,7 @@ import { radius } from "../lib/theme";
  * theme switch in the corner. */
 export function AuthShell({ children, themeToggle = true }: { children: React.ReactNode; themeToggle?: boolean }) {
   const { palette } = useTheme();
+  const insets = useSafeAreaInsets();
   return (
     <View style={[styles.root, { backgroundColor: palette.background }]}>
       <AuthBackdrop />
@@ -23,8 +24,9 @@ export function AuthShell({ children, themeToggle = true }: { children: React.Re
         </ScrollView>
         {/* Outside the ScrollView so the keyboard and tall content never move it. */}
         {themeToggle ? (
-          <View style={styles.corner} pointerEvents="box-none">
-            <ThemeToggle size={36} />
+          // Absolute children ignore the SafeAreaView padding, so the notch inset is added by hand.
+          <View style={[styles.corner, { top: insets.top + 8 }]} pointerEvents="box-none">
+            <ThemeToggle size={44} />
           </View>
         ) : null}
       </SafeAreaView>
@@ -54,7 +56,7 @@ const styles = StyleSheet.create({
   // Clips the drifting backdrop circles (they start past the edge) so the page never scrolls sideways, in either direction.
   root: { flex: 1, width: "100%", overflow: "hidden" },
   content: { flexGrow: 1, justifyContent: "center", padding: 20 },
-  corner: { position: "absolute", top: 8, end: 12, zIndex: 2 },
+  corner: { position: "absolute", end: 12, zIndex: 2 },
   column: { width: "100%", maxWidth: 440, alignSelf: "center", gap: 20, alignItems: "stretch" },
   card: { borderWidth: 1, borderRadius: radius.dialog, padding: 22, gap: 16 },
 });

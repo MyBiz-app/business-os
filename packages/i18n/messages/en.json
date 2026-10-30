@@ -9373,6 +9373,7 @@
     "invites": "Class invitations",
     "invitedBy": "{name} invited you. A spot is held for you.",
     "youInvited": "You invited {name}.",
+    "someone": "a friend",
     "acceptInvite": "Join the class",
     "declineInvite": "Not this time",
     "cancelInvite": "Cancel invitation",
