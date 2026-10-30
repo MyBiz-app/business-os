@@ -131,3 +131,22 @@ def test_database_isolates_clients(engine: Engine, two_tenants: dict[str, UUID])
     # Alice, a member of A, sees exactly her one client.
     with open_session(engine, two_tenants["alice"], two_tenants["tenant_a"]) as session:
         assert session.execute(text("SELECT count(*) FROM app.clients")).scalar() == 1
+
+
+def test_clients_list_ignores_own_rows_in_other_businesses(
+    client: TestClient, auth: AuthHeaders, two_tenants: dict[str, UUID]
+) -> None:
+    """An owner who is also a client of another business sees only this business's clients."""
+    alice, tenant_a, tenant_b = (two_tenants[k] for k in ("alice", "tenant_a", "tenant_b"))
+    code = client.get("/tenants/current", headers=auth(two_tenants["bob"], tenant_b)).json()[
+        "join_code"
+    ]
+    joined = client.post("/client/businesses", json={"code": code}, headers=auth(alice))
+    assert joined.status_code == 201, joined.text
+
+    listed = client.get("/clients", headers=auth(alice, tenant_a)).json()
+
+    assert listed["total"] == 0
+    assert listed["items"] == []
+    found = client.get("/search", params={"q": "alice"}, headers=auth(alice, tenant_a))
+    assert [hit for hit in found.json()["items"] if hit["kind"] == "client"] == []
