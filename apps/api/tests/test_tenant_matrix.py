@@ -30,7 +30,11 @@ PLATFORM_TABLES = {
 # waitlist_requests needs a kind that matches its time columns and a future day.
 # subscription_cancellations is written only when an owner cancels or pauses (R33).
 # booking_series is written only when a client sets up a standing booking (C5).
+# owner_push_events is queued by the alert-owners job, owner_push_prefs by an owner's own
+# choice in the app (B14).
 UNSEEDED: set[str] = {
+    "owner_push_events",
+    "owner_push_prefs",
     "time_clock_approvals",
     "waitlist_requests",
     "subscription_cancellations",

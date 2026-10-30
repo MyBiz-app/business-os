@@ -41,9 +41,15 @@ def upgrade() -> None:
         "CREATE INDEX owner_push_events_waiting ON app.owner_push_events (tenant_id) "
         "WHERE sent_at IS NULL"
     )
-    # Written and read by the jobs role only (it bypasses row-level security); the API never
-    # sees the queue.
+    # Written and read by the jobs role only (it bypasses row-level security). The API role has
+    # no grant on the queue; the policy is there so that a later grant could never show another
+    # business's rows.
     op.execute("ALTER TABLE app.owner_push_events ENABLE ROW LEVEL SECURITY")
+    op.execute("""
+        CREATE POLICY owner_push_events_tenant ON app.owner_push_events TO app_api
+        USING (tenant_id = app.current_tenant_id())
+        WITH CHECK (tenant_id = app.current_tenant_id())
+    """)
 
     op.execute(f"""
         CREATE TABLE app.owner_push_prefs (
@@ -54,6 +60,7 @@ def upgrade() -> None:
             PRIMARY KEY (tenant_id, user_id, kind)
         )
     """)
+    op.execute("CREATE INDEX owner_push_prefs_user ON app.owner_push_prefs (user_id)")
     op.execute("GRANT SELECT, INSERT, UPDATE ON app.owner_push_prefs TO app_api")
     op.execute("ALTER TABLE app.owner_push_prefs ENABLE ROW LEVEL SECURITY")
     op.execute("""

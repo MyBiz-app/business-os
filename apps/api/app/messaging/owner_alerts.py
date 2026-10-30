@@ -63,18 +63,26 @@ _COLLECT = {
 }
 
 
+# The collectors above are module constants (no value from outside reaches the SQL text); the
+# bound values are :since and :kind.
+_QUEUE_HEAD = """
+    INSERT INTO app.owner_push_events (tenant_id, kind, ref_id, occurred_at)
+    SELECT e.tenant_id, CAST(:kind AS text), e.id, e.at
+    FROM (
+"""
+_QUEUE_TAIL = """
+    ) AS e(tenant_id, id, at)
+    JOIN app.tenants t ON t.id = e.tenant_id AND t.closed_at IS NULL
+    ON CONFLICT (tenant_id, kind, ref_id) DO NOTHING
+"""
+
+
 def queue_events(conn: Connection, now: datetime) -> int:
     """Adds the events of the last day that are not queued yet; returns how many were new."""
     added = 0
     for kind, select in _COLLECT.items():
         added += conn.execute(
-            text(f"""
-                INSERT INTO app.owner_push_events (tenant_id, kind, ref_id, occurred_at)
-                SELECT e.tenant_id, CAST(:kind AS text), e.id, e.at
-                FROM ({select}) AS e(tenant_id, id, at)
-                JOIN app.tenants t ON t.id = e.tenant_id AND t.closed_at IS NULL
-                ON CONFLICT (tenant_id, kind, ref_id) DO NOTHING
-            """),
+            text(_QUEUE_HEAD + select + _QUEUE_TAIL),
             {"kind": kind, "since": now - LOOKBACK},
         ).rowcount
     return added
