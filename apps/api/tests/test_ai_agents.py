@@ -655,3 +655,21 @@ def test_a_draft_agent_can_be_tried_before_it_joins_the_team(
         client.post("/ai/conversations", json={"agent_key": draft["key"]}, headers=desk).status_code
         == 201
     )
+
+
+def test_builtin_role_and_topic_follow_the_business_language() -> None:
+    from app.ai.agents import CATALOG, resolve
+
+    assert set(CATALOG) == set(_he_keys())
+    for key, spec in CATALOG.items():
+        he = resolve(spec, None, "he")
+        en = resolve(spec, None, "en")
+        assert en.role_title == spec.role_title and en.topic == spec.topic
+        assert he.role_title != spec.role_title and he.topic != spec.topic
+        assert any("א" <= ch <= "ת" for ch in he.role_title + he.topic), key
+
+
+def _he_keys() -> list[str]:
+    from app.ai.agents import _HE_TEXT
+
+    return list(_HE_TEXT)

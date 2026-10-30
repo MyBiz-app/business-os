@@ -245,6 +245,39 @@ class Agent:
     map_y: float | None = None
 
 
+# What the catalog's role and one-line topic say in Hebrew (the English is on the spec itself).
+# Only the built-in text is translated: what a business wrote itself shows as written.
+_HE_TEXT: dict[str, tuple[str, str]] = {
+    "chief": ("ראש המטה", "שאלות רוחביות, מה דחוף היום, והעברה לסוכן המתאים."),
+    "secretary": (
+        "מזכירה אישית",
+        "יומן, הזמנות, רשימות המתנה, תזכורות, שעות פנויות והודעות ללקוחות.",
+    ),
+    "marketing": (
+        "שיווק ולידים",
+        "צנרת לידים, מעקבים, מקורות, החזרת לקוחות רדומים וטיוטות קמפיינים.",
+    ),
+    "sales": ("מכירות", "הכנסות, מנויים שנמכרו, חידושים, הצעות מחיר פתוחות והזדמנויות שדרוג."),
+    "finance": ("כספים", "יתרות פתוחות, חשבונות, קבלות, תחזית תזרים וחיוב חודשי."),
+    "team": ("צוות ומשמרות", "חורים בסידור, החלפות, חופשות, שעות לשכר וזמינות."),
+    "care": ("שירות לקוחות", "תיבת ההודעות, מענה ב-WhatsApp, ביקורות ולקוחות שעלולים לעזוב."),
+    "analyst": ("אנליסט נתונים", "השוואת סניפים, מגמות, חריגות והדוח השבועי."),
+    "creative": (
+        "תוכן ויצירה",
+        "פוסטים, טקסטים לקידום, ניוזלטרים, תסריטי סטורי וייעוץ לרשתות חברתיות.",
+    ),
+}
+
+
+def _catalog_text(spec: AgentSpec | None, field: str, locale: str) -> str:
+    if spec is None:
+        return ""
+    he = _HE_TEXT.get(spec.key) if locale == "he" else None
+    if he is not None:
+        return he[0] if field == "role_title" else he[1]
+    return spec.role_title if field == "role_title" else spec.topic
+
+
 def _row_overrides(row: Any | None) -> dict[str, Any]:
     return dict(row._mapping) if row is not None else {}
 
@@ -264,9 +297,9 @@ def resolve(spec: AgentSpec | None, row: Any | None, locale: str) -> Agent:
         id=data.get("id"),
         builtin=builtin,
         name=pick("name", spec.name.get(locale) or spec.name["en"] if spec else ""),
-        role_title=pick("role_title", spec.role_title if spec else ""),
+        role_title=pick("role_title", _catalog_text(spec, "role_title", locale)),
         color=pick("color", spec.color if spec else "#6B7280"),
-        topic=pick("topic", spec.topic if spec else ""),
+        topic=pick("topic", _catalog_text(spec, "topic", locale)),
         instructions=pick("instructions", spec.instructions if spec else ""),
         tone=pick("tone", "friendly"),
         domains=frozenset(pick("tool_domains", spec.domains if spec else ()))

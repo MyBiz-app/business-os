@@ -230,7 +230,9 @@ SEARCH_TEXT = (
 # The current branch's clients, and those without a home branch (they belong to all).
 # In a branch-scoped business a client belongs to the branches on its "my branches" list
 # (see client_locations); one on no list belongs to all. Used by the list and by the search.
-VISIBLE_CLIENTS = """WHERE (
+# The tenant test is explicit: the policy clients_own_select also shows a person their own client
+# rows in other businesses, which must not leak into this business's list or count.
+VISIBLE_CLIENTS = """WHERE app.clients.tenant_id = app.current_tenant_id() AND (
         CASE WHEN (SELECT network_scope FROM app.tenants WHERE id = app.current_tenant_id())
                   = 'branch'
              THEN NOT EXISTS (SELECT 1 FROM app.client_locations cl
