@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Platform, Pressable, StyleSheet, TextInput, type TextInputInstance, View } from "react-native";
+import { I18nManager, Platform, Pressable, StyleSheet, TextInput, type TextInputInstance, View } from "react-native";
 
 import { tint } from "../lib/brand";
 import { font } from "../lib/typography";
@@ -30,13 +30,18 @@ export function OtpInput({
   invalid?: boolean;
 }) {
   const input = useRef<TextInputInstance>(null);
+  // The digits always run left to right. On the web `dir="ltr"` does it; natively a row follows the
+  // app's layout direction (not the locale: in Expo Go the layout can stay LTR under a Hebrew locale),
+  // so it is reversed only when the layout really is right-to-left.
+  const webLtr = Platform.OS === "web" ? ({ dir: "ltr" } as object) : {};
+  const row = { flexDirection: Platform.OS !== "web" && I18nManager.isRTL ? ("row-reverse" as const) : ("row" as const) };
   const change = (raw: string) => {
     const digits = raw.replace(/\D/g, "").slice(0, length);
     onChange(digits);
     if (digits.length === length) onComplete?.(digits);
   };
   return (
-    <Pressable accessible={false} onPress={() => input.current?.focus()} style={styles.row}>
+    <Pressable accessible={false} {...webLtr} onPress={() => input.current?.focus()} style={[styles.row, row]}>
       {Array.from({ length }, (_, index) => {
         const filled = index < value.length;
         const active = index === Math.min(value.length, length - 1);
@@ -76,10 +81,9 @@ export function OtpInput({
 }
 
 const styles = StyleSheet.create({
-  // `direction: "ltr"` pins the order of the boxes whatever the app's layout direction (a right-to-left layout would show the code backwards).
-  row: { flexDirection: "row", direction: "ltr", justifyContent: "center", gap: 8 },
+  row: { justifyContent: "center", gap: 8 },
   box: { width: 46, height: 58, borderRadius: radius.control, alignItems: "center", justifyContent: "center" },
   digit: { fontSize: 24, ...font.semibold },
   // Covers the boxes and is invisible, so taps and pastes land on it.
-  hidden: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, opacity: 0.02, fontSize: 1, direction: "ltr", textAlign: "left" },
+  hidden: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, opacity: 0.02, fontSize: 1, writingDirection: "ltr", textAlign: "left" },
 });
