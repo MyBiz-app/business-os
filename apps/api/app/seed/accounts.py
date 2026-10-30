@@ -179,3 +179,30 @@ def delete_account(conn: Connection, email: str) -> dict[str, int]:
         auth = conn.execute(text("DELETE FROM auth.users WHERE id = :u"), {"u": user}).rowcount
     remaining = conn.execute(text("DELETE FROM app.users WHERE id = :u"), {"u": user}).rowcount
     return {"app_users": remaining, "auth_users": auth}
+
+
+def rename_email(conn: Connection, old_email: str, new_email: str) -> dict[str, int]:
+    """Gives an account a new email, keeping everything it holds: the app profile and, when the
+    sign-in table exists, the sign-in and its email identity. Refuses if the new email is taken."""
+    old = _user(conn, old_email)
+    if old is None:
+        raise SystemExit(f"No account for {old_email}.")
+    if _user(conn, new_email) is not None:
+        raise SystemExit(f"{new_email} already exists: not renamed.")
+    params = {"u": old, "e": new_email.lower()}
+    app_rows = conn.execute(text("UPDATE app.users SET email = :e WHERE id = :u"), params).rowcount
+    auth_rows = 0
+    if conn.execute(text("SELECT to_regclass('auth.users') IS NOT NULL")).scalar():
+        auth_rows = conn.execute(
+            text("UPDATE auth.users SET email = :e WHERE id = :u"), params
+        ).rowcount
+        conn.execute(
+            text("""
+                UPDATE auth.identities
+                SET provider_id = :e,
+                    identity_data = jsonb_set(identity_data, '{email}', to_jsonb(CAST(:e AS text)))
+                WHERE user_id = :u AND provider = 'email'
+            """),
+            params,
+        )
+    return {"app_users": app_rows, "auth_users": auth_rows}
