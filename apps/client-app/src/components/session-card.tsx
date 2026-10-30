@@ -10,6 +10,7 @@ import { Chip } from "@business-os/app-kit/components/chip";
 import { Button } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { confirm } from "@business-os/app-kit/lib/confirm";
+import { offerPushAfterBooking } from "@business-os/app-kit/lib/push-offer";
 import { InstructorAvatar } from "@/components/instructor-avatar";
 import { AttendeeStack } from "@/components/attendee-stack";
 import { SessionSheet } from "@/components/session-sheet";
@@ -101,7 +102,10 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
     : [];
   const chosen = choices.find((c) => c.id === who) ?? choices[0] ?? null;
 
-  const run = async (action: () => Promise<{ data?: ClientSession; error?: unknown; response: Response }>) => {
+  const run = async (
+    action: () => Promise<{ data?: ClientSession; error?: unknown; response: Response }>,
+    { booking = false } = {},
+  ) => {
     setBusy(true);
     setError(null);
     setNeedsHealth(false);
@@ -109,6 +113,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
     setBusy(false);
     if (result?.data) {
       forgetSessionPeople(session.id);
+      if (booking) offerPushAfterBooking();
       return onChange(result.data);
     }
     const detail = (result?.error as { detail?: string } | undefined)?.detail;
@@ -132,6 +137,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
         params: { ...scope, path: { session_id: session.id } },
         body: { dependent_id: chosen && chosen.id !== ME ? chosen.id : null },
       }),
+      { booking: true },
     );
   };
   resume.current = () => void book();

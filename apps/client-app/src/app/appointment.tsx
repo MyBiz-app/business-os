@@ -14,6 +14,7 @@ import { BackBar } from "@business-os/app-kit/components/rows";
 import { Button, Card, ErrorText, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
+import { offerPushAfterBooking } from "@business-os/app-kit/lib/push-offer";
 import { calendarLink } from "@business-os/app-kit/lib/client-home";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import type { Palette } from "@business-os/app-kit/lib/theme";
@@ -147,7 +148,10 @@ export default function Appointment() {
       })
       .catch(() => null);
     setBusy(false);
-    if (result?.data) return setBooked(slot);
+    if (result?.data) {
+      offerPushAfterBooking();
+      return setBooked(slot);
+    }
     const detail = (result?.error as { detail?: string } | undefined)?.detail;
     setError(KNOWN.includes(detail as (typeof KNOWN)[number]) ? t(`errors.${detail as (typeof KNOWN)[number]}`) : t("errors.generic"));
   };

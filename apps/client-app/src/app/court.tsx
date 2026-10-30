@@ -15,6 +15,7 @@ import { Button, Card, EmptyState, ErrorText, Heading, Screen, styles } from "@b
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
+import { offerPushAfterBooking } from "@business-os/app-kit/lib/push-offer";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { defaultTime, groupByCourt, rentalLengths, splitOffset, timeOptions } from "@/lib/court-search";
@@ -150,6 +151,7 @@ export default function Court() {
     setBusy(false);
     if (result?.data) {
       setKey(newIdempotencyKey());
+      offerPushAfterBooking();
       return setDone(result.data);
     }
     const detail = (result?.error as { detail?: string } | undefined)?.detail;

@@ -9318,6 +9318,12 @@
     "failed": "Sorry, I couldn't book that one. Ask again and I'll check what's free.",
     "unavailable": "I can't answer right now. The team will get back to you soon."
   },
+  "pushOffer": {
+    "title": "Get a reminder?",
+    "body": "We will remind you before your booking and tell you at once if anything changes, like a cancelled class or a spot opening up. You can turn this off any time in your phone settings.",
+    "turnOn": "Turn on reminders",
+    "notNow": "Not now"
+  },
   "appLock": {
     "title": "MyBiz is locked",
     "subtitle": "Verify it's you to continue.",
