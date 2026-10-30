@@ -28,3 +28,13 @@ the **Seed staging demo data** workflow:
 2. Refresh the full demo: demo = `full`, owner_email = `adired7399@gmail.com` (links the plus logins).
 3. Owner as client of every business they own: demo = `asclient`, owner_email = `adired7399@gmail.com`.
 4. Studio + client for the primary owner: demo = `ownerclient`, owner_email = `adire7399@gmail.com`.
+
+## Clean-up (2026-10-30)
+
+Remove a stray demo business or a retired account from the same workflow:
+
+- `delete_business_ids` (comma separated): removes businesses that `owner_email` owns alone. Add
+  `allow_co_owners` for one with a second owner. Use demo = `asclient` with replace off so nothing
+  else is seeded.
+- `delete_account`: removes an account that holds no business membership and no client record.
+  Hand its branches over first with `move_owner_from`.
