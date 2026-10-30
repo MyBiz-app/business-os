@@ -1,7 +1,5 @@
-import { localeDirection, type Locale } from "@business-os/i18n";
 import { useRef } from "react";
-import { Pressable, StyleSheet, TextInput, type TextInputInstance, View } from "react-native";
-import { useLocale } from "use-intl";
+import { Platform, Pressable, StyleSheet, TextInput, type TextInputInstance, View } from "react-native";
 
 import { tint } from "../lib/brand";
 import { font } from "../lib/typography";
@@ -32,15 +30,13 @@ export function OtpInput({
   invalid?: boolean;
 }) {
   const input = useRef<TextInputInstance>(null);
-  // Digits always run left to right; in a right-to-left layout the row has to be reversed to do that.
-  const rtl = localeDirection[useLocale() as Locale] === "rtl";
   const change = (raw: string) => {
     const digits = raw.replace(/\D/g, "").slice(0, length);
     onChange(digits);
     if (digits.length === length) onComplete?.(digits);
   };
   return (
-    <Pressable accessible={false} onPress={() => input.current?.focus()} style={[styles.row, { flexDirection: rtl ? "row-reverse" : "row" }]}>
+    <Pressable accessible={false} onPress={() => input.current?.focus()} style={styles.row}>
       {Array.from({ length }, (_, index) => {
         const filled = index < value.length;
         const active = index === Math.min(value.length, length - 1);
@@ -67,8 +63,9 @@ export function OtpInput({
         onChangeText={change}
         accessibilityLabel={label}
         keyboardType="number-pad"
-        autoComplete="one-time-code"
+        autoComplete={Platform.OS === "android" ? "sms-otp" : "one-time-code"}
         textContentType="oneTimeCode"
+        importantForAutofill="yes"
         maxLength={length}
         autoFocus
         caretHidden
@@ -79,9 +76,10 @@ export function OtpInput({
 }
 
 const styles = StyleSheet.create({
-  row: { justifyContent: "center", gap: 8 },
+  // `direction: "ltr"` pins the order of the boxes whatever the app's layout direction (a right-to-left layout would show the code backwards).
+  row: { flexDirection: "row", direction: "ltr", justifyContent: "center", gap: 8 },
   box: { width: 46, height: 58, borderRadius: radius.control, alignItems: "center", justifyContent: "center" },
   digit: { fontSize: 24, ...font.semibold },
   // Covers the boxes and is invisible, so taps and pastes land on it.
-  hidden: { position: "absolute", top: 0, bottom: 0, start: 0, end: 0, opacity: 0.02, fontSize: 1 },
+  hidden: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, opacity: 0.02, fontSize: 1, direction: "ltr", textAlign: "left" },
 });
