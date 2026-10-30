@@ -7427,8 +7427,18 @@
       "timeline": "Today's schedule",
       "numbers": "The last 30 days"
     },
+    "broadcast": {
+      "title": "Message a group",
+      "back": "Clients",
+      "send": "Send",
+      "previewCaption": "How the first person on the list will see it",
+      "needBody": "Write the message first.",
+      "needSubject": "Add a subject: email and app notifications need one."
+    },
     "clients": {
       "search": "Search",
+      "messageGroup": "Message a group",
+      "messageGroupHint": "Write to everyone active, to plan holders who stopped coming, and more",
       "none": "No one matches.",
       "visits": "{count, plural, =0 {No visits} one {# visit} other {# visits}}",
       "lastVisit": "Last visit {date}",
