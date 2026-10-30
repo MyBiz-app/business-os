@@ -5,6 +5,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { ListRow, RowGroup } from "@business-os/app-kit/components/rows";
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
@@ -40,7 +41,11 @@ export default function Me() {
     api
       .GET("/me")
       .then(unwrap)
-      .then((me) => setEmailRoster(me.email_roster ?? true))
+      .then((me) => {
+        setEmailRoster(me.email_roster ?? true);
+        // Start from the saved name; what they already typed is kept.
+        setName((typed) => typed ?? me.full_name ?? "");
+      })
       .catch(() => undefined);
   }, [api]);
 
@@ -96,35 +101,13 @@ export default function Me() {
         )}
       </Card>
 
-      {can("schedule.read") && !solo && (
-        <Button
-          label={tSchedule("open")}
-          variant="secondary"
-          palette={palette}
-          onPress={() => router.push("/staff-schedule")}
-        />
-      )}
-      {can("schedule.read") && !solo && (
-        <Button label={tClock("open")} variant="secondary" palette={palette} onPress={() => router.push("/time-clock")} />
-      )}
-      {can("schedule.read") && (
-        <Button
-          label={tAvailability("open")}
-          variant="secondary"
-          palette={palette}
-          onPress={() => router.push("/availability")}
-        />
-      )}
-      {!solo && <Button label={tDocuments("open")} variant="secondary" palette={palette} onPress={() => router.push("/my-documents")} />}
-
-      {!solo && (
-        <Button
-          label={tForm("open")}
-          variant="secondary"
-          palette={palette}
-          onPress={() => router.push("/form101")}
-        />
-      )}
+      <RowGroup palette={palette}>
+        {can("schedule.read") && !solo ? <ListRow palette={palette} title={tSchedule("open")} onPress={() => router.push("/staff-schedule")} /> : null}
+        {can("schedule.read") && !solo ? <ListRow palette={palette} title={tClock("open")} onPress={() => router.push("/time-clock")} /> : null}
+        {can("schedule.read") ? <ListRow palette={palette} title={tAvailability("open")} onPress={() => router.push("/availability")} /> : null}
+        {!solo ? <ListRow palette={palette} title={tDocuments("open")} onPress={() => router.push("/my-documents")} /> : null}
+        {!solo ? <ListRow palette={palette} title={tForm("open")} onPress={() => router.push("/form101")} /> : null}
+      </RowGroup>
 
       <Card palette={palette}>
         <Field

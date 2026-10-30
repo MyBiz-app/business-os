@@ -1849,6 +1849,7 @@
       "photoSaved": "Picture updated",
       "photoFailed": "Could not update the picture",
       "photoPermission": "Allow access in your phone settings to add a picture",
+      "changePhoto": "Change photo",
       "status": "Status",
       "statusPlaceholder": "A short line about you",
       "statusCount": "{count}/{max}",
@@ -7530,8 +7531,10 @@
       "requests": "Time off",
       "noRequests": "No time-off requests.",
       "request": "Request time off",
-      "from": "First day (YYYY-MM-DD)",
-      "to": "Last day (YYYY-MM-DD)",
+      "from": "First day",
+      "to": "Last day",
+      "today": "Today",
+      "closedShort": "Closed",
       "reason": "Reason (optional)",
       "send": "Send request",
       "sent": "Request sent. A manager will decide.",
@@ -7607,7 +7610,8 @@
       "classRestored": "The class is back on the schedule.",
       "classCancelled": "Class cancelled",
       "markedCheckedIn": "{name} checked in",
-      "markedNoShow": "{name} marked as no-show"
+      "markedNoShow": "{name} marked as no-show",
+      "more": "More"
     },
     "leads": {
       "open": "Open",

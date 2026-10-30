@@ -10,6 +10,7 @@ import { Badge, BackBar, ListRow, SectionTitle } from "@business-os/app-kit/comp
 import { Button, Card, EmptyState, ErrorText, Field, Heading, Screen } from "@business-os/app-kit/components/ui";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { canOfferSwap, isOpenSwap } from "@business-os/app-kit/lib/shift-swaps";
+import { DayStrip } from "@business-os/app-kit/components/calendar-strip";
 import { timeOffProblem } from "@business-os/app-kit/lib/time-off";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useStaff } from "@/providers/staff-provider";
@@ -33,6 +34,8 @@ const SWAP_TONES = {
 
 /** The signed-in person's own shifts for the next four weeks, their shift-swap offers (made and
  * received), their time-off requests, and the form to ask for days off (a manager decides on the web). */
+const NO_DAYS: ReadonlySet<string> = new Set();
+
 export default function MySchedule() {
   const t = useTranslations("business.schedule");
   const locale = useLocale();
@@ -276,21 +279,31 @@ export default function MySchedule() {
 
       <SectionTitle title={t("request")} palette={palette} />
       <Card palette={palette}>
-        <Field
-          label={t("from")}
+        <Text style={{ color: palette.foreground, fontWeight: "500" }}>{t("from")}</Text>
+        <DayStrip
+          selected={startsOn}
+          today={today}
+          // The last day never falls before the first.
+          onSelect={(day) => {
+            setStartsOn(day);
+            if (endsOn < day) setEndsOn(day);
+          }}
+          marked={NO_DAYS}
+          closed={NO_DAYS}
           palette={palette}
-          value={startsOn}
-          onChangeText={setStartsOn}
-          autoCapitalize="none"
-          style={{ writingDirection: "ltr" }}
+          todayLabel={t("today")}
+          closedLabel={t("closedShort")}
         />
-        <Field
-          label={t("to")}
+        <Text style={{ color: palette.foreground, fontWeight: "500" }}>{t("to")}</Text>
+        <DayStrip
+          selected={endsOn}
+          today={today}
+          onSelect={(day) => setEndsOn(day < startsOn ? startsOn : day)}
+          marked={NO_DAYS}
+          closed={NO_DAYS}
           palette={palette}
-          value={endsOn}
-          onChangeText={setEndsOn}
-          autoCapitalize="none"
-          style={{ writingDirection: "ltr" }}
+          todayLabel={t("today")}
+          closedLabel={t("closedShort")}
         />
         <Field label={t("reason")} palette={palette} value={reason} onChangeText={setReason} maxLength={200} />
         <ErrorText message={error} palette={palette} />

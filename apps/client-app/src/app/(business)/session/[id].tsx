@@ -52,6 +52,8 @@ export default function SessionScreen() {
   const [search, setSearch] = useState("");
   const [matches, setMatches] = useState<ClientListItem[] | null>(null);
   const [noteFor, setNoteFor] = useState<Booking | null>(null);
+  // The booking whose secondary actions (note, cancel) are open: check-in and no-show stay in view.
+  const [moreFor, setMoreFor] = useState<string | null>(null);
   // Industries that keep pets / children: tapping a client then asks which one comes.
   const [picking, setPicking] = useState<{ client: ClientListItem; choices: { id: string; name: string }[] } | null>(null);
   const tDependents = useTranslations("dependents");
@@ -435,6 +437,8 @@ export default function SessionScreen() {
         coming.map((booking) => {
           const tone = TONE[booking.status as keyof typeof TONE] ?? "muted";
           const writing = noteFor?.id === booking.id;
+          const booked = booking.status === "booked";
+          const moreOpen = !booked || moreFor === booking.id;
           return (
             <Card key={booking.id} palette={palette}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -455,7 +459,7 @@ export default function SessionScreen() {
                 <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
                   {open && (booking.status === "booked" || booking.status === "waitlisted") ? (
                     <>
-                      {booking.status === "booked" && (
+                      {booked && (
                         <View style={{ flexGrow: 1, flexBasis: "45%" }}>
                           <Button
                             label={t("checkIn")}
@@ -466,7 +470,7 @@ export default function SessionScreen() {
                           />
                         </View>
                       )}
-                      {booking.status === "booked" && (
+                      {booked && (
                         <View style={{ flexGrow: 1, flexBasis: "45%" }}>
                           <Button
                             label={t("noShow")}
@@ -478,27 +482,42 @@ export default function SessionScreen() {
                           />
                         </View>
                       )}
-                      <View style={{ flexGrow: 1, flexBasis: "45%" }}>
-                        <Button
-                          label={tSession("note")}
-                          accessibilityLabel={tSession("noteFor", { name: booking.client_name })}
-                          variant="secondary"
-                          palette={palette}
-                          onPress={() => {
-                            setNoteFor(writing ? null : booking);
-                            setNote("");
-                          }}
-                        />
-                      </View>
-                      <View style={{ flexGrow: 1, flexBasis: "45%" }}>
-                        <Button
-                          label={tSession("cancel")}
-                          accessibilityLabel={`${tSession("cancel")}: ${booking.client_name}`}
-                          variant="danger"
-                          palette={palette}
-                          onPress={() => void cancel(booking)}
-                        />
-                      </View>
+                      {booked && (
+                        <View style={{ flexBasis: "100%" }}>
+                          <Button
+                            label={tSession("more")}
+                            accessibilityLabel={`${tSession("more")}: ${booking.client_name}`}
+                            variant="quiet"
+                            palette={palette}
+                            onPress={() => setMoreFor(moreOpen ? null : booking.id)}
+                          />
+                        </View>
+                      )}
+                      {moreOpen && (
+                        <>
+                          <View style={{ flexGrow: 1, flexBasis: "45%" }}>
+                            <Button
+                              label={tSession("note")}
+                              accessibilityLabel={tSession("noteFor", { name: booking.client_name })}
+                              variant="secondary"
+                              palette={palette}
+                              onPress={() => {
+                                setNoteFor(writing ? null : booking);
+                                setNote("");
+                              }}
+                            />
+                          </View>
+                          <View style={{ flexGrow: 1, flexBasis: "45%" }}>
+                            <Button
+                              label={tSession("cancel")}
+                              accessibilityLabel={`${tSession("cancel")}: ${booking.client_name}`}
+                              variant="danger"
+                              palette={palette}
+                              onPress={() => void cancel(booking)}
+                            />
+                          </View>
+                        </>
+                      )}
                     </>
                   ) : (
                     <>
