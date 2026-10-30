@@ -17,6 +17,12 @@ on:
       move_owner_from:
         description: "Instead of seeding: hand every business of this account to owner_email (both signed in once)"
         required: false
+      delete_business_ids:
+        description: "Instead of seeding: remove these businesses (ids, comma separated) that owner_email owns alone"
+        required: false
+      delete_account:
+        description: "Instead of seeding: remove this account if it holds no business or client record"
+        required: false
       owner_name:
         description: "Display name for the account (optional)"
         required: false
@@ -58,6 +64,8 @@ jobs:
           OWNER_EMAIL: ${{ inputs.owner_email }}
           OWNER_NAME: ${{ inputs.owner_name }}
           MOVE_FROM: ${{ inputs.move_owner_from }}
+          DELETE_IDS: ${{ inputs.delete_business_ids }}
+          DELETE_ACCOUNT: ${{ inputs.delete_account }}
           DEMO: ${{ inputs.demo }}
           MONTHS: ${{ inputs.months }}
           REPLACE: ${{ inputs.replace }}
@@ -70,4 +78,9 @@ jobs:
           if [ -n "$OWNER_NAME" ]; then args+=(--owner-name "$OWNER_NAME"); fi
           if [ "$REPLACE" = "true" ]; then args+=(--replace); fi
           if [ -n "$MOVE_FROM" ]; then args+=(--move-owner-from "$MOVE_FROM"); fi
+          if [ -n "$DELETE_IDS" ]; then
+            IFS=',' read -ra ids <<< "$DELETE_IDS"
+            for id in "${ids[@]}"; do args+=(--delete-business "$id"); done
+          fi
+          if [ -n "$DELETE_ACCOUNT" ]; then args+=(--delete-account "$DELETE_ACCOUNT"); fi
           uv run python -m app.seed "${args[@]}"

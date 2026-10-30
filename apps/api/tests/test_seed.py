@@ -1002,3 +1002,32 @@ def test_the_owner_moves_and_trains_in_their_own_studio(engine: Engine) -> None:
             {"t": tenant, "u": new},
         ).scalar_one()
         assert clients == 1  # a client of their own studio, once
+
+
+def test_a_demo_business_and_an_empty_account_can_be_removed(engine: Engine) -> None:
+    from app.seed.accounts import delete_account, delete_businesses, move_owner
+
+    with engine.begin() as connection:
+        for email in ("gone-owner@example.com", "stay-owner@example.com"):
+            connection.execute(
+                text("INSERT INTO app.users (id, email) VALUES (:id, :e)"),
+                {"id": uuid4(), "e": email},
+            )
+        (kept,) = seed_demo(connection, "stay-owner@example.com", "studio", 1, random.Random(1))
+    with engine.begin() as connection:
+        (doomed,) = seed_demo(connection, "gone-owner@example.com", "studio", 1, random.Random(2))
+    with engine.begin() as connection:
+        with pytest.raises(SystemExit, match="not owned"):
+            delete_businesses(connection, "gone-owner@example.com", [str(kept)])
+        with pytest.raises(SystemExit, match="still holds"):
+            delete_account(connection, "gone-owner@example.com")
+        assert delete_businesses(connection, "gone-owner@example.com", [str(doomed)]) == 1
+        # the studio's demo team still belongs to nobody else; the account itself now holds nothing
+        assert (
+            move_owner(connection, "gone-owner@example.com", "stay-owner@example.com")["moved"] == 0
+        )
+        assert delete_account(connection, "gone-owner@example.com")["app_users"] == 1
+        assert delete_account(connection, "gone-owner@example.com") == {
+            "app_users": 0,
+            "auth_users": 0,
+        }

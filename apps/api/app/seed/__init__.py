@@ -23,7 +23,7 @@ import random
 from sqlalchemy import create_engine
 
 from app.core.config import get_settings
-from app.seed.accounts import move_owner, owner_as_client
+from app.seed.accounts import delete_account, delete_businesses, move_owner, owner_as_client
 from app.seed.business import seed
 from app.seed.common import (
     AC_COMPANY,
@@ -96,6 +96,17 @@ def main() -> None:
         default=None,
         help="Hand every business of this account to --owner-email, then stop",
     )
+    parser.add_argument(
+        "--delete-business",
+        action="append",
+        default=[],
+        help="Remove a business (id) that --owner-email owns alone, then stop (repeatable)",
+    )
+    parser.add_argument(
+        "--delete-account",
+        default=None,
+        help="Remove this account if it holds no business or client record, then stop",
+    )
     parser.add_argument("--owner-name", default=None, help="Sets the owner's display name")
     parser.add_argument(
         "--replace",
@@ -111,6 +122,12 @@ def main() -> None:
 
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
+        if args.delete_business:
+            print(delete_businesses(conn, args.owner_email, args.delete_business))
+            return
+        if args.delete_account:
+            print(delete_account(conn, args.delete_account))
+            return
         if args.move_owner_from:
             print(move_owner(conn, args.move_owner_from, args.owner_email))
             return
