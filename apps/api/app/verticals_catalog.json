@@ -22,6 +22,7 @@
     "client_home": [
       "next_booking",
       "membership",
+      "progress",
       "shortcuts",
       "health",
       "updates",
@@ -1282,6 +1283,7 @@
       "next_booking",
       "dependents",
       "membership",
+      "progress",
       "shortcuts",
       "updates",
       "business_info"
@@ -1934,6 +1936,7 @@
       "next_booking",
       "rebook",
       "membership",
+      "progress",
       "shortcuts",
       "updates",
       "business_info"

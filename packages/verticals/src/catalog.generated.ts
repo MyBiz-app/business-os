@@ -25,6 +25,7 @@ export const CATALOG: Entry[] = [
     "client_home": [
       "next_booking",
       "membership",
+      "progress",
       "shortcuts",
       "health",
       "updates",
@@ -1285,6 +1286,7 @@ export const CATALOG: Entry[] = [
       "next_booking",
       "dependents",
       "membership",
+      "progress",
       "shortcuts",
       "updates",
       "business_info"
@@ -1937,6 +1939,7 @@ export const CATALOG: Entry[] = [
       "next_booking",
       "rebook",
       "membership",
+      "progress",
       "shortcuts",
       "updates",
       "business_info"

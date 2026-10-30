@@ -3,7 +3,7 @@
 /** The home cards the app knows how to draw (CLIENT_HOME_CARDS in packages/verticals). */
 export const KNOWN_HOME_CARDS = [
   "next_booking", "membership", "shortcuts", "rebook", "dependents", "health",
-  "documents", "quotes", "addresses", "updates", "business_info",
+  "documents", "quotes", "addresses", "updates", "business_info", "progress",
 ] as const;
 export type HomeCard = (typeof KNOWN_HOME_CARDS)[number];
 

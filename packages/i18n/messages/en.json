@@ -2095,6 +2095,16 @@
       }
     },
     "homeCards": {
+      "progress": {
+        "title": "Your month",
+        "month": "Visits this month",
+        "streak": "Weeks in a row",
+        "weeks": "{count, plural, one {# week} other {# weeks}}",
+        "thisWeek": "{done} of {goal} this week",
+        "goalReached": "Goal reached: {done} of {goal} this week",
+        "goal": "Weekly goal",
+        "goalOption": "{count, plural, one {# visit a week} other {# visits a week}}"
+      },
       "call": "Call",
       "whatsapp": "WhatsApp",
       "nearMe": "Branch near me",
@@ -9335,6 +9345,24 @@
     "expired": "That offer has expired. Ask again and I'll check what's free.",
     "failed": "Sorry, I couldn't book that one. Ask again and I'll check what's free.",
     "unavailable": "I can't answer right now. The team will get back to you soon."
+  },
+  "intro": {
+    "what": {
+      "title": "All your places in one app",
+      "body": "Book classes, appointments and courts at the places you go to, and see everything you booked in one place."
+    },
+    "join": {
+      "title": "Join with a code",
+      "body": "Ask the business for its join code, scan its QR code, or search for it by name. It takes a minute."
+    },
+    "stay": {
+      "title": "Never miss a thing",
+      "body": "Get a reminder before you go, see your plan, and book the same thing again in one tap."
+    },
+    "next": "Next",
+    "skip": "Skip",
+    "start": "Get started",
+    "step": "Step {current} of {total}"
   },
   "pushOffer": {
     "title": "Get a reminder?",
