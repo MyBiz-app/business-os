@@ -20,6 +20,10 @@ on:
       delete_business_ids:
         description: "Instead of seeding: remove these businesses (ids, comma separated) that owner_email owns alone"
         required: false
+      allow_co_owners:
+        description: "With delete_business_ids: also remove businesses that have other owners (owner_email must be one of them)"
+        type: boolean
+        default: false
       delete_account:
         description: "Instead of seeding: remove this account if it holds no business or client record"
         required: false
@@ -66,6 +70,7 @@ jobs:
           MOVE_FROM: ${{ inputs.move_owner_from }}
           DELETE_IDS: ${{ inputs.delete_business_ids }}
           DELETE_ACCOUNT: ${{ inputs.delete_account }}
+          ALLOW_CO_OWNERS: ${{ inputs.allow_co_owners }}
           DEMO: ${{ inputs.demo }}
           MONTHS: ${{ inputs.months }}
           REPLACE: ${{ inputs.replace }}
@@ -82,5 +87,6 @@ jobs:
             IFS=',' read -ra ids <<< "$DELETE_IDS"
             for id in "${ids[@]}"; do args+=(--delete-business "$id"); done
           fi
+          if [ "$ALLOW_CO_OWNERS" = "true" ]; then args+=(--allow-co-owners); fi
           if [ -n "$DELETE_ACCOUNT" ]; then args+=(--delete-account "$DELETE_ACCOUNT"); fi
           uv run python -m app.seed "${args[@]}"

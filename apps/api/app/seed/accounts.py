@@ -123,9 +123,12 @@ def owner_as_client(conn: Connection, owner_email: str) -> dict[str, int]:
     return {"businesses": done, "bookings": bookings}
 
 
-def delete_businesses(conn: Connection, owner_email: str, tenant_ids: list[str]) -> int:
-    """Removes demo businesses by id. Only businesses the account owns alone are removed; any
-    other id is refused so a typo can never reach someone else's business."""
+def delete_businesses(
+    conn: Connection, owner_email: str, tenant_ids: list[str], *, allow_co_owners: bool = False
+) -> int:
+    """Removes demo businesses by id. Only businesses the account owns alone are removed (with
+    `allow_co_owners`, the account must still be one of the owners); any other id is refused so a
+    typo can never reach someone else's business."""
     owner = _user(conn, owner_email)
     if owner is None:
         raise SystemExit(f"No account for {owner_email}.")
@@ -136,7 +139,7 @@ def delete_businesses(conn: Connection, owner_email: str, tenant_ids: list[str])
             text("SELECT user_id FROM app.tenant_members WHERE tenant_id = :t AND role = 'owner'"),
             {"t": tenant_id},
         ).scalars().all()  # fmt: skip
-        if owners != [owner]:
+        if owners != [owner] and not (allow_co_owners and owner in owners):
             raise SystemExit(f"Business {raw} is not owned by {owner_email} alone: not removed.")
         removed += conn.execute(
             text("DELETE FROM app.tenants WHERE id = :t"), {"t": tenant_id}
