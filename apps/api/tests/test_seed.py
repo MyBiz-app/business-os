@@ -1062,3 +1062,27 @@ def test_a_business_with_a_second_owner_is_removed_only_when_allowed(engine: Eng
             )
             == 1
         )
+
+
+def test_branches_managed_by_the_old_account_go_to_the_new_one(engine: Engine) -> None:
+    from app.seed.accounts import move_owner
+
+    with engine.begin() as connection:
+        for email in ("old-mgr@example.com", "new-owner@example.com"):
+            connection.execute(
+                text("INSERT INTO app.users (id, email) VALUES (:id, :e)"),
+                {"id": uuid4(), "e": email},
+            )
+        (tenant,) = seed_demo(connection, "new-owner@example.com", "studio", 1, random.Random(4))
+        old = connection.execute(
+            text("SELECT id FROM app.users WHERE email = 'old-mgr@example.com'")
+        ).scalar_one()
+        connection.execute(
+            text("UPDATE app.locations SET manager_user_id = :u WHERE tenant_id = :t"),
+            {"u": old, "t": tenant},
+        )
+        move_owner(connection, "old-mgr@example.com", "new-owner@example.com")
+        left = connection.execute(
+            text("SELECT count(*) FROM app.locations WHERE manager_user_id = :u"), {"u": old}
+        ).scalar_one()
+        assert left == 0

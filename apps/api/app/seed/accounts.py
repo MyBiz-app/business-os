@@ -33,7 +33,8 @@ _DEPENDANTS = """
 
 def move_owner(conn: Connection, old_email: str, new_email: str) -> dict[str, int]:
     """Moves the old account's business memberships (and their shifts, appointments, ...) to the
-    new account. Businesses where the new account is already a member are left alone."""
+    new account. Businesses where the new account is already a member are left alone, but branches
+    the old account managed there go to the new account."""
     ids = {}
     for label, email in (("old", old_email), ("new", new_email)):
         found = _user(conn, email)
@@ -83,6 +84,15 @@ def move_owner(conn: Connection, old_email: str, new_email: str) -> dict[str, in
             text("DELETE FROM app.tenant_members WHERE user_id = :old AND tenant_id = ANY(:m)"),
             {"old": old, "m": moving},
         )
+    conn.execute(
+        text("""
+            UPDATE app.locations l SET manager_user_id = :new
+            WHERE l.manager_user_id = :old AND EXISTS (
+                SELECT 1 FROM app.tenant_members x
+                WHERE x.tenant_id = l.tenant_id AND x.user_id = :new)
+        """),
+        {"old": old, "new": new},
+    )
     clients = conn.execute(
         text("""
             UPDATE app.clients c SET user_id = :new
