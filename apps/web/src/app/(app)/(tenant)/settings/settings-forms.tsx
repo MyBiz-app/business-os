@@ -31,6 +31,7 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
   const key = [
     tenant.name,
     tenant.website_url,
+    tenant.contact_phone,
     tenant.locale,
     tenant.time_zone,
     tenant.currency,
@@ -56,6 +57,7 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
           <SettingsRows>
             <InputRow label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
             <InputRow label={t("settings.website")} hint={t("settings.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="url" placeholder="www.example.com" defaultValue={tenant.website_url ?? ""} />
+            <InputRow label={t("settings.contactPhone")} hint={t("settings.contactPhoneHint")} name="contact_phone" type="tel" inputMode="tel" maxLength={24} dir="ltr" autoComplete="tel" placeholder="050-1234567" defaultValue={tenant.contact_phone ?? ""} />
             <SelectRow
               label={t("onboarding.locale")}
               name="locale"

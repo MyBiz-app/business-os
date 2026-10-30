@@ -13315,6 +13315,11 @@ export interface components {
              */
             website_url?: string | null;
             /**
+             * Contact Phone
+             * @description The number to call or message on WhatsApp, if the business set one
+             */
+            contact_phone?: string | null;
+            /**
              * Join Code
              * @description The code anyone can use to join; shared in friend invitations
              */
@@ -23930,6 +23935,11 @@ export interface components {
              */
             website_url?: string | null;
             /**
+             * Contact Phone
+             * @description The number clients can call or message on WhatsApp
+             */
+            contact_phone?: string | null;
+            /**
              * Listed In Search
              * @description Whether people can find the business by name in the client app
              * @default false
@@ -24390,6 +24400,11 @@ export interface components {
              * @description The business's website; empty clears it
              */
             website_url?: string | null;
+            /**
+             * Contact Phone
+             * @description The number clients can call or message on WhatsApp; empty clears it
+             */
+            contact_phone?: string | null;
             /**
              * Listed In Search
              * @description Show the business in the client app's search (off by default)

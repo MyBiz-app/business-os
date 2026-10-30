@@ -93,6 +93,7 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
             "address_details",
             "street_unlisted",
             "website_url",
+            "contact_phone",
             "employer_file_number",
             "business_license_number",
             "business_license_expires_on",

@@ -56314,6 +56314,18 @@
             "title": "Website Url",
             "description": "The business's website, if any"
           },
+          "contact_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Phone",
+            "description": "The number to call or message on WhatsApp, if the business set one"
+          },
           "join_code": {
             "anyOf": [
               {
@@ -83698,6 +83710,18 @@
             "title": "Website Url",
             "description": "The business's website (its branches may have their own)"
           },
+          "contact_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Phone",
+            "description": "The number clients can call or message on WhatsApp"
+          },
           "listed_in_search": {
             "type": "boolean",
             "title": "Listed In Search",
@@ -84986,6 +85010,19 @@
             ],
             "title": "Website Url",
             "description": "The business's website; empty clears it"
+          },
+          "contact_phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Phone",
+            "description": "The number clients can call or message on WhatsApp; empty clears it"
           },
           "listed_in_search": {
             "anyOf": [

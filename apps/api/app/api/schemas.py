@@ -1,4 +1,5 @@
 import datetime as dt
+import re
 from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
@@ -212,6 +213,11 @@ class TenantUpdate(AddressFields):
     website_url: str | None = Field(
         default=None, max_length=300, description="The business's website; empty clears it"
     )
+    contact_phone: str | None = Field(
+        default=None,
+        max_length=20,
+        description="The number clients can call or message on WhatsApp; empty clears it",
+    )
     listed_in_search: bool | None = Field(
         default=None, description="Show the business in the client app's search (off by default)"
     )
@@ -239,6 +245,19 @@ class TenantUpdate(AddressFields):
     @classmethod
     def clean_website(cls, value: object) -> object:
         return normalize_website(value) if isinstance(value, str) else value
+
+    @field_validator("contact_phone", mode="before")
+    @classmethod
+    def clean_phone(cls, value: object) -> object:
+        # People type spaces, dashes and brackets; keep digits and a leading plus.
+        if not isinstance(value, str):
+            return value
+        cleaned = re.sub(r"[\s().-]", "", value)
+        if not cleaned:
+            return None
+        if not re.fullmatch(r"\+?[0-9]{6,15}", cleaned):
+            raise ValueError("a phone number has 6 to 15 digits and may start with +")
+        return cleaned
 
     @field_validator("business_number", "employer_file_number", mode="before")
     @classmethod
@@ -287,6 +306,9 @@ class Tenant(BaseModel):
     )
     website_url: str | None = Field(
         default=None, description="The business's website (its branches may have their own)"
+    )
+    contact_phone: str | None = Field(
+        default=None, description="The number clients can call or message on WhatsApp"
     )
     listed_in_search: bool = Field(
         default=False, description="Whether people can find the business by name in the client app"

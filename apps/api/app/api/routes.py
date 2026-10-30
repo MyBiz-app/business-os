@@ -86,6 +86,7 @@ def load_current_tenant(session: Session) -> Tenant:
                                  || extract(epoch FROM t.cover_updated_at)::bigint END AS cover_url,
                        t.legal_entity_type, t.business_number,
                        t.address_line, t.address_city, t.employer_file_number, t.website_url,
+                       t.contact_phone,
                        t.city_code, t.street_code, t.house_number, t.address_details,
                        t.street_unlisted,
                        (SELECT st.name_he FROM app.geo_streets st
