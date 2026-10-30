@@ -13,6 +13,7 @@ import { Text } from "@business-os/app-kit/components/text";
 import { Card, EmptyState, styles } from "@business-os/app-kit/components/ui";
 import { assetUrl } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
+import { callHref, whatsappHref } from "@business-os/app-kit/lib/contact";
 import { byDistance, distanceLabel, hasPoint } from "@business-os/app-kit/lib/distance";
 import { lastVisit, nextBooking, type HomeCard } from "@business-os/app-kit/lib/client-home";
 import { googleMapsLink, wazeLink } from "@business-os/app-kit/lib/maps";
@@ -339,6 +340,7 @@ export function BusinessInfo({ data }: { data: Pick<HomeData, "locations"> }) {
   const [selected, setSelected] = useState<string>();
   const device = useDevicePosition();
   if (!business) return null;
+  const chat = business.contact_phone ? whatsappHref(business.contact_phone, business.currency) : null;
   const placed = data.locations.filter(hasPoint);
   // Nearest first once the person shared where they are; the position never leaves this phone.
   const ranked = device.position ? byDistance(device.position, data.locations) : [];
@@ -352,6 +354,12 @@ export function BusinessInfo({ data }: { data: Pick<HomeData, "locations"> }) {
     <Section title={t("businessInfo")}>
       <Card palette={palette}>
         <Text style={[local.lineTitle, { color: palette.foreground }]}>{business.name}</Text>
+        {business.contact_phone ? (
+          <View style={local.chips}>
+            <ActionPill label={t("call")} icon="call-outline" palette={palette} onPress={() => void Linking.openURL(callHref(business.contact_phone!))} />
+            {chat ? <ActionPill label={t("whatsapp")} icon="logo-whatsapp" palette={palette} onPress={() => void Linking.openURL(chat)} /> : null}
+          </View>
+        ) : null}
         <BranchMap locations={data.locations} selectedId={selected ?? nearest} onSelect={setSelected} />
         {placed.length > 1 && device.state !== "ready" ? (
           <View style={local.chips}>

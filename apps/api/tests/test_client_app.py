@@ -354,3 +354,36 @@ def test_business_search_lists_only_businesses_that_opted_in(
 
     client.patch("/tenants/current", json={"listed_in_search": False}, headers=studio["headers"])
     assert client.get("/public/businesses-search", params={"q": "Studio"}).json() == []
+
+
+def test_contact_phone_is_cleaned_shown_to_clients_and_can_be_cleared(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    user = uuid4()
+    member(client, auth, studio, user)
+
+    typed = client.patch(
+        "/tenants/current", json={"contact_phone": " 050-123 45 67 "}, headers=studio["headers"]
+    )
+    assert typed.status_code == 200, typed.text
+    assert typed.json()["contact_phone"] == "0501234567"
+    [mine] = client.get("/client/businesses", headers=auth(user)).json()
+    assert mine["contact_phone"] == "0501234567"
+
+    international = client.patch(
+        "/tenants/current", json={"contact_phone": "+972 (50) 123-4567"}, headers=studio["headers"]
+    )
+    assert international.json()["contact_phone"] == "+972501234567"
+
+    for bad in ("call me", "123", "+1234567890123456"):
+        refused = client.patch(
+            "/tenants/current", json={"contact_phone": bad}, headers=studio["headers"]
+        )
+        assert refused.status_code == 422, bad
+
+    cleared = client.patch(
+        "/tenants/current", json={"contact_phone": ""}, headers=studio["headers"]
+    )
+    assert cleared.json()["contact_phone"] is None
+    [mine] = client.get("/client/businesses", headers=auth(user)).json()
+    assert mine["contact_phone"] is None

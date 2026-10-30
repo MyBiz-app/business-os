@@ -72,6 +72,10 @@ class ClientBusiness(BaseModel):
     primary_color: str | None
     logo_url: str | None
     website_url: str | None = Field(default=None, description="The business's website, if any")
+    contact_phone: str | None = Field(
+        default=None,
+        description="The number to call or message on WhatsApp, if the business set one",
+    )
     join_code: str | None = Field(
         default=None, description="The code anyone can use to join; shared in friend invitations"
     )
@@ -269,7 +273,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
            t.cancellation_window_minutes, t.terms_override, t.online_sales, t.resource_payment,
-           t.website_url, t.join_code,
+           t.website_url, t.contact_phone, t.join_code,
            CASE WHEN t.waitlist_enabled THEN t.waitlist_class_mode ELSE 'off' END AS waitlist_class,
            CASE WHEN t.waitlist_enabled THEN t.waitlist_appointment_mode ELSE 'off' END
                AS waitlist_appointment,

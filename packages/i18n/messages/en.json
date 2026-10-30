@@ -98,6 +98,8 @@
     "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book.",
     "website": "Business website",
     "websiteHint": "Shown to clients in the app, on the join page, in emails and on invoices. Branches can have their own.",
+    "contactPhone": "Phone for clients",
+    "contactPhoneHint": "Clients see Call and WhatsApp buttons in the app. Leave empty to hide them.",
     "onlineSales": "Clients can buy plans in the app",
     "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged.",
     "billingLink": "MyBiz billing",
@@ -2093,6 +2095,8 @@
       }
     },
     "homeCards": {
+      "call": "Call",
+      "whatsapp": "WhatsApp",
       "nearMe": "Branch near me",
       "nearMeDenied": "Location is off for this app, so we can't find the nearest branch.",
       "nearMeUnavailable": "Couldn't find where you are right now.",
