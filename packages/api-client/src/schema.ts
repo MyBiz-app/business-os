@@ -4119,6 +4119,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/owner-alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Alert Settings
+         * @description The alert kinds and whether each is on for this owner in this business.
+         */
+        get: operations["get_alert_settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/owner-alerts/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Alert
+         * @description Switches one alert kind on or off for this owner in this business.
+         */
+        put: operations["set_alert"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/tours": {
         parameters: {
             query?: never;
@@ -11140,6 +11180,30 @@ export interface components {
             alerts: number[];
             /** Limits */
             limits: components["schemas"]["CreditLimit"][];
+        };
+        /** AlertChoice */
+        AlertChoice: {
+            /** Enabled */
+            enabled: boolean;
+        };
+        /** AlertSetting */
+        AlertSetting: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "booking_new" | "booking_cancelled" | "waitlist_joined" | "client_joined" | "lead_new";
+            /** Enabled */
+            enabled: boolean;
+        };
+        /** AlertSettings */
+        AlertSettings: {
+            /** Kinds */
+            kinds: components["schemas"]["AlertSetting"][];
+            /** Quiet From Hour */
+            quiet_from_hour: number;
+            /** Quiet Until Hour */
+            quiet_until_hour: number;
         };
         /** Announcement */
         Announcement: {
@@ -35643,6 +35707,78 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_alert_settings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_alert: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                kind: "booking_new" | "booking_cancelled" | "waitlist_joined" | "client_joined" | "lead_new";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertChoice"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertSettings"];
+                };
             };
             /** @description Validation Error */
             422: {

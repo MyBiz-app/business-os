@@ -82,3 +82,24 @@ jobs:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
           API_ENVIRONMENT: staging
         run: uv run python -m app.jobs notify-payslips
+
+  alert-owners:
+    name: Tell owners what clients did (push)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --locked --no-dev
+
+      - name: Send
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs alert-owners

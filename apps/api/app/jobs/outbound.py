@@ -12,6 +12,7 @@ from app.messaging.email import (
     send_emails,
     sender_from_settings,
 )
+from app.messaging.owner_alerts import alert_owners
 from app.messaging.payroll_notices import notify_payslips_ready, remind_payroll
 from app.messaging.push import push_sender_from_settings
 from app.messaging.roster import notify_roster, notify_roster_changes
@@ -111,6 +112,13 @@ def remind_payroll_job(conn: Connection) -> dict[str, int] | str:
     if push is None:
         return "no push provider configured; nothing sent"
     return remind_payroll(conn, push)
+
+
+def alert_owners_job(conn: Connection) -> dict[str, int] | str:
+    push = push_sender_from_settings()
+    if push is None:
+        return "no push provider configured; nothing sent"
+    return alert_owners(conn, push)
 
 
 def notify_payslips(conn: Connection) -> dict[str, int] | str:

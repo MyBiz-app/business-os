@@ -130,6 +130,14 @@
         "reply_to": "reply-to email",
         "notifications": "notifications email"
       }
+    },
+    "ownerAlert": {
+      "title": "{business}: what's new",
+      "booking_new": "New bookings: {count}",
+      "booking_cancelled": "Cancellations: {count}",
+      "waitlist_joined": "Joined a waitlist: {count}",
+      "client_joined": "New clients: {count}",
+      "lead_new": "New enquiries: {count}"
     }
   },
   "securityEmail": {

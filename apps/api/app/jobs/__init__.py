@@ -4,6 +4,7 @@
     uv run python -m app.jobs remind-sessions
     uv run python -m app.jobs remind-plans
     uv run python -m app.jobs remind-payroll  (daily: owners are reminded on the 1st and 5th)
+    uv run python -m app.jobs alert-owners     (hourly: owners' phones hear what clients did)
     uv run python -m app.jobs notify-payslips (hourly: "your payslip is ready" after an approval)
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/messaging/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
@@ -39,6 +40,7 @@ Where the code lives: `schedule.py`, `retention.py`, `outbound.py` (the jobs) an
 from app.jobs.base import HORIZON_DAYS as HORIZON_DAYS
 from app.jobs.base import LOCK_PREFIX as LOCK_PREFIX
 from app.jobs.outbound import _publish_moment as _publish_moment
+from app.jobs.outbound import alert_owners_job as alert_owners_job
 from app.jobs.outbound import issue_documents as issue_documents
 from app.jobs.outbound import move_files as move_files
 from app.jobs.outbound import notify_payslips as notify_payslips
