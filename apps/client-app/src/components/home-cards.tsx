@@ -8,7 +8,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { ActionPill } from "@business-os/app-kit/components/action-pill";
 import { PressableScale } from "@business-os/app-kit/components/motion";
-import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
+import { Badge, ListRow, PillRow, SectionTitle, StatTile, TileGrid } from "@business-os/app-kit/components/rows";
 import { Text } from "@business-os/app-kit/components/text";
 import { Card, EmptyState, styles } from "@business-os/app-kit/components/ui";
 import { assetUrl } from "@business-os/app-kit/lib/api";
@@ -17,6 +17,7 @@ import { callHref, whatsappHref } from "@business-os/app-kit/lib/contact";
 import { byDistance, distanceLabel, hasPoint } from "@business-os/app-kit/lib/distance";
 import { lastVisit, nextBooking, type HomeCard } from "@business-os/app-kit/lib/client-home";
 import { googleMapsLink, wazeLink } from "@business-os/app-kit/lib/maps";
+import { progressOf } from "@business-os/app-kit/lib/progress";
 import { bookingModesFor, useTerm } from "@business-os/app-kit/lib/vertical";
 import { BookingActions } from "@/components/booking-actions";
 import { BranchMap } from "@/components/branch-map";
@@ -25,6 +26,7 @@ import { notificationIcon, useNotificationText } from "@/lib/notification-text";
 import { useAccount } from "@/lib/use-account";
 import { useDevicePosition } from "@/lib/use-device-position";
 import { useDependents } from "@/lib/use-dependents";
+import { GOALS, useWeeklyGoal } from "@/lib/use-weekly-goal";
 import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { useInbox } from "@/providers/inbox-provider";
@@ -232,6 +234,47 @@ function Rebook({ data }: { data: HomeData }) {
   );
 }
 
+/** "Your month": visits, weeks in a row and a personal weekly goal. Only for industries that list it, and only
+ * once the client has a visit to count. */
+function Progress({ data }: { data: HomeData }) {
+  const t = useTranslations("client.homeCards.progress");
+  const { business, palette } = useBusiness();
+  const [goal, setGoal] = useWeeklyGoal(business?.id);
+  if (!business) return null;
+  const p = progressOf(data.bookings, business.time_zone);
+  if (p.total === 0) return null;
+  const ratio = Math.min(1, p.weekVisits / goal);
+  const reached = p.weekVisits >= goal;
+  return (
+    <Section title={t("title")}>
+      <Card palette={palette}>
+        <TileGrid>
+          <StatTile label={t("month")} value={String(p.monthVisits)} palette={palette} />
+          <StatTile label={t("streak")} value={t("weeks", { count: p.streakWeeks })} palette={palette} />
+        </TileGrid>
+        <Text style={[local.lineTitle, { color: palette.foreground }]}>{t(reached ? "goalReached" : "thisWeek", { done: p.weekVisits, goal })}</Text>
+        <View
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel={t("thisWeek", { done: p.weekVisits, goal })}
+          accessibilityValue={{ min: 0, max: goal, now: Math.min(p.weekVisits, goal) }}
+          style={[local.barTrack, { backgroundColor: palette.border }]}
+        >
+          <View style={[local.barFill, { width: `${Math.round(ratio * 100)}%`, backgroundColor: reached ? palette.success : palette.primary }]} />
+        </View>
+        <Text style={[local.lineMeta, { color: palette.muted }]}>{t("goal")}</Text>
+        <PillRow<string>
+          label={t("goal")}
+          palette={palette}
+          value={String(goal)}
+          onChange={(value) => setGoal(Number(value))}
+          options={GOALS.map((g) => ({ value: String(g), label: String(g), accessibilityLabel: t("goalOption", { count: g }) }))}
+        />
+      </Card>
+    </Section>
+  );
+}
+
 function Dependents() {
   const t = useTranslations("client.homeCards");
   const tDependents = useTranslations("dependents");
@@ -406,6 +449,7 @@ export function BusinessInfo({ data }: { data: Pick<HomeData, "locations"> }) {
  * nothing to show for this client draws nothing. */
 export const HOME_CARDS: Record<HomeCard, (props: { data: HomeData }) => ReactNode> = {
   next_booking: NextBooking,
+  progress: Progress,
   membership: Membership,
   shortcuts: Shortcuts,
   rebook: Rebook,
@@ -419,6 +463,8 @@ export const HOME_CARDS: Record<HomeCard, (props: { data: HomeData }) => ReactNo
 };
 
 const local = StyleSheet.create({
+  barTrack: { height: 8, borderRadius: 4, overflow: "hidden" },
+  barFill: { height: "100%", borderRadius: 4 },
   section: { gap: 8 },
   grow: { gap: 2 },
   // One branch per block: name, address and distance at full width, the navigation pills on their own row below.

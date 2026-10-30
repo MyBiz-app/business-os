@@ -22,7 +22,7 @@ export const BOOKING_MODES = ["class", "appointment", "resource"] as const;
 /** The cards a client's home screen can show, in the order the entry lists them. */
 export const CLIENT_HOME_CARDS = [
   "next_booking", "membership", "shortcuts", "rebook", "dependents", "health",
-  "documents", "quotes", "addresses", "updates", "business_info",
+  "documents", "quotes", "addresses", "updates", "business_info", "progress",
 ] as const;
 export const PRESETS = ["starter", "growing", "ai_powered"] as const;
 export const RECOMMENDABLE = ["client_app", "ai", "crm", "whatsapp"] as const;
