@@ -40,3 +40,14 @@ export function buildTimeline<S extends TimelineSession>(sessions: S[], timeZone
   if (!marked && sorted.length > 0) items.push({ kind: "now", key: "now" });
   return items;
 }
+
+/**
+ * The session the "now" card is about: the one running (the earliest, when two overlap), or else the next
+ * one that has not started. Cancelled sessions never count. Null when the day is over or empty.
+ */
+export function focusSession<S extends TimelineSession>(sessions: S[], nowMs: number): { session: S; live: boolean } | null {
+  const open = sessions.filter((s) => s.status !== "cancelled" && Date.parse(s.ends_at) > nowMs).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+  const live = open.find((s) => Date.parse(s.starts_at) <= nowMs);
+  if (live) return { session: live, live: true };
+  return open[0] ? { session: open[0], live: false } : null;
+}

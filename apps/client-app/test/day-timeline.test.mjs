@@ -34,3 +34,13 @@ test("hours follow the time zone", () => {
   const items = lib.buildTimeline([at("a", "17:00", "18:00")], "Asia/Jerusalem", null);
   assert.equal(items[0].hour, 19);
 });
+
+test("the now card picks the running session, else the next one, and skips cancelled and finished ones", () => {
+  const sessions = [at("a", "07:00", "08:00"), at("b", "09:00", "10:00"), at("c", "09:30", "10:30"), at("x", "11:00", "12:00", "cancelled"), at("d", "13:00", "14:00")];
+  const during = lib.focusSession(sessions, Date.parse("2026-10-25T09:40:00Z"));
+  assert.deepEqual([during.session.id, during.live], ["b", true]);
+  const between = lib.focusSession(sessions, Date.parse("2026-10-25T10:45:00Z"));
+  assert.deepEqual([between.session.id, between.live], ["d", false]);
+  assert.equal(lib.focusSession(sessions, Date.parse("2026-10-25T15:00:00Z")), null);
+  assert.equal(lib.focusSession([], Date.parse("2026-10-25T09:00:00Z")), null);
+});

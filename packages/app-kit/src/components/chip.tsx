@@ -14,7 +14,7 @@ type Props = {
   onPress: () => void;
   palette: Palette;
   accessibilityLabel?: string;
-  role?: "radio" | "tab" | "button";
+  role?: "radio" | "checkbox" | "tab" | "button";
 };
 
 /** A selectable pill: one choice in a row (staff, time, day…). */
@@ -22,7 +22,7 @@ export function Chip({ label, sublabel, selected, onPress, palette, accessibilit
   return (
     <PressableScale
       role={role}
-      aria-checked={role === "radio" ? selected : undefined}
+      aria-checked={role === "radio" || role === "checkbox" ? selected : undefined}
       aria-selected={role === "tab" ? selected : undefined}
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={() => {

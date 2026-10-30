@@ -17,6 +17,7 @@ import { IncidentBanner } from "./incident-banner";
 import { LaunchSplash } from "./launch-splash";
 import { LegalUpdateModal } from "./legal-update-modal";
 import { OfflineBanner } from "./offline-banner";
+import { PushOfferSheet } from "./push-offer-sheet";
 import { ToastProvider } from "./toast";
 
 initMonitoring();
@@ -67,6 +68,7 @@ export function AppRoot({ Provider }: { Provider: ComponentType<{ children: Reac
                   <ThemedStack />
                   <LegalUpdateModal />
                   <AnnouncementsModal />
+                  <PushOfferSheet />
                 </AppLockGate>
                 <LaunchSplash />
               </ToastProvider>

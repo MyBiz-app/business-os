@@ -11,7 +11,21 @@ import { apiClient } from "./api";
 const projectId = (Constants.expoConfig?.extra as { eas?: { projectId?: string } } | undefined)?.eas
   ?.projectId;
 
+/** Pushes can only work on a phone build that has the EAS project id (not on the web). */
+export const pushAvailable = Platform.OS !== "web" && Boolean(projectId);
+
 let registered: string | null = null;
+
+/** What the phone says about notifications right now ("undetermined": not asked yet). */
+export async function pushPermission(): Promise<"granted" | "denied" | "undetermined"> {
+  if (!pushAvailable) return "denied";
+  try {
+    const { status } = await Notifications.getPermissionsAsync();
+    return status === "granted" ? "granted" : status === "denied" ? "denied" : "undetermined";
+  } catch {
+    return "denied";
+  }
+}
 
 /** Registers this phone for push. With `ask` false it only registers when the person has
  *  already allowed notifications, so it is safe to call on every sign-in. Never throws. */

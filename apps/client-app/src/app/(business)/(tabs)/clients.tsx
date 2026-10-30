@@ -111,6 +111,9 @@ export default function Clients() {
           />
         )}
       </View>
+      {can("clients.write") && (
+        <ListRow palette={palette} title={t("messageGroup")} subtitle={t("messageGroupHint")} onPress={() => router.push("/message-group")} />
+      )}
       <Field
         label={term(tenant, "searchClients")}
         placeholder={t("searchHint")}
