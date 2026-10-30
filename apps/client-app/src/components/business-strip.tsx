@@ -104,7 +104,7 @@ function Circle({
         <View style={[local.circle, { backgroundColor: tint(color, 0.14) }]}>{children}</View>
         {dot && <View style={[local.dot, { backgroundColor: palette.primary, borderColor: palette.background }]} />}
       </View>
-      <Text numberOfLines={1} style={[local.label, { color: selected ? palette.foreground : palette.muted }]}>
+      <Text numberOfLines={2} style={[local.label, { color: selected ? palette.foreground : palette.muted }]}>
         {label}
       </Text>
     </Pressable>
@@ -113,10 +113,10 @@ function Circle({
 
 const local = StyleSheet.create({
   row: { gap: space.md, paddingVertical: space.xs, paddingHorizontal: 2 },
-  item: { width: SIZE + 16, alignItems: "center", gap: space.xs },
+  item: { width: SIZE + 24, alignItems: "center", gap: space.xs },
   ring: { width: SIZE + 8, height: SIZE + 8, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
   circle: { width: SIZE, height: SIZE, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", overflow: "hidden" },
   logo: { width: SIZE, height: SIZE },
   dot: { position: "absolute", top: 0, end: 0, width: 14, height: 14, borderRadius: radius.pill, borderWidth: 2 },
-  label: { fontSize: 12, ...font.medium, textAlign: "center", maxWidth: SIZE + 16 },
+  label: { fontSize: 12, lineHeight: 15, ...font.medium, textAlign: "center", maxWidth: SIZE + 24 },
 });
