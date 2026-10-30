@@ -129,7 +129,8 @@ def curate(
     created = [
         seed(conn, owner_email, months, rng, spec) for spec in specs if spec.name not in first
     ]
-    # Demo businesses are findable by name in the app's join search (new ones start listed; older ones are switched on here).
+    # Demo businesses are findable in the app's join search: new ones start listed,
+    # older ones are switched on here.
     conn.execute(
         text("UPDATE app.tenants SET listed_in_search = true WHERE id = ANY(:ids)"),
         {"ids": [tenant for tenant, _ in _owned(conn, owner)]},
