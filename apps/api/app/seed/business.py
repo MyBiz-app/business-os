@@ -167,8 +167,8 @@ def seed(
         text("""
             INSERT INTO app.tenants (name, vertical, locale, time_zone, currency, primary_color,
                                      created_at, trial_ends_at, listed_in_search)
-            VALUES (:name, :vertical, 'he', :tz, 'ILS', :color, :created, true,
-                    CAST(:created AS timestamptz) + interval '14 days')
+            VALUES (:name, :vertical, 'he', :tz, 'ILS', :color, :created,
+                    CAST(:created AS timestamptz) + interval '14 days', true)
             RETURNING id
         """),
         {
