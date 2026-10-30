@@ -13220,6 +13220,22 @@ export interface components {
              * Format: uuid
              */
             session_id: string;
+            /**
+             * Service Id
+             * Format: uuid
+             * @description What was booked, to book the same again
+             */
+            service_id: string;
+            /**
+             * Booking Mode
+             * @description class, appointment or resource: where to book it again
+             */
+            booking_mode: string;
+            /**
+             * Instructor User Id
+             * @description Who the appointment was with, to book the same person again
+             */
+            instructor_user_id?: string | null;
             /** Service Name */
             service_name: string;
             /**

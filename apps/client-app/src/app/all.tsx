@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@business-os/app-kit/components/text";
 import { Avatar, BackBar, Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Card, Heading, LoadError, Screen, SkeletonCard, styles } from "@business-os/app-kit/components/ui";
-import { rebookTarget } from "@business-os/app-kit/lib/all-mine";
+import { rebookParams, rebookTarget } from "@business-os/app-kit/lib/all-mine";
 import { assetUrl } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { radius } from "@business-os/app-kit/lib/theme";
@@ -59,13 +59,10 @@ export default function AllMine() {
   };
 
   const openRebook = (r: Rebook) => {
-    const base = { service: r.service_id };
-    const params =
-      r.booking_mode === "resource"
-        ? { ...base, at: localValue(r.last_at, zone(r.business_id)).slice(11, 16) }
-        : r.booking_mode === "appointment"
-          ? { ...base, ...(r.instructor_user_id ? { staff: r.instructor_user_id } : {}) }
-          : base;
+    const params = rebookParams(r.booking_mode, r.service_id, {
+      staff: r.instructor_user_id,
+      at: localValue(r.last_at, zone(r.business_id)).slice(11, 16),
+    });
     void open(r.business_id, { pathname: rebookTarget(r.booking_mode), params } as Href);
   };
 

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { circleInitials, neighbour, rebookTarget, swipeStep, waitingCounts } from "./all-mine.ts";
+import { circleInitials, neighbour, rebookParams, rebookTarget, swipeStep, waitingCounts } from "./all-mine.ts";
 
 test("a swipe moves to the next or previous business and stops at the ends", () => {
   const ids = ["a", "b", "c"];
@@ -42,4 +42,12 @@ test("book again opens the screen the thing was booked on", () => {
   assert.equal(rebookTarget("class"), "/schedule");
   assert.equal(rebookTarget("appointment"), "/appointment");
   assert.equal(rebookTarget("resource"), "/court");
+});
+
+test("book again carries the same person for an appointment and the same time for a court", () => {
+  const last = { staff: "u1", at: "18:00" };
+  assert.deepEqual(rebookParams("class", "s1", last), { service: "s1" });
+  assert.deepEqual(rebookParams("appointment", "s1", last), { service: "s1", staff: "u1" });
+  assert.deepEqual(rebookParams("appointment", "s1", { at: "18:00" }), { service: "s1" });
+  assert.deepEqual(rebookParams("resource", "s1", last), { service: "s1", at: "18:00" });
 });

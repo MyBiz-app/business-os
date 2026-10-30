@@ -1124,6 +1124,7 @@
     "skipToContent": "Skip to main content",
     "loadFailed": "Couldn't load this right now.",
     "retry": "Try again",
+    "offline": "No connection. You see what was loaded last; changes will not be saved until it is back.",
     "save": "Save",
     "create": "Create",
     "cancel": "Cancel",
@@ -1818,6 +1819,8 @@
       "releaseReminderBody": "The schedule for the next week is open. Book your spot!"
     },
     "bookings": {
+      "rebook": "Book again",
+      "rebookLabel": "Book {service} again",
       "title": "Mine",
       "upcoming": "Upcoming",
       "history": "History",
