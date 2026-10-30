@@ -23,7 +23,13 @@ import random
 from sqlalchemy import create_engine
 
 from app.core.config import get_settings
-from app.seed.accounts import delete_account, delete_businesses, move_owner, owner_as_client
+from app.seed.accounts import (
+    delete_account,
+    delete_businesses,
+    move_owner,
+    owner_as_client,
+    rename_email,
+)
 from app.seed.business import seed
 from app.seed.common import (
     AC_COMPANY,
@@ -108,6 +114,13 @@ def main() -> None:
         help="With --delete-business: also remove businesses that have other owners",
     )
     parser.add_argument(
+        "--rename-email",
+        action="append",
+        default=[],
+        metavar="OLD=NEW",
+        help="Give an account a new email (repeatable), then stop",
+    )
+    parser.add_argument(
         "--delete-account",
         default=None,
         help="Remove this account if it holds no business or client record, then stop",
@@ -137,6 +150,9 @@ def main() -> None:
                 )
             )
             return
+        for pair in args.rename_email:
+            old_email, _, new_email = pair.partition("=")
+            print(rename_email(conn, old_email.strip(), new_email.strip()))
         if args.delete_account:
             print(delete_account(conn, args.delete_account))
             return

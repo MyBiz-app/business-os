@@ -1086,3 +1086,33 @@ def test_branches_managed_by_the_old_account_go_to_the_new_one(engine: Engine) -
             text("SELECT count(*) FROM app.locations WHERE manager_user_id = :u"), {"u": old}
         ).scalar_one()
         assert left == 0
+
+
+def test_an_account_can_get_a_new_email_and_keeps_its_business(engine: Engine) -> None:
+    from app.seed.accounts import rename_email
+
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, 'rename-me@example.com')"),
+            {"id": uuid4()},
+        )
+        (tenant,) = seed_demo(connection, "rename-me@example.com", "studio", 1, random.Random(5))
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, 'taken@example.com')"),
+            {"id": uuid4()},
+        )
+        with pytest.raises(SystemExit, match="already exists"):
+            rename_email(connection, "rename-me@example.com", "taken@example.com")
+        assert (
+            rename_email(connection, "rename-me@example.com", "renamed@example.com")["app_users"]
+            == 1
+        )
+        owner = connection.execute(
+            text(
+                "SELECT u.email FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id "
+                "WHERE m.tenant_id = :t AND m.role = 'owner'"
+            ),
+            {"t": tenant},
+        ).scalar_one()
+        assert owner == "renamed@example.com"
