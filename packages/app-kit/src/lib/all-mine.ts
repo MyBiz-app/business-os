@@ -36,3 +36,17 @@ export function circleInitials(name: string): string {
 export function rebookTarget(mode: string): "/schedule" | "/appointment" | "/court" {
   return mode === "appointment" ? "/appointment" : mode === "resource" ? "/court" : "/schedule";
 }
+
+/**
+ * What "book again" passes to the booking screen: always the service; an appointment also the same
+ * person, a court the same time of day (`at`, "HH:MM" in the business's time zone).
+ */
+export function rebookParams(
+  mode: string,
+  serviceId: string,
+  last: { staff?: string | null; at: string },
+): Record<string, string> {
+  if (mode === "resource") return { service: serviceId, at: last.at };
+  if (mode === "appointment") return { service: serviceId, ...(last.staff ? { staff: last.staff } : {}) };
+  return { service: serviceId };
+}

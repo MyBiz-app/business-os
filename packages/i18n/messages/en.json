@@ -1819,6 +1819,8 @@
       "releaseReminderBody": "The schedule for the next week is open. Book your spot!"
     },
     "bookings": {
+      "rebook": "Book again",
+      "rebookLabel": "Book {service} again",
       "title": "Mine",
       "upcoming": "Upcoming",
       "history": "History",

@@ -1,6 +1,6 @@
 import type { components } from "@business-os/api-client";
-import { formatTime } from "@business-os/i18n/dates";
-import { router, useFocusEffect } from "expo-router";
+import { formatTime, localValue } from "@business-os/i18n/dates";
+import { type Href, router, useFocusEffect } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { ListSkeleton } from "@business-os/app-kit/components/skeleton";
 import { Button, Card, EmptyState, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { rebookParams, rebookTarget } from "@business-os/app-kit/lib/all-mine";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -84,25 +85,48 @@ export default function Bookings() {
   const day = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" });
   const money = (amount: number, currency: string) => formatMoney(amount, currency, locale);
 
+  /** Opens the screen this was booked on, with the same service (and person, or time of day). */
+  const bookAgain = (booking: Booking) =>
+    router.push({
+      pathname: rebookTarget(booking.booking_mode),
+      params: rebookParams(booking.booking_mode, booking.service_id, {
+        staff: booking.instructor_user_id,
+        at: localValue(booking.starts_at, business.time_zone).slice(11, 16),
+      }),
+    } as Href);
+
   const row = (booking: Booking) => (
-    <View key={booking.id} style={local.row}>
-      <View style={local.info}>
-        <Text style={[local.name, { color: palette.foreground }]}>{booking.service_name}</Text>
-        <Text style={[local.meta, { color: palette.muted }]}>
-          {date.format(new Date(booking.starts_at))} · {formatTime(booking.starts_at, locale, business.time_zone)}
-        </Text>
-        {booking.rating ? (
-          <Text style={[local.meta, { color: palette.muted }]}>{tReview("rated", { count: booking.rating })}</Text>
-        ) : null}
+    <View key={booking.id}>
+      <View style={local.row}>
+        <View style={local.info}>
+          <Text style={[local.name, { color: palette.foreground }]}>{booking.service_name}</Text>
+          <Text style={[local.meta, { color: palette.muted }]}>
+            {date.format(new Date(booking.starts_at))} · {formatTime(booking.starts_at, locale, business.time_zone)}
+          </Text>
+          {booking.rating ? (
+            <Text style={[local.meta, { color: palette.muted }]}>{tReview("rated", { count: booking.rating })}</Text>
+          ) : null}
+        </View>
+        <Badge
+          label={
+            (booking.session_status === "cancelled" ? tStatus("sessionCancelled") : tStatus(`statuses.${booking.status}`)) +
+            (booking.late_cancel ? ` · ${tStatus("lateCancel")}` : "")
+          }
+          tone={TONE[booking.session_status === "cancelled" ? "cancelled" : booking.status] ?? "muted"}
+          palette={palette}
+        />
       </View>
-      <Badge
-        label={
-          (booking.session_status === "cancelled" ? tStatus("sessionCancelled") : tStatus(`statuses.${booking.status}`)) +
-          (booking.late_cancel ? ` · ${tStatus("lateCancel")}` : "")
-        }
-        tone={TONE[booking.session_status === "cancelled" ? "cancelled" : booking.status] ?? "muted"}
-        palette={palette}
-      />
+      {booking.session_status !== "cancelled" && booking.status === "checked_in" && !booking.dependent_name ? (
+        <View style={local.again}>
+          <Button
+            label={t("rebook")}
+            accessibilityLabel={t("rebookLabel", { service: booking.service_name })}
+            variant="quiet"
+            palette={palette}
+            onPress={() => bookAgain(booking)}
+          />
+        </View>
+      ) : null}
     </View>
   );
 
@@ -281,6 +305,7 @@ export default function Bookings() {
 const local = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8 },
   info: { flex: 1, gap: 2 },
+  again: { alignItems: "flex-start" },
   name: { fontSize: 15, fontWeight: "500", textAlign: "left" },
   meta: { fontSize: 13, textAlign: "left" },
   status: { fontSize: 13, fontWeight: "500" },

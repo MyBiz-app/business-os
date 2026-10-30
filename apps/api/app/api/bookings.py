@@ -100,6 +100,11 @@ class Booking(BaseModel):
 class ClientBooking(BaseModel):
     id: UUID
     session_id: UUID
+    service_id: UUID = Field(description="What was booked, to book the same again")
+    booking_mode: str = Field(description="class, appointment or resource: where to book it again")
+    instructor_user_id: UUID | None = Field(
+        default=None, description="Who the appointment was with, to book the same person again"
+    )
     service_name: str
     starts_at: datetime
     ends_at: datetime
@@ -475,7 +480,8 @@ def list_client_bookings(
     rows = (
         context.session.execute(
             text("""
-            SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
+            SELECT b.id, b.session_id, sv.id AS service_id, sv.booking_mode,
+                   s.instructor_user_id, sv.name AS service_name, s.starts_at, s.ends_at,
                    s.status AS session_status, b.status, b.late_cancel,
                    d.name AS dependent_name,
                    (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating,

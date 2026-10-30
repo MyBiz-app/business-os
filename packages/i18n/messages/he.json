@@ -1819,6 +1819,8 @@
       "releaseReminderBody": "המערכת לשבוע הבא נפתחה. אפשר להירשם לשיעורים!"
     },
     "bookings": {
+      "rebook": "להזמין שוב",
+      "rebookLabel": "להזמין שוב: {service}",
       "title": "שלי",
       "upcoming": "קרובות",
       "history": "היסטוריה",

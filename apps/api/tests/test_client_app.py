@@ -239,6 +239,10 @@ def test_late_window_applies_to_clients(
 
     [entry] = client.get("/client/bookings", headers=headers).json()
     assert entry["late_cancel"] is True
+    # What the app needs to book the same thing again.
+    assert entry["service_id"]
+    assert entry["booking_mode"] == "class"
+    assert entry["instructor_user_id"] is None
 
 
 def test_client_needs_a_valid_plan(client: TestClient, studio: dict, auth: AuthHeaders) -> None:

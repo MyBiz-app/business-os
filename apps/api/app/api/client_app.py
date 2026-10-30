@@ -603,7 +603,8 @@ def my_bookings(context: ClientDep) -> list[ClientBooking]:
     """The client's bookings in this business, newest session first."""
     rows = context.session.execute(
         text("""
-            SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
+            SELECT b.id, b.session_id, sv.id AS service_id, sv.booking_mode,
+                   s.instructor_user_id, sv.name AS service_name, s.starts_at, s.ends_at,
                    s.status AS session_status, b.status, b.late_cancel,
                    d.name AS dependent_name,
                    (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating,

@@ -56106,6 +56106,30 @@
             "format": "uuid",
             "title": "Session Id"
           },
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id",
+            "description": "What was booked, to book the same again"
+          },
+          "booking_mode": {
+            "type": "string",
+            "title": "Booking Mode",
+            "description": "class, appointment or resource: where to book it again"
+          },
+          "instructor_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor User Id",
+            "description": "Who the appointment was with, to book the same person again"
+          },
           "service_name": {
             "type": "string",
             "title": "Service Name"
@@ -56184,6 +56208,8 @@
         "required": [
           "id",
           "session_id",
+          "service_id",
+          "booking_mode",
           "service_name",
           "starts_at",
           "ends_at",
