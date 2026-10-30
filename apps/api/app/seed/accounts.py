@@ -121,3 +121,48 @@ def owner_as_client(conn: Connection, owner_email: str) -> dict[str, int]:
             bookings += 1
         done += 1
     return {"businesses": done, "bookings": bookings}
+
+
+def delete_businesses(conn: Connection, owner_email: str, tenant_ids: list[str]) -> int:
+    """Removes demo businesses by id. Only businesses the account owns alone are removed; any
+    other id is refused so a typo can never reach someone else's business."""
+    owner = _user(conn, owner_email)
+    if owner is None:
+        raise SystemExit(f"No account for {owner_email}.")
+    removed = 0
+    for raw in tenant_ids:
+        tenant_id = UUID(raw)
+        owners = conn.execute(
+            text("SELECT user_id FROM app.tenant_members WHERE tenant_id = :t AND role = 'owner'"),
+            {"t": tenant_id},
+        ).scalars().all()  # fmt: skip
+        if owners != [owner]:
+            raise SystemExit(f"Business {raw} is not owned by {owner_email} alone: not removed.")
+        removed += conn.execute(
+            text("DELETE FROM app.tenants WHERE id = :t"), {"t": tenant_id}
+        ).rowcount
+    return removed
+
+
+def delete_account(conn: Connection, email: str) -> dict[str, int]:
+    """Removes an account that holds nothing: no business memberships and no client records.
+    Refuses otherwise, so hand its businesses over first (`move_owner`)."""
+    user = conn.execute(
+        text("SELECT id FROM app.users WHERE lower(email) = lower(:e)"), {"e": email}
+    ).scalar()
+    if user is None:
+        return {"app_users": 0, "auth_users": 0}
+    held = conn.execute(
+        text("""
+            SELECT (SELECT count(*) FROM app.tenant_members WHERE user_id = :u)
+                 + (SELECT count(*) FROM app.clients WHERE user_id = :u)
+        """),
+        {"u": user},
+    ).scalar_one()
+    if held:
+        raise SystemExit(f"{email} still holds {held} memberships or client records: not removed.")
+    auth = 0
+    if conn.execute(text("SELECT to_regclass('auth.users') IS NOT NULL")).scalar():
+        auth = conn.execute(text("DELETE FROM auth.users WHERE id = :u"), {"u": user}).rowcount
+    remaining = conn.execute(text("DELETE FROM app.users WHERE id = :u"), {"u": user}).rowcount
+    return {"app_users": remaining, "auth_users": auth}
