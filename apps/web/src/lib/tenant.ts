@@ -76,7 +76,15 @@ export const getTenant = cache(async () => {
   if (refusal === "business_closed") redirect("/closed");
   // An unpaid MyBiz invoice (30 days) or an ended subscription: only the billing page works.
   if (refusal === "billing_suspended") redirect("/suspended");
-  if (response.error && branch) {
+  // A leftover business cookie (a closed or deleted business, or one from another account in the
+  // same browser) that the API no longer accepts: work in the person's own first business instead
+  // of crashing, or send them on when they have none.
+  if (refusal === "not_a_member" && membership.tenant_id === store.get(TENANT_COOKIE)?.value) {
+    const own = me.memberships.find((m) => m.tenant_id !== membership.tenant_id);
+    if (!own) redirect(me.platform_admin ? "/platform" : "/welcome");
+    scope = scopeOf(own.tenant_id, store.get(branchCookie(own.tenant_id))?.value);
+    response = await fetchCurrent(own.tenant_id, store.get(branchCookie(own.tenant_id))?.value);
+  } else if (response.error && branch) {
     // A branch that no longer belongs to the business: fall back to all branches.
     scope = scopeOf(membership.tenant_id);
     response = await fetchCurrent(membership.tenant_id);
