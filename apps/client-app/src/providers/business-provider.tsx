@@ -12,10 +12,17 @@ import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 export type ClientBusiness = components["schemas"]["ClientBusiness"];
 
 const SELECTED_KEY = "client.business";
+/** Waits before each automatic new try after a failed load (a sleeping server needs a moment). */
+const RETRY_AFTER_MS = [2000, 5000, 12000];
 
 type BusinessContextValue = {
-  /** null until loaded (or while signed out). */
+  /** null until loaded (or while signed out, or when loading failed: see `failed`). An empty list
+   * always means "this person has no business", never "it could not be loaded". */
   businesses: ClientBusiness[] | null;
+  /** The list could not be loaded (the server was unreachable); it is tried again by itself. */
+  failed: boolean;
+  /** Tries to load the list again, now. */
+  retry: () => void;
   business: ClientBusiness | null;
   api: ApiClient;
   /** Request parameters that select the business: `params: { ...scope, ... }`. */
@@ -35,6 +42,8 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
   const { palette } = useTheme();
   const [businesses, setBusinesses] = useState<ClientBusiness[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [tries, setTries] = useState(0);
   const userId = session?.user.id;
 
   const refresh = useCallback(async () => {
@@ -51,8 +60,27 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
   }, [userId]);
 
   useEffect(() => {
-    void refresh().catch(() => setBusinesses([]));
-  }, [refresh]);
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let attempt = 0;
+    const load = () => {
+      refresh().then(
+        () => !cancelled && setFailed(false),
+        () => {
+          if (cancelled) return;
+          // Never turn "could not load" into "no businesses": that sends a member to the join screen.
+          setFailed(true);
+          if (attempt < RETRY_AFTER_MS.length) timer = setTimeout(load, RETRY_AFTER_MS[attempt++]);
+        },
+      );
+    };
+    load();
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [refresh, tries]);
+  const retry = useCallback(() => setTries((n) => n + 1), []);
 
   const select = useCallback(async (tenantId: string) => {
     setSelectedId(tenantId);
@@ -82,6 +110,8 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       businesses,
+      failed,
+      retry,
       business,
       api: apiClient(),
       scope: { header: { "X-Tenant-Id": business?.id ?? "" } },
@@ -91,7 +121,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
       joinOwn,
       refresh,
     }),
-    [businesses, business, palette, select, join, joinOwn, refresh],
+    [businesses, failed, retry, business, palette, select, join, joinOwn, refresh],
   );
 
   return <BusinessContext.Provider value={value}>{children}</BusinessContext.Provider>;

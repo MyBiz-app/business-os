@@ -16,6 +16,7 @@ import { useTranslations } from "use-intl";
 import { controlHeight, radius, space } from "@business-os/design-tokens";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+import { RevealProvider, useKeyboardReveal, useRevealFocused } from "./keyboard-scroll";
 import { FadeIn, PressableScale, useReducedMotion } from "./motion";
 import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
@@ -76,8 +77,10 @@ type FieldProps = TextInputProps & {
   dir?: "ltr";
 };
 
-export function Field({ label, palette, hint, error, dir, style, ...inputProps }: FieldProps) {
+export function Field({ label, palette, hint, error, dir, style, onFocus, ...inputProps }: FieldProps) {
   const id = useId();
+  // On a scrolling screen, a field that takes focus is brought above the keyboard.
+  const reveal = useRevealFocused();
   return (
     <View style={styles.field}>
       <Text nativeID={id} style={[styles.label, { color: palette.foreground }]}>
@@ -94,6 +97,10 @@ export function Field({ label, palette, hint, error, dir, style, ...inputProps }
           style,
         ]}
         {...inputProps}
+        onFocus={(event) => {
+          onFocus?.(event);
+          reveal?.();
+        }}
       />
       {error ? <ErrorText message={error} palette={palette} /> : hint ? <Text style={[styles.hint, { color: palette.muted }]}>{hint}</Text> : null}
     </View>
@@ -217,6 +224,7 @@ const TITLE_COLLAPSE = 36;
 export function Screen({ palette, children, refreshing, onRefresh, footer, title }: ScreenProps) {
   const scrollY = useRef(new Animated.Value(0)).current;
   const barOpacity = scrollY.interpolate({ inputRange: [0, TITLE_COLLAPSE], outputRange: [0, 1], extrapolate: "clamp" });
+  const keyboard = useKeyboardReveal();
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.screen, { backgroundColor: palette.background }]}>
       {title ? (
@@ -233,10 +241,11 @@ export function Screen({ palette, children, refreshing, onRefresh, footer, title
         </View>
       ) : null}
       <Animated.ScrollView
-        contentContainerStyle={styles.content}
+        ref={keyboard.scrollRef}
+        contentContainerStyle={[styles.content, keyboard.bottomPadding > 0 && { paddingBottom: keyboard.bottomPadding + space.lg }]}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
-        automaticallyAdjustKeyboardInsets
+        {...keyboard.scrollProps}
         scrollEventThrottle={16}
         onScroll={title ? Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: Platform.OS !== "web" }) : undefined}
         refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} /> : undefined}
@@ -247,11 +256,13 @@ export function Screen({ palette, children, refreshing, onRefresh, footer, title
           </Text>
         ) : null}
         {/* Each block of the screen rises in, one after another. */}
-        {Children.toArray(children).map((child, index) => (
-          <FadeIn key={index} index={index} style={styles.block}>
-            {child}
-          </FadeIn>
-        ))}
+        <RevealProvider value={keyboard.reveal}>
+          {Children.toArray(children).map((child, index) => (
+            <FadeIn key={index} index={index} style={styles.block}>
+              {child}
+            </FadeIn>
+          ))}
+        </RevealProvider>
       </Animated.ScrollView>
       {footer ? (
         <View style={[styles.footer, { backgroundColor: palette.background, borderTopColor: palette.border }]}>{footer}</View>
