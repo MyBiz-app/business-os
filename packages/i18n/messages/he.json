@@ -21,7 +21,10 @@
     "reference": "מזהה: {code}",
     "home": "חזרה לעמוד הבית",
     "notFoundTitle": "העמוד לא נמצא",
-    "notFoundText": "העמוד שחיפשתם לא קיים או שהועבר."
+    "notFoundText": "העמוד שחיפשתם לא קיים או שהועבר.",
+    "switchBusiness": "החלפת עסק",
+    "toSite": "לאתר הציבורי",
+    "signOut": "התנתקות"
   },
   "home": {
     "status": "מצב המערכת",
@@ -9052,7 +9055,8 @@
   },
   "userMenu": {
     "open": "פתיחת התפריט שלך",
-    "label": "החשבון שלך"
+    "label": "החשבון שלך",
+    "site": "אתר MyBiz"
   },
   "imageCrop": {
     "title": "מיקום התמונה",

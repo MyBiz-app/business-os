@@ -9,7 +9,8 @@ import { supabaseConfig } from "./env";
 
 const PUBLIC_PAGES = new Set(["/", "/login", "/login/code", "/signup", "/check-email", "/email-confirmed", "/forgot-password", "/start", "/getting-started", "/sitemap.xml", "/robots.txt", CSP_REPORT_PATH]);
 const PUBLIC_ASSETS = ["/opengraph-image", "/twitter-image"];
-const AUTH_PAGES = new Set(["/", "/login", "/login/code", "/signup"]);
+// The landing page ("/") is not here: a signed-in person may browse the public site too.
+const AUTH_PAGES = new Set(["/login", "/login/code", "/signup"]);
 
 // The marketing site and the public pages around sign-in and joining.
 const PUBLIC_PREFIXES = ["/auth/", "/invite/", "/join/", "/inquiry/", "/embed/", "/geo/public/", "/q/", "/features", "/industries", "/ai-team", "/pricing", "/websites", "/about", "/contact", "/legal/", "/maplibre/"];

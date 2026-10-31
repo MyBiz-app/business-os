@@ -31,6 +31,8 @@ test("the last-resort error page strings match the message files", () => {
       text: m.errorPages.text,
       reference: m.errorPages.reference,
       retry: m.common.retry,
+      toSite: m.errorPages.toSite,
+      signOut: m.errorPages.signOut,
     });
   }
 });
