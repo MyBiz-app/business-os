@@ -1,6 +1,7 @@
 import { createApiClient, type ApiClient } from "@business-os/api-client";
 
 import { API_URL } from "./env";
+import { responseObserver } from "./api-observer";
 import { isNetworkFailure, setOnline } from "./connection";
 import { queryClient } from "./query-client";
 import { supabase } from "./supabase";
@@ -16,25 +17,14 @@ export class ApiError extends Error {
   }
 }
 
-/** Calls the app makes by itself, which change nothing a screen shows. */
-const BACKGROUND_PATHS = /^\/me\/(devices|push-tokens)/;
-
 /** A typed API client that signs requests as the current user. */
 export function apiClient(): ApiClient {
   const client = createApiClient({ baseUrl: API_URL });
+  client.use(responseObserver({ markOnline: () => setOnline(true), invalidateAll: () => void queryClient.invalidateQueries() }));
   client.use({
     async onRequest({ request }) {
       const { data } = await supabase.auth.getSession();
       if (data.session) request.headers.set("Authorization", `Bearer ${data.session.access_token}`);
-      return request;
-    },
-    onResponse({ request, response }) {
-      setOnline(true);
-      // Anything the person changed may show on other screens: their saved copies count as old.
-      if (response.ok && request.method !== "GET" && !BACKGROUND_PATHS.test(new URL(request.url).pathname)) {
-        void queryClient.invalidateQueries();
-      }
-      return response;
     },
     onError({ error }) {
       if (isNetworkFailure(error)) setOnline(false);
