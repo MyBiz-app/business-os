@@ -14,8 +14,11 @@ const ACTIVE_KEY = "app.area";
 export const READY_AREAS: readonly AreaKind[] = ["client", "business", "platform"];
 
 type AreaContextValue = {
-  /** null until loaded (or while signed out). */
+  /** null until loaded (or while signed out, or while loading failed: see `failed`). */
   areas: Area[] | null;
+  /** The person's businesses or roles could not be loaded; shown with a retry, never as "no business". */
+  failed: boolean;
+  retry: () => void;
   active: Area | null;
   /** Opens an area and remembers it as the last one used. */
   switchTo: (key: string) => Promise<void>;
@@ -27,10 +30,14 @@ const AreaContext = createContext<AreaContextValue | null>(null);
  * businesses they are a client of. Opens the last one used and lets them switch. */
 export function AreaProvider({ children }: { children: React.ReactNode }) {
   const { session } = useSession();
-  const { businesses, select, joinOwn } = useBusiness();
+  const { businesses, failed: businessesFailed, retry: retryBusinesses, select, joinOwn } = useBusiness();
   const userId = session?.user.id;
   const [identity, setIdentity] = useState<{ platformAdmin: boolean; memberships: Parameters<typeof buildAreas>[0]["memberships"] } | null>(null);
   const [storedKey, setStoredKey] = useState<string | null>(null);
+  // /me could not be read: the person still gets their client areas, but with no business at all
+  // that is a failure to load, not an empty account.
+  const [identityFailed, setIdentityFailed] = useState(false);
+  const [tries, setTries] = useState(0);
 
   useEffect(() => {
     if (!userId) {
@@ -43,17 +50,36 @@ export function AreaProvider({ children }: { children: React.ReactNode }) {
         if (cancelled) return;
         setIdentity({ platformAdmin: me.platform_admin, memberships: me.memberships });
         setStoredKey(stored);
+        setIdentityFailed(false);
       })
       // Not being able to read /me must never lock a client out of their own area.
-      .catch(() => !cancelled && setIdentity({ platformAdmin: false, memberships: [] }));
+      .catch(() => {
+        if (cancelled) return;
+        setIdentity({ platformAdmin: false, memberships: [] });
+        setIdentityFailed(true);
+      });
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, tries]);
+
+  const noBusinessLoaded = identityFailed && (businesses?.length ?? 0) === 0;
+  const failed = businessesFailed || noBusinessLoaded;
+  const retry = useCallback(() => {
+    setTries((n) => n + 1);
+    retryBusinesses();
+  }, [retryBusinesses]);
+
+  // Tried again by itself a few times, so a server that was asleep does not need a tap.
+  useEffect(() => {
+    if (!noBusinessLoaded || tries >= 3) return;
+    const timer = setTimeout(() => setTries((n) => n + 1), 2000 * (tries + 1));
+    return () => clearTimeout(timer);
+  }, [noBusinessLoaded, tries]);
 
   const areas = useMemo(
-    () => (identity && businesses ? buildAreas({ ...identity, businesses, platformName: BRAND.name }) : null),
-    [identity, businesses],
+    () => (identity && businesses && !noBusinessLoaded ? buildAreas({ ...identity, businesses, platformName: BRAND.name }) : null),
+    [identity, businesses, noBusinessLoaded],
   );
   const active = useMemo(() => (areas ? pickArea(areas, storedKey, READY_AREAS) : null), [areas, storedKey]);
 
@@ -71,7 +97,7 @@ export function AreaProvider({ children }: { children: React.ReactNode }) {
     [areas, select, joinOwn],
   );
 
-  const value = useMemo(() => ({ areas, active, switchTo }), [areas, active, switchTo]);
+  const value = useMemo(() => ({ areas, failed, retry, active, switchTo }), [areas, failed, retry, active, switchTo]);
   return <AreaContext.Provider value={value}>{children}</AreaContext.Provider>;
 }
 

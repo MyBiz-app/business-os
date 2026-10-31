@@ -23,7 +23,9 @@ import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 import { radius } from "@business-os/app-kit/lib/theme";
 
 type Profile = components["schemas"]["BusinessProfile"];
-type Listed = components["schemas"]["ListedBusiness"];
+
+/** Join codes are 8 characters long. */
+const CODE_LENGTH = 8;
 
 const normalize = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16);
 
@@ -51,10 +53,6 @@ export default function Join() {
   const [joinedId, setJoinedId] = useState<string | null>(null);
   const palette = brandPalette(basePalette, profile?.primary_color);
   const [scanning, setScanning] = useState(false);
-  // Opt-in search by name, for people who have no code at hand.
-  const [query, setQuery] = useState("");
-  const [found, setFound] = useState<Listed[] | null>(null);
-  const shown = query.trim().length >= 2 ? found : null;
 
   const lookUp = async (value: string) => {
     if (value.length === 0) return setError(t("codeRequired"));
@@ -77,24 +75,6 @@ export default function Join() {
     // Only for a code that arrived in the link.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.code]);
-
-  useEffect(() => {
-    const text = query.trim();
-    if (text.length < 2) return;
-    let live = true;
-    // Wait for a pause in typing before asking.
-    const timer = setTimeout(() => {
-      apiClient()
-        .GET("/public/businesses-search", { params: { query: { q: text } } })
-        .then(unwrap)
-        .then((rows) => live && setFound(rows))
-        .catch(() => live && setFound([]));
-    }, 350);
-    return () => {
-      live = false;
-      clearTimeout(timer);
-    };
-  }, [query]);
 
   const pick = (value: string) => {
     const next = normalize(value);
@@ -137,52 +117,34 @@ export default function Join() {
   const entryForm = (
     <>
           {firstTime ? null : <Text style={[styles.muted, { color: palette.muted }]}>{t("subtitle")}</Text>}
+          {/* The business gives its QR or its code: scanning is the quick way, so it comes first. */}
+          <Button label={t("scan")} palette={palette} onPress={() => setScanning(true)} />
+          <Text style={[styles.muted, { color: palette.muted, textAlign: "center" }]}>{t("orType")}</Text>
           <Field
             label={t("code")}
             palette={palette}
             value={code}
-            onChangeText={(value) => setCode(normalize(value))}
+            onChangeText={(value) => {
+              const next = normalize(value);
+              setCode(next);
+              // A whole code (a pasted or an autofilled one) is looked up at once.
+              if (next.length === CODE_LENGTH && next !== code) void lookUp(next);
+            }}
             autoCapitalize="characters"
             autoCorrect={false}
             style={local.code}
+            returnKeyType="go"
             onSubmitEditing={() => void lookUp(code)}
           />
           <ErrorText message={error} palette={palette} />
-          <Button label={t("continue")} palette={palette} busy={busy} onPress={() => void lookUp(code)} />
-          <Button label={t("scan")} variant="secondary" palette={palette} onPress={() => setScanning(true)} />
-          <Field
-            label={t("searchLabel")}
-            palette={palette}
-            hint={t("searchHint")}
-            value={query}
-            onChangeText={setQuery}
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {shown?.length === 0 && <Text style={[styles.muted, { color: palette.muted }]}>{t("searchEmpty")}</Text>}
-          {shown?.map((row) => (
-            <Pressable key={row.join_code} accessibilityRole="button" accessibilityLabel={row.name} onPress={() => pick(row.join_code)}>
-              <Card palette={palette}>
-                <View style={local.brand}>
-                  {row.logo_url ? (
-                    <Image source={{ uri: assetUrl(row.logo_url)! }} style={local.logo} accessibilityIgnoresInvertColors />
-                  ) : (
-                    <View style={[local.logo, { backgroundColor: row.primary_color ?? palette.primary }]} />
-                  )}
-                  <View style={{ flex: 1 }}>
-                    <Text style={[local.name, { color: palette.foreground }]}>{row.name}</Text>
-                    {row.city ? <Text style={[styles.muted, { color: palette.muted }]}>{row.city}</Text> : null}
-                  </View>
-                </View>
-              </Card>
-            </Pressable>
-          ))}
+          <Button label={t("continue")} variant="secondary" palette={palette} busy={busy} onPress={() => void lookUp(code)} />
+          <Text style={[styles.muted, { color: palette.muted, textAlign: "center" }]}>{t("noCode")}</Text>
           <JoinScanner visible={scanning} palette={palette} onCode={pick} onClose={() => setScanning(false)} />
           {businesses && businesses.length > 0 && (
             <Button label={t("back")} variant="secondary" palette={palette} onPress={() => router.replace("/home")} />
           )}
           {firstTime ? (
-            <Button label={t("otherAccount")} variant="secondary" palette={palette} onPress={() => void supabase.auth.signOut().then(() => router.replace("/sign-in"))} />
+            <Button label={t("otherAccount")} variant="quiet" palette={palette} onPress={() => void supabase.auth.signOut().then(() => router.replace("/sign-in"))} />
           ) : null}
     </>
   );

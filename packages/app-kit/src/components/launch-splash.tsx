@@ -4,7 +4,7 @@ import { Animated, Easing, Platform, StyleSheet, View } from "react-native";
 import { tint } from "../lib/brand";
 import { colors } from "../lib/theme";
 import { useTheme } from "../providers/theme-provider";
-import { AuthBackdrop } from "./auth-backdrop";
+import { AuthBackdrop, Glow } from "./auth-backdrop";
 import { useReducedMotion } from "./motion";
 
 const native = Platform.OS !== "web";
@@ -113,24 +113,12 @@ export function DepthLogo({ size = 1, still = false }: { size?: number; still?: 
   const box = TILE * size;
   return (
     <View style={{ width: box * 1.7, height: box * 1.7, alignItems: "center", justifyContent: "center" }}>
-      <View
-        style={{
-          position: "absolute",
-          width: box * 1.6,
-          height: box * 1.6,
-          borderRadius: box,
-          backgroundColor: tint(palette.primary, 0.14),
-        }}
-      />
-      <View
-        style={{
-          position: "absolute",
-          width: box * 1.28,
-          height: box * 1.28,
-          borderRadius: box,
-          backgroundColor: tint(palette.accent, 0.12),
-        }}
-      />
+      <View style={{ position: "absolute" }}>
+        <Glow color={palette.primary} size={box * 1.7} alpha={0.05} />
+      </View>
+      <View style={{ position: "absolute" }}>
+        <Glow color={palette.accent} size={box * 1.2} alpha={0.03} />
+      </View>
       <Animated.View
         style={{
           width: box,
