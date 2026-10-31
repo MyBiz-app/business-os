@@ -9,7 +9,7 @@ export const ERROR_MESSAGES: Record<Locale, { title: string; text: string; refer
     text: "לא הצלחנו להציג את העמוד. נסו שוב; אם זה חוזר, פנו לתמיכה וציינו את המזהה שמופיע למטה.",
     reference: "מזהה: {code}",
     retry: "נסו שוב",
-    toSite: "לאתר MyBiz",
+    toSite: "לאתר הציבורי",
     signOut: "התנתקות",
   },
   en: {
@@ -17,7 +17,7 @@ export const ERROR_MESSAGES: Record<Locale, { title: string; text: string; refer
     text: "We couldn't show this page. Please try again; if it keeps happening, contact support and mention the reference below.",
     reference: "Reference: {code}",
     retry: "Try again",
-    toSite: "MyBiz website",
+    toSite: "Public website",
     signOut: "Sign out",
   },
 };
