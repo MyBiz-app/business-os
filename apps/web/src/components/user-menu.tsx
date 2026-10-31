@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Settings, ShieldCheck } from "lucide-react";
+import { Globe, LogOut, Settings, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useCallback, useId, useRef, useState } from "react";
@@ -93,6 +93,12 @@ export function UserMenu({ id, name, email, avatar, platform, status = [], signO
             <Settings aria-hidden="true" className="size-4 text-muted" />
             {t("account.link")}
           </Link>
+          {/* A plain anchor: the public site is a separate part of the app, opened without signing out. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a role="menuitem" href="/" className={item}>
+            <Globe aria-hidden="true" className="size-4 text-muted" />
+            {t("userMenu.site")}
+          </a>
           {platform && (
             <Link role="menuitem" href="/platform" className={item}>
               <ShieldCheck aria-hidden="true" className="size-4 text-muted" />

@@ -21,7 +21,10 @@
     "reference": "Reference: {code}",
     "home": "Back to the home page",
     "notFoundTitle": "Page not found",
-    "notFoundText": "The page you're looking for doesn't exist or was moved."
+    "notFoundText": "The page you're looking for doesn't exist or was moved.",
+    "switchBusiness": "Switch business",
+    "toSite": "Public website",
+    "signOut": "Sign out"
   },
   "home": {
     "status": "System status",
@@ -9052,7 +9055,8 @@
   },
   "userMenu": {
     "open": "Open your menu",
-    "label": "Your account"
+    "label": "Your account",
+    "site": "MyBiz website"
   },
   "imageCrop": {
     "title": "Position your picture",

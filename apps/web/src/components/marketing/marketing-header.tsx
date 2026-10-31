@@ -4,12 +4,13 @@ import { Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 
 import { Container } from "@/components/layout/container";
 import { BrandMark } from "@/components/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ACTIVITY_COOKIE } from "@/lib/mfa";
 import { moveFocus, useDismiss } from "@/components/use-dismiss";
 
 const LINKS = [
@@ -22,12 +23,18 @@ const LINKS = [
   { href: "/contact", key: "contact" },
 ] as const;
 
+const subscribeNothing = () => () => undefined;
+const hasActivityCookie = () => document.cookie.split("; ").some((c) => c.startsWith(`${ACTIVITY_COOKIE}=`));
+
 /** The marketing site's header: navigation, language and theme, and the two calls to action. */
 export function MarketingHeader() {
   const t = useTranslations("marketing.nav");
   const tApp = useTranslations("app");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // The activity cookie exists only while someone is signed in: the public pages stay static and
+  // the header swaps "log in / start" for a way back to their business.
+  const signedIn = useSyncExternalStore(subscribeNothing, hasActivityCookie, () => false);
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const close = useCallback(() => setOpen(false), []);
@@ -65,12 +72,20 @@ export function MarketingHeader() {
         <div className="hidden items-center gap-2 lg:flex">
           <LocaleSwitcher />
           <ThemeToggle />
-          <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-foreground/5">
-            {t("login")}
-          </Link>
-          <Link href="/start" className="btn-primary rounded-full px-5 py-2 text-sm">
-            {t("start")}
-          </Link>
+          {signedIn ? (
+            <Link href="/dashboard" className="btn-primary rounded-full px-5 py-2 text-sm">
+              {t("dashboard")}
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-foreground/5">
+                {t("login")}
+              </Link>
+              <Link href="/start" className="btn-primary rounded-full px-5 py-2 text-sm">
+                {t("start")}
+              </Link>
+            </>
+          )}
         </div>
 
         <div ref={root} className="relative lg:hidden">
@@ -98,14 +113,22 @@ export function MarketingHeader() {
               <LocaleSwitcher />
               <ThemeToggle />
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-2 px-1 pb-1">
-              <Link href="/login" onClick={close} className="btn-secondary px-4 py-2.5">
-                {t("login")}
-              </Link>
-              <Link href="/start" onClick={close} className="btn-primary px-4 py-2.5">
-                {t("start")}
-              </Link>
-            </div>
+            {signedIn ? (
+              <div className="mt-3 px-1 pb-1">
+                <Link href="/dashboard" onClick={close} className="btn-primary block px-4 py-2.5 text-center">
+                  {t("dashboard")}
+                </Link>
+              </div>
+            ) : (
+              <div className="mt-3 grid grid-cols-2 gap-2 px-1 pb-1">
+                <Link href="/login" onClick={close} className="btn-secondary px-4 py-2.5">
+                  {t("login")}
+                </Link>
+                <Link href="/start" onClick={close} className="btn-primary px-4 py-2.5">
+                  {t("start")}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </Container>
