@@ -7,13 +7,14 @@ import { introSeen } from "@business-os/app-kit/lib/intro";
 import { useAreas } from "@/providers/area-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
+import { Text } from "@business-os/app-kit/components/text";
 import { Spinner } from "@business-os/app-kit/components/spinner";
 import { LoadError } from "@business-os/app-kit/components/ui";
 
 /** Sends the person where they belong: sign in, join a business, or the area they used last. */
 export default function Gate() {
   const { session, loading, mfaPending } = useSession();
-  const { areas, active, failed, retry } = useAreas();
+  const { areas, active, failed, failure, retry } = useAreas();
   const { palette } = useTheme();
   // The first-run intro is for phones; the web (and its deep links and checks) goes straight to sign-in.
   const [intro, setIntro] = useState<"checking" | "seen" | "unseen">(Platform.OS === "web" ? "seen" : "checking");
@@ -39,6 +40,7 @@ export default function Gate() {
     return (
       <View style={{ flex: 1, justifyContent: "center", padding: 24, backgroundColor: palette.background }}>
         <LoadError palette={palette} onRetry={retry} />
+        {failure ? <Text style={{ color: palette.muted, fontSize: 12, textAlign: "center", marginTop: 12, writingDirection: "ltr" }}>{failure}</Text> : null}
       </View>
     );
   }

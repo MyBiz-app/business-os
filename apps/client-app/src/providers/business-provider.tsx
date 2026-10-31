@@ -1,10 +1,10 @@
 import type { ApiClient, components } from "@business-os/api-client";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { legalVersion } from "@business-os/i18n/brand";
 import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
 import { brandPalette } from "@business-os/app-kit/lib/brand";
+import { remembered } from "@business-os/app-kit/lib/remembered";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useTheme } from "@business-os/app-kit/providers/theme-provider";
@@ -21,6 +21,8 @@ type BusinessContextValue = {
   businesses: ClientBusiness[] | null;
   /** The list could not be loaded (the server was unreachable); it is tried again by itself. */
   failed: boolean;
+  /** What went wrong, as the technical message (shown small under the retry, for support). */
+  failure: string | null;
   /** Tries to load the list again, now. */
   retry: () => void;
   business: ClientBusiness | null;
@@ -43,6 +45,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
   const [businesses, setBusinesses] = useState<ClientBusiness[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
   const [tries, setTries] = useState(0);
   const userId = session?.user.id;
 
@@ -53,7 +56,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     }
     const [list, stored] = await Promise.all([
       apiClient().GET("/client/businesses").then(unwrap),
-      AsyncStorage.getItem(SELECTED_KEY),
+      remembered.read(SELECTED_KEY),
     ]);
     setBusinesses(list);
     setSelectedId(list.some((b) => b.id === stored) ? stored : (list[0]?.id ?? null));
@@ -65,11 +68,16 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     let attempt = 0;
     const load = () => {
       refresh().then(
-        () => !cancelled && setFailed(false),
         () => {
+          if (cancelled) return;
+          setFailed(false);
+          setFailure(null);
+        },
+        (error: unknown) => {
           if (cancelled) return;
           // Never turn "could not load" into "no businesses": that sends a member to the join screen.
           setFailed(true);
+          setFailure(error instanceof Error ? error.message : String(error));
           if (attempt < RETRY_AFTER_MS.length) timer = setTimeout(load, RETRY_AFTER_MS[attempt++]);
         },
       );
@@ -84,7 +92,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
 
   const select = useCallback(async (tenantId: string) => {
     setSelectedId(tenantId);
-    await AsyncStorage.setItem(SELECTED_KEY, tenantId);
+    await remembered.write(SELECTED_KEY, tenantId);
   }, []);
 
   const join = useCallback(
@@ -111,6 +119,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     () => ({
       businesses,
       failed,
+      failure,
       retry,
       business,
       api: apiClient(),
@@ -121,7 +130,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
       joinOwn,
       refresh,
     }),
-    [businesses, failed, retry, business, palette, select, join, joinOwn, refresh],
+    [businesses, failed, failure, retry, business, palette, select, join, joinOwn, refresh],
   );
 
   return <BusinessContext.Provider value={value}>{children}</BusinessContext.Provider>;
