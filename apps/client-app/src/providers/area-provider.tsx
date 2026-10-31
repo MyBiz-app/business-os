@@ -1,9 +1,9 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { BRAND } from "@business-os/i18n/brand";
 import { fetchMe } from "@business-os/app-kit/lib/me";
+import { remembered } from "@business-os/app-kit/lib/remembered";
 import { areaHome, buildAreas, pickArea, type Area, type AreaKind } from "@business-os/app-kit/lib/areas";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useBusiness } from "@/providers/business-provider";
@@ -18,6 +18,8 @@ type AreaContextValue = {
   areas: Area[] | null;
   /** The person's businesses or roles could not be loaded; shown with a retry, never as "no business". */
   failed: boolean;
+  /** The technical message of what failed, if known. */
+  failure: string | null;
   retry: () => void;
   active: Area | null;
   /** Opens an area and remembers it as the last one used. */
@@ -30,13 +32,14 @@ const AreaContext = createContext<AreaContextValue | null>(null);
  * businesses they are a client of. Opens the last one used and lets them switch. */
 export function AreaProvider({ children }: { children: React.ReactNode }) {
   const { session } = useSession();
-  const { businesses, failed: businessesFailed, retry: retryBusinesses, select, joinOwn } = useBusiness();
+  const { businesses, failed: businessesFailed, failure: businessesFailure, retry: retryBusinesses, select, joinOwn } = useBusiness();
   const userId = session?.user.id;
   const [identity, setIdentity] = useState<{ platformAdmin: boolean; memberships: Parameters<typeof buildAreas>[0]["memberships"] } | null>(null);
   const [storedKey, setStoredKey] = useState<string | null>(null);
   // /me could not be read: the person still gets their client areas, but with no business at all
   // that is a failure to load, not an empty account.
   const [identityFailed, setIdentityFailed] = useState(false);
+  const [identityFailure, setIdentityFailure] = useState<string | null>(null);
   const [tries, setTries] = useState(0);
 
   useEffect(() => {
@@ -45,18 +48,20 @@ export function AreaProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     let cancelled = false;
-    void Promise.all([fetchMe(), AsyncStorage.getItem(ACTIVE_KEY)])
+    void Promise.all([fetchMe(), remembered.read(ACTIVE_KEY)])
       .then(([me, stored]) => {
         if (cancelled) return;
         setIdentity({ platformAdmin: me.platform_admin, memberships: me.memberships });
         setStoredKey(stored);
         setIdentityFailed(false);
+        setIdentityFailure(null);
       })
       // Not being able to read /me must never lock a client out of their own area.
-      .catch(() => {
+      .catch((error: unknown) => {
         if (cancelled) return;
         setIdentity({ platformAdmin: false, memberships: [] });
         setIdentityFailed(true);
+        setIdentityFailure(error instanceof Error ? error.message : String(error));
       });
     return () => {
       cancelled = true;
@@ -65,6 +70,7 @@ export function AreaProvider({ children }: { children: React.ReactNode }) {
 
   const noBusinessLoaded = identityFailed && (businesses?.length ?? 0) === 0;
   const failed = businessesFailed || noBusinessLoaded;
+  const failure = businessesFailed ? businessesFailure : identityFailure;
   const retry = useCallback(() => {
     setTries((n) => n + 1);
     retryBusinesses();
@@ -90,14 +96,14 @@ export function AreaProvider({ children }: { children: React.ReactNode }) {
       // A team member's first visit to their business as a client makes their client card.
       if (next.joinOnOpen && next.tenantId) await joinOwn(next.tenantId);
       setStoredKey(key);
-      await AsyncStorage.setItem(ACTIVE_KEY, key);
+      await remembered.write(ACTIVE_KEY, key);
       if (next.kind === "client" && next.tenantId) await select(next.tenantId);
       router.replace(areaHome(next));
     },
     [areas, select, joinOwn],
   );
 
-  const value = useMemo(() => ({ areas, failed, retry, active, switchTo }), [areas, failed, retry, active, switchTo]);
+  const value = useMemo(() => ({ areas, failed, failure, retry, active, switchTo }), [areas, failed, failure, retry, active, switchTo]);
   return <AreaContext.Provider value={value}>{children}</AreaContext.Provider>;
 }
 
