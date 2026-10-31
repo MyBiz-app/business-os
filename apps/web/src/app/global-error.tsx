@@ -62,6 +62,15 @@ export default function GlobalError({
         <button type="button" onClick={reset} style={{ padding: "0.625rem 1.5rem", fontSize: "1rem", fontWeight: 600, color: "#fff", background: "var(--accent)", border: 0, borderRadius: "999px", cursor: "pointer" }}>
           {retry}
         </button>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a href="/" style={{ padding: "0.625rem 1.5rem", fontSize: "1rem", fontWeight: 600, color: "var(--fg)", background: "transparent", border: "1px solid currentColor", borderRadius: "999px", cursor: "pointer", textDecoration: "none" }}>
+          {t.toSite}
+        </a>
+        <form action="/escape/sign-out" method="post" style={{ margin: 0 }}>
+          <button type="submit" style={{ padding: "0.625rem 1.5rem", fontSize: "1rem", fontWeight: 600, color: "var(--fg)", background: "transparent", border: "1px solid currentColor", borderRadius: "999px", cursor: "pointer" }}>
+            {t.signOut}
+          </button>
+        </form>
       </body>
     </html>
   );

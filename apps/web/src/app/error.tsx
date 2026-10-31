@@ -37,11 +37,21 @@ export default function ErrorPage({
       <button type="button" onClick={reset} className="btn-primary rounded-full px-6 py-2.5">
         {common("retry")}
       </button>
-      {/* A plain link: the router itself may be what failed. */}
+      {/* Plain links and forms: the router itself may be what failed. */}
       {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a href="/" className="btn-secondary rounded-full px-6 py-2.5">
-        {t("home")}
+        {t("toSite")}
       </a>
+      <form action="/escape/switch-business" method="post">
+        <button type="submit" className="btn-secondary rounded-full px-6 py-2.5">
+          {t("switchBusiness")}
+        </button>
+      </form>
+      <form action="/escape/sign-out" method="post">
+        <button type="submit" className="btn-secondary rounded-full px-6 py-2.5">
+          {t("signOut")}
+        </button>
+      </form>
     </StatusPage>
   );
 }
