@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "supabase": "2.119.0",
-    "turbo": "2.11.6"
+    "turbo": "2.11.10"
   },
   "packageManager": "pnpm@12.8.1",
   "engines": {
