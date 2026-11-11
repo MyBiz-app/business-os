@@ -20,6 +20,6 @@
     "export:api": "node scripts/export-api.mjs"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "typescript": "^7"
   }
 }
